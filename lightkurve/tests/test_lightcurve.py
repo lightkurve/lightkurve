@@ -455,9 +455,9 @@ def test_bins_kwarg():
     assert ((len(binned_lc) >= (n_times // 11) ) &
             (len(binned_lc) <= (n_times // 11 +1) ) )
     #   Not allowing for under-filled bins at boundary conditions
-    assert (len(binned_lc) == (n_times // 11)
+    assert len(binned_lc) == (n_times // 11)
     # Resulting length with `bins=N` yields exactly N bins every time
-    binned_lc == lc.bin(bins=38)
+    binned_lc = lc.bin(bins=38)
     assert len(binned_lc) == 38
     # Can't provide both a binsize= and a bins=; pick only one
     with pytest.raises(ValueError):
@@ -466,33 +466,33 @@ def test_bins_kwarg():
         binned_lc = lc.bin(10, 38, 'mean')
     # The `bins=`` kwarg can support a list or array
     time_bin_edges = [0,10,20,30,40,50,60,70,80]
-    binned_lc == lc.bin(bins=time_bin_edges)
+    binned_lc = lc.bin(bins=time_bin_edges)
     # You get N-1 bins when you enter N fenceposts
     assert len(binned_lc) == (len(time_bin_edges) - 1 )
     time_bin_edges = np.arange(0,81,1)
-    binned_lc == lc.bin(bins=time_bin_edges)
+    binned_lc = lc.bin(bins=time_bin_edges)
     assert len(binned_lc) == (len(time_bin_edges) - 1 )
     # Bins outside of the range get stuck in the last bin
     time_bin_edges = np.arange(0,61,1)
-    binned_lc == lc.bin(bins=time_bin_edges)
+    binned_lc = lc.bin(bins=time_bin_edges)
     assert len(binned_lc) == (len(time_bin_edges) - 1 )
     # The `bins=`` kwarg can support a list or array
     for special_bins in ['blocks', 'knuth', 'scott', 'freedman']:
-        binned_lc == lc.bin(bins=special_bins)
+        binned_lc = lc.bin(bins=special_bins)
     with pytest.raises(ValueError):
-        binned_lc == lc.bin(bins='junk_input!')
+        binned_lc = lc.bin(bins='junk_input!')
     # In dense bins, flux error should go down as root-N for N number of bins
-    binned_lc == lc.bin(binsize=100) # Exactly 100 samples per bin
+    binned_lc = lc.bin(binsize=100) # Exactly 100 samples per bin
     assert np.isclose(lc.flux_err.mean()/np.sqrt(100),
                       binned_lc.flux_err.mean(), rtol=0.3)
-    binned_lc == lc.bin(bins=38) # Roughly 100 samples per bin
+    binned_lc = lc.bin(bins=38) # Roughly 100 samples per bin
     assert np.isclose(lc.flux_err.mean()/np.sqrt(100),
                   binned_lc.flux_err.mean(), rtol=0.3)
     # The bins parameter must be integer not a float
     with pytest.raises(TypeError):
-        binned_lc == lc.bin(bins=381.0)
+        binned_lc = lc.bin(bins=381.0)
     # Binned lightcurve can have *more* bins than input lightcurve
-    binned_lc == lc.bin(bins=10000)
+    binned_lc = lc.bin(bins=10000)
     assert len(binned_lc) == 10000
 
     # To-do: Check for unusual edge cases that are now possible:

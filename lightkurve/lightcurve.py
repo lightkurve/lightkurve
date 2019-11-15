@@ -11,10 +11,11 @@ import warnings
 import numpy as np
 from scipy import signal
 from scipy.interpolate import interp1d
+from scipy.stats import binned_statistic
 from matplotlib import pyplot as plt
 from copy import deepcopy
 
-from astropy.stats import sigma_clip
+from astropy.stats import sigma_clip, calculate_bin_edges
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
@@ -880,7 +881,7 @@ class LightCurve(object):
             return self[~outlier_mask], outlier_mask
         return self[~outlier_mask]
 
-    def bin(self, binsize=13, bins=None, method='mean'):
+    def bin(self, binsize=None, bins=None, method='mean'):
         """Bins a lightcurve in chunks defined by `binsize` or `bins`
 
         The value of the bins will contain the mean (``method='mean'``) or the
@@ -889,10 +890,11 @@ class LightCurve(object):
         Parameters
         ----------
         binsize : int or None
-            Number of cadences to include in every bin.  Default: 13
+            Number of cadences to include in every bin.  The default
+            is 13 if neither `bins` nor `binsize` is assigned.
         bins : int or list or str (optional)
             Instruction for how to assign bin locations grouping by the time of
-            samples rather than index.
+            samples rather than index; overrides the `binsize=` if given.
             If ``bins`` is an int, it is the number of bins. If it is a list
             it is taken to be the bin edges. If it is a string, it must be one
             of  'blocks', 'knuth', 'scott' or 'freedman'. See
@@ -920,39 +922,78 @@ class LightCurve(object):
         method = validate_method(method, supported_methods=['mean', 'median'])
         methodf = np.__dict__['nan' + method]
 
-        n_bins = self.flux.size // binsize
+        # Define and map some functions to be applied to each bin
+        quality_func = lambda x: np.bitwise_or.reduce(x) if np.all(np.isfinite(x)) else np.nan
+        centroid_func = lambda x: methodf(x) if np.any(np.isfinite(x)) else np.nan
+        # Assume erroneously that mean and median have same error propagation
+        rmse_func = lambda x: np.sqrt(np.nansum(x**2))/len(x) if np.any(np.isfinite(x)) else np.nan
+        cadenceno_func = lambda x: np.nan
+        statistic_mapper = {'flux':methodf, 'time':methodf, 'quality':quality_func,
+                            'centroid_row':centroid_func, 'centroid_col':centroid_func,
+                            'flux_err':rmse_func, 'cadenceno':cadenceno_func}
+        statistic_mapper = {key:value for key, value in statistic_mapper.items() \
+                            if hasattr(self, key)}
+
+        if (binsize is None) and (bins is None):
+            binsize=13
+            log.info('No bins nor binsize provided.  '
+                     'Defaulting to binsize={:d}'.format(binsize))
+        elif (binsize is not None) and (bins is not None):
+            raise ValueError('Both binsize and bins kwargs were passed to '
+                             '`.bin()`.  Must assign only one of these.')
+
         binned_lc = self.copy()
-        indexes = np.array_split(np.arange(len(self.time)), n_bins)
-        binned_lc.time = np.array([methodf(self.time[a]) for a in indexes])
-        binned_lc.flux = np.array([methodf(self.flux[a]) for a in indexes])
+        if bins is None:
+            n_bins = self.flux.size // binsize
+            indexes = np.array_split(np.arange(len(self.time)), n_bins)
+            binned_lc.time = np.array([methodf(self.time[a]) for a in indexes])
+            binned_lc.flux = np.array([methodf(self.flux[a]) for a in indexes])
 
-        if np.any(np.isfinite(self.flux_err)):
-            # root-mean-square error
-            binned_lc.flux_err = np.array(
-                [np.sqrt(np.nansum(self.flux_err[a]**2))
-                 for a in indexes]
-            ) / binsize
-        else:
-            # If the original light curve does not provide `flux_err`,
-            # then report the standard deviations of the fluxes in each bin.
-            binned_lc.flux_err = np.array([np.nanstd(self.flux[a]) for a in indexes])
+            if np.any(np.isfinite(self.flux_err)):
+                # root-mean-square error
+                binned_lc.flux_err = np.array(
+                    [np.sqrt(np.nansum(self.flux_err[a]**2))
+                     for a in indexes]
+                ) / binsize
+            else:
+                # If the original light curve does not provide `flux_err`,
+                # then report the standard deviations of the fluxes in each bin.
+                binned_lc.flux_err = np.array([np.nanstd(self.flux[a]) for a in indexes])
 
-        if hasattr(binned_lc, 'quality'):
-            # Note: np.bitwise_or only works if there are no NaNs
-            binned_lc.quality = np.array(
-                [np.bitwise_or.reduce(a) if np.all(np.isfinite(a)) else np.nan
-                 for a in np.array_split(self.quality, n_bins)])
-        if hasattr(binned_lc, 'cadenceno'):
-            binned_lc.cadenceno = np.array([np.nan] * n_bins)
-        if hasattr(binned_lc, 'centroid_col'):
-            # Note: nanmean/nanmedian yield a RuntimeWarning if a slice is all NaNs
-            binned_lc.centroid_col = np.array(
-                [methodf(a) if np.any(np.isfinite(a)) else np.nan
-                 for a in np.array_split(self.centroid_col, n_bins)])
-        if hasattr(binned_lc, 'centroid_row'):
-            binned_lc.centroid_row = np.array(
-                [methodf(a) if np.any(np.isfinite(a)) else np.nan
-                 for a in np.array_split(self.centroid_row, n_bins)])
+            if hasattr(binned_lc, 'quality'):
+                # Note: np.bitwise_or only works if there are no NaNs
+                binned_lc.quality = np.array(
+                    [np.bitwise_or.reduce(a) if np.all(np.isfinite(a)) else np.nan
+                     for a in np.array_split(self.quality, n_bins)])
+            if hasattr(binned_lc, 'cadenceno'):
+                binned_lc.cadenceno = np.array([np.nan] * n_bins)
+            if hasattr(binned_lc, 'centroid_col'):
+                # Note: nanmean/nanmedian yield a RuntimeWarning if a slice is all NaNs
+                binned_lc.centroid_col = np.array(
+                    [methodf(a) if np.any(np.isfinite(a)) else np.nan
+                     for a in np.array_split(self.centroid_col, n_bins)])
+            if hasattr(binned_lc, 'centroid_row'):
+                binned_lc.centroid_row = np.array(
+                    [methodf(a) if np.any(np.isfinite(a)) else np.nan
+                     for a in np.array_split(self.centroid_row, n_bins)])
+        else: #bins was assigned
+
+            bin_edges = calculate_bin_edges(self.time, bins=bins)
+            n_bins = len(bin_edges)-1
+
+            for attr, bin_function in statistic_mapper.items():
+                values_to_bin = getattr(self, attr)
+                # Override error propagation if flux_err is all Nan
+                if (attr == 'flux_err') & np.all(np.isnan(self.flux_err)):
+                    values_to_bin = self.flux
+                    bin_function = np.nanstd
+
+                binned_stat = binned_statistic(self.time, values_to_bin,
+                        statistic=bin_function, bins=bin_edges).statistic
+                setattr(binned_lc, attr, binned_stat)
+
+        # Replace any zeros in flux error with NaNs
+        binned_lc.flux_err[binned_lc.flux_err==0] = np.NaN
 
         return binned_lc
 
