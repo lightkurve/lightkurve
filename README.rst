@@ -62,4 +62,4 @@ Please read the citation instructions at `https://docs.lightkurve.org/about/citi
 Contact
 -------
 Lightkurve is an open source community project created by `the authors <AUTHORS.rst>`_.
-The best way to contact us is to [open an issue](https://github.com/KeplerGO/lightkurve/issues/new) or to e-mail  tesshelp@bigbang.gsfc.nasa.gov.
+The best way to contact us is to `open an issue <https://github.com/KeplerGO/lightkurve/issues/new>`_ or to e-mail  tesshelp@bigbang.gsfc.nasa.gov.
