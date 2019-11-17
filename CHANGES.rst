@@ -1,3 +1,12 @@
+1.4.1 (unreleased)
+==================
+
+- Fixed a bug which caused `search_targetpixelfile` and `search_lightcurvefile`
+  to raise an `IndexError` if the `sector` parameter was passed and the
+  requested target was observed by both TESS and Kepler. [#631]
+
+
+
 1.4.0 (2019-11-12)
 ==================
 
