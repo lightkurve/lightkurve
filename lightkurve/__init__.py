@@ -13,8 +13,6 @@ if os.name == 'posix' and "DISPLAY" not in os.environ:
     import matplotlib
     matplotlib.use('Agg')
 
-import tkinter
-
 import logging
 log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
