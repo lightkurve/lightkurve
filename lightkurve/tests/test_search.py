@@ -99,11 +99,11 @@ def test_search_tesscut():
     search_coords = search_tesscut(c)
     # These should be identical
     assert(len(search_string.table) == len(search_coords.table))
-    # Test cutout at edge of FFI
-    search_edge = search_tesscut('30.578761, 6.210593')
-    assert(len(search_edge.table) == 1)
+    # The coordinates below are just beyond the edge of the sector 4 FFI
+    search_edge = search_tesscut('30.578761, 6.210593', sector=4)
+    assert(len(search_edge.table) == 0)
     try:
-        # This is too near the FFI edge and should fail to download
+        # This is beyond the FFI edge and should fail to download
         search_edge.download()
     except (SearchError, HTTPError):
         pass
