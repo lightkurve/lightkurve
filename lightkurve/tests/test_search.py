@@ -288,3 +288,11 @@ def test_filenotfound():
         FileNotFoundError = IOError
     with pytest.raises(FileNotFoundError):
         open("DOESNOTEXIST")
+
+
+@pytest.mark.remote_data
+def test_indexerror_631():
+    """Regression test for #631; avoid IndexError."""
+    # This previously triggered an exception:
+    result = search_lightcurvefile("KIC 8462852", sector=15)
+    assert len(result) == 1
