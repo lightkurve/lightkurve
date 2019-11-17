@@ -99,14 +99,9 @@ def test_search_tesscut():
     search_coords = search_tesscut(c)
     # These should be identical
     assert(len(search_string.table) == len(search_coords.table))
-    # Test cutout at edge of FFI
-    search_edge = search_tesscut('30.578761, 6.210593')
-    assert(len(search_edge.table) == 1)
-    try:
-        # This is too near the FFI edge and should fail to download
-        search_edge.download()
-    except (SearchError, HTTPError):
-        pass
+    # The coordinates below are beyond the edge of the sector 4 (camera 1-4) FFI
+    search_edge = search_tesscut('30.578761, 6.210593', sector=4)
+    assert(len(search_edge.table) == 0)
 
 
 @pytest.mark.remote_data
@@ -250,10 +245,13 @@ def test_open():
 def test_issue_472():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/472"""
     # The line below previously threw an exception because the target was not
-    # observed in Sector 2; we're expecting an empty SearchResult instead.
+    # observed in Sector 2; we're always expecting a SearchResult object (empty
+    # or not) rather than an exception.
+    # Whether or not this SearchResult is empty has changed over the years,
+    # because the target is only ~15 pixels beyond the FFI edge and the accuracy
+    # of the FFI footprint polygons at the MAST portal have changed at times.
     search = search_tesscut("TIC41336498", sector=2)
     assert isinstance(search, SearchResult)
-    assert len(search) == 0
 
 
 @pytest.mark.remote_data
@@ -288,3 +286,11 @@ def test_filenotfound():
         FileNotFoundError = IOError
     with pytest.raises(FileNotFoundError):
         open("DOESNOTEXIST")
+
+
+@pytest.mark.remote_data
+def test_indexerror_631():
+    """Regression test for #631; avoid IndexError."""
+    # This previously triggered an exception:
+    result = search_lightcurvefile("KIC 8462852", sector=15)
+    assert len(result) == 1

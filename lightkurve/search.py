@@ -910,7 +910,7 @@ def _mask_tess_products(products, sector=None, filetype='Target Pixel'):
     if sector is not None:
         sector_mask = np.zeros(len(products), dtype=bool)
         for s in np.atleast_1d(sector):
-            sector_mask |= np.array([fn.split('-')[1] == 's{:04d}'.format(s)
+            sector_mask |= np.array([("-" in fn) and (fn.split('-')[1] == 's{:04d}'.format(s))
                                      for fn in products['productFilename']])
         mask &= sector_mask
 
