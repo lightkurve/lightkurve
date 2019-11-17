@@ -9,11 +9,11 @@ MPLSTYLE = '{}/data/lightkurve.mplstyle'.format(PACKAGEDIR)
 # By default Matplotlib is configured to work with a graphical user interface
 # which may require an X11 connection (i.e. a display).  When no display is
 # available, errors may occur.  In this case, we default to the robust Agg backend.
-# Reference: https://matplotlib.org/faq/howto_faq.html#matplotlib-in-a-web-application-server
-import platform
-if platform.system() == "Linux" and os.environ.get('DISPLAY','') == '':
+if os.name == 'posix' and "DISPLAY" not in os.environ:
     import matplotlib
     matplotlib.use('Agg')
+
+import tkinter
 
 import logging
 log = logging.getLogger(__name__)
