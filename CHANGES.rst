@@ -1,9 +1,10 @@
-1.4.1 (unreleased)
+1.4.1 (2019-11-18)
 ==================
 
 - Fixed a bug which caused ``search_targetpixelfile`` and
   ``search_lightcurvefile`` to raise an ``IndexError`` if the sector keyword
   was passed and the target was observed by both TESS & Kepler. [#631]
+
 
 
 
