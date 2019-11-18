@@ -1,6 +1,8 @@
 1.5.0 (unreleased)
 ==================
 
+- Improved the representation of ``SearchResult`` objects to make it easier to
+  see at a glance which quarter/campaign/sector a result belongs to. [#632]
 
 
 
