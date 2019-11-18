@@ -2,6 +2,7 @@
 from __future__ import division
 import os
 import logging
+import re
 import warnings
 from requests import HTTPError
 
@@ -46,13 +47,43 @@ class SearchResult(object):
             self.table = Table()
         else:
             self.table = table
+            if len(table) > 0:
+                self._add_columns()
 
-    def __repr__(self):
+    def _add_columns(self):
+        """Adds user-friendly ``idx`` and ``observation`` columns.
+
+        These columns are not part of the MAST Portal API, but they make the
+        display of search results much nicer in Lightkurve.
+        """
+        self.table['observation'] = None
+        self.table['#'] = None
+        try:
+            prefix = {'Kepler': 'Quarter', 'K2': 'Campaign', 'TESS': 'Sector'}
+            for idx in range(len(self.table)):
+                self.table['#'][idx] = idx
+                mission = self.table['obs_collection'][idx]
+                seqno = self.table['sequence_number'][idx]
+                if mission == 'Kepler' and self.table['sequence_number'].mask[3]:
+                    seqno = re.findall(r".*Q(\d+)", self.table['description'][idx])[0]
+                self.table['observation'][idx] = "{} {} {}".format(mission,
+                                                                   prefix[mission],
+                                                                   seqno)
+        except Exception:
+            # be tolerant of any MAST API changes
+            # which may cause the code above to fail
+            log.warning("Unexpected data encountered in the ``SearchResult`` "
+                        "constructor; the MAST API may have changed.")
+
+    def __repr__(self, html=False):
         out = 'SearchResult containing {} data products.'.format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = ['target_name', 'productFilename', 'description', 'distance']
-        return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300))
+        columns = ['#', 'observation', 'target_name', 'productFilename', 'distance']
+        return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, html=html))
+
+    def _repr_html_(self):
+        return self.__repr__(html=True)
 
     def __getitem__(self, key):
         """Implements indexing and slicing, e.g. SearchResult[2:5]."""
@@ -631,9 +662,10 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                 cutouts.append({'description': 'TESS FFI Cutout (sector {})'.format(s),
                                 'target_name': str(target),
                                 'targetid': str(target),
-                                'productFilename': 'n/a',
+                                'productFilename': 'TESSCut',
                                 'distance': 0.0,
-                                'sequence_number': s}
+                                'sequence_number': s,
+                                'obs_collection': 'TESS'}
                                )
         if len(cutouts) > 0:
             log.debug("Found {} matching cutouts.".format(len(cutouts)))
