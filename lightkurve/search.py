@@ -2,6 +2,7 @@
 from __future__ import division
 import os
 import logging
+import re
 import warnings
 from requests import HTTPError
 
@@ -46,13 +47,36 @@ class SearchResult(object):
             self.table = Table()
         else:
             self.table = table
+            self._add_columns()
+
+    def _add_columns(self):
+        """Adds user-friendly "idx" and "collection" columns."""
+        prefix = {'Kepler': 'Quarter', 'K2': 'Campaign', 'TESS': 'Sector'}
+        self.table['collection'] = None
+        self.table['idx'] = None
+        for idx in range(len(self.table)):
+            self.table['idx'][idx] = idx
+            mission = self.table['obs_collection'][idx]
+            seqno = self.table['sequence_number'][idx]
+            if mission == 'Kepler' and self.table['sequence_number'].mask[3]:
+                seqno = re.findall(r".*Q(\d+)", self.table['description'][idx])[0]
+            self.table['collection'][idx] = "{} {} {}".format(mission,
+                                                              prefix[mission],
+                                                              seqno)
 
     def __repr__(self):
         out = 'SearchResult containing {} data products.'.format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = ['target_name', 'productFilename', 'description', 'distance']
-        return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300))
+        columns = ['idx', 'collection', 'target_name', 'productFilename', 'distance']
+        return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, align='<'))
+
+    def _repr_html_(self):
+        out = 'SearchResult containing {} data products.'.format(len(self.table))
+        if len(self.table) == 0:
+            return out
+        columns = ['idx', 'collection', 'target_name', 'productFilename', 'distance']
+        return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, html=True, align='<'))
 
     def __getitem__(self, key):
         """Implements indexing and slicing, e.g. SearchResult[2:5]."""
@@ -631,9 +655,10 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                 cutouts.append({'description': 'TESS FFI Cutout (sector {})'.format(s),
                                 'target_name': str(target),
                                 'targetid': str(target),
-                                'productFilename': 'n/a',
+                                'productFilename': 'TESSCut',
                                 'distance': 0.0,
-                                'sequence_number': s}
+                                'sequence_number': s,
+                                'obs_collection': 'TESS'}
                                )
         if len(cutouts) > 0:
             log.debug("Found {} matching cutouts.".format(len(cutouts)))
