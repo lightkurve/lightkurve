@@ -47,36 +47,41 @@ class SearchResult(object):
             self.table = Table()
         else:
             self.table = table
-            self._add_columns()
+            if len(table) > 0:
+                self._add_columns()
 
     def _add_columns(self):
-        """Adds user-friendly "idx" and "collection" columns."""
-        prefix = {'Kepler': 'Quarter', 'K2': 'Campaign', 'TESS': 'Sector'}
+        """Adds user-friendly ``idx`` and ``collection`` columns.
+        
+        These columns are not part of the MAST Portal API, but they make the
+        display of search results much nicer in Lightkurve."""
         self.table['collection'] = None
-        self.table['idx'] = None
-        for idx in range(len(self.table)):
-            self.table['idx'][idx] = idx
-            mission = self.table['obs_collection'][idx]
-            seqno = self.table['sequence_number'][idx]
-            if mission == 'Kepler' and self.table['sequence_number'].mask[3]:
-                seqno = re.findall(r".*Q(\d+)", self.table['description'][idx])[0]
-            self.table['collection'][idx] = "{} {} {}".format(mission,
-                                                              prefix[mission],
-                                                              seqno)
+        self.table['#'] = None
+        try:
+            prefix = {'Kepler': 'Quarter', 'K2': 'Campaign', 'TESS': 'Sector'}
+            for idx in range(len(self.table)):
+                self.table['#'][idx] = idx
+                mission = self.table['obs_collection'][idx]
+                seqno = self.table['sequence_number'][idx]
+                if mission == 'Kepler' and self.table['sequence_number'].mask[3]:
+                    seqno = re.findall(r".*Q(\d+)", self.table['description'][idx])[0]
+                self.table['collection'][idx] = "{} {} {}".format(mission,
+                                                                prefix[mission],
+                                                                seqno)
+        except Exception as e:
+            # be robust against MAST API changes
+            # which may cause the above to fail
+            pass
 
-    def __repr__(self):
+    def __repr__(self, html=False):
         out = 'SearchResult containing {} data products.'.format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = ['idx', 'collection', 'target_name', 'productFilename', 'distance']
-        return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, align='<'))
+        columns = ['#', 'collection', 'target_name', 'productFilename', 'distance']
+        return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, html=html))
 
     def _repr_html_(self):
-        out = 'SearchResult containing {} data products.'.format(len(self.table))
-        if len(self.table) == 0:
-            return out
-        columns = ['idx', 'collection', 'target_name', 'productFilename', 'distance']
-        return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, html=True, align='<'))
+        return self.__repr__(html=True)
 
     def __getitem__(self, key):
         """Implements indexing and slicing, e.g. SearchResult[2:5]."""
