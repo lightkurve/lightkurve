@@ -950,6 +950,12 @@ class LightCurve(object):
             bin_edges = calculate_bin_edges(bin_by_array, bins=bins)
             n_bins = len(bin_edges)-1
 
+            if ((np.max(bin_edges) < np.min(self.time)) or
+                (np.nanmax(self.time) < np.nanmin(bin_edges)) ):
+                log.warning("warning: the range of the bin edges ({}-{}) do not"
+                "fall in the time range ({}-{})!".format(np.min(bin_edges),
+                np.max(bin_edges), np.nanmin(self.time), np.max(self.time)))
+
         for attr, bin_function in statistic_mapper.items():
             values_to_bin = getattr(self, attr)
             # Override error propagation if flux_err is all NaN
