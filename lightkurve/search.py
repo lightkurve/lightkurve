@@ -51,10 +51,11 @@ class SearchResult(object):
                 self._add_columns()
 
     def _add_columns(self):
-        """Adds user-friendly ``idx`` and ``collection`` columns.
+        """Adds user-friendly ``idx`` and ``observation`` columns.
 
         These columns are not part of the MAST Portal API, but they make the
-        display of search results much nicer in Lightkurve."""
+        display of search results much nicer in Lightkurve.
+        """
         self.table['observation'] = None
         self.table['#'] = None
         try:
