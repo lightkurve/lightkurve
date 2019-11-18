@@ -882,7 +882,7 @@ class LightCurve(object):
         return self[~outlier_mask]
 
     def bin(self, binsize=None, bins=None, method='mean'):
-        """Bins a lightcurve in chunks defined by `binsize` or `bins`
+        """Bins a lightcurve in chunks defined by `binsize` or `bins`.
 
         The value of the bins will contain the mean (``method='mean'``) or the
         median (``method='median'``) of the original data.  The default is mean.
