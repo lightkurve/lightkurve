@@ -953,7 +953,7 @@ class LightCurve(object):
         for attr, bin_function in statistic_mapper.items():
             values_to_bin = getattr(self, attr)
             # Override error propagation if flux_err is all NaN
-            if (attr == 'flux_err') & np.all(np.isnan(self.flux_err)):
+            if (attr == 'flux_err') & ~np.any(np.isfinite(self.flux_err)):
                 values_to_bin = self.flux
                 bin_function = np.nanstd
 
