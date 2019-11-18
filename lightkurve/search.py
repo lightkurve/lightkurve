@@ -55,7 +55,7 @@ class SearchResult(object):
 
         These columns are not part of the MAST Portal API, but they make the
         display of search results much nicer in Lightkurve."""
-        self.table['collection'] = None
+        self.table['observation'] = None
         self.table['#'] = None
         try:
             prefix = {'Kepler': 'Quarter', 'K2': 'Campaign', 'TESS': 'Sector'}
