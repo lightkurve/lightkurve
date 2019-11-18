@@ -892,7 +892,7 @@ class LightCurve(object):
         binsize : int or None
             Number of cadences to include in every bin.  The default
             is 13 if neither `bins` nor `binsize` is assigned.
-        bins : int or list or str (optional)
+        bins : int, list of int, or str
             Instruction for how to assign bin locations grouping by the time of
             samples rather than index; overrides the `binsize=` if given.
             If ``bins`` is an int, it is the number of bins. If it is a list
