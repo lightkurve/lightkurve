@@ -66,8 +66,8 @@ class SearchResult(object):
                 if mission == 'Kepler' and self.table['sequence_number'].mask[3]:
                     seqno = re.findall(r".*Q(\d+)", self.table['description'][idx])[0]
                 self.table['collection'][idx] = "{} {} {}".format(mission,
-                                                                prefix[mission],
-                                                                seqno)
+                                                                  prefix[mission],
+                                                                  seqno)
         except Exception as e:
             # be robust against MAST API changes
             # which may cause the above to fail

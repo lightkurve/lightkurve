@@ -163,7 +163,8 @@ def test_searchresult():
     assert len(sr) == len(sr.table)  # Tests SearchResult.__len__
     assert len(sr[2:7]) == 5  # Tests SearchResult.__get__
     assert len(sr[2]) == 1
-    assert "kplr" in str(sr)  # Tests SearchResult.__repr__
+    assert "kplr" in sr.__repr__()
+    assert "kplr" in sr._repr_html_()
 
 
 @pytest.mark.remote_data
