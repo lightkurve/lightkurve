@@ -52,7 +52,7 @@ class SearchResult(object):
 
     def _add_columns(self):
         """Adds user-friendly ``idx`` and ``collection`` columns.
-        
+
         These columns are not part of the MAST Portal API, but they make the
         display of search results much nicer in Lightkurve."""
         self.table['collection'] = None
@@ -65,19 +65,20 @@ class SearchResult(object):
                 seqno = self.table['sequence_number'][idx]
                 if mission == 'Kepler' and self.table['sequence_number'].mask[3]:
                     seqno = re.findall(r".*Q(\d+)", self.table['description'][idx])[0]
-                self.table['collection'][idx] = "{} {} {}".format(mission,
-                                                                  prefix[mission],
-                                                                  seqno)
-        except Exception as e:
-            # be robust against MAST API changes
-            # which may cause the above to fail
-            pass
+                self.table['observation'][idx] = "{} {} {}".format(mission,
+                                                                   prefix[mission],
+                                                                   seqno)
+        except Exception:
+            # be tolerant of any MAST API changes
+            # which may cause the code above to fail
+            log.warning("Unexpected data encountered in the ``SearchResult`` "
+                        "constructor; the MAST API may have changed.")
 
     def __repr__(self, html=False):
         out = 'SearchResult containing {} data products.'.format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = ['#', 'collection', 'target_name', 'productFilename', 'distance']
+        columns = ['#', 'observation', 'target_name', 'productFilename', 'distance']
         return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, html=html))
 
     def _repr_html_(self):
