@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from astropy.io import fits as pyfits
+from astropy.io.fits import Undefined
 
 from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags,
                     LightkurveWarning, detect_filetype)
@@ -43,6 +44,20 @@ class LightCurveFile(object):
         """Header of the object at extension `ext`"""
         return self.hdu[ext].header
 
+    def get_keyword(self, keyword, hdu=0, default=None):
+        """Returns a header keyword value.
+
+        If the keyword is Undefined or does not exist,
+        then return ``default`` instead.
+        """
+        try:
+            kw = self.hdu[hdu].header[keyword]
+        except KeyError:
+            return default
+        if isinstance(kw, Undefined):
+            return default
+        return kw
+
     @property
     def time(self):
         """The file's `TIME` column."""
@@ -56,12 +71,12 @@ class LightCurveFile(object):
     @property
     def ra(self):
         """Right Ascension as recorded in the header's `RA_OBJ` keyword."""
-        return self.hdu[0].header['RA_OBJ']
+        return self.get_keyword('RA_OBJ')
 
     @property
     def dec(self):
         """Declination as recorded in the header's `DEC_OBJ` keyword."""
-        return self.hdu[0].header['DEC_OBJ']
+        return self.get_keyword('DEC_OBJ')
 
     @property
     def FLUX(self):
@@ -468,6 +483,25 @@ class TessLightCurveFile(LightCurveFile):
     def __repr__(self):
         return('TessLightCurveFile(TICID: {})'.format(self.targetid))
 
+    @property
+    def sector(self):
+        """TESS Sector number ('SECTOR' header keyword)."""
+        return self.get_keyword('SECTOR')
+
+    @property
+    def camera(self):
+        """TESS Camera number ('CAMERA' header keyword)."""
+        return self.get_keyword('CAMERA')
+
+    @property
+    def ccd(self):
+        """TESS CCD number ('CCD' header keyword)."""
+        return self.get_keyword('CCD')
+
+    @property
+    def mission(self):
+        return 'TESS'
+
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if centroid_type+"1" in self.hdu[1].data.columns.names:
             centroid_col = self.hdu[1].data[centroid_type + "1"][self.quality_mask]
@@ -491,7 +525,12 @@ class TessLightCurveFile(LightCurveFile):
                 quality_bitmask=self.quality_bitmask,
                 cadenceno=self.cadenceno,
                 targetid=self.targetid,
-                label=self.hdu[0].header['OBJECT'])
+                label=self.hdu[0].header['OBJECT'],
+                sector=self.sector,
+                camera=self.camera,
+                ccd=self.ccd,
+                ra=self.ra,
+                dec=self.dec)
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types()))
