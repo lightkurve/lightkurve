@@ -43,7 +43,9 @@ class TargetPixelFile(object):
     Parameters
     ----------
     path : str or `astropy.io.fits.HDUList`
-        Path to a Target Pixel (FITS) File or a `HDUList` object.
+        Path to a Target Pixel (FITS) File or an `HDUList` object.  TPFs can be
+        constructed with the TargetPixelFileFactory class, for example to create
+        a TPF from a 3D numpy array.
     quality_bitmask : None
         (Not implemented in base class) A bitmask (integer) which identifies the
         quality flag bitmask that should be used to mask out bad cadences.
@@ -966,7 +968,6 @@ class TargetPixelFile(object):
             newfits = fits.HDUList(hdus)
         return self.__class__(newfits)
 
-    @staticmethod
     def from_fits_images(images, position, size=(11, 11), extension=1,
                          targetid="unnamed-target", hdu0_keywords=None, **kwargs):
         """Creates a new Target Pixel File from a set of images.
