@@ -430,7 +430,7 @@ class TargetPixelFile(object):
 
         return LightCurve(time=self.time,
                 flux=np.nansum(self.flux[:, aperture_mask], axis=1),
-                flux_err=flux_err,centroid_col=centroid_col,
+                flux_err=flux_err, centroid_col=centroid_col,
                 centroid_row=centroid_row, quality=self.quality, ra=self.ra,
                 dec=self.dec, label=self.header['OBJECT'], targetid=self.targetid)
 
