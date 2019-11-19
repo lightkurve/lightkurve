@@ -974,9 +974,11 @@ class LightCurve(object):
                 values_to_bin = self.flux
                 bin_function = np.nanstd
 
-            binned_stat = binned_statistic(bin_by_array, values_to_bin,
+            with warnings.catch_warnings():  # Ignore empty slice warnings
+                warnings.simplefilter("ignore", RuntimeWarning)
+                binned_stat = binned_statistic(bin_by_array, values_to_bin,
                     statistic=bin_function, bins=bin_edges).statistic
-            setattr(binned_lc, attr, binned_stat)
+                setattr(binned_lc, attr, binned_stat)
 
         return binned_lc
 
