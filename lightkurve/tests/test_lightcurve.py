@@ -932,7 +932,20 @@ def test_to_stingray():
         sr = lc.to_stingray()
         assert_allclose(sr.time, time)
         assert_allclose(sr.counts, flux)
-        assert_allclose(sr.err, flux_err)
+        assert_allclose(sr.counts_err, flux_err)
     except ImportError:
         # Requires Stingray
         pass
+
+
+def test_from_stingray():
+    """Test the `LightCurve.from_stingray()` method."""
+    try:
+        from stingray import sampledata
+        sr = sampledata.sample_data()
+        lc = LightCurve.from_stingray(sr)
+        assert_allclose(sr.time, lc.time)
+        assert_allclose(sr.counts, lc.flux)
+        assert_allclose(sr.counts_err, lc.flux_err)
+    except ImportError:
+        pass  # stingray is not a required dependency
