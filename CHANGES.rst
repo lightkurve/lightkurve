@@ -10,6 +10,10 @@
 - Added the ``bins`` argument to ``LightCurve.bin()`` to enable custom binning
   by specifying the bin edges or the total number of bins. [#629]
 
+- Added ``transform_func`` & ``ylim_func`` keywords to ``interact()`` to
+  support user-defined light curve transformations and y-axis limits. [#600]
+
+
 
 1.4.1 (2019-11-18)
 ==================
