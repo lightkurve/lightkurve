@@ -1473,5 +1473,5 @@ class TessTargetPixelFile(TargetPixelFile):
                 flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                 flux_err=flux_bkg_err, label=self.header['OBJECT'],
                 targetid=self.targetid, quality=self.quality, ra=self.ra,
-                dec=self.dec, sector=self.sector,camera=self.camera,
+                dec=self.dec, sector=self.sector, camera=self.camera,
                 cadenceno=self.cadenceno, ccd=self.ccd)
