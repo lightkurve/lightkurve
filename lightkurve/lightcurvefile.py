@@ -299,10 +299,7 @@ class KeplerLightCurveFile(LightCurveFile):
         self.quality_mask = KeplerQualityFlags.create_quality_mask(
                                 quality_array=self.hdu[1].data['SAP_QUALITY'],
                                 bitmask=quality_bitmask)
-        try:
-            self.targetid = self.header()['KEPLERID']
-        except KeyError:
-            self.targetid = None
+        self.targetid = self.get_keyword('KEPLERID')
 
     def __repr__(self):
         return('KeplerLightCurveFile(ID: {})'.format(self.targetid))
@@ -348,7 +345,7 @@ class KeplerLightCurveFile(LightCurveFile):
                 mission=self.mission,
                 cadenceno=self.cadenceno,
                 targetid=self.targetid,
-                label=self.hdu[0].header['OBJECT'],
+                label=self.get_keyword('OBJECT'),
                 ra=self.ra,
                 dec=self.dec)
         else:
@@ -358,12 +355,12 @@ class KeplerLightCurveFile(LightCurveFile):
     @property
     def channel(self):
         """Kepler CCD channel number. ('CHANNEL' header keyword)"""
-        return self.header(ext=0)['CHANNEL']
+        return self.get_keyword('CHANNEL')
 
     @property
     def obsmode(self):
         """'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
-        return self.header()['OBSMODE']
+        return self.get_keyword('OBSMODE')
 
     @property
     def pos_corr1(self):
@@ -378,26 +375,17 @@ class KeplerLightCurveFile(LightCurveFile):
     @property
     def quarter(self):
         """Kepler quarter number. ('QUARTER' header keyword)"""
-        try:
-            return self.header(ext=0)['QUARTER']
-        except KeyError:
-            return None
+        return self.get_keyword('QUARTER')
 
     @property
     def campaign(self):
         """K2 Campaign number. ('CAMPAIGN' header keyword)"""
-        try:
-            return self.header(ext=0)['CAMPAIGN']
-        except KeyError:
-            return None
+        return self.get_keyword('CAMPAIGN')
 
     @property
     def mission(self):
         """'Kepler' or 'K2'. ('MISSION' header keyword)"""
-        try:
-            return self.header(ext=0)['MISSION']
-        except KeyError:
-            return None
+        return self.get_keyword('MISSION')
 
     def compute_cotrended_lightcurve(self, cbvs=(1, 2), **kwargs):
         """Returns a LightCurve object after cotrending the SAP_FLUX
@@ -474,11 +462,7 @@ class TessLightCurveFile(LightCurveFile):
         # which were not flagged by a QUALITY flag yet; the line below prevents
         # these cadences from being used. They would break most methods!
         self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
-
-        try:
-            self.targetid = self.header()['TICID']
-        except KeyError:
-            self.targetid = None
+        self.targetid = self.get_keyword('TICID')
 
     def __repr__(self):
         return('TessLightCurveFile(TICID: {})'.format(self.targetid))
@@ -525,7 +509,7 @@ class TessLightCurveFile(LightCurveFile):
                 quality_bitmask=self.quality_bitmask,
                 cadenceno=self.cadenceno,
                 targetid=self.targetid,
-                label=self.hdu[0].header['OBJECT'],
+                label=self.get_keyword('OBJECT'),
                 sector=self.sector,
                 camera=self.camera,
                 ccd=self.ccd,
