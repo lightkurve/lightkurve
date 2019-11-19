@@ -4,6 +4,8 @@
 - Improved the representation of ``SearchResult`` objects to make it easier to
   see at a glance which quarter/campaign/sector a result belongs to. [#632]
 
+- Added ``mission``, ``sector``, ``camera``, and ``ccd`` properties to
+  ``TessLightCurveFile`` for consistency with ``TessTargetPixelFile``. [#633]
 
 
 
@@ -13,7 +15,6 @@
 - Fixed a bug which caused ``search_targetpixelfile`` and
   ``search_lightcurvefile`` to raise an ``IndexError`` if the sector keyword
   was passed and the target was observed by both TESS & Kepler. [#631]
-
 
 
 
@@ -36,7 +37,6 @@
 
 - Changed ``SearchResult.download()`` to raise a more explicit ``HTTPError``
   exception when MAST's TESSCut service is overloaded and times out. [#627]
-
 
 
 
