@@ -40,18 +40,17 @@ TessTargetPixelFile
 
    .. autosummary::
 
+      ~TessTargetPixelFile.centroids
       ~TessTargetPixelFile.create_threshold_mask
-      ~TessTargetPixelFile.cutout
       ~TessTargetPixelFile.estimate_centroids
       ~TessTargetPixelFile.extract_aperture_photometry
+      ~TessTargetPixelFile.from_fits
       ~TessTargetPixelFile.get_bkg_lightcurve
       ~TessTargetPixelFile.get_coordinates
       ~TessTargetPixelFile.get_keyword
       ~TessTargetPixelFile.interact
-      ~TessTargetPixelFile.interact_sky
       ~TessTargetPixelFile.plot
       ~TessTargetPixelFile.show_properties
-      ~TessTargetPixelFile.to_corrector
       ~TessTargetPixelFile.to_fits
       ~TessTargetPixelFile.to_lightcurve
 
@@ -85,17 +84,16 @@ TessTargetPixelFile
 
    .. rubric:: Methods Documentation
 
+   .. automethod:: centroids
    .. automethod:: create_threshold_mask
-   .. automethod:: cutout
    .. automethod:: estimate_centroids
    .. automethod:: extract_aperture_photometry
+   .. automethod:: from_fits
    .. automethod:: get_bkg_lightcurve
    .. automethod:: get_coordinates
    .. automethod:: get_keyword
    .. automethod:: interact
-   .. automethod:: interact_sky
    .. automethod:: plot
    .. automethod:: show_properties
-   .. automethod:: to_corrector
    .. automethod:: to_fits
    .. automethod:: to_lightcurve

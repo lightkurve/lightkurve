@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.4</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.5</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -100,7 +100,7 @@
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev2226)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.HDUList</span></code></a> object</span></dt><dd><p>Local path or remote url of a lightcurve FITS file.
+<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev1540)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.HDUList</span></code></a> object</span></dt><dd><p>Local path or remote url of a lightcurve FITS file.
 Also accepts a FITS file object already opened using AstroPy.</p>
 </dd>
 <dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Keyword arguments to be passed to astropy.io.fits.open.</p>
@@ -115,25 +115,22 @@ Also accepts a FITS file object already opened using AstroPy.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.FLUX" title="lightkurve.lightcurvefile.LightCurveFile.FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FLUX</span></code></a></p></td>
-<td><p>Returns a <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object based on the contents of the <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.FLUX" title="lightkurve.lightcurvefile.LightCurveFile.FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FLUX</span></code></a> column in the file, if that column exists.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.PDCSAP_FLUX" title="lightkurve.lightcurvefile.LightCurveFile.PDCSAP_FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PDCSAP_FLUX</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.PDCSAP_FLUX" title="lightkurve.lightcurvefile.LightCurveFile.PDCSAP_FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PDCSAP_FLUX</span></code></a></p></td>
 <td><p>Returns a <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object based on the contents of the <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.PDCSAP_FLUX" title="lightkurve.lightcurvefile.LightCurveFile.PDCSAP_FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PDCSAP_FLUX</span></code></a> column in the file, if that column exists.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.SAP_FLUX" title="lightkurve.lightcurvefile.LightCurveFile.SAP_FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAP_FLUX</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.SAP_FLUX" title="lightkurve.lightcurvefile.LightCurveFile.SAP_FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAP_FLUX</span></code></a></p></td>
 <td><p>Returns a <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object based on the contents of the <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.SAP_FLUX" title="lightkurve.lightcurvefile.LightCurveFile.SAP_FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAP_FLUX</span></code></a> column in the file, if that column exists.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.cadenceno" title="lightkurve.lightcurvefile.LightCurveFile.cadenceno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadenceno</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.cadenceno" title="lightkurve.lightcurvefile.LightCurveFile.cadenceno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadenceno</span></code></a></p></td>
 <td><p>The file’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">CADENCENO</span></code> column.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.dec" title="lightkurve.lightcurvefile.LightCurveFile.dec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.dec" title="lightkurve.lightcurvefile.LightCurveFile.dec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code></a></p></td>
 <td><p>Declination as recorded in the header’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">DEC_OBJ</span></code> keyword.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.ra" title="lightkurve.lightcurvefile.LightCurveFile.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.ra" title="lightkurve.lightcurvefile.LightCurveFile.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></p></td>
 <td><p>Right Ascension as recorded in the header’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">RA_OBJ</span></code> keyword.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.time" title="lightkurve.lightcurvefile.LightCurveFile.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.time" title="lightkurve.lightcurvefile.LightCurveFile.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a></p></td>
 <td><p>The file’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">TIME</span></code> column.</p></td>
 </tr>
 </tbody>
@@ -145,8 +142,8 @@ Also accepts a FITS file object already opened using AstroPy.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.errorbar" title="lightkurve.lightcurvefile.LightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a>(self[, flux_types, style])</p></td>
-<td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.errorbar" title="lightkurve.lightcurvefile.LightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFile.from_fits</span></code></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.header" title="lightkurve.lightcurvefile.LightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
 <td><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p></td>
@@ -154,19 +151,9 @@ Also accepts a FITS file object already opened using AstroPy.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="lightkurve.lightcurvefile.LightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="lightkurve.lightcurvefile.LightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.scatter" title="lightkurve.lightcurvefile.LightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(self[, flux_types, style])</p></td>
-<td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.scatter" title="lightkurve.lightcurvefile.LightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
-</tr>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.LightCurveFile.FLUX">
-<code class="sig-name descname">FLUX</code><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.FLUX" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object based on the
-contents of the <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.FLUX" title="lightkurve.lightcurvefile.LightCurveFile.FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FLUX</span></code></a> column in the file, if that column exists.</p>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.LightCurveFile.PDCSAP_FLUX">
 <code class="sig-name descname">PDCSAP_FLUX</code><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.PDCSAP_FLUX" title="Permalink to this definition">¶</a></dt>
@@ -207,45 +194,6 @@ contents of the <a class="reference internal" href="#lightkurve.lightcurvefile.L
 
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
-<dt id="lightkurve.lightcurvefile.LightCurveFile.errorbar">
-<code class="sig-name descname">errorbar</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">flux_types=None</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.errorbar" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.errorbar" title="lightkurve.lightcurvefile.LightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
-a new one will be generated.</p>
-</dd>
-<dt><strong>flux_types</strong><span class="classifier">list or None</span></dt><dd><p>Which fluxes in the LCF to plot. Default is lcf._flux_types().
-For Kepler this is PDCSAP and SAP flux. Pass a list to change flux
-types.</p>
-</dd>
-<dt><strong>normalize</strong><span class="classifier">bool</span></dt><dd><p>Normalize the lightcurve before plotting?</p>
-</dd>
-<dt><strong>xlabel</strong><span class="classifier">str</span></dt><dd><p>Plot x axis label</p>
-</dd>
-<dt><strong>ylabel</strong><span class="classifier">str</span></dt><dd><p>Plot y axis label</p>
-</dd>
-<dt><strong>title</strong><span class="classifier">str</span></dt><dd><p>Plot set_title</p>
-</dd>
-<dt><strong>style</strong><span class="classifier">str</span></dt><dd><p>Path or URL to a matplotlib style file, or name of one of
-matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
-Lightkurve’s custom stylesheet is used by default.</p>
-</dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
 <dt id="lightkurve.lightcurvefile.LightCurveFile.header">
 <code class="sig-name descname">header</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ext=0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p>
@@ -255,45 +203,6 @@ Lightkurve’s custom stylesheet is used by default.</p>
 <dt id="lightkurve.lightcurvefile.LightCurveFile.plot">
 <code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">flux_types=None</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="lightkurve.lightcurvefile.LightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
-a new one will be generated.</p>
-</dd>
-<dt><strong>flux_types</strong><span class="classifier">list or None</span></dt><dd><p>Which fluxes in the LCF to plot. Default is lcf._flux_types().
-For Kepler this is PDCSAP and SAP flux. Pass a list to change flux
-types.</p>
-</dd>
-<dt><strong>normalize</strong><span class="classifier">bool</span></dt><dd><p>Normalize the lightcurve before plotting?</p>
-</dd>
-<dt><strong>xlabel</strong><span class="classifier">str</span></dt><dd><p>Plot x axis label</p>
-</dd>
-<dt><strong>ylabel</strong><span class="classifier">str</span></dt><dd><p>Plot y axis label</p>
-</dd>
-<dt><strong>title</strong><span class="classifier">str</span></dt><dd><p>Plot set_title</p>
-</dd>
-<dt><strong>style</strong><span class="classifier">str</span></dt><dd><p>Path or URL to a matplotlib style file, or name of one of
-matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
-Lightkurve’s custom stylesheet is used by default.</p>
-</dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurvefile.LightCurveFile.scatter">
-<code class="sig-name descname">scatter</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">flux_types=None</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.scatter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.scatter" title="lightkurve.lightcurvefile.LightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>

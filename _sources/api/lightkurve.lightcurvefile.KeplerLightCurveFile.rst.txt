@@ -10,7 +10,6 @@ KeplerLightCurveFile
 
    .. autosummary::
 
-      ~KeplerLightCurveFile.FLUX
       ~KeplerLightCurveFile.PDCSAP_FLUX
       ~KeplerLightCurveFile.SAP_FLUX
       ~KeplerLightCurveFile.astropy_time
@@ -31,15 +30,14 @@ KeplerLightCurveFile
    .. autosummary::
 
       ~KeplerLightCurveFile.compute_cotrended_lightcurve
-      ~KeplerLightCurveFile.errorbar
+      ~KeplerLightCurveFile.from_archive
+      ~KeplerLightCurveFile.from_fits
       ~KeplerLightCurveFile.get_lightcurve
       ~KeplerLightCurveFile.header
       ~KeplerLightCurveFile.plot
-      ~KeplerLightCurveFile.scatter
 
    .. rubric:: Attributes Documentation
 
-   .. autoattribute:: FLUX
    .. autoattribute:: PDCSAP_FLUX
    .. autoattribute:: SAP_FLUX
    .. autoattribute:: astropy_time
@@ -58,8 +56,8 @@ KeplerLightCurveFile
    .. rubric:: Methods Documentation
 
    .. automethod:: compute_cotrended_lightcurve
-   .. automethod:: errorbar
+   .. automethod:: from_archive
+   .. automethod:: from_fits
    .. automethod:: get_lightcurve
    .. automethod:: header
    .. automethod:: plot
-   .. automethod:: scatter

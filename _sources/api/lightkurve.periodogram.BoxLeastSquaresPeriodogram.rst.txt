@@ -32,7 +32,6 @@ BoxLeastSquaresPeriodogram
       ~BoxLeastSquaresPeriodogram.plot
       ~BoxLeastSquaresPeriodogram.show_properties
       ~BoxLeastSquaresPeriodogram.smooth
-      ~BoxLeastSquaresPeriodogram.to_seismology
       ~BoxLeastSquaresPeriodogram.to_table
 
    .. rubric:: Attributes Documentation
@@ -57,5 +56,4 @@ BoxLeastSquaresPeriodogram
    .. automethod:: plot
    .. automethod:: show_properties
    .. automethod:: smooth
-   .. automethod:: to_seismology
    .. automethod:: to_table

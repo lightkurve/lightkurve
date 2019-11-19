@@ -11,8 +11,6 @@ KeplerLightCurve
    .. autosummary::
 
       ~KeplerLightCurve.astropy_time
-      ~KeplerLightCurve.flux_quantity
-      ~KeplerLightCurve.flux_unit
 
    .. rubric:: Methods Summary
 
@@ -20,58 +18,50 @@ KeplerLightCurve
 
       ~KeplerLightCurve.append
       ~KeplerLightCurve.bin
+      ~KeplerLightCurve.cdpp
       ~KeplerLightCurve.copy
+      ~KeplerLightCurve.correct
       ~KeplerLightCurve.errorbar
       ~KeplerLightCurve.estimate_cdpp
       ~KeplerLightCurve.fill_gaps
       ~KeplerLightCurve.flatten
       ~KeplerLightCurve.fold
-      ~KeplerLightCurve.from_timeseries
-      ~KeplerLightCurve.interact_bls
       ~KeplerLightCurve.normalize
       ~KeplerLightCurve.plot
       ~KeplerLightCurve.remove_nans
       ~KeplerLightCurve.remove_outliers
       ~KeplerLightCurve.scatter
       ~KeplerLightCurve.show_properties
-      ~KeplerLightCurve.to_corrector
       ~KeplerLightCurve.to_csv
       ~KeplerLightCurve.to_fits
       ~KeplerLightCurve.to_pandas
       ~KeplerLightCurve.to_periodogram
-      ~KeplerLightCurve.to_seismology
       ~KeplerLightCurve.to_table
-      ~KeplerLightCurve.to_timeseries
 
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: astropy_time
-   .. autoattribute:: flux_quantity
-   .. autoattribute:: flux_unit
 
    .. rubric:: Methods Documentation
 
    .. automethod:: append
    .. automethod:: bin
+   .. automethod:: cdpp
    .. automethod:: copy
+   .. automethod:: correct
    .. automethod:: errorbar
    .. automethod:: estimate_cdpp
    .. automethod:: fill_gaps
    .. automethod:: flatten
    .. automethod:: fold
-   .. automethod:: from_timeseries
-   .. automethod:: interact_bls
    .. automethod:: normalize
    .. automethod:: plot
    .. automethod:: remove_nans
    .. automethod:: remove_outliers
    .. automethod:: scatter
    .. automethod:: show_properties
-   .. automethod:: to_corrector
    .. automethod:: to_csv
    .. automethod:: to_fits
    .. automethod:: to_pandas
    .. automethod:: to_periodogram
-   .. automethod:: to_seismology
    .. automethod:: to_table
-   .. automethod:: to_timeseries

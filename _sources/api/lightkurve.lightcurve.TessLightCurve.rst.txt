@@ -11,8 +11,6 @@ TessLightCurve
    .. autosummary::
 
       ~TessLightCurve.astropy_time
-      ~TessLightCurve.flux_quantity
-      ~TessLightCurve.flux_unit
 
    .. rubric:: Methods Summary
 
@@ -20,58 +18,48 @@ TessLightCurve
 
       ~TessLightCurve.append
       ~TessLightCurve.bin
+      ~TessLightCurve.cdpp
       ~TessLightCurve.copy
       ~TessLightCurve.errorbar
       ~TessLightCurve.estimate_cdpp
       ~TessLightCurve.fill_gaps
       ~TessLightCurve.flatten
       ~TessLightCurve.fold
-      ~TessLightCurve.from_timeseries
-      ~TessLightCurve.interact_bls
       ~TessLightCurve.normalize
       ~TessLightCurve.plot
       ~TessLightCurve.remove_nans
       ~TessLightCurve.remove_outliers
       ~TessLightCurve.scatter
       ~TessLightCurve.show_properties
-      ~TessLightCurve.to_corrector
       ~TessLightCurve.to_csv
       ~TessLightCurve.to_fits
       ~TessLightCurve.to_pandas
       ~TessLightCurve.to_periodogram
-      ~TessLightCurve.to_seismology
       ~TessLightCurve.to_table
-      ~TessLightCurve.to_timeseries
 
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: astropy_time
-   .. autoattribute:: flux_quantity
-   .. autoattribute:: flux_unit
 
    .. rubric:: Methods Documentation
 
    .. automethod:: append
    .. automethod:: bin
+   .. automethod:: cdpp
    .. automethod:: copy
    .. automethod:: errorbar
    .. automethod:: estimate_cdpp
    .. automethod:: fill_gaps
    .. automethod:: flatten
    .. automethod:: fold
-   .. automethod:: from_timeseries
-   .. automethod:: interact_bls
    .. automethod:: normalize
    .. automethod:: plot
    .. automethod:: remove_nans
    .. automethod:: remove_outliers
    .. automethod:: scatter
    .. automethod:: show_properties
-   .. automethod:: to_corrector
    .. automethod:: to_csv
    .. automethod:: to_fits
    .. automethod:: to_pandas
    .. automethod:: to_periodogram
-   .. automethod:: to_seismology
    .. automethod:: to_table
-   .. automethod:: to_timeseries

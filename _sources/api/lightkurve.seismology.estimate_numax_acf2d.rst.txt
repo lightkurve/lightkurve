@@ -1,6 +1,0 @@
-estimate_numax_acf2d
-====================
-
-.. currentmodule:: lightkurve.seismology
-
-.. autofunction:: estimate_numax_acf2d

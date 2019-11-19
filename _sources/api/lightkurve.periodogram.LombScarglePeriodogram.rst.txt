@@ -23,11 +23,9 @@ LombScarglePeriodogram
       ~LombScarglePeriodogram.copy
       ~LombScarglePeriodogram.flatten
       ~LombScarglePeriodogram.from_lightcurve
-      ~LombScarglePeriodogram.model
       ~LombScarglePeriodogram.plot
       ~LombScarglePeriodogram.show_properties
       ~LombScarglePeriodogram.smooth
-      ~LombScarglePeriodogram.to_seismology
       ~LombScarglePeriodogram.to_table
 
    .. rubric:: Attributes Documentation
@@ -43,9 +41,7 @@ LombScarglePeriodogram
    .. automethod:: copy
    .. automethod:: flatten
    .. automethod:: from_lightcurve
-   .. automethod:: model
    .. automethod:: plot
    .. automethod:: show_properties
    .. automethod:: smooth
-   .. automethod:: to_seismology
    .. automethod:: to_table

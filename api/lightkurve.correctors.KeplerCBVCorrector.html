@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.4</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.5</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -138,7 +138,7 @@ to the L1 norm.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.coeffs" title="lightkurve.correctors.KeplerCBVCorrector.coeffs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeffs</span></code></a></p></td>
 <td><p>Returns the fitted coefficients.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.lc" title="lightkurve.correctors.KeplerCBVCorrector.lc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lc</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector.lc_file</span></code></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.opt_result" title="lightkurve.correctors.KeplerCBVCorrector.opt_result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">opt_result</span></code></a></p></td>
@@ -156,16 +156,13 @@ to the L1 norm.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.correct" title="lightkurve.correctors.KeplerCBVCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>(self[, cbvs, method, options])</p></td>
 <td><p>Correct the SAP_FLUX by fitting a number of cotrending basis vectors <code class="xref py py-obj docutils literal notranslate"><span class="pre">cbvs</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.diagnose" title="lightkurve.correctors.KeplerCBVCorrector.diagnose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose</span></code></a>(self)</p></td>
-<td><p>Returns plots which elucidate the most recent call to <a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.correct" title="lightkurve.correctors.KeplerCBVCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code></a>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url" title="lightkurve.correctors.KeplerCBVCorrector.get_cbv_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cbv_url</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url" title="lightkurve.correctors.KeplerCBVCorrector.get_cbv_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cbv_url</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list" title="lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cbvs_list</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list" title="lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cbvs_list</span></code></a>(self)</p></td>
 <td><p>Returns the subsequence of subsequent CBVs that maximizes Bayes’ factor <a class="reference internal" href="#r327af9fd7ac9-1" id="id1">[1]</a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs" title="lightkurve.correctors.KeplerCBVCorrector.plot_cbvs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cbvs</span></code></a>(self[, cbvs, ax])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs" title="lightkurve.correctors.KeplerCBVCorrector.plot_cbvs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cbvs</span></code></a>(self[, cbvs, ax])</p></td>
 <td><p>Plot the CBVs for a given list of CBVs</p></td>
 </tr>
 </tbody>
@@ -176,11 +173,6 @@ to the L1 norm.</p>
 <code class="sig-name descname">coeffs</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.coeffs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the fitted coefficients.</p>
 </dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.correctors.KeplerCBVCorrector.lc">
-<code class="sig-name descname">lc</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.lc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.opt_result">
@@ -208,12 +200,6 @@ full list of methods.</p>
 </dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.KeplerCBVCorrector.diagnose">
-<code class="sig-name descname">diagnose</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.diagnose" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns plots which elucidate the most recent call to <a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.correct" title="lightkurve.correctors.KeplerCBVCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="method">

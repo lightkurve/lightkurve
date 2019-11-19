@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.4</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.5</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -92,6 +92,19 @@
     
   <div class="section" id="full-changelog">
 <span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="unreleased">
+<h2>1.5.0 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Changed the representation of <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> objects to make it easier to
+see at a glance which quarter/campaign/sector a result belongs to. [#632]</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">mission</span></code>, <code class="docutils literal notranslate"><span class="pre">sector</span></code>, <code class="docutils literal notranslate"><span class="pre">camera</span></code>, and <code class="docutils literal notranslate"><span class="pre">ccd</span></code> properties to
+<code class="docutils literal notranslate"><span class="pre">TessLightCurveFile</span></code> for consistency with <code class="docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code>. [#633]</p></li>
+<li><p>Added the <code class="docutils literal notranslate"><span class="pre">bins</span></code> argument to <code class="docutils literal notranslate"><span class="pre">LightCurve.bin()</span></code> to enable custom binning
+by specifying the bin edges or the total number of bins. [#629]</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">transform_func</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">ylim_func</span></code> keywords to <code class="docutils literal notranslate"><span class="pre">interact()</span></code> to
+support user-defined light curve transformations and y-axis limits. [#600]</p></li>
+</ul>
+</div>
 <div class="section" id="id1">
 <h2>1.4.1 (2019-11-18)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">

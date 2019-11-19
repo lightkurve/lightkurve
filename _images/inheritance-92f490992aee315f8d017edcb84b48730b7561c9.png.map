@@ -1,6 +1,6 @@
 <map id="inheritance705d965b67" name="inheritance705d965b67">
-<area shape="rect" id="node1" title="Base class for `LightCurveCollection`, `LightCurveFileCollection`," alt="" coords="5,55,92,80"/>
-<area shape="rect" id="node2" href="lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection" target="_top" title="Class to hold a collection of LightCurve objects." alt="" coords="152,5,309,31"/>
-<area shape="rect" id="node3" href="lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection" target="_top" title="Class to hold a collection of LightCurveFile objects." alt="" coords="141,55,320,80"/>
-<area shape="rect" id="node4" href="lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection" target="_top" title="Class to hold a collection of `~lightkurve.targetpixelfile.TargetPixelFile` objects." alt="" coords="140,104,321,129"/>
+<area shape="rect" id="node1" title="Base class for `LightCurveCollection`, `LightCurveFileCollection`," alt="" coords="5,55,85,80"/>
+<area shape="rect" id="node2" href="lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection" target="_top" title="Class to hold a collection of LightCurve objects." alt="" coords="145,5,291,31"/>
+<area shape="rect" id="node3" href="lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection" target="_top" title="Class to hold a collection of LightCurveFile objects." alt="" coords="135,55,301,80"/>
+<area shape="rect" id="node4" href="lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection" target="_top" title="Class to hold a collection of `~lightkurve.targetpixelfile.TargetPixelFile` objects." alt="" coords="133,104,303,129"/>
 </map>

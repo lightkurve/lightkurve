@@ -1,9 +1,9 @@
 <map id="inheritancedaaf1231cc" name="inheritancedaaf1231cc">
-<area shape="rect" id="node1" title="Abstract base class." alt="" coords="51,104,133,129"/>
-<area shape="rect" id="node4" title="Remove systematic trends from Kepler light curves by fitting" alt="" coords="228,55,379,80"/>
-<area shape="rect" id="node5" title="Implements the Pixel Level Decorrelation (PLD) systematics removal method." alt="" coords="250,104,357,129"/>
-<area shape="rect" id="node6" title="Remove noise using linear regression against a `.DesignMatrix`." alt="" coords="227,153,380,179"/>
-<area shape="rect" id="node2" title="A matrix of column vectors for use in linear regression." alt="" coords="38,55,146,80"/>
-<area shape="rect" id="node3" title="A set of design matrices." alt="" coords="5,5,179,31"/>
-<area shape="rect" id="node7" title="Special case of `.RegressionCorrector` where the `.DesignMatrix` includes" alt="" coords="428,153,532,179"/>
+<area shape="rect" id="node1" title="Abstract base class." alt="" coords="46,104,123,129"/>
+<area shape="rect" id="node4" title="Remove systematic trends from Kepler light curves by fitting" alt="" coords="213,55,357,80"/>
+<area shape="rect" id="node5" title="Implements the Pixel Level Decorrelation (PLD) systematics removal method." alt="" coords="233,104,337,129"/>
+<area shape="rect" id="node6" title="Remove noise using linear regression against a `.DesignMatrix`." alt="" coords="212,153,357,179"/>
+<area shape="rect" id="node2" title="A matrix of column vectors for use in linear regression." alt="" coords="35,55,135,80"/>
+<area shape="rect" id="node3" title="A set of design matrices." alt="" coords="5,5,164,31"/>
+<area shape="rect" id="node7" title="Special case of `.RegressionCorrector` where the `.DesignMatrix` includes" alt="" coords="405,153,508,179"/>
 </map>

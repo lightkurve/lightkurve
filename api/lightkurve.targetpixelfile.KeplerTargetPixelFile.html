@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.4</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.5</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -106,9 +106,9 @@ in the online documentation for examples on using this class.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev2226)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a></span></dt><dd><p>Path to a Kepler Target Pixel file. Alternatively, you can pass a
+<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev1540)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a></span></dt><dd><p>Path to a Kepler Target Pixel file. Alternatively, you can pass a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code> object, which is the AstroPy object returned by
-the <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v4.1.dev2226)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a> function.</p>
+the <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v4.1.dev1540)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a> function.</p>
 </dd>
 <dt><strong>quality_bitmask</strong><span class="classifier">“none”, “default”, “hard”, “hardest”, or int</span></dt><dd><p>Bitmask that should be used to ignore bad-quality cadences.
 If a string is passed, it has the following meaning:</p>
@@ -131,7 +131,7 @@ have the effect of removing cadences where
 <code class="docutils literal notranslate"><span class="pre">(tpf.hdu[1].data['QUALITY']</span> <span class="pre">&amp;</span> <span class="pre">quality_bitmask)</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.
 See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Optional keyword arguments passed on to <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v4.1.dev2226)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a>.</p>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Optional keyword arguments passed on to <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v4.1.dev1540)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -240,11 +240,11 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.create_threshold_mask" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.create_threshold_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_threshold_mask</span></code></a>(self[, threshold, …])</p></td>
-<td><p>Returns an aperture mask creating using the thresholding method.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile.centroids</span></code></p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.cutout" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.cutout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cutout</span></code></a>(self[, center, size])</p></td>
-<td><p>Cut a rectangle out of the Target Pixel File.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.create_threshold_mask" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.create_threshold_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_threshold_mask</span></code></a>(self[, threshold, …])</p></td>
+<td><p>Returns an aperture mask creating using the thresholding method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.estimate_centroids" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.estimate_centroids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_centroids</span></code></a>(self[, aperture_mask, method])</p></td>
 <td><p>Returns the flux center of an object inside <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code>.</p></td>
@@ -254,6 +254,12 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.extract_prf_photometry" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.extract_prf_photometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_prf_photometry</span></code></a>(self[, cadences, …])</p></td>
 <td><p>Returns the results of PRF photometry applied to the pixel file.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile.from_archive</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile.from_fits</span></code></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_fits_images</span></code></a>(images, position[, size, …])</p></td>
 <td><p>Creates a new Target Pixel File from a set of images.</p></td>
@@ -276,20 +282,14 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>(self[, notebook_url, max_cadences, …])</p></td>
 <td><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact_sky" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact_sky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_sky</span></code></a>(self[, notebook_url, …])</p></td>
-<td><p>Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, ax, frame, cadenceno, bkg, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, ax, frame, cadenceno, bkg, …])</p></td>
 <td><p>Plot the pixel data for a single frame (i.e.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_lightcurve</span></code></a>(self, \*\*kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_lightcurve</span></code></a>(self, \*\*kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>(self)</p></td>
 <td><p>Prints a description of all non-callable attributes.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector</span></code></a>(self[, method])</p></td>
-<td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> instance to remove systematics.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>(self[, output_fn, overwrite])</p></td>
 <td><p>Writes the TPF to a FITS file on disk.</p></td>
@@ -503,37 +503,6 @@ will be selected. If <a class="reference external" href="https://docs.python.org
 <dd class="field-even"><dl class="simple">
 <dt><strong>aperture_mask</strong><span class="classifier">ndarray</span></dt><dd><p>2D boolean numpy array containing <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> for pixels above the
 threshold.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.cutout">
-<code class="sig-name descname">cutout</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">center=None</em>, <em class="sig-param">size=5</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.cutout" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cut a rectangle out of the Target Pixel File.</p>
-<p>This methods returns a new <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> object containing a
-rectangle of a given <code class="docutils literal notranslate"><span class="pre">size</span></code> cut out around a given <code class="docutils literal notranslate"><span class="pre">center</span></code>.</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>center</strong><span class="classifier">(int, int) tuple or <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.SkyCoord</span></code></span></dt><dd><p>Center of the cutout.  If an (int, int) tuple is passed, it will be
-interpreted as the (column, row) coordinates relative to
-the bottom-left corner of the TPF.  If an <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.SkyCoord</span></code> is
-passed then the sky coordinate will be used instead.
-If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> (default) then the center of the TPF will be used.</p>
-</dd>
-<dt><strong>size</strong><span class="classifier">int or (int, int) tuple</span></dt><dd><p>Number of pixels to cut out. If a single integer is passed then
-a square of that size will be cut. If a tuple is passed then a
-rectangle with dimensions (column_size, row_size) will be cut.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl>
-<dt><strong>tpf</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.TargetPixelFile</span></code> object</span></dt><dd><p>New and smaller Target Pixel File object containing only the data
-cut out.</p>
 </dd>
 </dl>
 </dd>
@@ -759,7 +728,7 @@ necessary metadata in the tpf object.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact">
-<code class="sig-name descname">interact</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">max_cadences=30000</em>, <em class="sig-param">aperture_mask='pipeline'</em>, <em class="sig-param">exported_filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interact</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">max_cadences=30000</em>, <em class="sig-param">aperture_mask='pipeline'</em>, <em class="sig-param">exported_filename=None</em>, <em class="sig-param">transform_func=None</em>, <em class="sig-param">ylim_func=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
 the lightcurve shown is obtained by calling the <a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve()</span></code></a> method,
@@ -797,32 +766,34 @@ the custom aperture mask generated by clicking on pixels in interact.
 The default adds a suffix ‘-custom-aperture-mask.fits’ to the
 TargetPixelFile basename.</p>
 </dd>
-</dl>
+<dt><strong>transform_func: function</strong></dt><dd><p>A function that transforms the lightcurve.  The function takes in a
+LightCurve object as input and returns a LightCurve object as output.
+The function can be complex, such as detrending the lightcurve.  In this
+way, the interactive selection of aperture mask can be evaluated after
+inspection of the transformed lightcurve.  The transform_func is applied
+before saving a fits file.  Default: None (no transform is applied).</p>
 </dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact_sky">
-<code class="sig-name descname">interact_sky</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">magnitude_limit=18</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact_sky" title="Permalink to this definition">¶</a></dt>
-<dd><p>Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>notebook_url: str</strong></dt><dd><p>Location of the Jupyter notebook page (default: “localhost:8888”)
-When showing Bokeh applications, the Bokeh server must be
-explicitly configured to allow connections originating from
-different URLs. This parameter defaults to the standard notebook
-host and port. If you are running on a different location, you
-will need to supply this value for the application to display
-properly. If no protocol is supplied in the URL, e.g. if it is
-of the form “localhost:8888”, then “http” will be used.</p>
-</dd>
-<dt><strong>magnitude_limit</strong><span class="classifier">float</span></dt><dd><p>A value to limit the results in based on Gaia Gmag. Default, 18.</p>
+<dt><strong>ylim_func: function</strong></dt><dd><p>A function that returns ylimits (low, high) given a LightCurve object.
+The default is to return an expanded window around the 10-90th
+percentile of lightcurve flux values.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<p>To select an aperture mask for V827 Tau:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;V827 Tau&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To see the full y-axis dynamic range of your lightcurve and normalize
+the lightcurve after each pixel selection:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ylim_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">ylim_func</span><span class="o">=</span><span class="n">ylim_func</span><span class="p">,</span> <span class="n">transform_func</span><span class="o">=</span><span class="n">transform_func</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -877,28 +848,6 @@ Lightkurve’s custom stylesheet is used by default.</p>
 <code class="sig-name descname">show_properties</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints a description of all non-callable attributes.</p>
 <p>Prints in order of type (ints, strings, lists, arrays, others).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector">
-<code class="sig-name descname">to_corrector</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='pld'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> instance to remove systematics.</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>methods</strong><span class="classifier">string</span></dt><dd><p>Currently, only “pld” is supported.  This will return a
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code> class instance.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl>
-<dt><strong>correcter</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.Correcter</span></code></span></dt><dd><p>Instance of a Corrector class, which typically provides <code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code>
-and <code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose()</span></code> methods.</p>
-</dd>
-</dl>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="method">

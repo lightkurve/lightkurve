@@ -10,7 +10,6 @@ LightCurveFile
 
    .. autosummary::
 
-      ~LightCurveFile.FLUX
       ~LightCurveFile.PDCSAP_FLUX
       ~LightCurveFile.SAP_FLUX
       ~LightCurveFile.cadenceno
@@ -22,14 +21,12 @@ LightCurveFile
 
    .. autosummary::
 
-      ~LightCurveFile.errorbar
+      ~LightCurveFile.from_fits
       ~LightCurveFile.header
       ~LightCurveFile.plot
-      ~LightCurveFile.scatter
 
    .. rubric:: Attributes Documentation
 
-   .. autoattribute:: FLUX
    .. autoattribute:: PDCSAP_FLUX
    .. autoattribute:: SAP_FLUX
    .. autoattribute:: cadenceno
@@ -39,7 +36,6 @@ LightCurveFile
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: errorbar
+   .. automethod:: from_fits
    .. automethod:: header
    .. automethod:: plot
-   .. automethod:: scatter

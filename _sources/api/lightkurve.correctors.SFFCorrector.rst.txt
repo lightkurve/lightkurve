@@ -10,14 +10,18 @@ SFFCorrector
 
    .. autosummary::
 
+      ~SFFCorrector.arclength
+      ~SFFCorrector.bin_and_interpolate
+      ~SFFCorrector.breakpoints
       ~SFFCorrector.correct
-      ~SFFCorrector.diagnose
-      ~SFFCorrector.diagnose_arclength
-      ~SFFCorrector.diagnose_priors
+      ~SFFCorrector.fit_bspline
+      ~SFFCorrector.rotate_centroids
 
    .. rubric:: Methods Documentation
 
+   .. automethod:: arclength
+   .. automethod:: bin_and_interpolate
+   .. automethod:: breakpoints
    .. automethod:: correct
-   .. automethod:: diagnose
-   .. automethod:: diagnose_arclength
-   .. automethod:: diagnose_priors
+   .. automethod:: fit_bspline
+   .. automethod:: rotate_centroids

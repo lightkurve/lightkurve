@@ -80,6 +80,7 @@ commonly want to do with time series data.
 
     02-recover-a-planet.ipynb
     02-how-to-recover-the-first-tess-candidate.ipynb
+    05-advanced_patterns_binning.ipynb
 
 
 3.2. Asteroseismology examples

@@ -10,7 +10,6 @@ TessLightCurveFile
 
    .. autosummary::
 
-      ~TessLightCurveFile.FLUX
       ~TessLightCurveFile.PDCSAP_FLUX
       ~TessLightCurveFile.SAP_FLUX
       ~TessLightCurveFile.cadenceno
@@ -22,15 +21,13 @@ TessLightCurveFile
 
    .. autosummary::
 
-      ~TessLightCurveFile.errorbar
+      ~TessLightCurveFile.from_fits
       ~TessLightCurveFile.get_lightcurve
       ~TessLightCurveFile.header
       ~TessLightCurveFile.plot
-      ~TessLightCurveFile.scatter
 
    .. rubric:: Attributes Documentation
 
-   .. autoattribute:: FLUX
    .. autoattribute:: PDCSAP_FLUX
    .. autoattribute:: SAP_FLUX
    .. autoattribute:: cadenceno
@@ -40,8 +37,7 @@ TessLightCurveFile
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: errorbar
+   .. automethod:: from_fits
    .. automethod:: get_lightcurve
    .. automethod:: header
    .. automethod:: plot
-   .. automethod:: scatter

@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.4</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.5</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -115,17 +115,23 @@ design to capture the intrinsic, long-term variability of the target.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>(self[, centroid_col, centroid_row, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector.arclength</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector.bin_and_interpolate</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector.breakpoints</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>(self[, centroid_col, centroid_row, …])</p></td>
 <td><p>Find the best fit correction for the light curve.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.diagnose" title="lightkurve.correctors.SFFCorrector.diagnose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose</span></code></a>(self)</p></td>
-<td><p>Returns a diagnostic plot which visualizes what happened during the most recent call to <a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code></a>.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector.fit_bspline</span></code></p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.diagnose_arclength" title="lightkurve.correctors.SFFCorrector.diagnose_arclength"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose_arclength</span></code></a>(self)</p></td>
-<td><p>Returns a diagnostic plot which visualizes arclength vs flux from most recent call to <a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code></a>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.diagnose_priors" title="lightkurve.correctors.SFFCorrector.diagnose_priors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose_priors</span></code></a>(self)</p></td>
-<td><p>Returns a diagnostic plot visualizing how the best-fit coefficients compare against the priors.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector.rotate_centroids</span></code></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -180,38 +186,6 @@ distribution of weights.</p>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
 <dt><strong>corrected_lc</strong><span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt><dd><p>Corrected light curve, with noise removed.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.SFFCorrector.diagnose">
-<code class="sig-name descname">diagnose</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.diagnose" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a diagnostic plot which visualizes what happened during the
-most recent call to <a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code></a>.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.SFFCorrector.diagnose_arclength">
-<code class="sig-name descname">diagnose_arclength</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.diagnose_arclength" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a diagnostic plot which visualizes arclength vs flux
-from most recent call to <a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code></a>.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.SFFCorrector.diagnose_priors">
-<code class="sig-name descname">diagnose_priors</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.diagnose_priors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a diagnostic plot visualizing how the best-fit coefficients
-compare against the priors.</p>
-<p>The method will show the results obtained during the most recent call
-to <a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code></a>.  If <a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code></a> has not yet been called, a
-<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> will be raised.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>

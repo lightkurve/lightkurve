@@ -11,9 +11,7 @@ PLDCorrector
    .. autosummary::
 
       ~PLDCorrector.correct
-      ~PLDCorrector.diagnose
 
    .. rubric:: Methods Documentation
 
    .. automethod:: correct
-   .. automethod:: diagnose

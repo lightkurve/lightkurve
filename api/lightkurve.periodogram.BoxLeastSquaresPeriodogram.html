@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.4</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.5</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -165,10 +165,7 @@ representing a power spectrum generated using the Box Least Squares (BLS) method
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.smooth" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth</span></code></a>(self, \*\*kwargs)</p></td>
 <td><p>Smooths the power spectrum using the ‘boxkernel’ or ‘logmedian’ method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_seismology" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_seismology</span></code></a>(self, \*\*kwargs)</p></td>
-<td><p>Returns a <a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object to analyze the periodogram.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_table" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_table" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>(self)</p></td>
 <td><p>Exports the Periodogram as an Astropy Table.</p></td>
 </tr>
 </tbody>
@@ -465,27 +462,13 @@ has been smoothed.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_seismology">
-<code class="sig-name descname">to_seismology</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_seismology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a <a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object to analyze the periodogram.</p>
-<dl class="field-list">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><dl>
-<dt><strong>seismology</strong><span class="classifier"><a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a></span></dt><dd><p>Helper object to run asteroseismology methods.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_table">
 <code class="sig-name descname">to_table</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports the Periodogram as an Astropy Table.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl>
-<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.1.dev2226)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object</span></dt><dd><p>An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
+<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.1.dev1540)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object</span></dt><dd><p>An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
 </dd>
 </dl>
 </dd>

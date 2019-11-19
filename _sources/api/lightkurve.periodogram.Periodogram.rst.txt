@@ -22,10 +22,10 @@ Periodogram
       ~Periodogram.bin
       ~Periodogram.copy
       ~Periodogram.flatten
+      ~Periodogram.from_lightcurve
       ~Periodogram.plot
       ~Periodogram.show_properties
       ~Periodogram.smooth
-      ~Periodogram.to_seismology
       ~Periodogram.to_table
 
    .. rubric:: Attributes Documentation
@@ -40,8 +40,8 @@ Periodogram
    .. automethod:: bin
    .. automethod:: copy
    .. automethod:: flatten
+   .. automethod:: from_lightcurve
    .. automethod:: plot
    .. automethod:: show_properties
    .. automethod:: smooth
-   .. automethod:: to_seismology
    .. automethod:: to_table
