@@ -882,10 +882,11 @@ class LightCurve(object):
         return self[~outlier_mask]
 
     def bin(self, binsize=None, bins=None, method='mean'):
-        """Bins a lightcurve in chunks defined by `binsize` or `bins`.
+        """Bins a lightcurve in chunks defined by ``binsize`` or ``bins``.
 
-        The value of the bins will contain the mean (``method='mean'``) or the
-        median (``method='median'``) of the original data.  The default is mean.
+        The flux value of the bins will be computed by taking the mean
+        (``method='mean'``) or the median (``method='median'``) of the flux.
+        The default is mean.
 
         Parameters
         ----------
@@ -919,42 +920,52 @@ class LightCurve(object):
         - If the original lightcurve contains a quality attribute, then the
           bitwise OR of the quality flags will be returned per bin.
         """
+        # Validate user input
         method = validate_method(method, supported_methods=['mean', 'median'])
-        methodf = np.__dict__['nan' + method]
-
-        # Define and map some functions to be applied to each bin
-        quality_func = lambda x: np.bitwise_or.reduce(x) if np.all(np.isfinite(x)) else np.nan
-        centroid_func = lambda x: methodf(x) if np.any(np.isfinite(x)) else np.nan
-        # Assume erroneously that mean and median have same error propagation
-        rmse_func = lambda x: np.sqrt(np.nansum(x**2))/len(x) if np.any(np.isfinite(x)) else np.nan
-        cadenceno_func = lambda x: np.nan
-        statistic_mapper = {'flux':methodf, 'time':methodf, 'quality':quality_func,
-                            'centroid_row':centroid_func, 'centroid_col':centroid_func,
-                            'flux_err':rmse_func, 'cadenceno':cadenceno_func}
-        statistic_mapper = {key:value for key, value in statistic_mapper.items() \
-                            if hasattr(self, key)}
-
         if (binsize is None) and (bins is None):
-            binsize=13
+            binsize = 13
         elif (binsize is not None) and (bins is not None):
             raise ValueError('Both binsize and bins kwargs were passed to '
                              '`.bin()`.  Must assign only one of these.')
 
+        # Define and map the functions to be applied to each bin
+        method_func = np.__dict__['nan' + method]
+        quality_func = lambda x: np.bitwise_or.reduce(x) \
+                                 if np.all(np.isfinite(x)) else np.nan
+        centroid_func = lambda x: method_func(x) \
+                                  if np.any(np.isfinite(x)) else np.nan
+        # Assume the errors combine as the root-mean-square
+        rmse_func = lambda x: np.sqrt(np.nansum(x**2))/len(x) \
+                              if np.any(np.isfinite(x)) else np.nan
+        statistic_mapper = {'flux': method_func,
+                            'time': method_func,
+                            'quality': quality_func,
+                            'centroid_row': centroid_func,
+                            'centroid_col': centroid_func,
+                            'flux_err': rmse_func,
+                            'cadenceno': lambda x: np.nan}
+        statistic_mapper = {key: value
+                            for key, value in statistic_mapper.items()
+                            if hasattr(self, key)}
+
+        # Now create the new binned light curve object
         binned_lc = self.copy()
-        if bins is None: #use binsize
+        if bins is None:  # use ``binsize```
             n_bins = self.flux.size // binsize
             bin_by_array = np.arange(len(self.time))
             bin_edges = calculate_bin_edges(bin_by_array, bins=n_bins)
-        else: #bins was assigned
+        else:  # ``bins``` was assigned
             bin_by_array = self.time
             bin_edges = calculate_bin_edges(bin_by_array, bins=bins)
-            n_bins = len(bin_edges)-1
-
-            if ((np.max(bin_edges) < np.min(self.time)) or
-                (np.nanmax(self.time) < np.nanmin(bin_edges)) ):
-                log.warning("warning: the range of the bin edges ({}-{}) do not"
-                "fall in the time range ({}-{})!".format(np.min(bin_edges),
-                np.max(bin_edges), np.nanmin(self.time), np.max(self.time)))
+            n_bins = len(bin_edges) - 1
+            # Trigger a warning if the bin edges make no sense
+            if ((np.max(bin_edges) < np.nanmin(self.time)) or
+                    (np.nanmax(self.time) < np.nanmin(bin_edges))):
+                warnings.warn("the range of the bin edges ({}-{}) does not "
+                              "fall in the light curve's time range ({}-{})"
+                              "".format(np.min(bin_edges), np.max(bin_edges),
+                                        np.nanmin(self.time), np.nanmax(self.time)),
+                               LightkurveWarning)
 
         for attr, bin_function in statistic_mapper.items():
             values_to_bin = getattr(self, attr)
