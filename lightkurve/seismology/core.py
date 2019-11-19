@@ -19,13 +19,13 @@ from scipy.signal import find_peaks
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
-    from bokeh.io import show, output_notebook, push_notebook
+    from bokeh.io import show, output_notebook
     from bokeh.plotting import figure
     from bokeh.models import LogColorMapper, Slider, RangeSlider, \
-                             Span, LogTicker, Range1d, Button
+                             LogTicker, Button
     from bokeh.layouts import layout, Spacer
-except:
-    # Nice error when interact_echelle is called.
+except ImportError:
+    # There is a nice error when interact_echelle is called and bokeh is not avail.
     pass
 
 log = logging.getLogger(__name__)
@@ -152,9 +152,9 @@ class Seismology(object):
         ep : np.ndarray
             Echelle diagram power
         x_f : np.ndarray
-            frequencies for X axis
+            delta nu frequencies for X axis of echelle diagram
         y_f : np.ndarray
-            frequencies for Y axis
+            numax frequencies for Y axis of echelle diagram
         """
         #if numax is None:
 
@@ -171,10 +171,11 @@ class Seismology(object):
         if smooth_filter_width:
             pgsmooth = self.periodogram.smooth(filter_width=smooth_filter_width)
             freq = pgsmooth.frequency  # Makes code below more readable below
-            power = pgsmooth.power     # Makes code below more readable below
+            power = pgsmooth.power  # Makes code below more readable below
+
         else:
             freq = self.periodogram.frequency  # Makes code below more readable
-            power = self.periodogram.power     # Makes code below more readable
+            power = self.periodogram.power  # Makes code below more readable
 
         fmin = freq[0]
         fmax = freq[-1]
@@ -362,10 +363,10 @@ class Seismology(object):
 
         return ax
 
-    def _make_echelle_elements(self, deltanu, cmap='viridis',
+    def _make_echelle_elements(self, deltanu,
                          minimum_frequency=None, maximum_frequency=None,
                          smooth_filter_width=.1,
-                         scale='linear', plot_width=490, plot_height=340, title='Echelle'):
+                         scale='linear', plot_width=550, plot_height=340, title='Echelle diagram'):
         """Helper function to make the elements of the echelle diagram for bokeh plotting.
         """
 
@@ -375,10 +376,8 @@ class Seismology(object):
         if smooth_filter_width:
             pgsmooth = self.periodogram.smooth(filter_width=smooth_filter_width)
             freq = pgsmooth.frequency  # Makes code below more readable below
-            power = pgsmooth.power     # Makes code below more readable below
         else:
             freq = self.periodogram.frequency  # Makes code below more readable
-            power = self.periodogram.power     # Makes code below more readable
 
 
         ep, x_f, y_f = self._clean_echelle(deltanu=deltanu,
@@ -398,7 +397,9 @@ class Seismology(object):
         lo, hi = np.nanpercentile(ep.value, [0.1, 99.9])
         vlo, vhi = 0.3 * lo, 1.7 * hi
         vstep = (lo - hi)/500
-        color_mapper = LogColorMapper(palette="RdYlGn10", low=lo, high=hi)
+        from bokeh.palettes import Blues8
+        Blues8.reverse()
+        color_mapper = LogColorMapper(palette=Blues8, low=lo, high=hi)
 
         fig.image(image=[ep.value], x=0, y=y_f[0].value,
                   dw=1, dh=y_f[-1].value,
@@ -428,6 +429,42 @@ class Seismology(object):
 
     def interact_echelle(self, notebook_url='localhost:8888', **kwargs):
         """ Shows an interactive Echelle diagram based on a Seismology object.
+
+        Optional keywords are the same as the `plot_echelle` function.
+
+        Parameters
+        ----------
+        notebook_url: str
+            Location of the Jupyter notebook page (default: “localhost:8888”)
+            When showing Bokeh applications, the Bokeh server must be explicitly
+            configured to allow connections originating from different URLs.
+            This parameter defaults to the standard notebook host and port.
+            If you are running on a different location, you will need to supply this
+            value for the application to display properly. If no protocol is
+            supplied in the URL, e.g. if it is of the form “localhost:8888”,
+            then “http” will be used.
+        deltanu : float
+            Value for the large frequency separation of the seismic mode
+            frequencies in the periodogram. Assumed to have the same units as
+            the frequencies, unless given an Astropy unit.
+            Is assumed to be in the same units as frequency if not given a unit.
+        numax : float
+            Value for the frequency of maximum oscillation. If a numax is
+            passed, a suitable range one FWHM of the mode envelope either side
+            of the will be shown. This is overwritten by custom frequency ranges.
+            Is assumed to be in the same units as frequency if not given a unit.
+        minimum_frequency : float
+            The minimum frequency at which to display the echelle
+            Is assumed to be in the same units as frequency if not given a unit.
+        maximum_frequency : float
+            The maximum frequency at which to display the echelle.
+            Is assumed to be in the same units as frequency if not given a unit.
+        smooth_filter_width : float
+            If given a value, will smooth periodogram used to plot the echelle
+            diagram using the periodogram.smooth(method='boxkernel') method with
+            a filter width of `smooth_filter_width`. This helps visualise the
+            echelle diagram. Is assumed to be in the same units as the
+            periodogram frequency.
         """
 
         try:
@@ -440,10 +477,12 @@ class Seismology(object):
             return None
 
         maximum_frequency = kwargs.pop('maximum_frequency', self.periodogram.frequency.max().value)
-        minimum_frequency = kwargs.pop('minimum_frequency', self.periodogram.frequency. min().value)
+        minimum_frequency = kwargs.pop('minimum_frequency', self.periodogram.frequency.min().value)
+        maximum_deltanu = kwargs.pop('maximum_deltanu', maximum_frequency/5)
+        minimum_deltanu = kwargs.pop('minimum_deltanu', 0.01)
 
         if not hasattr(self, 'deltanu'):
-            dnu = SeismologyQuantity(quantity=self.periodogram.frequency.max()/30,
+            dnu = SeismologyQuantity(quantity=np.mean([minimum_deltanu, maximum_deltanu]) * self.periodogram.frequency.unit,
                                                        name='deltanu', method='echelle')
         else:
             dnu = self.deltanu
@@ -456,14 +495,15 @@ class Seismology(object):
                                                 maximum_frequency=maximum_frequency,
                                                 minimum_frequency=minimum_frequency,
                                                 **kwargs)
-            maxdnu = self.periodogram.frequency.max().value/5
+
             # Interactive slider widgets
-            dnu_slider = Slider(start=0.01,
-                                end=maxdnu,
+            dnu_slider = Slider(start=minimum_deltanu,
+                                end=maximum_deltanu,
                                 value=dnu.value,
                                 step=0.001,
                                 title="Delta Nu",
                                 width=290)
+
             r_button = Button(label=">", button_type="default", width=30)
             l_button = Button(label="<", button_type="default", width=30)
             rr_button = Button(label=">>", button_type="default", width=30)
@@ -500,7 +540,7 @@ class Seismology(object):
             def go_right_by_one():
                 """Step forward in time by a single cadence"""
                 existing_value = dnu_slider.value
-                if existing_value < maxdnu:
+                if existing_value < maximum_deltanu:
                     dnu_slider.value = existing_value + 0.1
 
             def go_left_by_one():
@@ -516,7 +556,10 @@ class Seismology(object):
             ll_button.on_click(go_left_by_one)
 
             widgets_and_figures = layout([fig_tpf, [Spacer(height=20), stretch_slider]],
-                                         [ll_button, Spacer(width=30), l_button, Spacer(width=25), dnu_slider, Spacer(width=30), r_button, Spacer(width=23), rr_button])
+                                         [ll_button, Spacer(width=30), l_button, Spacer(width=25),
+                                            dnu_slider, Spacer(width=30), r_button,
+                                            Spacer(width=23), rr_button]
+                                         )
             doc.add_root(widgets_and_figures)
 
         output_notebook(verbose=False, hide_banner=True)
