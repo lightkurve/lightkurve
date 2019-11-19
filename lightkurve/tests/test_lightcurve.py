@@ -922,3 +922,30 @@ def test_normalize_unit():
     lc = LightCurve(flux=[1, 2, 3])
     for unit in ['percent', 'ppt', 'ppm']:
         assert lc.normalize(unit=unit).flux_unit.name == unit
+
+
+def test_to_stingray():
+    """Test the `LightCurve.to_stingray()` method."""
+    time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
+    lc = LightCurve(time, flux, flux_err, time_format="jd")
+    try:
+        sr = lc.to_stingray()
+        assert_allclose(sr.time, time)
+        assert_allclose(sr.counts, flux)
+        assert_allclose(sr.counts_err, flux_err)
+    except ImportError:
+        # Requires Stingray
+        pass
+
+
+def test_from_stingray():
+    """Test the `LightCurve.from_stingray()` method."""
+    try:
+        from stingray import sampledata
+        sr = sampledata.sample_data()
+        lc = LightCurve.from_stingray(sr)
+        assert_allclose(sr.time, lc.time)
+        assert_allclose(sr.counts, lc.flux)
+        assert_allclose(sr.counts_err, lc.flux_err)
+    except ImportError:
+        pass  # stingray is not a required dependency
