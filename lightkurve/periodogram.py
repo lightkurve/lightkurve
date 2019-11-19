@@ -839,15 +839,13 @@ class LombScarglePeriodogram(Periodogram):
                              nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization='psd')
 
+        # Asteroseismologists define `power` as (4 / N)  * lomb_scargle_power
+        power *= 4. / len(time)
+
+        # To compute the Power Spectral Density (PSD) we need to keep track
+        # of the frequency spacing.
         meta = {}
-        # To rescale from the unnormalized power output by Astropy's
-        # Lomb-Scargle function to units of flux_variance / [frequency unit],
-        # the power needs to be multiplied by 2 / frequency_spacing.
-        # This is often called the Power Spectral Density (PSD).
-        meta['psd_factor'] = 2. / (len(time) * oversample_factor * fs)
-        # To rescale from power to amplitude, we'll need to compute
-        # sqrt(power * 4/N)
-        meta['amplitude_factor'] = np.sqrt(4./len(lc.time))
+        meta['frequency_spacing'] = oversample_factor * fs
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
@@ -858,14 +856,14 @@ class LombScarglePeriodogram(Periodogram):
 
     @property
     def amplitude(self):
-        """Power expressed as amplitude."""
-        return np.sqrt(self.power) * self.meta['amplitude_factor']
+        """Returns the square root of the power."""
+        return np.sqrt(self.power)
 
     @property
     def psd(self):
         """Power expressed in units Power Spectral Density (PSD),
         i.e. flux_variance / [frequency unit]."""
-        return (self.power * self.meta['psd_factor']).to(self.power.unit / u.Hertz)
+        return self.power / (2 * self.meta['frequency_spacing']).to(self.power.unit / u.Hertz)
 
     def model(self, time, frequency=None):
         """Obtain the flux model for a given frequency and time
