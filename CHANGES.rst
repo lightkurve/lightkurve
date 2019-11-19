@@ -13,6 +13,10 @@
 - Added ``transform_func`` & ``ylim_func`` keywords to ``interact()`` to
   support user-defined light curve transformations and y-axis limits. [#600]
 
+- Added ``to_stringray()`` and ``from_stingray()`` to ``LightCurve`` to enable
+  interoperability with the `Stingray <https://stingraysoftware.github.io/>`_
+  spectral timing package. [#567]
+
 
 
 1.4.1 (2019-11-18)
