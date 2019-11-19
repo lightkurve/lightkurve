@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from astropy.io import fits as pyfits
+from astropy.io.fits import Undefined
 
 from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags,
                     LightkurveWarning, detect_filetype)
@@ -43,6 +44,20 @@ class LightCurveFile(object):
         """Header of the object at extension `ext`"""
         return self.hdu[ext].header
 
+    def get_keyword(self, keyword, hdu=0, default=None):
+        """Returns a header keyword value.
+
+        If the keyword is Undefined or does not exist,
+        then return ``default`` instead.
+        """
+        try:
+            kw = self.hdu[hdu].header[keyword]
+        except KeyError:
+            return default
+        if isinstance(kw, Undefined):
+            return default
+        return kw
+
     @property
     def time(self):
         """The file's `TIME` column."""
@@ -56,12 +71,12 @@ class LightCurveFile(object):
     @property
     def ra(self):
         """Right Ascension as recorded in the header's `RA_OBJ` keyword."""
-        return self.hdu[0].header['RA_OBJ']
+        return self.get_keyword('RA_OBJ')
 
     @property
     def dec(self):
         """Declination as recorded in the header's `DEC_OBJ` keyword."""
-        return self.hdu[0].header['DEC_OBJ']
+        return self.get_keyword('DEC_OBJ')
 
     @property
     def FLUX(self):
@@ -284,10 +299,7 @@ class KeplerLightCurveFile(LightCurveFile):
         self.quality_mask = KeplerQualityFlags.create_quality_mask(
                                 quality_array=self.hdu[1].data['SAP_QUALITY'],
                                 bitmask=quality_bitmask)
-        try:
-            self.targetid = self.header()['KEPLERID']
-        except KeyError:
-            self.targetid = None
+        self.targetid = self.get_keyword('KEPLERID')
 
     def __repr__(self):
         return('KeplerLightCurveFile(ID: {})'.format(self.targetid))
@@ -333,7 +345,7 @@ class KeplerLightCurveFile(LightCurveFile):
                 mission=self.mission,
                 cadenceno=self.cadenceno,
                 targetid=self.targetid,
-                label=self.hdu[0].header['OBJECT'],
+                label=self.get_keyword('OBJECT'),
                 ra=self.ra,
                 dec=self.dec)
         else:
@@ -343,12 +355,12 @@ class KeplerLightCurveFile(LightCurveFile):
     @property
     def channel(self):
         """Kepler CCD channel number. ('CHANNEL' header keyword)"""
-        return self.header(ext=0)['CHANNEL']
+        return self.get_keyword('CHANNEL')
 
     @property
     def obsmode(self):
         """'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
-        return self.header()['OBSMODE']
+        return self.get_keyword('OBSMODE')
 
     @property
     def pos_corr1(self):
@@ -363,26 +375,17 @@ class KeplerLightCurveFile(LightCurveFile):
     @property
     def quarter(self):
         """Kepler quarter number. ('QUARTER' header keyword)"""
-        try:
-            return self.header(ext=0)['QUARTER']
-        except KeyError:
-            return None
+        return self.get_keyword('QUARTER')
 
     @property
     def campaign(self):
         """K2 Campaign number. ('CAMPAIGN' header keyword)"""
-        try:
-            return self.header(ext=0)['CAMPAIGN']
-        except KeyError:
-            return None
+        return self.get_keyword('CAMPAIGN')
 
     @property
     def mission(self):
         """'Kepler' or 'K2'. ('MISSION' header keyword)"""
-        try:
-            return self.header(ext=0)['MISSION']
-        except KeyError:
-            return None
+        return self.get_keyword('MISSION')
 
     def compute_cotrended_lightcurve(self, cbvs=(1, 2), **kwargs):
         """Returns a LightCurve object after cotrending the SAP_FLUX
@@ -459,14 +462,29 @@ class TessLightCurveFile(LightCurveFile):
         # which were not flagged by a QUALITY flag yet; the line below prevents
         # these cadences from being used. They would break most methods!
         self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
-
-        try:
-            self.targetid = self.header()['TICID']
-        except KeyError:
-            self.targetid = None
+        self.targetid = self.get_keyword('TICID')
 
     def __repr__(self):
         return('TessLightCurveFile(TICID: {})'.format(self.targetid))
+
+    @property
+    def sector(self):
+        """TESS Sector number ('SECTOR' header keyword)."""
+        return self.get_keyword('SECTOR')
+
+    @property
+    def camera(self):
+        """TESS Camera number ('CAMERA' header keyword)."""
+        return self.get_keyword('CAMERA')
+
+    @property
+    def ccd(self):
+        """TESS CCD number ('CCD' header keyword)."""
+        return self.get_keyword('CCD')
+
+    @property
+    def mission(self):
+        return 'TESS'
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if centroid_type+"1" in self.hdu[1].data.columns.names:
@@ -491,7 +509,12 @@ class TessLightCurveFile(LightCurveFile):
                 quality_bitmask=self.quality_bitmask,
                 cadenceno=self.cadenceno,
                 targetid=self.targetid,
-                label=self.hdu[0].header['OBJECT'])
+                label=self.get_keyword('OBJECT'),
+                sector=self.sector,
+                camera=self.camera,
+                ccd=self.ccd,
+                ra=self.ra,
+                dec=self.dec)
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types()))

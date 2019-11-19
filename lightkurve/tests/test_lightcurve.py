@@ -150,6 +150,11 @@ def test_TessLightCurveFile(quality_bitmask):
     assert lc.time_format == 'btjd'
     assert lc.time_scale == 'tdb'
     assert lc.flux_unit == u.electron / u.second
+    assert lc.sector == hdu[0].header['SECTOR']
+    assert lc.camera == hdu[0].header['CAMERA']
+    assert lc.ccd == hdu[0].header['CCD']
+    assert lc.ra == hdu[0].header['RA_OBJ']
+    assert lc.dec == hdu[0].header['DEC_OBJ']
 
     assert_array_equal(lc.time[0:10], hdu[1].data['TIME'][0:10])
     assert_array_equal(lc.flux[0:10], hdu[1].data['SAP_FLUX'][0:10])
