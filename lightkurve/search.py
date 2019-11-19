@@ -64,7 +64,7 @@ class SearchResult(object):
                 self.table['#'][idx] = idx
                 mission = self.table['obs_collection'][idx]
                 seqno = self.table['sequence_number'][idx]
-                if mission == 'Kepler' and self.table['sequence_number'].mask[3]:
+                if mission == 'Kepler' and self.table['sequence_number'].mask[idx]:
                     seqno = re.findall(r".*Q(\d+)", self.table['description'][idx])[0]
                 self.table['observation'][idx] = "{} {} {}".format(mission,
                                                                    prefix[mission],
