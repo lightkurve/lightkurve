@@ -134,21 +134,13 @@ class TargetPixelFile(object):
     @property
     def ra(self):
         """Right Ascension of target ('RA_OBJ' header keyword)."""
-        RA_OBJ = self.get_keyword('RA_OBJ')
-        if RA_OBJ != '':
-            return RA_OBJ
-        else:
-            return self.get_keyword('RA_REF')
+        return self.get_keyword('RA_OBJ')
 
 
     @property
     def dec(self):
         """Declination of target ('DEC_OBJ' header keyword)."""
-        DEC_OBJ = self.get_keyword('DEC_OBJ')
-        if DEC_OBJ != '':
-            return DEC_OBJ
-        else:
-            return self.get_keyword('DEC_REF')
+        return self.get_keyword('DEC_OBJ')
 
     @property
     def column(self):
@@ -205,9 +197,6 @@ class TargetPixelFile(object):
     def cadenceno(self):
         """Return the cadence number for all good-quality cadences."""
         cadenceno = self.hdu[1].data['CADENCENO'][self.quality_mask]
-        #TODO move to subclass
-        # The TESScut service returns an array of zeros as CADENCENO.
-        # If this is the case, return frame numbers from 0 instead.
         if cadenceno[0] == 0:
             return np.arange(0, len(cadenceno), 1, dtype=int)
         return cadenceno
