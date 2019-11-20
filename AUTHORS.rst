@@ -54,3 +54,4 @@ Comments, corrections & suggestions:
 - `Daniel Foreman-Mackey <https://github.com/dfm>`_
 - `Saeed Hojjatpanah <https://github.com/saeedm31>`_
 - `Simon J Murphy <https://github.com/SimonJMurphy>`_
+- `Alex Lyttle <https://github.com/alexlyttle>`_
