@@ -616,15 +616,9 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
-    if isinstance(target, int):
-        if (0 < target) and (target < 13161030):
-            log.warning("Warning: {} may refer to a different Kepler or TESS target. "
-                        "Please add the prefix 'KIC' or 'TIC' to disambiguate."
-                        "".format(target))
-        elif (0 < 200000000) and (target < 251813739):
-            log.warning("Warning: {} may refer to a different K2 or TESS target. "
-                        "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
-                        "".format(target))
+    if isinstance(target, int) or (isinstance(target, str) and target.isdigit()):
+        log.warning("Warning: {} is ambiguous. Please add a catalog prefix "
+                    "such as 'KIC', 'TIC', or 'EPIC'.".format(target))
 
     observations = _query_mast(target, project=mission, radius=radius)
     log.debug("MAST found {} observations. "
@@ -710,17 +704,36 @@ def _query_mast(target, radius=None, project=('Kepler', 'K2', 'TESS')):
         # If `target` looks like a KIC or EPIC ID, we will pass the exact
         # `target_name` under which MAST will know the object to prevent
         # source confusion (see GitHub issue #148).
-        target = int(target)
-        if isinstance(target, str) and target.lower().startswith(('epic', 'kic')):
-            target = int(''.join(filter(str.isdigit, target)))
-            if (target > 0) and (target < 200000000):
+        target_name = None
+
+        # If `target` is an integer, interpret it as a MAST target_name
+        # For Kepler/K2, MAST target_name values have prefix `kplr` and `ktwo`;
+        # for TESS there is no prefix.
+        if isinstance(target, int) or (isinstance(target, str) and target.isdigit()):
+            target = int(target)
+            if (target > 757075) and (target < 100004301):
                 target_name = 'kplr{:09d}'.format(target)
-            elif (target > 200000000) and (target < 300000000):
+            elif (target > 200000810) and (target < 251816812):
                 target_name = 'ktwo{:09d}'.format(target)
-        elif isinstance(target, str) and target.lower().startswith(('tic')):
-            target_name = int(''.join(filter(str.isdigit, target)))
-        else:
-            raise ValueError("{:09d}: not in the KIC, TIC, or EPIC ID range".format(target))
+            else:
+                target_name = '{:d}'.format(target)
+
+        # If `target` is a string with a mission catalog prefix, translate
+        # it to the appropriate MAST target_name.
+        if isinstance(target, str):
+            target_digits = int(''.join(filter(str.isdigit, target)))
+            if target.lower().startswith('kic'):
+                target_name = 'kplr{:09d}'.format(target_digits)
+            elif target.lower().startswith('epic'):
+                target_name = 'ktwo{:09d}'.format(target_digits)
+            elif target.lower().startswith('tic'):
+                # Note: TESS targets do not have a target_name prefix at MAST
+                target_name = '{:d}'.format(target_digits)
+
+        # Skip to the end of the except block if the target string couldn't
+        # be translated to a MAST target_name
+        if target_name is None:
+            raise ValueError("{}: not a KIC, EPIC, or TIC ID".format(target))
 
         # query_criteria does not allow a cone search when target_name is passed in
         # so first grab desired target with ~0 arcsecond radius
