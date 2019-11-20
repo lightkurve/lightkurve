@@ -100,7 +100,7 @@ class Seismology(object):
 
     def plot_echelle(self, deltanu=None, numax=None,
                      minimum_frequency=None, maximum_frequency=None,
-                     smooth_filter_width=.1,
+                     smooth_filter_width=.1, ax=None,
                      scale='linear', cmap='Blues'):
         """Plots an echelle diagram of the periodogram by stacking the
         periodogram in slices of deltanu.
@@ -135,6 +135,9 @@ class Seismology(object):
             a filter width of `smooth_filter_width`. This helps visualise the
             echelle diagram. Is assumed to be in the same units as the
             periodogram frequency.
+        ax : `~matplotlib.axes.Axes`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be created.
         scale: str
             Set z axis to be "linear" or "log". Default is linear.
         cmap : str
@@ -250,7 +253,8 @@ class Seismology(object):
 
         #Plot the echelle diagram
         with plt.style.context(MPLSTYLE):
-            fig, ax = plt.subplots()
+            if ax is None:
+                fig, ax = plt.subplots()
             extent = (x_f[0].value, x_f[-1].value, y_f[0].value, y_f[-1].value)
             figsize = plt.rcParams['figure.figsize']
             a = figsize[1] / figsize[0]
