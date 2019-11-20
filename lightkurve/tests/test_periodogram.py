@@ -38,9 +38,9 @@ def test_periodogram_normalization():
                     flux_err=np.zeros(1000)+0.1, flux_unit='electron/second')
     # Test amplitude normalization and correct units
     pg = lc.to_periodogram(normalization='amplitude')
-    assert pg.power.unit == u.electron / u.second
+    assert pg.amplitude.unit == u.electron / u.second
     pg = lc.normalize(unit='ppm').to_periodogram(normalization='amplitude')
-    assert pg.power.unit == u.cds.ppm
+    assert pg.amplitude.unit == u.cds.ppm
 
     # Test PSD normalization and correct units
     pg = lc.to_periodogram(freq_unit=u.microhertz, normalization='psd')
@@ -56,7 +56,7 @@ def test_periodogram_warnings():
     lc = lc.normalize(unit='ppm')
     # Test amplitude normalization and correct units
     pg = lc.to_periodogram(normalization='amplitude')
-    assert pg.power.unit == u.cds.ppm
+    assert pg.amplitude.unit == u.cds.ppm
     pg = lc.to_periodogram(freq_unit=u.microhertz, normalization='psd')
     assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
@@ -72,10 +72,10 @@ def test_periodogram_units():
 
     # Has the correct units
     assert p.frequency.unit == 1./u.day
-    assert p.power.unit == u.electron / u.second
+    assert p.power.unit == u.day * u.electron**2 / u.second**2
     assert p.period.unit == u.day
     assert p.frequency_at_max_power.unit == 1./u.day
-    assert p.max_power.unit == u.electron / u.second
+    assert p.max_power.unit == u.day * u.electron**2 / u.second**2
 
 
 def test_periodogram_can_find_periods():

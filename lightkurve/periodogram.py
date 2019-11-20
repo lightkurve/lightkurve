@@ -848,7 +848,7 @@ class LombScarglePeriodogram(Periodogram):
                              nterms=nterms, **kwargs)
             lspower = LS.power(frequency, method=ls_method, normalization='psd')
 
-        # Asteroseismologists typically use `power` as a synonym for 
+        # Asteroseismologists typically use `power` as a synonym for
         # power spectral density
         frequency_spacing = oversample_factor * fs
         power = (2. / len(time)) * (lspower / frequency_spacing)
