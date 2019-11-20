@@ -92,8 +92,8 @@
     
   <div class="section" id="full-changelog">
 <span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="unreleased">
-<h2>1.5.0 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h2>1.5.0 (2019-11-20)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Changed the representation of <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> objects to make it easier to
 see at a glance which quarter/campaign/sector a result belongs to. [#632]</p></li>
@@ -103,18 +103,23 @@ see at a glance which quarter/campaign/sector a result belongs to. [#632]</p></l
 by specifying the bin edges or the total number of bins. [#629]</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">transform_func</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">ylim_func</span></code> keywords to <code class="docutils literal notranslate"><span class="pre">interact()</span></code> to
 support user-defined light curve transformations and y-axis limits. [#600]</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">to_stringray()</span></code> and <code class="docutils literal notranslate"><span class="pre">from_stingray()</span></code> to <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> to enable
+interoperability with the <a class="reference external" href="https://stingraysoftware.github.io/">Stingray</a>
+spectral timing package. [#567]</p></li>
+<li><p>Added an <code class="xref py py-obj docutils literal notranslate"><span class="pre">ax</span></code> (axes) keyword to <code class="docutils literal notranslate"><span class="pre">Seismology.plot_echelle()</span></code> to enable
+Echelle diagrams to be plotted into an existing Matplotlib figure. [#635]</p></li>
 </ul>
 </div>
-<div class="section" id="id1">
-<h2>1.4.1 (2019-11-18)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h2>1.4.1 (2019-11-18)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug which caused <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> and
 <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code> to raise an <code class="docutils literal notranslate"><span class="pre">IndexError</span></code> if the sector keyword
 was passed and the target was observed by both TESS &amp; Kepler. [#631]</p></li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h2>1.4.0 (2019-11-12)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h2>1.4.0 (2019-11-12)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added the generic <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> and <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> classes which
 provide a user-friendly way to use linear regression to remove background or
@@ -130,8 +135,8 @@ to measure the mass, radius, and surface gravity of a solar-like star. [#624]</p
 exception when MAST’s TESSCut service is overloaded and times out. [#627]</p></li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h2>1.3.0 (2019-10-21)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h2>1.3.0 (2019-10-21)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added a <code class="docutils literal notranslate"><span class="pre">method=&quot;quadratic&quot;</span></code> option to <code class="docutils literal notranslate"><span class="pre">tpf.estimate_centroids()</span></code> which
 enables centroids to be estimated by fitting a bivariate polynomial to the
@@ -147,8 +152,8 @@ a single float and lists of floats in addition to numpy arrays. [#608]</p></li>
 sampled grid in frequency space. [#614]</p></li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h2>1.2.0 (2019-10-01)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h2>1.2.0 (2019-10-01)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">flux_unit</span></code> and <code class="docutils literal notranslate"><span class="pre">flux_quantity</span></code> properties to the <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code>
 class to enable users to keep track of a light curve’s flux units. [#591]</p></li>
@@ -169,8 +174,8 @@ objects, e.g. two <code class="docutils literal notranslate"><span class="pre">L
 take all recent Lightkurve API changes into account. [#596]</p></li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id6">
+<h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <p>Lightkurve v1.1.1 is a bugfix release which includes the following changes:</p>
 <ul class="simple">
 <li><p>Changed <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> to emit a
@@ -189,8 +194,8 @@ Lightkurve to receive the “code quality A” certification by codacy.com.
 [#557, #560, #564, #565, #566, #568, #573, #574, #575]</p></li>
 </ul>
 </div>
-<div class="section" id="id6">
-<h2>1.1.0 (2019-07-19)<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h2>1.1.0 (2019-07-19)<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">lightkurve.seismology</span></code> sub-package which enables quick-look
 asteroseismic quantities to be extracted from <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects. [#496]</p></li>
@@ -225,8 +230,8 @@ sub-package, named <code class="docutils literal notranslate"><span class="pre">
 an AstroPy Quantity object. [#521]</p></li>
 </ul>
 </div>
-<div class="section" id="id7">
-<h2>1.0.1 (2019-05-20)<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id8">
+<h2>1.0.1 (2019-05-20)<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <p>This is a minor bugfix release containing the following improvements:</p>
 <ul class="simple">
 <li><p>Fixed minor bugs in <code class="docutils literal notranslate"><span class="pre">PLDCorrector.correct()</span></code> [#498],
@@ -240,8 +245,8 @@ if the download cache contains a corrupt file. [#512]</p></li>
 <li><p>Switched continuous integration from Travis/Appveyor to Azure. [#497]</p></li>
 </ul>
 </div>
-<div class="section" id="id8">
-<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id9">
+<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>This is the first stable release of Lightkurve.  It was prepared with the help
 of 45 contributors!</p>
 <p>This release contains major changes to the <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> class:</p>

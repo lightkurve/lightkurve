@@ -201,11 +201,11 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessTargetPixelFile.centroids</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.create_threshold_mask" title="lightkurve.targetpixelfile.TessTargetPixelFile.create_threshold_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_threshold_mask</span></code></a>(self[, threshold, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.create_threshold_mask" title="lightkurve.targetpixelfile.TessTargetPixelFile.create_threshold_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_threshold_mask</span></code></a>(self[, threshold, …])</p></td>
 <td><p>Returns an aperture mask creating using the thresholding method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.cutout" title="lightkurve.targetpixelfile.TessTargetPixelFile.cutout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cutout</span></code></a>(self[, center, size])</p></td>
+<td><p>Cut a rectangle out of the Target Pixel File.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.estimate_centroids" title="lightkurve.targetpixelfile.TessTargetPixelFile.estimate_centroids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_centroids</span></code></a>(self[, aperture_mask, method])</p></td>
 <td><p>Returns the flux center of an object inside <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code>.</p></td>
@@ -213,20 +213,20 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.extract_aperture_photometry" title="lightkurve.targetpixelfile.TessTargetPixelFile.extract_aperture_photometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_aperture_photometry</span></code></a>(self[, …])</p></td>
 <td><p>Performs aperture photometry.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessTargetPixelFile.from_fits</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_bkg_lightcurve" title="lightkurve.targetpixelfile.TessTargetPixelFile.get_bkg_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bkg_lightcurve</span></code></a>(self[, aperture_mask])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_bkg_lightcurve" title="lightkurve.targetpixelfile.TessTargetPixelFile.get_bkg_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bkg_lightcurve</span></code></a>(self[, aperture_mask])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_coordinates" title="lightkurve.targetpixelfile.TessTargetPixelFile.get_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_coordinates</span></code></a>(self[, cadence])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_coordinates" title="lightkurve.targetpixelfile.TessTargetPixelFile.get_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_coordinates</span></code></a>(self[, cadence])</p></td>
 <td><p>Returns two 3D arrays of RA and Dec values in decimal degrees.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_keyword" title="lightkurve.targetpixelfile.TessTargetPixelFile.get_keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code></a>(self, keyword[, hdu, default])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_keyword" title="lightkurve.targetpixelfile.TessTargetPixelFile.get_keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code></a>(self, keyword[, hdu, default])</p></td>
 <td><p>Returns a header keyword value.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="lightkurve.targetpixelfile.TessTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>(self[, notebook_url, max_cadences, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="lightkurve.targetpixelfile.TessTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>(self[, notebook_url, max_cadences, …])</p></td>
 <td><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact_sky" title="lightkurve.targetpixelfile.TessTargetPixelFile.interact_sky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_sky</span></code></a>(self[, notebook_url, …])</p></td>
+<td><p>Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.plot" title="lightkurve.targetpixelfile.TessTargetPixelFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, ax, frame, cadenceno, bkg, …])</p></td>
 <td><p>Plot the pixel data for a single frame (i.e.</p></td>
@@ -234,10 +234,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.show_properties" title="lightkurve.targetpixelfile.TessTargetPixelFile.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>(self)</p></td>
 <td><p>Prints a description of all non-callable attributes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_fits" title="lightkurve.targetpixelfile.TessTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>(self[, output_fn, overwrite])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_corrector" title="lightkurve.targetpixelfile.TessTargetPixelFile.to_corrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector</span></code></a>(self[, method])</p></td>
+<td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> instance to remove systematics.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_fits" title="lightkurve.targetpixelfile.TessTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>(self[, output_fn, overwrite])</p></td>
 <td><p>Writes the TPF to a FITS file on disk.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve</span></code></a>(self[, method])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve</span></code></a>(self[, method])</p></td>
 <td><p>Performs photometry on the pixel data and returns a LightCurve object.</p></td>
 </tr>
 </tbody>
@@ -440,6 +443,37 @@ threshold.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lightkurve.targetpixelfile.TessTargetPixelFile.cutout">
+<code class="sig-name descname">cutout</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">center=None</em>, <em class="sig-param">size=5</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.cutout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cut a rectangle out of the Target Pixel File.</p>
+<p>This methods returns a new <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> object containing a
+rectangle of a given <code class="docutils literal notranslate"><span class="pre">size</span></code> cut out around a given <code class="docutils literal notranslate"><span class="pre">center</span></code>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>center</strong><span class="classifier">(int, int) tuple or <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.SkyCoord</span></code></span></dt><dd><p>Center of the cutout.  If an (int, int) tuple is passed, it will be
+interpreted as the (column, row) coordinates relative to
+the bottom-left corner of the TPF.  If an <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.SkyCoord</span></code> is
+passed then the sky coordinate will be used instead.
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> (default) then the center of the TPF will be used.</p>
+</dd>
+<dt><strong>size</strong><span class="classifier">int or (int, int) tuple</span></dt><dd><p>Number of pixels to cut out. If a single integer is passed then
+a square of that size will be cut. If a tuple is passed then a
+rectangle with dimensions (column_size, row_size) will be cut.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>tpf</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.TargetPixelFile</span></code> object</span></dt><dd><p>New and smaller Target Pixel File object containing only the data
+cut out.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.estimate_centroids">
 <code class="sig-name descname">estimate_centroids</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">aperture_mask='pipeline'</em>, <em class="sig-param">method='moments'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.estimate_centroids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the flux center of an object inside <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code>.</p>
@@ -620,6 +654,29 @@ the lightcurve after each pixel selection:</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lightkurve.targetpixelfile.TessTargetPixelFile.interact_sky">
+<code class="sig-name descname">interact_sky</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">magnitude_limit=18</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact_sky" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>notebook_url: str</strong></dt><dd><p>Location of the Jupyter notebook page (default: “localhost:8888”)
+When showing Bokeh applications, the Bokeh server must be
+explicitly configured to allow connections originating from
+different URLs. This parameter defaults to the standard notebook
+host and port. If you are running on a different location, you
+will need to supply this value for the application to display
+properly. If no protocol is supplied in the URL, e.g. if it is
+of the form “localhost:8888”, then “http” will be used.</p>
+</dd>
+<dt><strong>magnitude_limit</strong><span class="classifier">float</span></dt><dd><p>A value to limit the results in based on Gaia Gmag. Default, 18.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.plot">
 <code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">frame=0</em>, <em class="sig-param">cadenceno=None</em>, <em class="sig-param">bkg=False</em>, <em class="sig-param">aperture_mask=None</em>, <em class="sig-param">show_colorbar=True</em>, <em class="sig-param">mask_color='pink'</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the pixel data for a single frame (i.e. at a single time).</p>
@@ -666,6 +723,28 @@ Lightkurve’s custom stylesheet is used by default.</p>
 <code class="sig-name descname">show_properties</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.show_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints a description of all non-callable attributes.</p>
 <p>Prints in order of type (ints, strings, lists, arrays, others).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.targetpixelfile.TessTargetPixelFile.to_corrector">
+<code class="sig-name descname">to_corrector</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='pld'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_corrector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> instance to remove systematics.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>methods</strong><span class="classifier">string</span></dt><dd><p>Currently, only “pld” is supported.  This will return a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code> class instance.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>correcter</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.Correcter</span></code></span></dt><dd><p>Instance of a Corrector class, which typically provides <code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code>
+and <code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose()</span></code> methods.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
