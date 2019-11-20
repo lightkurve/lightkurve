@@ -294,14 +294,18 @@ class Periodogram(object):
         if style is None or style == 'lightkurve':
             style = MPLSTYLE
         if ylabel is None:
-            ylabel = "Power"
-            if self.power.unit.to_string() != '':
-                unit_label = self.power.unit.to_string('latex')
-                # The line below is a workaround for AstroPy bug #9218.
-                # It can be removed once the fix for that issue is widespread.
-                # See https://github.com/astropy/astropy/pull/9218
-                unit_label = re.sub(r"\^{([^}]+)}\^{([^}]+)}", r"^{\g<1>^{\g<2>}}", unit_label)
-                ylabel += " [{}]".format(unit_label)
+            if ('normalization' in self.meta) and (self.meta['normalization'] == 'amplitude'):
+                ylabel = 'Amplitude'
+                ylabel += " [{}]".format(self.amplitude.unit.to_string('latex'))
+            else:
+                ylabel = "Power"
+                if self.power.unit.to_string() != '':
+                    unit_label = self.power.unit.to_string('latex')
+                    # The line below is a workaround for AstroPy bug #9218.
+                    # It can be removed once the fix for that issue is widespread.
+                    # See https://github.com/astropy/astropy/pull/9218
+                    unit_label = re.sub(r"\^{([^}]+)}\^{([^}]+)}", r"^{\g<1>^{\g<2>}}", unit_label)
+                    ylabel += " [{}]".format(unit_label)
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
         if ('label' not in kwargs) and ('label' in dir(self)):
@@ -311,13 +315,18 @@ class Periodogram(object):
             if ax is None:
                 fig, ax = plt.subplots()
 
+            if ('normalization' in self.meta) and (self.meta['normalization'] == 'amplitude'):
+                ydata = self.amplitude
+            else:
+                ydata = self.power
+
             # Plot frequency and power
             if view == 'frequency':
-                ax.plot(self.frequency.to(unit), self.power, **kwargs)
+                ax.plot(self.frequency.to(unit), ydata, **kwargs)
                 if xlabel is None:
                     xlabel = "Frequency [{}]".format(unit.to_string('latex'))
             elif view == 'period':
-                ax.plot(self.period.to(unit), self.power, **kwargs)
+                ax.plot(self.period.to(unit), ydata, **kwargs)
                 if xlabel is None:
                     xlabel = "Period [{}]".format(unit.to_string('latex'))
             ax.set_xlabel(xlabel)
@@ -833,19 +842,22 @@ class LombScarglePeriodogram(Periodogram):
         if float(astropy.__version__[0]) >= 3:
             LS = LombScargle(time, lc.flux_quantity,
                              nterms=nterms, normalization='psd', **kwargs)
-            power = LS.power(frequency, method=ls_method)
+            lspower = LS.power(frequency, method=ls_method)
         else:
             LS = LombScargle(time, lc.flux_quantity,
                              nterms=nterms, **kwargs)
-            power = LS.power(frequency, method=ls_method, normalization='psd')
+            lspower = LS.power(frequency, method=ls_method, normalization='psd')
 
-        # Asteroseismologists define `power` as (4 / N)  * lomb_scargle_power
-        power *= 4. / len(time)
+        # Asteroseismologists typically use `power` as a synonym for 
+        # power spectral density
+        frequency_spacing = oversample_factor * fs
+        power = (2. / len(time)) * (lspower / frequency_spacing)
 
-        # To compute the Power Spectral Density (PSD) we need to keep track
+        # To compute the amplituude we need to keep track
         # of the frequency spacing.
         meta = {}
-        meta['frequency_spacing'] = oversample_factor * fs
+        meta['frequency_spacing'] = frequency_spacing
+        meta['normalization'] = normalization
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
@@ -856,14 +868,8 @@ class LombScarglePeriodogram(Periodogram):
 
     @property
     def amplitude(self):
-        """Returns the square root of the power."""
-        return np.sqrt(self.power)
-
-    @property
-    def psd(self):
-        """Power expressed in units Power Spectral Density (PSD),
-        i.e. flux_variance / [frequency unit]."""
-        return self.power / (2 * self.meta['frequency_spacing']).to(self.power.unit / u.Hertz)
+        """Returns the amplitude in units of flux."""
+        return np.sqrt(2. * self.meta['frequency_spacing'] * self.power)
 
     def model(self, time, frequency=None):
         """Obtain the flux model for a given frequency and time
