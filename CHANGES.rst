@@ -1,4 +1,4 @@
-1.5.0 (unreleased)
+1.5.0 (2019-11-20)
 ==================
 
 - Changed the representation of ``SearchResult`` objects to make it easier to
