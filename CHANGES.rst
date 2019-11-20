@@ -17,6 +17,9 @@
   interoperability with the `Stingray <https://stingraysoftware.github.io/>`_
   spectral timing package. [#567]
 
+- Added an `ax` (axes) keyword to ``Seismology.plot_echelle()`` to enable
+  Echelle diagrams to be plotted into an existing Matplotlib figure. [#635]
+
 
 
 1.4.1 (2019-11-18)
