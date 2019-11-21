@@ -208,12 +208,12 @@ class TargetPixelFile(object):
 
     @property
     def wcs(self):
-        """Returns an astropy.wcs.WCS object with the World Coordinate System
+        """Returns an `astropy.wcs.WCS` object with the World Coordinate System
         solution for the target pixel file.
 
         Returns
         -------
-        w : astropy.wcs.WCS object
+        w : `astropy.wcs.WCS` object
             WCS solution
         """
         if 'MAST' in self.hdu[0].header['ORIGIN']:  # Is it a TessCut TPF?
@@ -653,7 +653,7 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        notebook_url: str
+        notebook_url : str
             Location of the Jupyter notebook page (default: "localhost:8888")
             When showing Bokeh applications, the Bokeh server must be
             explicitly configured to allow connections originating from
@@ -720,7 +720,7 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        notebook_url: str
+        notebook_url : str
             Location of the Jupyter notebook page (default: "localhost:8888")
             When showing Bokeh applications, the Bokeh server must be
             explicitly configured to allow connections originating from
@@ -1652,14 +1652,19 @@ class TessTargetPixelFile(TargetPixelFile):
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', or 'all'
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If the string 'all' is passed, all pixels will be used.
+        aperture_mask : array-like, 'pipeline', 'threshold' or 'all'
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
             The default behaviour is to use the TESS pipeline mask.
         centroid_method : str, 'moments' or 'quadratic'
             For the details on this arguments, please refer to the documentation
             for `TargetPixelFile.estimate_centroids`.
+
         Returns
         -------
         lc : TessLightCurve object
