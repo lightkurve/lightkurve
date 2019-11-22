@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.5</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.6</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -301,7 +301,7 @@ div.rendered_html tbody tr:hover {
 <p>TESS FFIs have an additive scattered light background that has not been removed by the pipeline. This scattered light must be removed by the user. This can be done in a few ways, including a simple median subtraction. In this tutorial, we’ll show you how to use <em>Lightkurve</em>’s corrector tools to remove the scattered light.</p>
 <div class="section" id="1.-Using-RegressionCorrector-on-TESSCut-FFI-cutouts">
 <h2>1. Using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> on TESSCut FFI cutouts<a class="headerlink" href="#1.-Using-RegressionCorrector-on-TESSCut-FFI-cutouts" title="Permalink to this headline">¶</a></h2>
-<p>For this tutorial we will use the TESS Sector 15 data of <a class="reference external" href="https://en.wikipedia.org/wiki/Tabby%27s_Star">KIC 8462852</a> (also known as Tabby’s Star). We’ll start by downloading the FFI data using MAST’s <em>TESSCut</em> service, querying it through <em>Lightkurve</em>.</p>
+<p>For this tutorial we will use the TESS Sector 15 data of <a class="reference external" href="https://en.wikipedia.org/wiki/Tabby%27s_Star">KIC 8462852</a> (also known as Boyajian’s Star). We’ll start by downloading the FFI data using MAST’s <em>TESSCut</em> service, querying it through <em>Lightkurve</em>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -316,8 +316,8 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">target</span> <span class="o">=</span> <span class="s1">&#39;KIC 8462852&#39;</span>  <span class="c1"># Tabby&#39;s star</span>
-<span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_tesscut</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">cutout_size</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">51</span><span class="p">))</span>
+<span></span><span class="n">target</span> <span class="o">=</span> <span class="s1">&#39;KIC 8462852&#39;</span>  <span class="c1"># Boyajian&#39;s Star</span>
+<span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_tesscut</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">cutout_size</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -378,7 +378,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -398,7 +398,7 @@ div.rendered_html tbody tr:hover {
 <p>In this case, we can use the <strong>pixels outside the aperture</strong> as vectors that are highly predictive of the systematic noise, i.e. we will make the assumption that these pixels do not contain any flux from our target.</p>
 <p>We can select these pixels very simply by specifying flux outside the aperture using Python’s bitwise invert operator <code class="docutils literal notranslate"><span class="pre">~</span></code> to take the inverse of the aperture mask.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -407,7 +407,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -416,22 +416,22 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>(1190, 2541)
+<span></span>(1190, 2491)
 </pre></div>
 </div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">regressors</span></code> is now an array with shape <em>ntime</em> x <em>npixels outside of the aperture</em>. If we plot the first 30 of these pixels, we can see that they contain mostly scattered light, with some offset terms.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pixels</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">30</span><span class="p">]);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">regressors</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">30</span><span class="p">]);</span>
 </pre></div>
 </div>
 </div>
@@ -445,16 +445,16 @@ div.rendered_html tbody tr:hover {
 <p>In linear regression problems, it is commong to refer to the matrix of regressors as the <em>design matrix</em> (also known as <em>model matrix</em> or <em>regressor matrix</em>). Lightkurve provides a convenient <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> class which is designed to help you work with detrending vectors.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> class has several convenience functions, and can be passed into <em>Lightkurve</em>’s corrector objects. Please consult the <a class="reference external" href="../api/lightkurve.correctors.DesignMatrix.html">DesignMatrix page</a> in the API docs for the full details on the methods and features provided by this class.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dm</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">DesignMatrix</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;regressors&#39;</span><span class="p">)</span>
+<span></span><span class="n">dm</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">DesignMatrix</span><span class="p">(</span><span class="n">regressors</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;regressors&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -463,11 +463,11 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>regressors DesignMatrix (1190, 2541)
+<span></span>regressors DesignMatrix (1190, 2491)
 </pre></div>
 </div>
 </div>
@@ -479,7 +479,7 @@ div.rendered_html tbody tr:hover {
 </ol>
 <p>The choice of the number of components is a tricky issue, but in general you should choose a number that is much smaller than the number of vectors.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -488,7 +488,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -497,7 +497,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -507,7 +507,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>Using the <code class="docutils literal notranslate"><span class="pre">pca()</span></code> method, we have now reduced the number of components in our design matrix to 5. These vectors show a combination of scattered light and spacecraft motion, which makes them suited to detrend our input light curve.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -525,7 +525,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>Note: the <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> object provides a convenient <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method to visualize the vectors:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -542,7 +542,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>We can now detrend the raw light curve against these vectors. <em>Lightkurve</em>’s <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> will use linear algebra to find the combination of vectors that makes the input light curve <strong>closest to zero</strong>. To do this, we need one more component; we need an “offset” term, to be able to fit the mean level of the light curve. We can do this by appending a “constant” to our design matrix.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -551,7 +551,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -560,7 +560,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -571,7 +571,7 @@ div.rendered_html tbody tr:hover {
 <p>Now that we have a design matrix, we only need to pass it into a <code class="docutils literal notranslate"><span class="pre">lightkurve.Corrector</span></code>. To use our design matrix, we can pass it to the <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>, which will detrend the input light curve against the vectors we’ve built.</p>
 <p>Please consult the <a class="reference external" href="../api/lightkurve.correctors.RegressionCorrector.html">RegressionCorrector page</a> in the API docs for the full details on the methods and features provided by this class.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -580,7 +580,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -589,7 +589,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -599,7 +599,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>To correct the light curve, we simply pass in our design matrix.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -609,7 +609,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>Now we can plot the results</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -627,7 +627,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>As shown above, the scattered light from the background has been removed. If we want to see a more in depth look at the correction, we can use the <code class="docutils literal notranslate"><span class="pre">diagnose()</span></code> method to see what the <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> found as the best fitting solution.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -647,7 +647,7 @@ div.rendered_html tbody tr:hover {
 <p>The <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> assumes that you want to remove the trend and set the lightkurve to the <strong>mean</strong> level of the <strong>raw lightkurve</strong>. This isn’t true for TESS scattered light. TESS FFI light curves have <strong>additive background</strong>, and so we want to reduce the flux to the lowest recorded level, assuming that at that point the contribution from scattered light is approximately zero.</p>
 <p>To do this, we will first need to look at the <em>model</em> of the background that <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> built. We can access that in the <code class="docutils literal notranslate"><span class="pre">corrector</span></code> object.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -656,16 +656,16 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;lightkurve.lightcurve.LightCurve at 0x7f6752592588&gt;
+<span></span>&lt;lightkurve.lightcurve.LightCurve at 0x7f2a385e9a90&gt;
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -684,7 +684,7 @@ div.rendered_html tbody tr:hover {
 <p>As you can see above, the <em>model</em> drop below zero flux. This is impossible; the scattered light can’t be <strong>removing</strong> flux from our target!</p>
 <p>To rectify this, we can subtract the model flux value at the 5th percentile.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -694,7 +694,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -711,7 +711,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>This looks better. Now we can simply remove this model from our raw light curve.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -720,7 +720,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -738,11 +738,11 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>This looks great. As a final test, let’s investigate how the light curve we obtained using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> compares against a light curve obtained using a more simple median background removal method.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[57]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">bkg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span></span><span class="n">bkg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">regressors</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">bkg</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bkg</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
 <span class="n">npix</span> <span class="o">=</span> <span class="n">aper</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -762,7 +762,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>Lastly, lets show how you can do all of the above in a single cell.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[62]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -771,7 +771,7 @@ div.rendered_html tbody tr:hover {
 <span class="n">raw_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="p">)</span>
 
 <span class="c1"># Make a design matrix and pass it to a linear regression corrector</span>
-<span class="n">dm</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">DesignMatrix</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[:,</span> <span class="o">~</span><span class="n">aper</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;pixels&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">append_constant</span><span class="p">()</span>
+<span class="n">dm</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">DesignMatrix</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[:,</span> <span class="o">~</span><span class="n">aper</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;regressors&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">append_constant</span><span class="p">()</span>
 <span class="n">rc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">RegressionCorrector</span><span class="p">(</span><span class="n">raw_lc</span><span class="p">)</span>
 <span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">rc</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">dm</span><span class="p">)</span>
 
@@ -781,7 +781,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -803,17 +803,17 @@ div.rendered_html tbody tr:hover {
 <p><em>TESS</em> releases high time resolution TPFs of interesting targets. These higher time resolution TPFs have background removed for users by the pipeline. However, there are still common trends in TPF pixels that are not due to scattered light, e.g. from spacecraft motion.</p>
 <p><code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> can be used in exactly the same way to remove these common trends.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Download a 2-minute cadence Target Pixel File (TPF)</span>
-<span class="n">tpf_2min</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="n">target_name</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s1">&#39;tess&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="n">tpf_2min</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s1">&#39;TESS&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -822,7 +822,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -832,7 +832,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>Note, unlike the FFI data, the TPF has been processed by the pipeline, and includes an aperture mask.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[67]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -850,7 +850,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[68]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -868,7 +868,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>As you can see the corrected light curve has removed long term trends, and some motion noise (e.g. see time around 1720 BTJD). We can use the same <code class="docutils literal notranslate"><span class="pre">diagnose()</span></code> method to understand the model that has been fit and subtracted by <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[69]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -885,7 +885,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>To show the corrected version has improved, we can use the <em>CDPP</em> metric. As shown below, the corrected light curve has a lower <em>CDPP</em>, showing it is less noisy.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[70]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -894,7 +894,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[70]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -903,7 +903,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[71]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -912,11 +912,11 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[71]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>836.8752819184294
+<span></span>836.8812270953588
 </pre></div>
 </div>
 </div>

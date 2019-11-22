@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.5</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.6</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -190,7 +190,7 @@
 <td><p>Returns the time for all good-quality cadences.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.wcs" title="lightkurve.targetpixelfile.TessTargetPixelFile.wcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wcs</span></code></a></p></td>
-<td><p>Returns an astropy.wcs.WCS object with the World Coordinate System solution for the target pixel file.</p></td>
+<td><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev1333)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System solution for the target pixel file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -390,12 +390,12 @@
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.wcs">
 <code class="sig-name descname">wcs</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.wcs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an astropy.wcs.WCS object with the World Coordinate System
+<dd><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev1333)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System
 solution for the target pixel file.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>w</strong><span class="classifier">astropy.wcs.WCS object</span></dt><dd><p>WCS solution</p>
+<dd class="field-odd"><dl>
+<dt><strong>w</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev1333)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object</span></dt><dd><p>WCS solution</p>
 </dd>
 </dl>
 </dd>
@@ -528,16 +528,22 @@ for each cadence, or NaN for cadences where the estimation failed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, or ‘all’</span></dt><dd><p>A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> means
-that the pixel will be masked out.
-If the string ‘all’ is passed, all pixels will be used.
+<dt><strong>aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, ‘threshold’ or ‘all’</span></dt><dd><p>A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
+that the pixel will be used.
+If None or ‘all’ are passed, all pixels will be used.
+If ‘pipeline’ is passed, the mask suggested by the official pipeline
+will be returned.
+If ‘threshold’ is passed, all pixels brighter than 3-sigma above
+the median flux will be used.
 The default behaviour is to use the TESS pipeline mask.</p>
 </dd>
 <dt><strong>centroid_method</strong><span class="classifier">str, ‘moments’ or ‘quadratic’</span></dt><dd><p>For the details on this arguments, please refer to the documentation
 for <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile.estimate_centroids</span></code>.</p>
 </dd>
-<dt><strong>Returns</strong></dt><dd></dd>
-<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt><strong>lc</strong><span class="classifier">TessLightCurve object</span></dt><dd><p>Contains the summed flux within the aperture for each cadence.</p>
 </dd>
 </dl>
@@ -598,7 +604,7 @@ are contained in the TPF (e.g. short cadence data).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>notebook_url: str</strong></dt><dd><p>Location of the Jupyter notebook page (default: “localhost:8888”)
+<dt><strong>notebook_url</strong><span class="classifier">str</span></dt><dd><p>Location of the Jupyter notebook page (default: “localhost:8888”)
 When showing Bokeh applications, the Bokeh server must be
 explicitly configured to allow connections originating from
 different URLs. This parameter defaults to the standard notebook
@@ -660,7 +666,7 @@ the lightcurve after each pixel selection:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>notebook_url: str</strong></dt><dd><p>Location of the Jupyter notebook page (default: “localhost:8888”)
+<dt><strong>notebook_url</strong><span class="classifier">str</span></dt><dd><p>Location of the Jupyter notebook page (default: “localhost:8888”)
 When showing Bokeh applications, the Bokeh server must be
 explicitly configured to allow connections originating from
 different URLs. This parameter defaults to the standard notebook
@@ -678,7 +684,7 @@ of the form “localhost:8888”, then “http” will be used.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.plot">
-<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">frame=0</em>, <em class="sig-param">cadenceno=None</em>, <em class="sig-param">bkg=False</em>, <em class="sig-param">aperture_mask=None</em>, <em class="sig-param">show_colorbar=True</em>, <em class="sig-param">mask_color='pink'</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">frame=0</em>, <em class="sig-param">cadenceno=None</em>, <em class="sig-param">bkg=False</em>, <em class="sig-param">aperture_mask=None</em>, <em class="sig-param">show_colorbar=True</em>, <em class="sig-param">mask_color='pink'</em>, <em class="sig-param">title=None</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the pixel data for a single frame (i.e. at a single time).</p>
 <p>The time can be specified by frame index number (<code class="xref py py-obj docutils literal notranslate"><span class="pre">frame=0</span></code> will show the
 first frame) or absolute cadence number (<a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.cadenceno" title="lightkurve.targetpixelfile.TessTargetPixelFile.cadenceno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadenceno</span></code></a>).</p>
