@@ -560,7 +560,8 @@ class TargetPixelFile(object):
         return col_centr, row_centr
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
-             show_colorbar=True, mask_color='pink', style='lightkurve', **kwargs):
+             show_colorbar=True, mask_color='pink', title=None, style='lightkurve',
+             **kwargs):
         """Plot the pixel data for a single frame (i.e. at a single time).
 
         The time can be specified by frame index number (`frame=0` will show the
@@ -614,10 +615,11 @@ class TargetPixelFile(object):
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
         with plt.style.context(style):
-            img_title = 'Target ID: {}, Cadence: {}'.format(self.targetid, self.cadenceno[frame])
+            if title is None:
+                title = 'Target ID: {}, Cadence: {}'.format(self.targetid, self.cadenceno[frame])
             img_extent = (self.column, self.column + self.shape[2],
                           self.row, self.row + self.shape[1])
-            ax = plot_image(pflux, ax=ax, title=img_title, extent=img_extent,
+            ax = plot_image(pflux, ax=ax, title=title, extent=img_extent,
                             show_colorbar=show_colorbar, **kwargs)
             ax.grid(False)
         if aperture_mask is not None:
