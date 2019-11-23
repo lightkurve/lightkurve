@@ -1,7 +1,8 @@
-1.6.0 (unreleased)
+1.5.1 (2019-11-22)
 ==================
 
-
+- Fixed a bug introduced in Lightkurve v1.5 which caused ``import lightkurve``
+  on Mac OSX to automatically select the Matplotlib Agg backend. [#640]
 
 
 
