@@ -991,7 +991,7 @@ class TargetPixelFile(object):
             newfits = fits.HDUList(hdus)
         return self.__class__(newfits)
 
-    @staticmethod
+    @staticmethod #<-- slated for removal!
     def from_fits_images(images, position, size=(11, 11), extension=1,
                          targetid="unnamed-target", hdu0_keywords=None, **kwargs):
         """Creates a new Target Pixel File from a set of images.
