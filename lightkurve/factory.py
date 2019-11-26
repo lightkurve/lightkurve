@@ -6,8 +6,14 @@ import warnings
 import logging
 
 from astropy.io import fits
+from astropy.io.fits import Undefined
+from astropy.coordinates import SkyCoord
+from astropy.utils.exceptions import AstropyWarning
+from astropy.nddata import Cutout2D
+from astropy.wcs import WCS
 
 import numpy as np
+from tqdm import tqdm
 
 from . import PACKAGEDIR
 from .utils import LightkurveWarning
