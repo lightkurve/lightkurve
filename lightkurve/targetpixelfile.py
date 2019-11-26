@@ -7,7 +7,6 @@ import logging
 
 from astropy.io import fits
 from astropy.io.fits import Undefined
-from astropy.nddata import Cutout2D
 from astropy.table import Table
 from astropy.wcs import WCS
 from astropy.utils.exceptions import AstropyWarning
