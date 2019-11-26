@@ -957,6 +957,21 @@ class TargetPixelFile(object):
         return self.__class__(newfits)
 
 
+    @staticmethod
+    def from_fits_images(images, position, size=(11, 11), extension=1,
+                         targetid="unnamed-target", hdu0_keywords=None, **kwargs):
+        """Creates a new Target Pixel File from a set of images.
+
+        Deprecated-- moved to TargetPixelFileFactory
+        """
+        warnings.warn('`from_fits_images` is deprecated, please use '
+                    'TargetPixelFileFactory.from_fits_images() instead',
+                      LightkurveWarning)
+        return TargetPixelFileFactory.from_fits_images(images, position,
+                size=size, extension=extension,targetid=targetid,
+                hdu0_keywords=hdu0_keywords, **kwargs)
+
+
 class KeplerTargetPixelFile(TargetPixelFile):
     """Class to read and interact with the pixel data products
     ("Target Pixel Files") created by NASA's Kepler pipeline.
