@@ -15,7 +15,7 @@ from scipy.stats import binned_statistic
 from matplotlib import pyplot as plt
 from copy import deepcopy
 
-from astropy.stats import sigma_clip, calculate_bin_edges
+from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
@@ -893,13 +893,14 @@ class LightCurve(object):
         binsize : int or None
             Number of cadences to include in every bin.  The default
             is 13 if neither `bins` nor `binsize` is assigned.
-        bins : int, list of int, or str
+        bins : int, list of int, str, or None
+            Requires Astropy version >3.1 and >2.10
             Instruction for how to assign bin locations grouping by the time of
             samples rather than index; overrides the `binsize=` if given.
             If ``bins`` is an int, it is the number of bins. If it is a list
             it is taken to be the bin edges. If it is a string, it must be one
-            of  'blocks', 'knuth', 'scott' or 'freedman'. See
-            `~astropy.stats.histogram` for a description of each method.
+            of  'blocks', 'knuth', 'scott' or 'freedman'.
+            See `~astropy.stats.histogram` for description of these algorithms.
         method: str, one of 'mean' or 'median'
             The summary statistic to return for each bin. Default: 'mean'.
 
@@ -920,6 +921,8 @@ class LightCurve(object):
         - If the original lightcurve contains a quality attribute, then the
           bitwise OR of the quality flags will be returned per bin.
         """
+        # Early versions of astropy do not have calculate_bin_edges
+
         # Validate user input
         method = validate_method(method, supported_methods=['mean', 'median'])
         if (binsize is None) and (bins is None):
@@ -927,6 +930,14 @@ class LightCurve(object):
         elif (binsize is not None) and (bins is not None):
             raise ValueError('Both binsize and bins kwargs were passed to '
                              '`.bin()`.  Must assign only one of these.')
+        if bins is not None:
+            try:
+                from astropy.stats import calculate_bin_edges
+            except ImportError:
+                from astropy import __version__ as astropy_version
+                raise ImportError(" The `bins=` parameter requires astropy >3.1 or >2.10,"
+                      " you currently have astropy version {}."
+                      " Update astropy or use the `binsize` kwarg".format(astropy_version))
 
         # Define and map the functions to be applied to each bin
         method_func = np.__dict__['nan' + method]
@@ -953,7 +964,9 @@ class LightCurve(object):
         if bins is None:  # use ``binsize```
             n_bins = self.flux.size // binsize
             bin_by_array = np.arange(len(self.time))
-            bin_edges = calculate_bin_edges(bin_by_array, bins=n_bins)
+            #bin_edges = calculate_bin_edges(bin_by_array, bins=n_bins)
+            bin_edges = np.linspace(bin_by_array.min(), bin_by_array.max(),
+                        n_bins + 1, endpoint=True)
         else:  # ``bins``` was assigned
             bin_by_array = self.time
             bin_edges = calculate_bin_edges(bin_by_array, bins=bins)
