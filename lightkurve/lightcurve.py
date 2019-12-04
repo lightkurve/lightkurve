@@ -15,7 +15,7 @@ from scipy.stats import binned_statistic
 from matplotlib import pyplot as plt
 from copy import deepcopy
 
-from astropy.stats import sigma_clip, calculate_bin_edges
+from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
@@ -898,8 +898,10 @@ class LightCurve(object):
             samples rather than index; overrides the `binsize=` if given.
             If ``bins`` is an int, it is the number of bins. If it is a list
             it is taken to be the bin edges. If it is a string, it must be one
-            of  'blocks', 'knuth', 'scott' or 'freedman'. See
-            `~astropy.stats.histogram` for a description of each method.
+            of  'blocks', 'knuth', 'scott' or 'freedman' if your AstroPy version
+            supports string input to `~astropy.stats.histogram`. Older versions
+            of AstroPy will instead default to the `~numpy.histogram_bin_edges`
+            method.
         method: str, one of 'mean' or 'median'
             The summary statistic to return for each bin. Default: 'mean'.
 
@@ -920,6 +922,17 @@ class LightCurve(object):
         - If the original lightcurve contains a quality attribute, then the
           bitwise OR of the quality flags will be returned per bin.
         """
+        # Early versions of astropy do not have calculate_bin_edges
+        try:
+            from astropy.stats import calculate_bin_edges
+            raise ImportError #for debugging purposes
+        except ImportError:
+            from astropy import __version__ as astropy_version
+            log.info("Version {} of astropy does not support calculate_bin_edges,"
+                  " falling back to numpy analog.  Upgrade astropy to version to"
+                  " >3.1 or >2.10 for consistent string input".format(astropy_version))
+            from numpy import histogram_bin_edges as calculate_bin_edges
+
         # Validate user input
         method = validate_method(method, supported_methods=['mean', 'median'])
         if (binsize is None) and (bins is None):
