@@ -1,14 +1,9 @@
-1.6.0 (unreleased)
+1.5.2 (2019-12-05)
 ==================
 
-
-
-1.5.2 (2019-12-04)
-==================
-
-- Fixed a bug introduced in Lightkurve v1.5 which raised an error upon import
-  for installs with astropy version <=3.1 or <=2.10, due to missing
-  calculate_bin_edges. [#644]
+- Fixed a bug introduced in v1.5.0 which caused an ``ImportError`` related to
+  ``astropy.stats.calculate_bin_edges`` to be raised when a user has an older
+  version of AstroPy installed (version <3.1 or <2.10). [#644]
 
 - Fixed a bug which caused the positions of stars in ``tpf.interact_sky()`` to
   be off by one pixel. [#638]

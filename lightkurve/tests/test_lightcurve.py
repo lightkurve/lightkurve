@@ -442,6 +442,14 @@ def test_bin():
 
 def test_bins_kwarg():
     """Does binning work with user-defined bin placement?"""
+    # The bins feature requires astropy >3.1 or >2.10;
+    # so we'll ignore this test if those versions are not available.
+    # We should remove this check once we upgrade the minimum requirements.
+    try:
+        from astropy.stats import calculate_bin_edges
+    except ImportError:
+        return
+
     n_times = 3800
     time_points = np.sort(np.random.uniform(low=0.0, high=80.0, size=n_times))
     lc = LightCurve(time=time_points, flux=1.0+np.random.normal(0, 0.1, n_times),
