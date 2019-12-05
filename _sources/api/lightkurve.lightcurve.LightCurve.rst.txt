@@ -26,6 +26,7 @@ LightCurve
       ~LightCurve.fill_gaps
       ~LightCurve.flatten
       ~LightCurve.fold
+      ~LightCurve.from_stingray
       ~LightCurve.from_timeseries
       ~LightCurve.interact_bls
       ~LightCurve.normalize
@@ -40,6 +41,7 @@ LightCurve
       ~LightCurve.to_pandas
       ~LightCurve.to_periodogram
       ~LightCurve.to_seismology
+      ~LightCurve.to_stingray
       ~LightCurve.to_table
       ~LightCurve.to_timeseries
 
@@ -59,6 +61,7 @@ LightCurve
    .. automethod:: fill_gaps
    .. automethod:: flatten
    .. automethod:: fold
+   .. automethod:: from_stingray
    .. automethod:: from_timeseries
    .. automethod:: interact_bls
    .. automethod:: normalize
@@ -73,5 +76,6 @@ LightCurve
    .. automethod:: to_pandas
    .. automethod:: to_periodogram
    .. automethod:: to_seismology
+   .. automethod:: to_stingray
    .. automethod:: to_table
    .. automethod:: to_timeseries

@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -100,7 +101,7 @@
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev1392)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.HDUList</span></code></a> object</span></dt><dd><p>Local path or remote url of a lightcurve FITS file.
+<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.HDUList</span></code></a> object</span></dt><dd><p>Local path or remote url of a lightcurve FITS file.
 Also accepts a FITS file object already opened using AstroPy.</p>
 </dd>
 <dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Keyword arguments to be passed to astropy.io.fits.open.</p>
@@ -148,13 +149,16 @@ Also accepts a FITS file object already opened using AstroPy.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.errorbar" title="lightkurve.lightcurvefile.LightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.errorbar" title="lightkurve.lightcurvefile.LightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.header" title="lightkurve.lightcurvefile.LightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.get_keyword" title="lightkurve.lightcurvefile.LightCurveFile.get_keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code></a>(self, keyword[, hdu, default])</p></td>
+<td><p>Returns a header keyword value.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.header" title="lightkurve.lightcurvefile.LightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
 <td><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="lightkurve.lightcurvefile.LightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="lightkurve.lightcurvefile.LightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="lightkurve.lightcurvefile.LightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.scatter" title="lightkurve.lightcurvefile.LightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(self[, flux_types, style])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.scatter" title="lightkurve.lightcurvefile.LightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.scatter" title="lightkurve.lightcurvefile.LightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 </tbody>
@@ -243,6 +247,14 @@ Lightkurve’s custom stylesheet is used by default.</p>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.lightcurvefile.LightCurveFile.get_keyword">
+<code class="sig-name descname">get_keyword</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">keyword</em>, <em class="sig-param">hdu=0</em>, <em class="sig-param">default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.get_keyword" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a header keyword value.</p>
+<p>If the keyword is Undefined or does not exist,
+then return <code class="docutils literal notranslate"><span class="pre">default</span></code> instead.</p>
 </dd></dl>
 
 <dl class="method">

@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -191,16 +192,19 @@ following meaning:</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar" title="lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar" title="lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lightcurve</span></code></a>(self, flux_type[, centroid_type])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_keyword" title="lightkurve.lightcurvefile.KeplerLightCurveFile.get_keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code></a>(self, keyword[, hdu, default])</p></td>
+<td><p>Returns a header keyword value.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lightcurve</span></code></a>(self, flux_type[, centroid_type])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.header" title="lightkurve.lightcurvefile.KeplerLightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.header" title="lightkurve.lightcurvefile.KeplerLightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
 <td><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="lightkurve.lightcurvefile.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="lightkurve.lightcurvefile.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="lightkurve.lightcurvefile.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.scatter" title="lightkurve.lightcurvefile.KeplerLightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(self[, flux_types, style])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.scatter" title="lightkurve.lightcurvefile.KeplerLightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.scatter" title="lightkurve.lightcurvefile.KeplerLightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 </tbody>
@@ -362,6 +366,14 @@ Lightkurve’s custom stylesheet is used by default.</p>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.get_keyword">
+<code class="sig-name descname">get_keyword</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">keyword</em>, <em class="sig-param">hdu=0</em>, <em class="sig-param">default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_keyword" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a header keyword value.</p>
+<p>If the keyword is Undefined or does not exist,
+then return <code class="docutils literal notranslate"><span class="pre">default</span></code> instead.</p>
 </dd></dl>
 
 <dl class="method">

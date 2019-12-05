@@ -23,6 +23,7 @@ LightCurveFile
    .. autosummary::
 
       ~LightCurveFile.errorbar
+      ~LightCurveFile.get_keyword
       ~LightCurveFile.header
       ~LightCurveFile.plot
       ~LightCurveFile.scatter
@@ -40,6 +41,7 @@ LightCurveFile
    .. rubric:: Methods Documentation
 
    .. automethod:: errorbar
+   .. automethod:: get_keyword
    .. automethod:: header
    .. automethod:: plot
    .. automethod:: scatter

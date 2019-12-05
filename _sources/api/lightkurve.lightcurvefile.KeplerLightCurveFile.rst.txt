@@ -32,6 +32,7 @@ KeplerLightCurveFile
 
       ~KeplerLightCurveFile.compute_cotrended_lightcurve
       ~KeplerLightCurveFile.errorbar
+      ~KeplerLightCurveFile.get_keyword
       ~KeplerLightCurveFile.get_lightcurve
       ~KeplerLightCurveFile.header
       ~KeplerLightCurveFile.plot
@@ -59,6 +60,7 @@ KeplerLightCurveFile
 
    .. automethod:: compute_cotrended_lightcurve
    .. automethod:: errorbar
+   .. automethod:: get_keyword
    .. automethod:: get_lightcurve
    .. automethod:: header
    .. automethod:: plot

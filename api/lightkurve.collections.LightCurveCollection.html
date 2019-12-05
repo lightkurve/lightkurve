@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -163,7 +164,7 @@ a new one will be created.</p>
 
 <dl class="method">
 <dt id="lightkurve.collections.LightCurveCollection.stitch">
-<code class="sig-name descname">stitch</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">corrector_func=&lt;function LightCurveCollection.&lt;lambda&gt; at 0x7ff4e4713400&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.collections.LightCurveCollection.stitch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stitch</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">corrector_func=&lt;function LightCurveCollection.&lt;lambda&gt; at 0x7f6fa313e830&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.collections.LightCurveCollection.stitch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stitch all light curves in the collection into a single lk.LightCurve</p>
 <p>Any function passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">corrector_func</span></code> will be applied to each light curve
 before stitching. For example, passing “lambda x: x.normalize().flatten()”

@@ -6,6 +6,12 @@ RegressionCorrector
 .. autoclass:: RegressionCorrector
    :show-inheritance:
 
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~RegressionCorrector.X
+
    .. rubric:: Methods Summary
 
    .. autosummary::
@@ -13,6 +19,10 @@ RegressionCorrector
       ~RegressionCorrector.correct
       ~RegressionCorrector.diagnose
       ~RegressionCorrector.diagnose_priors
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: X
 
    .. rubric:: Methods Documentation
 

@@ -6,6 +6,12 @@ SFFCorrector
 .. autoclass:: SFFCorrector
    :show-inheritance:
 
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~SFFCorrector.X
+
    .. rubric:: Methods Summary
 
    .. autosummary::
@@ -14,6 +20,10 @@ SFFCorrector
       ~SFFCorrector.diagnose
       ~SFFCorrector.diagnose_arclength
       ~SFFCorrector.diagnose_priors
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: X
 
    .. rubric:: Methods Documentation
 
