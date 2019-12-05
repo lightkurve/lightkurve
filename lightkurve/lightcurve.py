@@ -921,8 +921,6 @@ class LightCurve(object):
         - If the original lightcurve contains a quality attribute, then the
           bitwise OR of the quality flags will be returned per bin.
         """
-        # Early versions of astropy do not have calculate_bin_edges
-
         # Validate user input
         method = validate_method(method, supported_methods=['mean', 'median'])
         if (binsize is None) and (bins is None):
@@ -930,14 +928,17 @@ class LightCurve(object):
         elif (binsize is not None) and (bins is not None):
             raise ValueError('Both binsize and bins kwargs were passed to '
                              '`.bin()`.  Must assign only one of these.')
+
+        # Only recent versions of AstroPy (>Dec 2018) provide ``calculate_bin_edges``
         if bins is not None:
             try:
                 from astropy.stats import calculate_bin_edges
             except ImportError:
                 from astropy import __version__ as astropy_version
-                raise ImportError(" The `bins=` parameter requires astropy >3.1 or >2.10,"
-                      " you currently have astropy version {}."
-                      " Update astropy or use the `binsize` kwarg".format(astropy_version))
+                raise ImportError("The `bins=` parameter requires astropy >=3.1 or >=2.10, "
+                                  "you currently have astropy version {}. "
+                                  "Update astropy or use the `binsize` argument instead."
+                                  "".format(astropy_version))
 
         # Define and map the functions to be applied to each bin
         method_func = np.__dict__['nan' + method]
