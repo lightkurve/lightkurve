@@ -18,7 +18,7 @@
     <div class="row">
       <div class="col-lg-6">
         <p style="font-size: 1.2em; font-weight: 700;">
-         Time domain astronomy made easy
+         Time domain astronomy made easy for all
         </p>
         <p>
           Lightkurve offers a user-friendly way
@@ -26,10 +26,10 @@
           in particular NASA’s Kepler and TESS exoplanet missions.
         </p>
         <p>
-          Lightkurve aims to lower barriers, promote best practices, and reduce costs
-          by providing high-quality <a href="api/index.html">API's</a> and
-          <a href="tutorials/index.html">tutorials</a>
-          accessible to everyone.
+          Lightkurve aims to lower barriers, promote best practices, reduce costs,
+          and improve scientific fidelity
+          by providing accessible Python <a href="api/index.html">tools</a> and
+          <a href="tutorials/index.html">tutorials</a>.
         </p>
       </div> 
 
