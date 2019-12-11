@@ -56,13 +56,22 @@ class Periodogram(object):
         Human-friendly object label, e.g. "KIC 123456789".
     targetid : str
         Identifier of the target.
-    default_view : "frequency" or "period"
-        Should plots be shown in frequency space or period space by default?
+    xaxis_default : "frequency" or "period"
+        Should the X axis of plots show frequency or period by default?
+    yaxis_default : "amplitude" or "power"
+        Should the Y axis of plots show amplitude or power by default?
     meta : dict
         Free-form metadata associated with the Periodogram.
     """
     def __init__(self, frequency, power, nyquist=None, label=None,
-                 targetid=None, default_view='frequency', meta={}):
+                 targetid=None, xaxis_default="frequency", yaxis_default="power",
+                 default_view=None, meta={}):
+        # ``default_view``` is deprecated in favor of ``xaxis_default```
+        # TODO: ADD DEPRECATION WARNING
+        if xaxis_default == "frequency" and default_view is not None:
+            xaxis_default = default_view
+        xaxis_default = validate_method(xaxis_default, ["frequency", "period"])
+        yaxis_default = validate_method(yaxis_default, ["power", "amplitude"])
         # Input validation
         if not isinstance(frequency, u.quantity.Quantity):
             raise ValueError('frequency must be an `astropy.units.Quantity` object.')
@@ -84,16 +93,9 @@ class Periodogram(object):
         self.nyquist = nyquist
         self.label = label
         self.targetid = targetid
-        self.default_view = self._validate_view(default_view)
+        self.xaxis_default = xaxis_default
+        self.yaxis_default = yaxis_default
         self.meta = meta
-
-    def _validate_view(self, view):
-        """Verifies whether `view` is is one of {"frequency", "period"} and
-        raises a helpful `ValueError` if not.
-        """
-        if view is None and hasattr(self, 'default_view'):
-            view = self.default_view
-        return validate_method(view, ["frequency", "period"])
 
     @property
     def period(self):
@@ -249,7 +251,8 @@ class Periodogram(object):
             return smooth_pg
 
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
-             style='lightkurve', view=None, unit=None, **kwargs):
+             style='lightkurve', view=None, xaxis=None, yaxis=None, unit=None,
+             **kwargs):
         """Plots the Periodogram.
 
         Parameters
@@ -281,10 +284,22 @@ class Periodogram(object):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
+        if xaxis is None:
+            if view is not None:
+                # ``view`` is deprecated in favor of xaxis
+                # TODO: ADD DEPRECATION WARNING
+                # TODO: UPDATE DOCSTRING
+                xaxis = view
+            else:
+                xaxis = self.xaxis_default
+        xaxis = validate_method(xaxis, ["frequency", "period"])
+
+        if yaxis is None:
+            yaxis = self.yaxis_default
+        yaxis = validate_method(yaxis, ["power", "amplitude"])
+
         if isinstance(unit, u.quantity.Quantity):
             unit = unit.unit
-
-        view = self._validate_view(view)
 
         if unit is None:
             unit = self.frequency.unit
@@ -294,7 +309,7 @@ class Periodogram(object):
         if style is None or style == 'lightkurve':
             style = MPLSTYLE
         if ylabel is None:
-            if ('normalization' in self.meta) and (self.meta['normalization'] == 'amplitude'):
+            if normalization == 'amplitude':
                 ylabel = 'Amplitude'
                 ylabel += " [{}]".format(self.amplitude.unit.to_string('latex'))
             else:
