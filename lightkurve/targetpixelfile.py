@@ -567,26 +567,26 @@ class TargetPixelFile(object):
         flux, flux_err, centroid_col, centroid_row
         """
         # Validate the aperture mask
-        aperture_mask = self._parse_aperture_mask(aperture_mask)
-        if aperture_mask.sum() == 0:
+        apmask = self._parse_aperture_mask(aperture_mask)
+        if apmask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
 
         # Estimate centroids
-        centroid_col, centroid_row = self.estimate_centroids(aperture_mask,
-                                                             method=centroid_method)
+        centroid_col, centroid_row = self.estimate_centroids(apmask, method=centroid_method)
 
-        # Estimate flux and flux_err
-        flux = np.nansum(self.flux[:, aperture_mask], axis=1)
-        # Ignore warnings related to zero or negative errors
+        # Estimate flux
+        flux = np.nansum(self.flux[:, apmask], axis=1)
+        # We use ``np.nansum`` above to be robust against a subset of pixels
+        # being NaN, however if *all* pixels are NaN, we propagate a NaN.
+        is_allnan = ~np.any(np.isfinite(self.flux[:, apmask]), axis=1)
+        flux[is_allnan] = np.nan
+        
+        # Estimate flux_err
         with warnings.catch_warnings():
+            # Ignore warnings due to negative errors
             warnings.simplefilter("ignore", RuntimeWarning)
-            flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
-            # We use ``np.nansum`` above to be robust against the errors in a
-            # subset of pixels being NaN. However, if *all* pixels show
-            # ``FLUX_ERR==NaN```, it is important that we propogate
-            # ``flux_err=NaN``` for that cadence:
-            is_allnan = ~np.any(np.isfinite(self.flux_err[:, aperture_mask]),
-                                axis=1)
+            flux_err = np.nansum(self.flux_err[:, apmask]**2, axis=1)**0.5
+            is_allnan = ~np.any(np.isfinite(self.flux_err[:, apmask]), axis=1)
             flux_err[is_allnan] = np.nan
 
         return flux, flux_err, centroid_col, centroid_row

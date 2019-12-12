@@ -1,3 +1,11 @@
+1.5.3 (unreleased)
+==================
+
+- Fixed a bug in ``tpf.to_lightcurve()`` which caused ``flux`` and ``flux_err``
+  to be ``0`` instead of ``NaN`` for cadences with all-NaN pixels. [#651]
+
+
+
 1.5.2 (2019-12-05)
 ==================
 
