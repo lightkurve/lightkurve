@@ -580,7 +580,7 @@ class TargetPixelFile(object):
         # being NaN, however if *all* pixels are NaN, we propagate a NaN.
         is_allnan = ~np.any(np.isfinite(self.flux[:, apmask]), axis=1)
         flux[is_allnan] = np.nan
-        
+
         # Estimate flux_err
         with warnings.catch_warnings():
             # Ignore warnings due to negative errors
