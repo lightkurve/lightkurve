@@ -534,3 +534,15 @@ def test_cutout():
         ntpf = tpf.cutout(size=2)
         assert np.product(ntpf.flux.shape[1:]) == 4
         assert ntpf.targetid == '{}_CUTOUT'.format(tpf.targetid)
+
+
+def test_aperture_photometry_fluxerr_nan():
+    """Regression test for #648.
+
+    When FLUX_ERR is entirely NaN in a TPF, the resulting light curve
+    should report flux_err=NaN in that cadence rather than zero."""
+    tpf = lkopen(filename_tpf_one_center)
+    tpf.hdu[1].data['FLUX_ERR'][2] = np.nan
+    lc = tpf.to_lightcurve(aperture_mask='all')
+    assert ~np.isnan(lc.flux_err[1])
+    assert np.isnan(lc.flux_err[2])

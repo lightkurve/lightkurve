@@ -242,20 +242,20 @@ class LightCurve(object):
         light curve of Pi Mensae as an example, which we obtained as follows::
 
             >>> import lightkurve as lk
-            >>> lc = lk.search_lightcurvefile("Pi Mensae", mission="TESS", sector=1).download().PDCSAP_FLUX
-            >>> lc
+            >>> lc = lk.search_lightcurvefile("Pi Mensae", mission="TESS", sector=1).download().PDCSAP_FLUX  # doctest: +SKIP
+            >>> lc  # doctest: +SKIP
             TessLightCurve(TICID: 261136679)
 
         Every `LightCurve` object has a `time` attribute, which provides access
         to the original array of time values given in the native format and
         scale used by the data product from which the light curve was obtained::
 
-            >>> lc.time
+            >>> lc.time  # doctest: +SKIP
             array([1325.29698328, 1325.29837215, 1325.29976102, ..., 1353.17431099,
                    1353.17569985, 1353.17708871])
-            >>> lc.time_format
+            >>> lc.time_format  # doctest: +SKIP
             'btjd'
-            >>> lc.time_scale
+            >>> lc.time_scale  # doctest: +SKIP
             'tdb'
 
         To enable users to convert these time values to different formats or
