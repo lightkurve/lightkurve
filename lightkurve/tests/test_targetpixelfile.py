@@ -98,7 +98,7 @@ def test_tpf_zeros():
     # When you do mask out bad data everything should work.
     assert (tpf.astropy_time.jd == 0).any()
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask='hard')
-    lc = tpf.to_lightcurve()
+    lc = tpf.to_lightcurve(aperture_mask="all")
     assert len(lc.time) == len(lc.flux)
     assert np.all(lc.time == tpf.time)
     assert np.all(lc.flux == 0)
@@ -534,3 +534,18 @@ def test_cutout():
         ntpf = tpf.cutout(size=2)
         assert np.product(ntpf.flux.shape[1:]) == 4
         assert ntpf.targetid == '{}_CUTOUT'.format(tpf.targetid)
+
+
+def test_aperture_photometry_nan():
+    """Regression test for #648.
+
+    When FLUX or FLUX_ERR is entirely NaN in a TPF, the resulting light curve
+    should report NaNs in that cadence rather than zero."""
+    tpf = lkopen(filename_tpf_one_center)
+    tpf.hdu[1].data['FLUX'][2] = np.nan
+    tpf.hdu[1].data['FLUX_ERR'][2] = np.nan
+    lc = tpf.to_lightcurve(aperture_mask='all')
+    assert ~np.isnan(lc.flux[1])
+    assert ~np.isnan(lc.flux_err[1])
+    assert np.isnan(lc.flux[2])
+    assert np.isnan(lc.flux_err[2])
