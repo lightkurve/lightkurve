@@ -31,21 +31,21 @@ class Seismology(object):
     Download the TESS light curve for HIP 116158:
 
         >>> import lightkurve as lk
-        >>> lc = lk.search_lightcurvefile("HIP 116158", sector=2).download().PDCSAP_FLUX
-        >>> lc = lc.normalize().remove_nans().remove_outliers()
+        >>> lc = lk.search_lightcurvefile("HIP 116158", sector=2).download().PDCSAP_FLUX  # doctest: +SKIP
+        >>> lc = lc.normalize().remove_nans().remove_outliers()  # doctest: +SKIP
 
     Create a Lomb-Scargle periodogram:
 
-        >>> pg = lc.to_periodogram(normalization='psd', minimum_frequency=100, maximum_frequency=800)
+        >>> pg = lc.to_periodogram(normalization='psd', minimum_frequency=100, maximum_frequency=800)  # doctest: +SKIP
 
     Create a Seismology object and use it to estimate parameters:
 
-        >>> seismology = pg.flatten().to_seismology()
-        >>> seismology.estimate_numax()
+        >>> seismology = pg.flatten().to_seismology()  # doctest: +SKIP
+        >>> seismology.estimate_numax()  # doctest: +SKIP
         numax: 415.00 uHz (method: ACF2D)
-        >>> seismology.estimate_deltanu()
+        >>> seismology.estimate_deltanu()  # doctest: +SKIP
         deltanu: 28.78 uHz (method: ACF2D)
-        >>> seismology.estimate_radius(teff=5080)
+        >>> seismology.estimate_radius(teff=5080)  # doctest: +SKIP
         radius: 2.78 solRad (method: Uncorrected Scaling Relations)
 
     Parameters

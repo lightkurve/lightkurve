@@ -1,8 +1,13 @@
-1.5.3 (2019-12-05)
+1.5.3 (unreleased)
 ==================
 
-- Added a new TESS data anomaly flag (bit 13 / value 4096) which marks cadences
-  affected by strong scattered light since Sector 14.
+- Fixed a bug in ``tpf.to_lightcurve()`` which caused ``flux`` and ``flux_err``
+  to be ``0`` instead of ``NaN`` for cadences with all-NaN pixels. [#651]
+
+- Added a new TESS data anomaly flag (bit 13 / value 4096) which was introduced
+  in Sector 14 to mark cadences affected by strong scattered light.  Compared
+  to the original stray light flag (bit 12), this flag is set automatically by
+  the pipeline based on background level thresholds.
 
 
 

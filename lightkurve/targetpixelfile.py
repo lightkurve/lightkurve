@@ -559,6 +559,38 @@ class TargetPixelFile(object):
         row_centr = np.asfarray(row_centr) + self.row + .5
         return col_centr, row_centr
 
+    def _aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
+        """Helper method for ``extract_aperture photometry``.
+
+        Returns
+        -------
+        flux, flux_err, centroid_col, centroid_row
+        """
+        # Validate the aperture mask
+        apmask = self._parse_aperture_mask(aperture_mask)
+        if apmask.sum() == 0:
+            log.warning('Warning: aperture mask contains zero pixels.')
+
+        # Estimate centroids
+        centroid_col, centroid_row = self.estimate_centroids(apmask, method=centroid_method)
+
+        # Estimate flux
+        flux = np.nansum(self.flux[:, apmask], axis=1)
+        # We use ``np.nansum`` above to be robust against a subset of pixels
+        # being NaN, however if *all* pixels are NaN, we propagate a NaN.
+        is_allnan = ~np.any(np.isfinite(self.flux[:, apmask]), axis=1)
+        flux[is_allnan] = np.nan
+
+        # Estimate flux_err
+        with warnings.catch_warnings():
+            # Ignore warnings due to negative errors
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_err = np.nansum(self.flux_err[:, apmask]**2, axis=1)**0.5
+            is_allnan = ~np.any(np.isfinite(self.flux_err[:, apmask]), axis=1)
+            flux_err[is_allnan] = np.nan
+
+        return flux, flux_err, centroid_col, centroid_row
+
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
              show_colorbar=True, mask_color='pink', title=None, style='lightkurve',
              **kwargs):
@@ -697,16 +729,16 @@ class TargetPixelFile(object):
         To select an aperture mask for V827 Tau::
 
             >>> import lightkurve as lk
-            >>> tpf = lk.search_targetpixelfile("V827 Tau", mission="K2").download()
-            >>> tpf.interact()
+            >>> tpf = lk.search_targetpixelfile("V827 Tau", mission="K2").download()  # doctest: +SKIP
+            >>> tpf.interact()  # doctest: +SKIP
 
 
         To see the full y-axis dynamic range of your lightcurve and normalize
         the lightcurve after each pixel selection::
 
-            >>> ylim_func = lambda lc: (0.0, lc.flux.max())
-            >>> transform_func = lambda lc: lc.normalize()
-            >>> tpf.interact(ylim_func=ylim_func, transform_func=transform_func)
+            >>> ylim_func = lambda lc: (0.0, lc.flux.max())  # doctest: +SKIP
+            >>> transform_func = lambda lc: lc.normalize()  # doctest: +SKIP
+            >>> tpf.interact(ylim_func=ylim_func, transform_func=transform_func)  # doctest: +SKIP
 
         """
         from .interact import show_interact_widget
@@ -1050,15 +1082,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Array containing the summed flux within the aperture for each
             cadence.
         """
-        aperture_mask = self._parse_aperture_mask(aperture_mask)
-        if aperture_mask.sum() == 0:
-            log.warning('Warning: aperture mask contains zero pixels.')
-        centroid_col, centroid_row = self.estimate_centroids(aperture_mask, method=centroid_method)
-        # Ignore warnings related to zero or negative errors
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RuntimeWarning)
-            flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
-
+        flux, flux_err, centroid_col, centroid_row = \
+            self._aperture_photometry(aperture_mask=aperture_mask,
+                                      centroid_method=centroid_method)
         keys = {'centroid_col': centroid_col,
                 'centroid_row': centroid_row,
                 'quality': self.quality,
@@ -1072,7 +1098,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'label': self.header['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
-                                flux=np.nansum(self.flux[:, aperture_mask], axis=1),
+                                flux=flux,
                                 flux_err=flux_err,
                                 **keys)
 
@@ -1650,7 +1676,7 @@ class TessTargetPixelFile(TargetPixelFile):
         return btjd_to_astropy_time(btjd=self.time)
 
     def extract_aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
-        """Performs aperture photometry.
+        """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
         ----------
@@ -1672,15 +1698,9 @@ class TessTargetPixelFile(TargetPixelFile):
         lc : TessLightCurve object
             Contains the summed flux within the aperture for each cadence.
         """
-        aperture_mask = self._parse_aperture_mask(aperture_mask)
-        if aperture_mask.sum() == 0:
-            log.warning('Warning: aperture mask contains zero pixels.')
-        centroid_col, centroid_row = self.estimate_centroids(aperture_mask, method=centroid_method)
-        # Ignore warnings related to zero or negative errors
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RuntimeWarning)
-            flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
-
+        flux, flux_err, centroid_col, centroid_row = \
+            self._aperture_photometry(aperture_mask=aperture_mask,
+                                      centroid_method=centroid_method)
         keys = {'centroid_col': centroid_col,
                 'centroid_row': centroid_row,
                 'quality': self.quality,
@@ -1693,7 +1713,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'label': self.get_keyword('OBJECT'),
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
-                              flux=np.nansum(self.flux[:, aperture_mask], axis=1),
+                              flux=flux,
                               flux_err=flux_err,
                               **keys)
 
