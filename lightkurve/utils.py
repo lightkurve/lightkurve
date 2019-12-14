@@ -192,16 +192,19 @@ class TessQualityFlags(QualityFlags):
     Discontinuity = 256
     ImpulsiveOutlier = 512
     CollateralCosmic = 1024
+    #: The first stray light flag is set manually by MIT based on visual inspection.
     Straylight = 2048
+    #: The second stray light flag is set automatically by Ames/SPOC based on background level thresholds.
+    Straylight2 = 4096
 
     #: DEFAULT bitmask identifies all cadences which are definitely useless.
     DEFAULT_BITMASK = (AttitudeTweak | SafeMode | CoarsePoint | EarthPoint |
                        Desat | ManualExclude)
     #: HARD bitmask is conservative and may identify cadences which are useful.
     HARD_BITMASK = (DEFAULT_BITMASK | ApertureCosmic |
-                    CollateralCosmic | Straylight)
+                    CollateralCosmic | Straylight | ScatteredLight)
     #: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.
-    HARDEST_BITMASK = 4095
+    HARDEST_BITMASK = 8191
 
     #: Dictionary which provides friendly names for the various bitmasks.
     OPTIONS = {'none': 0,
@@ -222,7 +225,8 @@ class TessQualityFlags(QualityFlags):
         256: "Discontinuity corrected",
         512: "Impulsive outlier",
         1024: "Cosmic ray in collateral data",
-        2048: "Straylight"
+        2048: "Straylight",
+        4096: "Straylight2"
     }
 
 def channel_to_module_output(channel):

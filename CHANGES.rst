@@ -1,3 +1,11 @@
+1.5.3 (2019-12-05)
+==================
+
+- Added a new TESS data anomaly flag (bit 13 / value 4096) which marks cadences
+  affected by strong scattered light since Sector 14.
+
+
+
 1.5.2 (2019-12-05)
 ==================
 
