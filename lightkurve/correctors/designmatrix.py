@@ -207,16 +207,12 @@ class DesignMatrix():
         # nterms cannot be langer than the number of columns in the matrix
         if nterms > self.shape[1]:
             nterms = self.shape[1]
-        # `fbpca.pca` is faster than `np.linalg.svd` but an optional dependency
-        try:
-            from fbpca import pca
-            # fbpca is randomized, and has n_iter=2 as default,
-            # we find this to be too few, and that n_iter=10 is still fast but
-            # produces stable results.
-            new_values, _, _ = pca(self.values, nterms, n_iter=10)
-        except ImportError:
-            new_values, _, _ = np.linalg.svd(self.values)
-            new_values = new_values[:, :nterms]
+        # We use `fbpca.pca` instead of `np.linalg.svd` because it is faster.
+        # Note that fbpca is randomized, and has n_iter=2 as default,
+        # we find this to be too few, and that n_iter=10 is still fast but
+        # produces more stable results.
+        from fbpca import pca  # local import because not used elsewhere
+        new_values, _, _ = pca(self.values, nterms, n_iter=10)
         return DesignMatrix(new_values, name=self.name)
 
     def append_constant(self, prior_mu=0, prior_sigma=np.inf):
