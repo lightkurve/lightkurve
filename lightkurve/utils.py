@@ -202,7 +202,7 @@ class TessQualityFlags(QualityFlags):
                        Desat | ManualExclude)
     #: HARD bitmask is conservative and may identify cadences which are useful.
     HARD_BITMASK = (DEFAULT_BITMASK | ApertureCosmic |
-                    CollateralCosmic | Straylight | ScatteredLight)
+                    CollateralCosmic | Straylight | Straylight2)
     #: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.
     HARDEST_BITMASK = 8191
 
