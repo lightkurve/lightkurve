@@ -10,3 +10,4 @@ tqdm
 pandas
 uncertainties
 patsy
+fbpca

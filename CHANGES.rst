@@ -1,4 +1,4 @@
-1.5.3 (unreleased)
+1.6.0 (unreleased)
 ==================
 
 - Fixed a bug in ``tpf.to_lightcurve()`` which caused ``flux`` and ``flux_err``
@@ -8,6 +8,9 @@
   in Sector 14 to mark cadences affected by strong scattered light.  Compared
   to the original stray light flag (bit 12), this flag is set automatically by
   the pipeline based on background level thresholds.
+
+- Changed the requirements to make ``fbpca`` a required dependency, because
+  it allows ``DesignMatrix.pca()`` to be faster and more robust.
 
 
 
