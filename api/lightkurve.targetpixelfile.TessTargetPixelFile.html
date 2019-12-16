@@ -41,7 +41,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.5</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.6</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -191,7 +191,7 @@
 <td><p>Returns the time for all good-quality cadences.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.wcs" title="lightkurve.targetpixelfile.TessTargetPixelFile.wcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wcs</span></code></a></p></td>
-<td><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System solution for the target pixel file.</p></td>
+<td><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System solution for the target pixel file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -212,7 +212,7 @@
 <td><p>Returns the flux center of an object inside <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.extract_aperture_photometry" title="lightkurve.targetpixelfile.TessTargetPixelFile.extract_aperture_photometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_aperture_photometry</span></code></a>(self[, …])</p></td>
-<td><p>Performs aperture photometry.</p></td>
+<td><p>Returns a LightCurve obtained using aperture photometry.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_bkg_lightcurve" title="lightkurve.targetpixelfile.TessTargetPixelFile.get_bkg_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bkg_lightcurve</span></code></a>(self[, aperture_mask])</p></td>
 <td><p></p></td>
@@ -391,12 +391,12 @@
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.wcs">
 <code class="sig-name descname">wcs</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.wcs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System
+<dd><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System
 solution for the target pixel file.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl>
-<dt><strong>w</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object</span></dt><dd><p>WCS solution</p>
+<dt><strong>w</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object</span></dt><dd><p>WCS solution</p>
 </dd>
 </dl>
 </dd>
@@ -525,7 +525,7 @@ for each cadence, or NaN for cadences where the estimation failed.</p>
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.extract_aperture_photometry">
 <code class="sig-name descname">extract_aperture_photometry</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">aperture_mask='pipeline'</em>, <em class="sig-param">centroid_method='moments'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.extract_aperture_photometry" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs aperture photometry.</p>
+<dd><p>Returns a LightCurve obtained using aperture photometry.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -647,15 +647,15 @@ percentile of lightcurve flux values.</p>
 <p class="rubric">Examples</p>
 <p>To select an aperture mask for V827 Tau:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;V827 Tau&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;V827 Tau&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>  
 </pre></div>
 </div>
 <p>To see the full y-axis dynamic range of your lightcurve and normalize
 the lightcurve after each pixel selection:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ylim_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">transform_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">ylim_func</span><span class="o">=</span><span class="n">ylim_func</span><span class="p">,</span> <span class="n">transform_func</span><span class="o">=</span><span class="n">transform_func</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ylim_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">ylim_func</span><span class="o">=</span><span class="n">ylim_func</span><span class="p">,</span> <span class="n">transform_func</span><span class="o">=</span><span class="n">transform_func</span><span class="p">)</span>  
 </pre></div>
 </div>
 </dd></dl>

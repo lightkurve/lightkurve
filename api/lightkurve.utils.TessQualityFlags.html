@@ -41,7 +41,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.5</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.6</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -162,7 +162,7 @@ as documented in the TESS Data Products Description Document (Ref. [1], Table 26
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.utils.TessQualityFlags.Straylight" title="lightkurve.utils.TessQualityFlags.Straylight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Straylight</span></code></a></p></td>
-<td><p></p></td>
+<td><p>The first stray light flag is set manually by MIT based on visual inspection.</p></td>
 </tr>
 </tbody>
 </table>
@@ -230,13 +230,13 @@ as documented in the TESS Data Products Description Document (Ref. [1], Table 26
 
 <dl class="attribute">
 <dt id="lightkurve.utils.TessQualityFlags.HARDEST_BITMASK">
-<code class="sig-name descname">HARDEST_BITMASK</code><em class="property"> = 4095</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.HARDEST_BITMASK" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HARDEST_BITMASK</code><em class="property"> = 8191</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.HARDEST_BITMASK" title="Permalink to this definition">¶</a></dt>
 <dd><p>HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.TessQualityFlags.HARD_BITMASK">
-<code class="sig-name descname">HARD_BITMASK</code><em class="property"> = 3311</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.HARD_BITMASK" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HARD_BITMASK</code><em class="property"> = 7407</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.HARD_BITMASK" title="Permalink to this definition">¶</a></dt>
 <dd><p>HARD bitmask is conservative and may identify cadences which are useful.</p>
 </dd></dl>
 
@@ -252,13 +252,13 @@ as documented in the TESS Data Products Description Document (Ref. [1], Table 26
 
 <dl class="attribute">
 <dt id="lightkurve.utils.TessQualityFlags.OPTIONS">
-<code class="sig-name descname">OPTIONS</code><em class="property"> = {'default': 175, 'hard': 3311, 'hardest': 4095, 'none': 0}</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.OPTIONS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">OPTIONS</code><em class="property"> = {'default': 175, 'hard': 7407, 'hardest': 8191, 'none': 0}</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.OPTIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dictionary which provides friendly names for the various bitmasks.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.TessQualityFlags.STRINGS">
-<code class="sig-name descname">STRINGS</code><em class="property"> = {1: 'Attitude tweak', 2: 'Safe mode', 4: 'Coarse point', 8: 'Earth point', 16: 'Argabrightening', 32: 'Desaturation event', 64: 'Cosmic ray in optimal aperture', 128: 'Manual exclude', 256: 'Discontinuity corrected', 512: 'Impulsive outlier', 1024: 'Cosmic ray in collateral data', 2048: 'Straylight'}</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.STRINGS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">STRINGS</code><em class="property"> = {1: 'Attitude tweak', 2: 'Safe mode', 4: 'Coarse point', 8: 'Earth point', 16: 'Argabrightening', 32: 'Desaturation event', 64: 'Cosmic ray in optimal aperture', 128: 'Manual exclude', 256: 'Discontinuity corrected', 512: 'Impulsive outlier', 1024: 'Cosmic ray in collateral data', 2048: 'Straylight', 4096: 'Straylight2'}</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.STRINGS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pretty string descriptions for each flag</p>
 </dd></dl>
 
@@ -270,7 +270,8 @@ as documented in the TESS Data Products Description Document (Ref. [1], Table 26
 <dl class="attribute">
 <dt id="lightkurve.utils.TessQualityFlags.Straylight">
 <code class="sig-name descname">Straylight</code><em class="property"> = 2048</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.Straylight" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The first stray light flag is set manually by MIT based on visual inspection.</p>
+</dd></dl>
 
 <p class="rubric">Methods Documentation</p>
 <dl class="method">

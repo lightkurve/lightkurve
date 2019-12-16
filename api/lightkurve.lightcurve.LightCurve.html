@@ -41,7 +41,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.5</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.6</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -118,8 +118,8 @@
 </dd>
 <dt><strong>flux_err</strong><span class="classifier">array-like</span></dt><dd><p>Uncertainty on each flux data point.</p>
 </dd>
-<dt><strong>flux_unit</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Unit.html#astropy.units.Unit" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Unit</span></code></a> or str</span></dt><dd><p>Unit of the flux values.  If a string is passed, it will be passed
-on to <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Unit.html#astropy.units.Unit" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Unit</span></code></a>.</p>
+<dt><strong>flux_unit</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Unit.html#astropy.units.Unit" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Unit</span></code></a> or str</span></dt><dd><p>Unit of the flux values.  If a string is passed, it will be passed
+on to <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Unit.html#astropy.units.Unit" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Unit</span></code></a>.</p>
 </dd>
 <dt><strong>time_format</strong><span class="classifier">str</span></dt><dd><p>String specifying how an instant of time is represented,
 e.g. ‘bkjd’ or ‘jd’.</p>
@@ -144,7 +144,7 @@ e.g. ‘tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.astropy_time" title="lightkurve.lightcurve.LightCurve.astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy_time</span></code></a></p></td>
-<td><p>Returns the time values as an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
+<td><p>Returns the time values as an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.flux_quantity" title="lightkurve.lightcurve.LightCurve.flux_quantity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_quantity</span></code></a></p></td>
 <td><p>Returns the flux as an astropy.units.Quantity object.</p></td>
@@ -189,7 +189,7 @@ e.g. ‘tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td><p>Create a new <a class="reference internal" href="#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from a <code class="xref py py-obj docutils literal notranslate"><span class="pre">stingray.Lightcurve</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.from_timeseries" title="lightkurve.lightcurve.LightCurve.from_timeseries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_timeseries</span></code></a>(ts)</p></td>
-<td><p>Creates a new <a class="reference internal" href="#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p></td>
+<td><p>Creates a new <a class="reference internal" href="#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.interact_bls" title="lightkurve.lightcurve.LightCurve.interact_bls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_bls</span></code></a>(self[, notebook_url, …])</p></td>
 <td><p>Display an interactive Jupyter Notebook widget to find planets.</p></td>
@@ -234,10 +234,10 @@ e.g. ‘tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">stingray.Lightcurve</span></code> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_table" title="lightkurve.lightcurve.LightCurve.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>(self)</p></td>
-<td><p>Converts the light curve to an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p></td>
+<td><p>Converts the light curve to an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_timeseries" title="lightkurve.lightcurve.LightCurve.to_timeseries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_timeseries</span></code></a>(self)</p></td>
-<td><p>Converts the light curve to an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p></td>
+<td><p>Converts the light curve to an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p></td>
 </tr>
 </tbody>
 </table>
@@ -245,7 +245,7 @@ e.g. ‘tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <dl class="attribute">
 <dt id="lightkurve.lightcurve.LightCurve.astropy_time">
 <code class="sig-name descname">astropy_time</code><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.astropy_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the time values as an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p>
+<dd><p>Returns the time values as an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p>
 <p>The Time object will be created based on the values of the light curve’s
 <a class="reference external" href="https://docs.python.org/3/library/time.html#module-time" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">time_format</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">time_scale</span></code> attributes.</p>
 <dl class="field-list simple">
@@ -261,20 +261,20 @@ allowed by AstroPy.</p>
 <p>The section below demonstrates working with time values using the TESS
 light curve of Pi Mensae as an example, which we obtained as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s2">&quot;Pi Mensae&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s2">&quot;TESS&quot;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s2">&quot;Pi Mensae&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s2">&quot;TESS&quot;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span>  
 <span class="go">TessLightCurve(TICID: 261136679)</span>
 </pre></div>
 </div>
 <p>Every <a class="reference internal" href="#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object has a <a class="reference external" href="https://docs.python.org/3/library/time.html#module-time" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a> attribute, which provides access
 to the original array of time values given in the native format and
 scale used by the data product from which the light curve was obtained:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">time</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">time</span>  
 <span class="go">array([1325.29698328, 1325.29837215, 1325.29976102, ..., 1353.17431099,</span>
 <span class="go">       1353.17569985, 1353.17708871])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">time_format</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">time_format</span>  
 <span class="go">&#39;btjd&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">time_scale</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">time_scale</span>  
 <span class="go">&#39;tdb&#39;</span>
 </pre></div>
 </div>
@@ -351,7 +351,7 @@ samples rather than index; overrides the <code class="xref py py-obj docutils li
 If <code class="docutils literal notranslate"><span class="pre">bins</span></code> is an int, it is the number of bins. If it is a list
 it is taken to be the bin edges. If it is a string, it must be one
 of  ‘blocks’, ‘knuth’, ‘scott’ or ‘freedman’.
-See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.histogram.html#astropy.stats.histogram" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">histogram</span></code></a> for description of these algorithms.</p>
+See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.histogram.html#astropy.stats.histogram" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">histogram</span></code></a> for description of these algorithms.</p>
 </dd>
 <dt><strong>method: str, one of ‘mean’ or ‘median’</strong></dt><dd><p>The summary statistic to return for each bin. Default: ‘mean’.</p>
 </dd>
@@ -645,11 +645,11 @@ obtain a phase-folded plot using:</p>
 <dt id="lightkurve.lightcurve.LightCurve.from_timeseries">
 <em class="property">static </em><code class="sig-name descname">from_timeseries</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.from_timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new <a class="reference internal" href="#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an AstroPy
-<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p>
+<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>ts</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a></span></dt><dd><p>The AstroPy TimeSeries object.  The object must contain columns
+<dt><strong>ts</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a></span></dt><dd><p>The AstroPy TimeSeries object.  The object must contain columns
 named ‘time’, ‘flux’, and ‘flux_err’.</p>
 </dd>
 </dl>
@@ -844,7 +844,7 @@ value of <code class="docutils literal notranslate"><span class="pre">sigma</spa
 which data points were removed. Entries marked as <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> in the
 mask are considered outliers.  This mask is not returned by default.</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.sigma_clip.html#astropy.stats.sigma_clip" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.sigma_clip</span></code></a>.</p>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.sigma_clip.html#astropy.stats.sigma_clip" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.sigma_clip</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -989,7 +989,7 @@ Returns <a class="reference external" href="https://docs.python.org/3/library/co
 <dt id="lightkurve.lightcurve.LightCurve.to_fits">
 <code class="sig-name descname">to_fits</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">path=None</em>, <em class="sig-param">overwrite=False</em>, <em class="sig-param">flux_column_name='FLUX'</em>, <em class="sig-param">**extra_data</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_fits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the light curve to a FITS file in the Kepler/TESS file format.</p>
-<p>The FITS file will be returned as a <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a> object.
+<p>The FITS file will be returned as a <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a> object.
 If a <code class="xref py py-obj docutils literal notranslate"><span class="pre">path</span></code> is specified then the file will also be written to disk.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -1011,7 +1011,7 @@ in the first extension.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>hdu</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a></span></dt><dd><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a> object.</p>
+<dt><strong>hdu</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a></span></dt><dd><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a> object.</p>
 </dd>
 </dl>
 </dd>
@@ -1050,7 +1050,7 @@ power spectrum object.</p>
 <p>This method will call either
 <a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve()</span></code></a> or
 <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve()</span></code></a>,
-which in turn wrap <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.LombScargle.html#astropy.stats.LombScargle" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.LombScargle</span></code></a> and <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.BoxLeastSquares.html#astropy.stats.BoxLeastSquares" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.BoxLeastSquares</span></code></a>.</p>
+which in turn wrap <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.LombScargle.html#astropy.stats.LombScargle" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.LombScargle</span></code></a> and <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.BoxLeastSquares.html#astropy.stats.BoxLeastSquares" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.BoxLeastSquares</span></code></a>.</p>
 <p>Optional keywords accepted if <code class="docutils literal notranslate"><span class="pre">method='lombscargle'</span></code> are:
 <code class="docutils literal notranslate"><span class="pre">minimum_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">maximum_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">mininum_period</span></code>,
 <code class="docutils literal notranslate"><span class="pre">maximum_period</span></code>, <code class="docutils literal notranslate"><span class="pre">frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">period</span></code>, <code class="docutils literal notranslate"><span class="pre">nterms</span></code>,
@@ -1118,11 +1118,11 @@ be raised if this package is not available.</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.to_table">
 <code class="sig-name descname">to_table</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts the light curve to an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p>
+<dd><p>Converts the light curve to an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl>
-<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a></span></dt><dd><p>An AstroPy Table with columns ‘time’, ‘flux’, and ‘flux_err’.</p>
+<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a></span></dt><dd><p>An AstroPy Table with columns ‘time’, ‘flux’, and ‘flux_err’.</p>
 </dd>
 </dl>
 </dd>
@@ -1133,13 +1133,13 @@ be raised if this package is not available.</p>
 <dt id="lightkurve.lightcurve.LightCurve.to_timeseries">
 <code class="sig-name descname">to_timeseries</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the light curve to an AstroPy
-<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p>
+<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p>
 <p>This feature requires AstroPy v3.2 or later (released in 2019).
 An <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImportError</span></code></a> will be raised if this version is not available.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl>
-<dt><strong>timeseries</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev1600)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a></span></dt><dd><p>An AstroPy TimeSeries object.</p>
+<dt><strong>timeseries</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a></span></dt><dd><p>An AstroPy TimeSeries object.</p>
 </dd>
 </dl>
 </dd>
