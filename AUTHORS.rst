@@ -56,3 +56,5 @@ Comments, corrections & suggestions:
 - `Simon J Murphy <https://github.com/SimonJMurphy>`_
 - `Alex Lyttle <https://github.com/alexlyttle>`_
 - `ansainbdg <https://github.com/ansainbdg>`_
+- `newxr <https://github.com/newxr>`_
+
