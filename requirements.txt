@@ -6,8 +6,8 @@ astroquery>=0.3.9
 oktopus
 bs4
 requests
-tqdm
+tqdm>=4.25.0
 pandas
 uncertainties
-patsy
-fbpca
+patsy>=0.5.1
+fbpca>=1.0
