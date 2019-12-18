@@ -202,18 +202,22 @@ class RegressionCorrector(Corrector):
         else:
             cadence_mask = np.copy(cadence_mask)
 
+        # Prepare for iterative masking of residuals
+        clean_cadences = np.ones_like(cadence_mask)
         # Iterative sigma clipping
         for count in range(niters):
             coefficients, coefficients_err = \
-                self._fit_coefficients(cadence_mask=cadence_mask,
+                self._fit_coefficients(cadence_mask=cadence_mask & clean_cadences,
                                        prior_mu=self.X.prior_mu,
                                        prior_sigma=self.X.prior_sigma,
                                        propagate_errors=propagate_errors)
-            residuals = self.lc.flux - np.dot(self.X.values, coefficients)
-            cadence_mask &= ~sigma_clip(residuals, sigma=sigma).mask
+            model = np.ma.masked_array(data=np.dot(self.X.values, coefficients),
+                                       mask=~(cadence_mask & clean_cadences))
+            residuals = self.lc.flux - model
+            clean_cadences = ~sigma_clip(residuals, sigma=sigma).mask
             log.debug("correct(): iteration {}: clipped {} cadences"
-                      "".format(count, cadence_mask.sum()))
-        self.cadence_mask = cadence_mask
+                      "".format(count, (~clean_cadences).sum()))
+        self.cadence_mask = cadence_mask & clean_cadences
 
         self.coefficients = coefficients
         self.coefficients_err = coefficients_err
