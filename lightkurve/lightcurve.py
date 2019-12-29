@@ -308,7 +308,7 @@ class LightCurve(object):
             if not attr.startswith('_'):
                 try:
                     res = getattr(self, attr)
-                except Exception: 
+                except Exception:
                     continue
                 if callable(res):
                     continue
