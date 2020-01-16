@@ -129,6 +129,7 @@ class TargetPixelFile(object):
         hdu[1].data['FLUX'][self.quality_mask] += other
         fits.HDUList(hdus=list(hdu)).writeto(tmp.name, overwrite=True)
         tpf = type(self)(tmp.name, quality_bitmask=self.quality_bitmask)
+        tpf.path = None
         tmp.close()
         os.remove(tmp.name)
         return tpf
@@ -141,6 +142,7 @@ class TargetPixelFile(object):
         hdu[1].data['FLUX_ERR'][self.quality_mask] *= other
         fits.HDUList(hdus=list(hdu)).writeto(tmp.name, overwrite=True)
         tpf = type(self)(tmp.name, quality_bitmask=self.quality_bitmask)
+        tpf.path = None
         tmp.close()
         os.remove(tmp.name)
         return tpf
@@ -153,6 +155,7 @@ class TargetPixelFile(object):
         hdu[1].data['FLUX_ERR'][self.quality_mask] /= other
         fits.HDUList(hdus=list(hdu)).writeto(tmp.name, overwrite=True)
         tpf = type(self)(tmp.name, quality_bitmask=self.quality_bitmask)
+        tpf.path = None
         tmp.close()
         os.remove(tmp.name)
         return tpf
