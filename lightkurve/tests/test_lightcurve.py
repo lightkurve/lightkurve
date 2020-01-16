@@ -510,6 +510,7 @@ def test_bins_kwarg():
     #   - Bins = 310.0
 
 
+@pytest.mark.skip(reason="Temporarily skipping due to https://github.com/scipy/scipy/issues/11365")
 def test_bin_quality():
     """Binning must also revise the quality and centroid columns."""
     lc = KeplerLightCurve(time=[1, 2, 3, 4],
