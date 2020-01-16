@@ -23,6 +23,7 @@ from scipy.ndimage import label
 from tqdm import tqdm
 from copy import deepcopy
 import pandas as pd
+import tempfile
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
@@ -31,6 +32,7 @@ from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
                    LightkurveWarning, detect_filetype, validate_method, \
                    centroid_quadratic, _query_solar_system_objects
+
 
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
@@ -84,6 +86,104 @@ class TargetPixelFile(object):
             copy = fits.HDUList([myhdu.copy() for myhdu in self.hdu])
             copy[1].data = copy[1].data[selected_idx]
         return self.__class__(copy, quality_bitmask=self.quality_bitmask, targetid=self.targetid)
+
+    def __len__(self):
+        return len(self.time)
+
+
+    def _verify_other_(self, other):
+        # 1D
+        other = np.atleast_1d(np.copy(other))
+        if len(np.shape(other)) == 1:
+            # point
+            if np.shape(other)[0] == 1:
+                reshaped_other = other[0]
+            # vector
+            elif np.shape(other)[0] == len(self.time):
+                reshaped_other = np.atleast_3d(other).transpose([1, 0, 2]) * np.ones(self.flux.shape)
+            else:
+                raise ValueError('No way to add shape {} to self flux of shape {}'.format(other.shape, self.flux.shape))
+
+        # 2D
+        if len(np.shape(other)) == 2:
+            # point
+            if np.shape(other) == np.shape(self.flux)[1:]:
+                reshaped_other = np.atleast_3d(other).transpose([2, 0, 1]) * np.ones(self.flux.shape)
+            else:
+                raise ValueError('No way to add shape {} to tpf flux of shape {}'.format(other.shape, self.flux.shape))
+
+        # 3D
+        if len(np.shape(other)) == 3:
+            # point
+            if np.shape(other) == np.shape(self.flux):
+                reshaped_other = other
+            else:
+                raise ValueError('No way to add shape {} to tpf flux of shape {}'.format(other.shape, self.flux.shape))
+
+        return reshaped_other
+
+    def __add__(self, other):
+        other = self._verify_other_(other)
+        hdu = deepcopy(self.hdu)
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        hdu[1].data['FLUX'][self.quality_mask] += other
+        fits.HDUList(hdus=list(hdu)).writeto(tmp.name, overwrite=True)
+        tpf = type(self)(tmp.name, quality_bitmask=self.quality_bitmask)
+        tmp.close()
+        os.remove(tmp.name)
+        return tpf
+
+    def __mul__(self, other):
+        other = self._verify_other_(other)
+        hdu = deepcopy(self.hdu)
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        hdu[1].data['FLUX'][self.quality_mask] *= other
+        hdu[1].data['FLUX_ERR'][self.quality_mask] *= other
+        fits.HDUList(hdus=list(hdu)).writeto(tmp.name, overwrite=True)
+        tpf = type(self)(tmp.name, quality_bitmask=self.quality_bitmask)
+        tmp.close()
+        os.remove(tmp.name)
+        return tpf
+
+    def __rtruediv__(self, other):
+        other = self._verify_other_(other)
+        hdu = deepcopy(self.hdu)
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        hdu[1].data['FLUX'][self.quality_mask] /= other
+        hdu[1].data['FLUX_ERR'][self.quality_mask] /= other
+        fits.HDUList(hdus=list(hdu)).writeto(tmp.name, overwrite=True)
+        tpf = type(self)(tmp.name, quality_bitmask=self.quality_bitmask)
+        tmp.close()
+        os.remove(tmp.name)
+        return tpf
+
+    def __radd__(self, other):
+        other = self._verify_other_(other)
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        other = self._verify_other_(other)
+        return self.__add__(-1 * other)
+
+    def __rsub__(self, other):
+        other = self._verify_other_(other)
+        return (-1 * self).__add__(other)
+
+    def __rmul__(self, other):
+        other = self._verify_other_(other)
+        return self.__mul__(other)
+
+    def __truediv__(self, other):
+        other = self._verify_other_(other)
+        return self.__mul__(1. / other)
+
+    def __div__(self, other):
+        other = self._verify_other_(other)
+        return self.__truediv__(other)
+
+    def __rdiv__(self, other):
+        other = self._verify_other_(other)
+        return self.__rtruediv__(other)
 
     @property
     def hdu(self):
