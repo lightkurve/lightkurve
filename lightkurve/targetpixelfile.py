@@ -672,7 +672,7 @@ class TargetPixelFile(object):
 
     def interact(self, notebook_url='localhost:8888', max_cadences=30000,
                  aperture_mask='pipeline', exported_filename=None,
-                 transform_func=None, ylim_func=None):
+                 transform_func=None, ylim_func=None, **kwargs):
         """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
         The widget will show both the lightcurve and pixel data.  By default,
@@ -747,7 +747,7 @@ class TargetPixelFile(object):
                                     aperture_mask=aperture_mask,
                                     exported_filename=exported_filename,
                                     transform_func=transform_func,
-                                    ylim_func=ylim_func)
+                                    ylim_func=ylim_func, **kwargs)
 
     def interact_sky(self, notebook_url='localhost:8888', magnitude_limit=18):
         """Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.
