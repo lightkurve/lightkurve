@@ -306,7 +306,10 @@ class LightCurve(object):
         attrs = {}
         for attr in dir(self):
             if not attr.startswith('_'):
-                res = getattr(self, attr)
+                try:
+                    res = getattr(self, attr)
+                except Exception:
+                    continue
                 if callable(res):
                     continue
                 if attr == 'hdu':
