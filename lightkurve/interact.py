@@ -289,6 +289,14 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     fiducial_frame: int
         The tpf slice to start with by default, it is assumed the WCS
         is exact for this frame.
+    scale: str
+        Color scale for tpf figure. Default is 'log'
+    vmin: int [optional]
+        Minimum color scale for tpf figure
+    vmax: int [optional]
+        Maximum color scale for tpf figure
+    cmap: str
+        Colormap to use for tpf plot. Default is 'Viridis256'
 
     Returns
     -------
@@ -475,6 +483,14 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         A function that returns ylimits (low, high) given a LightCurve object.
         The default is to return an expanded window around the 10-90th
         percentile of lightcurve flux values.
+    scale: str
+        Color scale for tpf figure. Default is 'log'
+    vmin: int [optional]
+        Minimum color scale for tpf figure
+    vmax: int [optional]
+        Maximum color scale for tpf figure
+    cmap: str
+        Colormap to use for tpf plot. Default is 'Viridis256'    
     """
     try:
         import bokeh
