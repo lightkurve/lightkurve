@@ -306,7 +306,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     """
     if pedestal is None:
         pedestal = -np.nanmin(tpf.flux) + 1
-    if scale is 'linear':
+    if scale == 'linear':
         pedestal = 0
 
     if tpf.mission in ['Kepler', 'K2']:
@@ -333,14 +333,14 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     if vmax is not None:
         vhi, hi = vmax, vmax
 
-    if scale is 'log':
+    if scale == 'log':
         vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
-    if scale is 'linear':
+    if scale == 'linear':
         vstep = (vhi - vlo) / 300.0  # assumes counts >> 1.0!
 
-    if scale is 'log':
+    if scale == 'log':
         color_mapper = LogColorMapper(palette=cmap, low=lo, high=hi)
-    elif scale is 'linear':
+    elif scale == 'linear':
         color_mapper = LinearColorMapper(palette=cmap, low=lo, high=hi)
     else:
         raise ValueError('Please specify either `linear` or `log` scale for color.')
@@ -355,9 +355,9 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     # This effect is known, some workarounds might work to fix the plot area:
     # https://github.com/bokeh/bokeh/issues/5186
 
-    if scale is 'log':
+    if scale == 'log':
         ticker = LogTicker(desired_num_ticks=8)
-    elif scale is 'linear':
+    elif scale == 'linear':
         ticker = BasicTicker(desired_num_ticks=8)
 
     color_bar = ColorBar(color_mapper=color_mapper,
@@ -376,10 +376,10 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
                 fill_alpha=0.4, line_color='white')
 
     # Configure the stretch slider and its callback function
-    if scale is 'log':
+    if scale == 'log':
         start, end = np.log10(vlo), np.log10(vhi)
         values = (np.log10(lo), np.log10(hi))
-    elif scale is 'linear':
+    elif scale == 'linear':
         start, end = vlo, vhi
         values = (lo, hi)
 
@@ -406,9 +406,9 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
         fig.select('tpfimg')[0].glyph.color_mapper.high = new[1]
         fig.select('tpfimg')[0].glyph.color_mapper.low = new[0]
 
-    if scale is 'log':
+    if scale == 'log':
         stretch_slider.on_change('value', stretch_change_callback_log)
-    if scale is 'linear':
+    if scale == 'linear':
         stretch_slider.on_change('value', stretch_change_callback_linear)
 
     return fig, stretch_slider
@@ -550,7 +550,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
         # Create the TPF figure and its stretch slider
         pedestal = -np.nanmin(tpf.flux) + 1
-        if scale is 'linear':
+        if scale == 'linear':
             pedestal = 0
         fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source,
                                                            pedestal=pedestal,
