@@ -409,6 +409,7 @@ def test_cdpp_tabby():
     assert(np.abs(lc.estimate_cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
 
 
+@pytest.mark.skip(reason="Temporarily skipping due to https://github.com/scipy/scipy/issues/11365")
 def test_bin():
     """Does binning work?"""
     lc = LightCurve(time=np.arange(10),
