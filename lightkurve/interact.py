@@ -273,7 +273,8 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 
 
 def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None,
-                             plot_width=370, plot_height=340, scale='log', vmin=None, vmax=None, cmap='Viridis256'):
+                             plot_width=370, plot_height=340, scale='log', vmin=None, vmax=None,
+                             cmap='Viridis256', tools='tap,box_select,wheel_zoom,reset'):
     """Returns the lightcurve figure elements.
 
     Parameters
@@ -297,7 +298,8 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
         Maximum color scale for tpf figure
     cmap: str
         Colormap to use for tpf plot. Default is 'Viridis256'
-
+    tools: str
+        Bokeh tool list
     Returns
     -------
     fig, stretch_slider : bokeh.plotting.figure.Figure, RangeSlider
@@ -317,7 +319,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     fig = figure(plot_width=plot_width, plot_height=plot_height,
                  x_range=(tpf.column, tpf.column+tpf.shape[2]),
                  y_range=(tpf.row, tpf.row+tpf.shape[1]),
-                 title=title, tools='tap,box_select,wheel_zoom,reset',
+                 title=title, tools=tools,
                  toolbar_location="below",
                  border_fill_color="whitesmoke")
 
@@ -424,6 +426,7 @@ def make_default_export_name(tpf, suffix='custom-lc'):
 
 
 def show_interact_widget(tpf, notebook_url='localhost:8888',
+                         lc=None,
                          max_cadences=30000,
                          aperture_mask='pipeline',
                          exported_filename=None,
@@ -490,7 +493,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
     vmax: int [optional]
         Maximum color scale for tpf figure
     cmap: str
-        Colormap to use for tpf plot. Default is 'Viridis256'    
+        Colormap to use for tpf plot. Default is 'Viridis256'
     """
     try:
         import bokeh
@@ -513,8 +516,17 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
     if ('.fits' not in exported_filename.lower()):
         exported_filename += '.fits'
 
-    lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
+    if lc is None:
+        lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
+        tools = 'tap,box_select,wheel_zoom,reset'
+    else:
+        lc = lc.copy()
+        tools = 'wheel_zoom,reset'
+        aperture_mask = np.zeros(tpf.flux.shape[1:]).astype(bool)
+        aperture_mask[0, 0] = True
+
     lc.meta['aperture_mask'] = aperture_mask
+
     if transform_func is not None:
         lc = transform_func(lc)
 
@@ -543,7 +555,9 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source,
                                                            pedestal=pedestal,
                                                            fiducial_frame=0,
-                                                           vmin=vmin, vmax=vmax, scale=scale, cmap=cmap)
+                                                           vmin=vmin, vmax=vmax,
+                                                           scale=scale, cmap=cmap,
+                                                           tools=tools)
 
         # Helper lookup table which maps cadence number onto flux array index.
         tpf_index_lookup = {cad: idx for idx, cad in enumerate(tpf.cadenceno)}
