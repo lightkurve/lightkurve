@@ -70,7 +70,7 @@ def test_tpf_math():
                 TessTargetPixelFile(filename_tpf_all_zeros)]
     # These should work
     for tpf in tpfs:
-        for other in [1, [1], np.arange(len(tpf.time)), np.ones(tpf.flux.shape[1:]), np.ones(tpf.shape)]:
+        for other in [1, np.ones(tpf.flux.shape[1:]), np.ones(tpf.shape)]:
             tpf + other
             tpf - other
             tpf * other
@@ -84,7 +84,7 @@ def test_tpf_math():
 
     # These should fail with a value error because their shape is wrong.
     for tpf in tpfs:
-        for other in [[1, 2], np.arange(len(tpf.time) - 1), np.ones([100, 1]), np.ones([1, 2, 3])]:
+        for other in [np.asarray([1, 2]), np.arange(len(tpf.time) - 1), np.ones([100, 1]), np.ones([1, 2, 3])]:
             with pytest.raises(ValueError):
                 tpf + other
 
