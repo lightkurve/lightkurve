@@ -1,15 +1,16 @@
-"""Defines tools to retrieve Kepler data from the archive at MAST."""
+"""Defines tools to retrieve Kepler and TESS data from the archive at MAST."""
 from __future__ import division
 import os
 import logging
 import re
 import warnings
-from requests import HTTPError
+import requests
 
 import numpy as np
 from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
-from astropy.io import ascii, fits
+from astropy.io import ascii
+from astropy.io import fits as pyfits
 from astropy import units as u
 from astropy.utils.exceptions import AstropyWarning
 
@@ -17,11 +18,12 @@ from .targetpixelfile import TargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
 from .utils import suppress_stdout, LightkurveWarning, detect_filetype
 from . import PACKAGEDIR
+from .correctors.CBVFile import KeplerCBVFile
 
 log = logging.getLogger(__name__)
 
 __all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_tesscut',
-           'open', 'SearchResult']
+           'open', 'SearchResult', 'search_cbvs']
 
 
 class SearchError(Exception):
@@ -154,7 +156,7 @@ class SearchResult(object):
                 if "504" in msg:
                     # TESSCut will occasionally return a "504 Gateway Timeout
                     # error" when it is overloaded.
-                    raise HTTPError('The TESS FFI cutout service at MAST appears '
+                    raise requests.HTTPError('The TESS FFI cutout service at MAST appears '
                                     'to be temporarily unavailable. It returned '
                                     'the following error: {}'.format(exc))
                 else:
@@ -546,7 +548,6 @@ def search_lightcurvefile(target, radius=None, cadence='long',
     except SearchError as exc:
         log.error(exc)
         return SearchResult(None)
-
 
 def search_tesscut(target, sector=None):
     """Searches MAST for TESS Full Frame Image cutouts containing a desired target or region.
@@ -987,7 +988,7 @@ def open(path_or_url, **kwargs):
     log.debug("Opening {}.".format(path_or_url))
     # pass header into `detect_filetype()`
     try:
-        with fits.open(path_or_url) as temp:
+        with pyfits.open(path_or_url) as temp:
             filetype = detect_filetype(temp[0].header)
             log.debug("Detected filetype: '{}'.".format(filetype))
     except OSError as e:
@@ -1025,3 +1026,96 @@ def _resolve_object(target):
         return MastClass().resolve_object(target)
     except AttributeError:
         return MastClass()._resolve_object(target)
+
+
+def search_cbvs (mission=('Kepler', 'K2', 'TESS'), quarter=None, campaign=None, 
+        sector=None, camera=None, CCD=None):
+    """ Searches the `public data archive at MAST <https://archive.stsci.edu>`_ for a Kepler or TESS
+    :class:`CBVFile <CBVFile.CBVFile>`.
+
+    This function fetches the Cotrending Basis Vectors  FITS HDU for the desired mission and channel or CCD.
+
+    For Kepler/K2, the FITS files conatin all channels in a single file pr quarter/campaing. So there is no need to
+    specify the channel (or module/output).
+
+    But for TESS, each CCD CBVs are stroed in a seperate FITS file. So, one must also specify the camera and CCD,
+    along with the Sector.
+
+    Depending on which mission you are searching for different named arguments must be passed:
+        for Kepler: quarter only
+        for K2: campaign only
+        for TESS: sector, camera and CCD
+    If additional named arguments are passed then an error is thrown
+
+    Parameters
+    ----------
+    mission : str, list of str
+                'Kepler', 'K2', or 'TESS'.
+    quarter or campaign or sector : int, list of ints
+                Kepler Quarter, K2 Campaign, or TESS Sector number.
+    camera and CCD : int, list of ints
+                TESS camera and CCD
+
+    Returns
+    -------
+    result : :class:`CBVFile` object
+        Object detailing the data products found.
+
+    Examples
+    --------
+    This example will read in the CBV FITS file for Kepler quarter 8, 
+    and then extract the first 8 CBVs for module.output 16.4
+
+        >>> kCbvFile = search_cbvs(mission='Kepler', quarter=8) # doctest: +SKIP
+        >>> cbvs = kCbvFile.get_cbvs(module=16, output=4, cbvIndices=np.arange(1,9)) # doctest: +SKIP
+
+    This example will read in the CBV FITS file for TESS Sector 10 Camera.CCD 2.4
+    and then extract the first 6 CBVs of multi-scale band 2
+
+        >>> kCbvFile = search_cbvs(mission='TESS', sector=10, camera=2, CCD=4) # doctest: +SKIP
+        >>> cbvs = kCbvFile.get_cbvs(cbvType='MultiScale', band=2, cbvIndices=np.arange(1,7)) # doctest: +SKIP
+    """
+
+    #***
+    # Validate inputs 
+    # Make sure only the appropriate arguments are passed
+    # TODO: figure out a more elegant way to do this
+    if (mission == 'Kepler'):
+        assert  isinstance(quarter, int), 'quarter must be passed for Kepler mission'
+        # All these inputs are invalid
+        assert  campaign is None, 'campaign must not be passed for Kepler mission'
+        assert  sector is None,   'sector must not be passed for Kepler mission'
+        assert  camera is None,   'camera must not be passed for Kepler mission'
+        assert  CCD is None,      'CCD must not be passed for Kepler mission'
+    elif (mission == 'K2'):
+        assert  isinstance(campaign, int), 'campaign must be passed for K2 mission'
+        # All these inputs are invalid
+        assert  quarter is None,  'quarter must not be passed for K2 mission'
+        assert  sector is None,   'sector must not be passed for K2 mission'
+        assert  camera is None,   'camera must not be passed for K2 mission'
+        assert  CCD is None,      'CCD must not be passed for K2 mission'
+    elif (mission == 'TESS'):
+        assert  isinstance(sector, int),    'sector must be passed for TESS mission'
+        assert  not camera is None,   'camera must be passed'
+        assert  not CCD is None,      'CCD must be passed'
+        # All these inputs are invalid
+        assert  quarter is  None,  'quarter must not be passed for TESS mission'
+        assert  campaign is None, 'campaign must not be passed for TESS mission'
+    else:
+        raise Exception('Unknown mission type')
+        
+    try: 
+        if (mission == 'Kepler' or mission == 'K2'): 
+
+            kCbvFile = KeplerCBVFile(KeplerCBVFile.get_kepler_cbv_url(mission, quarter, campaign), mission)
+
+            return kCbvFile
+        else:
+            log.error("TESS CBV lookup not yet implemented.")
+            
+
+    except:
+        log.error('CBVS were not found')
+        return None
+
+
