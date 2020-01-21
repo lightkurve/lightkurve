@@ -12,8 +12,10 @@ import requests
 import numpy as np
 from astropy.io import fits as pyfits
 from bs4 import BeautifulSoup
+import urllib.request
+
 from ..utils import channel_to_module_output
-from .CBV import KeplerCotrendingBasisVectors
+from .CBV import KeplerCotrendingBasisVectors, TessCotrendingBasisVectors
 
 __all__ = ['KeplerCBVFile', 'TessCBVFile']
 
@@ -50,18 +52,6 @@ class CBVFile(object):
             self.path = path
             self.hdu = pyfits.open(self.path, **kwargs)
 
-  # @property
-  # def mission(self):
-  #     """ Curiously, Kepler/K2 and TESS CBV FITS files does not have a "MISSION" keyword 
-  #         We must define the mission in the subclass
-  #     """
-
-  #     log.error('Mission not defined')
-
-  # @mission.setter
-  # def mission(self, name):
-  #     self.mission = name
-
     def header(self, ext=0):
         """Header of the object at extension `ext`"""
         return self.hdu[ext].header
@@ -86,6 +76,7 @@ class CBVFile(object):
 
 
         
+#*************************************************************************************************************
 class KeplerCBVFile(CBVFile):
     """ Subclass for Kepler CBVs
  
@@ -105,15 +96,6 @@ class KeplerCBVFile(CBVFile):
         self.mission = mission
 
         pass
-
-  # @property
-  # def mission(self):
-  #     """'Kepler' or 'K2'"""
-  #     return self.mission
-
-  # @mission.setter
-  # def mission(self, name):
-  #     self.mission = name
 
     def get_cbvs(self, channel=None, module=None, output=None, cbvIndices='ALL'):
         """ Returns the requested CBVs as a CotrendingBasisVectors object
@@ -173,4 +155,90 @@ class KeplerCBVFile(CBVFile):
         return cbvBaseUrl + cbv_file
 
     get_kepler_cbv_url = staticmethod(get_kepler_cbv_url)
+
+#*************************************************************************************************************
+class TessCBVFile(CBVFile):
+    """ Subclass for TESS CBVs
+ 
+ 
+    """
+ 
+    def __init__ (self, path):
+        """ Constructor:
+
+            There is no "MISSION" keyword in the CBV FITS files so that must be explicitely given
+            leyword MISSION is not technically in the TESS CBV FITS files but 'TELESCOP' is in there whcih gives what we
+            need.
+        """
+
+        super(TessCBVFile, self).__init__(path)
+        
+        # Check that this is a TESS CBV FITS file
+        self.mission = self.hdu['Primary'].header['TELESCOP']
+        assert self.mission == 'TESS', log.error('This does not appear to be a TESS FITS HDU')
+        
+        pass
+
+    def get_cbvs(self, cbvType='SingleScale', band=None, cbvIndices='ALL'):
+        """ Returns the requested TESS CBVs as a CotrendingBasisVectors object
+
+            Input:
+                cbvType     -- [str ('SingleScale', 'MultiScale', 'Spike')
+                band        -- [int] MultiScale band number (invalid for other CBV types)
+                cbvIndices  -- [int arry] List of CBVs extracted for FITS file, {'ALL' => extract all}
+                                    (does not need to be in sequential order, and can skip indices)
+        """
+
+        cbvs = TessCotrendingBasisVectors(self.hdu, cbvType, band, cbvIndices=cbvIndices)
+ 
+        return cbvs
+
+
+    def get_tess_cbv_url(sector, camera, CCD):
+        """ STATIC method to obtain a path to a TESS CBV FITS file
+
+            The easiest way to obtain a link to the CBV file for a TESS Sector and camera.CCD is
+
+            1. Download the bulk download curl script (with a predictable url) for the desired sector and search it for the camera.CCD I need
+            2. Download the CBV FITS file based on the link in the curl script
+
+            The bulk download curl links have urls such as:
+
+            https://archive.stsci.edu/missions/tess/download_scripts/sector/tesscurl_sector_17_cbv.sh
+
+            Then the individual CBV files foudn in the curl file have urls such as:
+
+            https://archive.stsci.edu/missions/tess/ffi/s0017/2019/279/1-1/tess2019279210107-s0017-1-1-0161-s_cbv.fits
+
+            Returns a url string for the desired CBV FITS file
+    
+        """
+        curlBaseUrl = 'https://archive.stsci.edu/missions/tess/download_scripts/sector/tesscurl_sector_'
+        curlEndUrl = '_cbv.sh'
+        curlUrl = curlBaseUrl + str(sector) + curlEndUrl
+
+        # This is the string to search for in the curl script file
+        curlSearchString = 's00' + str(sector) + '-' + str(camera) + '-' + str(CCD) + '-' 
+
+        # 1. Read in the relevent curle script file and fine the line for the CBV data we are looking for
+        data = urllib.request.urlopen(curlUrl)
+        foundIndex = None
+        for line in data:
+            strLine = str(line)
+            try:
+                foundIndex = strLine.index(curlSearchString) # str.index will error when not found
+                break
+            except:
+                pass # continue searching
+        if (foundIndex is None):
+            log.error('CBV FITS file not found')
+
+        # extract url from strLine
+        htmlStartIndex = strLine.find('https:')
+        htmlEndIndex = strLine.rfind('fits')
+        cbvUrl = strLine[htmlStartIndex:htmlEndIndex+4] # Add 4 for length of 'fits' string
+
+        return cbvUrl
+
+    get_tess_cbv_url = staticmethod(get_tess_cbv_url)
 

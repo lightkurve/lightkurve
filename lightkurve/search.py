@@ -18,7 +18,7 @@ from .targetpixelfile import TargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
 from .utils import suppress_stdout, LightkurveWarning, detect_filetype
 from . import PACKAGEDIR
-from .correctors.CBVFile import KeplerCBVFile
+from .correctors.CBVFile import KeplerCBVFile, TessCBVFile
 
 log = logging.getLogger(__name__)
 
@@ -1111,7 +1111,10 @@ def search_cbvs (mission=('Kepler', 'K2', 'TESS'), quarter=None, campaign=None,
 
             return kCbvFile
         else:
-            log.error("TESS CBV lookup not yet implemented.")
+
+            tCbvFile = TessCBVFile(TessCBVFile.get_tess_cbv_url(sector, camera, CCD))
+
+            return tCbvFile
             
 
     except:
