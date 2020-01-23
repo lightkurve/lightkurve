@@ -1,3 +1,11 @@
+1.7.0 (unreleased)
+==================
+
+- Fixed a bug which caused ``LightCurve.show_properties()`` to raise a
+  ``ValueError`` when the time format was not set. [#655]
+
+
+
 1.6.0 (2019-12-16)
 ==================
 
