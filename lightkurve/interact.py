@@ -31,7 +31,7 @@ try:
     from bokeh.io import show, output_notebook, push_notebook
     from bokeh.plotting import figure, ColumnDataSource
     from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, \
-        Span, ColorBar, LogTicker, Range1d
+        Span, ColorBar, LogTicker, Range1d, LinearColorMapper, BasicTicker
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button, Div
@@ -273,7 +273,8 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 
 
 def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None,
-                             plot_width=370, plot_height=340):
+                             plot_width=370, plot_height=340, scale='log', vmin=None, vmax=None,
+                             cmap='Viridis256', tools='tap,box_select,wheel_zoom,reset'):
     """Returns the lightcurve figure elements.
 
     Parameters
@@ -289,13 +290,24 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     fiducial_frame: int
         The tpf slice to start with by default, it is assumed the WCS
         is exact for this frame.
-
+    scale: str
+        Color scale for tpf figure. Default is 'log'
+    vmin: int [optional]
+        Minimum color scale for tpf figure
+    vmax: int [optional]
+        Maximum color scale for tpf figure
+    cmap: str
+        Colormap to use for tpf plot. Default is 'Viridis256'
+    tools: str
+        Bokeh tool list
     Returns
     -------
     fig, stretch_slider : bokeh.plotting.figure.Figure, RangeSlider
     """
     if pedestal is None:
         pedestal = -np.nanmin(tpf.flux) + 1
+    if scale == 'linear':
+        pedestal = 0
 
     if tpf.mission in ['Kepler', 'K2']:
         title = 'Pixel data (CCD {}.{})'.format(tpf.module, tpf.output)
@@ -307,16 +319,31 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     fig = figure(plot_width=plot_width, plot_height=plot_height,
                  x_range=(tpf.column, tpf.column+tpf.shape[2]),
                  y_range=(tpf.row, tpf.row+tpf.shape[1]),
-                 title=title, tools='tap,box_select,wheel_zoom,reset',
+                 title=title, tools=tools,
                  toolbar_location="below",
                  border_fill_color="whitesmoke")
 
     fig.yaxis.axis_label = 'Pixel Row Number'
     fig.xaxis.axis_label = 'Pixel Column Number'
 
+
     vlo, lo, hi, vhi = np.nanpercentile(tpf.flux + pedestal, [0.2, 1, 95, 99.8])
-    vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
-    color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
+    if vmin is not None:
+        vlo, lo = vmin, vmin
+    if vmax is not None:
+        vhi, hi = vmax, vmax
+
+    if scale == 'log':
+        vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
+    if scale == 'linear':
+        vstep = (vhi - vlo) / 300.0  # assumes counts >> 1.0!
+
+    if scale == 'log':
+        color_mapper = LogColorMapper(palette=cmap, low=lo, high=hi)
+    elif scale == 'linear':
+        color_mapper = LinearColorMapper(palette=cmap, low=lo, high=hi)
+    else:
+        raise ValueError('Please specify either `linear` or `log` scale for color.')
 
     fig.image([tpf.flux[fiducial_frame, :, :] + pedestal], x=tpf.column, y=tpf.row,
               dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
@@ -327,8 +354,14 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     # This colorbar share of the plot window grows, shrinking plot area.
     # This effect is known, some workarounds might work to fix the plot area:
     # https://github.com/bokeh/bokeh/issues/5186
+
+    if scale == 'log':
+        ticker = LogTicker(desired_num_ticks=8)
+    elif scale == 'linear':
+        ticker = BasicTicker(desired_num_ticks=8)
+
     color_bar = ColorBar(color_mapper=color_mapper,
-                         ticker=LogTicker(desired_num_ticks=8),
+                         ticker=ticker,
                          label_standoff=-10, border_line_color=None,
                          location=(0, 0), background_fill_color='whitesmoke',
                          major_label_text_align='left',
@@ -336,18 +369,25 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
                          title='e/s', margin=0)
     fig.add_layout(color_bar, 'right')
 
-    color_bar.formatter = PrintfTickFormatter(format="%14u")
+    color_bar.formatter = PrintfTickFormatter(format="%14i")
 
     if tpf_source is not None:
         fig.rect('xx', 'yy', 1, 1, source=tpf_source, fill_color='gray',
                 fill_alpha=0.4, line_color='white')
 
     # Configure the stretch slider and its callback function
-    stretch_slider = RangeSlider(start=np.log10(vlo),
-                                 end=np.log10(vhi),
+    if scale == 'log':
+        start, end = np.log10(vlo), np.log10(vhi)
+        values = (np.log10(lo), np.log10(hi))
+    elif scale == 'linear':
+        start, end = vlo, vhi
+        values = (lo, hi)
+
+    stretch_slider = RangeSlider(start=start,
+                                 end=end,
                                  step=vstep,
-                                 title='Screen Stretch (log)',
-                                 value=(np.log10(lo), np.log10(hi)),
+                                 title='Screen Stretch ({})'.format(scale),
+                                 value=values,
                                  orientation='horizontal',
                                  width=200,
                                  direction='ltr',
@@ -356,12 +396,20 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
                                  height=15,
                                  name='tpfstretch')
 
-    def stretch_change_callback(attr, old, new):
+    def stretch_change_callback_log(attr, old, new):
         """TPF stretch slider callback."""
         fig.select('tpfimg')[0].glyph.color_mapper.high = 10**new[1]
         fig.select('tpfimg')[0].glyph.color_mapper.low = 10**new[0]
 
-    stretch_slider.on_change('value', stretch_change_callback)
+    def stretch_change_callback_linear(attr, old, new):
+        """TPF stretch slider callback."""
+        fig.select('tpfimg')[0].glyph.color_mapper.high = new[1]
+        fig.select('tpfimg')[0].glyph.color_mapper.low = new[0]
+
+    if scale == 'log':
+        stretch_slider.on_change('value', stretch_change_callback_log)
+    if scale == 'linear':
+        stretch_slider.on_change('value', stretch_change_callback_linear)
 
     return fig, stretch_slider
 
@@ -378,11 +426,16 @@ def make_default_export_name(tpf, suffix='custom-lc'):
 
 
 def show_interact_widget(tpf, notebook_url='localhost:8888',
+                         lc=None,
                          max_cadences=30000,
                          aperture_mask='pipeline',
                          exported_filename=None,
                          transform_func=None,
-                         ylim_func=None):
+                         ylim_func=None,
+                         vmin=None,
+                         vmax=None,
+                         scale='log',
+                         cmap='Viridis256'):
     """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
     The widget will show both the lightcurve and pixel data.  The pixel data
@@ -433,6 +486,14 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         A function that returns ylimits (low, high) given a LightCurve object.
         The default is to return an expanded window around the 10-90th
         percentile of lightcurve flux values.
+    scale: str
+        Color scale for tpf figure. Default is 'log'
+    vmin: int [optional]
+        Minimum color scale for tpf figure
+    vmax: int [optional]
+        Maximum color scale for tpf figure
+    cmap: str
+        Colormap to use for tpf plot. Default is 'Viridis256'
     """
     try:
         import bokeh
@@ -455,8 +516,17 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
     if ('.fits' not in exported_filename.lower()):
         exported_filename += '.fits'
 
-    lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
+    if lc is None:
+        lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
+        tools = 'tap,box_select,wheel_zoom,reset'
+    else:
+        lc = lc.copy()
+        tools = 'wheel_zoom,reset'
+        aperture_mask = np.zeros(tpf.flux.shape[1:]).astype(bool)
+        aperture_mask[0, 0] = True
+
     lc.meta['aperture_mask'] = aperture_mask
+
     if transform_func is not None:
         lc = transform_func(lc)
 
@@ -480,9 +550,14 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
         # Create the TPF figure and its stretch slider
         pedestal = -np.nanmin(tpf.flux) + 1
+        if scale == 'linear':
+            pedestal = 0
         fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source,
                                                            pedestal=pedestal,
-                                                           fiducial_frame=0)
+                                                           fiducial_frame=0,
+                                                           vmin=vmin, vmax=vmax,
+                                                           scale=scale, cmap=cmap,
+                                                           tools=tools)
 
         # Helper lookup table which maps cadence number onto flux array index.
         tpf_index_lookup = {cad: idx for idx, cad in enumerate(tpf.cadenceno)}
