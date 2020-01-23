@@ -1,6 +1,9 @@
 1.7.0 (unreleased)
 ==================
 
+- Added a ``scale='linear'`` option to ``TargetPixelFile.interact()`` to show
+  pixels using a linear stretch. The default is ``scale='log'``. [#664]
+
 - Fixed a bug which caused ``LightCurve.show_properties()`` to raise a
   ``ValueError`` when the time format was not set. [#655]
 
