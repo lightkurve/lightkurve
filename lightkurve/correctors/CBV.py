@@ -1,45 +1,46 @@
 """
-Defines a CotrendingBasisVectors class.
-
-Stores Cotrending Basis Vectors for the Kepler/K2/TESS missions. 
-
-Use search_cbvs to find the appropriate FITs files and KeplerCBVFile and TessCBVFile to retrieve the CBV FITS files.
-
-Each CotrendingBasisVectors objects contains only ONE set of CBVs. Instantiate multiple objects to stroe multiple set of
-CBVS, for example to save all three multi-scale bands.
 
 """
 
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
+from ..lightcurve import LightCurve
 from .. import MPLSTYLE
 
 __all__ = ['KeplerCotrendingBasisVectors', 'TessCotrendingBasisVectors']
 
 log = logging.getLogger(__name__)
 
-"""
-Class Attributes:
-    mission         -- [str] ('Kepler', 'K2', 'TESS')
-    quarter         -- only for Kepler mission
-    campaign        -- only for K2 mission
-    sector          -- only for TESS mission
-    module,output   -- only for Kepler/K2
-    camera,CCD      -- only for TESS
-    cbvType         -- [str ('SingleScale', 'MultiScale', 'Spike')
-    band            -- [int] MultiScale band number (invalid for other CBV types)
-    cbvIndices      -- [int arry] List of CBVs extracted for FITS file, {'ALL' => extract all}
-    cbvArray        -- [np.ndarray] The basis vectors
-    cbvCadenceNo    -- [int list] Candece indices  
-    gapIndicators   -- [bool list]
-    cbvExtName      -- [str] The EXTNAME extension in the header
-
-"""
 
 class CotrendingBasisVectors:
-    """ Super class for generic components of CBVs
     """
+    Defines a CotrendingBasisVectors class. Superclass for KeplerCotrendingBasisVectors and TessCotrendingBasisVectors
+
+    Stores Cotrending Basis Vectors for the Kepler/K2/TESS missions. 
+
+    Use search_cbvs to find the appropriate FITs files and KeplerCBVFile and TessCBVFile to retrieve the CBV FITS files.
+
+    Each CotrendingBasisVectors objects contains only ONE set of CBVs. Instantiate multiple objects to store multiple set of
+    CBVS, for example to save all three multi-scale bands.
+
+    Attributes
+    ----------
+    mission         : [str] ('Kepler', 'K2', 'TESS')
+    quarter         : only for Kepler mission
+    campaign        : only for K2 mission
+    sector          : only for TESS mission
+    module,output   : only for Kepler/K2
+    camera,CCD      : only for TESS
+    cbvType         : [str ('SingleScale', 'MultiScale', 'Spike')
+    band            : [int] MultiScale band number (invalid for other CBV types)
+    cbvIndices      : [int array] List of CBVs extracted for FITS file, {'ALL' => extract all}
+    cbvArray        : [np.ndarray] The basis vectors
+    cadenceno       : [int list] Cadence indices  
+    gapIndicators   : [bool list]
+    cbvExtName      : [str] The EXTNAME extension in the header
+
+"""
 
     #***
     # Some constants
@@ -103,9 +104,10 @@ class CotrendingBasisVectors:
                 _, ax = plt.subplots(1)
 
             for idx, cbv in enumerate(self.cbvArray[cbvChosenLogicalArray, :][:, :]):
+                cbvIndex = cbvIndices[idx]
                 # Do not plot gaps
                 cbv[self.gapIndicators] = np.nan
-                ax.plot(self.cbvCadenceNo, cbv-idx/10., label='{}'.format(idx + 1))
+                ax.plot(self.cadenceno, cbv-idx/10., label='{}'.format(cbvIndex))
 
             ax.set_yticks([])
             ax.set_xlabel('Cadence Number')
@@ -129,8 +131,46 @@ class CotrendingBasisVectors:
             ax.legend()
         return ax
 
-        
+    def align(self, lc, trim_lc=False):
+        """ Aligns the CBVs with a light curve. The lightCurve object might not have the same cadences as the CBVs. This
+        will trim the CBVs to be aligned with the light curve. 
 
+        This method will preferentially use the cadence number (lc.cadenceno) to perform the synchronization,
+        but will revert to using cadence time if cadenceno is not available in the light curve, which is more prone to errors
+
+        It will report a warning and not synchronize if the light curve contains cadences not in the CBVs, unless trim_lc=True, in whcih
+        case the light curve will also be trimmed.
+
+        Parameters
+        ----------
+            lc : LightCurve object
+            trim_lc : [bool] If True then also trim the light curve if needed
+
+        """
+
+        if not isinstance(lc, LightCurve):
+            log.error('<lc> must be a LightCurve class')
+
+
+        if hasattr(lc, 'cadenceno'):
+
+            lc_trim_mask = np.in1d(lc.cadenceno, self.cadenceno)
+            if (np.any(np.logical_not(lc_trim_mask))):
+                if (trim_lc):
+                    # lc trim method
+                    lc.trim(lc_trim_mask)
+                else:
+                    log.warning('There are cadences in the light curve that are not in the CBVs. NO SYNCHRONIZATION OCCURED')
+
+
+            trim_mask = np.in1d(self.cadenceno, lc.cadenceno)
+            self.cbvArray       = self.cbvArray[:,trim_mask]
+            self.cadenceno      = self.cadenceno[trim_mask]
+            self.gapIndicators  = self.gapIndicators[trim_mask]
+
+        else:
+            log.warning('Synchronization with cadence time stamps is not yet implemented. NO SYNCHRONIZATION OCCURED')
+        
 #***
 class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
 
@@ -166,7 +206,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
         extName = 'MODOUT_{0}_{1}'.format(module, output)
         cbv_data = HDU[extName].data
 
-        self.cbvCadenceNo    = HDU[extName].data['CADENCENO']
+        self.cadenceno    = HDU[extName].data['CADENCENO']
         self.gapIndicators   = HDU[extName].data['GAPFLAG']
         self.cbvExtName      = HDU[extName].header['EXTNAME']
 
@@ -219,7 +259,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
 
         cbv_data = HDU[extName].data
 
-        self.cbvCadenceNo    = HDU[extName].data['CADENCENO']
+        self.cadenceno    = HDU[extName].data['CADENCENO']
         self.gapIndicators   = HDU[extName].data['GAP']
         self.cbvExtName      = HDU[extName].header['EXTNAME']
 

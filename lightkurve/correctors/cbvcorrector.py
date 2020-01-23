@@ -53,8 +53,7 @@ class KeplerCBVCorrector(Corrector):
     >>> plt.legend() # doctest: +SKIP
     """
 
-    def __init__(self, lc, cbvArray=None, cbvCadenceNo=None, likelihood=oktopus.LaplacianLikelihood,
-                 prior=oktopus.LaplacianPrior):
+    def __init__(self, lc, likelihood=oktopus.LaplacianLikelihood, prior=oktopus.LaplacianPrior):
         self.lc = lc
         if not hasattr(self.lc, 'channel'):
             raise ValueError('Input must have a `channel` attribute.')
@@ -62,24 +61,19 @@ class KeplerCBVCorrector(Corrector):
         self.prior = prior
         self._ncbvs = CBVFile.nCBVsDefault  # default number of cbvs for Kepler/K2
 
-        if cbvArray is None:
-            if self.lc.mission == 'Kepler':
-                kCbvFile = search_cbvs(mission=self.lc.mission, quarter=self.lc.quarter)
-                cbvs = kCbvFile.get_cbvs(channel=self.lc.channel, cbvIndices='ALL')
-            elif self.lc.mission == 'K2':
-                kCbvFile = search_cbvs(mission=self.lc.mission, campaign=self.lc.campaign)
-                cbvs = kCbvFile.get_cbvs(channel=self.lc.channel, cbvIndices='ALL')
-            cbvArray = cbvs.cbvArray
-            cbvCadenceNo = cbvs.cbvCadenceNo
+        # Get the CBVs from MAST
+        if self.lc.mission == 'Kepler':
+            kCbvFile = search_cbvs(mission=self.lc.mission, quarter=self.lc.quarter)
+            cbvs = kCbvFile.get_cbvs(channel=self.lc.channel, cbvIndices='ALL')
+        elif self.lc.mission == 'K2':
+            kCbvFile = search_cbvs(mission=self.lc.mission, campaign=self.lc.campaign)
+            cbvs = kCbvFile.get_cbvs(channel=self.lc.channel, cbvIndices='ALL')
 
+        self.cbvs = cbvs
 
-        if (cbvArray is not None) & (cbvCadenceNo is None):
-            raise ValueError('Please specify both `cbvArray` and `cbvCadenceNo`')
 
         # Align the CBVs with the lightcurve flux using the cadence numbers
-        align_mask = np.in1d(cbvCadenceNo, self.lc.cadenceno)
-        self.cbvArray = cbvArray[:,align_mask]
-        self.cbvCadenceNo = cbvCadenceNo[align_mask]
+        cbvs.align(self.lc, trim_lc=True)
 
 
     @property
@@ -114,14 +108,14 @@ class KeplerCBVCorrector(Corrector):
         """
         return self._opt_result
 
-    def correct(self, cbvs=(1, 2), method='powell', options=None):
+    def correct(self, cbvIndices=(1, 2), method='powell', options=None):
         """
         Correct the SAP_FLUX by fitting a number of cotrending basis vectors
-        `cbvs`.
+        `CBVs`.
 
         Parameters
         ----------
-        cbvs : list of ints
+        cbvIndices : list of ints
             The list of cotrending basis vectors to fit to the data. For example,
             [1, 2] will fit the first two basis vectors.
         method : str
@@ -136,14 +130,13 @@ class KeplerCBVCorrector(Corrector):
         norm_flux = self.lc.flux / median_flux - 1
         norm_err_flux = self.lc.flux_err / median_flux
 
-        # Trim down to the right number of cbvs
-        clip = np.in1d(np.arange(1, len(self.cbvArray)+1), np.asarray(cbvs))
-        time_clip = np.in1d(self.cbvCadenceNo, self.lc.cadenceno)
+        # Trim down to the correct number of cbvs
+        clip = np.in1d(np.arange(1, len(self.cbvs.cbvArray)+1), np.asarray(cbvIndices))
         def mean_model(*theta):
             coeffs = np.asarray(theta)
-            return np.dot(coeffs, self.cbvArray[clip, :][:, time_clip])
+            return np.dot(coeffs, self.cbvs.cbvArray[clip, :][:, :])
 
-        prior = self.prior(mean=np.zeros(len(cbvs)), var=16.)
+        prior = self.prior(mean=np.zeros(len(cbvIndices)), var=16.)
         likelihood = self.likelihood(data=norm_flux, mean=mean_model,
                                      var=norm_err_flux)
         x0 = likelihood.fit(x0=prior.mean, method=method, options=options).x

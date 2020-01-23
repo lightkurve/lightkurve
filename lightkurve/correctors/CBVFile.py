@@ -102,11 +102,12 @@ class KeplerCBVFile(CBVFile):
     def get_cbvs(self, channel=None, module=None, output=None, cbvIndices='ALL'):
         """ Returns the requested CBVs as a CotrendingBasisVectors object
 
-            Input:
-                channel     -- [int] If passed then module and output must NOT be
-                module      -- [int] If passed then channel must Not be
-                output      -- [int] If passed then channel must Not be
-                cbvIndices  -- [int array] List of CBVs to get (does not need to be in sequential order, and can skip indices)
+            Parameters
+            ----------
+                channel     : [int] If passed then module and output must NOT be
+                module      : [int] If passed then channel must Not be
+                output      : [int] If passed then channel must Not be
+                cbvIndices  : [int array] List of CBVs to get (does not need to be in sequential order, and can skip indices)
         """
 
         # CBV FITS files use module/output, not channel
@@ -126,6 +127,7 @@ class KeplerCBVFile(CBVFile):
         return cbvs
 
 
+    @staticmethod
     def get_kepler_cbv_url(mission, quarter, campaign):
         """ STATIC method to obtain a path to a Kepler/K2 CBV FITS file
 
@@ -156,7 +158,6 @@ class KeplerCBVFile(CBVFile):
                     break
         return cbvBaseUrl + cbv_file
 
-    get_kepler_cbv_url = staticmethod(get_kepler_cbv_url)
 
 #*************************************************************************************************************
 class TessCBVFile(CBVFile):
@@ -196,6 +197,7 @@ class TessCBVFile(CBVFile):
         return cbvs
 
 
+    @staticmethod
     def get_tess_cbv_url(sector, camera, CCD):
         """ STATIC method to obtain a path to a TESS CBV FITS file
 
@@ -241,6 +243,4 @@ class TessCBVFile(CBVFile):
         cbvUrl = strLine[htmlStartIndex:htmlEndIndex+4] # Add 4 for length of 'fits' string
 
         return cbvUrl
-
-    get_tess_cbv_url = staticmethod(get_tess_cbv_url)
 
