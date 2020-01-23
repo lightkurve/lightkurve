@@ -17,7 +17,7 @@ import urllib.request
 from ..utils import channel_to_module_output
 from .CBV import KeplerCotrendingBasisVectors, TessCotrendingBasisVectors
 
-__all__ = ['KeplerCBVFile', 'TessCBVFile']
+__all__ = ['CBVFile', 'KeplerCBVFile', 'TessCBVFile']
 
 log = logging.getLogger(__name__)
 
@@ -29,9 +29,11 @@ class CBVFile(object):
     #***
     # Some constants
     @property
-    def nCBVsDefault(self):
+    def nCBVsDefault():
         """ Default number of CBVs """
+        # For Kepler/K2/TESS it's always been 16 CBVs
         return 16
+    nCBVsDefault = staticmethod(nCBVsDefault)
 
     #***
     def __init__(self, path, **kwargs):

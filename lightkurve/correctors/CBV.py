@@ -12,8 +12,10 @@ CBVS, for example to save all three multi-scale bands.
 
 import logging
 import numpy as np
+import matplotlib.pyplot as plt
+from .. import MPLSTYLE
 
-__all__ = ['KeplerCotrendingBasisVectors']
+__all__ = ['KeplerCotrendingBasisVectors', 'TessCotrendingBasisVectors']
 
 log = logging.getLogger(__name__)
 
@@ -70,12 +72,63 @@ class CotrendingBasisVectors:
 
         # For Kepler/K2/TESS it's always been 16 CBVs
         # TODO: automate this based on the CBVs in the FITS file, to future-proof potential changes
-        if (isinstance(cbvIndices, str)):
-            if (cbvIndices == 'ALL'):
-                # TODO: figure out how to do this with one conditional, such as with the && logical in Matlab
-                cbvIndices=np.arange(1,17)
+        if (isinstance(cbvIndices, str) and (cbvIndices == 'ALL')):
+            cbvIndices=np.arange(1,16+1)
         self.cbvIndices = cbvIndices
  
+    def plot_cbvs(self, cbvIndices='ALL', ax=None):
+        '''Plot the requested CBVs
+
+            Does not plot gapped cadences
+
+        Parameters
+        ----------
+        cbvIndices  : list of ints
+                        The list of cotrending basis vectors to plot. For example:
+                            [1, 2] will fit the first two basis vectors. 'ALL' => plot all
+        ax          : matplotlib.pyplot.Axes.AxesSubplot
+                        Matplotlib axis object. If `None`, one will be generated.
+
+        Returns
+        -------
+        ax      : matplotlib.pyplot.Axes.AxesSubplot
+                    Matplotlib axis object
+        '''
+        with plt.style.context(MPLSTYLE):
+            if (isinstance(cbvIndices, str) and (cbvIndices == 'ALL')):
+                cbvIndices=np.arange(1,len(self.cbvArray)+1)
+            cbvChosenLogicalArray = np.in1d(np.arange(1, len(self.cbvArray)+1), np.asarray(cbvIndices))
+
+            if ax is None:
+                _, ax = plt.subplots(1)
+
+            for idx, cbv in enumerate(self.cbvArray[cbvChosenLogicalArray, :][:, :]):
+                # Do not plot gaps
+                cbv[self.gapIndicators] = np.nan
+                ax.plot(self.cbvCadenceNo, cbv-idx/10., label='{}'.format(idx + 1))
+
+            ax.set_yticks([])
+            ax.set_xlabel('Cadence Number')
+
+            if self.mission == 'Kepler':
+                ax.set_title('Kepler CBVs (Quarter.Module.Output : {}.{}.{})'
+                             ''.format(self.quarter, self.module, self.output))
+            elif self.mission == 'K2':
+                ax.set_title('K2 CBVs (Campaign.Module.Output : {}.{}.{})'
+                             ''.format( self.campaign, self.module, self.output))
+            elif self.mission == 'TESS':
+                if (self.cbvType == 'MultiScale'):
+                    ax.set_title('TESS CBVs (Sector.Camera.CCD : {}.{}.{}, CBVType.Band : {}.{})'
+                             ''.format(self.sector, self.camera, self.CCD, self.cbvType, self.band),
+                             fontdict={'fontsize': 9})
+                else:
+                    ax.set_title('TESS CBVs (Sector.Camera.CCD : {}.{}.{}, CBVType : {})'
+                             ''.format(self.sector, self.camera, self.CCD, self.cbvType))
+
+            ax.grid(':', alpha=0.3)
+            ax.legend()
+        return ax
+
         
 
 #***
@@ -100,11 +153,11 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
         super(KeplerCotrendingBasisVectors, self).__init__(mission, cbvType='SingleScale', band=None, cbvIndices=cbvIndices)
         del mission, cbvIndices # Force use of object attributes
 
-        if (mission == 'Kepler'):
+        if (self.mission == 'Kepler'):
             self.quarter = HDU['Primary'].header['QUARTER']
             self.campaign = None
-        elif (mission == 'TESS'):
-            self.campaign = HDU['Primary'].header['QUARTER']
+        elif (self.mission == 'K2'):
+            self.campaign = HDU['Primary'].header['CAMPAIGN']
             self.quarter = None
 
         self.module = module

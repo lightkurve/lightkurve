@@ -6,11 +6,9 @@ from tqdm import tqdm
 
 import oktopus
 import numpy as np
-from matplotlib import pyplot as plt
 
 from astropy.io import fits as pyfits
 
-from .. import MPLSTYLE
 from ..lightcurve import KeplerLightCurve
 from ..lightcurvefile import KeplerLightCurveFile
 from .corrector import Corrector
@@ -196,39 +194,3 @@ class KeplerCBVCorrector(Corrector):
         # note that range(1, k) equals the interval [1, k), which excludes k.
         return list(range(1, k+2))
 
-    def plot_cbvs(self, cbvs=(1, 2), ax=None):
-        '''Plot the CBVs for a given list of CBVs
-
-        Parameters
-        ----------
-        cbvs : list of ints
-            The list of cotrending basis vectors to fit to the data. For example,
-            [1, 2] will fit the first two basis vectors.
-        ax : matplotlib.pyplot.Axes.AxesSubplot
-            Matplotlib axis object. If `None`, one will be generated.
-
-        Returns
-        -------
-        ax : matplotlib.pyplot.Axes.AxesSubplot
-            Matplotlib axis object
-        '''
-        with plt.style.context(MPLSTYLE):
-            clip = np.in1d(np.arange(1, len(self.cbvArray)+1), np.asarray(cbvs))
-            time_clip = np.in1d(self.cbvCadenceNo, self.lc.cadenceno)
-
-            if ax is None:
-                _, ax = plt.subplots(1)
-            for idx, cbv in enumerate(self.cbvArray[clip, :][:, time_clip]):
-                ax.plot(self.cbvCadenceNo[time_clip], cbv+idx/10., label='{}'.format(idx + 1))
-            ax.set_yticks([])
-            ax.set_xlabel('Time (MJD)')
-            module, output = channel_to_module_output(self.lc.channel)
-            if self.lc.mission == 'Kepler':
-                ax.set_title('Kepler CBVs (Module : {}, Output : {}, Quarter : {})'
-                             ''.format(module, output, self.lc.quarter))
-            elif self.lc.mission == 'K2':
-                ax.set_title('K2 CBVs (Module : {}, Output : {}, Campaign : {})'
-                             ''.format(module, output, self.lc.campaign))
-            ax.grid(':', alpha=0.3)
-            ax.legend()
-        return ax
