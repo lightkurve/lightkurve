@@ -9,6 +9,9 @@
 - Fixed a bug which caused ``LightCurve.show_properties()`` to raise a
   ``ValueError`` when the time format was not set. [#655]
 
+- Fixed a bug which caused ``TargetPixelFile.interact()`` to crash if the
+  pipeline aperture mask did not contain pixels. [#667]
+
 
 
 1.6.0 (2019-12-16)
