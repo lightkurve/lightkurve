@@ -206,10 +206,11 @@ class LightCurveFileCollection(Collection):
         `LightCurveFileCollection.SAP_FLUX.stitch()`.
         """
         try:
-            warnings.warn('Stitching a `LightCurveFileCollection` which contains both SAP and '
-                          'PDCSAP_FLUX. Plotting PDCSAP_FLUX. You can remove this warning by '
-                          'using `LightCurveFileCollection.PDCSAP_FLUX.stitch()`.',
-                         LightkurveWarning)
+            warnings.warn("Stitching a `LightCurveFileCollection` which contains "
+                          "both SAP and PDCSAP_FLUX. Using PDCSAP_FLUX. "
+                          "You can remove this warning by explicitely using "
+                          "`LightCurveFileCollection.PDCSAP_FLUX.stitch()`.",
+                          LightkurveWarning)
             return self.PDCSAP_FLUX.stitch()
         except ValueError:
             return self.SAP_FLUX.stitch()
