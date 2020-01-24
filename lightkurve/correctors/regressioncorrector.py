@@ -2,6 +2,7 @@
 from __future__ import division  # necessary for math in `_fit_coefficients`
 
 import logging
+import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -126,6 +127,9 @@ class RegressionCorrector(Corrector):
             if len(prior_sigma) != len(self.X.values.T):
                 raise ValueError('`prior_sigma` must have shape {}'
                                  ''.format(len(self.X.values.T)))
+            if np.any(prior_sigma <= 0):
+                raise ValueError('`prior_sigma` values cannot be smaller than '
+                                 'or equal to zero')
 
         # If prior_mu is specified, prior_sigma must be specified
         if not ((prior_mu is None) & (prior_sigma is None)) | \
@@ -225,7 +229,13 @@ class RegressionCorrector(Corrector):
         model_flux = np.dot(self.X.values, coefficients)
         model_flux -= np.median(model_flux)
         if propagate_errors:
-            samples = np.asarray([np.dot(self.X.values, np.random.multivariate_normal(coefficients, coefficients_err)) for idx in range(100)]).T
+            with warnings.catch_warnings():
+                # ignore "RuntimeWarning: covariance is not symmetric positive-semidefinite."
+                warnings.simplefilter("ignore", RuntimeWarning)
+                samples = np.asarray(
+                    [np.dot(self.X.values,
+                            np.random.multivariate_normal(coefficients, coefficients_err))
+                     for idx in range(100)]).T
             model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
         else:
             model_err = np.zeros(len(model_flux))

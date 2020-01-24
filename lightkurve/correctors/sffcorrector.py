@@ -152,7 +152,9 @@ class SFFCorrector(RegressionCorrector):
                             for jdx in range(len(dm.T))])
 
             # I'm putting VERY weak priors on the SFF motion vectors
-            prior_sigmas.append(np.ones(len(dm.T)) * 10000 * self.lc[a:b].flux.std())
+            # (1e-6 is being added to prevent sigma from being zero)
+            ps = np.ones(len(dm.T)) * 10000 * self.lc[a:b].flux.std() + 1e-6
+            prior_sigmas.append(ps)
 
         sff_dm = DesignMatrix(pd.DataFrame(np.hstack(stack)),
                               columns=np.hstack(columns),
@@ -168,7 +170,7 @@ class SFFCorrector(RegressionCorrector):
         s_dm.prior_mu = np.asarray(means)
 
         # I'm putting WEAK priors on the spline that it must be around 1
-        s_dm.prior_sigma = np.ones(len(s_dm.prior_mu)) * 1000 * self.lc.flux.std()
+        s_dm.prior_sigma = np.ones(len(s_dm.prior_mu)) * 1000 * self.lc.flux.std() + 1e-6
 
         # additional
         if additional_design_matrix is not None:
