@@ -1,5 +1,6 @@
 import pytest
 from astropy import units as u
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import unit_impulse as deltafn
 
@@ -274,14 +275,17 @@ def test_plot_echelle():
     # Assert basic echelle works
     butler.plot_echelle(deltanu=deltanu, numax=numax)
     butler.plot_echelle(u.Quantity(deltanu, 1/u.day), numax)
+    plt.close('all')
 
     # Assert accepts dimensionless input
     butler.plot_echelle(deltanu=deltanu.value*1.001, numax=numax)
     butler.plot_echelle(deltanu=deltanu, numax=numax.value/1.001)
+    plt.close('all')
 
     # Assert echelle works with numax
     butler.plot_echelle(deltanu, numax)
     butler.plot_echelle(deltanu, u.Quantity(numax, 1/u.day))
+    plt.close('all')
 
     # Assert echelle works with minimum limit
     butler.plot_echelle(deltanu, numax, minimum_frequency=numax)
@@ -290,6 +294,7 @@ def test_plot_echelle():
     butler.plot_echelle(deltanu, numax, maximum_frequency=u.Quantity(numax, 1/u.day))
     butler.plot_echelle(deltanu, numax, minimum_frequency=u.Quantity(numax-deltanu, 1/u.day),
                         maximum_frequency=numax+deltanu)
+    plt.close('all')
 
     # Assert raises error if numax or either of the limits are too high
     with pytest.raises(ValueError):
@@ -301,3 +306,4 @@ def test_plot_echelle():
 
     # Assert can pass colormap
     butler.plot_echelle(deltanu, numax, cmap='viridis')
+    plt.close('all')
