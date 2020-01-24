@@ -506,8 +506,10 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
     aperture_mask = tpf._parse_aperture_mask(aperture_mask)
     if ~aperture_mask.any():
+        log.error("No pixels in `aperture_mask`, finding optimum aperture using `tpf.create_threshold_mask`.")
         aperture_mask = tpf.create_threshold_mask()
     if ~aperture_mask.any():
+        log.error("No pixels in `aperture_mask`, using all pixels.")
         aperture_mask = tpf._parse_aperture_mask('all')
 
 
