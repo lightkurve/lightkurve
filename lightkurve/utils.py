@@ -557,6 +557,28 @@ def validate_method(method, supported_methods):
     raise ValueError("method '{}' is not supported; "
                      "must be one of {}".format(method, supported_methods))
 
+def validate_value(value, value_range):
+    """Raises a `ValueError` if a value is not supported.
+
+    Parameters
+    ----------
+    value : float or int
+        The value specified by the user.
+    value_range : [lower_value, upper_value]
+        The range of values supported, inclusive
+
+    Returns
+    -------
+    value : float or int
+        Will return the the value if it is within range.
+    """
+
+    if (value <= value_range[0] and value >= value_range[1]):
+        return value
+    raise ValueError("value '{}' is not valid; "
+                     "must be within [{},{}]".format(method, value_range[0],
+                         value_range[1]))
+
 
 def centroid_quadratic(data, mask=None):
     """Computes the quadratic estimate of the centroid in a 2d-array.
