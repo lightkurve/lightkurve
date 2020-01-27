@@ -791,9 +791,6 @@ def test_flatten_robustness():
     lc = LightCurve([1, 2, 3, 4, 5, 6], [10, 20, 30, 40, 50, 60])
     expected_result = np.array([1.,  1.,  1.,  1.,  1., 1.])
     flat_lc = lc.flatten(window_length=3, polyorder=1)
-    a, b = lc.flatten(window_length=3, polyorder=1, return_trend=True)
-    print(a.flux)
-    print(b.flux)
     assert_allclose(flat_lc.flux, expected_result)
     # flatten should work even if `window_length > len(flux)`
     flat_lc = lc.flatten(window_length=7, polyorder=1)

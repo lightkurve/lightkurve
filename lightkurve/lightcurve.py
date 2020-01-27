@@ -477,8 +477,14 @@ class LightCurve(object):
                 # Reduce `window_length` and `polyorder` for short segments;
                 # this prevents `savgol_filter` from raising an exception
                 # If the segment is too short, just take the median
+                print("l {}".format(l))
+                print("h {}".format(h))
+                print("window_length {}".format(window_length))
+                print("break_tolerance {}".format(break_tolerance))
+
                 if np.any([window_length > (h - l), (h - l) < break_tolerance]):
                     trend_signal[l:h] = np.nanmedian(self.flux[mask][l:h])
+                    print("USING MEDIAN")
                 else:
                     # Scipy outputs a warning here that is not useful, will be fixed in version 1.2
                     with warnings.catch_warnings():
