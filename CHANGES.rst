@@ -12,6 +12,9 @@
 - Fixed a bug which caused ``TargetPixelFile.interact()`` to crash if the
   pipeline aperture mask did not contain pixels. [#667]
 
+- Fixed a bug which caused ``RegressionCorrector.correct()`` to crash if the
+  input light curve contained flux uncertainties <= 0. [#668]
+
 
 
 1.6.0 (2019-12-16)
