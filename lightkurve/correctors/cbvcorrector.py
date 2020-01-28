@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 import oktopus
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import requests
 from astropy.io import fits as pyfits
@@ -17,14 +18,16 @@ from ..lightcurve import LightCurve, KeplerLightCurve
 from ..lightcurvefile import KeplerLightCurveFile
 from .corrector import Corrector
 from ..utils import channel_to_module_output, validate_method
+from .designmatrix import DesignMatrix, DesignMatrixCollection
+from .regressioncorrector import RegressionCorrector
 
 log = logging.getLogger(__name__)
 
 # For Kepler/K2/TESS max number of stored CBVs has always been 16
 DEFAULT_NUMBER_CBVS = 16
 
-__all__ = ['KeplerCBVCorrector', 'KeplerCotrendingBasisVectors',
-        'TessCotrendingBasisVectors', 'get_cbvs']
+__all__ = ['CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
+        'TessCotrendingBasisVectors', 'get_cbvs', 'CBVCorrector']
 
 #*******************************************************************************
 class CotrendingBasisVectors:
@@ -45,7 +48,7 @@ class CotrendingBasisVectors:
     campaign        : only for K2 mission
     sector          : only for TESS mission
     module,output   : only for Kepler/K2
-    camera,CCD      : only for TESS
+    camera,ccd      : only for TESS
     cbv_type        : [str ('SingleScale', 'MultiScale', 'Spike')
     band            : [int] MultiScale band number (invalid for other CBV types)
     cbv_indices     : [int array] List of CBVs extracted for FITS file, {'ALL' => extract all}
@@ -57,14 +60,9 @@ class CotrendingBasisVectors:
     """
 
     #***
-    # Some constants
-    @property
-    def validMissionOptions(self):
-        return ('Kepler', 'K2', 'TESS')
+    validMissionOptions = ('Kepler', 'K2', 'TESS')
+    validCBVTypes = ('SingleScale', 'MultiScale', 'Spike')
 
-    @property
-    def validCBVTypes(self):
-        return ('SingleScale', 'MultiScale', 'Spike')
     #***
 
     def __init__(self, mission, cbv_type='SingleScale', band=None, cbv_indices='ALL'):
@@ -74,25 +72,31 @@ class CotrendingBasisVectors:
             self.validMissionOptions.index(mission)
             self.mission = mission
         except:
-            log.error('Invalid mission')
+            raise ValueError('Invalid mission')
 
         # Check if a valid cbv_type was passed
         try:
             self.validCBVTypes.index(cbv_type)
             self.cbv_type = cbv_type
         except:
-            log.error('Invalid cbv_type')
+            raise ValueError('Invalid cbv_type')
 
         self.band = band
 
         # For Kepler/K2/TESS it's always been 16 CBVs
         # TODO: automate this based on the CBVs in the FITS file, to future-proof potential changes
         if (isinstance(cbv_indices, str) and (cbv_indices == 'ALL')):
-            cbv_indices=np.arange(1,16+1)
+            cbv_indices=np.arange(1,DEFAULT_NUMBER_CBVS+1)
         self.cbv_indices = cbv_indices
+
+    def _cbvs_to_matrix(self):
+        """ Converts cbv_array (which is a list of np.ndarrays, one for each
+        CBV, to a two-dimensional ndarray where the columns are the CBVs
+        """
+        return np.array(self.cbv_array).T
  
     def plot_cbvs(self, cbv_indices='ALL', ax=None):
-        '''Plot the requested CBVs
+        """Plot the requested CBVs
 
             Does not plot gapped cadences
 
@@ -108,7 +112,7 @@ class CotrendingBasisVectors:
         -------
         ax      : matplotlib.pyplot.Axes.AxesSubplot
                     Matplotlib axis object
-        '''
+        """
         with plt.style.context(MPLSTYLE):
             if (isinstance(cbv_indices, str) and (cbv_indices == 'ALL')):
                 cbv_indices=np.arange(1,len(self.cbv_array)+1)
@@ -135,11 +139,11 @@ class CotrendingBasisVectors:
             elif self.mission == 'TESS':
                 if (self.cbv_type == 'MultiScale'):
                     ax.set_title('TESS CBVs (Sector.Camera.CCD : {}.{}.{}, CBVType.Band : {}.{})'
-                             ''.format(self.sector, self.camera, self.CCD, self.cbv_type, self.band),
+                             ''.format(self.sector, self.camera, self.ccd, self.cbv_type, self.band),
                              fontdict={'fontsize': 9})
                 else:
                     ax.set_title('TESS CBVs (Sector.Camera.CCD : {}.{}.{}, CBVType : {})'
-                             ''.format(self.sector, self.camera, self.CCD, self.cbv_type))
+                             ''.format(self.sector, self.camera, self.ccd, self.cbv_type))
 
             ax.grid(':', alpha=0.3)
             ax.legend()
@@ -184,19 +188,60 @@ class CotrendingBasisVectors:
 
         else:
             log.warning('Synchronization with cadence time stamps is not yet implemented. NO SYNCHRONIZATION OCCURED')
+
+    @staticmethod
+    def _extract_cbvs_from_hdu_data(cbv_data, cbv_indices):
+        """ STATIC method: Extracts the CBVs from the HDU[extName].data CBV data set
+
+        Will remove all-zero CBVs.
+
+        For internal use only
+
+        Parameters
+        ----------
+        cbv_data : HDU extension data
+                    The CBV data from the HDU extension
+        cbv_indices : int-like
+                    List of CBV indices to extract
+
+        Returns
+        -------
+        cbv_array   : float array
+                    The extracted CBVs in a ndarray list, all-zero CBVs removed
+        cbv_indices : int array
+                    List of CBV indices to extract all-zero CBVs removed
+        """
+        cbv_array = []
+        indices_to_remove = []
+        for idx, i in enumerate(cbv_indices):
+            try:
+                cbv = cbv_data.field('VECTOR_{}'.format(i))
+                if (np.all(cbv == 0.0)):
+                    # all-zero CBV, remove form list
+                    raise Exception()
+                cbv_array.append(cbv)
+            except:
+                # For CBV vectors that do not exist remove from cbv_indices list
+                indices_to_remove.append(idx)
+        cbv_indices = np.delete(cbv_indices, indices_to_remove)
+        cbv_array = np.asarray(cbv_array)
+
+        return cbv_array, cbv_indices
         
 #***
 class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
+    """ Sub-class for Kepler/K2 cotrending basis vectors
+
+
+        Parameters
+        ----------
+
+    """
 
     #***
-    # Some constants
-    @property
-    def validMissionOptions(self):
-        return ('Kepler', 'K2')
+    validMissionOptions = ('Kepler', 'K2')
+    validCBVTypes = ('SingleScale')
 
-    @property
-    def validCBVTypes(self):
-        return ('SingleScale')
     #***
 
     def __init__(self, mission, HDU, module, output, cbv_indices='ALL'):
@@ -220,15 +265,13 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
         extName = 'MODOUT_{0}_{1}'.format(module, output)
         cbv_data = HDU[extName].data
 
-        self.cadenceno    = HDU[extName].data['CADENCENO']
-        self.gap_indicators   = HDU[extName].data['GAPFLAG']
-        self.cbvEXTNAME      = HDU[extName].header['EXTNAME']
+        self.cadenceno      = HDU[extName].data['CADENCENO']
+        self.gap_indicators = HDU[extName].data['GAPFLAG']
+        self.cbvEXTNAME     = HDU[extName].header['EXTNAME']
 
-        cbv_array = []
-        for i in self.cbv_indices:
-            cbv_array.append(cbv_data.field('VECTOR_{}'.format(i)))
-        self.cbv_array = np.asarray(cbv_array)
-    
+        # Pull out each individual CBV
+        self.cbv_array, self.cbv_indices = self._extract_cbvs_from_hdu_data(cbv_data, self.cbv_indices)
+
     @staticmethod
     def get_kepler_cbv_url(mission, quarter, campaign):
         """ STATIC method to obtain a path to a Kepler/K2 CBV FITS file
@@ -265,14 +308,9 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
 class TessCotrendingBasisVectors(CotrendingBasisVectors):
 
     #***
-    # Some constants
-    @property
-    def validMissionOptions(self):
-        return ('TESS')
+    validMissionOptions = ('TESS')
+    validCBVTypes = ('SingleScale', 'MultiScale', 'Spike')
 
-    @property
-    def validCBVTypes(self):
-        return ('SingleScale', 'MultiScale', 'Spike')
     #***
 
     def __init__(self, HDU, cbv_type, band, cbv_indices='ALL'):
@@ -281,7 +319,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
         """
 
         mission = HDU['PRIMARY'].header['TELESCOP']
-        assert mission == 'TESS', log.error('This does not appear to be a TESS FITS HDU')
+        assert mission == 'TESS', 'This does not appear to be a TESS FITS HDU'
 
         super(TessCotrendingBasisVectors, self).__init__(mission, cbv_type=cbv_type, band=band, cbv_indices=cbv_indices)
         del mission, cbv_type, band, cbv_indices # Force use of object attributes
@@ -289,30 +327,29 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
         self.sector = HDU['PRIMARY'].header['SECTOR']
         # Curiosly, camera and CCD are not in the primary header!
         self.camera = HDU[1].header['CAMERA']
-        self.CCD = HDU[1].header['CCD']
+        self.ccd = HDU[1].header['CCD']
 
         # Get the requested cbv_type
         switcher = {
-            'SingleScale': 'CBV.single-scale.{}.{}'.format(self.camera, self.CCD),
-            'MultiScale': 'CBV.multiscale-band-{}.{}.{}'.format(self.band, self.camera, self.CCD),
-            'Spike': 'CBV.spike.{}.{}',
+            'SingleScale': 'CBV.single-scale.{}.{}'.format(self.camera, self.ccd),
+            'MultiScale': 'CBV.multiscale-band-{}.{}.{}'.format(self.band,
+                self.camera, self.ccd),
+            'Spike': 'CBV.spike.{}.{}'.format(self.camera, self.ccd),
             'unknown': 'error'
             }
         extName = switcher.get(self.cbv_type, switcher['unknown'])
         if (extName == 'error'):
-            log.error('Invalide cbv_type')
+            raise Exception('Invalide cbv_type')
 
 
         cbv_data = HDU[extName].data
 
-        self.cadenceno    = HDU[extName].data['CADENCENO']
-        self.gap_indicators   = HDU[extName].data['GAP']
-        self.cbvEXTNAME      = HDU[extName].header['EXTNAME']
+        self.cadenceno      = HDU[extName].data['CADENCENO']
+        self.gap_indicators = HDU[extName].data['GAP']
+        self.cbvEXTNAME     = HDU[extName].header['EXTNAME']
 
-        cbv_array = []
-        for i in self.cbv_indices:
-            cbv_array.append(cbv_data.field('VECTOR_{}'.format(i)))
-        self.cbv_array = np.asarray(cbv_array)
+        # Pull out each individual CBV
+        self.cbv_array, self.cbv_indices = self._extract_cbvs_from_hdu_data(cbv_data, self.cbv_indices)
 
     @staticmethod
     def get_tess_cbv_url(sector, camera, CCD):
@@ -339,7 +376,17 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
         curlUrl = curlBaseUrl + str(sector) + curlEndUrl
 
         # This is the string to search for in the curl script file
-        curlSearchString = 's00' + str(sector) + '-' + str(camera) + '-' + str(CCD) + '-' 
+        # Pad the sector number with a first '0' if less than 10
+        # TODO: figure out a way to pad an interger number with forward zeros
+        # without needing conditional
+        sector = int(sector)
+        if (sector < 10):
+            curlSearchString = 's000' + str(sector) + '-' + str(camera) + '-' + str(CCD) + '-' 
+        elif (sector > 99):
+            # We will be blessed if we get to more than 99 sectors!
+            raise Exception('Only up to 99 Sectors is currently supported')
+        else:
+            curlSearchString = 's00' + str(sector) + '-' + str(camera) + '-' + str(CCD) + '-' 
 
         # 1. Read in the relevent curl script file and find the line for the CBV data we are looking for
         data = urllib.request.urlopen(curlUrl)
@@ -352,7 +399,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
             except:
                 pass # continue searching
         if (foundIndex is None):
-            log.error('CBV FITS file not found')
+            raise Exception('CBV FITS file not found')
 
         # extract url from strLine
         htmlStartIndex = strLine.find('https:')
@@ -492,14 +539,197 @@ def get_cbvs (mission=('Kepler', 'K2', 'TESS'), quarter=None, campaign=None,
             
 
     except:
-        log.error('CBVS were not found')
+        raise Exception('CBVS were not found')
         return None
 
 
 #*******************************************************************************
 # Correctors
-class KeplerCBVCorrector(Corrector):
-    r"""Remove systematic trends from Kepler light curves by fitting
+
+
+class CBVCorrector(Corrector):
+    """ Class for removing systematics using CBV correctors for Kepler/K2/TESS
+
+
+
+    Attributes
+    ----------
+    lc  : LightCurve
+        The light curve to correct
+    cbv_type : str list
+        List of CBV types to use
+    cbv_indices : list of lists
+        List of CBV vectors to use in each of cbv_type passed. {'ALL' => Use all}
+    cbvs    : CetrendingBasisVectors
+        The retrieved CBVs
+    cbv_design_matrix : DesignMatrix
+        The retrieved CBVs ported into a DesignMatrix object
+    extra_design_matrix : DesignMatrix
+        An extra design matrix to include in the fit with the CBVs
+    design_matrix   : DesignMatrixCollection
+        The design matrix collection composed of cbv_design_matrix and extra_design_matrix 
+    regression_corrector : RegressionCorrector
+        The constrcuted RegressionCorrector to be used to perform the fit
+    corrected_lc : LightCurve
+        The returned light curve from regression_corrector.correct
+
+
+    """
+
+    def __init__(self, lc, cbv_type='SingleScale', cbv_indices='ALL', band=None, ext_dm=None):
+        """ Constructor for CBVClass objects
+
+        This constructor will retrieve the desired CBVs from MAST and then
+        align them with the passed light curve.
+
+        For TESS we have the option to load multiple CBV types
+        
+        Attributes
+        ----------
+        lc  : LightCurve
+            The light curve to correct
+        cbv_type : str list
+            List of CBV types to use
+        cbv_indices : list of lists
+            List of CBV vectors to use in each passed cbv_type. {'ALL' => Use all}
+        band        : int list
+            Multi-Scale band number to correspond to the passed cbv_type
+            For non-Multi-Scale CBVs use None
+        ext_dm  : DesignMatrix
+            Optionall pass an extra design matrix to also be used in the fit
+
+        """
+
+        if not isinstance(lc, LightCurve):
+            raise Exception('<lc> must be a LightCurve class')
+
+        if (isinstance(cbv_type, list)):
+            if (not lc.mission == 'TESS'):
+                raise Exception('Multiple CBV types are only allowed for TESS')
+            if (not len(cbv_type) == len(cbv_indices)):
+                raise Exception('cbv_type and cbv_indices must be the same list length')
+
+        self.lc = lc
+        self.cbv_type = cbv_type
+
+        # If any DesignMatrix was passed the store it
+        self.extra_design_matrix = ext_dm
+
+        #***
+        # Retrieve the CBVs from MAST
+        # TODO: create CBV collection class
+        cbvs = []
+        if (isinstance(cbv_indices, str) and (cbv_indices == 'ALL')):
+            cbv_indices=np.arange(1,DEFAULT_NUMBER_CBVS+1)
+
+        if self.lc.mission == 'Kepler':
+            cbvs.append(get_cbvs(mission=self.lc.mission, quarter=self.lc.quarter, 
+                    channel=self.lc.channel, cbv_indices=cbv_indices))
+            self.cbv_indices = cbvs.cbv_indices
+        elif self.lc.mission == 'K2':
+            cbvs.append(get_cbvs(mission=self.lc.mission, campaign=self.lc.campaign, 
+                    channel=self.lc.channel, cbv_indices=cbv_indices))
+            self.cbv_indices = cbvs.cbv_indices
+        elif self.lc.mission == 'TESS':
+            # For TESS we can load multiple CBV types
+            # TODO: finish this for band input list
+            self.cbv_indices = []
+            for idx in np.arange(len(cbv_indices)):
+                cbvs.append(get_cbvs(mission=self.lc.mission, sector=self.lc.sector,
+                    camera=self.lc.camera, CCD=self.lc.ccd, cbv_type=cbv_type[idx],
+                    band=band, cbv_indices=cbv_indices[idx]))
+                self.cbv_indices.append(cbvs[idx].cbv_indices)
+        else:
+            raise ValueError('Unknown mission type')
+
+        for idx in np.arange(len(cbvs)):
+            if (not isinstance(cbvs[idx], CotrendingBasisVectors)):
+                raise Exception('CBVs could not be loaded. CBVCorrector must exit')
+
+        # Align the CBVs with the lightcurve flux using the cadence numbers
+        for idx in np.arange(len(cbvs)):
+            cbvs[idx].align(self.lc, trim_lc=True)
+
+        self.cbvs = cbvs
+
+
+    def correct(self):
+        """ Performs the correction using RegressionCorrector methods
+
+        This method will assemble the full design matrix collection composed of
+        cbv_design_matrix and extra_design_matrix. Then use
+        RegressionCorrector.correct to perform the correction
+
+        TODO: A whole bunch! This is a shell of a method. Just to demonstrate
+        basis functionality. We should consider allowing for standard
+        regaulrization methods such as Ridge Regression (L2 Norm) and Lasso (L1
+        Norm).  Maybe even BIC or AIC methods also.
+
+        Eventually, the plan is to use over-fitting and under-fitting goodness
+        metrics to constrain the regression fit.
+
+
+        """
+
+        # Create the design matrix collection with CBVs, plus extra passed basis vectors
+
+        #Create a CBV design matrix for each CBV set loaded
+        self.cbv_design_matrix = []
+        for idx in np.arange(len(self.cbvs)):
+            cbv_index_names = [cbv_index for cbv_index in self.cbv_indices[idx]]
+            self.cbv_design_matrix.append(DesignMatrix(self.cbvs[idx]._cbvs_to_matrix(),
+                    name=self.cbvs[idx].cbv_type, columns=cbv_index_names))
+
+        # Add the passed in design matrix
+        # If none passed then still add the constant offset term (array of ones)
+        if (self.extra_design_matrix is None):
+            ones_df = pd.DataFrame(np.atleast_2d(np.ones(self.cbv_design_matrix[0].shape[0])).T, columns=['offset'])
+            extra_design_matrix = DesignMatrix(ones_df, name='offset')
+        else:
+            extra_design_matrix = self.extra_design_matrix.append_constant()
+
+        # Create the full design matrix collection
+        dm_to_flatten = [[cbv_dm for cbv_dm in self.cbv_design_matrix], [extra_design_matrix]]
+        flattened_dm_list = [item for sublist in dm_to_flatten for item in sublist]
+        self.design_matrix = DesignMatrixCollection(flattened_dm_list)
+
+            
+        # Use RegressionCorrector for the actual fitting
+        self.regression_corrector = RegressionCorrector(self.lc)
+        self.corrected_lc = self.regression_corrector.correct(self.design_matrix)
+        return self.corrected_lc
+
+    def diagnose(self):
+        """Returns diagnostic plots to assess the most recent call to `correct()`.
+
+        If `correct()` has not yet been called, a ``ValueError`` will be raised.
+
+        Returns
+        -------
+        `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+
+        if not hasattr(self, 'corrected_lc'):
+            raise ValueError('Please call the `correct()` method before trying to diagnose.')
+
+        return self.regression_corrector.diagnose()
+
+
+
+
+#*******************************************************************************
+#*******************************************************************************
+#*******************************************************************************
+# CANDIDATE FOR REMOVAL
+# Do we wish to retain any othis functionality? Or is it superseeded by
+# RegressionCorrector?
+#*******************************************************************************
+#*******************************************************************************
+#*******************************************************************************
+
+class OldKeplerCBVCorrector(Corrector):
+    """Remove systematic trends from Kepler light curves by fitting
     Cotrending Basis Vectors (CBVs).
 
     .. math::
