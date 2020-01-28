@@ -473,26 +473,13 @@ class LightCurve(object):
             high = np.append(cut, len(self.time[mask]))
             # Then, apply the savgol_filter to each segment separately
             trend_signal = np.zeros(len(self.time[mask]))
-            print("low {}".format(low))
-            print("high {}".format(high))
-            print("cut {}".format(cut))
-            print("lentimemask {}".format(len(self.time[mask])))
-            print("dt {}".format(dt))
-            print("time {}".format(self.time))
-            print("mask {}".format(mask))
 
             for l, h in zip(low, high):
                 # Reduce `window_length` and `polyorder` for short segments;
                 # this prevents `savgol_filter` from raising an exception
                 # If the segment is too short, just take the median
-                print("l {}".format(l))
-                print("h {}".format(h))
-                print("window_length {}".format(window_length))
-                print("break_tolerance {}".format(break_tolerance))
-
                 if np.any([window_length > (h - l), (h - l) < break_tolerance]):
                     trend_signal[l:h] = np.nanmedian(self.flux[mask][l:h])
-                    print("USING MEDIAN")
                 else:
                     # Scipy outputs a warning here that is not useful, will be fixed in version 1.2
                     with warnings.catch_warnings():
@@ -505,11 +492,6 @@ class LightCurve(object):
             mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
                     (np.nanstd(self.flux[mask] - trend_signal) * sigma + 1e-14)
             f = interp1d(self.time[mask][mask1], trend_signal[mask1], fill_value='extrapolate')
-            print("fm-ts {}".format(self.flux[mask] - trend_signal))
-            print("nantonum {}".format(np.nan_to_num(np.abs(self.flux[mask] - trend_signal))))
-            print("sigma {}".format(sigma))
-            print("nanstd {}".format(np.nanstd(self.flux[mask] - trend_signal)))
-            print("================")
             trend_signal = f(self.time)
             mask[mask] &= mask1
 
