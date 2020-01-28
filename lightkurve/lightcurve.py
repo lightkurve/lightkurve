@@ -487,9 +487,10 @@ class LightCurve(object):
                                                                  window_length=window_length,
                                                                  polyorder=polyorder,
                                                                  **kwargs)
-            # No outliers
+            # Ignore outliers; note we add `1e-14` below to avoid detecting
+            # outliers which are merely caused by numerical noise.
             mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
-                    (np.nanstd(self.flux[mask] - trend_signal) * sigma)
+                    (np.nanstd(self.flux[mask] - trend_signal) * sigma + 1e-14)
             f = interp1d(self.time[mask][mask1], trend_signal[mask1], fill_value='extrapolate')
             trend_signal = f(self.time)
             mask[mask] &= mask1
