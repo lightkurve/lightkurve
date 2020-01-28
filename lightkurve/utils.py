@@ -316,6 +316,8 @@ def running_mean(data, window_size):
     window_size : int
         Window length used to compute the running mean.
     """
+    if window_size > len(data):
+        window_size = len(data)
     cumsum = np.cumsum(np.insert(data, 0, 0))
     return (cumsum[window_size:] - cumsum[:-window_size]) / float(window_size)
 
