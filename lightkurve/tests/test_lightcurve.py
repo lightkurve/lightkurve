@@ -267,11 +267,11 @@ def test_lightcurve_copy():
     # By changing 1 of the 4 data points in the new lightcurve's array-like
     # attributes, we expect assert_array_equal to raise an AssertionError
     # indicating a mismatch of 1/4 (or 25%).
-    with pytest.raises(AssertionError, match=r'ismatch.* 25'):
+    with pytest.raises(AssertionError, match=r'ismatch.*25'):
         assert_array_equal(lc.time, nlc.time)
-    with pytest.raises(AssertionError, match=r'ismatch.* 25'):
+    with pytest.raises(AssertionError, match=r'ismatch.*25'):
         assert_array_equal(lc.flux, nlc.flux)
-    with pytest.raises(AssertionError, match=r'ismatch.* 25'):
+    with pytest.raises(AssertionError, match=r'ismatch.*25'):
         assert_array_equal(lc.flux_err, nlc.flux_err)
 
     # KeplerLightCurve has extra data
@@ -297,17 +297,17 @@ def test_lightcurve_copy():
     # with a repeating decimal. However, float precision for python 2.7 is 10
     # decimal digits, while python 3.6's is 13 decimal digits. Therefore,
     # a regular expression is needed for both versions.
-    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch.*33\.3+'):
         assert_array_equal(lc.time, nlc.time)
-    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch.*33\.3+'):
         assert_array_equal(lc.flux, nlc.flux)
-    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch.*33\.3+'):
         assert_array_equal(lc.centroid_col, nlc.centroid_col)
-    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch.*33\.3+'):
         assert_array_equal(lc.centroid_row, nlc.centroid_row)
-    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch.*33\.3+'):
         assert_array_equal(lc.cadenceno, nlc.cadenceno)
-    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch.*33\.3+'):
         assert_array_equal(lc.quality, nlc.quality)
 
 @pytest.mark.parametrize("path, mission", [(filename_tess_custom, "TESS"),
@@ -409,6 +409,7 @@ def test_cdpp_tabby():
     assert(np.abs(lc.estimate_cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
 
 
+@pytest.mark.skip(reason="Temporarily skipping due to https://github.com/scipy/scipy/issues/11365")
 def test_bin():
     """Does binning work?"""
     lc = LightCurve(time=np.arange(10),
@@ -509,6 +510,7 @@ def test_bins_kwarg():
     #   - Bins = 310.0
 
 
+@pytest.mark.skip(reason="Temporarily skipping due to https://github.com/scipy/scipy/issues/11365")
 def test_bin_quality():
     """Binning must also revise the quality and centroid columns."""
     lc = KeplerLightCurve(time=[1, 2, 3, 4],

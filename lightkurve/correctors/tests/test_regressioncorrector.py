@@ -1,10 +1,12 @@
 """Unit tests for the `RegressionCorrector` class."""
+import warnings
+
 import numpy as np
 from numpy.testing import assert_almost_equal
 import pandas as pd
 import pytest
 
-from ... import LightCurve
+from ... import LightCurve, LightkurveWarning
 from .. import RegressionCorrector, DesignMatrix
 
 
@@ -81,14 +83,19 @@ def test_sinusoid_noise():
 
 def test_nan_input():
     # The following light curves should all raise ValueErrors because of NaNs
-    lcs = [LightCurve(flux=[5, 10], flux_err=[np.nan, 1]),
-           LightCurve(flux=[np.nan, 10], flux_err=[1, 1]),
-           LightCurve(time=[1, np.nan], flux=[5, 10], flux_err=[1, 1])]
+    with warnings.catch_warnings():
+        # Instantiating light curves with NaN times will yield a warning
+        warnings.simplefilter("ignore", LightkurveWarning)
+        lcs = [LightCurve(flux=[5, 10], flux_err=[np.nan, 1]),
+               LightCurve(flux=[np.nan, 10], flux_err=[1, 1]),
+               LightCurve(time=[1, np.nan], flux=[5, 10], flux_err=[1, 1])]
+
+    # Passing these to RegressionCorrector should raise a ValueError
     for lc in lcs:
         with pytest.raises(ValueError):
             RegressionCorrector(lc)
 
-    # All NaNs in flux_err should be fine,
-    # because it is the default when flux_err is missing.
+    # However, we should be flexible with letting `flux_err` be all-NaNs,
+    # because it is common for errors to be missing.
     lc = LightCurve(flux=[5, 10], flux_err=[np.nan, np.nan])
     RegressionCorrector(lc)

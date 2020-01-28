@@ -2,6 +2,7 @@
 from __future__ import division  # necessary for math in `_fit_coefficients`
 
 import logging
+import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -126,6 +127,9 @@ class RegressionCorrector(Corrector):
             if len(prior_sigma) != len(self.X.values.T):
                 raise ValueError('`prior_sigma` must have shape {}'
                                  ''.format(len(self.X.values.T)))
+            if np.any(prior_sigma <= 0):
+                raise ValueError('`prior_sigma` values cannot be smaller than '
+                                 'or equal to zero')
 
         # If prior_mu is specified, prior_sigma must be specified
         if not ((prior_mu is None) & (prior_sigma is None)) | \
@@ -202,18 +206,22 @@ class RegressionCorrector(Corrector):
         else:
             cadence_mask = np.copy(cadence_mask)
 
+        # Prepare for iterative masking of residuals
+        clean_cadences = np.ones_like(cadence_mask)
         # Iterative sigma clipping
         for count in range(niters):
             coefficients, coefficients_err = \
-                self._fit_coefficients(cadence_mask=cadence_mask,
+                self._fit_coefficients(cadence_mask=cadence_mask & clean_cadences,
                                        prior_mu=self.X.prior_mu,
                                        prior_sigma=self.X.prior_sigma,
                                        propagate_errors=propagate_errors)
-            residuals = self.lc.flux - np.dot(self.X.values, coefficients)
-            cadence_mask &= ~sigma_clip(residuals, sigma=sigma).mask
+            model = np.ma.masked_array(data=np.dot(self.X.values, coefficients),
+                                       mask=~(cadence_mask & clean_cadences))
+            residuals = self.lc.flux - model
+            clean_cadences = ~sigma_clip(residuals, sigma=sigma).mask
             log.debug("correct(): iteration {}: clipped {} cadences"
-                      "".format(count, cadence_mask.sum()))
-        self.cadence_mask = cadence_mask
+                      "".format(count, (~clean_cadences).sum()))
+        self.cadence_mask = cadence_mask & clean_cadences
 
         self.coefficients = coefficients
         self.coefficients_err = coefficients_err
@@ -221,7 +229,13 @@ class RegressionCorrector(Corrector):
         model_flux = np.dot(self.X.values, coefficients)
         model_flux -= np.median(model_flux)
         if propagate_errors:
-            samples = np.asarray([np.dot(self.X.values, np.random.multivariate_normal(coefficients, coefficients_err)) for idx in range(100)]).T
+            with warnings.catch_warnings():
+                # ignore "RuntimeWarning: covariance is not symmetric positive-semidefinite."
+                warnings.simplefilter("ignore", RuntimeWarning)
+                samples = np.asarray(
+                    [np.dot(self.X.values,
+                            np.random.multivariate_normal(coefficients, coefficients_err))
+                     for idx in range(100)]).T
             model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
         else:
             model_err = np.zeros(len(model_flux))

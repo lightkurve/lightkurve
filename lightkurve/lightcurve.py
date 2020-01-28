@@ -306,7 +306,10 @@ class LightCurve(object):
         attrs = {}
         for attr in dir(self):
             if not attr.startswith('_'):
-                res = getattr(self, attr)
+                try:
+                    res = getattr(self, attr)
+                except Exception:
+                    continue
                 if callable(res):
                     continue
                 if attr == 'hdu':
@@ -352,18 +355,20 @@ class LightCurve(object):
         output.pprint(max_lines=-1, max_width=-1)
 
     def append(self, others, inplace=False):
-        """
-        Append LightCurve objects.
+        """Append one or more other `LightCurve` object(s) to this one.
 
         Parameters
         ----------
-        others : LightCurve object or list of LightCurve objects
-            Light curves to be appended to the current one.
+        others : `LightCurve`, or list of `LightCurve`
+            Light curve(s) to be appended to the current one.
+        inplace : bool
+            If True, change the current `LightCurve` instance in place instead
+            of creating and returning a new one. Defaults to False.
 
         Returns
         -------
-        new_lc : LightCurve object
-            Concatenated light curve.
+        new_lc : `LightCurve`
+            Light curve which has the other light curves appened to it.
         """
         if not hasattr(others, '__iter__'):
             others = [others]
@@ -387,15 +392,15 @@ class LightCurve(object):
         return new_lc
 
     def copy(self):
-        """Returns a copy of the LightCurve object.
+        """Returns a copy of this `LightCurve` object.
 
-        This method uses the `copy.deepcopy` function to ensure that all
-        objects stored within the LightCurve are copied (e.g. time and flux).
+        This method uses Python's `copy.deepcopy` function to ensure that all
+        objects stored within the LightCurve instance are fully copied.
 
         Returns
         -------
-        lc_copy : LightCurve
-            A new `LightCurve` object which is a copy of the original.
+        lc_copy : `LightCurve`
+            A new light curve object which is a copy of the original.
         """
         return copy.deepcopy(self)
 
@@ -437,13 +442,12 @@ class LightCurve(object):
 
         Returns
         -------
-        flatten_lc : LightCurve object
-            Flattened lightcurve.
-        If ``return_trend`` is `True`, the method will also return:
-        trend_lc : LightCurve object
-            Trend in the lightcurve data
+        flatten_lc : `LightCurve`
+            New light curve object with long-term trends removed.
+        If ``return_trend`` is set to ``True``, this method will also return:
+        trend_lc : `LightCurve`
+            New light curve object containing the trend that was removed.
         """
-
         if mask is None:
             mask = np.ones(len(self.time), dtype=bool)
         else:
