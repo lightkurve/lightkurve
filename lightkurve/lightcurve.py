@@ -505,13 +505,12 @@ class LightCurve(object):
             mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
                     (np.nanstd(self.flux[mask] - trend_signal) * sigma)
             f = interp1d(self.time[mask][mask1], trend_signal[mask1], fill_value='extrapolate')
-            trend_signal = f(self.time)
             print("fm-ts {}".format(self.flux[mask] - trend_signal))
             print("nantonum {}".format(np.nan_to_num(np.abs(self.flux[mask] - trend_signal))))
             print("sigma {}".format(sigma))
             print("nanstd {}".format(np.nanstd(self.flux[mask] - trend_signal)))
             print("================")
-
+            trend_signal = f(self.time)
             mask[mask] &= mask1
 
         flatten_lc = self.copy()
