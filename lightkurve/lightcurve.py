@@ -503,7 +503,7 @@ class LightCurve(object):
                                                                  **kwargs)
             # No outliers
             mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
-                    (np.nanstd(self.flux[mask] - trend_signal) * sigma + 1e-15)
+                    (np.nanstd(self.flux[mask] - trend_signal) * sigma + 1e-14)
             f = interp1d(self.time[mask][mask1], trend_signal[mask1], fill_value='extrapolate')
             print("fm-ts {}".format(self.flux[mask] - trend_signal))
             print("nantonum {}".format(np.nan_to_num(np.abs(self.flux[mask] - trend_signal))))
