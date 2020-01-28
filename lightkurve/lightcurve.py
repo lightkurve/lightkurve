@@ -475,6 +475,12 @@ class LightCurve(object):
             trend_signal = np.zeros(len(self.time[mask]))
             print("low {}".format(low))
             print("high {}".format(high))
+            print("cut {}".format(cut))
+            print("lentimemask {}".format(len(self.time[mask])))
+            print("dt {}".format(dt))
+            print("time {}".format(self.time))
+            print("mask {}".format(mask))
+
             for l, h in zip(low, high):
                 # Reduce `window_length` and `polyorder` for short segments;
                 # this prevents `savgol_filter` from raising an exception
