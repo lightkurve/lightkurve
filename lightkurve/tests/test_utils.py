@@ -41,6 +41,7 @@ def test_running_mean():
     assert_almost_equal(running_mean([1, 2, 3], window_size=1), [1, 2, 3])
     assert_almost_equal(running_mean([1, 2, 3], window_size=2), [1.5, 2.5])
     assert_almost_equal(running_mean([2, 2, 2], window_size=3), [2])
+    assert_almost_equal(running_mean([2, 2, 2], window_size=20), [2])
 
 
 def test_quality_flag_decoding_kepler():
