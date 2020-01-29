@@ -172,5 +172,5 @@ def test_sff_breakindex():
 def test_sff_tess_warning():
     """SFF is not designed for TESS, so we raise a warning."""
     lc = TessLightCurve(flux=[1, 2, 3])
-    with pytest.warns(LightkurveWarning, match='not designed for'):
+    with pytest.warns(LightkurveWarning, match='not suitable'):
         corr = SFFCorrector(lc)
