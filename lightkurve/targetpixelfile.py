@@ -92,14 +92,8 @@ class TargetPixelFile(object):
 
     def __add__(self, other):
         hdu = deepcopy(self.hdu)
-        tmp = tempfile.NamedTemporaryFile(delete=False)
         hdu[1].data['FLUX'][self.quality_mask] += other
-        fits.HDUList(hdus=list(hdu)).writeto(tmp.name, overwrite=True)
-        tpf = type(self)(tmp.name, quality_bitmask=self.quality_bitmask)
-        tpf.path = None
-        tmp.close()
-        os.remove(tmp.name)
-        return tpf
+        return type(self)(hdu, quality_bitmask=self.quality_bitmask)
 
     def __mul__(self, other):
         hdu = deepcopy(self.hdu)
