@@ -63,32 +63,41 @@ def prepare_lightcurve_datasource(lc):
         human_time = [' '] * len(lc.flux)
 
     # Convert binary quality numbers into human readable strings
-    qual_strings = []
-    if (lc.mission == 'Kepler') or (lc.mission == 'K2'):
+    # How to decode the flags?
+    if lc.mission in ['Kepler', 'K2']:
+        flagdecoder = KeplerQualityFlags
+    elif lc.mission == 'TESS':
+        flagdecoder = TessQualityFlags
+    else:
+        flagdecoder = None
+
+    if flagdecoder is None:
+        qual_strings = [' '] * len(lc.flux)
+    else:
+        qual_strings = []
         for bitmask in lc.quality:
-            flag_str_list = KeplerQualityFlags.decode(bitmask)
+            flag_str_list = flagdecoder.decode(bitmask)
             if len(flag_str_list) == 0:
                 qual_strings.append(' ')
             if len(flag_str_list) == 1:
                 qual_strings.append(flag_str_list[0])
             if len(flag_str_list) > 1:
                 qual_strings.append("; ".join(flag_str_list))
-    else:
-        qual_strings = [' '] * len(lc.flux)
-        #TODO add TESS support
 
+    # Default cadence numbers
     if hasattr(lc, 'cadenceno'):
         cadences = lc.cadenceno
     else:
         cadences = np.arange(0, len(lc.time), 1)
 
     lc_source = ColumnDataSource(data=dict(
-                                 time=lc.time,
-                                 time_iso=human_time,
-                                 flux=lc.flux,
-                                 cadence=cadences,
-                                 quality_code=lc.quality,
-                                 quality=np.array(qual_strings)))
+                                        time=lc.time,
+                                        time_iso=human_time,
+                                        flux=lc.flux,
+                                        cadence=cadences,
+                                        quality_code=lc.quality,
+                                        quality=np.array(qual_strings)
+                                ))
     return lc_source
 
 

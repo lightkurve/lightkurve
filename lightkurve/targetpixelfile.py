@@ -411,6 +411,9 @@ class TargetPixelFile(object):
             will be returned.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
+        centroid_method : str, 'moments' or 'quadratic'
+            For the details on this arguments, please refer to the documentation
+            for `TargetPixelFile.estimate_centroids`.
 
         Returns
         -------
@@ -418,21 +421,20 @@ class TargetPixelFile(object):
             Array containing the summed flux within the aperture for each
             cadence.
         """
-        aperture_mask = self._parse_aperture_mask(aperture_mask)
-        if aperture_mask.sum() == 0:
-            log.warning('Warning: aperture mask contains zero pixels.')
-        centroid_col, centroid_row = self.estimate_centroids(aperture_mask,centroid_method)
-        # Ignore warnings related to zero or negative errors
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RuntimeWarning)
-            flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
-
+        flux, flux_err, centroid_col, centroid_row = \
+            self._aperture_photometry(aperture_mask=aperture_mask,
+                                      centroid_method=centroid_method)
+        keys = {'centroid_col': centroid_col,
+                'centroid_row': centroid_row,
+                'quality': self.quality,
+                'ra': self.ra,
+                'dec': self.dec,
+                'label': self.header['OBJECT'],
+                'targetid': self.targetid}
         return LightCurve(time=self.time,
-                flux=np.nansum(self.flux[:, aperture_mask], axis=1),
-                flux_err=flux_err, centroid_col=centroid_col,
-                centroid_row=centroid_row, quality=self.quality, ra=self.ra,
-                dec=self.dec, label=self.header['OBJECT'], targetid=self.targetid)
-
+                          flux=flux,
+                          flux_err=flux_err,
+                          **keys)
 
     def _parse_aperture_mask(self, aperture_mask):
         """Parse the `aperture_mask` parameter as given by a user.
