@@ -36,8 +36,9 @@ class SFFCorrector(RegressionCorrector):
     """
     def __init__(self, lc):
         if getattr(lc, 'mission', '') == 'TESS':
-            warnings.warn("The SFF correction method is not designed for use "
-                          "with TESS light curves.",
+            warnings.warn("The SFF correction method is not suitable for use "
+                          "with TESS data, because the spacecraft motion does "
+                          "not proceed along a consistent arc.",
                           LightkurveWarning)
 
         self.raw_lc = lc
