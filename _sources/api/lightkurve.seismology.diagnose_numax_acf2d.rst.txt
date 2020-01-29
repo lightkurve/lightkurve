@@ -1,0 +1,6 @@
+diagnose_numax_acf2d
+====================
+
+.. currentmodule:: lightkurve.seismology
+
+.. autofunction:: diagnose_numax_acf2d

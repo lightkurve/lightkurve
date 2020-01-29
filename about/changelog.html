@@ -13,7 +13,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -41,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.6</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -89,12 +88,27 @@
 </nav>
 </header>
 
-<div class="container">
+<div class="container"  role="main">
     
   <div class="section" id="full-changelog">
 <span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id1">
-<h2>1.6.0 (2019-12-16)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h2>1.7.0 (2020-01-29)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added a <code class="docutils literal notranslate"><span class="pre">scale='linear'</span></code> option to <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact()</span></code> to show
+pixels using a linear stretch. The default is <code class="docutils literal notranslate"><span class="pre">scale='log'</span></code>. [#664]</p></li>
+<li><p>Added a warning if <code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code> is used to correct TESS data. [#660]</p></li>
+<li><p>Added improved sigma-clipping inside <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>. [#654]</p></li>
+<li><p>Fixed a bug which caused <code class="docutils literal notranslate"><span class="pre">LightCurve.show_properties()</span></code> to raise a
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when the time format was not set. [#655]</p></li>
+<li><p>Fixed a bug which caused <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact()</span></code> to crash if the
+pipeline aperture mask did not contain pixels. [#667]</p></li>
+<li><p>Fixed a bug which caused <code class="docutils literal notranslate"><span class="pre">RegressionCorrector.correct()</span></code> to crash if the
+input light curve contained flux uncertainties &lt;= 0. [#668]</p></li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h2>1.6.0 (2019-12-16)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug in <code class="docutils literal notranslate"><span class="pre">tpf.to_lightcurve()</span></code> which caused <code class="docutils literal notranslate"><span class="pre">flux</span></code> and <code class="docutils literal notranslate"><span class="pre">flux_err</span></code>
 to be <code class="docutils literal notranslate"><span class="pre">0</span></code> instead of <code class="docutils literal notranslate"><span class="pre">NaN</span></code> for cadences with all-NaN pixels. [#651]</p></li>
@@ -106,8 +120,8 @@ the pipeline based on background level thresholds. [#652]</p></li>
 it allows <code class="docutils literal notranslate"><span class="pre">DesignMatrix.pca()</span></code> to be faster and more robust. [#653]</p></li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h2>1.5.2 (2019-12-05)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h2>1.5.2 (2019-12-05)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug introduced in v1.5.0 which caused an <code class="docutils literal notranslate"><span class="pre">ImportError</span></code> related to
 <code class="docutils literal notranslate"><span class="pre">astropy.stats.calculate_bin_edges</span></code> to be raised when a user has an older
@@ -116,15 +130,15 @@ version of AstroPy installed (version &lt;3.1 or &lt;2.10). [#644]</p></li>
 be off by one pixel. [#638]</p></li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h2>1.5.1 (2019-11-22)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h2>1.5.1 (2019-11-22)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug introduced in Lightkurve v1.5 which caused <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">lightkurve</span></code>
 on Mac OSX to automatically select the Matplotlib Agg backend. [#640]</p></li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h2>1.5.0 (2019-11-20)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h2>1.5.0 (2019-11-20)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Changed the representation of <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> objects to make it easier to
 see at a glance which quarter/campaign/sector a result belongs to. [#632]</p></li>
@@ -141,16 +155,16 @@ spectral timing package. [#567]</p></li>
 Echelle diagrams to be plotted into an existing Matplotlib figure. [#635]</p></li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h2>1.4.1 (2019-11-18)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id6">
+<h2>1.4.1 (2019-11-18)<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug which caused <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> and
 <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code> to raise an <code class="docutils literal notranslate"><span class="pre">IndexError</span></code> if the sector keyword
 was passed and the target was observed by both TESS &amp; Kepler. [#631]</p></li>
 </ul>
 </div>
-<div class="section" id="id6">
-<h2>1.4.0 (2019-11-12)<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h2>1.4.0 (2019-11-12)<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added the generic <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> and <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> classes which
 provide a user-friendly way to use linear regression to remove background or
@@ -166,8 +180,8 @@ to measure the mass, radius, and surface gravity of a solar-like star. [#624]</p
 exception when MAST’s TESSCut service is overloaded and times out. [#627]</p></li>
 </ul>
 </div>
-<div class="section" id="id7">
-<h2>1.3.0 (2019-10-21)<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id8">
+<h2>1.3.0 (2019-10-21)<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added a <code class="docutils literal notranslate"><span class="pre">method=&quot;quadratic&quot;</span></code> option to <code class="docutils literal notranslate"><span class="pre">tpf.estimate_centroids()</span></code> which
 enables centroids to be estimated by fitting a bivariate polynomial to the
@@ -183,8 +197,8 @@ a single float and lists of floats in addition to numpy arrays. [#608]</p></li>
 sampled grid in frequency space. [#614]</p></li>
 </ul>
 </div>
-<div class="section" id="id8">
-<h2>1.2.0 (2019-10-01)<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id9">
+<h2>1.2.0 (2019-10-01)<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">flux_unit</span></code> and <code class="docutils literal notranslate"><span class="pre">flux_quantity</span></code> properties to the <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code>
 class to enable users to keep track of a light curve’s flux units. [#591]</p></li>
@@ -205,8 +219,8 @@ objects, e.g. two <code class="docutils literal notranslate"><span class="pre">L
 take all recent Lightkurve API changes into account. [#596]</p></li>
 </ul>
 </div>
-<div class="section" id="id9">
-<h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id10">
+<h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <p>Lightkurve v1.1.1 is a bugfix release which includes the following changes:</p>
 <ul class="simple">
 <li><p>Changed <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> to emit a
@@ -225,8 +239,8 @@ Lightkurve to receive the “code quality A” certification by codacy.com.
 [#557, #560, #564, #565, #566, #568, #573, #574, #575]</p></li>
 </ul>
 </div>
-<div class="section" id="id10">
-<h2>1.1.0 (2019-07-19)<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id11">
+<h2>1.1.0 (2019-07-19)<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">lightkurve.seismology</span></code> sub-package which enables quick-look
 asteroseismic quantities to be extracted from <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects. [#496]</p></li>
@@ -261,8 +275,8 @@ sub-package, named <code class="docutils literal notranslate"><span class="pre">
 an AstroPy Quantity object. [#521]</p></li>
 </ul>
 </div>
-<div class="section" id="id11">
-<h2>1.0.1 (2019-05-20)<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id12">
+<h2>1.0.1 (2019-05-20)<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
 <p>This is a minor bugfix release containing the following improvements:</p>
 <ul class="simple">
 <li><p>Fixed minor bugs in <code class="docutils literal notranslate"><span class="pre">PLDCorrector.correct()</span></code> [#498],
@@ -276,8 +290,8 @@ if the download cache contains a corrupt file. [#512]</p></li>
 <li><p>Switched continuous integration from Travis/Appveyor to Azure. [#497]</p></li>
 </ul>
 </div>
-<div class="section" id="id12">
-<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id13">
+<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
 <p>This is the first stable release of Lightkurve.  It was prepared with the help
 of 45 contributors!</p>
 <p>This release contains major changes to the <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> class:</p>

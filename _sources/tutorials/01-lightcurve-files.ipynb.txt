@@ -21,7 +21,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Kepler light curves from MAST have some level of processing (more details [here](https://arxiv.org/pdf/1207.3093.pdf)) and allow you to access the two kinds of flux; the **SAP** flux and the **PDCSAP** flux. SAP flux is Simple Aperture Photometry flux, the same as we made in the [previous tutorial](http://lightkurve.keplerscience.org/tutorials/1.03-what-are-lightcurves.html). PDCSAP is the Pre-search Data Conditioning SAP flux. Long term trends have been removed from this data using so-called Cotrending Basis Vectors (CBVs). PDCSAP flux is usually slightly cleaner data than the SAP flux and will have fewer long term trends.\n",
+    "Kepler light curves from MAST have some level of processing (more details [here](https://arxiv.org/pdf/1207.3093.pdf)) and allow you to access the two kinds of flux; the **SAP** flux and the **PDCSAP** flux. SAP flux is Simple Aperture Photometry flux, the same as we made in the [previous tutorial](http://lightkurve.keplerscience.org/tutorials/1.03-what-are-lightcurves.html). PDCSAP is the Pre-search Data Conditioning SAP flux. Long term trends have been removed from this data using so-called Cotrending Basis Vectors (CBVs). PDCSAP flux is usually cleaner data than the SAP flux and will have fewer systematic trends.\n",
     "\n",
     "We can read in a light curve file from the Kepler mission using `KeplerLightCurveFile`. We can use the `search_lightcurvefile()` function to fetch them from the data archive:"
    ]
@@ -217,7 +217,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.7.3"
+   "version": "3.7.4"
   }
  },
  "nbformat": 4,

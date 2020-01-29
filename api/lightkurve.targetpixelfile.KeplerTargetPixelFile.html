@@ -13,7 +13,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -41,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.6</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -89,7 +88,7 @@
 </nav>
 </header>
 
-<div class="container">
+<div class="container"  role="main">
     
   <div class="section" id="keplertargetpixelfile">
 <h1>KeplerTargetPixelFile<a class="headerlink" href="#keplertargetpixelfile" title="Permalink to this headline">¶</a></h1>
@@ -107,9 +106,9 @@ in the online documentation for examples on using this class.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a></span></dt><dd><p>Path to a Kepler Target Pixel file. Alternatively, you can pass a
+<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a></span></dt><dd><p>Path to a Kepler Target Pixel file. Alternatively, you can pass a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code> object, which is the AstroPy object returned by
-the <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a> function.</p>
+the <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a> function.</p>
 </dd>
 <dt><strong>quality_bitmask</strong><span class="classifier">“none”, “default”, “hard”, “hardest”, or int</span></dt><dd><p>Bitmask that should be used to ignore bad-quality cadences.
 If a string is passed, it has the following meaning:</p>
@@ -132,7 +131,7 @@ have the effect of removing cadences where
 <code class="docutils literal notranslate"><span class="pre">(tpf.hdu[1].data['QUALITY']</span> <span class="pre">&amp;</span> <span class="pre">quality_bitmask)</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.
 See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Optional keyword arguments passed on to <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a>.</p>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Optional keyword arguments passed on to <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -230,7 +229,7 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 <td><p>Returns the time for all good-quality cadences.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.wcs" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.wcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wcs</span></code></a></p></td>
-<td><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System solution for the target pixel file.</p></td>
+<td><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System solution for the target pixel file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -458,12 +457,12 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.wcs">
 <code class="sig-name descname">wcs</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.wcs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System
+<dd><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System
 solution for the target pixel file.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl>
-<dt><strong>w</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1.dev708)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object</span></dt><dd><p>WCS solution</p>
+<dt><strong>w</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object</span></dt><dd><p>WCS solution</p>
 </dd>
 </dl>
 </dd>
@@ -760,7 +759,7 @@ necessary metadata in the tpf object.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact">
-<code class="sig-name descname">interact</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">max_cadences=30000</em>, <em class="sig-param">aperture_mask='pipeline'</em>, <em class="sig-param">exported_filename=None</em>, <em class="sig-param">transform_func=None</em>, <em class="sig-param">ylim_func=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interact</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">max_cadences=30000</em>, <em class="sig-param">aperture_mask='pipeline'</em>, <em class="sig-param">exported_filename=None</em>, <em class="sig-param">transform_func=None</em>, <em class="sig-param">ylim_func=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
 the lightcurve shown is obtained by calling the <a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve()</span></code></a> method,
@@ -860,7 +859,7 @@ first frame) or absolute cadence number (<a class="reference internal" href="#li
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
 a new one will be generated.</p>
 </dd>
 <dt><strong>frame</strong><span class="classifier">int</span></dt><dd><p>Frame number. The default is 0, i.e. the first frame.</p>
@@ -886,7 +885,7 @@ Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>

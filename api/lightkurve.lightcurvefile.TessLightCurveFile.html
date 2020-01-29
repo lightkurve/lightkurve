@@ -13,7 +13,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -41,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.6</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -89,7 +88,7 @@
 </nav>
 </header>
 
-<div class="container">
+<div class="container"  role="main">
     
   <div class="section" id="tesslightcurvefile">
 <h1>TessLightCurveFile<a class="headerlink" href="#tesslightcurvefile" title="Permalink to this headline">¶</a></h1>
@@ -144,23 +143,11 @@ following meaning:</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.cadenceno" title="lightkurve.lightcurvefile.TessLightCurveFile.cadenceno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadenceno</span></code></a></p></td>
 <td><p>The file’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">CADENCENO</span></code> column.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.camera" title="lightkurve.lightcurvefile.TessLightCurveFile.camera"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera</span></code></a></p></td>
-<td><p>TESS Camera number (‘CAMERA’ header keyword).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.ccd" title="lightkurve.lightcurvefile.TessLightCurveFile.ccd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ccd</span></code></a></p></td>
-<td><p>TESS CCD number (‘CCD’ header keyword).</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.dec" title="lightkurve.lightcurvefile.TessLightCurveFile.dec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code></a></p></td>
 <td><p>Declination as recorded in the header’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">DEC_OBJ</span></code> keyword.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.mission" title="lightkurve.lightcurvefile.TessLightCurveFile.mission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mission</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.ra" title="lightkurve.lightcurvefile.TessLightCurveFile.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.ra" title="lightkurve.lightcurvefile.TessLightCurveFile.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></p></td>
 <td><p>Right Ascension as recorded in the header’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">RA_OBJ</span></code> keyword.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.sector" title="lightkurve.lightcurvefile.TessLightCurveFile.sector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sector</span></code></a></p></td>
-<td><p>TESS Sector number (‘SECTOR’ header keyword).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.time" title="lightkurve.lightcurvefile.TessLightCurveFile.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a></p></td>
 <td><p>The file’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">TIME</span></code> column.</p></td>
@@ -177,19 +164,16 @@ following meaning:</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.errorbar" title="lightkurve.lightcurvefile.TessLightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.errorbar" title="lightkurve.lightcurvefile.TessLightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.get_keyword" title="lightkurve.lightcurvefile.TessLightCurveFile.get_keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code></a>(self, keyword[, hdu, default])</p></td>
-<td><p>Returns a header keyword value.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lightcurve</span></code></a>(self, flux_type[, centroid_type])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lightcurve</span></code></a>(self, flux_type[, centroid_type])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.header" title="lightkurve.lightcurvefile.TessLightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.header" title="lightkurve.lightcurvefile.TessLightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
 <td><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.plot" title="lightkurve.lightcurvefile.TessLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.plot" title="lightkurve.lightcurvefile.TessLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.plot" title="lightkurve.lightcurvefile.TessLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.scatter" title="lightkurve.lightcurvefile.TessLightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(self[, flux_types, style])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.scatter" title="lightkurve.lightcurvefile.TessLightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.scatter" title="lightkurve.lightcurvefile.TessLightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 </tbody>
@@ -223,38 +207,15 @@ contents of the <a class="reference internal" href="#lightkurve.lightcurvefile.T
 </dd></dl>
 
 <dl class="attribute">
-<dt id="lightkurve.lightcurvefile.TessLightCurveFile.camera">
-<code class="sig-name descname">camera</code><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile.camera" title="Permalink to this definition">¶</a></dt>
-<dd><p>TESS Camera number (‘CAMERA’ header keyword).</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.TessLightCurveFile.ccd">
-<code class="sig-name descname">ccd</code><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile.ccd" title="Permalink to this definition">¶</a></dt>
-<dd><p>TESS CCD number (‘CCD’ header keyword).</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="lightkurve.lightcurvefile.TessLightCurveFile.dec">
 <code class="sig-name descname">dec</code><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile.dec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Declination as recorded in the header’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">DEC_OBJ</span></code> keyword.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="lightkurve.lightcurvefile.TessLightCurveFile.mission">
-<code class="sig-name descname">mission</code><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile.mission" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="lightkurve.lightcurvefile.TessLightCurveFile.ra">
 <code class="sig-name descname">ra</code><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile.ra" title="Permalink to this definition">¶</a></dt>
 <dd><p>Right Ascension as recorded in the header’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">RA_OBJ</span></code> keyword.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.TessLightCurveFile.sector">
-<code class="sig-name descname">sector</code><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile.sector" title="Permalink to this definition">¶</a></dt>
-<dd><p>TESS Sector number (‘SECTOR’ header keyword).</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -271,7 +232,7 @@ contents of the <a class="reference internal" href="#lightkurve.lightcurvefile.T
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
 a new one will be generated.</p>
 </dd>
 <dt><strong>flux_types</strong><span class="classifier">list or None</span></dt><dd><p>Which fluxes in the LCF to plot. Default is lcf._flux_types().
@@ -290,25 +251,17 @@ types.</p>
 matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
 Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurvefile.TessLightCurveFile.get_keyword">
-<code class="sig-name descname">get_keyword</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">keyword</em>, <em class="sig-param">hdu=0</em>, <em class="sig-param">default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile.get_keyword" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a header keyword value.</p>
-<p>If the keyword is Undefined or does not exist,
-then return <code class="docutils literal notranslate"><span class="pre">default</span></code> instead.</p>
 </dd></dl>
 
 <dl class="method">
@@ -329,7 +282,7 @@ then return <code class="docutils literal notranslate"><span class="pre">default
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
 a new one will be generated.</p>
 </dd>
 <dt><strong>flux_types</strong><span class="classifier">list or None</span></dt><dd><p>Which fluxes in the LCF to plot. Default is lcf._flux_types().
@@ -348,13 +301,13 @@ types.</p>
 matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
 Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>
@@ -368,7 +321,7 @@ Lightkurve’s custom stylesheet is used by default.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
 a new one will be generated.</p>
 </dd>
 <dt><strong>flux_types</strong><span class="classifier">list or None</span></dt><dd><p>Which fluxes in the LCF to plot. Default is lcf._flux_types().
@@ -387,13 +340,13 @@ types.</p>
 matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
 Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>

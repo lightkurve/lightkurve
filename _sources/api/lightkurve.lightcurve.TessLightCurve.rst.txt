@@ -26,7 +26,6 @@ TessLightCurve
       ~TessLightCurve.fill_gaps
       ~TessLightCurve.flatten
       ~TessLightCurve.fold
-      ~TessLightCurve.from_stingray
       ~TessLightCurve.from_timeseries
       ~TessLightCurve.interact_bls
       ~TessLightCurve.normalize
@@ -41,7 +40,6 @@ TessLightCurve
       ~TessLightCurve.to_pandas
       ~TessLightCurve.to_periodogram
       ~TessLightCurve.to_seismology
-      ~TessLightCurve.to_stingray
       ~TessLightCurve.to_table
       ~TessLightCurve.to_timeseries
 
@@ -61,7 +59,6 @@ TessLightCurve
    .. automethod:: fill_gaps
    .. automethod:: flatten
    .. automethod:: fold
-   .. automethod:: from_stingray
    .. automethod:: from_timeseries
    .. automethod:: interact_bls
    .. automethod:: normalize
@@ -76,6 +73,5 @@ TessLightCurve
    .. automethod:: to_pandas
    .. automethod:: to_periodogram
    .. automethod:: to_seismology
-   .. automethod:: to_stingray
    .. automethod:: to_table
    .. automethod:: to_timeseries

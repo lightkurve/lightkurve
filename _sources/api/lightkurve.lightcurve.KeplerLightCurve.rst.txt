@@ -26,7 +26,6 @@ KeplerLightCurve
       ~KeplerLightCurve.fill_gaps
       ~KeplerLightCurve.flatten
       ~KeplerLightCurve.fold
-      ~KeplerLightCurve.from_stingray
       ~KeplerLightCurve.from_timeseries
       ~KeplerLightCurve.interact_bls
       ~KeplerLightCurve.normalize
@@ -41,7 +40,6 @@ KeplerLightCurve
       ~KeplerLightCurve.to_pandas
       ~KeplerLightCurve.to_periodogram
       ~KeplerLightCurve.to_seismology
-      ~KeplerLightCurve.to_stingray
       ~KeplerLightCurve.to_table
       ~KeplerLightCurve.to_timeseries
 
@@ -61,7 +59,6 @@ KeplerLightCurve
    .. automethod:: fill_gaps
    .. automethod:: flatten
    .. automethod:: fold
-   .. automethod:: from_stingray
    .. automethod:: from_timeseries
    .. automethod:: interact_bls
    .. automethod:: normalize
@@ -76,6 +73,5 @@ KeplerLightCurve
    .. automethod:: to_pandas
    .. automethod:: to_periodogram
    .. automethod:: to_seismology
-   .. automethod:: to_stingray
    .. automethod:: to_table
    .. automethod:: to_timeseries
