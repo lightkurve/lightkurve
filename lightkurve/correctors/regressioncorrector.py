@@ -84,7 +84,7 @@ class RegressionCorrector(Corrector):
             raise ValueError('Input light curve has NaNs in `flux_err`. '
                              'Please remove NaNs before correction '
                              '(e.g. using `lc = lc.remove_nans()`).')
-        if np.any(lc.flux_err <= 0):
+        if np.any(lc.flux_err[np.isfinite(lc.flux_err)] <= 0):
             raise ValueError('Input light curve contains flux uncertainties '
                              'smaller than or equal to zero. Please remove '
                              'these (e.g. using `lc = lc[lc.flux_err > 0]`).')
