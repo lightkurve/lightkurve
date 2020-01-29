@@ -605,11 +605,11 @@ class LightCurve(object):
                                 label=self.label,
                                 meta=self.meta)
 
-    def normalize(self, unit='unscaled'):
+    def normalize(self, unit='unscaled', method='median'):
         """Returns a normalized version of the light curve.
 
         The normalized light curve is obtained by dividing the ``flux`` and
-        ``flux_err`` object attributes by the by the median flux.
+        ``flux_err`` object attributes by the median or mean flux.
         Optionally, the result will be multiplied by 1e2 (if `unit='percent'`),
         1e3 (`unit='ppt'`), or 1e6 (`unit='ppm'`).
 
@@ -618,6 +618,9 @@ class LightCurve(object):
         unit : 'unscaled', 'percent', 'ppt', 'ppm'
             The desired relative units of the normalized light curve;
             'ppt' means 'parts per thousand', 'ppm' means 'parts per million'.
+        method : 'median' or 'mean'
+            Determines whether ``flux`` and ``flux_err`` will be divided by the
+            median or the mean flux.
 
         Examples
         --------
@@ -642,6 +645,7 @@ class LightCurve(object):
             from zero.
         """
         validate_method(unit, ['unscaled', 'percent', 'ppt', 'ppm'])
+        validate_method(method, ['median', 'mean'])
         median_flux = np.nanmedian(self.flux)
         std_flux = np.nanstd(self.flux)
 
@@ -673,8 +677,12 @@ class LightCurve(object):
 
         # Create a new light curve instance and normalize its values
         lc = self.copy()
-        lc.flux = lc.flux / median_flux
-        lc.flux_err = lc.flux_err / median_flux
+        if method == 'median':
+            denominator = median_flux
+        elif method == 'mean':
+            denominator = np.nanmean(self.flux)
+        lc.flux = lc.flux / denominator
+        lc.flux_err = lc.flux_err / denominator
         lc.flux_unit = u.dimensionless_unscaled
 
         # Set the desired relative (dimensionless) units
