@@ -529,6 +529,10 @@ def test_normalize():
     lc = LightCurve(time=np.arange(10), flux=5*np.ones(10), flux_err=0.05*np.ones(10))
     assert_allclose(np.median(lc.normalize().flux), 1)
     assert_allclose(np.median(lc.normalize().flux_err), 0.05/5)
+    # Test support for different methods
+    lc = LightCurve(flux=[1, 1, 10])
+    assert_allclose(lc.normalize(method='median').flux, [1, 1, 10])
+    assert_allclose(lc.normalize(method='mean').flux, [1/4., 1/4., 10/4.])
 
 
 def test_invalid_normalize():
