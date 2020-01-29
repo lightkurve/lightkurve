@@ -66,10 +66,12 @@ class LightCurve(object):
         Bitmask specifying quality flags of cadences that should be ignored
     mission : str
         Mission name
-    targetid : int
-        Object Identifier
+    ra : float
+        Right Ascension coordinate of the target.
+    dec : float
+        Declination coordinate of the target.
     meta : dict
-        Free-form metadata associated with the LightCurve.
+        Free-form metadata dictionary.
 
     Examples
     --------
@@ -85,7 +87,7 @@ class LightCurve(object):
     def __init__(self, time=None, flux=None, flux_err=None, flux_unit=None,
                  time_format=None, time_scale=None, targetid=None, label=None,
                  centroid_col=None, centroid_row=None, quality=None,
-                 quality_bitmask=None, mission=None,ra=None,
+                 quality_bitmask=None, mission=None, ra=None,
                  dec=None, meta=None):
         if time is None and flux is None:
             raise ValueError('either time or flux must be given')
@@ -1769,19 +1771,28 @@ class KeplerLightCurve(LightCurve):
         Mission name
     cadenceno : array-like
         Cadence numbers corresponding to every time measurement
-    targetid : int
-        Kepler ID number
+    targetid : str
+        Identifier of the target.
+    label : str
+        Human-friendly object label, e.g. "KIC 123456789".
+    ra : float
+        Right Ascension coordinate of the target.
+    dec : float
+        Declination coordinate of the target.
+    meta : dict
+        Free-form metadata dictionary.
     """
     def __init__(self, time=None, flux=None, flux_err=None,
                  flux_unit=u.Unit('electron/second'), time_format='bkjd', time_scale='tdb',
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
                  cadenceno=None, targetid=None, ra=None, dec=None, label=None, meta=None):
-        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
-                                               time_format=time_format, time_scale=time_scale,
-                                               targetid=targetid, label=label, centroid_col=centroid_col,
-                                               centroid_row=centroid_row, quality=quality,
-                                               quality_bitmask=quality_bitmask,ra=ra, dec=dec,meta=meta)
+        super(KeplerLightCurve, self).__init__(
+            time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
+            time_format=time_format, time_scale=time_scale,
+            targetid=targetid, label=label, centroid_col=centroid_col,
+            centroid_row=centroid_row, quality=quality,
+            quality_bitmask=quality_bitmask, ra=ra, dec=dec, meta=meta)
         self.cadenceno = self._validate_array(cadenceno, name='cadenceno')
         self.channel = channel
         self.campaign = campaign
@@ -1914,19 +1925,28 @@ class TessLightCurve(LightCurve):
         Bitmask specifying quality flags of cadences that should be ignored
     cadenceno : array-like
         Cadence numbers corresponding to every time measurement
-    targetid : int
-        Tess Input Catalog ID number
+    targetid : str
+        Identifier of the target (e.g. TESS Input Catalog number).
+    label : str
+        Human-friendly object label, e.g. "TIC 123456789".
+    ra : float
+        Right Ascension coordinate of the target.
+    dec : float
+        Declination coordinate of the target.
+    meta : dict
+        Free-form metadata dictionary.
     """
     def __init__(self, time=None, flux=None, flux_err=None,
                  flux_unit=u.Unit('electron/second'), time_format='btjd', time_scale='tdb',
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, sector=None, camera=None, ccd=None,
                  targetid=None, ra=None, dec=None, label=None, meta=None):
-        super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
-                                               time_format=time_format, time_scale=time_scale,
-                                               targetid=targetid, label=label, centroid_col=centroid_col,
-                                               centroid_row=centroid_row, quality=quality,
-                                               quality_bitmask=quality_bitmask,ra=ra, dec=dec,meta=meta)
+        super(TessLightCurve, self).__init__(
+            time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
+            time_format=time_format, time_scale=time_scale,
+            targetid=targetid, label=label, centroid_col=centroid_col,
+            centroid_row=centroid_row, quality=quality,
+            quality_bitmask=quality_bitmask, ra=ra, dec=dec, meta=meta)
         self.cadenceno = self._validate_array(cadenceno)
         self.mission = "TESS"
         self.sector = sector
