@@ -22,8 +22,6 @@ import numpy as np
 from scipy.ndimage import label
 from tqdm import tqdm
 from copy import deepcopy
-import pandas as pd
-import tempfile
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
@@ -97,27 +95,15 @@ class TargetPixelFile(object):
 
     def __mul__(self, other):
         hdu = deepcopy(self.hdu)
-        tmp = tempfile.NamedTemporaryFile(delete=False)
         hdu[1].data['FLUX'][self.quality_mask] *= other
         hdu[1].data['FLUX_ERR'][self.quality_mask] *= other
-        fits.HDUList(hdus=list(hdu)).writeto(tmp.name, overwrite=True)
-        tpf = type(self)(tmp.name, quality_bitmask=self.quality_bitmask)
-        tpf.path = None
-        tmp.close()
-        os.remove(tmp.name)
-        return tpf
+        return type(self)(hdu, quality_bitmask=self.quality_bitmask)
 
     def __rtruediv__(self, other):
         hdu = deepcopy(self.hdu)
-        tmp = tempfile.NamedTemporaryFile(delete=False)
         hdu[1].data['FLUX'][self.quality_mask] /= other
         hdu[1].data['FLUX_ERR'][self.quality_mask] /= other
-        fits.HDUList(hdus=list(hdu)).writeto(tmp.name, overwrite=True)
-        tpf = type(self)(tmp.name, quality_bitmask=self.quality_bitmask)
-        tpf.path = None
-        tmp.close()
-        os.remove(tmp.name)
-        return tpf
+        return type(self)(hdu, quality_bitmask=self.quality_bitmask)
 
     def __radd__(self, other):
         return self.__add__(other)
