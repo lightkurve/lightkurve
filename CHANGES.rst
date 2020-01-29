@@ -1,4 +1,4 @@
-1.7.0 (unreleased)
+1.7.0 (2020-01-29)
 ==================
 
 - Added a ``scale='linear'`` option to ``TargetPixelFile.interact()`` to show
@@ -6,7 +6,7 @@
 
 - Added a warning if ``SFFCorrector`` is used to correct TESS data. [#660]
 
-- Changed the behavior of sigma-clipping inside ``RegressionCorrector``. [#654]
+- Added improved sigma-clipping inside ``RegressionCorrector``. [#654]
 
 - Fixed a bug which caused ``LightCurve.show_properties()`` to raise a
   ``ValueError`` when the time format was not set. [#655]
