@@ -24,7 +24,10 @@ from astropy.coordinates import SkyCoord, Angle
 from astropy.stats import sigma_clip
 from astropy.utils.exceptions import AstropyUserWarning
 
-from .utils import KeplerQualityFlags, LightkurveWarning
+from .utils import KeplerQualityFlags, TessQualityFlags, LightkurveWarning
+import os
+from astropy.coordinates import SkyCoord, Angle
+import astropy.units as u
 
 log = logging.getLogger(__name__)
 
