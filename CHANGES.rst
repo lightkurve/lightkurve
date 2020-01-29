@@ -4,6 +4,8 @@
 - Added a ``scale='linear'`` option to ``TargetPixelFile.interact()`` to show
   pixels using a linear stretch. The default is ``scale='log'``. [#664]
 
+- Added a warning if ``SFFCorrector`` is used to correct TESS data. [#660]
+
 - Changed the behavior of sigma-clipping inside ``RegressionCorrector``. [#654]
 
 - Fixed a bug which caused ``LightCurve.show_properties()`` to raise a
