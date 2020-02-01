@@ -1,6 +1,8 @@
 1.8.0 (unreleased)
 ==================
 
+- Fixed a bug which caused ``TargetPixelFile.interact()`` to raise a
+  ``ValueError`` if the pixel file contained NaN flux values. [#679]
 
 
 
