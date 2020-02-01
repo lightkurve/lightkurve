@@ -2,7 +2,6 @@
 import warnings
 
 from astropy.utils.data import get_pkg_data_filename
-from bokeh.plotting import ColumnDataSource
 import numpy as np
 import pytest
 
@@ -15,6 +14,7 @@ from ..interact import get_lightcurve_y_limits
 bad_optional_imports = False
 try:
     import bokeh
+    from bokeh.plotting import ColumnDataSource
 except ImportError:
     bad_optional_imports = True
 
@@ -155,6 +155,7 @@ def test_interact_sky_functions():
     add_gaia_figure_elements(tpf, fig1, magnitude_limit=22)
 
 
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_ylim_with_nans():
     """Regression test for #679: y limits should not be NaN."""
     lc_source = ColumnDataSource({'flux': [-1, np.nan, 1]})
