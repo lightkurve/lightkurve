@@ -12,6 +12,8 @@ import requests
 from astropy.io import fits as pyfits
 from bs4 import BeautifulSoup
 import urllib.request
+import astropy.units as u
+
 from .. import MPLSTYLE
 
 from ..lightcurve import LightCurve, KeplerLightCurve
@@ -26,7 +28,7 @@ log = logging.getLogger(__name__)
 # For Kepler/K2/TESS max number of stored CBVs has always been 16
 DEFAULT_NUMBER_CBVS = 16
 
-__all__ = ['CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
+__all__ = ['DEFAULT_NUMBER_CBVS', 'CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
         'TessCotrendingBasisVectors', 'get_cbvs', 'CBVCorrector']
 
 #*******************************************************************************
@@ -34,7 +36,7 @@ class CotrendingBasisVectors:
     """
     Defines a CotrendingBasisVectors class. Superclass for KeplerCotrendingBasisVectors and TessCotrendingBasisVectors
 
-    Stores Cotrending Basis Vectors for the Kepler/K2/TESS missions. 
+    Stores Cotrending Basis Vectors for the Kepler/K2/TESS missions.
 
     Use search_cbvs to find the appropriate FITs files and KeplerCBVFile and TessCBVFile to retrieve the CBV FITS files.
 
@@ -53,7 +55,7 @@ class CotrendingBasisVectors:
     band            : [int] MultiScale band number (invalid for other CBV types)
     cbv_indices     : [int array] List of CBVs extracted for FITS file, {'ALL' => extract all}
     cbv_array       : [np.ndarray] The basis vectors
-    cadenceno       : [int list] Cadence indices  
+    cadenceno       : [int list] Cadence indices
     gap_indicators  : [bool list]
     cbvEXTNAME      : [str] The EXTNAME extension in the header
 
@@ -162,8 +164,14 @@ class CotrendingBasisVectors:
         Parameters
         ----------
             lc : LightCurve object
-            trim_lc : [bool] If True then also trim the light curve if needed
+                The reference light curve to align to
+            trim_lc : [bool] If True then also trim the light curve, if needed
 
+        Returns
+            lc : LightCurve object
+                If trim_lc = True then the return light curve is also trimmed,
+                if needed
+        -------
         """
 
         if not isinstance(lc, LightCurve):
@@ -175,19 +183,21 @@ class CotrendingBasisVectors:
             lc_trim_mask = np.in1d(lc.cadenceno, self.cadenceno)
             if (np.any(np.logical_not(lc_trim_mask))):
                 if (trim_lc):
-                    # lc trim method
-                    lc.trim(lc_trim_mask)
+                    # trim the light curve
+                    lc = lc[lc_trim_mask]
                 else:
                     log.warning('There are cadences in the light curve that are not in the CBVs. NO SYNCHRONIZATION OCCURED')
 
 
             trim_mask = np.in1d(self.cadenceno, lc.cadenceno)
-            self.cbv_array       = self.cbv_array[:,trim_mask]
+            self.cbv_array      = self.cbv_array[:,trim_mask]
             self.cadenceno      = self.cadenceno[trim_mask]
-            self.gap_indicators  = self.gap_indicators[trim_mask]
+            self.gap_indicators = self.gap_indicators[trim_mask]
 
         else:
             log.warning('Synchronization with cadence time stamps is not yet implemented. NO SYNCHRONIZATION OCCURED')
+
+        return lc
 
     @staticmethod
     def _extract_cbvs_from_hdu_data(cbv_data, cbv_indices):
@@ -283,7 +293,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
             this might slow things down in case the user wants to fit 1e3 stars
         """
  
-        if (mission == 'Kepler'): 
+        if (mission == 'Kepler'):
             cbvBaseUrl = "http://archive.stsci.edu/missions/kepler/cbv/"
         elif (mission == 'K2'):
             cbvBaseUrl = "http://archive.stsci.edu/missions/k2/cbv/"
@@ -381,12 +391,12 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
         # without needing conditional
         sector = int(sector)
         if (sector < 10):
-            curlSearchString = 's000' + str(sector) + '-' + str(camera) + '-' + str(CCD) + '-' 
+            curlSearchString = 's000' + str(sector) + '-' + str(camera) + '-' + str(CCD) + '-'
         elif (sector > 99):
             # We will be blessed if we get to more than 99 sectors!
             raise Exception('Only up to 99 Sectors is currently supported')
         else:
-            curlSearchString = 's00' + str(sector) + '-' + str(camera) + '-' + str(CCD) + '-' 
+            curlSearchString = 's00' + str(sector) + '-' + str(camera) + '-' + str(CCD) + '-'
 
         # 1. Read in the relevent curl script file and find the line for the CBV data we are looking for
         data = urllib.request.urlopen(curlUrl)
@@ -396,7 +406,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
             try:
                 foundIndex = strLine.index(curlSearchString) # str.index will error when not found
                 break
-            except:
+            except Exception:
                 pass # continue searching
         if (foundIndex is None):
             raise Exception('CBV FITS file not found')
@@ -456,7 +466,7 @@ def get_cbvs (mission=('Kepler', 'K2', 'TESS'), quarter=None, campaign=None,
 
     Examples
     --------
-    This example will read in the CBVs for Kepler quarter 8, 
+    This example will read in the CBVs for Kepler quarter 8,
     and then extract the first 8 CBVs for module.output 16.4
 
         >>> cbvs = get_cbvs(mission='Kepler', quarter=8, module=16, output=4,   # doctest: +SKIP
@@ -470,7 +480,7 @@ def get_cbvs (mission=('Kepler', 'K2', 'TESS'), quarter=None, campaign=None,
     """
 
     #***
-    # Validate inputs 
+    # Validate inputs
     # Make sure only the appropriate arguments are passed
     # TODO: figure out a more elegant way to do this
     if (mission == 'Kepler'):
@@ -489,8 +499,8 @@ def get_cbvs (mission=('Kepler', 'K2', 'TESS'), quarter=None, campaign=None,
         assert  CCD is None,      'CCD must not be passed for K2 mission'
     elif (mission == 'TESS'):
         assert  isinstance(sector, int),    'sector must be passed for TESS mission'
-        assert  not camera is None,   'camera must be passed'
-        assert  not CCD is None,      'CCD must be passed'
+        assert  camera is not None,   'camera must be passed'
+        assert  CCD is not None,      'CCD must be passed'
         # All these inputs are invalid
         assert  quarter is  None,  'quarter must not be passed for TESS mission'
         assert  campaign is None, 'campaign must not be passed for TESS mission'
@@ -511,8 +521,8 @@ def get_cbvs (mission=('Kepler', 'K2', 'TESS'), quarter=None, campaign=None,
                 module, output = channel_to_module_output(channel)
                 channel = None
             else:
-                assert  not module is None, 'module must be passed'
-                assert  not output is None, 'output must be passed'
+                assert  module is not None, 'module must be passed'
+                assert  output is not None, 'output must be passed'
 
             kepler_cbv_url = KeplerCotrendingBasisVectors.get_kepler_cbv_url(mission, quarter, campaign)
 
@@ -540,14 +550,13 @@ def get_cbvs (mission=('Kepler', 'K2', 'TESS'), quarter=None, campaign=None,
 
     except:
         raise Exception('CBVS were not found')
-        return None
 
 
 #*******************************************************************************
 # Correctors
 
 
-class CBVCorrector(Corrector):
+class CBVCorrector(RegressionCorrector):
     """ Class for removing systematics using CBV correctors for Kepler/K2/TESS
 
 
@@ -566,25 +575,23 @@ class CBVCorrector(Corrector):
         The retrieved CBVs ported into a DesignMatrix object
     extra_design_matrix : DesignMatrix
         An extra design matrix to include in the fit with the CBVs
-    design_matrix   : DesignMatrixCollection
-        The design matrix collection composed of cbv_design_matrix and extra_design_matrix 
-    regression_corrector : RegressionCorrector
-        The constrcuted RegressionCorrector to be used to perform the fit
+    design_matrix_collection   : DesignMatrixCollection
+        The design matrix collection composed of cbv_design_matrix and extra_design_matrix
     corrected_lc : LightCurve
         The returned light curve from regression_corrector.correct
 
 
     """
 
-    def __init__(self, lc, cbv_type='SingleScale', cbv_indices='ALL', band=None, ext_dm=None):
+    def __init__(self, lc, cbv_type='SingleScale', cbv_indices='ALL', band=None):
         """ Constructor for CBVClass objects
 
         This constructor will retrieve the desired CBVs from MAST and then
-        align them with the passed light curve.
+        align them with the passed in light curve.
 
         For TESS we have the option to load multiple CBV types
         
-        Attributes
+        Parameters
         ----------
         lc  : LightCurve
             The light curve to correct
@@ -595,8 +602,6 @@ class CBVCorrector(Corrector):
         band        : int list
             Multi-Scale band number to correspond to the passed cbv_type
             For non-Multi-Scale CBVs use None
-        ext_dm  : DesignMatrix
-            Optionall pass an extra design matrix to also be used in the fit
 
         """
 
@@ -609,11 +614,10 @@ class CBVCorrector(Corrector):
             if (not len(cbv_type) == len(cbv_indices)):
                 raise Exception('cbv_type and cbv_indices must be the same list length')
 
-        self.lc = lc
-        self.cbv_type = cbv_type
+        # Call the RegesssionCorrector Constructor
+        super(CBVCorrector, self).__init__(lc)
 
-        # If any DesignMatrix was passed the store it
-        self.extra_design_matrix = ext_dm
+        self.cbv_type = cbv_type
 
         #***
         # Retrieve the CBVs from MAST
@@ -623,11 +627,11 @@ class CBVCorrector(Corrector):
             cbv_indices=np.arange(1,DEFAULT_NUMBER_CBVS+1)
 
         if self.lc.mission == 'Kepler':
-            cbvs.append(get_cbvs(mission=self.lc.mission, quarter=self.lc.quarter, 
+            cbvs.append(get_cbvs(mission=self.lc.mission, quarter=self.lc.quarter,
                     channel=self.lc.channel, cbv_indices=cbv_indices))
             self.cbv_indices = cbvs.cbv_indices
         elif self.lc.mission == 'K2':
-            cbvs.append(get_cbvs(mission=self.lc.mission, campaign=self.lc.campaign, 
+            cbvs.append(get_cbvs(mission=self.lc.mission, campaign=self.lc.campaign,
                     channel=self.lc.channel, cbv_indices=cbv_indices))
             self.cbv_indices = cbvs.cbv_indices
         elif self.lc.mission == 'TESS':
@@ -648,30 +652,44 @@ class CBVCorrector(Corrector):
 
         # Align the CBVs with the lightcurve flux using the cadence numbers
         for idx in np.arange(len(cbvs)):
-            cbvs[idx].align(self.lc, trim_lc=True)
+            self.lc = cbvs[idx].align(self.lc, trim_lc=True)
 
         self.cbvs = cbvs
 
 
-    def correct(self):
+    def correct(self, alpha=1e-20, l1_ratio=0.01, ext_dm=None, cadence_mask=None):
         """ Performs the correction using RegressionCorrector methods
 
         This method will assemble the full design matrix collection composed of
-        cbv_design_matrix and extra_design_matrix. Then use
+        cbv_design_matrix and extra_design_matrix. Then use the super-class
         RegressionCorrector.correct to perform the correction
 
         TODO: A whole bunch! This is a shell of a method. Just to demonstrate
-        basis functionality. We should consider allowing for standard
+        basic functionality. We should consider allowing for standard
         regaulrization methods such as Ridge Regression (L2 Norm) and Lasso (L1
         Norm).  Maybe even BIC or AIC methods also.
 
         Eventually, the plan is to use over-fitting and under-fitting goodness
         metrics to constrain the regression fit.
 
+        Parameters
+        ----------
+        ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
+            Optionally pass an extra design matrix to also be used in the fit
+        cadence_mask : np.ndarray of bools (optional)
+            Mask, where True indicates a cadence that should be used.
 
         """
 
+        if cadence_mask is None:
+            self.cadence_mask = np.ones(len(self.lc.time), bool)
+        else:
+            self.cadence_mask = np.copy(cadence_mask)
+
         # Create the design matrix collection with CBVs, plus extra passed basis vectors
+
+        # If any DesignMatrix was passed then store it
+        self.extra_design_matrix = ext_dm
 
         #Create a CBV design matrix for each CBV set loaded
         self.cbv_design_matrix = []
@@ -680,49 +698,217 @@ class CBVCorrector(Corrector):
             self.cbv_design_matrix.append(DesignMatrix(self.cbvs[idx]._cbvs_to_matrix(),
                     name=self.cbvs[idx].cbv_type, columns=cbv_index_names))
 
-        # Add the passed in design matrix
-        # If none passed then still add the constant offset term (array of ones)
-        if (self.extra_design_matrix is None):
-            ones_df = pd.DataFrame(np.atleast_2d(np.ones(self.cbv_design_matrix[0].shape[0])).T, columns=['offset'])
-            extra_design_matrix = DesignMatrix(ones_df, name='offset')
-        else:
-            extra_design_matrix = self.extra_design_matrix.append_constant()
-
         # Create the full design matrix collection
-        dm_to_flatten = [[cbv_dm for cbv_dm in self.cbv_design_matrix], [extra_design_matrix]]
-        flattened_dm_list = [item for sublist in dm_to_flatten for item in sublist]
-        self.design_matrix = DesignMatrixCollection(flattened_dm_list)
+        if self.extra_design_matrix is not None:
+            dm_to_flatten = [[cbv_dm for cbv_dm in self.cbv_design_matrix], [self.extra_design_matrix]]
+            flattened_dm_list = [item for sublist in dm_to_flatten for item in sublist]
+        else:
+            dm_to_flatten = [[cbv_dm for cbv_dm in self.cbv_design_matrix]]
+            flattened_dm_list = [item for sublist in dm_to_flatten for item in sublist]
+        self.design_matrix_collection = DesignMatrixCollection(flattened_dm_list)
+        self.design_matrix_collection._validate()
 
             
-        # Use RegressionCorrector for the actual fitting
-        self.regression_corrector = RegressionCorrector(self.lc)
-        self.corrected_lc = self.regression_corrector.correct(self.design_matrix)
+        # Use RegressionCorrector.correct for the actual fitting
+       #super(CBVCorrector, self).correct(design_matrix)
+
+        from sklearn import linear_model
+
+        # Use Scikit-learn ElasticNet
+        self.regressor = linear_model.ElasticNet(alpha=alpha, l1_ratio=l1_ratio,
+                normalize=True)
+
+        X = self.design_matrix_collection.values
+        y = self.lc.flux
+        self.regressor.fit(X, y)
+
+        model_flux  = np.dot(X, self.regressor.coef_)
+        model_err   = np.zeros(len(model_flux))
+
+        self.coefficients = self.regressor.coef_
+
+        self.model_lc = LightCurve(self.lc.time, model_flux, model_err)
+        self.corrected_lc = self.lc.copy()
+        self.corrected_lc.flux = self.lc.flux - self.model_lc.flux
+        self.corrected_lc.flux_err = (self.lc.flux_err**2 + model_err**2)**0.5
+        self.diagnostic_lightcurves = self._create_diagnostic_lightcurves()
         return self.corrected_lc
 
-    def diagnose(self):
-        """Returns diagnostic plots to assess the most recent call to `correct()`.
+    def correct_optimizer(self, alpha_init=1e-20, l1_ratio=0.01, ext_dm=None,
+            cadence_mask=None, max_iter=100, target_score=0.0):
+        """ Performs the correction using RegressionCorrector methods
 
-        If `correct()` has not yet been called, a ``ValueError`` will be raised.
+        This method will adjust the regularization penalty term based on the introduced
+        noise metric. l1_ratio is not optimized.
+
+        It uses a basic gradient decent method hit the target introduced noise
+        metric.
+
+        Parameters
+        ----------
+        ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
+            Optionally pass an extra design matrix to also be used in the fit
+        cadence_mask : np.ndarray of bools (optional)
+            Mask, where True indicates a cadence that should be used.
+        alphas_init : float
+            The initial regularization penalty term. Start with a small number.
+        l1_ratio : float
+            The ElasticNet mixing parameter
+        target_score : float
+            Target Over-fitting metric score
+
+
+        """
+
+        if cadence_mask is None:
+            self.cadence_mask = np.ones(len(self.lc.time), bool)
+        else:
+            self.cadence_mask = np.copy(cadence_mask)
+
+        # Create the design matrix collection with CBVs, plus extra passed basis vectors
+
+        # If any DesignMatrix was passed then store it
+        self.extra_design_matrix = ext_dm
+
+        #Create a CBV design matrix for each CBV set loaded
+        self.cbv_design_matrix = []
+        for idx in np.arange(len(self.cbvs)):
+            cbv_index_names = [cbv_index for cbv_index in self.cbv_indices[idx]]
+            self.cbv_design_matrix.append(DesignMatrix(self.cbvs[idx]._cbvs_to_matrix(),
+                    name=self.cbvs[idx].cbv_type, columns=cbv_index_names))
+
+        # Create the full design matrix collection
+        if self.extra_design_matrix is not None:
+            dm_to_flatten = [[cbv_dm for cbv_dm in self.cbv_design_matrix], [self.extra_design_matrix]]
+            flattened_dm_list = [item for sublist in dm_to_flatten for item in sublist]
+        else:
+            dm_to_flatten = [[cbv_dm for cbv_dm in self.cbv_design_matrix]]
+            flattened_dm_list = [item for sublist in dm_to_flatten for item in sublist]
+        self.design_matrix_collection = DesignMatrixCollection(flattened_dm_list)
+        self.design_matrix_collection._validate()
+
+        X = self.design_matrix_collection.values
+        y = self.lc.flux
+            
+        from sklearn import linear_model
+
+        # Use Scikit-learn ElasticNet
+        self.regressor = linear_model.ElasticNet(alpha=alpha_init,
+                l1_ratio=l1_ratio, normalize=True)
+
+        alpha = alpha_init
+        alpha_step_factor = 1.1 # being by increasing alpha by 10%
+        for idx in np.arange(max_iter):
+
+            metric = self._apply_fit(X, y, alpha)
+
+            # Check goodness metric
+            if (metric > target_score):
+                # Over-fitting occured, increase alpha
+                alpha *= alpha_step_factor
+            else:
+                # We're good, exit loop
+                break
+        
+        self.introduced_noise_score = metric
+
+
+        return self.corrected_lc
+
+
+
+
+    def over_fitting_metric(self):
+        """ Uses a LombScarglePeriodogram to assess the change in broad-band
+        power in a corrected light curve to measure degree of over-fitting
+
+        This function expects a median normalized light curve
+        """
+
+        # TODO: handle gaps and/or masks
+
+        pgOrig = self.lc.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=10)
+        pgCorrected = self.corrected_lc.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=10)
+
+        # Get an esitmate of the PSD at the uncertainties limit
+        # The raw and corrected uncertainties should be essentially identical so use the corrected
+        # TODO: the periodogram of WGN should be analytical to compute!
+        nNonGappedCadences = len(self.lc.flux)
+        meanCorrectedUncertainties = np.mean(self.corrected_lc.flux_err)
+        WGNCorrectedUncert = (np.random.randn(nNonGappedCadences,1) * meanCorrectedUncertainties).T[0]
+        model_err   = np.zeros(len(self.lc.flux))
+        noise_lc = LightCurve(self.lc.time, WGNCorrectedUncert, model_err)
+        pgCorrectedUncert = noise_lc.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=10)
+        meanCorrectedUncertPower = np.mean(np.array(pgCorrectedUncert.power))
+        
+        # Compute the change in power
+        pgChange = np.array(pgCorrected.power) - np.array(pgOrig.power)
+
+        # If no increase in power in ANY bands then return a perfect loss
+        # function
+        if (len(np.nonzero(pgChange>0.0)[0]) == 0):
+            return 0.0
+        
+        # We are only concerned with bands where the power increased so
+        # when(pgCorrected - pgRaw) > 0 
+        # Normalize by the noise in the uncertainty
+        # We want the goodness to begin to degrade when the introduced noise is greater than the uncertainties.
+        # So, when DeltaNoise > 0.5 (given twiceSigmoidInv defn.)
+        metric = np.sum(pgChange[pgChange>0.0]) / ((len(np.nonzero(pgChange>0.0)[0]))*meanCorrectedUncertPower)
+
+        
+      # #****************
+      # # This converts the loss function into a goodness metric
+      # # Adjust the decay rate of the sigmoid so that it's not too steep of a decent.
+      # # A noiseScale of about 0.05 looks good.
+      # noiseScale = 0.05
+      # metric *= noiseScale
+      # if (metric < 0.0):
+      #     metric = 0.0
+
+      # # We want the goodness to span (0,1] so take the inverse of each component using a sigmoid
+      # # Use twice an inverse sigmoid to get a [0,1] range from a [0,inf) range
+      # def sigmoidInv(x): return 2.0 / (1 + np.exp(x))
+      # metric     = sigmoidInv(metric)
+
+        return metric
+
+    def _apply_fit(self, X, y, alpha):
+        """ Helper function to apply the regressor fit and set all values in
+        object.
 
         Returns
         -------
-        `~matplotlib.axes.Axes`
-            The matplotlib axes object.
+        metric  : float
+            Over-fitting metric
         """
+        
+        self.regressor.alpha = alpha
 
-        if not hasattr(self, 'corrected_lc'):
-            raise ValueError('Please call the `correct()` method before trying to diagnose.')
+        self.regressor.fit(X, y)
 
-        return self.regression_corrector.diagnose()
+        model_flux  = np.dot(X, self.regressor.coef_)
+        model_err   = np.zeros(len(model_flux))
+        
+        self.coefficients = self.regressor.coef_
+        
+        self.model_lc = LightCurve(self.lc.time, model_flux, model_err)
+        self.corrected_lc = self.lc.copy()
+        self.corrected_lc.flux = self.lc.flux - self.model_lc.flux
+        self.corrected_lc.flux_err = (self.lc.flux_err**2 + model_err**2)**0.5
+        self.diagnostic_lightcurves = self._create_diagnostic_lightcurves()
+            
+        metric = self.over_fitting_metric()
 
+        return metric
 
-
+            
 
 #*******************************************************************************
 #*******************************************************************************
 #*******************************************************************************
 # CANDIDATE FOR REMOVAL
-# Do we wish to retain any othis functionality? Or is it superseeded by
+# Do we wish to retain any of this functionality? Or is it superseeded by
 # RegressionCorrector?
 #*******************************************************************************
 #*******************************************************************************
@@ -772,10 +958,10 @@ class OldKeplerCBVCorrector(Corrector):
 
         # Get the CBVs from MAST
         if self.lc.mission == 'Kepler':
-            cbvs = get_cbvs(mission=self.lc.mission, quarter=self.lc.quarter, 
+            cbvs = get_cbvs(mission=self.lc.mission, quarter=self.lc.quarter,
                     channel=self.lc.channel, cbv_indices='ALL')
         elif self.lc.mission == 'K2':
-            cbvs = get_cbvs(mission=self.lc.mission, campaign=self.lc.campaign, 
+            cbvs = get_cbvs(mission=self.lc.mission, campaign=self.lc.campaign,
                     channel=self.lc.channel, cbv_indices='ALL')
 
         self.cbvs = cbvs
