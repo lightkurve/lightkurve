@@ -939,7 +939,10 @@ def test_to_stingray():
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
     lc = LightCurve(time, flux, flux_err, time_format="jd")
     try:
-        sr = lc.to_stingray()
+        with warnings.catch_warnings():
+            # Ignore "UserWarning: Numba not installed" raised by stingray.
+            warnings.simplefilter("ignore", UserWarning)
+            sr = lc.to_stingray()
         assert_allclose(sr.time, time)
         assert_allclose(sr.counts, flux)
         assert_allclose(sr.counts_err, flux_err)
