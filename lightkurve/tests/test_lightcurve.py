@@ -968,3 +968,14 @@ def test_from_stingray():
         assert_allclose(sr.counts_err, lc.flux_err)
     except ImportError:
         pass  # stingray is not a required dependency
+
+
+def test_waterfall():
+    lc = LightCurve(time=np.arange(100), flux=np.random.normal(1, 0.01, 100))
+    folded_lc = lc.fold(10, 1)
+    folded_lc.waterfall()
+    plt.close()
+    folded_lc.waterfall(minimum_phase=-0.1, maximum_phase=0.2)
+    plt.close()
+    folded_lc.waterfall(bin_method='median', bin_points=11)
+    plt.close()

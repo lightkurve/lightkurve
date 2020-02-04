@@ -395,9 +395,3 @@ def test_bls_period():
     with pytest.raises(ValueError) as err:  # NaNs should raise a nice error message
         lc.to_periodogram(method="bls", period=[1, 2, 3, np.nan, 4])
     assert("period" in err.value.args[0])
-
-
-def test_waterfall():
-    lc = LightCurve(time=np.arange(100), flux=np.random.normal(1, 0.01, 100))
-    ax = lc.fold(10, 1).waterfall()
-    plt.close()

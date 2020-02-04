@@ -1745,21 +1745,23 @@ class FoldedLightCurve(LightCurve):
             ax.set_xlabel("Phase")
         return ax
 
-    def waterfall(self, ax=None, bin_points=1, minimum_phase=-0.5, maximum_phase=0.5, bin_method='mean',
-                        waterfall_method='average', **kwargs):
-        """Plot the folded light curve as a waterfall plot. Keywords are passed
-        to matplotlib.
+    def waterfall(self, ax=None, bin_points=1, minimum_phase=-0.5, maximum_phase=0.5,
+                  bin_method='mean', waterfall_method='average', **kwargs):
+        """Plot the folded light curve as a waterfall plot.
+
+        All extra keywords supplied are passed on to Matplotlib's
+        `~matplotlib.pyplot.pcolormesh` function.
 
         Parameters
         ----------
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         bin_points : int
-            How many points should be in each bin
+            How many points should be in each bin.
         minimum_phase : float
-            The minimum phase to plot
+            The minimum phase to plot.
         maximum_phase : float
-            The maximum phase to plot
+            The maximum phase to plot.
         bin_method : str
             The bin method. Choose from `'mean'` or `'median'`.
         waterfall_method : 'str'
@@ -1769,7 +1771,8 @@ class FoldedLightCurve(LightCurve):
             the error in each bin, in order to show the data in terms of standard
             deviation.
         kwargs : dict
-            Dictionary of arguments to be passed to matplotlib
+            Dictionary of arguments to be passed on to Matplotlib's
+            `~matplotlib.pyplot.pcolormesh` function.
 
         Returns
         -------
@@ -1777,13 +1780,12 @@ class FoldedLightCurve(LightCurve):
             The matplotlib axes object.
         """
         bin_method = validate_method(bin_method, supported_methods=['mean', 'median'])
-        if bin_method == 'mean':
+        if bin_points == 1:
+            bin_func = lambda y, e: (y[0], e[0])
+        elif bin_method == 'mean':
             bin_func = lambda y, e: (np.nanmean(y), np.nansum(e**2)**0.5/len(e))
         elif bin_method == 'median':
             bin_func = lambda y, e: (np.nanmedian(y), np.nansum(e**2)**0.5/len(e))
-
-        if bin_points == 1:
-            bin_func = lambda y, e: (y[0], e[0])
 
         waterfall_method = validate_method(waterfall_method, supported_methods=['average', 'sigma'])
         if waterfall_method == 'sigma':
@@ -1811,8 +1813,6 @@ class FoldedLightCurve(LightCurve):
         cyc -= np.min(cyc)
         ph[ph > 0.5] -= 1
 
-        # with warnings.catch_warnings():
-        #     warnings.simplefilter("ignore")
         ar = np.empty((n, np.max(cyc) + 1))
         ar[:] = np.nan
         bs = np.linspace(minimum_phase, maximum_phase, n)
@@ -1829,13 +1829,15 @@ class FoldedLightCurve(LightCurve):
                 if not np.any(cyc_mask & ph_mask & qual_mask):
                     ar[jdx, cyc1] = np.nan
                 else:
-                    ar[jdx, cyc1] = waterfall_func(*bin_func(y[cyc_mask & ph_mask], e[cyc_mask & ph_mask]))
+                    ar[jdx, cyc1] = waterfall_func(*bin_func(y[cyc_mask & ph_mask],
+                                                             e[cyc_mask & ph_mask]))
 
         # If the method is average we need to denormalize the plot
         if waterfall_method == 'average':
             ar *= np.nanmedian(self.flux)
 
-        d = np.max([np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 5)), np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 95))])
+        d = np.max([np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 5)),
+                    np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 95))])
         vmin = kwargs.pop('vmin', np.nanmedian(ar) - d)
         vmax = kwargs.pop('vmax', np.nanmedian(ar) + d)
         if waterfall_method == 'average':
@@ -1860,18 +1862,21 @@ class FoldedLightCurve(LightCurve):
                     cbar.set_label("Average Flux in Bin {}".format(unit))
             if waterfall_method == 'sigma':
                 if bin_points == 1:
-                    cbar.set_label("Flux in units of Standard Deviation $(f - \overline{f})/(\sigma_f)$")
+                    cbar.set_label("Flux in units of Standard Deviation "
+                                   "$(f - \overline{f})/(\sigma_f)$")
                 else:
-                    cbar.set_label("Average Flux in Bin in units of Standard Deviation $(f - \overline{f})/(\sigma_f)$")
+                    cbar.set_label("Average Flux in Bin in units of Standard Deviation "
+                                   "$(f - \overline{f})/(\sigma_f)$")
 
             ax.set_xlabel("Phase")
             ax.set_ylabel("Cycle")
             ax.set_ylim(cyc.max(), 0)
             ax.set_title(self.label)
-            a = cyc.max()*0.1/12
+            a = cyc.max() * 0.1 / 12.
             b = (cyc.max() - cyc.min()) / (bs.max() - bs.min())
             ax.set_aspect(a/b)
         return ax
+
 
 class KeplerLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
