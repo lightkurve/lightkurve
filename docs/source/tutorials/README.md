@@ -10,7 +10,6 @@
 - [What are LightCurve objects?](01-what-are-lightcurves.ipynb)  [:tv:](https://youtu.be/xBesCFlkjIw)
 - [What are LightCurveFile objects?](01-lightcurve-files.ipynb)  [:tv:](https://youtu.be/rh7kSNlsqGM)
 - [What is the Periodogram class?](01-using-the-periodogram-class.ipynb) [:tv:](https://youtu.be/dYk2gjZGK7k)
-- [How do you use waterfall plots?](01-using-waterfall-plots.ipynb)
 
 ### Science with lightkurve
 
@@ -26,6 +25,7 @@
 - [How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?](03-cutting-out-tpfs-from-tess-ffis.ipynb)
 - [How to save a LightCurve in FITS format?](03-making-fits-files.ipynb)
 - [How to combine lightcurves from different Kepler quarters](03-appending-lightcurves.ipynb)
+- [How do you use waterfall plots?](03-using-waterfall-plots.ipynb)
 
 ### Systematics correction
 

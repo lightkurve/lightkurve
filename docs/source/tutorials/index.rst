@@ -19,7 +19,6 @@ all classes and methods, please consult the `API docs <../api/index.html>`_.
     01-what-are-lightcurves.ipynb
     01-lightcurve-files.ipynb
     01-using-the-periodogram-class.ipynb
-    01-using-waterfall-plots.ipynb
 
 
 
@@ -42,6 +41,8 @@ can be extracted from the pixel data, and on the removal of instrument noise
     03-cutting-out-tpfs-from-tess-ffis.ipynb
     03-making-fits-files.ipynb
     03-appending-lightcurves.ipynb
+    03-using-waterfall-plots.ipynb
+
 
 
 2.2. Identifying instrument noise
