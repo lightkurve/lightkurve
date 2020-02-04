@@ -605,6 +605,7 @@ class LightCurve(object):
                                 period=period,
                                 t0=t0,
                                 label=self.label,
+                                flux_unit=self.flux_unit,
                                 meta=self.meta)
 
     def normalize(self, unit='unscaled'):
@@ -1744,39 +1745,54 @@ class FoldedLightCurve(LightCurve):
             ax.set_xlabel("Phase")
         return ax
 
-    def waterfall(self, ax=None, bin=1, phmin=-0.5, phmax=0.5, bin_type='mean',
-                        waterfall_type='average', **kwargs):
+    def waterfall(self, ax=None, bin_points=1, phmin=-0.5, phmax=0.5, bin_method='mean',
+                        waterfall_method='average', **kwargs):
         """Plot the folded light curve as a waterfall plot. Keywords are passed
         to matplotlib.
         Parameters
         ----------
+        ax : `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        bin_points : int
+            How many points should be in each bin
+        phmin : float
+            The minimum phase to plot
+        phmax : float
+            The maximum phase to plot
+        bin_method : str
+            The bin method. Choose from `'mean'` or `'median'`.
+        waterfall_method : 'str'
+            Type of waterfall plot, choose from `'average'` or `'sigma'`.
+            If `'average'`, the plot will display the average value in each bin.
+            If `'sigma'`, the plot will display the average in the bin divided by
+            the error in each bin, in order to show the data in terms of standard
+            deviation.
         kwargs : dict
-            Dictionary of arguments to be passed to `LightCurve.plot`.
+            Dictionary of arguments to be passed to matplotlib
         Returns
         -------
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
+        bin_method = validate_method(bin_method, supported_methods=['mean', 'median'])
+        if bin_method == 'mean':
+            bin_func = lambda y, e: (np.nanmean(y), np.sum(e**2)**0.5/len(e))
+        elif bin_method == 'median':
+            bin_func = lambda y, e: (np.nanmedian(y), np.sum(e**2)**0.5/len(e))
 
-        if bin_type.lower() == 'mean':
-            bin_func = np.nanmean
-        elif bin_type.lower() == 'median':
-            bin_func = np.nanmedian
-        else:
-            raise ValueError('`bin_type` not understood.')
-
-        if waterfall_type == 'sigma':
+        waterfall_method = validate_method(waterfall_method, supported_methods=['average', 'sigma'])
+        if waterfall_method == 'sigma':
             waterfall_func = lambda y, e: (y - 1)/e
-        elif waterfall_type == 'average':
+        elif waterfall_method == 'average':
             waterfall_func = lambda y, e: y
         else:
-            raise ValueError('`waterfall_type` not understood.')
+            raise ValueError('`waterfall_method` not understood.')
 
         x, y, e = self.time_original[np.argsort(self.time_original)], self.flux[np.argsort(self.time_original)], self.flux_err[np.argsort(self.time_original)]
-        e /= np.nanmedian(y)
-        y /= np.nanmedian(y)
+        e /= np.nanmedian(self.flux)
+        y /= np.nanmedian(self.flux)
 
-        n = int(self.period/np.median(np.diff(x)) * (phmax - phmin)/bin)
+        n = int(self.period/np.median(np.diff(x)) * (phmax - phmin)/bin_points)
         ph = x/self.period % 1
         cyc = np.asarray((x - x % self.period)/self.period, int)
         cyc -= np.min(cyc)
@@ -1799,15 +1815,18 @@ class FoldedLightCurve(LightCurve):
                     if j.sum() == 0:
                         ar[jdx, cyc1] = np.nan
                     else:
-                        ar[jdx, cyc1] = bin_func(waterfall_func(y[k][j], e[k][j]))
+                        ar[jdx, cyc1] = waterfall_func(*bin_func(y[k][j], e[k][j]))
+                        if waterfall_method is 'average':
+                            # If the method is average we need to denormalize the plot
+                            ar[jdx, cyc1] *= np.nanmedian(self.flux)
 
 
         d = np.max([np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 5)), np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 95))])
         vmin = kwargs.pop('vmin', np.nanmedian(ar) - d)
         vmax = kwargs.pop('vmax', np.nanmedian(ar) + d)
-        if waterfall_type == 'average':
+        if waterfall_method == 'average':
             cmap = kwargs.pop('cmap', 'viridis')
-        if waterfall_type == 'sigma':
+        if waterfall_method == 'sigma':
             cmap = kwargs.pop('cmap', 'coolwarm')
 
 
@@ -1817,10 +1836,20 @@ class FoldedLightCurve(LightCurve):
 
             im = ax.pcolormesh(bs, cycs, ar.T, vmin=vmin, vmax=vmax, cmap=cmap, **kwargs)
             cbar = plt.colorbar(im, ax=ax)
-            if waterfall_type == 'average':
-                cbar.set_label("Average Flux in Bin")
-            if waterfall_type == 'sigma':
-                cbar.set_label("Average $\sigma$ in Bin")
+            if waterfall_method == 'average':
+                unit = '[Normalized Flux]'
+                if self.flux_unit is not None:
+                    if (self.flux_unit != u.dimensionless_unscaled):
+                        unit = '[{}]'.format(self.flux_unit.to_string('latex'))
+                if bin_points == 1:
+                    cbar.set_label("Flux {}".format(unit))
+                else:
+                    cbar.set_label("Average Flux in Bin {}".format(unit))
+            if waterfall_method == 'sigma':
+                if bin_points == 1:
+                    cbar.set_label("Flux in units of Standard Deviation $(f - \overline{f})/(\sigma_f)$")
+                else:
+                    cbar.set_label("Average Flux in Bin in units of Standard Deviation $(f - \overline{f})/(\sigma_f)$")
 
             ax.set_xlabel("Phase")
             ax.set_ylabel("Cycle")

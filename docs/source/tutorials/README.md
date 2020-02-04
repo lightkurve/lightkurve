@@ -10,6 +10,7 @@
 - [What are LightCurve objects?](01-what-are-lightcurves.ipynb)  [:tv:](https://youtu.be/xBesCFlkjIw)
 - [What are LightCurveFile objects?](01-lightcurve-files.ipynb)  [:tv:](https://youtu.be/rh7kSNlsqGM)
 - [What is the Periodogram class?](01-using-the-periodogram-class.ipynb) [:tv:](https://youtu.be/dYk2gjZGK7k)
+- [How do you use waterfall plots?](01-using-waterfall-plots.ipynb)
 
 ### Science with lightkurve
 
