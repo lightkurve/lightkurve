@@ -1816,7 +1816,7 @@ class FoldedLightCurve(LightCurve):
                         ar[jdx, cyc1] = np.nan
                     else:
                         ar[jdx, cyc1] = waterfall_func(*bin_func(y[k][j], e[k][j]))
-                        if waterfall_method is 'average':
+                        if waterfall_method == 'average':
                             # If the method is average we need to denormalize the plot
                             ar[jdx, cyc1] *= np.nanmedian(self.flux)
 
