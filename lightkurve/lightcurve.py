@@ -223,7 +223,7 @@ class LightCurve(object):
 
     @property
     def flux_quantity(self):
-        """Returns the flux as an astropy.units.Quantity object."""
+        """Returns the flux as an Astropy `~astropy.units.Quantity` object."""
         if isinstance(self.flux_unit, u.UnitBase):
             return self.flux * self.flux_unit
         else:
