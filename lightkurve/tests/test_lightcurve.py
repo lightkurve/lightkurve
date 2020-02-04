@@ -211,8 +211,8 @@ def test_lightcurve_fold():
     plt.close('all')
 
 
-    odd = fold.odd
-    even = fold.even
+    odd = fold.odd_mask
+    even = fold.even_mask
     assert len(odd) == len(fold.time)
     assert np.all(odd == ~even)
     assert np.sum(odd) == np.sum(even)

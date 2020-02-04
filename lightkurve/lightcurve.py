@@ -602,10 +602,10 @@ class LightCurve(object):
                                 flux_err=self.flux_err[sorted_args],
                                 time_original=self.time[sorted_args],
                                 targetid=self.targetid,
-                                label=self.label,
-                                meta=self.meta,
                                 period=period,
-                                t0=t0)
+                                t0=t0,
+                                label=self.label,
+                                meta=self.meta)
 
     def normalize(self, unit='unscaled'):
         """Returns a normalized version of the light curve.
@@ -1646,16 +1646,15 @@ class FoldedLightCurve(LightCurve):
         return self.time
 
     @property
-    def odd(self):
+    def odd_mask(self):
         ''' Mask to show only odd numbered transits/oscillations. '''
-        phase = (self.t0 % self.period) / self.period
-        odd = (((self.time_original - phase * (self.period) - self.period * 0.5) / (self.period * 2)) % 1) < 0.5
-        return odd
+        odd_mask = (((self.time_original - self.time * (self.period) - self.period * 0.5) / (self.period * 2)) % 1) < 0.5
+        return odd_mask
 
     @property
-    def even(self):
+    def even_mask(self):
         ''' Mask to show only even numbered transits/oscillations. '''
-        return ~self.odd
+        return ~self.odd_mask
 
     def plot(self, **kwargs):
         """Plot the folded light curve using matplotlib's
