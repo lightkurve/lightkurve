@@ -23,9 +23,9 @@ def test_periodogram_basics():
                     flux_err=np.zeros(1000)+0.1)
     lc = lc.normalize()
     pg = lc.to_periodogram()
-    ax = pg.plot()
+    pg.plot()
     plt.close()
-    ax = pg.plot(view='period')
+    pg.plot(view='period')
     plt.close()
     pg.show_properties()
     pg.to_table()
@@ -204,7 +204,7 @@ def test_flatten():
     assert all(b.power == p.smooth(method='logmedian', filter_width=0.01).power)
     assert all(s.power == p.flatten().power)
     str(s)
-    ax = s.plot()
+    s.plot()
     plt.close()
 
 def test_index():
@@ -231,7 +231,7 @@ def test_bls(caplog):
     keys = ['period', 'power', 'duration', 'transit_time', 'depth', 'snr']
     assert np.all([key in  dir(p) for key in keys])
 
-    ax = p.plot()
+    p.plot()
     plt.close()
 
     # we should be able to specify some keywords
