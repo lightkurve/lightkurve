@@ -4,6 +4,7 @@
 - Fixed a bug which caused ``TargetPixelFile.interact()`` to raise a
   ``ValueError`` if the pixel file contained NaN flux values. [#679]
 
+- Fixed minor issues in the tutorials. [#662, #683]
 
 
 
