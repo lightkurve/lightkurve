@@ -4,6 +4,7 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy.signal import find_peaks
 
 from astropy import units as u
 from astropy.units import cds
@@ -14,18 +15,16 @@ from ..periodogram import SNRPeriodogram
 from ..utils import LightkurveWarning, validate_method
 from .utils import  SeismologyQuantity
 
-from scipy.signal import find_peaks
-
-# Import the optional Bokeh dependency, or print a friendly error otherwise.
+# Import the optional Bokeh dependency required by ``interact_echelle```,
+# or print a friendly error otherwise.
 try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
-    from bokeh.io import show, output_notebook, push_notebook
+    from bokeh.io import show, output_notebook
     from bokeh.plotting import figure
-    from bokeh.models import LogColorMapper, Slider, RangeSlider, \
-                             Span, LogTicker, Range1d, Button
+    from bokeh.models import LogColorMapper, Slider, RangeSlider, Button
     from bokeh.layouts import layout, Spacer
 except:
-    # Nice error when interact_echelle is called.
+    # Nice error will be raised when ``interact_echelle``` is called.
     pass
 
 log = logging.getLogger(__name__)
@@ -156,8 +155,6 @@ class Seismology(object):
         y_f : np.ndarray
             frequencies for Y axis
         """
-        #if numax is None:
-
         if (minimum_frequency is None) & (maximum_frequency is None):
             numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
@@ -166,7 +163,6 @@ class Seismology(object):
             numax = numax * self.periodogram.frequency.unit
         if (not hasattr(deltanu, 'unit')) & (deltanu is not None):
             deltanu = deltanu * self.periodogram.frequency.unit
-
 
         if smooth_filter_width:
             pgsmooth = self.periodogram.smooth(filter_width=smooth_filter_width)
@@ -206,13 +202,13 @@ class Seismology(object):
         if minimum_frequency is not None:
             fmin =  u.Quantity(minimum_frequency, freq.unit).value
             if fmin > freq[-1].value:
-                raise ValueError("You can't pass in a limit outside the"
+                raise ValueError("You can't pass in a limit outside the "
                                  "frequency range of the periodogram.")
 
         if maximum_frequency is not None:
             fmax = u.Quantity(maximum_frequency, freq.unit).value
             if fmax > freq[-1].value:
-                raise ValueError("You can't pass in a limit outside the"
+                raise ValueError("You can't pass in a limit outside the "
                                  "frequency range of the periodogram.")
 
         # Make sure fmin and fmax are Quantities or code below will break
@@ -259,15 +255,14 @@ class Seismology(object):
         if scale=='log':
             ep = np.log10(ep)
 
-        #Reshape the freq into n_rowss of n_columnss & create arays
+        # Reshape the freq into n_rowss of n_columnss & create arays
         ef = np.reshape(ff[start : end], (n_rows, n_columns))
         x_f = ((ef[0,:]-ef[0,0]) % deltanu)
         y_f = (ef[:,0])
         return ep, x_f, y_f
 
-    def plot_echelle(self, deltanu=None, numax=None,
-                     minimum_frequency=None, maximum_frequency=None,
-                     smooth_filter_width=.1,
+    def plot_echelle(self, deltanu=None, numax=None, minimum_frequency=None,
+                     maximum_frequency=None, smooth_filter_width=.1,
                      scale='linear', ax=None, cmap='Blues'):
         """Plots an echelle diagram of the periodogram by stacking the
         periodogram in slices of deltanu.
