@@ -1854,7 +1854,7 @@ class FoldedLightCurve(LightCurve):
             ax.set_xlabel("Phase")
             ax.set_ylabel("Cycle")
             ax.set_ylim(cyc.max(), 0)
-            ax.set_title(self.targetid)
+            ax.set_title(self.label)
             a = cyc.max()*0.1/12
             b = (cyc.max() - cyc.min()) / (bs.max() - bs.min())
             ax.set_aspect(a/b)
