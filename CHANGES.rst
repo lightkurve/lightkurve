@@ -1,6 +1,9 @@
 1.8.0 (unreleased)
 ==================
 
+- Added ``odd_mask`` and ``even_mask`` properties to ``FoldedLightCurve`` to
+  make it easy to plot odd- and even-numbered transits. [#425]
+
 - Fixed a bug which caused ``TargetPixelFile.interact()`` to raise a
   ``ValueError`` if the pixel file contained NaN flux values. [#679]
 
