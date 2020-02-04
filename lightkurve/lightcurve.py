@@ -27,7 +27,7 @@ from .utils import (
     LightkurveWarning, validate_method
 )
 
-__all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve']
+__all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve', 'FoldedLightCurve']
 
 log = logging.getLogger(__name__)
 
@@ -1630,16 +1630,21 @@ class LightCurve(object):
 
 
 class FoldedLightCurve(LightCurve):
-    """Generic class to store and plot phase-folded light curves.
+    """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
+    in which the ``time`` parameter represents phase values.
 
     Compared to the `~lightkurve.lightcurve.LightCurve` base class, this class
-    offers an extra `phase` property and implements different plotting defaults.
+    takes three extra parameters (``period``, ``t0``, ``time_original``),
+    offers extra properties (`phase`, `odd_mask`, `even_mask`),
+    and implements different plotting defaults.
     """
-    def __init__(self, *args, **kwargs):
-        self.time_original = kwargs.pop("time_original", None)
-        self.period = kwargs.pop("period", None)
-        self.t0 = kwargs.pop("t0", None)
-        super(FoldedLightCurve, self).__init__(*args, **kwargs)
+    def __init__(self, time=None, flux=None, flux_err=None, period=None, t0=None,
+                 time_original=None, *args, **kwargs):
+        self.period = period
+        self.t0 = t0
+        self.time_original = time_original
+        super(FoldedLightCurve, self).__init__(time=time, flux=flux,
+            flux_err=flux_err, *args, **kwargs)
 
     @property
     def phase(self):
@@ -1647,13 +1652,33 @@ class FoldedLightCurve(LightCurve):
 
     @property
     def odd_mask(self):
-        ''' Mask to show only odd numbered transits/oscillations. '''
-        odd_mask = (((self.time_original - self.time * (self.period) - self.period * 0.5) / (self.period * 2)) % 1) < 0.5
-        return odd_mask
+        """Boolean mask which flags the odd-numbered cycles (1, 3, 5, etc).
+
+        This is useful for studying every second occurence of a signal.
+        For example, in exoplanet searches, comparisons of odd and even transits
+        can help confirm the planetary nature of a signal. Differences in the
+        depth, duration, or shape of the odd- and even-numbered transits would
+        indicate that the 'transits' are being caused by a near-equal mass
+        eclipsing background binary, rather than a true transiting exoplanet.
+
+        Examples
+        --------
+        You can can visualize the odd- and even-centered transits separately as
+        follows:
+
+            >>> f = lc.fold(...)  # doctest: +SKIP
+            >>> f[f.odd_mask].scatter()  # doctest: +SKIP
+            >>> f[f.even_mask].scatter()  # doctest: +SKIP
+        """
+        cycle = (self.time_original - self.time * (self.period) - self.period * 0.5) / (self.period * 2)
+        return (cycle % 1) < 0.5
 
     @property
     def even_mask(self):
-        ''' Mask to show only even numbered transits/oscillations. '''
+        """Boolean mask which flags the even-numbered cycles (2, 4, 6, etc).
+
+        See the documentation of `odd_mask` for examples.
+        """
         return ~self.odd_mask
 
     def plot(self, **kwargs):
