@@ -1,6 +1,7 @@
 import pytest
 from astropy import units as u
 import numpy as np
+import matplotlib.pyplot as plt
 from numpy.testing import assert_almost_equal, assert_array_equal
 
 from ..lightcurve import LightCurve
@@ -22,8 +23,10 @@ def test_periodogram_basics():
                     flux_err=np.zeros(1000)+0.1)
     lc = lc.normalize()
     pg = lc.to_periodogram()
-    pg.plot()
-    pg.plot(view='period')
+    ax = pg.plot()
+    plt.close()
+    ax = pg.plot(view='period')
+    plt.close()
     pg.show_properties()
     pg.to_table()
     str(pg)
@@ -201,7 +204,8 @@ def test_flatten():
     assert all(b.power == p.smooth(method='logmedian', filter_width=0.01).power)
     assert all(s.power == p.flatten().power)
     str(s)
-    s.plot()
+    ax = s.plot()
+    plt.close()
 
 def test_index():
     """Test if you can mask out periodogram
@@ -227,7 +231,8 @@ def test_bls(caplog):
     keys = ['period', 'power', 'duration', 'transit_time', 'depth', 'snr']
     assert np.all([key in  dir(p) for key in keys])
 
-    p.plot()
+    ax = p.plot()
+    plt.close()
 
     # we should be able to specify some keywords
     lc.to_periodogram(method='bls', minimum_period=0.2, duration=0.1, maximum_period=0.5)
@@ -394,4 +399,5 @@ def test_bls_period():
 
 def test_waterfall():
     lc = LightCurve(time=np.arange(100), flux=np.random.normal(1, 0.01, 100))
-    lc.fold(10, 1).waterfall()
+    ax = lc.fold(10, 1).waterfall()
+    plt.close()
