@@ -1607,8 +1607,22 @@ class TessTargetPixelFile(TargetPixelFile):
     ----------
     path : str
         Path to a Kepler Target Pixel (FITS) File.
-    quality_bitmask : str or int
-        Bitmask specifying quality flags of cadences that should be ignored.
+    quality_bitmask : "none", "default", "hard", "hardest", or int
+        Bitmask that should be used to ignore bad-quality cadences.
+        If a string is passed, it has the following meaning:
+
+            * "none": no cadences will be ignored (`quality_bitmask=0`).
+            * "default": cadences with severe quality issues will be ignored
+              (`quality_bitmask=175`).
+            * "hard": more conservative choice of flags to ignore
+              (`quality_bitmask=7407`). This is known to remove good data.
+            * "hardest": removes all data that has been flagged
+              (`quality_bitmask=8191`). This mask is not recommended.
+
+        If an integer is passed, it will be used as a bitmask, i.e. it will
+        have the effect of removing cadences where
+        ``(tpf.hdu[1].data['QUALITY'] & quality_bitmask) > 0``.
+        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
     kwargs : dict
         Keyword arguments passed to `astropy.io.fits.open()`.
     """

@@ -424,11 +424,11 @@ class TessLightCurveFile(LightCurveFile):
 
             * "none": no cadences will be ignored (`quality_bitmask=0`).
             * "default": cadences with severe quality issues will be ignored
-              (`quality_bitmask=1130799`).
+              (`quality_bitmask=175`).
             * "hard": more conservative choice of flags to ignore
-              (`quality_bitmask=1664431`). This is known to remove good data.
+              (`quality_bitmask=7407`). This is known to remove good data.
             * "hardest": removes all data that has been flagged
-              (`quality_bitmask=2096639`). This mask is not recommended.
+              (`quality_bitmask=8191`). This mask is not recommended.
 
         See the :class:`TessQualityFlags` class for details on the bitmasks.
     kwargs : dict
