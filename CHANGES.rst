@@ -1,4 +1,4 @@
-1.8.0 (unreleased)
+1.8.0 (2020-02-09)
 ==================
 
 - Added the ``Seismology.interact_echelle()`` method for creating interactive
