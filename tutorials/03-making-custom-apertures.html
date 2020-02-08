@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -316,22 +316,13 @@ div.rendered_html tbody tr:hover {
 <p>We’ve now created a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> objects, where each item is a different quarter. We’re going to be able to combine these just like in the <a href="#id1"><span class="problematic" id="id2">`stitching tutorial &lt;&gt;`__</span></a>.</p>
 <p>Let’s take a look at just one of those target pixel files.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Build the light curve</span>
 <span class="n">pipeline_lc</span> <span class="o">=</span> <span class="n">tpfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">tpf</span> <span class="ow">in</span> <span class="n">tpfs</span><span class="p">:</span>
+<span class="k">for</span> <span class="n">tpf</span> <span class="ow">in</span> <span class="n">tpfs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
     <span class="n">pipeline_lc</span> <span class="o">=</span> <span class="n">pipeline_lc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
 
 <span class="c1"># Clean the light curve</span>
@@ -362,7 +353,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_03-making-custom-apertures_8_0.png" src="../_images/tutorials_03-making-custom-apertures_8_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_03-making-custom-apertures_7_0.png"><img alt="../_images/tutorials_03-making-custom-apertures_7_0.png" src="../_images/tutorials_03-making-custom-apertures_7_0.png" style="width: 789px; height: 375px;" /></a>
 </div>
 </div>
 <p>Looks like a great candidate. However, we might just want to check on the pixels. Let’s plot one of the target pixel files.</p>
@@ -379,7 +370,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_03-making-custom-apertures_10_0.png" src="../_images/tutorials_03-making-custom-apertures_10_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_03-making-custom-apertures_9_0.png"><img alt="../_images/tutorials_03-making-custom-apertures_9_0.png" src="../_images/tutorials_03-making-custom-apertures_9_0.png" style="width: 609px; height: 401px;" /></a>
 </div>
 </div>
 <p>The Kepler Pipeline aperture is in red. It looks like there is a nearby contaminate star! We might want to check that the signal is not really coming from the bright, nearby contaminant, rather than our target star. Let’s use the top right corner four pixels as our new mask.</p>
@@ -399,7 +390,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_03-making-custom-apertures_12_0.png" src="../_images/tutorials_03-making-custom-apertures_12_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_03-making-custom-apertures_11_0.png"><img alt="../_images/tutorials_03-making-custom-apertures_11_0.png" src="../_images/tutorials_03-making-custom-apertures_11_0.png" style="width: 609px; height: 401px;" /></a>
 </div>
 </div>
 <p>The new mask covers the bright star. Now we can iterate through the target pixel files and build the light curve in the same way as before, but this time</p>
@@ -412,7 +403,7 @@ div.rendered_html tbody tr:hover {
 <span class="n">aper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">tpfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
 <span class="n">aper</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">user_lc</span> <span class="o">=</span> <span class="n">tpfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">tpf</span> <span class="ow">in</span> <span class="n">tpfs</span><span class="p">:</span>
+<span class="k">for</span> <span class="n">tpf</span> <span class="ow">in</span> <span class="n">tpfs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
     <span class="n">aper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
     <span class="n">aper</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span>
     <span class="n">user_lc</span> <span class="o">=</span> <span class="n">user_lc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
@@ -447,7 +438,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_03-making-custom-apertures_16_1.png" src="../_images/tutorials_03-making-custom-apertures_16_1.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_03-making-custom-apertures_15_1.png"><img alt="../_images/tutorials_03-making-custom-apertures_15_1.png" src="../_images/tutorials_03-making-custom-apertures_15_1.png" style="width: 789px; height: 375px;" /></a>
 </div>
 </div>
 <p>Looks like the planet signal is only in the target star and doesn’t belong to the contaminant. This is just one of many checks you might want to perform to validate your planet candidates!</p>

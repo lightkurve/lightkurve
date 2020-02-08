@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -343,7 +343,7 @@ stars in very crowded regions or star clusters.</p>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
 Warning: PRF-fitting photometry is experimental in this version of lightkurve.
-Fitting cadences: 100%|██████████| 3634/3634 [00:40&lt;00:00, 89.59it/s]
+Fitting cadences: 100%|██████████| 3634/3634 [00:45&lt;00:00, 79.69it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -351,7 +351,7 @@ Fitting cadences: 100%|██████████| 3634/3634 [00:40&lt;00:00
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c20b4d940&gt;
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x12b65e710&gt;
 </pre></div>
 </div>
 </div>
@@ -359,7 +359,7 @@ Fitting cadences: 100%|██████████| 3634/3634 [00:40&lt;00:00
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_3_2.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_3_2.png" src="../_images/tutorials_03-how-to-use-prf-photometry_3_2.png" style="width: 755px; height: 369px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_3_2.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_3_2.png" src="../_images/tutorials_03-how-to-use-prf-photometry_3_2.png" style="width: 774px; height: 368px;" /></a>
 </div>
 </div>
 <p>A good way to verify that the model-fitting photometry produced a sensible output is by comparing it against standard aperture photometry. You can obtain aperture photometry using the same <code class="docutils literal notranslate"><span class="pre">to_lightcurve</span></code> method and the parameter <code class="docutils literal notranslate"><span class="pre">method='aperture'</span></code> (which is the default value of this parameter).</p>
@@ -378,7 +378,7 @@ Fitting cadences: 100%|██████████| 3634/3634 [00:40&lt;00:00
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c24abf470&gt;
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x12da28710&gt;
 </pre></div>
 </div>
 </div>
@@ -386,7 +386,7 @@ Fitting cadences: 100%|██████████| 3634/3634 [00:40&lt;00:00
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_5_1.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_5_1.png" src="../_images/tutorials_03-how-to-use-prf-photometry_5_1.png" style="width: 755px; height: 368px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_5_1.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_5_1.png" src="../_images/tutorials_03-how-to-use-prf-photometry_5_1.png" style="width: 774px; height: 375px;" /></a>
 </div>
 </div>
 <p>There is a notable difference in the long-term trend in both lightcurves. This is because PRF-fitting photometry yields a local estimate of the background which is often different from the Kepler pipeline’s global background level estimates.</p>
@@ -410,7 +410,7 @@ Fitting cadences: 100%|██████████| 3634/3634 [00:40&lt;00:00
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c23884b70&gt;
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x12db384e0&gt;
 </pre></div>
 </div>
 </div>
@@ -418,7 +418,7 @@ Fitting cadences: 100%|██████████| 3634/3634 [00:40&lt;00:00
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_7_1.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_7_1.png" src="../_images/tutorials_03-how-to-use-prf-photometry_7_1.png" style="width: 861px; height: 277px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_7_1.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_7_1.png" src="../_images/tutorials_03-how-to-use-prf-photometry_7_1.png" style="width: 859px; height: 277px;" /></a>
 </div>
 </div>
 <p>Success! Note that the outliers between <em>phase</em> -0.4 and 0.0 are caused by the transits of another planet with a different period.</p>
@@ -532,7 +532,7 @@ The CDPP noise metric equals:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;lightkurve.prf.tpfmodel.TPFModel object at 0x1c238c50b8&gt;
+&lt;lightkurve.prf.tpfmodel.TPFModel object at 0x12d2237f0&gt;
   &lt;StarPrior(
     col=&lt;GaussianPrior(mean=[655.70045778], var=[0.00046541])&gt;
     row=&lt;GaussianPrior(mean=[246.83753465], var=[0.0007464])&gt;
@@ -547,7 +547,7 @@ The CDPP noise metric equals:
   &lt;MotionPrior(
     shift_col=&lt;GaussianPrior(mean=[0], var=[1.])&gt;
     shift_row=&lt;GaussianPrior(mean=[0], var=[1.])&gt;)&gt;
-  &lt;lightkurve.prf.prfmodel.KeplerPRF object at 0x1c238c5b38&gt;
+  &lt;lightkurve.prf.prfmodel.KeplerPRF object at 0x12d219cc0&gt;
   fit_background=True
   fit_focus=False
   fit_motion=False
@@ -593,7 +593,7 @@ The CDPP noise metric equals:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;lightkurve.prf.tpfmodel.TPFModelParameters object at 0x1c237d66a0&gt;
+&lt;lightkurve.prf.tpfmodel.TPFModelParameters object at 0x12cf26940&gt;
   &lt;StarParameters(
     col=655.6409995230879
     row=246.75968144624395
@@ -673,7 +673,7 @@ The CDPP noise metric equals:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c236f34a8&gt;
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x12d23cf60&gt;
 </pre></div>
 </div>
 </div>
@@ -764,14 +764,14 @@ The CDPP noise metric equals:
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Fitting cadences: 100%|██████████| 3634/3634 [00:40&lt;00:00, 89.26it/s]
+Fitting cadences: 100%|██████████| 3634/3634 [00:54&lt;00:00, 66.66it/s]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_36_1.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_36_1.png" src="../_images/tutorials_03-how-to-use-prf-photometry_36_1.png" style="width: 424px; height: 684px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_36_1.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_36_1.png" src="../_images/tutorials_03-how-to-use-prf-photometry_36_1.png" style="width: 423px; height: 683px;" /></a>
 </div>
 </div>
 <p>You can access the details of the fit in each cadence using the <code class="docutils literal notranslate"><span class="pre">prfphot.results</span></code> property, e.g.:</p>
@@ -808,7 +808,7 @@ Fitting cadences: 100%|██████████| 3634/3634 [00:40&lt;00:00
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;lightkurve.lightcurve.LightCurve at 0x1c24883278&gt;
+<span></span>&lt;lightkurve.lightcurve.LightCurve at 0x12eac4080&gt;
 </pre></div>
 </div>
 </div>
@@ -830,14 +830,14 @@ Fitting cadences: 100%|██████████| 3634/3634 [00:40&lt;00:00
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Fitting cadences: 100%|██████████| 3634/3634 [02:17&lt;00:00, 26.47it/s]
+Fitting cadences: 100%|██████████| 3634/3634 [03:04&lt;00:00, 19.68it/s]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_42_1.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_42_1.png" src="../_images/tutorials_03-how-to-use-prf-photometry_42_1.png" style="width: 424px; height: 684px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_42_1.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_42_1.png" src="../_images/tutorials_03-how-to-use-prf-photometry_42_1.png" style="width: 422px; height: 683px;" /></a>
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -854,7 +854,7 @@ Fitting cadences: 100%|██████████| 3634/3634 [02:17&lt;00:00
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c249a39e8&gt;
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x130f41c50&gt;
 </pre></div>
 </div>
 </div>
@@ -862,7 +862,7 @@ Fitting cadences: 100%|██████████| 3634/3634 [02:17&lt;00:00
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_43_1.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_43_1.png" src="../_images/tutorials_03-how-to-use-prf-photometry_43_1.png" style="width: 755px; height: 368px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_03-how-to-use-prf-photometry_43_1.png"><img alt="../_images/tutorials_03-how-to-use-prf-photometry_43_1.png" src="../_images/tutorials_03-how-to-use-prf-photometry_43_1.png" style="width: 771px; height: 368px;" /></a>
 </div>
 </div>
 <p>Uhoh, the increased model flexibility introduced complicated systematics. These systematics are caused in part by the degeneracy between the star’s <code class="docutils literal notranslate"><span class="pre">col</span></code> and <code class="docutils literal notranslate"><span class="pre">row</span></code> position and the <code class="docutils literal notranslate"><span class="pre">shift_col</span></code> and <code class="docutils literal notranslate"><span class="pre">shift_row</span></code> parameters. The degeneracy will disappear when additional stars are present in the data, or when tighter priors are employed.</p>

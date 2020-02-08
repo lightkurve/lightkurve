@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -297,22 +297,35 @@ div.rendered_html tbody tr:hover {
 </div>
 <br style="clear:both;"><div class="section" id="How-to-remove-common-systematics-from-Kepler-light-curves-using-the-KeplerCBVCorrector?">
 <h1>How to remove common systematics from Kepler light curves using the <code class="docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code>?<a class="headerlink" href="#How-to-remove-common-systematics-from-Kepler-light-curves-using-the-KeplerCBVCorrector?" title="Permalink to this headline">¶</a></h1>
-<p>Cotrending Basis Vectors are used to remove long term trends in light curves. They are built from the most common trends observed in each channel. You can read more about CBVs in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Demystifying Kepler Data</a>. They can be used to clean lightcurves of common trends experience by all targets.</p>
+<p>Cotrending Basis Vectors are generated in the PDC component of the pipeline and are used to remove systematic trends in light curves. They are built from the most common systematic trends observed in each channel. You can read more about CBVs in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Demystifying Kepler Data</a>. They can be used to clean lightcurves of common trends experienced by all targets.</p>
 <p>Below is an example workflow to remove CBVs from an light curve in Kepler; <a class="reference external" href="https://en.wikipedia.org/wiki/KIC_8462852">Tabby’s star</a>.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_lightcurvefile</span>
 <span class="n">lcf</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s1">&#39;KIC 8462852&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<span class="n">lc</span> <span class="o">=</span> <span class="n">lcf</span><span class="o">.</span><span class="n">SAP_FLUX</span>
-
-<span class="c1">#Remove nans and outliers</span>
-<span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span>
-
-<span class="o">%</span><span class="k">matplotlib</span> inline
-<span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_SAP</span> <span class="o">=</span> <span class="n">lcf</span><span class="o">.</span><span class="n">SAP_FLUX</span>
+<span class="n">lc_PDC</span> <span class="o">=</span> <span class="n">lcf</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc_SAP</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;SAP Flux&#39;</span><span class="p">);</span>
+<span class="n">lc_PDC</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;PDCSAP Flux&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -320,12 +333,12 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-removing-cbvs_2_0.png"><img alt="../_images/tutorials_04-removing-cbvs_2_0.png" src="../_images/tutorials_04-removing-cbvs_2_0.png" style="width: 745px; height: 368px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_04-removing-cbvs_4_0.png"><img alt="../_images/tutorials_04-removing-cbvs_4_0.png" src="../_images/tutorials_04-removing-cbvs_4_0.png" style="width: 774px; height: 368px;" /></a>
 </div>
 </div>
-<p>The light curve above has a significant dip due to the astrophysical variability from Tabby’s star. However there are other long term trends and small ramps due to heating in the spacecraft, which we would like to remove. We can use CBV’s to do this. Let’s import the CBV corrector from <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code>.</p>
+<p>The SAP light curve above has a significant dip due to the astrophysical variability from Tabby’s star. However there are other long term trends and small ramps due to heating and other effects from the spacecraft, which we would like to remove. But PDC appears to have not performed well at removing these systematics for this particular star. Let’s import the CBV corrector from <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> and perform our own correction.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -335,7 +348,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>We can use the <code class="docutils literal notranslate"><span class="pre">plot_cbvs</span></code> function to take a look at the trends we are going to remove. Let’s look at just the first 8 trends.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -347,12 +360,12 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-removing-cbvs_6_0.png"><img alt="../_images/tutorials_04-removing-cbvs_6_0.png" src="../_images/tutorials_04-removing-cbvs_6_0.png" style="width: 711px; height: 401px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_04-removing-cbvs_8_0.png"><img alt="../_images/tutorials_04-removing-cbvs_8_0.png" src="../_images/tutorials_04-removing-cbvs_8_0.png" style="width: 711px; height: 401px;" /></a>
 </div>
 </div>
-<p>We probably don’t want to correct all these trends out of Tabby’s star. Let’s pick just the first 5.</p>
+<p>The high index CBVs generally contain higher amounts of noise. Using all basis vectors therefore runs the risk of introducing noise into the light curves (See <a class="reference external" href="https://en.wikipedia.org/wiki/Overfitting">Overfitting</a>). We therefore probably don’t want to jointly fit all these trends out of Tabby’s star. Let’s pick just the first 5.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -361,7 +374,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -370,7 +383,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -380,11 +393,11 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>We can plot the two light curves on the same plot window to see the difference.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SAP Flux&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc_SAP</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SAP Flux&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
 <span class="n">corr_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C2&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CBV Corrected SAP Flux&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -393,10 +406,10 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-removing-cbvs_11_0.png"><img alt="../_images/tutorials_04-removing-cbvs_11_0.png" src="../_images/tutorials_04-removing-cbvs_11_0.png" style="width: 745px; height: 368px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_04-removing-cbvs_13_0.png"><img alt="../_images/tutorials_04-removing-cbvs_13_0.png" src="../_images/tutorials_04-removing-cbvs_13_0.png" style="width: 774px; height: 368px;" /></a>
 </div>
 </div>
-<p>Now the CBVs have been corrected only the astrophysical variability is left, the variability from spacecraft heating has been removed.</p>
+<p>Now that looks much better! The CBVs appears to have removed the instrumental systematics and only the astrophysical variability looks to be left. Of course, there is no guarantee only the systematics will be removed or that no noise will be introduced into the light curve when performing a sytematic error correction. The reader is advised to have a healthy amount of skepticism with any processed light curve!</p>
 </div>
 
 

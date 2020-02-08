@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -298,8 +298,8 @@ div.rendered_html tbody tr:hover {
 <br style="clear:both;"><div class="section" id="How-to-identify-time-variable-background-noise-(“rolling-bands”)?">
 <h1>How to identify time-variable background noise (“rolling bands”)?<a class="headerlink" href="#How-to-identify-time-variable-background-noise-(“rolling-bands”)?" title="Permalink to this headline">¶</a></h1>
 <p>In the previous tutorial we looked at making custom apertures to check planet signals. In this tutorial we will use the same technique to find variable background (such as rolling band signal) in Kepler data.</p>
-<p>The background flux level of Kepler pixel data is not static. In particular, certain CCD channels occasionally experience the ‘rolling band’ effect, where the background has a strong time varying component of a ‘band’ moving up the detector. You can read more about rolling band in the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19033-001.pdf">Kepler Instrument Handbook</a>. An example of the rolling band artifact is shown in the video below. You can see the band move through the superstamp at
-the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
+<p>The background flux level of Kepler pixel data is not static. In particular, certain CCD channels occasionally experience the ‘rolling band’ effect, where the background has a strong time varying component of a ‘band’ moving up the detector (the band is the horizontal dark line that is approxmiately 30 pixels wide). You can read more about rolling band in the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19033-001.pdf">Kepler Instrument Handbook</a>. An example of the rolling band artifact is
+shown in the video below. You can see the band move through the superstamp at the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 <p><img alt="image0" src="../_images/rollingband.gif" /></p>
 <p>The rolling band artifact is small, up to about 20 counts per pixel. However, this signal can add up to significant levels for large apertures containing many pixels or for faint, quiet targets.</p>
 <p>Rolling band can often add spurious signals into your data which look like real astrophysical variability. The best way to spot rolling band is to vary your aperture size. If the signal strength increases as you increase the number of background pixels in the aperture, the effect is likely to be an additive background component.</p>
@@ -384,7 +384,7 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c1d040a58&gt;
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x12859dd30&gt;
 </pre></div>
 </div>
 </div>

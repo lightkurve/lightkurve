@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -146,7 +146,7 @@ e.g. ‘tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td><p>Returns the time values as an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.flux_quantity" title="lightkurve.lightcurve.LightCurve.flux_quantity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_quantity</span></code></a></p></td>
-<td><p>Returns the flux as an astropy.units.Quantity object.</p></td>
+<td><p>Returns the flux as an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.flux_unit" title="lightkurve.lightcurve.LightCurve.flux_unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_unit</span></code></a></p></td>
 <td><p></p></td>
@@ -218,7 +218,7 @@ e.g. ‘tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td><p>Converts the light curve to a FITS file in the Kepler/TESS file format.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="lightkurve.lightcurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>(self[, columns])</p></td>
-<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.0.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
+<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.0.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_periodogram" title="lightkurve.lightcurve.LightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodogram</span></code></a>(self[, method])</p></td>
 <td><p>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</p></td>
@@ -296,7 +296,7 @@ that correspond to the raw time values:</p>
 <dl class="attribute">
 <dt id="lightkurve.lightcurve.LightCurve.flux_quantity">
 <code class="sig-name descname">flux_quantity</code><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.flux_quantity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the flux as an astropy.units.Quantity object.</p>
+<dd><p>Returns the flux as an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -564,7 +564,7 @@ data you want to preserve, e.g. transits.</p>
 <dt id="lightkurve.lightcurve.LightCurve.fold">
 <code class="sig-name descname">fold</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">period</em>, <em class="sig-param">t0=None</em>, <em class="sig-param">transit_midpoint=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.fold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Folds the lightcurve at a specified <code class="xref py py-obj docutils literal notranslate"><span class="pre">period</span></code> and reference time <code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code>.</p>
-<p>This method returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> object
+<p>This method returns a <a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> object
 in which the time values range between -0.5 to +0.5 (i.e. the phase).
 Data points which occur exactly at <code class="docutils literal notranslate"><span class="pre">t0</span></code> or an integer multiple of
 <code class="docutils literal notranslate"><span class="pre">t0</span> <span class="pre">+</span> <span class="pre">n*period</span></code> will have phase value 0.0.</p>
@@ -583,7 +583,7 @@ LightCurve’s <code class="docutils literal notranslate"><span class="pre">time
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>folded_lightcurve</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></span></dt><dd><p>A new light curve object in which the data are folded and sorted by
+<dt><strong>folded_lightcurve</strong><span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a></span></dt><dd><p>A new light curve object in which the data are folded and sorted by
 phase. The object contains an extra <code class="docutils literal notranslate"><span class="pre">phase</span></code> attribute.</p>
 </dd>
 </dl>
@@ -593,7 +593,7 @@ phase. The object contains an extra <code class="docutils literal notranslate"><
 <p>The example below shows a light curve with a period dip which occurs near
 time value 1001 and has a period of 5 days. Calling the <a class="reference internal" href="#lightkurve.lightcurve.LightCurve.fold" title="lightkurve.lightcurve.LightCurve.fold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fold</span></code></a> method
 will transform the light curve into a
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> object:</p>
+<a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> object:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1001</span><span class="p">,</span> <span class="mi">1012</span><span class="p">),</span> <span class="n">flux</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">folded_lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">5.</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">1006.</span><span class="p">)</span>
@@ -601,7 +601,7 @@ will transform the light curve into a
 <span class="go">&lt;lightkurve.lightcurve.FoldedLightCurve&gt;</span>
 </pre></div>
 </div>
-<p>An object of type <code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> is useful
+<p>An object of type <a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> is useful
 because it provides convenient access to the phase values and the
 phase-folded fluxes:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">folded_lc</span><span class="o">.</span><span class="n">phase</span>
@@ -615,7 +615,7 @@ phase-folded fluxes:</p>
 <span class="go">array([1004, 1009, 1005, 1010, 1001, 1006, 1011, 1002, 1007, 1003, 1008])</span>
 </pre></div>
 </div>
-<p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> inherits all the features
+<p>A <a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> inherits all the features
 of a standard <a class="reference internal" href="#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object. For example, we can very quickly
 obtain a phase-folded plot using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">folded_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>    
@@ -1003,7 +1003,7 @@ in the first extension.</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.to_pandas">
 <code class="sig-name descname">to_pandas</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">columns=('time'</em>, <em class="sig-param">'flux'</em>, <em class="sig-param">'flux_err')</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.0.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p>
+<dd><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.0.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p>
 <p>By default, the object returned will contain the columns ‘time’, ‘flux’,
 and ‘flux_err’.  This can be changed using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">columns</span></code> parameter.</p>
 <dl class="field-list">
@@ -1016,7 +1016,7 @@ attributes of the <a class="reference internal" href="#lightkurve.lightcurve.Lig
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>dataframe</strong><span class="classifier"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.0.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt><dd><p>A data frame indexed by <a class="reference external" href="https://docs.python.org/3/library/time.html#module-time" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a> and containing the columns <code class="docutils literal notranslate"><span class="pre">flux</span></code>
+<dt><strong>dataframe</strong><span class="classifier"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.0.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt><dd><p>A data frame indexed by <a class="reference external" href="https://docs.python.org/3/library/time.html#module-time" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a> and containing the columns <code class="docutils literal notranslate"><span class="pre">flux</span></code>
 and <code class="docutils literal notranslate"><span class="pre">flux_err</span></code>.</p>
 </dd>
 </dl>

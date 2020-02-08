@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -110,16 +110,20 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" title="lightkurve.lightcurve.TessLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessLightCurve</span></code></a>([time, flux, flux_err, …])</p></td>
 <td><p>Subclass of <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a> which holds extra data specific to the TESS mission.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a>([time, flux, flux_err, …])</p></td>
+<td><p>Subclass of <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a> in which the <code class="docutils literal notranslate"><span class="pre">time</span></code> parameter represents phase values.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<div class="graphviz"><img src="../_images/inheritance-f113ca8d49f59bb20529ea0c2c287efdb7339146.png" alt="Inheritance diagram of lightkurve.lightcurve.LightCurve, lightkurve.lightcurve.KeplerLightCurve, lightkurve.lightcurve.TessLightCurve" usemap="#inheritance7c28f86df0" class="inheritance graphviz" /></div>
-<map id="inheritance7c28f86df0" name="inheritance7c28f86df0">
-<area shape="rect" id="node1" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" target="_top" title="Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`" alt="" coords="145,5,279,31"/>
-<area shape="rect" id="node2" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" target="_top" title="Generic light curve object to hold time series photometry for one target." alt="" coords="5,31,97,56"/>
-<area shape="rect" id="node3" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" target="_top" title="Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`" alt="" coords="152,55,272,80"/>
+<div class="graphviz"><img src="../_images/inheritance-5dc34f3c173f99c0ac8341502b8904fe7340211b.png" alt="Inheritance diagram of lightkurve.lightcurve.LightCurve, lightkurve.lightcurve.KeplerLightCurve, lightkurve.lightcurve.TessLightCurve, lightkurve.lightcurve.FoldedLightCurve" usemap="#inheritancec672026571" class="inheritance graphviz" /></div>
+<map id="inheritancec672026571" name="inheritancec672026571">
+<area shape="rect" id="node1" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" target="_top" title="Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`" alt="" coords="145,5,280,31"/>
+<area shape="rect" id="node2" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" target="_top" title="Generic light curve object to hold time series photometry for one target." alt="" coords="5,55,97,80"/>
+<area shape="rect" id="node3" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" target="_top" title="Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`" alt="" coords="146,55,279,80"/>
+<area shape="rect" id="node4" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" target="_top" title="Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`" alt="" coords="153,104,273,129"/>
 </map></div>
 </div>
 

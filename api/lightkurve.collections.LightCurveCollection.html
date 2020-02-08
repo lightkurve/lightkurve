@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -163,7 +163,7 @@ a new one will be created.</p>
 
 <dl class="method">
 <dt id="lightkurve.collections.LightCurveCollection.stitch">
-<code class="sig-name descname">stitch</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">corrector_func=&lt;function LightCurveCollection.&lt;lambda&gt; at 0x7ff946407268&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.collections.LightCurveCollection.stitch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stitch</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">corrector_func=&lt;function LightCurveCollection.&lt;lambda&gt; at 0x7ffb4641cc80&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.collections.LightCurveCollection.stitch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stitch all light curves in the collection into a single lk.LightCurve</p>
 <p>Any function passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">corrector_func</span></code> will be applied to each light curve
 before stitching. For example, passing “lambda x: x.normalize().flatten()”

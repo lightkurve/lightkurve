@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -364,7 +364,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_8_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_8_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_8_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_8_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_8_0.png" style="width: 519px; height: 401px;" /></a>
 </div>
 </div>
 <p>Looks good. We can sum up the pixels in this aperture, and create an uncorrected (“raw”) light curve.</p>
@@ -390,7 +390,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_11_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_11_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_11_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_11_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_11_0.png" style="width: 753px; height: 368px;" /></a>
 </div>
 </div>
 <p>The flux in the aperture appears to be dominated by scattered light. We can tell because TESS orbits Earth twice in each sector, thus patterns which appear twice within a Sector are typically related to TESS’ orbit (such as the scattered light effect).</p>
@@ -439,7 +439,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_16_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_16_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_16_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_16_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_16_0.png" style="width: 375px; height: 248px;" /></a>
 </div>
 </div>
 <p>In linear regression problems, it is commong to refer to the matrix of regressors as the <em>design matrix</em> (also known as <em>model matrix</em> or <em>regressor matrix</em>). Lightkurve provides a convenient <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> class which is designed to help you work with detrending vectors.</p>
@@ -520,7 +520,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_24_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_24_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_24_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_24_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_24_0.png" style="width: 372px; height: 248px;" /></a>
 </div>
 </div>
 <p>Note: the <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> object provides a convenient <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method to visualize the vectors:</p>
@@ -537,7 +537,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_26_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_26_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_26_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_26_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_26_0.png" style="width: 691px; height: 392px;" /></a>
 </div>
 </div>
 <p>We can now detrend the raw light curve against these vectors. <em>Lightkurve</em>’s <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> will use linear algebra to find the combination of vectors that makes the input light curve <strong>closest to zero</strong>. To do this, we need one more component; we need an “offset” term, to be able to fit the mean level of the light curve. We can do this by appending a “constant” to our design matrix.</p>
@@ -622,7 +622,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_36_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_36_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_36_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_36_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_36_0.png" style="width: 753px; height: 368px;" /></a>
 </div>
 </div>
 <p>As shown above, the scattered light from the background has been removed. If we want to see a more in depth look at the correction, we can use the <code class="docutils literal notranslate"><span class="pre">diagnose()</span></code> method to see what the <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> found as the best fitting solution.</p>
@@ -639,7 +639,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_38_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_38_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_38_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_38_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_38_0.png" style="width: 870px; height: 519px;" /></a>
 </div>
 </div>
 <p>Regression corrector has clipped out some outliers during the fit of the trend. You can read more about the outlier removal, how to pass a cadence mask, and error propagation in our <a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector">docs</a>.</p>
@@ -660,7 +660,7 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;lightkurve.lightcurve.LightCurve at 0x7f2a385e9a90&gt;
+<span></span>&lt;lightkurve.lightcurve.LightCurve at 0x127862eb8&gt;
 </pre></div>
 </div>
 </div>
@@ -678,7 +678,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_42_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_42_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_42_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_42_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_42_0.png" style="width: 750px; height: 368px;" /></a>
 </div>
 </div>
 <p>As you can see above, the <em>model</em> drop below zero flux. This is impossible; the scattered light can’t be <strong>removing</strong> flux from our target!</p>
@@ -706,7 +706,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_45_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_45_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_45_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_45_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_45_0.png" style="width: 750px; height: 368px;" /></a>
 </div>
 </div>
 <p>This looks better. Now we can simply remove this model from our raw light curve.</p>
@@ -733,7 +733,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_48_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_48_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_48_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_48_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_48_0.png" style="width: 753px; height: 368px;" /></a>
 </div>
 </div>
 <p>This looks great. As a final test, let’s investigate how the light curve we obtained using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> compares against a light curve obtained using a more simple median background removal method.</p>
@@ -757,7 +757,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_50_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_50_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_50_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_50_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_50_0.png" style="width: 753px; height: 368px;" /></a>
 </div>
 </div>
 <p>Lastly, lets show how you can do all of the above in a single cell.</p>
@@ -794,7 +794,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_53_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_53_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_53_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_53_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_53_0.png" style="width: 753px; height: 368px;" /></a>
 </div>
 </div>
 </div>
@@ -863,7 +863,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_59_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_59_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_59_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_59_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_59_0.png" style="width: 753px; height: 368px;" /></a>
 </div>
 </div>
 <p>As you can see the corrected light curve has removed long term trends, and some motion noise (e.g. see time around 1720 BTJD). We can use the same <code class="docutils literal notranslate"><span class="pre">diagnose()</span></code> method to understand the model that has been fit and subtracted by <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>.</p>
@@ -880,7 +880,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_61_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_61_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_61_0.png"><img alt="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_61_0.png" src="../_images/tutorials_04-how-to-remove-tess-scattered-light-using-regressioncorrector_61_0.png" style="width: 870px; height: 519px;" /></a>
 </div>
 </div>
 <p>To show the corrected version has improved, we can use the <em>CDPP</em> metric. As shown below, the corrected light curve has a lower <em>CDPP</em>, showing it is less noisy.</p>
@@ -916,7 +916,7 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>836.8812270953588
+<span></span>836.8828675392166
 </pre></div>
 </div>
 </div>

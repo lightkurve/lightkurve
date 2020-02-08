@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -297,7 +297,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <br style="clear:both;"><div class="section" id="How-to-remove-motion-noise-from-K2-data-using-the-SFFCorrector?">
 <h1>How to remove motion noise from K2 data using the <code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code>?<a class="headerlink" href="#How-to-remove-motion-noise-from-K2-data-using-the-SFFCorrector?" title="Permalink to this headline">¶</a></h1>
-<p>You can use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to remove the spacecraft motion noise from K2 data. Targets in K2 data move over multiple pixels during the exposure due to thruster firings. This can be corrected using the Self Flat Fielding method (SFF), which you can read more about <a class="reference external" href="04-replicate-vanderburg-2014-k2sff.html">here</a>.</p>
+<p>You can use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to remove the spacecraft motion noise from K2 data. Targets in K2 data move over multiple pixels during the exposure due to thruster firings. This can be corrected using the Self Flat Fielding method (SFF), which you can read more about <a class="reference external" href="https://docs.lightkurve.org/tutorials/04-replicate-vanderburg-2014-k2sff">here</a>.</p>
 <p>This tutorial demonstrates how you can apply the method on your light curves Using <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code>.</p>
 <p>Let’s start by downloading a K2 light curve of an exoplanet host star.</p>
 <div class="nbinput nblast docutils container">
@@ -330,7 +330,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-detrend_3_0.png" src="../_images/tutorials_04-how-to-detrend_3_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-detrend_3_0.png"><img alt="../_images/tutorials_04-how-to-detrend_3_0.png" src="../_images/tutorials_04-how-to-detrend_3_0.png" style="width: 764px; height: 372px;" /></a>
 </div>
 </div>
 <p>This light curve of the object <a class="reference external" href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname=K2-133+b&amp;type=CONFIRMED_PLANET">K2-133</a>, which is known to host an exoplanet with a period of 3.0712 days. The light curve shows a lot of motion noise on K2’s typical 6-hour motion timescale.</p>
@@ -348,7 +348,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-detrend_5_0.png" src="../_images/tutorials_04-how-to-detrend_5_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-detrend_5_0.png"><img alt="../_images/tutorials_04-how-to-detrend_5_0.png" src="../_images/tutorials_04-how-to-detrend_5_0.png" style="width: 755px; height: 372px;" /></a>
 </div>
 </div>
 <p>We can see the hint of an exoplanet transit close to the center, but the motion of the spacecraft has made it difficult to make out above the noise.</p>
@@ -395,7 +395,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-detrend_11_0.png" src="../_images/tutorials_04-how-to-detrend_11_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-detrend_11_0.png"><img alt="../_images/tutorials_04-how-to-detrend_11_0.png" src="../_images/tutorials_04-how-to-detrend_11_0.png" style="width: 755px; height: 372px;" /></a>
 </div>
 </div>
 <p>Voilà! Correcting motion systematics can vastly improve the signal-to-noise ratio in your lightcurve.</p>

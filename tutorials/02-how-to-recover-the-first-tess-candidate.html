@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -331,14 +331,13 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>SearchResult containing 1 data products.
+<div class="output_area rendered_html docutils container">
+SearchResult containing 1 data products.
 
-target_name                     productFilename                        description     distance
------------ ------------------------------------------------------- ------------------ --------
-  261136679 tess2018206045859-s0001-0000000261136679-0120-s_tp.fits Target pixel files      0.0
-</pre></div>
-</div>
+<table id="table5028396504">
+<thead><tr><th>#</th><th>observation</th><th>target_name</th><th>productFilename</th><th>distance</th></tr></thead>
+<tr><td>0</td><td>TESS Sector 1</td><td>261136679</td><td>tess2018206045859-s0001-0000000261136679-0120-s_tp.fits</td><td>0.0</td></tr>
+</table></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -491,7 +490,7 @@ target_name                     productFilename                        descripti
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x1c19e27240&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x1c1c3c7d30&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x1c1b54ef28&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x1c1b827be0&gt;]
+<span></span>[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x12bb70e80&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x12f57afd0&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x12ba8c208&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x12f9be1d0&gt;]
 </pre></div>
 </div>
 </div>
@@ -749,7 +748,7 @@ target_name                     productFilename                        descripti
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_28_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_28_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_28_0.png" style="width: 755px; height: 368px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_28_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_28_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_28_0.png" style="width: 785px; height: 370px;" /></a>
 </div>
 </div>
 <p>This looks pretty good, but maybe we can improve things by creating a new aperture.</p>
@@ -794,7 +793,7 @@ target_name                     productFilename                        descripti
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_32_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_32_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_32_0.png" style="width: 755px; height: 368px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_32_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_32_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_32_0.png" style="width: 785px; height: 368px;" /></a>
 </div>
 </div>
 <p>There’s a long term trend in this dataset, which we can remove with a simple smoothing filter. You can use the <code class="docutils literal notranslate"><span class="pre">lc.flatten()</span></code> method to apply and divide the <a class="reference external" href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky-Golay smoothing filter</a>. Here we’ll use a <code class="docutils literal notranslate"><span class="pre">window_length</span></code> of 1001 cadences, which is roughly a 5% of the full length of the light curve.</p>
@@ -830,7 +829,7 @@ target_name                     productFilename                        descripti
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png" style="width: 755px; height: 368px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png" style="width: 759px; height: 368px;" /></a>
 </div>
 </div>
 <p>The light curve looks much flatter. Unfortunately there is a portion of the light curve that is very noisy, due to a jitter in the TESS spacecraft. We can remove this simply by masking the light curve. First we’ll select the times that had the jitter.</p>
@@ -859,7 +858,7 @@ target_name                     productFilename                        descripti
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_39_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_39_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_39_0.png" style="width: 766px; height: 368px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_39_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_39_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_39_0.png" style="width: 769px; height: 368px;" /></a>
 </div>
 </div>
 <p>We can use <em>Lightkurve</em> to plot these two light curves over each other to see the difference.</p>
@@ -880,7 +879,7 @@ target_name                     productFilename                        descripti
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_41_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_41_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_41_0.png" style="width: 755px; height: 368px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_41_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_41_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_41_0.png" style="width: 759px; height: 368px;" /></a>
 </div>
 </div>
 <p>This looks much better. Now we might want to clip out some outliers from the light curve. We can do that with a simple lightkurve function <code class="docutils literal notranslate"><span class="pre">remove_outliers()</span></code></p>
@@ -898,7 +897,7 @@ target_name                     productFilename                        descripti
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_43_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_43_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_43_0.png" style="width: 776px; height: 368px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_43_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_43_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_43_0.png" style="width: 780px; height: 368px;" /></a>
 </div>
 </div>
 <p>It’s a little hard to see these data because of the plotting style. Let’s use a scatter plot instead. We can do this with the <code class="docutils literal notranslate"><span class="pre">lc.scatter()</span></code> method. This method works in the same way that <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code> works, and takes in the same keyword arguments.</p>
@@ -915,7 +914,7 @@ target_name                     productFilename                        descripti
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_45_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_45_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_45_0.png" style="width: 766px; height: 369px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_45_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_45_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_45_0.png" style="width: 769px; height: 369px;" /></a>
 </div>
 </div>
 <p>We can also add errorbars using the <code class="docutils literal notranslate"><span class="pre">lc.errorbar()</span></code> method.</p>
@@ -933,7 +932,7 @@ target_name                     productFilename                        descripti
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_47_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_47_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_47_0.png" style="width: 766px; height: 369px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_47_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_47_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_47_0.png" style="width: 769px; height: 369px;" /></a>
 </div>
 </div>
 <p>Finally let’s use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to fold the data at the exoplanet orbital period and see if we can see the transit.</p>
@@ -969,7 +968,7 @@ target_name                     productFilename                        descripti
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_51_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_51_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_51_0.png" style="width: 779px; height: 386px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_51_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_51_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_51_0.png" style="width: 780px; height: 386px;" /></a>
 </div>
 </div>
 <p>And now we can see the transit of Pi Men c!</p>
@@ -989,7 +988,7 @@ target_name                     productFilename                        descripti
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_53_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_53_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_53_0.png" style="width: 779px; height: 386px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_53_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_53_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_53_0.png" style="width: 780px; height: 386px;" /></a>
 </div>
 </div>
 </div>
@@ -1025,7 +1024,7 @@ target_name                     productFilename                        descripti
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_56_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_56_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_56_0.png" style="width: 790px; height: 386px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_56_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_56_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_56_0.png" style="width: 780px; height: 386px;" /></a>
 </div>
 </div>
 <p>The importance of using different aperture masks is clearly visible in the figure above. Note however that the data archive at MAST also contains lightcurve products which have more advanced systematics removal methods applied. We will explore those in a future tutorial!</p>

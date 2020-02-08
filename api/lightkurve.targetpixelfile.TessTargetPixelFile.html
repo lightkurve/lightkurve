@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -98,12 +98,28 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.targetpixelfile.TargetPixelFile</span></code></p>
 <p>Represents pixel data products created by NASA’s TESS pipeline.</p>
 <p>This class enables extraction of custom light curves and centroid positions.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
+<dd class="field-odd"><dl>
 <dt><strong>path</strong><span class="classifier">str</span></dt><dd><p>Path to a Kepler Target Pixel (FITS) File.</p>
 </dd>
-<dt><strong>quality_bitmask</strong><span class="classifier">str or int</span></dt><dd><p>Bitmask specifying quality flags of cadences that should be ignored.</p>
+<dt><strong>quality_bitmask</strong><span class="classifier">“none”, “default”, “hard”, “hardest”, or int</span></dt><dd><p>Bitmask that should be used to ignore bad-quality cadences.
+If a string is passed, it has the following meaning:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>“none”: no cadences will be ignored (<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=0</span></code>).</p></li>
+<li><p>“default”: cadences with severe quality issues will be ignored
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=175</span></code>).</p></li>
+<li><p>“hard”: more conservative choice of flags to ignore
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=7407</span></code>). This is known to remove good data.</p></li>
+<li><p>“hardest”: removes all data that has been flagged
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=8191</span></code>). This mask is not recommended.</p></li>
+</ul>
+</div></blockquote>
+<p>If an integer is passed, it will be used as a bitmask, i.e. it will
+have the effect of removing cadences where
+<code class="docutils literal notranslate"><span class="pre">(tpf.hdu[1].data['QUALITY']</span> <span class="pre">&amp;</span> <span class="pre">quality_bitmask)</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.
+See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
 </dd>
 <dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Keyword arguments passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open()</span></code>.</p>
 </dd>

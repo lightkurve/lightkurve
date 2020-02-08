@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.7</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -321,14 +321,13 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>SearchResult containing 1 data products.
+<div class="output_area rendered_html docutils container">
+SearchResult containing 1 data products.
 
-target_name productFilename         description         distance
------------ --------------- --------------------------- --------
-   HAT-P-11             n/a TESS FFI Cutout (sector 14)      0.0
-</pre></div>
-</div>
+<table id="table4887955328">
+<thead><tr><th>#</th><th>observation</th><th>target_name</th><th>productFilename</th><th>distance</th></tr></thead>
+<tr><td>0</td><td>TESS Sector 14</td><td>HAT-P-11</td><td>TESSCut</td><td>0.0</td></tr>
+</table></div>
 </div>
 <div class="line-block">
 <div class="line">TESS observed the Kepler prime field in Sector 14— let’s see if we can detect planet b.</div>
@@ -421,7 +420,7 @@ target_name productFilename         description         distance
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_13_0.png"><img alt="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_13_0.png" src="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_13_0.png" style="width: 755px; height: 371px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_13_0.png"><img alt="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_13_0.png" src="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_13_0.png" style="width: 764px; height: 368px;" /></a>
 </div>
 </div>
 <p>The lightcurve clearly shows a 3% signal arising from significant time-variable background in these 10 pixels. Background flux is uncorrected in these TESS FFI cutouts, so we will have to estimate it directly. We can make a clever threshold mask:</p>
@@ -551,7 +550,7 @@ background sources can be examined using <code class="docutils literal notransla
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_27_0.png"><img alt="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_27_0.png" src="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_27_0.png" style="width: 755px; height: 368px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_27_0.png"><img alt="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_27_0.png" src="../_images/tutorials_03-cutting-out-tpfs-from-tess-ffis_27_0.png" style="width: 764px; height: 368px;" /></a>
 </div>
 </div>
 <p>Woohoo! We see the transit signal of HAT-P-11 b! Let’s fold it on its known period 4.887802443 days (Huber et al. 2017).</p>
