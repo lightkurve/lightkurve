@@ -19,6 +19,12 @@ The procedure requires the following steps:
 
 4. Verify that the docs and all tutorial notebooks can be compiled without failure (see *Building documentation* above), and upload them to the webserver.
 
+.. code-block:: bash
+
+    $ cd docs
+    $ make html
+    $ make upload
+
 5. Edit the CHANGES.rst file by changing the date for the version you are about to release from “unreleased” to today’s date. Also be sure to make sure the change log is complete and accurate. Then add and commit those changes with:
 
 .. code-block:: bash
