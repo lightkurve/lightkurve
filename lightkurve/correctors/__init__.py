@@ -17,4 +17,5 @@ from .designmatrix import *
 from .pldcorrector import *
 from .sffcorrector import *
 from .cbvcorrector import *
+from .pixelcorrector import *
 from .regressioncorrector import *
