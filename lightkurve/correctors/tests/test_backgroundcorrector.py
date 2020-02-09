@@ -12,4 +12,4 @@ TESS_TPF = get_pkg_data_filename("../../tests/data/tess25155310-s01-first-cadenc
 def test_basics():
     tpf = lkopen(TESS_TPF)
     corrector = BackgroundCorrector(tpf)
-    corrector.correct(n_knots=3)
+    corrector.correct(spline_n_knots=3)

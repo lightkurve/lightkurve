@@ -13,6 +13,7 @@ from astropy.modeling import models, fitting
 
 from . import DesignMatrix, DesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
+from .designmatrix import create_spline_matrix
 
 from .. import MPLSTYLE
 from ..utils import LightkurveWarning
@@ -169,7 +170,7 @@ class SFFCorrector(RegressionCorrector):
 
         # long term
         n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
-        s_dm = _get_spline_dm(self.lc.time, n_knots=n_knots, include_intercept=True)
+        s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots, include_intercept=True)
 
         means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
         s_dm.prior_mu = np.asarray(means)
@@ -256,37 +257,6 @@ class SFFCorrector(RegressionCorrector):
 ######################
 #  Helper functions  #
 ######################
-
-def _get_spline_dm(x, n_knots=20, degree=3, name='spline',
-                   include_intercept=False):
-    """Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.
-
-    Parameters
-    ----------
-    x : np.ndarray
-        vector to spline
-    n_knots: int
-        Number of knots (default: 20).
-    degree: int
-        Polynomial degree
-    name: string
-        Name to pass to `.DesignMatrix` (default: 'spline').
-    include_intercept: bool
-        Whether to include row of ones to find intercept. Default False.
-
-    Returns
-    -------
-    dm: `.DesignMatrix`
-        Design matrix object with shape (len(x), n_knots*degree).
-    """
-    from patsy import dmatrix  # local import because it's rarely-used
-    dm_formula = "bs(x, df={}, degree={}, include_intercept={}) - 1" \
-                 "".format(n_knots, degree, include_intercept)
-    spline_dm = np.asarray(dmatrix(dm_formula, {"x": x}))
-    df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
-                                          for idx in range(n_knots)])
-    return DesignMatrix(df, name=name)
-
 
 def _get_centroid_dm(col, row, name='centroids'):
     """Returns a `.DesignMatrix` containing (col, row) centroid positions
