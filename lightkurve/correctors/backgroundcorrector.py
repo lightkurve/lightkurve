@@ -1,3 +1,14 @@
+"""Defines a BackgroundCorrector class which provides a simple way to correct a
+light curve by utilizing the pixel time series data contained within the
+target's own Target Pixel File. Specifically, this corrector is intended to be
+used on TESS target pixel files provided by TESSCut.
+
+PixelCorrector builds upon RegressionCorrector by correlating the light curve
+against a design matrix composed of the following elements:
+* A background light curve to capture the dominant scattered light systematics.
+* Background-corrected pixel time series to capture any residual systematics.
+* Splines to capture the target's intrinsic variability.
+"""
 import numpy as np
 
 from . import DesignMatrix, DesignMatrixCollection
@@ -5,15 +16,22 @@ from .regressioncorrector import RegressionCorrector
 from .sffcorrector import _get_spline_dm
 
 
-__all__ = ['PixelCorrector']
+__all__ = ['BackgroundCorrector']
 
 
-class PixelCorrector(RegressionCorrector):
-    """Special case of `.RegressionCorrector` where the `.DesignMatrix` is
+class BackgroundCorrector(RegressionCorrector):
+    """Correct a light curve using local pixel time series.
+    
+    Special case of `.RegressionCorrector` where the `.DesignMatrix` is
     composed of background-corrected pixel time series.
 
     The design matrix also contains columns representing a spline in time
     design to capture the intrinsic, long-term variability of the target.
+
+    Examples
+    --------
+    >>> corrector = BackgroundCorrector(tpf)  # doctest: +SKIP
+    >>> lc = corrector.correct()  # doctest: +SKIP
 
     Parameters
     ----------
@@ -24,7 +42,7 @@ class PixelCorrector(RegressionCorrector):
         if aperture_mask is None:
             aperture_mask = tpf.create_threshold_mask(2)
         if background_mask is None:
-            # Default to pixels not 1-sigma above the background
+            # Default to pixels <1-sigma above the background
             background_mask = ~tpf.create_threshold_mask(1, reference_pixel=None)
 
         lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
@@ -32,12 +50,13 @@ class PixelCorrector(RegressionCorrector):
         self.tpf = tpf
         self.aperture_mask = aperture_mask
         self.background_mask = background_mask
-        super(PixelCorrector, self).__init__(lc=lc)
+        super(BackgroundCorrector, self).__init__(lc=lc)
 
     def __repr__(self):
-        return 'PixelCorrector (LC: {})'.format(self.lc.label)
+        return 'BackgroundCorrector (LC: {})'.format(self.lc.label)
 
-    def correct(self, restore_trend=True, **kwargs):
+    def correct(self, restore_trend=True, pixel_components=3, n_knots=100,
+                degree=3, **kwargs):
         """Find the best fit correction for the light curve.
         """
         # Estimate the median background over time
@@ -48,15 +67,16 @@ class PixelCorrector(RegressionCorrector):
         simple_bkg -= np.percentile(simple_bkg, 5)
 
         # Background-corrected pixel time series
-        pixels = (self.tpf.flux.transpose([1, 2, 0]) - simple_bkg).transpose([2, 0, 1])[:, self.background_mask]
+        pixels = (self.tpf.flux.transpose([1, 2, 0]) - simple_bkg
+                    ).transpose([2, 0, 1])[:, self.background_mask]
 
-        dm_pixels = DesignMatrix(pixels, name='pixel_series').pca(3)
+        dm_pixels = DesignMatrix(pixels, name='pixel_series').pca(pixel_components)
         dm_bkg = DesignMatrix(simple_bkg, name='background_model')
-        dm_spline = _get_spline_dm(self.lc.time, 100).append_constant()
+        dm_spline = _get_spline_dm(self.lc.time, n_knots=n_knots, degree=degree).append_constant()
 
         dm = DesignMatrixCollection([dm_pixels, dm_bkg, dm_spline])
 
-        clc = super(PixelCorrector, self).correct(dm, **kwargs)
+        clc = super(BackgroundCorrector, self).correct(dm, **kwargs)
 
         if restore_trend:
             clc += self.diagnostic_lightcurves['spline']
