@@ -9,11 +9,13 @@ against a design matrix composed of the following elements:
 * Background-corrected pixel time series to capture any residual systematics.
 * Splines to capture the target's intrinsic variability.
 """
+import matplotlib.pyplot as plt
 import numpy as np
 
 from . import DesignMatrix, DesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
 from .designmatrix import create_spline_matrix
+from .. import MPLSTYLE
 
 
 __all__ = ['BackgroundCorrector']
@@ -90,6 +92,7 @@ class BackgroundCorrector(RegressionCorrector):
         if background_mask is None:
             # Default to pixels <1-sigma above the background
             background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
+        self.background_mask = background_mask
 
         dm = self._create_design_matrix(background_mask=background_mask,
                                         pixel_components=pixel_components,
@@ -99,3 +102,38 @@ class BackgroundCorrector(RegressionCorrector):
         if restore_trend:
             clc += self.diagnostic_lightcurves['spline']
         return clc
+
+    def diagnose(self):
+        """Returns diagnostic plots to assess the most recent call to `correct()`.
+
+        If `correct()` has not yet been called, a ``ValueError`` will be raised.
+
+        Returns
+        -------
+        `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+        if not hasattr(self, 'corrected_lc'):
+            raise ValueError('Please call the `correct()` method before trying to diagnose.')
+
+        with plt.style.context(MPLSTYLE):
+            _, axs = plt.subplots(3, figsize=(10, 9), sharex=True)
+            ax = axs[0]
+            self.lc.plot(ax=ax, normalize=False, label='original', alpha=0.4)
+            for key in ['background_model']:
+                (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
+            ax.set_xlabel('')
+
+            ax = axs[1]
+            self.corrected_lc.plot(ax=ax, normalize=False, label='corrected', alpha=0.4)
+            for key in ['pixel_series', 'spline']:
+                (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
+            ax.set_xlabel('')
+
+            ax = axs[2]
+            self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
+            self.corrected_lc[~self.cadence_mask].scatter(
+                                            normalize=False, c='r', marker='x',
+                                            s=10, label='Outliers', ax=ax)
+            self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
+        return axs
