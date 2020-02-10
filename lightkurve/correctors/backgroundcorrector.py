@@ -23,7 +23,7 @@ __all__ = ['BackgroundCorrector']
 
 class BackgroundCorrector(RegressionCorrector):
     """Correct a light curve using local pixel time series.
-    
+
     Special case of `.RegressionCorrector` where the `.DesignMatrix` is
     composed of background-corrected pixel time series.
 
