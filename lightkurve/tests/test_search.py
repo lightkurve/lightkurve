@@ -86,7 +86,7 @@ def test_search_lightcurvefile(caplog):
 
 
 @pytest.mark.remote_data
-def test_search_tesscut():
+def test_search_tesscut(caplog):
     # Cutout by target name
     assert(len(search_tesscut("pi Mensae", sector=1).table) == 1)
     assert(len(search_tesscut("pi Mensae").table) > 1)
@@ -102,6 +102,9 @@ def test_search_tesscut():
     # The coordinates below are beyond the edge of the sector 4 (camera 1-4) FFI
     search_edge = search_tesscut('30.578761, 6.210593', sector=4)
     assert(len(search_edge.table) == 0)
+    tpf_download = search_coords.download(cutout_size=1)
+    tpf_cached = search_coords.download(cutout_size=1)
+    assert "Cached file found." in caplog.text
 
 
 @pytest.mark.remote_data
