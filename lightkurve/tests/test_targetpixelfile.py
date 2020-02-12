@@ -555,3 +555,16 @@ def test_aperture_photometry_nan():
     assert ~np.isnan(lc.flux_err[1])
     assert np.isnan(lc.flux[2])
     assert np.isnan(lc.flux_err[2])
+
+
+def test_to_gif():
+    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+                TessTargetPixelFile(filename_tess)]:
+        # `delete=False` is necessary to enable writing to the file on Windows
+        # but it means we have to clean up the tmp file ourselves
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".gif")
+        try:
+            tpf.to_gif(tmp.name, frames=[1, 2, 3], vmin=20)
+        finally:
+            tmp.close()
+            os.remove(tmp.name)

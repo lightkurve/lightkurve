@@ -14,6 +14,7 @@ from astropy.wcs import WCS
 from astropy.utils.exceptions import AstropyWarning
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
+from astropy.visualization import PercentileInterval
 
 from matplotlib import patches
 import matplotlib.pyplot as plt
@@ -647,6 +648,9 @@ class TargetPixelFile(object):
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
         with plt.style.context(style):
+            # Our default style uses figsize=(8.485, 4), which is too wide!
+            if style == MPLSTYLE:
+                plt.rcParams['figure.figsize'] = (6, 4)
             if title is None:
                 title = 'Target ID: {}, Cadence: {}'.format(self.targetid, self.cadenceno[frame])
             img_extent = (self.column, self.column + self.shape[2],
@@ -663,6 +667,40 @@ class TargetPixelFile(object):
                                                        1, 1, color=mask_color, fill=True,
                                                        alpha=.6))
         return ax
+
+    def to_gif(self, output_fn="tpf.gif", frames=None, duration=100, **kwargs):
+        """Exports the pixel file to an animated gif.
+        
+        Parameters
+        ----------
+        output_fn : str
+            Filename of the gif file.  Must have suffix ".gif".
+        frames : list of int
+            Frames to include. Default: range(10).
+        duration : int
+            Milliseconds between frames.
+        **kwargs : dict
+            Extra plotting options to be passed to the object's `plot` method.
+        """
+        import gif  # Local import because it is rarely used
+        # Set the default frames to show
+        if frames is None:
+            if len(self.time) > 10:
+                frames = list(range(10))
+            else:
+                frames = list(range(len(self.time)))
+        # Set vmin/vmax defaults to be used across all frames
+        vmin_tmp, vmax_tmp = PercentileInterval(95.).get_limits(self.flux[frames])
+        vmin = kwargs.pop("vmin", vmin_tmp)
+        vmax = kwargs.pop("vmax", vmax_tmp)
+        # Export the gif
+        @gif.frame
+        def tpfplot(frame=1):
+            self.plot(frame=frame, vmin=vmin, vmax=vmax, **kwargs)
+        gif.save([tpfplot(idx) for idx in frames],
+                 output_fn,
+                 duration=duration)
+        log.info("Saved {}".format(output_fn))
 
     def to_fits(self, output_fn=None, overwrite=False):
         """Writes the TPF to a FITS file on disk."""
