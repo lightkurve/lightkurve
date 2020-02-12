@@ -365,7 +365,6 @@ class SearchResult(object):
         # this is necessary to ensure cutouts are not downloaded multiple times
         sec = TesscutClass().get_sectors(coords)
         sector_name = sec[sec['sector'] == 1]['sectorName'][0]
-        coords_str = str(round(coords.ra.value,5)) + '_' + str(round(coords.dec.value,5))
         if isinstance(cutout_size, int):
             size_str = str(int(cutout_size)) + 'x' + str(int(cutout_size))
         elif isinstance(cutout_size, tuple) or isinstance(cutout_size, list):
