@@ -370,12 +370,14 @@ class SearchResult(object):
         elif isinstance(cutout_size, tuple) or isinstance(cutout_size, list):
             size_str = str(int(cutout_size[0])) + 'x' + str(int(cutout_size[1]))
 
+        # search cache for file with matching ra, dec, and cutout size
+        # ra and dec are searched within 0.001 degrees of input target
+        ra_string = str(coords.ra.value)
+        dec_string = str(coords.dec.value)
         matchstring = r"{}_{}*_{}*_{}_astrocut.fits".format(sector_name,
-                                                            str(coords.ra.value)[:-1],
-                                                            str(coords.dec.value)[:-1],
+                                                            ra_string[:ra_string.find('.')+4],
+                                                            dec_string[:dec_string.find('.')+4],
                                                             size_str)
-
-        # check for matching files
         cached_files = glob.glob(os.path.join(tesscut_dir, matchstring))
 
         # if any files exist, return the path to them instead of downloading
