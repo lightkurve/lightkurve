@@ -380,7 +380,6 @@ class SearchResult(object):
 
         # if any files exist, return the path to them instead of downloading
         if len(cached_files) > 0:
-            print('zoom')
             path = cached_files[0]
             log.debug("Cached file found.")
         # otherwise the file will be downloaded
