@@ -127,7 +127,6 @@ class SearchResult(object):
         """Returns an array of dec values for targets in search"""
         return self.table['s_dec'].data.data
 
-<<<<<<< HEAD
     def _download_one(self, table, quality_bitmask, download_dir, cutout_size):
         """Private method used by `download()` and `download_all()` to download
         exactly one file from the MAST archive.
@@ -180,9 +179,6 @@ class SearchResult(object):
             return _open_downloaded_file(path, quality_bitmask=quality_bitmask)
 
     @suppress_stdout
-=======
-    # @suppress_stdout
->>>>>>> support caching tesscut downloads
     def download(self, quality_bitmask='default', download_dir=None, cutout_size=None):
         """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
 
@@ -363,29 +359,27 @@ class SearchResult(object):
                 tesscut_dir = download_dir
 
         # Resolve SkyCoord of given target
-<<<<<<< HEAD
         coords = _resolve_object(target)
         cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
                                                       sector=sector, path=tesscut_dir)
-=======
-        coords = MastClass()._resolve_object(target)
->>>>>>> support caching tesscut downloads
 
         # build path string name and check if it exists
         # this is necessary to ensure cutouts are not downloaded multiple times
         sec = TesscutClass().get_sectors(coords)
         sector_name = sec[sec['sector'] == 1]['sectorName'][0]
-        coords_str = str(round(coords.ra.value,13)) + '_' + str(round(coords.dec.value,13))
+        coords_str = str(round(coords.ra.value,5)) + '_' + str(round(coords.dec.value,5))
         if isinstance(cutout_size, int):
             size_str = str(int(cutout_size)) + 'x' + str(int(cutout_size))
         elif isinstance(cutout_size, tuple) or isinstance(cutout_size, list):
             size_str = str(int(cutout_size[0])) + 'x' + str(int(cutout_size[1]))
 
-        fname = sector_name + '_' + coords_str + '_' + size_str + '_astrocut.fits'
-        temp_path = os.path.join(download_dir, 'tesscut', fname)
+        temp_path = os.path.join(download_dir, (sector_name + '_' + coords_str
+                                 + '_' + size_str + '_astrocut.fits'))
 
-        if os.path.exists(temp_path):
+        print(temp_path)
+        if os.path.isfile(temp_path):
             path = temp_path
+            print('quick download')
         else:
             cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
                                                           sector=sector, path=tesscut_dir)
