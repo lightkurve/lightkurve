@@ -4,6 +4,7 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy.signal import find_peaks
 
 from astropy import units as u
 from astropy.units import cds
@@ -12,8 +13,19 @@ from .. import MPLSTYLE
 from . import utils, stellar_estimators
 from ..periodogram import SNRPeriodogram
 from ..utils import LightkurveWarning, validate_method
+from .utils import  SeismologyQuantity
 
-from scipy.signal import find_peaks
+# Import the optional Bokeh dependency required by ``interact_echelle```,
+# or print a friendly error otherwise.
+try:
+    import bokeh  # Import bokeh first so we get an ImportError we can catch
+    from bokeh.io import show, output_notebook
+    from bokeh.plotting import figure
+    from bokeh.models import LogColorMapper, Slider, RangeSlider, Button
+    from bokeh.layouts import layout, Spacer
+except:
+    # Nice error will be raised when ``interact_echelle``` is called.
+    pass
 
 log = logging.getLogger(__name__)
 
@@ -98,18 +110,11 @@ class Seismology(object):
         return deltanu
 
 
-    def plot_echelle(self, deltanu=None, numax=None,
-                     minimum_frequency=None, maximum_frequency=None,
-                     smooth_filter_width=.1, ax=None,
-                     scale='linear', cmap='Blues'):
-        """Plots an echelle diagram of the periodogram by stacking the
-        periodogram in slices of deltanu.
-
-        Modes of equal radial degree should appear approximately vertically aligned.
-        If no structure is present, you are likely dealing with a faulty deltanu
-        value or a low signal to noise case.
-
-        This method is adapted from work by Daniel Hey & Guy Davies.
+    def _clean_echelle(self, deltanu=None, numax=None,
+                         minimum_frequency=None, maximum_frequency=None,
+                         smooth_filter_width=.1, scale='linear'):
+        """Takes input seismology object and creates the necessary arrays for an echelle
+        diagram. Validates all the inputs.
 
         Parameters
         ----------
@@ -140,19 +145,23 @@ class Seismology(object):
             a new one will be created.
         scale: str
             Set z axis to be "linear" or "log". Default is linear.
-        cmap : str
-            The name of the matplotlib colourmap to use in the echelle diagram.
 
         Returns
         -------
-        ax : `~matplotlib.axes.Axes`
-            The matplotlib axes object.
+        ep : np.ndarray
+            Echelle diagram power
+        x_f : np.ndarray
+            frequencies for X axis
+        y_f : np.ndarray
+            frequencies for Y axis
         """
-        numax = self._validate_numax(numax)
-        if not hasattr(numax, 'unit'):
-            numax = numax * self.periodogram.frequency.unit
+        if (minimum_frequency is None) & (maximum_frequency is None):
+            numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
-        if not hasattr(deltanu, 'unit'):
+
+        if (not hasattr(numax, 'unit')) & (numax is not None):
+            numax = numax * self.periodogram.frequency.unit
+        if (not hasattr(deltanu, 'unit')) & (deltanu is not None):
             deltanu = deltanu * self.periodogram.frequency.unit
 
         if smooth_filter_width:
@@ -193,13 +202,13 @@ class Seismology(object):
         if minimum_frequency is not None:
             fmin =  u.Quantity(minimum_frequency, freq.unit).value
             if fmin > freq[-1].value:
-                raise ValueError("You can't pass in a limit outside the"
+                raise ValueError("You can't pass in a limit outside the "
                                  "frequency range of the periodogram.")
 
         if maximum_frequency is not None:
             fmax = u.Quantity(maximum_frequency, freq.unit).value
             if fmax > freq[-1].value:
-                raise ValueError("You can't pass in a limit outside the"
+                raise ValueError("You can't pass in a limit outside the "
                                  "frequency range of the periodogram.")
 
         # Make sure fmin and fmax are Quantities or code below will break
@@ -246,15 +255,76 @@ class Seismology(object):
         if scale=='log':
             ep = np.log10(ep)
 
-        #Reshape the freq into n_rowss of n_columnss & create arays
+        # Reshape the freq into n_rowss of n_columnss & create arays
         ef = np.reshape(ff[start : end], (n_rows, n_columns))
         x_f = ((ef[0,:]-ef[0,0]) % deltanu)
         y_f = (ef[:,0])
+        return ep, x_f, y_f
 
-        #Plot the echelle diagram
+    def plot_echelle(self, deltanu=None, numax=None, minimum_frequency=None,
+                     maximum_frequency=None, smooth_filter_width=.1,
+                     scale='linear', ax=None, cmap='Blues'):
+        """Plots an echelle diagram of the periodogram by stacking the
+        periodogram in slices of deltanu.
+
+        Modes of equal radial degree should appear approximately vertically aligned.
+        If no structure is present, you are likely dealing with a faulty deltanu
+        value or a low signal to noise case.
+
+        This method is adapted from work by Daniel Hey & Guy Davies.
+
+        Parameters
+        ----------
+        deltanu : float
+            Value for the large frequency separation of the seismic mode
+            frequencies in the periodogram. Assumed to have the same units as
+            the frequencies, unless given an Astropy unit.
+            Is assumed to be in the same units as frequency if not given a unit.
+        numax : float
+            Value for the frequency of maximum oscillation. If a numax is
+            passed, a suitable range one FWHM of the mode envelope either side
+            of the will be shown. This is overwritten by custom frequency ranges.
+            Is assumed to be in the same units as frequency if not given a unit.
+        minimum_frequency : float
+            The minimum frequency at which to display the echelle
+            Is assumed to be in the same units as frequency if not given a unit.
+        maximum_frequency : float
+            The maximum frequency at which to display the echelle.
+            Is assumed to be in the same units as frequency if not given a unit.
+        smooth_filter_width : float
+            If given a value, will smooth periodogram used to plot the echelle
+            diagram using the periodogram.smooth(method='boxkernel') method with
+            a filter width of `smooth_filter_width`. This helps visualise the
+            echelle diagram. Is assumed to be in the same units as the
+            periodogram frequency.
+        scale: str
+            Set z axis to be "linear" or "log". Default is linear.
+        cmap : str
+            The name of the matplotlib colourmap to use in the echelle diagram.
+
+        Returns
+        -------
+        ax : `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+        if (minimum_frequency is None) & (maximum_frequency is None):
+            numax = self._validate_numax(numax)
+        deltanu = self._validate_deltanu(deltanu)
+
+        if (not hasattr(numax, 'unit')) & (numax is not None):
+            numax = numax * self.periodogram.frequency.unit
+        if (not hasattr(deltanu, 'unit')) & (deltanu is not None):
+            deltanu = deltanu * self.periodogram.frequency.unit
+
+        ep, x_f, y_f = self._clean_echelle(numax=numax, deltanu=deltanu,
+                                           minimum_frequency=minimum_frequency,
+                                           maximum_frequency=maximum_frequency,
+                                           smooth_filter_width=smooth_filter_width)
+
+        # Plot the echelle diagram
         with plt.style.context(MPLSTYLE):
             if ax is None:
-                fig, ax = plt.subplots()
+                _, ax = plt.subplots()
             extent = (x_f[0].value, x_f[-1].value, y_f[0].value, y_f[-1].value)
             figsize = plt.rcParams['figure.figsize']
             a = figsize[1] / figsize[0]
@@ -263,10 +333,9 @@ class Seismology(object):
             vmax = np.nanpercentile(ep.value, 99)
 
             im = ax.imshow(ep.value, cmap=cmap, aspect=a/b, origin='lower',
-                        extent=extent, vmin=vmin, vmax=vmax)
+                           extent=extent, vmin=vmin, vmax=vmax)
 
             cbar = plt.colorbar(im, ax=ax, extend='both', pad=.01)
-
 
             if isinstance(self.periodogram, SNRPeriodogram):
                 ylabel = 'Signal to Noise Ratio (SNR)'
@@ -280,11 +349,175 @@ class Seismology(object):
 
             cbar.set_label(ylabel)
             ax.set_xlabel(r'Frequency mod. {:.2f}'.format(deltanu))
-            ax.set_ylabel(r'Frequency [{}]'.format(freq.unit.to_string('latex')))
+            ax.set_ylabel(r'Frequency [{}]'.format(self.periodogram.frequency.unit.to_string('latex')))
             ax.set_title('Echelle diagram for {}'.format(self.periodogram.label))
 
         return ax
 
+    def _make_echelle_elements(self, deltanu, cmap='viridis',
+        minimum_frequency=None, maximum_frequency=None, smooth_filter_width=.1,
+        scale='linear', plot_width=490, plot_height=340, title='Echelle'):
+        """Helper function to make the elements of the echelle diagram for bokeh plotting.
+        """
+        if not hasattr(deltanu, 'unit'):
+            deltanu = deltanu * self.periodogram.frequency.unit
+
+        if smooth_filter_width:
+            pgsmooth = self.periodogram.smooth(filter_width=smooth_filter_width)
+            freq = pgsmooth.frequency  # Makes code below more readable below
+        else:
+            freq = self.periodogram.frequency  # Makes code below more readable
+
+        ep, x_f, y_f = self._clean_echelle(deltanu=deltanu,
+                                           minimum_frequency=minimum_frequency,
+                                           maximum_frequency=maximum_frequency,
+                                           smooth_filter_width=smooth_filter_width,
+                                           scale=scale)
+
+        fig = figure(plot_width=plot_width, plot_height=plot_height,
+                     x_range=(0, 1), y_range=(y_f[0].value, y_f[-1].value),
+                     title=title, tools='pan,box_zoom,reset',
+                     toolbar_location="above",
+                     border_fill_color="white")
+
+        fig.yaxis.axis_label = r'Frequency [{}]'.format(freq.unit.to_string())
+        fig.xaxis.axis_label = r'Frequency / {:.3f} Mod. 1'.format(deltanu)
+
+        lo, hi = np.nanpercentile(ep.value, [0.1, 99.9])
+        vlo, vhi = 0.3 * lo, 1.7 * hi
+        vstep = (lo - hi)/500
+        color_mapper = LogColorMapper(palette="RdYlGn10", low=lo, high=hi)
+
+        fig.image(image=[ep.value], x=0, y=y_f[0].value,
+                  dw=1, dh=y_f[-1].value,
+                  color_mapper=color_mapper, name='img')
+
+        stretch_slider = RangeSlider(start=vlo,
+                                     end=vhi,
+                                     step=vstep,
+                                     title='',
+                                     value=(lo, hi),
+                                     orientation='vertical',
+                                     width=10,
+                                     height=230,
+                                     direction='rtl',
+                                     show_value=False,
+                                     sizing_mode='fixed',
+                                     name='stretch')
+
+        def stretch_change_callback(attr, old, new):
+            """TPF stretch slider callback."""
+            fig.select('img')[0].glyph.color_mapper.high = new[1]
+            fig.select('img')[0].glyph.color_mapper.low = new[0]
+
+        stretch_slider.on_change('value', stretch_change_callback)
+        return fig, stretch_slider
+
+
+    def interact_echelle(self, notebook_url="localhost:8888", **kwargs):
+        """Display an interactive Jupyter notebook widget showing an Echelle diagram.
+
+        This feature only works inside an active Jupyter Notebook, and
+        requires an optional dependency, ``bokeh`` (v1.0 or later).
+        This dependency can be installed using e.g. `conda install bokeh`.
+
+        Parameters
+        ----------
+        notebook_url : str
+            Location of the Jupyter notebook page (default: "localhost:8888")
+            When showing Bokeh applications, the Bokeh server must be
+            explicitly configured to allow connections originating from
+            different URLs. This parameter defaults to the standard notebook
+            host and port. If you are running on a different location, you
+            will need to supply this value for the application to display
+            properly. If no protocol is supplied in the URL, e.g. if it is
+            of the form "localhost:8888", then "http" will be used.
+        """
+        try:
+            import bokeh
+            if bokeh.__version__[0] == '0':
+                warnings.warn("interact() requires Bokeh version 1.0 or later", LightkurveWarning)
+        except ImportError:
+            log.error("The interact() tool requires the `bokeh` Python package; "
+                      "you can install bokeh using e.g. `conda install bokeh`.")
+            return None
+
+        maximum_frequency = kwargs.pop('maximum_frequency', self.periodogram.frequency.max().value)
+        minimum_frequency = kwargs.pop('minimum_frequency', self.periodogram.frequency. min().value)
+
+        if not hasattr(self, 'deltanu'):
+            dnu = SeismologyQuantity(quantity=self.periodogram.frequency.max()/30,
+                                     name='deltanu', method='echelle')
+        else:
+            dnu = self.deltanu
+
+        def create_interact_ui(doc):
+            fig_tpf, stretch_slider = self._make_echelle_elements(dnu,
+                                              maximum_frequency=maximum_frequency,
+                                              minimum_frequency=minimum_frequency,
+                                              **kwargs)
+            maxdnu = self.periodogram.frequency.max().value/5
+            # Interactive slider widgets
+            dnu_slider = Slider(start=0.01,
+                                end=maxdnu,
+                                value=dnu.value,
+                                step=0.01,
+                                title="Delta Nu",
+                                width=290)
+            r_button = Button(label=">", button_type="default", width=30)
+            l_button = Button(label="<", button_type="default", width=30)
+            rr_button = Button(label=">>", button_type="default", width=30)
+            ll_button = Button(label="<<", button_type="default", width=30)
+
+            def update(attr, old, new):
+                """Callback to take action when dnu slider changes"""
+                dnu = SeismologyQuantity(quantity=dnu_slider.value*u.microhertz,
+                                         name='deltanu', method='echelle')
+                ep, _, _ = self._clean_echelle(deltanu=dnu,
+                                               minimum_frequency=minimum_frequency,
+                                               maximum_frequency=maximum_frequency,
+                                               **kwargs)
+                fig_tpf.select('img')[0].data_source.data['image'] = [ep.value]
+                fig_tpf.xaxis.axis_label = r'Frequency / {:.3f} Mod. 1'.format(dnu)
+
+            def go_right_by_one_small():
+                """Step forward in time by a single cadence"""
+                existing_value = dnu_slider.value
+                if existing_value < maxdnu:
+                    dnu_slider.value = existing_value + 0.002
+
+            def go_left_by_one_small():
+                """Step back in time by a single cadence"""
+                existing_value = dnu_slider.value
+                if existing_value > 0:
+                    dnu_slider.value = existing_value - 0.002
+
+            def go_right_by_one():
+                """Step forward in time by a single cadence"""
+                existing_value = dnu_slider.value
+                if existing_value < maxdnu:
+                    dnu_slider.value = existing_value + 0.01
+
+            def go_left_by_one():
+                """Step back in time by a single cadence"""
+                existing_value = dnu_slider.value
+                if existing_value > 0:
+                    dnu_slider.value = existing_value - 0.01
+
+            dnu_slider.on_change('value', update)
+            r_button.on_click(go_right_by_one_small)
+            l_button.on_click(go_left_by_one_small)
+            rr_button.on_click(go_right_by_one)
+            ll_button.on_click(go_left_by_one)
+
+            widgets_and_figures = layout([fig_tpf, [Spacer(height=20), stretch_slider]],
+                                         [ll_button, Spacer(width=30), l_button,
+                                          Spacer(width=25), dnu_slider, Spacer(width=30),
+                                          r_button, Spacer(width=23), rr_button])
+            doc.add_root(widgets_and_figures)
+
+        output_notebook(verbose=False, hide_banner=True)
+        return show(create_interact_ui, notebook_url=notebook_url)
 
     def estimate_numax(self, method="acf2d", **kwargs):
         """Returns the frequency of the peak of the seismic oscillation modes envelope.

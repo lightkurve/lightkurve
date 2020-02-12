@@ -1,9 +1,13 @@
 """Tests the `lightkurve.correctors.SFFCorrector` class."""
 import pytest
+import warnings
+
 import numpy as np
 from astropy.utils.data import get_pkg_data_filename
 from numpy.testing import assert_array_equal
-from ... import LightCurve, KeplerLightCurveFile, KeplerLightCurve
+
+from ... import LightCurve, KeplerLightCurveFile, KeplerLightCurve, \
+                TessLightCurve, LightkurveWarning
 from .. import SFFCorrector
 
 
@@ -156,13 +160,23 @@ def test_sff_priors():
 def test_sff_breakindex():
     """Regression test for #616."""
     lc = LightCurve(flux=np.ones(20))
-    corr = SFFCorrector(lc)
-    corr.correct(breakindex=[5, 10],
-                 centroid_col=np.random.randn(20),
-                 centroid_row=np.random.randn(20))
-    assert 5 in corr.window_points
-    assert 10 in corr.window_points
-    corr.correct(breakindex=[5, 10],
-                 centroid_col=np.random.randn(20),
-                 centroid_row=np.random.randn(20), windows=1)
-    assert_array_equal(corr.window_points, np.asarray([5, 10]))
+    with warnings.catch_warnings():
+        # Ignore "LightkurveWarning: The design matrix has low rank".
+        warnings.simplefilter("ignore", LightkurveWarning)
+        corr = SFFCorrector(lc)
+        corr.correct(breakindex=[5, 10],
+                    centroid_col=np.random.randn(20),
+                    centroid_row=np.random.randn(20))
+        assert 5 in corr.window_points
+        assert 10 in corr.window_points
+        corr.correct(breakindex=[5, 10],
+                    centroid_col=np.random.randn(20),
+                    centroid_row=np.random.randn(20), windows=1)
+        assert_array_equal(corr.window_points, np.asarray([5, 10]))
+
+
+def test_sff_tess_warning():
+    """SFF is not designed for TESS, so we raise a warning."""
+    lc = TessLightCurve(flux=[1, 2, 3])
+    with pytest.warns(LightkurveWarning, match='not suitable'):
+        corr = SFFCorrector(lc)

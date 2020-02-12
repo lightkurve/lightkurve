@@ -417,6 +417,7 @@ def test_tpf_wcs_from_images():
         warnings.simplefilter("ignore", AstropyWarning)
         assert tpf.wcs.to_header()['CDELT1'] == w.wcs.cdelt[0]
 
+
 def test_properties2(capfd):
     '''Test if the describe function produces an output.
     The output is 1870 characters at the moment, but we might add more properties.'''
@@ -432,6 +433,7 @@ def test_interact():
                 TessTargetPixelFile(filename_tess)]:
         tpf.interact()
 
+
 @pytest.mark.remote_data
 def test_interact_sky():
     """Test the Jupyter notebook interact() widget."""
@@ -439,11 +441,15 @@ def test_interact_sky():
                 TessTargetPixelFile(filename_tess)]:
         tpf.interact_sky()
 
+
 def test_get_models():
     """Can we obtain PRF and TPF models?"""
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask=None)
-    tpf.get_model()
-    tpf.get_prf_model()
+    with warnings.catch_warnings():
+        # Ignore "RuntimeWarning: All-NaN slice encountered"
+        warnings.simplefilter("ignore", RuntimeWarning)
+        tpf.get_model()
+        tpf.get_prf_model()
 
 
 @pytest.mark.remote_data

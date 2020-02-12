@@ -35,6 +35,12 @@ class SFFCorrector(RegressionCorrector):
         The light curve that needs to be corrected.
     """
     def __init__(self, lc):
+        if getattr(lc, 'mission', '') == 'TESS':
+            warnings.warn("The SFF correction method is not suitable for use "
+                          "with TESS data, because the spacecraft motion does "
+                          "not proceed along a consistent arc.",
+                          LightkurveWarning)
+
         self.raw_lc = lc
         if hasattr(lc, 'flux_unit'):
             if lc.flux_unit is None:
@@ -47,8 +53,7 @@ class SFFCorrector(RegressionCorrector):
             lc = lc.copy().normalize()
 
         # Setting these values as None so we don't get a value error if the
-        # user calls before "correct()"
-
+        # user tries to access them before "correct()"
         self.window_points = None
         self.windows = None
         self.bins = None

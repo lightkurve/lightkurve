@@ -22,6 +22,7 @@ Direct code contributions and bugfixes:
 - `Peter Williams <https://github.com/pkgw>`_
 - `Szabo Pal <https://github.com/zabop>`_
 - `Sam Lee <https://github.com/orionlee>`_
+- `Jeff Smith <https://github.com/jcsmithhere>`_
 
 
 Comments, corrections & suggestions:
@@ -57,4 +58,4 @@ Comments, corrections & suggestions:
 - `Alex Lyttle <https://github.com/alexlyttle>`_
 - `ansainbdg <https://github.com/ansainbdg>`_
 - `newxr <https://github.com/newxr>`_
-
+- `Tony (Yu-Ching) Chen <https://github.com/xyz3919>`_

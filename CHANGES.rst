@@ -1,16 +1,37 @@
-1.7.0 (unreleased)
+1.8.0 (2020-02-09)
+==================
+
+- Added the ``Seismology.interact_echelle()`` method for creating interactive
+  asteroseismic echelle diagrams. [#625]
+
+- Added ``odd_mask`` and ``even_mask`` properties to ``FoldedLightCurve`` to
+  make it easy to plot odd- and even-numbered transits. [#425]
+
+- Fixed a bug which caused ``TargetPixelFile.interact()`` to raise a
+  ``ValueError`` if the pixel file contained NaN flux values. [#679]
+
+- Fixed minor issues in the tutorials. [#662, #683]
+
+
+
+1.7.0 (2020-01-29)
 ==================
 
 - Added a ``scale='linear'`` option to ``TargetPixelFile.interact()`` to show
   pixels using a linear stretch. The default is ``scale='log'``. [#664]
 
-- Changed the behavior of sigma-clipping inside ``RegressionCorrector``. [#654]
+- Added a warning if ``SFFCorrector`` is used to correct TESS data. [#660]
+
+- Added improved sigma-clipping inside ``RegressionCorrector``. [#654]
 
 - Fixed a bug which caused ``LightCurve.show_properties()`` to raise a
   ``ValueError`` when the time format was not set. [#655]
 
 - Fixed a bug which caused ``TargetPixelFile.interact()`` to crash if the
   pipeline aperture mask did not contain pixels. [#667]
+
+- Fixed a bug which caused ``RegressionCorrector.correct()`` to crash if the
+  input light curve contained flux uncertainties <= 0. [#668]
 
 
 

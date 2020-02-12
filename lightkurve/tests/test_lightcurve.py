@@ -210,6 +210,12 @@ def test_lightcurve_fold():
     assert (ax.get_xlabel() == 'Phase')
     plt.close('all')
 
+
+    odd = fold.odd_mask
+    even = fold.even_mask
+    assert len(odd) == len(fold.time)
+    assert np.all(odd == ~even)
+    assert np.sum(odd) == np.sum(even)
     # bad transit midpoint should give a warning
     # if user tries a t0 in JD but time is in BKJD
     with pytest.warns(LightkurveWarning, match='appears to be given in JD'):
@@ -939,7 +945,10 @@ def test_to_stingray():
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
     lc = LightCurve(time, flux, flux_err, time_format="jd")
     try:
-        sr = lc.to_stingray()
+        with warnings.catch_warnings():
+            # Ignore "UserWarning: Numba not installed" raised by stingray.
+            warnings.simplefilter("ignore", UserWarning)
+            sr = lc.to_stingray()
         assert_allclose(sr.time, time)
         assert_allclose(sr.counts, flux)
         assert_allclose(sr.counts_err, flux_err)

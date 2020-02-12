@@ -99,3 +99,17 @@ def test_nan_input():
     # because it is common for errors to be missing.
     lc = LightCurve(flux=[5, 10], flux_err=[np.nan, np.nan])
     RegressionCorrector(lc)
+
+
+def test_zero_fluxerr():
+    """Regression test for #668.
+
+    Flux uncertainties smaller than or equal to zero (`lc.flux_err <= 0`) will
+    trigger an invalid or non-finite matrix.  We expect `RegressionCorrector`
+    to detect this and yield a graceful `ValueError`."""
+    lc = LightCurve(flux=[5, 10], flux_err=[1, 0])
+    with pytest.raises(ValueError):
+        RegressionCorrector(lc)
+    lc = LightCurve(flux=[5, 10], flux_err=[1, -10])
+    with pytest.raises(ValueError):
+        RegressionCorrector(lc)

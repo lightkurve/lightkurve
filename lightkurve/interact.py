@@ -14,14 +14,17 @@ visualization widget showing the pixel data and a lightcurve::
 Note that this will only work inside a Jupyter notebook at this time.
 """
 from __future__ import division, print_function
+import os
 import logging
 import warnings
+
 import numpy as np
-from astropy.stats import sigma_clip
-from .utils import KeplerQualityFlags, LightkurveWarning
-import os
-from astropy.coordinates import SkyCoord, Angle
 import astropy.units as u
+from astropy.coordinates import SkyCoord, Angle
+from astropy.stats import sigma_clip
+from astropy.utils.exceptions import AstropyUserWarning
+
+from .utils import KeplerQualityFlags, LightkurveWarning
 
 log = logging.getLogger(__name__)
 
@@ -121,7 +124,9 @@ def get_lightcurve_y_limits(lc_source):
     ymin, ymax : float, float
         Flux min and max limits.
     """
-    flux = sigma_clip(lc_source.data['flux'], sigma=5)
+    with warnings.catch_warnings():  # Ignore warnings due to NaNs
+        warnings.simplefilter("ignore", AstropyUserWarning)
+        flux = sigma_clip(lc_source.data['flux'], sigma=5, masked=False)
     low, high = np.nanpercentile(flux, (1, 99))
     margin = 0.10 * (high - low)
     return low - margin, high + margin
