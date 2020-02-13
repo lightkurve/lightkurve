@@ -1717,7 +1717,7 @@ class LightCurve(object):
                     ar[jdx, cyc1] = np.nan
                 else:
                     ar[jdx, cyc1] = bin_func(y[cyc_mask & ph_mask],
-                                              e[cyc_mask & ph_mask])[0]
+                                             e[cyc_mask & ph_mask])[0]
 
         # If the method is average we need to denormalize the plot
         if method in ['mean', 'median']:

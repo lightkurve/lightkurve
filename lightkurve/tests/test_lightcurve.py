@@ -972,7 +972,7 @@ def test_from_stingray():
 
 def test_plot_waterfall():
     """Tests the `LightCurve.plot_waterfall()` method."""
-    lc = LightCurve(time=np.arange(100), flux=np.random.normal(1, 0.01, 100))
+    lc = LightCurve(time=np.arange(100)*0.1, flux=np.random.normal(10, 1., 100))
     lc.plot_waterfall(period=10.)
     plt.close()
     folded_lc = lc.fold(period=10, t0=1)
