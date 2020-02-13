@@ -1629,8 +1629,9 @@ class LightCurve(object):
             from .correctors import SFFCorrector
             return SFFCorrector(self)
 
-    def plot_waterfall(self, period, t0=0, ax=None, bin_points=1, minimum_phase=-0.5, maximum_phase=0.5,
-                  method='mean', **kwargs):
+    def plot_waterfall(self, period, t0=0, ax=None, bin_points=1,
+                       minimum_phase=-0.5, maximum_phase=0.5, method='mean',
+                       **kwargs):
         """Plot the folded light curve as a waterfall plot.
 
         All extra keywords supplied are passed on to Matplotlib's
@@ -1642,7 +1643,7 @@ class LightCurve(object):
             The matplotlib axes object.
         period: float
             Period at which to fold the light curve
-        t0: float
+        t0 : float
             Phase mid point for plotting
         bin_points : int
             How many points should be in each bin.
@@ -1723,7 +1724,7 @@ class LightCurve(object):
                     ar[jdx, cyc1] = np.nan
                 else:
                     ar[jdx, cyc1] = bin_func(y[cyc_mask & ph_mask],
-                                              e[cyc_mask & ph_mask])[0]
+                                             e[cyc_mask & ph_mask])[0]
 
         # If the method is average we need to denormalize the plot
         if method in ['mean', 'median']:
@@ -1889,12 +1890,12 @@ class FoldedLightCurve(LightCurve):
     def plot_waterfall(self, **kwargs):
         """Plot the folded light curve in a waterfall style
 
-        See `LightCurve.plot_waterfall` for details on the accepted arguments.
+        See `~LightCurve.plot_waterfall` for details on the accepted arguments.
 
         Parameters
         ----------
         kwargs : dict
-            Dictionary of arguments to be passed to `LightCurve.plot_waterfall`.
+            Dictionary of arguments to be passed to `~LightCurve.plot_waterfall`.
 
         Returns
         -------
@@ -1903,6 +1904,7 @@ class FoldedLightCurve(LightCurve):
         """
         ax = super(FoldedLightCurve, self).plot_waterfall(self.period, self.t0, **kwargs)
         return ax
+
 
 class KeplerLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
