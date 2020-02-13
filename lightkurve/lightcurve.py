@@ -1675,26 +1675,27 @@ class LightCurve(object):
         elif method == 'sigma':
             bin_func = lambda y, e: ((np.nanmean(y) - 1)/(np.nansum(e**2)**0.5/len(e)), np.nan)
 
-        # waterfall_method = validate_method(waterfall_method, supported_methods=['average', 'sigma'])
-        # if waterfall_method == 'sigma':
-        #     waterfall_func = lambda y, e: (y - 1)/e
-        # elif waterfall_method == 'average':
-        #     waterfall_func = lambda y, e: y
-
         if hasattr(self, 'time_original'):
             time = self.time_original
         else:
             time = self.time
+
         s = np.argsort(time)
         x, y, e = time[s], self.flux[s], self.flux_err[s]
         med = np.nanmedian(self.flux)
         e /= med
         y /= med
 
+
         # Here `ph` is the phase of each time point x
         # cyc is the number of cycles that have occured at each time point x
         # since the phase 0 before x[0]
         n = int(period/np.nanmedian(np.diff(x)) * (maximum_phase - minimum_phase)/bin_points)
+        if n == 1:
+            bin_points = int(maximum_phase - minimum_phase)/(2 / int(period/np.nanmedian(np.diff(x))))
+            warnings.warn('`bin_points` is too high to plot a phase curve, resetting to {}'.format(bin_points),
+                          LightkurveWarning)
+            n = 2
         ph = x/period % 1
         cyc = np.asarray((x - x % period)/period, int)
         cyc -= np.min(cyc)
