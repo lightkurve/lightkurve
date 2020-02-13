@@ -18,7 +18,7 @@ from astropy.table import Table
 
 from ..utils import LightkurveWarning
 from ..search import search_lightcurvefile, search_targetpixelfile, \
-                     search_tesscut, SearchResult, SearchError, open
+                     search_tesscut, SearchResult, SearchError, open, log
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
 from .. import PACKAGEDIR
@@ -131,8 +131,9 @@ def test_search_tesscut_download(caplog):
         # Download with rectangular dimennsions?
         rect_tpf = search_string[0].download(cutout_size=(3, 5))
         assert(rect_tpf.flux[0].shape == (3, 5))
-        # access cached file?
-        caplog.clear() # clear log to check log message from next function
+        # If we ask for the exact same cutout, do we get it from cache?
+        caplog.clear()
+        log.setLevel("DEBUG")
         tpf_cached = search_string[0].download(cutout_size=(3, 5))
         assert "Cached file found." in caplog.text
     except HTTPError as exc:

@@ -1,3 +1,11 @@
+1.9.0 (unreleased)
+==================
+
+- Added caching to `search_tesscut` to avoid requesting an identical cut out
+  more than once. [#481]
+
+
+
 1.8.0 (2020-02-09)
 ==================
 

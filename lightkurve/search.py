@@ -368,7 +368,7 @@ class SearchResult(object):
         if isinstance(cutout_size, int):
             size_str = str(int(cutout_size)) + 'x' + str(int(cutout_size))
         elif isinstance(cutout_size, tuple) or isinstance(cutout_size, list):
-            size_str = str(int(cutout_size[0])) + 'x' + str(int(cutout_size[1]))
+            size_str = str(int(cutout_size[1])) + 'x' + str(int(cutout_size[0]))
 
         # search cache for file with matching ra, dec, and cutout size
         # ra and dec are searched within 0.001 degrees of input target
