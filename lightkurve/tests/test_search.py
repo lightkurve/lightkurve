@@ -18,7 +18,7 @@ from astropy.table import Table
 
 from ..utils import LightkurveWarning
 from ..search import search_lightcurvefile, search_targetpixelfile, \
-                     search_tesscut, SearchResult, SearchError, open
+                     search_tesscut, SearchResult, SearchError, open, log
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
 from .. import PACKAGEDIR
@@ -105,7 +105,7 @@ def test_search_tesscut():
 
 
 @pytest.mark.remote_data
-def test_search_tesscut_download():
+def test_search_tesscut_download(caplog):
     """Can we download TESS cutouts via `search_cutout().download()?"""
     try:
         ra, dec = 30.578761, -83.210593
@@ -131,6 +131,11 @@ def test_search_tesscut_download():
         # Download with rectangular dimennsions?
         rect_tpf = search_string[0].download(cutout_size=(3, 5))
         assert(rect_tpf.flux[0].shape == (3, 5))
+        # If we ask for the exact same cutout, do we get it from cache?
+        caplog.clear()
+        log.setLevel("DEBUG")
+        tpf_cached = search_string[0].download(cutout_size=(3, 5))
+        assert "Cached file found." in caplog.text
     except HTTPError as exc:
         # TESSCut will occasionally return a "504 Gateway Timeout error" when
         # it is overloaded.  We don't want this to trigger a test failure.
