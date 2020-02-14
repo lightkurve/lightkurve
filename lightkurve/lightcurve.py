@@ -1629,10 +1629,10 @@ class LightCurve(object):
             from .correctors import SFFCorrector
             return SFFCorrector(self)
 
-    def plot_waterfall(self, period, t0=0, ax=None, bin_points=1,
+    def plot_river(self, period, t0=0, ax=None, bin_points=1,
                        minimum_phase=-0.5, maximum_phase=0.5, method='mean',
                        **kwargs):
-        """Plot the folded light curve as a waterfall plot.
+        """Plot the folded light curve as a river plot.
 
         All extra keywords supplied are passed on to Matplotlib's
         `~matplotlib.pyplot.pcolormesh` function.
@@ -1652,7 +1652,7 @@ class LightCurve(object):
         maximum_phase : float
             The maximum phase to plot.
         method : str
-            The waterfall method. Choose from `'mean'` or `'median'` or `'sigma'`.
+            The river method. Choose from `'mean'` or `'median'` or `'sigma'`.
             If `'mean'` or `'median'`, the plot will display the average value in each bin.
             If `'sigma'`, the plot will display the average in the bin divided by
             the error in each bin, in order to show the data in terms of standard
@@ -1667,8 +1667,10 @@ class LightCurve(object):
             The matplotlib axes object.
         """
         method = validate_method(method, supported_methods=['mean', 'median', 'sigma'])
-        if bin_points == 1:
+        if (bin_points == 1) and (method in ['mean', 'median']):
             bin_func = lambda y, e: (y[0], e[0])
+        elif (bin_points == 1) and (method in ['sigma']):
+            bin_func = lambda y, e: ((y[0] - 1)/e[0], np.nan)
         elif method == 'mean':
             bin_func = lambda y, e: (np.nanmean(y), np.nansum(e**2)**0.5/len(e))
         elif method == 'median':
@@ -1686,7 +1688,6 @@ class LightCurve(object):
         med = np.nanmedian(self.flux)
         e /= med
         y /= med
-
 
         # Here `ph` is the phase of each time point x
         # cyc is the number of cycles that have occured at each time point x
@@ -1714,7 +1715,6 @@ class LightCurve(object):
 
         ph_masks = [(ph > bs[jdx]) & (ph <= bs[jdx+1]) for jdx in range(n-1)]
         qual_mask = np.isfinite(y)
-
         for cyc1 in np.unique(cyc):
             cyc_mask = cyc == cyc1
             if not np.any(cyc_mask):
@@ -1887,22 +1887,22 @@ class FoldedLightCurve(LightCurve):
             ax.set_xlabel("Phase")
         return ax
 
-    def plot_waterfall(self, **kwargs):
-        """Plot the folded light curve in a waterfall style
+    def plot_river(self, **kwargs):
+        """Plot the folded light curve in a river style
 
-        See `~LightCurve.plot_waterfall` for details on the accepted arguments.
+        See `~LightCurve.plot_river` for details on the accepted arguments.
 
         Parameters
         ----------
         kwargs : dict
-            Dictionary of arguments to be passed to `~LightCurve.plot_waterfall`.
+            Dictionary of arguments to be passed to `~LightCurve.plot_river`.
 
         Returns
         -------
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        ax = super(FoldedLightCurve, self).plot_waterfall(self.period, self.t0, **kwargs)
+        ax = super(FoldedLightCurve, self).plot_river(self.period, self.t0, **kwargs)
         return ax
 
 

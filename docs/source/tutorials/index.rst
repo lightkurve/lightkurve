@@ -41,7 +41,7 @@ can be extracted from the pixel data, and on the removal of instrument noise
     03-cutting-out-tpfs-from-tess-ffis.ipynb
     03-making-fits-files.ipynb
     03-appending-lightcurves.ipynb
-    03-using-waterfall-plots.ipynb
+    03-using-river-plots.ipynb
 
 
 
