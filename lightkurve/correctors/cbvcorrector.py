@@ -17,6 +17,7 @@ import astropy.units as u
 from .. import MPLSTYLE
 
 from ..lightcurve import LightCurve, KeplerLightCurve
+from ..search import search_lightcurvefile
 from ..lightcurvefile import KeplerLightCurveFile
 from .corrector import Corrector
 from ..utils import channel_to_module_output, validate_method
@@ -562,6 +563,13 @@ def get_tess_cbvs (sector=None, camera=None,
 class CBVCorrector(RegressionCorrector):
     """ Class for removing systematics using CBV correctors for Kepler/K2/TESS
 
+    On construction of this object the relevent CBVs will be downloaded from
+    mast based on the lightcurve object passed to the constructor.
+
+    For TESS we have the option to load multiple CBV types. So, remember
+    that all are loaded and the user must specify which to use in the
+    correction.
+        
 
 
     Attributes
@@ -590,10 +598,8 @@ class CBVCorrector(RegressionCorrector):
         """ Constructor for CBVClass objects
 
         This constructor will retrieve all relevant CBVs from MAST and then
-        align them with the passed in light curve.
+        align them with the passed-in light curve.
 
-        For TESS we have the option to load multiple CBV types.
-        
         Parameters
         ----------
         lc  : LightCurve
@@ -608,6 +614,8 @@ class CBVCorrector(RegressionCorrector):
 
         # Call the RegresssionCorrector Constructor
         super(CBVCorrector, self).__init__(lc)
+
+        self.lc_neighborhood = None
 
         #***
         # Retrieve all relevant CBVs from MAST
@@ -629,7 +637,7 @@ class CBVCorrector(RegressionCorrector):
                 camera=self.lc.camera, CCD=self.lc.ccd, cbv_type='SingleScale',
                 cbv_indices='ALL'))
 
-            # TODO: loop over multi-scale CBV groups to searhc all in CNBV FITS
+            # TODO: loop over multi-scale CBV groups to search all in CBV FITS
             # file
             cbvs.append(get_tess_cbvs(sector=self.lc.sector,
                 camera=self.lc.camera, CCD=self.lc.ccd, cbv_type='MultiScale',
@@ -655,25 +663,23 @@ class CBVCorrector(RegressionCorrector):
                 raise Exception('CBVs could not be loaded. CBVCorrector must exit')
 
         # Align the CBVs with the lightcurve flux using the cadence numbers
+        # This will also trim the lightcurve if it contains cadences not in the
+        # CBVs
         for idx in np.arange(len(cbvs)):
             self.lc = cbvs[idx].align(self.lc, trim_lc=True)
 
         self.cbvs = cbvs
 
 
-    def correct(self, cbv_type='SingleScale', cbv_indices='ALL', alpha=1e-20, l1_ratio=0.01, ext_dm=None, cadence_mask=None):
-        """ Performs the correction using RegressionCorrector methods
+    def correct_ElasticNet(self, cbv_type='SingleScale', cbv_indices='ALL', alpha=1e-20, 
+            l1_ratio=0.01, ext_dm=None, cadence_mask=None):
+        """ Performs the correction using ElasticNet
 
         This method will assemble the full design matrix collection composed of
-        cbv_design_matrix and extra_design_matrix. Then use the super-class
-        RegressionCorrector.correct to perform the correction
+        cbv_design_matrix and extra_design_matrix. Then uses
+        scikit-learn.linear_model.ElasticNet to perform the correction
 
-        TODO: A whole bunch! This is a shell of a method. Just to demonstrate
-        basic functionality. We should consider allowing for standard
-        regaulrization methods such as Ridge Regression (L2 Norm) and Lasso (L1
-        Norm).  Maybe even BIC or AIC methods also.
-
-        Eventually, the plan is to use over-fitting and under-fitting goodness
+        This method utilies the over-fitting and under-fitting goodness
         metrics to constrain the regression fit.
 
         Parameters
@@ -700,9 +706,6 @@ class CBVCorrector(RegressionCorrector):
                 cbv_indices=cbv_indices, ext_dm=ext_dm, cadence_mask=cadence_mask)
 
             
-        # Use RegressionCorrector.correct for the actual fitting
-       #super(CBVCorrector, self).correct(design_matrix)
-
         from sklearn import linear_model
 
         # Use Scikit-learn ElasticNet
@@ -716,15 +719,66 @@ class CBVCorrector(RegressionCorrector):
 
         return self.corrected_lc
 
-    def correct_optimizer(self, cbv_type='SingleScale', cbv_indices='ALL', alpha_init=1e-20, l1_ratio=0.01, ext_dm=None,
-            cadence_mask=None, max_iter=100, target_score=0.0):
+    def correct_gaussian_prior(self, cbv_type='SingleScale', cbv_indices='ALL', 
+            alpha=1e-20, ext_dm=None, cadence_mask=None):
+        """ Performs the correction using RegressionCorrector methods. This is
+        the default correct method.
+
+        This method will assemble the full design matrix collection composed of
+        cbv_design_matrix and extra_design_matrixm (ext_dm). It then uses the
+        alpha L2_norm penalty term to set the widht on the design matrix priors.
+        Then uses the super-class RegressionCorrector.correct to perform the
+        correction.
+
+        By default this method will use the "SingleScale" basis vectors.
+
+        Parameters
+        ----------
+        cbv_type : str list
+            List of CBV types to use
+        cbv_indices : list of lists
+            List of CBV vectors to use in each passed cbv_type. {'ALL' => Use all}
+        alpha : float
+            L2-norm regularization penatly term.
+            {0 => no regularization}
+        ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
+            Optionally pass an extra design matrix to also be used in the fit
+        cadence_mask : np.ndarray of bools (optional)
+            Mask, where True indicates a cadence that should be used.
+
+        Examples
+        --------
+            >>> cbv_type = ['SingleScale', 'Spike']
+            >>> cbv_indices = [np.arange(1,9), 'ALL']
+            >>> corrected_lc = cbvCorrector.correct(cbv_type=cbv_type,
+                    cbv_indices=cbv_indices,  )
+        """
+        
+        # Perform all the preparatory stuff common to all correct methods
+        self._correct_initialization(cbv_type=cbv_type,
+                cbv_indices=cbv_indices, ext_dm=ext_dm)
+
+        # Add in a width to the Gaussian priors
+        # alpha = flux_sigma^2 / sigma^2
+        sigma = np.median(self.lc.flux_err) / np.sqrt(alpha)
+        self._set_prior_width(sigma)
+            
+        # Use RegressionCorrector.correct for the actual fitting
+        super(CBVCorrector, self).correct(self.design_matrix_collection, 
+                cadence_mask=cadence_mask)
+
+        return self.corrected_lc
+
+    def correct_optimizer(self, cbv_type='SingleScale', cbv_indices='ALL', 
+            alpha_init=1e-20, minimum_period=None, maximum_period=None, 
+            ext_dm=None, cadence_mask=None, max_iter=100, 
+            target_over_score=0.5, target_under_score=0.5):
         """ Performs the correction using RegressionCorrector methods
 
         This method will adjust the regularization penalty term based on the introduced
-        noise metric. l1_ratio is not optimized.
+        noise and residual correlation goodness metrics.
 
-        It uses a basic gradient decent method hit the target introduced noise
-        metric.
+        It attempts to hit the target score for both over- and under- metrics.
 
         Parameters
         ----------
@@ -732,89 +786,157 @@ class CBVCorrector(RegressionCorrector):
             Optionally pass an extra design matrix to also be used in the fit
         cadence_mask : np.ndarray of bools (optional)
             Mask, where True indicates a cadence that should be used.
-        alphas_init : float
+        alpha_init : float
             The initial regularization penalty term. Start with a small number.
-        l1_ratio : float
-            The ElasticNet mixing parameter
-        target_score : float
+        target_over_score : float
             Target Over-fitting metric score
-
+        target_under_score : float
+            Target under-fitting metric score
+        max_iter : int
+            Maximum number of iterations to optimize goodness metrics
 
         """
 
         # Perform all the preparatory stuff common to all correct methods
         self._correct_initialization(cbv_type=cbv_type,
-                cbv_indices=cbv_indices, ext_dm=ext_dm, cadence_mask=cadence_mask)
+                cbv_indices=cbv_indices, ext_dm=ext_dm)
 
+     #  # Minimize the introduced metric
+     #  from scipy.optimize import minimize
+     #  self.minimize_result = minimize(self.obj_fun, alpha_init, 
+     #          bounds=[(1e-20, 1e2)])
 
-        from sklearn import linear_model
+     #  # Re-fit with final alpha value
+     #  # (scipy.optimize.minimize does not exit with the final fit!)
+     #  self.obj_fun(self.minimize_result.x)
+     #  self.introduced_noise_score = self.over_fitting_metric()
 
-        X = self.design_matrix_collection.values
-        y = self.lc.flux
-            
-        # Use Scikit-learn ElasticNet
-        self.regressor = linear_model.ElasticNet(alpha=alpha_init,
-                l1_ratio=l1_ratio, normalize=True)
 
         alpha = alpha_init
-        alpha_step_factor = 1.1 # being by increasing alpha by 10%
+        # This is the learning rate
+        alpha_step_factor = 1.5 # Increasing/decreasing alpha by this factor
         for idx in np.arange(max_iter):
 
-            metric = self._apply_fit(X, y, alpha)
+            # Add in a width to the Gaussian priors
+            # alpha = flux_sigma^2 / sigma^2
+            sigma = np.median(self.lc.flux_err) / np.sqrt(alpha)
+            self._set_prior_width(sigma)                
+            # Use RegressionCorrector.correct for the actual fitting
+            super(CBVCorrector, self).correct(self.design_matrix_collection, 
+                cadence_mask=cadence_mask)
+            overMetric = self.over_fitting_metric(minimum_period=minimum_period,
+                    maximum_period=maximum_period, nSamples=1)
+            # TODO: figure out how to set min and max targets for under-fitting
+            # metric
+            underMetric = self.under_fitting_metric()
 
-            # Check goodness metric
-            if (metric > target_score):
-                # Over-fitting occured, increase alpha
-                alpha *= alpha_step_factor
+            # Check goodness metrics
+            if (overMetric < target_over_score):
+                # Over-fitting occured, increase alpha to constrain over-fitting
+                # Scale expansion factor by how far away the metric is to the
+                # target
+                # TODO: do gradient decent
+                alpha *= alpha_step_factor * (1 + (target_over_score - overMetric))
+            elif (underMetric < target_under_score):
+                # Under-fitting occured, decrease alpha to remove more
+                # systematics.
+                # Scale expansion factor by how far away the metric is to the
+                # target
+                alpha /= alpha_step_factor / (1 + (target_under_score - underMetric))
             else:
                 # We're good, exit loop
                 break
-        
-        self.introduced_noise_score = metric
 
+            if (idx == max_iter):
+                log.warning('Maximum iterations reached optimizing Goodness '
+                        'Metrics')
+        
+        self.over_fitting_score = overMetric
+        self.under_fitting_score = underMetric
+        self.optimized_alpha = alpha
 
         return self.corrected_lc
 
 
-
-
-    def over_fitting_metric(self):
+    def over_fitting_metric(self, minimum_period=None ,
+            maximum_period=None , nSamples=10):
         """ Uses a LombScarglePeriodogram to assess the change in broad-band
         power in a corrected light curve to measure degree of over-fitting
 
         This function expects a median normalized light curve
+
+        to_periodogram by default uses lomb-scragle and the default frequency
+        unit is 1/days. So, specify period in days
+
+        Parameters
+        ----------
+        minimum_period : float
+            The minimum period to consider in days
+        maximum_period : float
+            The maximum period to consider in days
+        nSamples : int
+            The number fo times to compute and average the metric
+            To stabalize the value
         """
+
+        # Check if corrected_lc is present
+        if (self.corrected_lc is None):
+            log.warning('A corrected light curve does not exist, please run '
+                    'correct first')
+            return None
+
+        # The fit can sometimes result in NaNs
+        lc = self.corrected_lc.copy()
+        lc = lc.remove_nans()
+        if (len(lc.flux) == 0):
+            return 1.0
+
 
         # TODO: handle gaps and/or masks
 
-        pgOrig = self.lc.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=10)
-        pgCorrected = self.corrected_lc.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=10)
+        # Perform the measurement multiple times and averge to stabalize the metric
 
-        # Get an esitmate of the PSD at the uncertainties limit
-        # The raw and corrected uncertainties should be essentially identical so use the corrected
-        # TODO: the periodogram of WGN should be analytical to compute!
-        nNonGappedCadences = len(self.lc.flux)
-        meanCorrectedUncertainties = np.mean(self.corrected_lc.flux_err)
-        WGNCorrectedUncert = (np.random.randn(nNonGappedCadences,1) * meanCorrectedUncertainties).T[0]
-        model_err   = np.zeros(len(self.lc.flux))
-        noise_lc = LightCurve(self.lc.time, WGNCorrectedUncert, model_err)
-        pgCorrectedUncert = noise_lc.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=10)
-        meanCorrectedUncertPower = np.mean(np.array(pgCorrectedUncert.power))
-        
-        # Compute the change in power
-        pgChange = np.array(pgCorrected.power) - np.array(pgOrig.power)
+        metric_per_iter = np.full_like(np.arange(nSamples), np.nan, dtype=np.double)
+        for idx in np.arange(nSamples):
 
-        # If no increase in power in ANY bands then return a perfect loss
-        # function
-        if (len(np.nonzero(pgChange>0.0)[0]) == 0):
-            return 0.0
-        
-        # We are only concerned with bands where the power increased so
-        # when(pgCorrected - pgRaw) > 0 
-        # Normalize by the noise in the uncertainty
-        # We want the goodness to begin to degrade when the introduced noise is greater than the uncertainties.
-        # So, when DeltaNoise > 0.5 (given twiceSigmoidInv defn.)
-        metric = np.sum(pgChange[pgChange>0.0]) / ((len(np.nonzero(pgChange>0.0)[0]))*meanCorrectedUncertPower)
+            pgOrig = self.lc.to_periodogram(minimum_period=minimum_period,
+                    maximum_period=maximum_period)
+            pgCorrected = lc.to_periodogram(minimum_period=minimum_period,
+                    maximum_period=maximum_period)
+            
+            # Get an estimate of the PSD at the uncertainties limit
+            # The raw and corrected uncertainties should be essentially identical so 
+            # use the corrected
+            # TODO: the periodogram of WGN should be analytical to compute!
+            nNonGappedCadences = len(self.lc.flux)
+            meanCorrectedUncertainties = np.mean(lc.flux_err)
+            WGNCorrectedUncert = (np.random.randn(nNonGappedCadences,1) * 
+                    meanCorrectedUncertainties).T[0]
+            model_err   = np.zeros(len(self.lc.flux))
+            noise_lc = LightCurve(self.lc.time, WGNCorrectedUncert, model_err)
+            pgCorrectedUncert = noise_lc.to_periodogram(minimum_period=minimum_period,
+                    maximum_period=maximum_period)
+            meanCorrectedUncertPower = np.mean(np.array(pgCorrectedUncert.power))
+            
+            # Compute the change in power
+            pgChange = np.array(pgCorrected.power) - np.array(pgOrig.power)
+            
+            # If no increase in power in ANY bands then return a perfect loss
+            # function
+            if (len(np.nonzero(pgChange>0.0)[0]) == 0):
+                metric_per_iter[idx] = 0.0
+                continue
+            
+            # We are only concerned with bands where the power increased so
+            # when(pgCorrected - pgOrig) > 0 
+            # Normalize by the noise in the uncertainty
+            # We want the goodness to begin to degrade when the introduced 
+            # noise is greater than the uncertainties.
+            # So, when Sigmoid > 0.5 (given twiceSigmoidInv defn.)
+            metric_per_iter[idx] = (np.sum(pgChange[pgChange>0.0]) / 
+                    ((len(np.nonzero(pgChange>0.0)[0]))*meanCorrectedUncertPower))
+
+        metric = np.mean(metric_per_iter)
 
         
       # #****************
@@ -826,21 +948,164 @@ class CBVCorrector(RegressionCorrector):
       # if (metric < 0.0):
       #     metric = 0.0
 
-      # # We want the goodness to span (0,1] so take the inverse of each component using a sigmoid
-      # # Use twice an inverse sigmoid to get a [0,1] range from a [0,inf) range
-      # def sigmoidInv(x): return 2.0 / (1 + np.exp(x))
-      # metric     = sigmoidInv(metric)
+        # We want the goodness to span (0,1] so take the inverse of each 
+        # component using a sigmoid
+        # Use twice an inverse sigmoid to get a [0,1] range from a [0,inf) range
+        # We also want a goodness of 0.8 to mean the introduced noise is just
+        # begining to increase beyond the noise of WGN of the mean of the uncertainties
+        # 0.8 = sigmoidInv(0.4)
+        # So, subtract 0.6 from the metric so that a metric value of 1.0 returns
+        # a goodness of 0.8
+        def sigmoidInv(x): return 2.0 / (1 + np.exp(x))
+        # Make sure maxcimum score is 1.0
+       #metric = sigmoidInv(np.max([metric - 0.6, 0.0]))
+        metric = sigmoidInv(metric)
+
+        return metric
+    
+    def under_fitting_metric(self, min_targets=30, max_targets=50):
+        """ This goodness metric measures the degree of under-fitting of the
+        CBVs to the light curve. It does so by measuring the residual target to
+        target correlation between the target under stufy and a selection of
+        neighboring targets.
+
+        This function 
+
+
+        Parameters
+        ----------
+        min_targets : float
+                Minimum number of targets to use in correlation metric
+                Using too few can cause unreliable results
+        max_targets : float
+                Maximum number of targets to use in correlation metric
+                Using too many can sow down the metric due to large data
+                download
+        """
+
+        # Check if corrected_lc is present
+        if (self.corrected_lc is None):
+            log.warning('A corrected light curve does not exist, please run '
+                    'correct first')
+            return None
+
+        # Retrieve PDC light curves in a neighborhood around the target
+        # Only do this once, check if lc set is already cached
+        if (self.lc_neighborhood is None):
+            continue_searching = True
+            search_radius = 5000 # arcseconds
+            while continue_searching:
+                search_result = search_lightcurvefile(self.lc.label,
+                    mission=self.lc.mission, sector=self.lc.sector,
+                    radius=search_radius, limit=max_targets)
+                # Check if too few found
+                if (len(search_result) < min_targets):
+                    # Too few found, increase search radius
+                    search_radius *= 1.5
+                else:
+                    continue_searching = False
+                    break
+                
+            else:
+                raise Exception ('Not enough targets were found to compute'
+                    'under-fitting metric')
+            print('Found {} neighboring targets for under-fitting '
+                    'metric'.format(len(search_result)))
+            print('Downloading... this might take a while')
+            lcfCol = search_result.download_all()
+
+            self.lc_neighborhood = []
+            # Extract SAP light curves
+            for lc in lcfCol:
+                lcSAP = lc.SAP_FLUX.remove_nans().normalize()
+                lcSAP.flux -= 1.0
+                self.lc_neighborhood.append(lcSAP)
+                # Align the neighboring target with the target under study
+                lc_trim_mask = np.in1d(self.lc_neighborhood[-1].cadenceno, 
+                        self.corrected_lc.cadenceno)
+                self.lc_neighborhood[-1] = self.lc_neighborhood[-1][lc_trim_mask]
+
+            
+            print('Neighboring targets ready for use')
+
+
+        # Create fluxMatrix Last entry is target under study
+        fluxMatrix = np.zeros((len(self.lc_neighborhood[0].flux),
+            len(self.lc_neighborhood)+1))
+        for idx in np.arange(len(fluxMatrix[0,:])-1):
+            fluxMatrix[:,idx] = self.lc_neighborhood[idx].flux
+
+        # Add in target under study
+        fluxMatrix[:,-1] = self.corrected_lc.flux
+
+
+        # Determine the target-target correlation between target and
+        # neighborhood
+        # Correlation matrix
+        correlationMatrix = compute_correlation(fluxMatrix)
+
+        # The selection basis for targets used for the PDC-MAP SVD based on
+        # correlation uses median absolute correlation per star.  However, here
+        # we wish to overemphasize any residual correlation between a handfull
+        # of targets and not the overall correlation (which should almost always
+        # be low).
+
+        # We want a residual correlation larger than random correlations of WGN
+        # to mean a meaningiful correlation. The median Pearson correlation of
+        # WGN of nCadences is given by the equation: 
+        # 0.0010288 + 0.80304 x^ -0.50128
+        nCadences = len(fluxMatrix[:,0])
+      # nValidSamplesPerTarget = sum(~[correctedDataStruct.gapIndicators], 1)
+      # medianNValidSamples = nanmedian(nValidSamplesPerTarget)
+        beta = [0.0007, 0.8083, -0.5023]
+      # def WGNCorrelation (x): return (beta(0)+beta(1)*(x**(beta(2))))
+      # WGNCorrelation = WGNCorrelation(nCadences)
+        WGNCorrelation = (beta[0]+beta[1]*(nCadences**(beta[2])))
+
+        # badLimit is the goodnes value for WGN correlations
+        # I.e. anything above this goodness value is equivalent to random correlations
+        badLimit = 0.95
+        correlationScale = 1 / (WGNCorrelation) * np.log((2.0 / badLimit) - 1.0)
+
+        # Over-emphasize any individual correlation groups. Note the power of 
+        # three after taking the absolute value
+        # of the correlation. Also, the mean is used so that outliers are *not* ignored. 
+        # Zero diagonal elements
+        correlationMatrix = (np.tril(correlationMatrix, k=-1) + 
+                                np.triu(correlationMatrix, k=+1))
+
+
+        # Add up the correlation over all targets ignoring NaNs (no corrected fit)
+       #correlation = np.nanmean(np.abs(correlationMatrix)**3, axis=0)
+       #correlationScale=10.0
+        correlation = correlationScale*np.nanmean(np.abs(correlationMatrix)**3, axis=0)
+
+        # We only want the last entry
+        correlation = correlation[-1]
+
+        def sigmoidInv(x): return 2.0 / (1 + np.exp(x))
+        metric = sigmoidInv(correlation)
 
         return metric
 
+
     def _correct_initialization(self, cbv_type='SingleScale', cbv_indices='ALL',
-            ext_dm=None, cadence_mask=None):
+            ext_dm=None):
         """ Performs all the preperatory needs before applying a correct method.
 
         This helper function is used so that multiple correct methods can be used
         without the need to repeat preparatory code.
 
-        Does things like sets up the design matrix
+        Does things like sets up the design matrix.
+
+        Parameters
+        ----------
+        cbv_type : str list
+            List of CBV types to use
+        cbv_indices : list of lists
+            List of CBV vectors to use in each passed cbv_type. {'ALL' => Use all}
+        ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
+            Optionally pass an extra design matrix to additionally be used in the fit
 
         """
 
@@ -853,11 +1118,6 @@ class CBVCorrector(RegressionCorrector):
             if (not len(cbv_type) == len(cbv_indices)):
                 raise Exception('cbv_type and cbv_indices must be the same list length')
 
-
-        if cadence_mask is None:
-            self.cadence_mask = np.ones(len(self.lc.time), bool)
-        else:
-            self.cadence_mask = np.copy(cadence_mask)
 
         #***
         # Create the design matrix collection with CBVs, plus extra passed basis vectors
@@ -947,6 +1207,77 @@ class CBVCorrector(RegressionCorrector):
 
         return metric
 
+    def _set_prior_width(self, sigma):
+        """ Sets the Gaussian prior in the design_matrix_collection widths to sigma
+
+        If sigma is a scalar then all widths are set to the same value
+        """
+
+        if (isinstance(sigma, list)):
+            raise Exception("Seperate widths is not yet implemented")
+
+        for dm in self.design_matrix_collection:
+            nCBVs = len(dm.prior_sigma)
+
+            dm.prior_sigma = np.ones(nCBVs) * sigma
+
+
+    def obj_fun(self, alpha):
+        """ The objective function to minimize with scipy.optimize.minimize
+
+        """
+
+        # Add in a width to the Gaussian priors
+        # alpha = flux_sigma^2 / sigma^2
+        sigma = np.median(self.lc.flux_err) / np.sqrt(alpha)
+        self._set_prior_width(sigma)                
+        # Use RegressionCorrector.correct for the actual fitting
+        super(CBVCorrector, self).correct(self.design_matrix_collection)
+
+        # Add a penalty term to introduced noise metric to minimize the alpha
+        # penalty term
+
+       #penalty = self.over_fitting_metric() - 0.001*np.log(alpha[0])
+        penalty = self.over_fitting_metric()
+
+        return penalty
+
+        
+#*******************************************************************************
+#*******************************************************************************
+#*******************************************************************************
+# Helper Functions
+#*******************************************************************************
+#*******************************************************************************
+#*******************************************************************************
+
+def compute_correlation(fluxMatrix):
+    """  Finds the empirical target to target flux time series Pearson correlation.
+
+    Parameters
+    ----------
+    fluxMatrix : float 2-d array[ntargets,ncadences]
+        The matrix of target flux. There should be no gaps or Nans
+
+    Returns
+    -------
+    correlation_matrix : [float matrix] (nTargets x nTargets)
+        The target-target correlation
+    """
+
+
+    nCadences = len(fluxMatrix[:,0])
+
+    # Scale each flux value by the rms flux for the given target.
+    rmsFlux = np.sqrt(np.sum(fluxMatrix**2.0, axis=0) / nCadences)
+    unitNormFlux = fluxMatrix / np.tile(rmsFlux, (nCadences, 1))
+
+    correlation_matrix = unitNormFlux.T.dot(unitNormFlux) / nCadences
+
+    return correlation_matrix
+
+
+        
             
 
 #*******************************************************************************

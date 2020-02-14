@@ -185,6 +185,7 @@ class RegressionCorrector(Corrector):
             from the light curve.
         cadence_mask : np.ndarray of bools (optional)
             Mask, where True indicates a cadence that should be used.
+            Note: The saved self.cadence_mask is overwritten for each call to correct.
         sigma : int (default 5)
             Standard deviation at which to remove outliers from fitting
         niters : int (default 5)
