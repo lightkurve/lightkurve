@@ -300,3 +300,12 @@ def test_indexerror_631():
     # This previously triggered an exception:
     result = search_lightcurvefile("KIC 8462852", sector=15)
     assert len(result) == 1
+
+
+@pytest.mark.remote_data
+def test_windows_cache_bug():
+    """Does opening a file from the cache work on Windows?"""
+    search = search_lightcurvefile('010848459', quarter=4)
+    lcf1 = search.download()
+    lcf2 = search.download()
+    assert "cache" in lcf2.path
