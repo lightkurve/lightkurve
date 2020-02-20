@@ -968,3 +968,21 @@ def test_from_stingray():
         assert_allclose(sr.counts_err, lc.flux_err)
     except ImportError:
         pass  # stingray is not a required dependency
+
+
+def test_river():
+    lc = LightCurve(time=np.arange(100), flux=np.random.normal(1, 0.01, 100))
+    lc.plot_river(10, 1)
+    plt.close()
+    folded_lc = lc.fold(10, 1)
+    folded_lc.plot_river()
+    plt.close()
+    folded_lc.plot_river(minimum_phase=-0.1, maximum_phase=0.2)
+    plt.close()
+    folded_lc.plot_river(method='median', bin_points=5)
+    plt.close()
+    folded_lc.plot_river(method='sigma', bin_points=5)
+    plt.close()
+    with pytest.warns(LightkurveWarning, match='`bin_points` is too high to plot'):
+        folded_lc.plot_river(method='median', bin_points=6)
+        plt.close()
