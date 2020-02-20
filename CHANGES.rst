@@ -1,6 +1,9 @@
 1.9.0 (unreleased)
 ==================
 
+- Added a ``LightCurve.plot_river()`` method to plot river diagrams, which uses
+  colors to visualize fluxes by period cycle (row) and phase (column). [#625]
+
 - Added caching to `search_tesscut` to avoid requesting an identical cut out
   more than once. [#481]
 

@@ -1632,7 +1632,13 @@ class LightCurve(object):
     def plot_river(self, period, t0=0, ax=None, bin_points=1,
                        minimum_phase=-0.5, maximum_phase=0.5, method='mean',
                        **kwargs):
-        """Plot the folded light curve as a river plot.
+        """Plot the light curve as a river plot.
+
+        A river plot uses colors to represent the light curve values in
+        chronological order, relative to the period of an interesting signal.
+        Each row in the plot represents a full period cycle, and each column
+        represents a fixed phase.  This type of plot is often used to visualize
+        Transit Timing Variations (TTVs) in the light curves of exoplanets.
 
         All extra keywords supplied are passed on to Matplotlib's
         `~matplotlib.pyplot.pcolormesh` function.
@@ -1888,7 +1894,7 @@ class FoldedLightCurve(LightCurve):
         return ax
 
     def plot_river(self, **kwargs):
-        """Plot the folded light curve in a river style
+        """Plot the folded light curve in a river style.
 
         See `~LightCurve.plot_river` for details on the accepted arguments.
 
