@@ -309,3 +309,6 @@ def test_windows_cache_bug():
     lcf1 = search.download()
     lcf2 = search.download()
     assert "cache" in lcf2.path
+    import platform
+    if platform.system() == 'Windows':
+        assert "fail" == lcf2.path
