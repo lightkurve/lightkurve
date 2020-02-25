@@ -385,3 +385,38 @@ class DesignMatrixCollection():
     def __repr__(self):
         return 'DesignMatrixCollection:\n' + \
                     ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
+
+
+####################################################
+# Functions to create commonly-used design matrices.
+####################################################
+
+def create_spline_matrix(x, n_knots=20, degree=3, name='spline',
+                         include_intercept=False):
+    """Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        vector to spline
+    n_knots: int
+        Number of knots (default: 20).
+    degree: int
+        Polynomial degree.
+    name: string
+        Name to pass to `.DesignMatrix` (default: 'spline').
+    include_intercept: bool
+        Whether to include row of ones to find intercept. Default False.
+
+    Returns
+    -------
+    dm: `.DesignMatrix`
+        Design matrix object with shape (len(x), n_knots*degree).
+    """
+    from patsy import dmatrix  # local import because it's rarely-used
+    dm_formula = "bs(x, df={}, degree={}, include_intercept={}) - 1" \
+                 "".format(n_knots, degree, include_intercept)
+    spline_dm = np.asarray(dmatrix(dm_formula, {"x": x}))
+    df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
+                                          for idx in range(n_knots)])
+    return DesignMatrix(df, name=name)
