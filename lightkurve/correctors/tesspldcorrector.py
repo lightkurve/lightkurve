@@ -22,7 +22,7 @@ __all__ = ['TessPLDCorrector']
 
 
 class TessPLDCorrector(RegressionCorrector):
-    """Correct a light curve using local pixel time series.
+    """Correct TESS light curves by detrending against local pixel time series.
 
     Special case of `.RegressionCorrector` where the `.DesignMatrix` is
     composed of background-corrected pixel time series.
