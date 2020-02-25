@@ -364,7 +364,7 @@ class SearchResult(object):
         # build path string name and check if it exists
         # this is necessary to ensure cutouts are not downloaded multiple times
         sec = TesscutClass().get_sectors(coords)
-        sector_name = sec[sec['sector'] == 1]['sectorName'][0]
+        sector_name = sec[sec['sector'] == sector]['sectorName'][0]
         if isinstance(cutout_size, int):
             size_str = str(int(cutout_size)) + 'x' + str(int(cutout_size))
         elif isinstance(cutout_size, tuple) or isinstance(cutout_size, list):

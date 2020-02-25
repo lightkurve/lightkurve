@@ -111,13 +111,13 @@ def test_search_tesscut_download(caplog):
         ra, dec = 30.578761, -83.210593
         search_string = search_tesscut('{}, {}'.format(ra, dec), sector=[1, 12])
         # Make sure they can be downloaded with default size
-        tpf = search_string[0].download()
-        # Ensure the correct object has been read in
+        tpf = search_string[1].download()
+        # Ensure the correct object has been returned
         assert(isinstance(tpf, TessTargetPixelFile))
         # Ensure default size is 5x5
         assert(tpf.flux[0].shape == (5, 5))
-        # Ensure the tpf has a targetid (#473 regression test)
-        assert(len(tpf.targetid) > 0)
+        assert(len(tpf.targetid) > 0)  # Regression test #473
+        assert(tpf.sector == 12)  # Regression test #696
         # Ensure the WCS is valid (#434 regression test)
         center_ra, center_dec = tpf.wcs.all_pix2world([[2.5, 2.5]], 1)[0]
         assert_almost_equal(ra, center_ra, decimal=1)
@@ -126,6 +126,8 @@ def test_search_tesscut_download(caplog):
         tpfc = search_string.download_all(cutout_size=4, quality_bitmask='hard')
         assert(isinstance(tpfc, TargetPixelFileCollection))
         assert(tpfc[0].quality_bitmask == 'hard')  # Regression test for #494
+        assert(tpfc[0].sector == 1)  # Regression test #696
+        assert(tpfc[1].sector == 12) # Regression test #696
         # Ensure correct dimensions
         assert(tpfc[0].flux[0].shape == (4, 4))
         # Download with rectangular dimennsions?
