@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.8</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.9</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -130,12 +130,15 @@ class, which provides three key methods:</p>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>(lc)</p></td>
 <td><p>Special case of <a class="reference internal" href="lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector" title="lightkurve.correctors.RegressionCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionCorrector</span></code></a> where the <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> includes the target’s centroid positions.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.TessPLDCorrector.html#lightkurve.correctors.TessPLDCorrector" title="lightkurve.correctors.TessPLDCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessPLDCorrector</span></code></a>(tpf[, aperture_mask])</p></td>
+<td><p>Correct TESS light curves by detrending against local pixel time series.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<div class="graphviz"><img src="../_images/inheritance-30035bb0bb105b705d3eb11bda117df31113c8ef.png" alt="Inheritance diagram of lightkurve.correctors.designmatrix.DesignMatrix, lightkurve.correctors.designmatrix.DesignMatrixCollection, lightkurve.correctors.cbvcorrector.KeplerCBVCorrector, lightkurve.correctors.pldcorrector.PLDCorrector, lightkurve.correctors.regressioncorrector.RegressionCorrector, lightkurve.correctors.sffcorrector.SFFCorrector" class="inheritance graphviz" /></div>
+<div class="graphviz"><img src="../_images/inheritance-998f45f5626bff84c4004ab80ba08272a2c8bd18.png" alt="Inheritance diagram of lightkurve.correctors.designmatrix.DesignMatrix, lightkurve.correctors.designmatrix.DesignMatrixCollection, lightkurve.correctors.cbvcorrector.KeplerCBVCorrector, lightkurve.correctors.pldcorrector.PLDCorrector, lightkurve.correctors.regressioncorrector.RegressionCorrector, lightkurve.correctors.sffcorrector.SFFCorrector, lightkurve.correctors.tesspldcorrector.TessPLDCorrector" class="inheritance graphviz" /></div>
 </div>
 </div>
 

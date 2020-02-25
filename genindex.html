@@ -41,7 +41,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="index.html">Lightkurve v1.8</a>
+    <a class="navbar-brand" href="index.html">Lightkurve v1.9</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -118,6 +118,7 @@
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
+ | <a href="#X"><strong>X</strong></a>
  | <a href="#Z"><strong>Z</strong></a>
  
 </div>
@@ -326,10 +327,10 @@
       </ul></li>
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.compress">compress() (lightkurve.seismology.SeismologyQuantity method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve">compute_cotrended_lightcurve() (lightkurve.lightcurvefile.KeplerLightCurveFile method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats">compute_stats() (lightkurve.periodogram.BoxLeastSquaresPeriodogram method)</a>
 </li>
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.conj">conj() (lightkurve.seismology.SeismologyQuantity method)</a>
@@ -362,6 +363,8 @@
         <li><a href="api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector.correct">(lightkurve.correctors.RegressionCorrector method)</a>
 </li>
         <li><a href="api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector.correct">(lightkurve.correctors.SFFCorrector method)</a>
+</li>
+        <li><a href="api/lightkurve.correctors.TessPLDCorrector.html#lightkurve.correctors.TessPLDCorrector.correct">(lightkurve.correctors.TessPLDCorrector method)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags.create_quality_mask">create_quality_mask() (lightkurve.utils.KeplerQualityFlags class method)</a>
@@ -444,8 +447,6 @@
 </li>
       <li><a href="api/lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags.DetectorAnomaly">DetectorAnomaly (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector.diagnose">diagnose() (lightkurve.correctors.KeplerCBVCorrector method)</a>
 
       <ul>
@@ -455,7 +456,11 @@
 </li>
         <li><a href="api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector.diagnose">(lightkurve.correctors.SFFCorrector method)</a>
 </li>
+        <li><a href="api/lightkurve.correctors.TessPLDCorrector.html#lightkurve.correctors.TessPLDCorrector.diagnose">(lightkurve.correctors.TessPLDCorrector method)</a>
+</li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector.diagnose_arclength">diagnose_arclength() (lightkurve.correctors.SFFCorrector method)</a>
 </li>
       <li><a href="api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.diagnose_deltanu">diagnose_deltanu() (lightkurve.seismology.Seismology method)</a>
@@ -470,6 +475,8 @@
 
       <ul>
         <li><a href="api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector.diagnose_priors">(lightkurve.correctors.SFFCorrector method)</a>
+</li>
+        <li><a href="api/lightkurve.correctors.TessPLDCorrector.html#lightkurve.correctors.TessPLDCorrector.diagnose_priors">(lightkurve.correctors.TessPLDCorrector method)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.diagonal">diagonal() (lightkurve.seismology.SeismologyQuantity method)</a>
@@ -1482,6 +1489,8 @@
 </li>
       <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile">TessLightCurveFile (class in lightkurve.lightcurvefile)</a>
 </li>
+      <li><a href="api/lightkurve.correctors.TessPLDCorrector.html#lightkurve.correctors.TessPLDCorrector">TessPLDCorrector (class in lightkurve.correctors)</a>
+</li>
       <li><a href="api/lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags">TessQualityFlags (class in lightkurve.utils)</a>
 </li>
       <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile">TessTargetPixelFile (class in lightkurve.targetpixelfile)</a>
@@ -1682,6 +1691,14 @@
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.wcs">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/lightkurve.correctors.TessPLDCorrector.html#lightkurve.correctors.TessPLDCorrector.X">X (lightkurve.correctors.TessPLDCorrector attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
