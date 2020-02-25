@@ -54,11 +54,14 @@ class TessPLDCorrector(RegressionCorrector):
 
     def _create_design_matrix(self, background_mask, pixel_components,
                               spline_n_knots, spline_degree):
-        """Returns a DesignMatrixCollection."""
-        # Estimate the median background over time
-        # Subtract the mean image from each cadence
+        """Returns a `DesignMatrixCollection`."""
+        # First, we estimate the per-pixel background flux over time by
+        # (i) subtracting a mean image from each cadence;
+        # (ii) computing the median pixel value in the residual images;
+        # (iii) assume that the 5%-percentile of those medians gives us the
+        # exact background level. This assumption appears to work well for TESS
+        # but it has not been validated in detail yet.
         simple_bkg = (self.tpf.flux - np.nanmean(self.tpf.flux, axis=0))
-        # Compute the median background pixel value over time
         simple_bkg = np.nanmedian(simple_bkg[:, background_mask], axis=1)
         simple_bkg -= np.percentile(simple_bkg, 5)
 
@@ -68,7 +71,9 @@ class TessPLDCorrector(RegressionCorrector):
 
         dm_pixels = DesignMatrix(pixels, name='pixel_series').pca(pixel_components)
         dm_bkg = DesignMatrix(simple_bkg, name='background_model')
-        dm_spline = create_spline_matrix(self.lc.time, n_knots=spline_n_knots, degree=spline_degree).append_constant()
+        dm_spline = create_spline_matrix(self.lc.time,
+                                         n_knots=spline_n_knots,
+                                         degree=spline_degree).append_constant()
         dm = DesignMatrixCollection([dm_pixels, dm_bkg, dm_spline])
         return dm
 
