@@ -1,9 +1,9 @@
-"""Defines a BackgroundCorrector class which provides a simple way to correct a
+"""Defines a `TessPLDCorrector` class which provides a simple way to correct a
 light curve by utilizing the pixel time series data contained within the
 target's own Target Pixel File. Specifically, this corrector is intended to be
 used on TESS target pixel files provided by TESSCut.
 
-PixelCorrector builds upon RegressionCorrector by correlating the light curve
+`TessPLDCorrector` builds upon `RegressionCorrector` by correlating the light curve
 against a design matrix composed of the following elements:
 * A background light curve to capture the dominant scattered light systematics.
 * Background-corrected pixel time series to capture any residual systematics.
@@ -18,10 +18,10 @@ from .designmatrix import create_spline_matrix
 from .. import MPLSTYLE
 
 
-__all__ = ['BackgroundCorrector']
+__all__ = ['TessPLDCorrector']
 
 
-class BackgroundCorrector(RegressionCorrector):
+class TessPLDCorrector(RegressionCorrector):
     """Correct a light curve using local pixel time series.
 
     Special case of `.RegressionCorrector` where the `.DesignMatrix` is
@@ -32,7 +32,7 @@ class BackgroundCorrector(RegressionCorrector):
 
     Examples
     --------
-    >>> corrector = BackgroundCorrector(tpf)  # doctest: +SKIP
+    >>> corrector = TessPLDCorrector(tpf)  # doctest: +SKIP
     >>> lc = corrector.correct()  # doctest: +SKIP
 
     Parameters
@@ -47,10 +47,10 @@ class BackgroundCorrector(RegressionCorrector):
         lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
         self.tpf = tpf
         self.aperture_mask = aperture_mask
-        super(BackgroundCorrector, self).__init__(lc=lc)
+        super(TessPLDCorrector, self).__init__(lc=lc)
 
     def __repr__(self):
-        return 'BackgroundCorrector (LC: {})'.format(self.lc.label)
+        return 'TessPLDCorrector (LC: {})'.format(self.lc.label)
 
     def _create_design_matrix(self, background_mask, pixel_components,
                               spline_n_knots, spline_degree):
@@ -98,7 +98,7 @@ class BackgroundCorrector(RegressionCorrector):
                                         pixel_components=pixel_components,
                                         spline_n_knots=spline_n_knots,
                                         spline_degree=spline_degree)
-        clc = super(BackgroundCorrector, self).correct(dm, **kwargs)
+        clc = super(TessPLDCorrector, self).correct(dm, **kwargs)
         if restore_trend:
             clc += self.diagnostic_lightcurves['spline']
         return clc
