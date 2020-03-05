@@ -61,9 +61,6 @@ docs/source/api/*
 # PyBuilder
 target/
 
-# PyCharm
-.idea
-
 # Custom additions
 pyraf
 
