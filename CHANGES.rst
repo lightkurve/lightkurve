@@ -1,3 +1,11 @@
+1.9.1 (unreleased)
+==================
+
+- Fixed a bug in `LightCurve.bin()` which caused the method to fail if the
+  ``quality`` array has a floating point data type. [#705]
+
+
+
 1.9.0 (2020-02-25)
 ==================
 
