@@ -986,3 +986,9 @@ def test_river():
     with pytest.warns(LightkurveWarning, match='`bin_points` is too high to plot'):
         folded_lc.plot_river(method='median', bin_points=6)
         plt.close()
+
+
+def test_bin_issue705():
+    """Regression test for #705: binning failed."""
+    lc = TessLightCurve(time=np.arange(50), flux=np.ones(50), quality=np.zeros(50))
+    lc.bin(binsize=15)

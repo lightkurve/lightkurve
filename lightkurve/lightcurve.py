@@ -779,7 +779,7 @@ class LightCurve(object):
         nlc.flux_err = fe
 
         if hasattr(lc, 'quality'):
-            quality = np.zeros(len(ntime))
+            quality = np.zeros(len(ntime), dtype=lc.quality.dtype)
             quality[in_original] = np.copy(lc.quality)
             quality[~in_original] += 65536
             nlc.quality = quality
@@ -951,7 +951,8 @@ class LightCurve(object):
         # Define and map the functions to be applied to each bin
         method_func = np.__dict__['nan' + method]
         quality_func = lambda x: np.bitwise_or.reduce(x) \
-                                 if np.all(np.isfinite(x)) else np.nan
+                                 if np.issubdtype(x.dtype, np.integer) and np.all(np.isfinite(x)) \
+                                 else np.nan
         centroid_func = lambda x: method_func(x) \
                                   if np.any(np.isfinite(x)) else np.nan
         # Assume the errors combine as the root-mean-square
