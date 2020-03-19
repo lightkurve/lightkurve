@@ -18,7 +18,7 @@ from astropy.table import Table
 
 from ..utils import LightkurveWarning
 from ..search import search_lightcurvefile, search_targetpixelfile, \
-                     search_tesscut, SearchResult, SearchError, open
+                     search_tesscut, SearchResult, SearchError, open, log
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
 from .. import PACKAGEDIR
@@ -105,19 +105,19 @@ def test_search_tesscut():
 
 
 @pytest.mark.remote_data
-def test_search_tesscut_download():
+def test_search_tesscut_download(caplog):
     """Can we download TESS cutouts via `search_cutout().download()?"""
     try:
         ra, dec = 30.578761, -83.210593
         search_string = search_tesscut('{}, {}'.format(ra, dec), sector=[1, 12])
         # Make sure they can be downloaded with default size
-        tpf = search_string[0].download()
-        # Ensure the correct object has been read in
+        tpf = search_string[1].download()
+        # Ensure the correct object has been returned
         assert(isinstance(tpf, TessTargetPixelFile))
         # Ensure default size is 5x5
         assert(tpf.flux[0].shape == (5, 5))
-        # Ensure the tpf has a targetid (#473 regression test)
-        assert(len(tpf.targetid) > 0)
+        assert(len(tpf.targetid) > 0)  # Regression test #473
+        assert(tpf.sector == 12)  # Regression test #696
         # Ensure the WCS is valid (#434 regression test)
         center_ra, center_dec = tpf.wcs.all_pix2world([[2.5, 2.5]], 1)[0]
         assert_almost_equal(ra, center_ra, decimal=1)
@@ -126,11 +126,18 @@ def test_search_tesscut_download():
         tpfc = search_string.download_all(cutout_size=4, quality_bitmask='hard')
         assert(isinstance(tpfc, TargetPixelFileCollection))
         assert(tpfc[0].quality_bitmask == 'hard')  # Regression test for #494
+        assert(tpfc[0].sector == 1)  # Regression test #696
+        assert(tpfc[1].sector == 12) # Regression test #696
         # Ensure correct dimensions
         assert(tpfc[0].flux[0].shape == (4, 4))
         # Download with rectangular dimennsions?
         rect_tpf = search_string[0].download(cutout_size=(3, 5))
         assert(rect_tpf.flux[0].shape == (3, 5))
+        # If we ask for the exact same cutout, do we get it from cache?
+        caplog.clear()
+        log.setLevel("DEBUG")
+        tpf_cached = search_string[0].download(cutout_size=(3, 5))
+        assert "Cached file found." in caplog.text
     except HTTPError as exc:
         # TESSCut will occasionally return a "504 Gateway Timeout error" when
         # it is overloaded.  We don't want this to trigger a test failure.

@@ -1,3 +1,25 @@
+1.9.1 (unreleased)
+==================
+
+- Fixed a bug in `LightCurve.bin()` which caused the method to fail if the
+  ``quality`` array has a floating point data type. [#705]
+
+
+
+1.9.0 (2020-02-25)
+==================
+
+- Added an experimental ``TessPLDCorrector`` class designed to correct TESS FFI
+  light curves by detrending against local pixel time series. [#687]
+
+- Added a ``LightCurve.plot_river()`` method to plot river diagrams, which uses
+  colors to visualize fluxes by period cycle (row) and phase (column). [#625]
+
+- Added caching to `search_tesscut` to avoid requesting an identical cut out
+  more than once. [#481]
+
+
+
 1.8.0 (2020-02-09)
 ==================
 

@@ -1,6 +1,7 @@
 """Defines tools to retrieve Kepler and TESS data from the archive at MAST."""
 from __future__ import division
 import os
+import glob
 import logging
 import re
 import warnings
@@ -149,7 +150,6 @@ class SearchResult(object):
                                                 table[0]['sequence_number'],
                                                 download_dir,
                                                 cutout_size)
-                log.debug("Finished downloading.")
             except Exception as exc:
                 msg = str(exc)
                 if "504" in msg:
@@ -361,10 +361,36 @@ class SearchResult(object):
 
         # Resolve SkyCoord of given target
         coords = _resolve_object(target)
-        cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
-                                                      sector=sector, path=tesscut_dir)
 
-        path = os.path.join(download_dir, cutout_path[0][0])
+        # build path string name and check if it exists
+        # this is necessary to ensure cutouts are not downloaded multiple times
+        sec = TesscutClass().get_sectors(coords)
+        sector_name = sec[sec['sector'] == sector]['sectorName'][0]
+        if isinstance(cutout_size, int):
+            size_str = str(int(cutout_size)) + 'x' + str(int(cutout_size))
+        elif isinstance(cutout_size, tuple) or isinstance(cutout_size, list):
+            size_str = str(int(cutout_size[1])) + 'x' + str(int(cutout_size[0]))
+
+        # search cache for file with matching ra, dec, and cutout size
+        # ra and dec are searched within 0.001 degrees of input target
+        ra_string = str(coords.ra.value)
+        dec_string = str(coords.dec.value)
+        matchstring = r"{}_{}*_{}*_{}_astrocut.fits".format(sector_name,
+                                                            ra_string[:ra_string.find('.')+4],
+                                                            dec_string[:dec_string.find('.')+4],
+                                                            size_str)
+        cached_files = glob.glob(os.path.join(tesscut_dir, matchstring))
+
+        # if any files exist, return the path to them instead of downloading
+        if len(cached_files) > 0:
+            path = cached_files[0]
+            log.debug("Cached file found.")
+        # otherwise the file will be downloaded
+        else:
+            cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
+                                                          sector=sector, path=tesscut_dir)
+            path = os.path.join(download_dir, cutout_path[0][0])
+            log.debug("Finished downloading.")
         return path
 
 

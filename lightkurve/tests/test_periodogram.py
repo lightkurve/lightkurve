@@ -1,6 +1,7 @@
 import pytest
 from astropy import units as u
 import numpy as np
+import matplotlib.pyplot as plt
 from numpy.testing import assert_almost_equal, assert_array_equal
 
 from ..lightcurve import LightCurve
@@ -23,7 +24,9 @@ def test_periodogram_basics():
     lc = lc.normalize()
     pg = lc.to_periodogram()
     pg.plot()
+    plt.close()
     pg.plot(view='period')
+    plt.close()
     pg.show_properties()
     pg.to_table()
     str(pg)
@@ -202,6 +205,7 @@ def test_flatten():
     assert all(s.power == p.flatten().power)
     str(s)
     s.plot()
+    plt.close()
 
 def test_index():
     """Test if you can mask out periodogram
@@ -228,6 +232,7 @@ def test_bls(caplog):
     assert np.all([key in  dir(p) for key in keys])
 
     p.plot()
+    plt.close()
 
     # we should be able to specify some keywords
     lc.to_periodogram(method='bls', minimum_period=0.2, duration=0.1, maximum_period=0.5)

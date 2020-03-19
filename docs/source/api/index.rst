@@ -60,7 +60,7 @@ It uses linear regression to correlate a light curve against a `.DesignMatrix`
 of column vectors which are known to correlate with additive noise components:
 
 .. automodsumm:: lightkurve.correctors
-    :skip: SFFCorrector, PLDCorrector, KeplerCBVCorrector
+    :skip: SFFCorrector, PLDCorrector, KeplerCBVCorrector, TessPLDCorrector
 
 The classes below extend `.RegressionCorrector` by providing the user with
 pre-configured `.DesignMatrix` objects which are known to be effective at
