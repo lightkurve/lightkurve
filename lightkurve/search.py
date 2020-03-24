@@ -652,10 +652,12 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                         "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
                         "".format(target))
 
-    # Speed up by restricting the MAST query
+    # Speed up by restricting the MAST query if we don't want FFI image data
     extra_query_criteria = {}
-    if filetype == 'Lightcurve':
-        extra_query_criteria['dataproduct_type'] = 'timeseries'
+    if filetype in ['Lightcurve', 'Target Pixel']:
+        # At MAST, non-FFI Kepler pipeline products are known as "cube" products,
+        # and non-FFI TESS pipeline products are listed as "timeseries".
+        extra_query_criteria['dataproduct_type'] = ['cube', 'timeseries']
     observations = _query_mast(target, project=mission, radius=radius, **extra_query_criteria)
     log.debug("MAST found {} observations. "
               "Now querying MAST for the corresponding data products."
