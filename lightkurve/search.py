@@ -610,7 +610,7 @@ def search_tesscut(target, sector=None):
 
 def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                      mission=('Kepler', 'K2', 'TESS'), quarter=None, month=None,
-                     campaign=None, sector=None, limit=None):
+                     campaign=None, sector=None, limit=None, **extra_query_criteria):
     """Helper function which returns a SearchResult object containing MAST
     products that match several criteria.
 
@@ -652,7 +652,11 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                         "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
                         "".format(target))
 
-    observations = _query_mast(target, project=mission, radius=radius)
+    # Speed up by restricting the MAST query
+    extra_query_criteria = {}
+    if filetype == 'Lightcurve':
+        extra_query_criteria['dataproduct_type'] = 'timeseries'
+    observations = _query_mast(target, project=mission, radius=radius, **extra_query_criteria)
     log.debug("MAST found {} observations. "
               "Now querying MAST for the corresponding data products."
               "".format(len(observations)))
@@ -702,7 +706,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
         return SearchResult(masked_result)
 
 
-def _query_mast(target, radius=None, project=('Kepler', 'K2', 'TESS')):
+def _query_mast(target, radius=None, project=('Kepler', 'K2', 'TESS'), **extra_query_criteria):
     """Helper function which wraps `astroquery.mast.Observations.query_criteria()`
     to returns a table of all Kepler or K2 observations of a given target.
 
@@ -755,7 +759,8 @@ def _query_mast(target, radius=None, project=('Kepler', 'K2', 'TESS')):
             target_obs = Observations.query_criteria(target_name=target_name,
                                                      radius=str(radius.to(u.deg)),
                                                      project=project,
-                                                     obs_collection=project)
+                                                     obs_collection=project,
+                                                     **extra_query_criteria)
 
         if len(target_obs) == 0:
             raise ValueError("No observations found for '{}'.".format(target_name))
@@ -779,7 +784,8 @@ def _query_mast(target, radius=None, project=('Kepler', 'K2', 'TESS')):
                 obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
                                                   radius=str(radius.to(u.deg)),
                                                   project=project,
-                                                  obs_collection=project)
+                                                  obs_collection=project,
+                                                  **extra_query_criteria)
             obs.sort('distance')
         return obs
     except ValueError:
@@ -799,7 +805,8 @@ def _query_mast(target, radius=None, project=('Kepler', 'K2', 'TESS')):
             obs = Observations.query_criteria(objectname=target,
                                               radius=str(radius.to(u.deg)),
                                               project=project,
-                                              obs_collection=project)
+                                              obs_collection=project,
+                                              **extra_query_criteria)
         obs.sort('distance')
         return obs
     except ResolverError as exc:
