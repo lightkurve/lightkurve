@@ -33,7 +33,7 @@ try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
     from bokeh.io import show, output_notebook, push_notebook
     from bokeh.plotting import figure, ColumnDataSource
-    from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, \
+    from bokeh.models import LogColorMapper, Slider, RangeSlider, \
         Span, ColorBar, LogTicker, Range1d, LinearColorMapper, BasicTicker
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
@@ -104,10 +104,8 @@ def prepare_tpf_datasource(tpf, aperture_mask):
     xx = tpf.column + np.arange(tpf.shape[2])
     yy = tpf.row + np.arange(tpf.shape[1])
     xa, ya = np.meshgrid(xx, yy)
-    preselected = Selection()
-    preselected.indices = pixel_index_array[aperture_mask].reshape(-1).tolist()
-    tpf_source = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5),
-                                  selected=preselected)
+    tpf_source = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5))
+    tpf_source.selected.indices = pixel_index_array[aperture_mask].reshape(-1).tolist()
     return tpf_source
 
 
