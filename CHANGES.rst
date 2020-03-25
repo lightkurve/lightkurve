@@ -1,14 +1,15 @@
-1.9.1 (unreleased)
+1.9.1 (2020-03-25)
 ==================
 
 - Increased the speed of ``search_lightcurvefile()`` and
-  ``search_targetpixelfile()`` by a factor ~10. [#715]
+  ``search_targetpixelfile()`` by a factor ~10x. [#715]
+
+- Fixed an issue which caused ``interact()`` and ``interact_bls()`` to be
+  incompatible with Bokeh v2.0.0. [#716]
 
 - Fixed a bug in `LightCurve.bin()` which caused the method to fail if the
   ``quality`` array has a floating point data type. [#705]
 
-- Resolved an issue which caused ``interact()`` and ``interact_bls()`` to be
-  incompatible with Bokeh v2.0.0. [#716]
 
 
 1.9.0 (2020-02-25)

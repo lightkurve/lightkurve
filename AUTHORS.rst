@@ -59,3 +59,4 @@ Comments, corrections & suggestions:
 - `ansainbdg <https://github.com/ansainbdg>`_
 - `newxr <https://github.com/newxr>`_
 - `Tony (Yu-Ching) Chen <https://github.com/xyz3919>`_
+- `Nuno Ramos Carvalho <https://github.com/nunorc>`_
