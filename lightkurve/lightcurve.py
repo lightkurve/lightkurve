@@ -1380,7 +1380,7 @@ class LightCurve(object):
 
         Parameters
         ----------
-        columns : list of str
+        columns : tuple of str
             List of columns to include in the DataFrame.  The names must match
             attributes of the `LightCurve` object (e.g. ``time``, ``flux``).
 
@@ -1406,8 +1406,7 @@ class LightCurve(object):
                 # See https://github.com/KeplerGO/lightkurve/issues/188
                 if data[col].dtype.byteorder == '>':  # is big endian?
                     data[col] = data[col].byteswap().newbyteorder()
-        df = pd.DataFrame(data=data, index=self.time, columns=columns)
-        df.index.name = 'time'
+        df = pd.DataFrame(data=data, columns=columns)
         return df
 
     def to_csv(self, path_or_buf=None, **kwargs):
