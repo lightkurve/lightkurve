@@ -415,7 +415,8 @@ def test_cdpp_tabby():
     assert(np.abs(lc.estimate_cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
 
 
-@pytest.mark.skip(reason="Temporarily skipping due to https://github.com/scipy/scipy/issues/11365")
+# TEMPORARILY SKIP, cf. https://github.com/KeplerGO/lightkurve/issues/663
+@pytest.mark.xfail
 def test_bin():
     """Does binning work?"""
     lc = LightCurve(time=np.arange(10),
@@ -516,7 +517,8 @@ def test_bins_kwarg():
     #   - Bins = 310.0
 
 
-@pytest.mark.skip(reason="Temporarily skipping due to https://github.com/scipy/scipy/issues/11365")
+# TEMPORARILY SKIP, cf. https://github.com/KeplerGO/lightkurve/issues/663
+@pytest.mark.xfail
 def test_bin_quality():
     """Binning must also revise the quality and centroid columns."""
     lc = KeplerLightCurve(time=[1, 2, 3, 4],
@@ -988,6 +990,8 @@ def test_river():
         plt.close()
 
 
+# TEMPORARILY SKIP, cf. https://github.com/KeplerGO/lightkurve/issues/663
+@pytest.mark.xfail
 def test_bin_issue705():
     """Regression test for #705: binning failed."""
     lc = TessLightCurve(time=np.arange(50), flux=np.ones(50), quality=np.zeros(50))

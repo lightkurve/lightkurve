@@ -25,7 +25,7 @@ try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
     from bokeh.io import show, output_notebook
     from bokeh.plotting import figure, ColumnDataSource
-    from bokeh.models import Selection, Slider, Span, Range1d
+    from bokeh.models import Slider, Span, Range1d
     from bokeh.models import Text
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
@@ -56,15 +56,13 @@ def prepare_bls_datasource(result, loc):
     bls_source : Bokeh.plotting.ColumnDataSource
         Bokeh style source for plotting
     """
-    preselected = Selection()
-    preselected.indices = [loc]
     bls_source = ColumnDataSource(data=dict(
                                         period=result['period'],
                                         power=result['power'],
                                         depth=result['depth'],
                                         duration=result['duration'],
-                                        transit_time=result['transit_time']),
-                                  selected=preselected)
+                                        transit_time=result['transit_time']))
+    bls_source.selected.indices = [loc]
     return bls_source
 
 
