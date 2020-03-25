@@ -1,6 +1,9 @@
 1.9.1 (unreleased)
 ==================
 
+- Increased the speed of ``search_lightcurvefile()`` and
+  ``search_targetpixelfile()`` by a factor ~10. [#715]
+
 - Fixed a bug in `LightCurve.bin()` which caused the method to fail if the
   ``quality`` array has a floating point data type. [#705]
 
