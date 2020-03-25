@@ -34,8 +34,8 @@ setup(name='lightkurve',
       description="A friendly package for Kepler & TESS time series analysis "
                   "in Python.",
       long_description=open('README.rst').read(),
-      author='KeplerGO',
-      author_email='keplergo@mail.arc.nasa.gov',
+      author='Geert Barentsen',
+      author_email='geert@barentsen.be',
       url='https://docs.lightkurve.org',
       license='MIT',
       package_dir={
