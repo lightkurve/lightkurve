@@ -6,6 +6,7 @@ from setuptools import setup
 # Prepare and send a new release to PyPI
 if "release" in sys.argv[-1]:
     os.system("python setup.py sdist")
+    os.system("python setup.py bdist_wheel")
     os.system("twine upload dist/*")
     os.system("rm -rf dist/lightkurve*")
     sys.exit()
