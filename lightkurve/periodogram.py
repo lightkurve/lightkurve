@@ -13,7 +13,6 @@ from matplotlib import pyplot as plt
 import astropy
 from astropy.table import Table
 from astropy import units as u
-from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel
 
 # LombScargle was moved from astropy.stats to astropy.timeseries in AstroPy v3.2
@@ -66,10 +65,12 @@ class Periodogram(object):
     def __init__(self, frequency, power, nyquist=None, label=None,
                  targetid=None, xaxis_default="frequency", yaxis_default="power",
                  default_view=None, meta={}):
-        # ``default_view``` is deprecated in favor of ``xaxis_default```
-        # TODO: ADD DEPRECATION WARNING
-        if xaxis_default == "frequency" and default_view is not None:
-            xaxis_default = default_view
+        if default_view is not None:
+            warnings.warn("`default_view` keyword is deprecated, please use "
+                          "`xaxis_default` and `yaxis_default` instead.",
+                          LightkurveWarning)
+            if xaxis_default == "frequency":
+                xaxis_default = default_view
         xaxis_default = validate_method(xaxis_default, ["frequency", "period"])
         yaxis_default = validate_method(yaxis_default, ["power", "amplitude"])
         # Input validation
@@ -863,15 +864,12 @@ class LombScarglePeriodogram(Periodogram):
                              nterms=nterms, **kwargs)
             lspower = LS.power(frequency, method=ls_method, normalization='psd')
 
-        # Asteroseismologists typically use `power` as a synonym for
-        # power spectral density
-        frequency_spacing = oversample_factor * fs
-        power = (2. / len(time)) * (lspower / frequency_spacing)
+        power = (4. / len(time)) * lspower
 
-        # To compute the amplituude we need to keep track
+        # To compute the amplitude we need to keep track
         # of the frequency spacing.
         meta = {}
-        meta['frequency_spacing'] = frequency_spacing
+        meta['frequency_spacing'] = oversample_factor * fs
         meta['normalization'] = normalization
 
         # Periodogram needs properties
@@ -884,7 +882,12 @@ class LombScarglePeriodogram(Periodogram):
     @property
     def amplitude(self):
         """Returns the amplitude in units of flux."""
-        return np.sqrt(2. * self.meta['frequency_spacing'] * self.power)
+        return np.sqrt(self.power)
+
+    @property
+    def psd(self):
+        """Returns the power spectral density."""
+        return self.power / (2. * self.meta['frequency_spacing'])
 
     def model(self, time, frequency=None):
         """Obtain the flux model for a given frequency and time
