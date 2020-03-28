@@ -44,10 +44,10 @@ def test_periodogram_normalization():
     assert pg.amplitude.unit == u.cds.ppm
 
     # Test PSD normalization and correct units
+    pg = lc.to_periodogram(default_xunit=u.microhertz)
+    assert pg.psd.unit == 1. / u.microhertz
     pg = lc.to_periodogram(default_xunit=u.microhertz, default_yunit="electron/second")
     assert pg.psd.unit ==  (u.electron/u.second)**2 / u.microhertz
-    pg = lc.to_periodogram(default_xunit=u.microhertz)
-    assert pg.psd.unit == u.cds.ppm**2 / u.microhertz
 
 
 def test_periodogram_warnings():
@@ -72,11 +72,11 @@ def test_periodogram_units():
     assert hasattr(p.frequency, 'unit')
 
     # Has the correct units
-    assert p.frequency.unit == u.microhertz
-    assert p.power.unit == ppm**2
+    assert p.frequency.unit == 1 / u.day
+    assert p.power.unit == ''
     assert p.period.unit == u.day
-    assert p.frequency_at_max_power.unit == u.microhertz
-    assert p.max_power.unit == ppm**2
+    assert p.frequency_at_max_power.unit == 1 / u.day
+    assert p.max_power.unit == ''
 
 
 def test_periodogram_can_find_periods():

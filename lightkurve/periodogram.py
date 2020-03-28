@@ -62,7 +62,7 @@ class Periodogram(object):
         Free-form metadata associated with the Periodogram.
     """
     def __init__(self, frequency, power, nyquist=None, label=None,
-                 targetid=None, default_xunit="microhertz", default_yunit="ppm",
+                 targetid=None, default_xunit="day", default_yunit="",
                  meta={}, **kwargs):
         # The `default_view` argument was removed in Lightkurve v1.10
         if "default_view" in kwargs:
@@ -304,7 +304,10 @@ class Periodogram(object):
         if xlabel is None:
             xlabel = "{} [{}]".format(xunit_type, xunit.to_string('latex'))
         if ylabel is None:
-            ylabel = "{} [{}]".format(yunit_type, yunit.to_string('latex'))
+            if yunit == "":
+                ylabel = "{} [normalized]".format(yunit_type)
+            else:
+                ylabel = "{} [{}]".format(yunit_type, yunit.to_string('latex'))
         if ('label' not in kwargs):
             kwargs['label'] = self.label
 
@@ -588,7 +591,7 @@ class LombScarglePeriodogram(Periodogram):
                         minimum_period=None, maximum_period=None,
                         frequency=None, period=None, nterms=1, nyquist_factor=1,
                         oversample_factor=None, ls_method='fast',
-                        default_xunit="microhertz", default_yunit="ppm",
+                        default_xunit="day", default_yunit="",
                         **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
@@ -755,7 +758,7 @@ class LombScarglePeriodogram(Periodogram):
         # or 'time' (because ppm**2/hz is a unit of time)
         if lc.flux_unit is not None and lc.flux_unit.physical_type != 'dimensionless':
             if default_yunit.physical_type in ['dimensionless', 'time']:
-                lc = lc.normalize(unit="ppm")
+                lc = lc.normalize()
 
         # Default oversample factor
         if oversample_factor is None:
@@ -1162,7 +1165,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
 
 def _unit2label(unit):
-    if unit in ["percent", "ppt", "ppm", "mag"]:
+    if unit in ["", "percent", "ppt", "ppm", "mag"]:
         return "Amplitude"
     elif unit in ["percent^2", "ppt^2", "ppm^2", "mag^2"]:
         return "Power"
@@ -1178,10 +1181,8 @@ def _unit2label(unit):
 def _validate_unit(unit, default=None):
     if unit is None:
         return default
-
     if isinstance(unit, u.quantity.Quantity):
         return unit.unit
-
     try:
         return u.Unit(unit)
     except ValueError as e:
