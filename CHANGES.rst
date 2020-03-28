@@ -1,6 +1,8 @@
 1.10.dev (unreleased)
 ==================
 
+- Removed the `default_view`, `normalization`, and `freq_unit` keywords from
+  the `Periodogram` class.
 
 
 

@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
 
 from .version import __version__
+from .units import *
 from .prf import *
 from .lightcurve import *
 from .lightcurvefile import *

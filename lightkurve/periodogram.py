@@ -4,7 +4,6 @@ from __future__ import division, print_function
 import copy
 import logging
 import math
-import re
 import warnings
 
 import numpy as np
@@ -55,24 +54,22 @@ class Periodogram(object):
         Human-friendly object label, e.g. "KIC 123456789".
     targetid : str
         Identifier of the target.
-    xaxis_default : "frequency" or "period"
-        Should the X axis of plots show frequency or period by default?
-    yaxis_default : "amplitude" or "power"
-        Should the Y axis of plots show amplitude or power by default?
+    default_xunit : str or `~astropy.units.quantity.Quantity`
+        Default unit to show on the X axis of plots.
+    default_yunit : str or `~astropy.units.quantity.Quantity`
+        Default unit to show on the Y axis of plots.
     meta : dict
         Free-form metadata associated with the Periodogram.
     """
     def __init__(self, frequency, power, nyquist=None, label=None,
-                 targetid=None, xaxis_default="frequency", yaxis_default="power",
-                 default_view=None, meta={}):
-        if default_view is not None:
-            warnings.warn("`default_view` keyword is deprecated, please use "
-                          "`xaxis_default` and `yaxis_default` instead.",
+                 targetid=None, default_xunit="microhertz", default_yunit="ppm",
+                 meta={}, **kwargs):
+        # The `default_view` argument was removed in Lightkurve v1.10
+        if "default_view" in kwargs:
+            warnings.warn("the `default_view` argument has been removed, "
+                          "please use `default_xunit` and `default_yunit` instead.",
                           LightkurveWarning)
-            if xaxis_default == "frequency":
-                xaxis_default = default_view
-        xaxis_default = validate_method(xaxis_default, ["frequency", "period"])
-        yaxis_default = validate_method(yaxis_default, ["power", "amplitude"])
+
         # Input validation
         if not isinstance(frequency, u.quantity.Quantity):
             raise ValueError('frequency must be an `astropy.units.Quantity` object.')
@@ -94,14 +91,19 @@ class Periodogram(object):
         self.nyquist = nyquist
         self.label = label
         self.targetid = targetid
-        self.xaxis_default = xaxis_default
-        self.yaxis_default = yaxis_default
+        self.default_xunit = _validate_unit(default_xunit)
+        self.default_yunit = _validate_unit(default_yunit)
         self.meta = meta
+
+    @property
+    def amplitude(self):
+        """Returns the square root of the power."""
+        return np.sqrt(self.power)
 
     @property
     def period(self):
         """Returns the array of periods, i.e. 1/frequency."""
-        return 1. / self.frequency
+        return (1. / self.frequency).to("day")
 
     @property
     def max_power(self):
@@ -116,7 +118,7 @@ class Periodogram(object):
     @property
     def period_at_max_power(self):
         """Returns the period corresponding to the highest peak in the periodogram."""
-        return 1. / self.frequency_at_max_power
+        return self.period[np.nanargmax(self.power)]
 
     def bin(self, binsize=10, method='mean'):
         """Bins the power spectrum.
@@ -252,8 +254,7 @@ class Periodogram(object):
             return smooth_pg
 
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
-             style='lightkurve', view=None, xaxis=None, yaxis=None, unit=None,
-             **kwargs):
+             style='lightkurve', xunit=None, yunit=None, **kwargs):
         """Plots the Periodogram.
 
         Parameters
@@ -273,10 +274,10 @@ class Periodogram(object):
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
-        view : str
-            {'frequency', 'period'}. Default 'frequency'. If 'frequency', x-axis
-            units will be frequency. If 'period', the x-axis units will be
-            period and 'log' scale.
+        xunit : str or `~astropy.units.quantity.Quantity`
+            Unit to show on the X axis.
+        yunit : str or `~astropy.units.quantity.Quantity`
+            Unit to show on the Y axis.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
@@ -285,66 +286,49 @@ class Periodogram(object):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        if xaxis is None:
-            if view is not None:
-                # ``view`` is deprecated in favor of xaxis
-                # TODO: ADD DEPRECATION WARNING
-                # TODO: UPDATE DOCSTRING
-                xaxis = view
-            else:
-                xaxis = self.xaxis_default
-        xaxis = validate_method(xaxis, ["frequency", "period"])
+        # The `view` argument was removed in Lightkurve v1.10
+        if "view" in kwargs:
+            warnings.warn("the `view` argument has been removed, please use "
+                          "the `xunit` and `yunit` arguments instead.",
+                          LightkurveWarning)
+            if not xunit:
+                xunit = "day" if kwargs.pop("view") == "period" else "microhertz"
 
-        if yaxis is None:
-            yaxis = self.yaxis_default
-        yaxis = validate_method(yaxis, ["power", "amplitude"])
+        # Validate units
+        xunit = _validate_unit(xunit, default=self.default_xunit)
+        yunit = _validate_unit(yunit, default=self.default_yunit)
+        xunit_type = _unit2label(xunit)
+        yunit_type = _unit2label(yunit)
 
-        if isinstance(unit, u.quantity.Quantity):
-            unit = unit.unit
-
-        if unit is None:
-            unit = self.frequency.unit
-            if view == 'period':
-                unit = self.period.unit
-
-        if style is None or style == 'lightkurve':
-            style = MPLSTYLE
+        # Set default labels
+        if xlabel is None:
+            xlabel = "{} [{}]".format(xunit_type, xunit.to_string('latex'))
         if ylabel is None:
-            if normalization == 'amplitude':
-                ylabel = 'Amplitude'
-                ylabel += " [{}]".format(self.amplitude.unit.to_string('latex'))
-            else:
-                ylabel = "Power"
-                if self.power.unit.to_string() != '':
-                    unit_label = self.power.unit.to_string('latex')
-                    # The line below is a workaround for AstroPy bug #9218.
-                    # It can be removed once the fix for that issue is widespread.
-                    # See https://github.com/astropy/astropy/pull/9218
-                    unit_label = re.sub(r"\^{([^}]+)}\^{([^}]+)}", r"^{\g<1>^{\g<2>}}", unit_label)
-                    ylabel += " [{}]".format(unit_label)
-
-        # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
-        if ('label' not in kwargs) and ('label' in dir(self)):
+            ylabel = "{} [{}]".format(yunit_type, yunit.to_string('latex'))
+        if ('label' not in kwargs):
             kwargs['label'] = self.label
 
+        # What data to plot on X axis?
+        if xunit_type == 'Period':
+            xdata = self.period.to(xunit)
+        else:
+            xdata = self.frequency.to(xunit)
+
+        # What data to plot on Y axis?
+        if yunit_type == "Amplitude":
+            ydata = self.amplitude.to(yunit)
+        elif yunit_type == "Power Spectral Density":
+            ydata = self.psd.to(yunit)
+        else:
+            ydata = self.power.to(yunit)
+
+        # Make the plot
+        if style is None or style == 'lightkurve':
+            style = MPLSTYLE
         with plt.style.context(style):
             if ax is None:
                 fig, ax = plt.subplots()
-
-            if ('normalization' in self.meta) and (self.meta['normalization'] == 'amplitude'):
-                ydata = self.amplitude
-            else:
-                ydata = self.power
-
-            # Plot frequency and power
-            if view == 'frequency':
-                ax.plot(self.frequency.to(unit), ydata, **kwargs)
-                if xlabel is None:
-                    xlabel = "Frequency [{}]".format(unit.to_string('latex'))
-            elif view == 'period':
-                ax.plot(self.period.to(unit), ydata, **kwargs)
-                if xlabel is None:
-                    xlabel = "Period [{}]".format(unit.to_string('latex'))
+            ax.plot(xdata, ydata, **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
@@ -355,7 +339,6 @@ class Periodogram(object):
             ax.set_xscale(scale)
             ax.set_title(title)
         return ax
-
 
     def flatten(self, method='logmedian', filter_width=0.01, return_trend=False):
         """Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
@@ -586,6 +569,7 @@ class SNRPeriodogram(Periodogram):
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
 
+
 class LombScarglePeriodogram(Periodogram):
     """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
     representing a power spectrum generated using the Lomb Scargle method.
@@ -599,13 +583,12 @@ class LombScarglePeriodogram(Periodogram):
     def __repr__(self):
         return('LombScarglePeriodogram(ID: {})'.format(self.label))
 
-
     @staticmethod
     def from_lightcurve(lc, minimum_frequency=None, maximum_frequency=None,
                         minimum_period=None, maximum_period=None,
-                        frequency=None, period=None,
-                        nterms=1, nyquist_factor=1, oversample_factor=None,
-                        freq_unit=None, normalization="amplitude", ls_method='fast',
+                        frequency=None, period=None, nterms=1, nyquist_factor=1,
+                        oversample_factor=None, ls_method='fast',
+                        default_xunit="microhertz", default_yunit="ppm",
                         **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
@@ -680,18 +663,22 @@ class LombScarglePeriodogram(Periodogram):
         ----------
         lc : LightCurve object
             The LightCurve from which to compute the Periodogram.
-        minimum_frequency : float
+        minimum_frequency : float or `~astropy.units.Quantity`
             If specified, use this minimum frequency rather than one over the
-            time baseline.
-        maximum_frequency : float
+            time baseline.  If a float is passed, we will assume it is in
+            units microhertz.
+        maximum_frequency : float or `~astropy.units.Quantity`
             If specified, use this maximum frequency rather than nyquist_factor
-            times the nyquist frequency.
-        minimum_period : float
+            times the nyquist frequency.  If a float is passed, we will assume
+            it is in units microhertz.
+        minimum_period : float or `~astropy.units.Quantity`
             If specified, use 1./minium_period as the maximum frequency rather
-            than nyquist_factor times the nyquist frequency.
-        maximum_period : float
+            than nyquist_factor times the nyquist frequency. If a float is
+            passed, it will be assumed to be in units of days.
+        maximum_period : float or `~astropy.units.Quantity`
             If specified, use 1./maximum_period as the minimum frequency rather
-            than one over the time baseline.
+            than one over the time baseline.  If a float is passed, it will be
+            assumed to be in units of days.
         frequency :  array-like
             The grid of frequencies to use. If given a unit, it is converted to
             units of freq_unit. If not, it is assumed to be in units of
@@ -713,19 +700,13 @@ class LombScarglePeriodogram(Periodogram):
             normalization='amplitude', oversample_factor will be set to 5. If
             normalization='psd', it will be 1. These defaults can be
             overridden.
-         freq_unit : `astropy.units.core.CompositeUnit`
-            Default: None. The desired frequency units for the Lomb Scargle
-            periodogram. This implies that 1/freq_unit is the units for period.
-            With default normalization ('amplitude'), the freq_unit is set to
-            1/day, which can be overridden. 'psd' normalization will set
-            freq_unit to microhertz.
-        normalization : 'psd' or 'amplitude'
-            Default: `'amplitude'`. The desired normalization of the spectrum.
-            Can be either power spectral density (`'psd'`) or amplitude
-            (`'amplitude'`).
         ls_method : str
             Default: `'fast'`. Passed to the `method` keyword of
             `astropy.stats.LombScargle()`.
+        default_xunit : str or `astropy.units.Unit`
+            Default frequency or period unit to show.
+        default_yunit : str or `astropy.units.Unit`
+            Default power or amplitude unit to show.
         kwargs : dict
             Keyword arguments passed to `astropy.stats.LombScargle()`
 
@@ -734,17 +715,17 @@ class LombScarglePeriodogram(Periodogram):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
-        # Input validation
-        normalization = validate_method(normalization, ['psd', 'amplitude'])
-
-        # Setting default frequency units
-        if freq_unit is None:
-            freq_unit = 1/u.day if normalization == 'amplitude' else u.microhertz
-
-        # Default oversample factor
-        if oversample_factor is None:
-            oversample_factor = 5. if normalization == 'amplitude' else 1.
-
+        # Deprecation warnings
+        if "freq_unit" in kwargs:
+            kwargs.pop("freq_unit")
+            warnings.warn("`freq_unit` keyword is no longer used, "
+                          "please use `default_xunit` instead.",
+                          LightkurveWarning)
+        if "normalization" in kwargs:
+            kwargs.pop("normalization")
+            warnings.warn("`normalization` keyword is no longer used, "
+                          "please use `default_yunit` instead.",
+                          LightkurveWarning)
         if "min_period" in kwargs:
             warnings.warn("`min_period` keyword is deprecated, "
                           "please use `minimum_period` instead.",
@@ -766,22 +747,48 @@ class LombScarglePeriodogram(Periodogram):
                           LightkurveWarning)
             maximum_frequency = kwargs.pop("max_frequency", None)
 
-        # Check if any values of period have been passed and set format accordingly
-        if not all(b is None for b in [period, minimum_period, maximum_period]):
-            default_view = 'period'
-        else:
-            default_view = 'frequency'
+        # Validate user input
+        default_xunit = _validate_unit(default_xunit)
+        default_yunit = _validate_unit(default_yunit)
+
+        # Ensure the light curve is normalized if the requested yunit is dimensionless
+        # or 'time' (because ppm**2/hz is a unit of time)
+        if lc.flux_unit is not None and lc.flux_unit.physical_type != 'dimensionless':
+            if default_yunit.physical_type in ['dimensionless', 'time']:
+                lc = lc.normalize(unit="ppm")
+
+        # Default oversample factor
+        if oversample_factor is None:
+            oversample_factor = 5.
 
         # If period and frequency keywords have both been set, throw an error
-        if (not all(b is None for b in [period, minimum_period, maximum_period])) & \
-           (not all(b is None for b in [frequency, minimum_frequency, maximum_frequency])):
+        if (not all(b is None for b in [period, minimum_period, maximum_period])) and \
+                (not all(b is None for b in [frequency, minimum_frequency, maximum_frequency])):
             raise ValueError('You have input keyword arguments for both frequency and period. '
                              'Please only use one.')
+        # Warn if there is confusing input
+        if (frequency is not None) & (any([a is not None for a in [minimum_frequency, maximum_frequency]])):
+            log.warning("You have passed both a grid of frequencies "
+                        "and min_frequency/maximum_frequency arguments; "
+                        "the latter will be ignored.")
+        if (period is not None) & (any([a is not None for a in [minimum_period, maximum_period]])):
+            log.warning("You have passed a grid of periods "
+                        "and minimum_period/maximum_period arguments; "
+                        "the latter will be ignored.")
 
         if (~np.isfinite(lc.flux)).any():
-            raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
-                             ' to remove NaN values from a LightCurve.')
+            warnings.warn("Lightcurve contains NaN values.", LightkurveWarning)
+            lc = lc.remove_nans()
 
+        # DETERMINE THE FREQUENCY GRID
+
+        # What unit will the frequency grid be in?
+        if default_xunit.physical_type == "frequency":
+            freq_unit = default_xunit
+        else:  # time unit
+            freq_unit = 1./default_xunit
+
+        # Ensure the time stamps are in days
         if lc.time_format in ['bkjd', 'btjd', 'd', 'days', 'day', None]:
             time = lc.time.copy() * u.day
         else:
@@ -795,39 +802,36 @@ class LombScarglePeriodogram(Periodogram):
         nyquist = nyquist.to(freq_unit)
         fs = fs.to(freq_unit)
 
-        # Warn if there is confusing input
-        if (frequency is not None) & (any([a is not None for a in [minimum_frequency, maximum_frequency]])):
-            log.warning("You have passed both a grid of frequencies "
-                        "and min_frequency/maximum_frequency arguments; "
-                        "the latter will be ignored.")
-        if (period is not None) & (any([a is not None for a in [minimum_period, maximum_period]])):
-            log.warning("You have passed a grid of periods "
-                        "and minimum_period/maximum_period arguments; "
-                        "the latter will be ignored.")
+        if minimum_period is not None and not isinstance(minimum_period, u.Quantity):
+            minimum_period *= u.day
+        if maximum_period is not None and not isinstance(maximum_period, u.Quantity):
+            maximum_period *= u.day
+        if minimum_frequency is not None and not isinstance(minimum_frequency, u.Quantity):
+            minimum_frequency *= u.microhertz
+        if maximum_frequency is not None and not isinstance(maximum_frequency, u.Quantity):
+            maximum_frequency *= u.microhertz
 
-        # Tidy up the period stuff...
         if maximum_period is not None:
-            # minimum_frequency MUST be none by this point.
             minimum_frequency = 1. / maximum_period
         if minimum_period is not None:
-            # maximum_frequency MUST be none by this point.
             maximum_frequency = 1. / minimum_period
+
         # If the user specified a period, copy it into the frequency.
         if (period is not None):
             frequency = 1. / period
 
-        # Do unit conversions if user input min/max frequency or period
+        # Default frequency grid
         if frequency is None:
             if minimum_frequency is not None:
                 minimum_frequency = u.Quantity(minimum_frequency, freq_unit)
             if maximum_frequency is not None:
                 maximum_frequency = u.Quantity(maximum_frequency, freq_unit)
-            if (minimum_frequency is not None) & (maximum_frequency is not None):
-                if (minimum_frequency > maximum_frequency):
-                    if default_view == 'frequency':
-                        raise ValueError('minimum_frequency cannot be larger than maximum_frequency')
-                    if default_view == 'period':
-                        raise ValueError('minimum_period cannot be larger than maximum_period')
+            if minimum_period is not None and maximum_period is not None \
+                and (minimum_period > maximum_period):
+                    raise ValueError('minimum_period cannot be larger than maximum_period')
+            if minimum_frequency is not None and maximum_frequency is not None \
+                and (minimum_frequency > maximum_frequency):
+                    raise ValueError('minimum_frequency cannot be larger than maximum_frequency')
             # If nothing has been passed in, set them to the defaults
             if minimum_frequency is None:
                 minimum_frequency = fs
@@ -835,15 +839,17 @@ class LombScarglePeriodogram(Periodogram):
                 maximum_frequency = nyquist * nyquist_factor
 
             # Create frequency grid evenly spaced in frequency
-            frequency = np.arange(minimum_frequency.value, maximum_frequency.value, fs.to(freq_unit).value)
+            frequency = np.arange(minimum_frequency.value,
+                                  maximum_frequency.value,
+                                  fs.to(freq_unit).value)
 
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
 
         # Change to compatible ls method if sampling not even in frequency
-        if not implementations.main._is_regular(frequency) and ls_method in ['fastchi2','fast']:
+        if not implementations.main._is_regular(frequency) and ls_method in ['fastchi2', 'fast']:
             oldmethod = ls_method
-            ls_method = {'fastchi2':'chi2','fast':'slow'}[ls_method]
+            ls_method = {'fastchi2': 'chi2','fast': 'slow'}[ls_method]
             log.warning("The requested periodogram is not evenly sampled in frequency.\n"
                         "Method has been changed from '{}' to '{}' to allow for this.".format(oldmethod,ls_method))
 
@@ -870,19 +876,14 @@ class LombScarglePeriodogram(Periodogram):
         # of the frequency spacing.
         meta = {}
         meta['frequency_spacing'] = oversample_factor * fs
-        meta['normalization'] = normalization
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
                                       targetid=lc.targetid, label=lc.label,
-                                      default_view=default_view, ls_obj=LS,
+                                      ls_obj=LS,
                                       nterms=nterms, ls_method=ls_method,
+                                      default_xunit=default_xunit, default_yunit=default_yunit,
                                       meta=meta)
-
-    @property
-    def amplitude(self):
-        """Returns the amplitude in units of flux."""
-        return np.sqrt(self.power)
 
     @property
     def psd(self):
@@ -1015,7 +1016,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
         return BoxLeastSquaresPeriodogram(frequency=1. / result.period,
                                           power=result.power,
-                                          default_view='period',
+                                          default_xunit='day',
                                           label=lc.label,
                                           targetid=lc.targetid,
                                           transit_time=result.transit_time,
@@ -1158,3 +1159,30 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
     def smooth(self, **kwargs):
         raise NotImplementedError('`smooth` is not implemented for `BoxLeastSquaresPeriodogram`. ')
+
+
+def _unit2label(unit):
+    if unit in ["percent", "ppt", "ppm", "mag"]:
+        return "Amplitude"
+    elif unit in ["percent^2", "ppt^2", "ppm^2", "mag^2"]:
+        return "Power"
+    elif unit in ["percent^2 / Hz", "ppt^2 / Hz", "ppm^2 / Hz", "mag^2 / Hz",
+                  "percent^2 / microhertz", "ppt^2 / microhertz", "ppm^2 / microhertz", "mag^2 / microhertz"]:
+        return "Power Spectral Density"
+    elif unit.physical_type == "frequency":
+        return "Frequency"
+    elif unit.physical_type == "time":
+        return "Period"
+
+
+def _validate_unit(unit, default=None):
+    if unit is None:
+        return default
+
+    if isinstance(unit, u.quantity.Quantity):
+        return unit.unit
+
+    try:
+        return u.Unit(unit)
+    except ValueError as e:
+        raise ValueError("invalid unit: {}".format(e))
