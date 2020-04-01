@@ -862,12 +862,13 @@ class LombScarglePeriodogram(Periodogram):
                           LightkurveWarning)
             nterms = 1
 
+        # Ensure that data is zero-centred for periodogram
         if float(astropy.__version__[0]) >= 3:
-            LS = LombScargle(time, lc.flux_quantity,
+            LS = LombScargle(time, lc.flux_quantity - np.median(lc.flux_quantity),
                              nterms=nterms, normalization='psd', **kwargs)
             lspower = LS.power(frequency, method=ls_method)
         else:
-            LS = LombScargle(time, lc.flux_quantity,
+            LS = LombScargle(time, lc.flux_quantity - np.median(lc.flux_quantity),
                              nterms=nterms, **kwargs)
             lspower = LS.power(frequency, method=ls_method, normalization='psd')
 
