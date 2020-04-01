@@ -746,7 +746,7 @@ class LombScarglePeriodogram(Periodogram):
         if default_xunit == "":
             default_xunit = "1/day" if normalization == 'amplitude' else "microhertz"
         if default_yunit == "":
-            default_yunit = "" if normalization == 'amplitude' else "ppm^2/uHz"
+            default_yunit = "ppm" if normalization == 'amplitude' else "ppm^2/uHz"
 
         # Validate user input
         default_xunit = _validate_unit(default_xunit)
