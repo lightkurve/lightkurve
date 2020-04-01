@@ -575,10 +575,7 @@ class LombScarglePeriodogram(Periodogram):
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
     def __repr__(self):
-        if self.normalization == 'amplitude':
-            return('Amplitude spectrum (ID: {})'.format(self.label))
-        elif self.normalization == 'psd':
-            return('Power spectral density (ID: {})'.format(self.label))
+        return("LombScarglePeriodogram(ID: {}, normalization: {})".format(self.label, self.normalization))
 
     @staticmethod
     def from_lightcurve(lc, minimum_frequency=None, maximum_frequency=None, 
