@@ -4,10 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.testing import assert_almost_equal, assert_array_equal
 
-from ..units import ppt, ppm
 from ..lightcurve import LightCurve
 from ..periodogram import Periodogram
 from ..utils import LightkurveWarning
+from ..units import ppt, ppm
 import sys
 
 
@@ -38,16 +38,18 @@ def test_periodogram_normalization():
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1, flux_unit='electron/second')
     # Test amplitude normalization and correct units
-    pg = lc.to_periodogram(default_yunit='electron / second')
-    assert pg.amplitude.unit == u.electron / u.second
-    pg = lc.normalize(unit='ppm').to_periodogram()
-    assert pg.amplitude.unit == u.cds.ppm
+    pg = lc.to_periodogram(normalization='amplitude')
+    assert pg.power.unit == ppm
+    pg = lc.normalize(unit='ppm').to_periodogram(normalization='amplitude')
+    assert pg.power.unit == ppm
 
     # Test PSD normalization and correct units
-    pg = lc.to_periodogram(default_xunit=u.microhertz)
-    assert pg.psd.unit == 1. / u.microhertz
-    pg = lc.to_periodogram(default_xunit=u.microhertz, default_yunit="electron/second")
-    assert pg.psd.unit ==  (u.electron/u.second)**2 / u.microhertz
+    pg = lc.to_periodogram(normalization='psd')
+    assert pg.power.unit == ppm**2 / u.microhertz
+    pg = lc.to_periodogram(normalization='psd', default_yunit=ppm**2 / u.hertz)
+    assert pg.power.unit == ppm**2 / u.hertz
+    pg = lc.normalize().to_periodogram(normalization='psd', default_yunit=ppt**2 / u.microhertz)
+    assert pg.power.unit == ppt**2 / u.microhertz
 
 
 def test_periodogram_warnings():
@@ -56,10 +58,10 @@ def test_periodogram_warnings():
                     flux_err=np.zeros(1000)+0.1)
     lc = lc.normalize(unit='ppm')
     # Test amplitude normalization and correct units
-    pg = lc.to_periodogram()
-    assert pg.amplitude.unit == u.cds.ppm
-    pg = lc.to_periodogram(default_xunit=u.microhertz)
-    assert pg.psd.unit == u.cds.ppm**2 / u.microhertz
+    pg = lc.to_periodogram(normalization='amplitude')
+    assert pg.power.unit == u.cds.ppm
+    pg = lc.to_periodogram(normalization='psd')
+    assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
 
 def test_periodogram_units():
@@ -67,28 +69,35 @@ def test_periodogram_units():
     # Fake, noisy data
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1, flux_unit='electron/second')
-    p = lc.to_periodogram()
-    # Has units
-    assert hasattr(p.frequency, 'unit')
 
-    # Has the correct units
-    assert p.frequency.unit == 1 / u.day
-    assert p.power.unit == ''
+    # Are the default units correct?
+    p = lc.to_periodogram()
+    assert p.frequency.unit == 1./u.day
+    assert p.power.unit == ppm
     assert p.period.unit == u.day
-    assert p.frequency_at_max_power.unit == 1 / u.day
-    assert p.max_power.unit == ''
+    assert p.frequency_at_max_power.unit == 1./u.day
+    assert p.max_power.unit == ppm
+
+    # Can units be changed?
+    p = lc.to_periodogram(default_xunit=u.microhertz, default_yunit=u.percent)
+    assert p.frequency.unit == u.microhertz
+    assert p.power.unit == u.percent
+
+    p = lc.to_periodogram(normalization='psd', default_xunit=u.microhertz,
+                          default_yunit=ppm**2/u.microhertz)
+    assert p.frequency.unit == u.microhertz
+    assert p.power.unit == ppm**2 / u.microhertz
 
 
 def test_periodogram_can_find_periods():
     """Periodogram should recover the correct period"""
     # Light curve that is noisy
-    lc = LightCurve(time=np.arange(1000),
-                    flux=np.random.normal(1, 0.1, 1000),
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
     # Add a 100 day period signal
     lc.flux += np.sin((lc.time/float(lc.time.max())) * 20 * np.pi)
     lc = lc.normalize()
-    p = lc.to_periodogram(default_xunit='1/day')
+    p = lc.to_periodogram(normalization='amplitude')
     assert np.isclose(p.period_at_max_power.value, 100, rtol=1e-3)
 
 
@@ -151,17 +160,17 @@ def test_smooth():
                     flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
     lc = lc.normalize()
-    p = lc.to_periodogram()
+    p = lc.to_periodogram(normalization='psd')
     # Test boxkernel and logmedian methods
     assert all(p.smooth(method='boxkernel').frequency == p.frequency)
     assert all(p.smooth(method='logmedian').frequency == p.frequency)
     # Check output units
-    assert p.smooth().psd.unit == p.psd.unit
+    assert p.smooth().power.unit == p.power.unit
 
     # Check logmedian smooth that the mean of the smoothed power should
     # be consistent with the mean of the power
-    assert np.isclose(np.mean(p.smooth(method='logmedian').psd.value),
-                      np.mean(p.psd.value), atol=0.1*np.mean(p.psd.value))
+    assert np.isclose(np.mean(p.smooth(method='logmedian').power.value),
+                     np.mean(p.power.value), atol=0.05*np.mean(p.power.value))
 
 
     # Can't pass filter_width below 0.
@@ -191,7 +200,7 @@ def test_flatten():
                     flux=np.random.normal(1, 0.1, npts),
                     flux_err=np.zeros(npts)+0.1)
     lc = lc.normalize()
-    p = lc.to_periodogram(default_xunit=1/u.day)
+    p = lc.to_periodogram(normalization='psd', default_xunit=1/u.day)
 
     # Check method returns equal frequency
     assert all(p.flatten(method='logmedian').frequency == p.frequency)
@@ -338,13 +347,6 @@ def test_error_messages():
     # Can't specify periods and frequencies
     with pytest.raises(ValueError) as err:
         lc.to_periodogram(frequency=np.arange(10), period=np.arange(10))
-
-    # Don't accept NaNs -- this is now a warning
-    #with pytest.raises(ValueError) as err:
-    #    lc_with_nans = lc.copy()
-    #    lc_with_nans.flux[0] = np.nan
-    #    lc_with_nans.to_periodogram()
-    #assert('Lightcurve contains NaN values.' in err.value.args[0])
 
     # No unitless periodograms
     with pytest.raises(ValueError) as err:

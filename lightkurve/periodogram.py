@@ -582,7 +582,7 @@ class LombScarglePeriodogram(Periodogram):
                         normalization='amplitude', minimum_period=None, maximum_period=None,
                         frequency=None, period=None, nterms=1, nyquist_factor=1,
                         oversample_factor=None, ls_method='fast',
-                        default_xunit="", default_yunit="",
+                        default_xunit=None, default_yunit=None,
                         **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
@@ -718,10 +718,13 @@ class LombScarglePeriodogram(Periodogram):
         
         # Deprecation warnings
         if "freq_unit" in kwargs:
-            kwargs.pop("freq_unit")
-            warnings.warn("`freq_unit` keyword is no longer used, "
+            warnings.warn("`freq_unit` keyword is deprecated, "
                           "please use `default_xunit` instead.",
                           LightkurveWarning)
+            if default_xunit is None:
+                default_xunit = kwargs.pop("freq_unit")
+            else:
+                kwargs.pop("freq_unit")
         if "min_period" in kwargs:
             warnings.warn("`min_period` keyword is deprecated, "
                           "please use `minimum_period` instead.",
@@ -743,9 +746,9 @@ class LombScarglePeriodogram(Periodogram):
                           LightkurveWarning)
             maximum_frequency = kwargs.pop("max_frequency", None)
         
-        if default_xunit == "":
+        if default_xunit is None:
             default_xunit = "1/day" if normalization == 'amplitude' else "microhertz"
-        if default_yunit == "":
+        if default_yunit is None:
             default_yunit = "ppm" if normalization == 'amplitude' else "ppm^2/uHz"
 
         # Validate user input
