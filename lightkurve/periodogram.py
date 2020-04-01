@@ -96,11 +96,6 @@ class Periodogram(object):
         self.meta = meta
 
     @property
-    def amplitude(self):
-        """Returns the square root of the power."""
-        return np.sqrt(self.power)
-
-    @property
     def period(self):
         """Returns the array of periods, i.e. 1/frequency."""
         return (1. / self.frequency).to("day")
@@ -318,19 +313,14 @@ class Periodogram(object):
             xdata = self.frequency.to(xunit)
 
         # What data to plot on Y axis?
-        if yunit_type == "Amplitude":
-            ydata = self.amplitude.to(yunit)
-        elif yunit_type == "Power Spectral Density":
-            ydata = self.psd.to(yunit)
-        else:
-            ydata = self.power.to(yunit)
+        ydata = self.power.to(yunit)
 
         # Make the plot
         if style is None or style == 'lightkurve':
             style = MPLSTYLE
         with plt.style.context(style):
             if ax is None:
-                fig, ax = plt.subplots()
+                _, ax = plt.subplots()
             ax.plot(xdata, ydata, **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
@@ -581,17 +571,18 @@ class LombScarglePeriodogram(Periodogram):
         self._LS_object = kwargs.pop("ls_obj", None)
         self.nterms = kwargs.pop("nterms", 1)
         self.ls_method = kwargs.pop("ls_method", 'fastchi2')
+        self.normalization = kwargs.pop("normalization")
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
     def __repr__(self):
-        return('LombScarglePeriodogram(ID: {})'.format(self.label))
+        return("LombScarglePeriodogram(ID: {}, normalization: {})".format(self.label, self.normalization))
 
     @staticmethod
-    def from_lightcurve(lc, minimum_frequency=None, maximum_frequency=None,
-                        minimum_period=None, maximum_period=None,
+    def from_lightcurve(lc, minimum_frequency=None, maximum_frequency=None, 
+                        normalization='amplitude', minimum_period=None, maximum_period=None,
                         frequency=None, period=None, nterms=1, nyquist_factor=1,
                         oversample_factor=None, ls_method='fast',
-                        default_xunit="day", default_yunit="",
+                        default_xunit="", default_yunit="",
                         **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
@@ -648,10 +639,10 @@ class LombScarglePeriodogram(Periodogram):
         model. Setting the Nyquist_factor to be greater than 1 will sample the
         space beyond the Nyquist frequency, which may introduce aliasing.
 
-        The `freq_unit` parameter allows a request for alternative units in frequency
+        The `default_xunit` parameter allows a request for alternative units in frequency
         space. By default frequency is in (1/day) and power in (amplitude).
         Asteroseismologists for example may want frequency in (microHz)
-        in which case they would pass `freq_unit=u.microhertz`.
+        in which case they would pass `default_xunit="microhertz"`.
 
         By default this method uses the LombScargle 'fast' method, which assumes
         a regular grid. If a regular grid of periods (i.e. an irregular grid of
@@ -674,6 +665,10 @@ class LombScarglePeriodogram(Periodogram):
             If specified, use this maximum frequency rather than nyquist_factor
             times the nyquist frequency.  If a float is passed, we will assume
             it is in units microhertz.
+        normalization : 'psd' or 'amplitude'
+            Default: `'amplitude'`. The desired normalization of the spectrum.
+            Can be either power spectral density (`'psd'`) or amplitude
+            (`'amplitude'`).
         minimum_period : float or `~astropy.units.Quantity`
             If specified, use 1./minium_period as the maximum frequency rather
             than nyquist_factor times the nyquist frequency. If a float is
@@ -718,16 +713,14 @@ class LombScarglePeriodogram(Periodogram):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
+        # Input validation
+        normalization = validate_method(normalization, ['psd', 'amplitude'])
+        
         # Deprecation warnings
         if "freq_unit" in kwargs:
             kwargs.pop("freq_unit")
             warnings.warn("`freq_unit` keyword is no longer used, "
                           "please use `default_xunit` instead.",
-                          LightkurveWarning)
-        if "normalization" in kwargs:
-            kwargs.pop("normalization")
-            warnings.warn("`normalization` keyword is no longer used, "
-                          "please use `default_yunit` instead.",
                           LightkurveWarning)
         if "min_period" in kwargs:
             warnings.warn("`min_period` keyword is deprecated, "
@@ -749,6 +742,11 @@ class LombScarglePeriodogram(Periodogram):
                           "please use `maximum_frequency` instead.",
                           LightkurveWarning)
             maximum_frequency = kwargs.pop("max_frequency", None)
+        
+        if default_xunit == "":
+            default_xunit = "1/day" if normalization == 'amplitude' else "microhertz"
+        if default_yunit == "":
+            default_yunit = "ppm" if normalization == 'amplitude' else "ppm^2/uHz"
 
         # Validate user input
         default_xunit = _validate_unit(default_xunit)
@@ -762,7 +760,7 @@ class LombScarglePeriodogram(Periodogram):
 
         # Default oversample factor
         if oversample_factor is None:
-            oversample_factor = 5.
+            oversample_factor = 5. if normalization == 'amplitude' else 1.
 
         # If period and frequency keywords have both been set, throw an error
         if (not all(b is None for b in [period, minimum_period, maximum_period])) and \
@@ -864,21 +862,20 @@ class LombScarglePeriodogram(Periodogram):
                           LightkurveWarning)
             nterms = 1
 
+        # Ensure that data is zero-centred for periodogram
         if float(astropy.__version__[0]) >= 3:
-            LS = LombScargle(time, lc.flux_quantity,
+            LS = LombScargle(time, lc.flux_quantity - np.median(lc.flux_quantity),
                              nterms=nterms, normalization='psd', **kwargs)
             lspower = LS.power(frequency, method=ls_method)
         else:
-            LS = LombScargle(time, lc.flux_quantity,
+            LS = LombScargle(time, lc.flux_quantity - np.median(lc.flux_quantity),
                              nterms=nterms, **kwargs)
             lspower = LS.power(frequency, method=ls_method, normalization='psd')
 
-        power = (4. / len(time)) * lspower
-
-        # To compute the amplitude we need to keep track
-        # of the frequency spacing.
-        meta = {}
-        meta['frequency_spacing'] = oversample_factor * fs
+        if normalization == 'psd':  # Power spectral density
+            power =  (lspower * 2. / (len(lc.time) * oversample_factor * fs)).to(default_yunit)
+        elif normalization == 'amplitude':
+            power = (np.sqrt(lspower) * np.sqrt(4./len(lc.time))).to(default_yunit)
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
@@ -886,12 +883,7 @@ class LombScarglePeriodogram(Periodogram):
                                       ls_obj=LS,
                                       nterms=nterms, ls_method=ls_method,
                                       default_xunit=default_xunit, default_yunit=default_yunit,
-                                      meta=meta)
-
-    @property
-    def psd(self):
-        """Returns the power spectral density."""
-        return self.power / (2. * self.meta['frequency_spacing'])
+                                      normalization=normalization)
 
     def model(self, time, frequency=None):
         """Obtain the flux model for a given frequency and time
