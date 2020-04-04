@@ -27,6 +27,19 @@ def test_designmatrix_basics():
     assert dm.split([10]).shape == (size, 6)        # expect double columns
     dm.__repr__()
 
+    # Test sparse
+    dm = DesignMatrix(df, name=name, sparse=True)
+    assert dm.columns == ['vector1', 'vector2', 'vector3']
+    assert dm.name == name
+    assert dm.shape == (size, 3)
+    assert (dm['vector1'] == df['vector1']).all()
+    dm.plot()
+    dm.plot_priors()
+    assert dm.append_constant().shape == (size, 4)  # expect one column more
+    assert dm.pca(nterms=2).shape == (size, 2)      # expect one column less
+    assert dm.split([10]).shape == (size, 6)        # expect double columns
+    dm.__repr__()
+
 
 def test_designmatrix_from_numpy():
     """Can we create a design matrix from an ndarray?"""
@@ -60,6 +73,11 @@ def test_split():
     assert (dm.split([2,8]).values[:8, 4:] == 0).all()
     # Are all the column names unique?
     assert len(set(dm.split(2).columns)) == 4
+    dm = DesignMatrix({'a': np.linspace(0, 9, 10),
+                       'b': np.linspace(100, 109, 10)}, sparse=True)
+    # Do we retrieve the correct shape?
+    assert dm.shape == (10, 2)
+    assert dm.split(2).shape == (10, 4)
 
 
 def test_standardize():
@@ -68,8 +86,16 @@ def test_standardize():
     dm = DesignMatrix({'const': np.ones(10)})
     assert (dm.standardize()['const'].values == dm['const'].values).all()
     # Normally-distributed columns will become Normal(0, 1)
-    dm = DesignMatrix({'normal': np.random.normal(loc=5, scale=3, size=100)})
-    assert np.round(dm.standardize()['normal'].median(), 3) == 0
+    dm = DesignMatrix({'normal': np.random.normal(loc=5, scale=3, size=1000)})
+    assert np.round(dm.standardize()['normal'].median(), 1) == 0
+    assert np.round(dm.standardize()['normal'].std(), 1) == 1
+
+    # A column with zero standard deviation remains unchanged
+    dm = DesignMatrix({'const': np.ones(10)}, sparse=True)
+    assert (dm.standardize()['const'].values == dm['const'].values).all()
+    # Normally-distributed columns will become Normal(0, 1)
+    dm = DesignMatrix({'normal': np.random.normal(loc=5, scale=3, size=1000)})
+    assert np.round(dm.standardize()['normal'].median(), 1) == 0
     assert np.round(dm.standardize()['normal'].std(), 1) == 1
 
 
@@ -95,6 +121,21 @@ def test_collection_basics():
     dmc.plot()
     dmc.__repr__()
 
+    """Can we create a design matrix collection when one is sparse?"""
+    size = 5
+    dm1 = DesignMatrix(np.ones((size, 1)), columns=['col1'], name='matrix1', sparse=True)
+    dm2 = DesignMatrix(np.zeros((size, 2)), columns=['col2', 'col3'], name='matrix2')
+    dmc = DesignMatrixCollection([dm1, dm2])
+    dmc.plot()
+    dmc.__repr__()
+
+    """Can we create a design matrix collection when all are sparse?"""
+    size = 5
+    dm1 = DesignMatrix(np.ones((size, 1)), columns=['col1'], name='matrix1', sparse=True)
+    dm2 = DesignMatrix(np.zeros((size, 2)), columns=['col2', 'col3'], name='matrix2', sparse=True)
+    dmc = DesignMatrixCollection([dm1, dm2])
+    dmc.plot()
+    dmc.__repr__()
 
 def test_designmatrix_rank():
     """Does DesignMatrix issue a low-rank warning when justified?"""

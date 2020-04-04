@@ -69,7 +69,7 @@ class SFFCorrector(RegressionCorrector):
 
     def correct(self, centroid_col=None, centroid_row=None, windows=20, bins=5,
                 timescale=1.5, breakindex=None, degree=3, restore_trend=False,
-                additional_design_matrix=None, polyorder=None, **kwargs):
+                additional_design_matrix=None, polyorder=None, sparse=False, **kwargs):
         """Find the best fit correction for the light curve.
 
         Parameters
@@ -120,7 +120,7 @@ class SFFCorrector(RegressionCorrector):
         """
         from patsy import dmatrix  # local import because it's rarely-used
 
-        if polyorder is not None: 
+        if polyorder is not None:
             warnings.warn("`polyorder` is deprecated and no longer used, "
                           "please use the `degree` keyword instead.",
                           LightkurveWarning)
@@ -165,14 +165,17 @@ class SFFCorrector(RegressionCorrector):
         sff_dm = DesignMatrix(pd.DataFrame(np.hstack(stack)),
                               columns=np.hstack(columns),
                               name='sff',
-                              prior_sigma=np.hstack(prior_sigmas))
+                              prior_sigma=np.hstack(prior_sigmas), sparse=sparse)
 
 
         # long term
         n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
-        s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots, include_intercept=True)
+        s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots, include_intercept=True, sparse=sparse)
 
-        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
+        if sparse:
+            means = [np.average(self.lc.flux, weights=s_dm.values[:, idx].toarray()[:, 0]) for idx in range(s_dm.shape[1])]
+        else:
+            means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
         s_dm.prior_mu = np.asarray(means)
 
         # I'm putting WEAK priors on the spline that it must be around 1

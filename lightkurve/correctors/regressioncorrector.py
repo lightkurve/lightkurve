@@ -7,6 +7,7 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.stats import sigma_clip
+from scipy import sparse
 
 from .corrector import Corrector
 from .designmatrix import DesignMatrix, DesignMatrixCollection
@@ -124,13 +125,13 @@ class RegressionCorrector(Corrector):
             The best fit model coefficients to the data.
         """
         if prior_mu is not None:
-            if len(prior_mu) != len(self.X.values.T):
+            if len(prior_mu) != self.X.values.shape[1]:
                 raise ValueError('`prior_mu` must have shape {}'
-                                 ''.format(len(self.X.values.T)))
+                                 ''.format(self.X.values.shape[1]))
         if prior_sigma is not None:
-            if len(prior_sigma) != len(self.X.values.T):
+            if len(prior_sigma) != self.X.values.shape[1]:
                 raise ValueError('`prior_sigma` must have shape {}'
-                                 ''.format(len(self.X.values.T)))
+                                 ''.format(self.X.values.shape[1]))
             if np.any(prior_sigma <= 0):
                 raise ValueError('`prior_sigma` values cannot be smaller than '
                                  'or equal to zero')
@@ -144,22 +145,35 @@ class RegressionCorrector(Corrector):
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.lc.flux), bool)
 
+        # Retrieve the design matrix (X) as a numpy array
+        X = self.X.values[cadence_mask]
+
         # If flux errors are not all finite numbers, then default to array of ones
         if np.all(~np.isfinite(self.lc.flux_err)):
             flux_err = np.ones(cadence_mask.sum())
         else:
             flux_err = self.lc.flux_err[cadence_mask]
 
-        # Retrieve the design matrix (X) as a numpy array
-        X = self.X.values[cadence_mask]
+        if self.X._sparse:
+            # If flux errors are not all finite numbers, then default to array of ones
+            sigma_f_inv = sparse.csr_matrix(1/flux_err[:, None]**2)
+            # Compute `X^T cov^-1 X + 1/prior_sigma^2`
+            sigma_w_inv = X.T.dot(X.multiply(sigma_f_inv))
+            sigma_w_inv = sigma_w_inv.toarray()
 
-        # Compute `X^T cov^-1 X + 1/prior_sigma^2`
-        sigma_w_inv = np.dot(X.T, X / flux_err[:, None]**2)
+            # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
+            B = X.T.dot((self.lc.flux[cadence_mask]/flux_err**2))
+
+        else:
+
+            # Compute `X^T cov^-1 X + 1/prior_sigma^2`
+            sigma_w_inv = np.dot(X.T, X / flux_err[:, None]**2)
+
+            # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
+            B = np.dot(X.T, self.lc.flux[cadence_mask] / flux_err**2)
+
         if prior_sigma is not None:
             sigma_w_inv += np.diag(1. / prior_sigma**2)
-
-        # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
-        B = np.dot(X.T, self.lc.flux[cadence_mask] / flux_err**2)
         if prior_sigma is not None:
             B += (prior_mu / prior_sigma**2)
 
@@ -219,7 +233,7 @@ class RegressionCorrector(Corrector):
                                        prior_mu=self.X.prior_mu,
                                        prior_sigma=self.X.prior_sigma,
                                        propagate_errors=propagate_errors)
-            model = np.ma.masked_array(data=np.dot(self.X.values, coefficients),
+            model = np.ma.masked_array(data=self.X.values.dot(coefficients),
                                        mask=~(cadence_mask & clean_cadences))
             residuals = self.lc.flux - model
             clean_cadences = ~sigma_clip(residuals, sigma=sigma).mask
@@ -230,15 +244,14 @@ class RegressionCorrector(Corrector):
         self.coefficients = coefficients
         self.coefficients_err = coefficients_err
 
-        model_flux = np.dot(self.X.values, coefficients)
+        model_flux = self.X.values.dot(coefficients)
         model_flux -= np.median(model_flux)
         if propagate_errors:
             with warnings.catch_warnings():
                 # ignore "RuntimeWarning: covariance is not symmetric positive-semidefinite."
                 warnings.simplefilter("ignore", RuntimeWarning)
                 samples = np.asarray(
-                    [np.dot(self.X.values,
-                            np.random.multivariate_normal(coefficients, coefficients_err))
+                    [self.X.values.dot(np.random.multivariate_normal(coefficients, coefficients_err))
                      for idx in range(100)]).T
             model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
         else:
@@ -267,7 +280,7 @@ class RegressionCorrector(Corrector):
             # submatrix_coefficients_err = self.coefficients_err[firstcol_idx:firstcol_idx+submatrix.shape[1], firstcol_idx:firstcol_idx+submatrix.shape[1]]
             # samples = np.asarray([np.dot(submatrix.values, np.random.multivariate_normal(submatrix_coefficients, submatrix_coefficients_err)) for idx in range(100)]).T
             # model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
-            model_flux = np.dot(submatrix.values, submatrix_coefficients)
+            model_flux = submatrix.values.dot(submatrix_coefficients)
             lcs[submatrix.name] = LightCurve(self.lc.time, model_flux, np.zeros(len(model_flux)), label=submatrix.name)
         return lcs
 

@@ -8,6 +8,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.sparse import csr_matrix, hstack
 
 from .. import MPLSTYLE
 from ..utils import LightkurveWarning, plot_image
@@ -42,13 +43,16 @@ class DesignMatrix():
         column in a linear regression problem.
     """
     def __init__(self, df, columns=None, name='unnamed_matrix', prior_mu=None,
-                 prior_sigma=None):
+                 prior_sigma=None, sparse=False):
         if not isinstance(df, pd.DataFrame):
             df = pd.DataFrame(df)
         if columns is not None:
             df.columns = columns
         self.df = df
         self.name = name
+        self._sparse = sparse
+        if self._sparse:
+            self._sparse_values = csr_matrix(self.df.values)
         if prior_mu is None:
             prior_mu = np.zeros(len(df.T))
         if prior_sigma is None:
@@ -76,7 +80,10 @@ class DesignMatrix():
             The matplotlib axes object.
         """
         with plt.style.context(MPLSTYLE):
-            ax = plot_image(self.values, ax=ax, xlabel='Component', ylabel='X',
+            values = self.values
+            if self._sparse:
+                values = values.toarray()
+            ax = plot_image(values, ax=ax, xlabel='Component', ylabel='X',
                             clabel='Component Value', title=self.name, **kwargs)
             ax.set_aspect(self.shape[1]/(1.6*self.shape[0]))
             if self.shape[1] <= 40:
@@ -155,9 +162,9 @@ class DesignMatrix():
         prior_mu = np.hstack([self.prior_mu for idx in range(len(dfs))])
         prior_sigma = np.hstack([self.prior_sigma for idx in range(len(dfs))])
         return DesignMatrix(new_df, name=self.name, prior_mu=prior_mu,
-                            prior_sigma=prior_sigma)
+                            prior_sigma=prior_sigma, sparse=self._sparse)
 
-    def standardize(self):
+    def standardize(self, inplace=False):
         """Returns a new `.DesignMatrix` in which the columns have been
         median-subtracted and sigma-divided.
 
@@ -178,15 +185,20 @@ class DesignMatrix():
         `.DesignMatrix`
             A new design matrix with median-subtracted & sigma-divided columns.
         """
-        ar = np.asarray(np.copy(self.df))
-        ar[ar == 0] = np.nan
-        # If a column has zero standard deviation, it will not change!
-        is_const = np.nanstd(ar, axis=0) == 0
-        median = np.atleast_2d(np.nanmedian(ar, axis=0)[~is_const])
-        std = np.atleast_2d(np.nanstd(ar, axis=0)[~is_const])
-        ar[:, ~is_const] = (ar[:, ~is_const] - median) / std
-        new_df = pd.DataFrame(ar, columns=self.columns).fillna(0)
-        return DesignMatrix(new_df, name=self.name)
+        df_nan = self.df.replace(0, np.nan)
+        mean = df_nan.mean()
+        std = df_nan.std()
+        mean[std == 0] = 0
+        std[std == 0] = 1
+        df = ((df_nan - mean) / std).fillna(0)
+        if 'offset' in df.columns:
+            df['offset'] = 1
+        if inplace:
+            self.df = df
+            if self._sparse:
+                self._sparse_values = csr_matrix(self.df.values)
+            return self
+        return DesignMatrix(df, name=self.name, sparse=self._sparse)
 
     def pca(self, nterms=6):
         """Returns a new `.DesignMatrix` with a smaller number of regressors.
@@ -212,10 +224,13 @@ class DesignMatrix():
         # we find this to be too few, and that n_iter=10 is still fast but
         # produces more stable results.
         from fbpca import pca  # local import because not used elsewhere
-        new_values, _, _ = pca(self.values, nterms, n_iter=10)
-        return DesignMatrix(new_values, name=self.name)
+        if self._sparse:
+            new_values, _, _ = pca(self.values.toarray(), nterms, n_iter=10)
+        else:
+            new_values, _, _ = pca(self.values, nterms, n_iter=10)
+        return DesignMatrix(new_values, name=self.name, sparse=self._sparse)
 
-    def append_constant(self, prior_mu=0, prior_sigma=np.inf):
+    def append_constant(self, prior_mu=0, prior_sigma=np.inf, inplace=False):
         """Returns a new `.DesignMatrix` with a column of ones appended.
 
         Returns
@@ -224,12 +239,19 @@ class DesignMatrix():
             New design matrix with a column of ones appended. This column is
             named "offset".
         """
-        extra_df = pd.DataFrame(np.atleast_2d(np.ones(self.shape[0])).T, columns=['offset'])
-        new_df = pd.concat([self.df, extra_df], axis=1)
-        prior_mu = np.append(self.prior_mu, prior_mu)
-        prior_sigma = np.append(self.prior_sigma, prior_sigma)
-        return DesignMatrix(new_df, name=self.name,
-                            prior_mu=prior_mu, prior_sigma=prior_sigma)
+        if inplace:
+            self.df.insert(self.df.shape[1], 'offset', 1, allow_duplicates=False)
+            self.prior_mu = np.append(self.prior_mu, prior_mu)
+            self.prior_sigma = np.append(self.prior_sigma, prior_sigma)
+            if self._sparse:
+                self._sparse_values = hstack([self.values, csr_matrix(np.ones(self.values.shape[0])).T], format='csr')
+            return self
+        else:
+            df = self.df.copy()
+            df.insert(self.df.shape[1], 'offset', 1, allow_duplicates=False)
+            return DesignMatrix(df, prior_mu=np.append(self.prior_mu, prior_mu),
+                                prior_sigma=np.append(self.prior_sigma, prior_sigma), name=self.name,
+                                sparse=self._sparse)
 
     def _validate(self):
         """Raises a `LightkurveWarning` if the matrix has a low rank."""
@@ -246,6 +268,8 @@ class DesignMatrix():
     @property
     def rank(self):
         """Matrix rank computed using `numpy.linalg.matrix_rank`."""
+        if self._sparse:
+                return np.linalg.matrix_rank(self.values.toarray())
         return np.linalg.matrix_rank(self.values)
 
     @property
@@ -261,24 +285,36 @@ class DesignMatrix():
     @property
     def values(self):
         """2D numpy array containing the matrix values."""
+        if self._sparse:
+            return self._sparse_values
         return self.df.values
 
     def __getitem__(self, key):
         return self.df[key]
 
     def __repr__(self):
+        if self._sparse:
+                return '{} DesignMatrix [sparse] {}'.format(self.name, self.shape)
         return '{} DesignMatrix {}'.format(self.name, self.shape)
 
 
 class DesignMatrixCollection():
     """A set of design matrices."""
     def __init__(self, matrices):
+        if np.all([m._sparse for m in matrices]):
+            self._sparse = True
+            self._sparse_values = hstack([m.values for m in matrices], format='csr')
+        else:
+            self._sparse = False
+
         self.matrices = matrices
 
     @property
     def values(self):
         """2D numpy array containing the matrix values."""
-        return np.hstack(tuple(m.values for m in self.matrices))
+        if self._sparse:
+            return self._sparse_values
+        return np.hstack(tuple(m.values if isinstance(m.values, np.ndarray) else m.values.toarray() for m in self.matrices))
 
     @property
     def prior_mu(self):
@@ -383,6 +419,9 @@ class DesignMatrixCollection():
         [d._validate() for d in self]
 
     def __repr__(self):
+        if self._sparse:
+            return 'DesignMatrixCollection [sparse]:\n' + \
+                        ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
         return 'DesignMatrixCollection:\n' + \
                     ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
 
@@ -392,7 +431,7 @@ class DesignMatrixCollection():
 ####################################################
 
 def create_spline_matrix(x, n_knots=20, degree=3, name='spline',
-                         include_intercept=False):
+                         include_intercept=False, sparse=True):
     """Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.
 
     Parameters
@@ -419,4 +458,4 @@ def create_spline_matrix(x, n_knots=20, degree=3, name='spline',
     spline_dm = np.asarray(dmatrix(dm_formula, {"x": x}))
     df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
                                           for idx in range(n_knots)])
-    return DesignMatrix(df, name=name)
+    return DesignMatrix(df, name=name, sparse=sparse)
