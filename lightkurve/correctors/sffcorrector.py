@@ -144,37 +144,41 @@ class SFFCorrector(RegressionCorrector):
         lower_idx = np.asarray(np.append(0, self.window_points), int)
         upper_idx = np.asarray(np.append(self.window_points, len(self.lc.time)), int)
 
-        stack = []
-        columns = []
-        prior_sigmas = []
+        #stack = []
+        #columns = []
+        #prior_sigmas = []
+
+        dms = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
             knots = list(np.percentile(self.arclength[a:b], np.linspace(0, 100, bins+1)[1:-1]))
             ar = np.copy(self.arclength)
             ar[~np.in1d(ar, ar[a:b])] = 0
-            dm = np.asarray(dmatrix("bs(x, knots={}, degree={}, include_intercept={}) - 1"
-                                    "".format(knots, degree, True), {"x": ar}))
-            stack.append(dm)
-            columns.append(['window{}_bin{}'.format(idx+1, jdx+1)
-                            for jdx in range(len(dm.T))])
+            #import pdb; pdb.set_trace()
+            if sparse:
+                dm = create_sparse_spline_matrix(ar, knots=knots, degree=degree).copy()
+            else:
+                dm = create_spline_matrix(ar, knots=knots, degree=degree).copy()
+#            dm = np.asarray(dmatrix("bs(x, knots={}, degree={}, include_intercept={}) - 1"
+#                                    "".format(knots, degree, True), {"x": ar}))
+#            stack.append(dm)
+            dm.columns = ['window{}_bin{}'.format(idx+1, jdx+1)
+                                        for jdx in range(dm.shape[1])]
 
             # I'm putting VERY weak priors on the SFF motion vectors
             # (1e-6 is being added to prevent sigma from being zero)
-            ps = np.ones(len(dm.T)) * 10000 * self.lc[a:b].flux.std() + 1e-6
-            prior_sigmas.append(ps)
+            ps = np.ones(dm.shape[1]) * 10000 * self.lc[a:b].flux.std() + 1e-6
+            dm.prior_sigmas = ps
+            dms.append(dm)
 
-        sff_dm = DesignMatrix(pd.DataFrame(np.hstack(stack)),
-                              columns=np.hstack(columns),
-                              name='sff',
-                              prior_sigma=np.hstack(prior_sigmas), sparse=sparse)
-
+        sff_dm = DesignMatrixCollection(dms).flatten().standardize()
 
         # long term
         n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
 
         if sparse:
-            s_dm = create_sparse_spline_matrix(self.lc.time, n_knots=n_knots)
+            s_dm = create_sparse_spline_matrix(self.lc.time, n_knots=n_knots, name='sff').append_constant()
         else:
-            s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots)
+            s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots, name='sff')
 
         means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
         s_dm.prior_mu = np.asarray(means)

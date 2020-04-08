@@ -43,36 +43,42 @@ class DesignMatrix():
         Prior standard deviations of the coefficients associated with each
         column in a linear regression problem.
     """
-    def __init__(self, X, columns=None, name='unnamed_matrix', prior_mu=None,
+    def __init__(self, input, columns=None, name='unnamed_matrix', prior_mu=None,
                  prior_sigma=None, sparse=False):
 
         self.name = name
         self._sparse = sparse
 
-        if issparse(X):
+        if issparse(input):
             # Build a sparse DM
             self._sparse = True
-            self.X = X
+            self.X = input
             self.columns = columns
+            self.df = None
+
         else:
-            if not isinstance(X, pd.DataFrame):
-                X = pd.DataFrame(X)
+            if not isinstance(input, pd.DataFrame):
+                X = pd.DataFrame(input)
+            else:
+                X = deepcopy(input)
+            if not sparse:
+                self.df = X
+
             if columns is not None:
-                if hasattr(X, 'columns'):
-                    X.columns = columns
-                else:
-                    self.columns = columns
-            else:
                 self.columns = columns
-            if self._sparse:
-                self.X = lil_matrix(np.asarray(X))
             else:
-                self.X = X
+                if hasattr(X, 'columns'):
+                    self.columns = X.columns
+
+            if self._sparse:
+                self.X = lil_matrix(X.values)
+            else:
+                self.X = X.values
 
         if prior_mu is None:
-            prior_mu = np.zeros(X.shape[1])
+            prior_mu = np.zeros(self.X.shape[1])
         if prior_sigma is None:
-            prior_sigma = np.ones(X.shape[1]) * np.inf
+            prior_sigma = np.ones(self.X.shape[1]) * np.inf
         self.prior_mu = prior_mu
         self.prior_sigma = prior_sigma
 
@@ -176,10 +182,11 @@ class DesignMatrix():
         x = np.arange(dm.shape[0])
         dm.prior_mu = np.concatenate([list(self.prior_mu) * (len(row_indices) + 1)])
         dm.prior_sigma = np.concatenate([list(self.prior_sigma) * (len(row_indices) + 1)])
-        if isinstance(dm.X, pd.DataFrame):
-            dm.X = pd.concat([((dm.X * np.atleast_2d(np.in1d(x, idx).astype(int)).T)).add_suffix('_{}'.format(jdx)) for jdx, idx in enumerate(np.array_split(x, row_indices))], axis=1)
-            non_zero = dm.X.sum(axis=0) != 0
-            dm.X = dm.X[dm.X.columns[non_zero]]
+        if isinstance(dm.df, pd.DataFrame):
+            dm.df = pd.concat([((dm.X * np.atleast_2d(np.in1d(x, idx).astype(int)).T)).add_suffix('_{}'.format(jdx)) for jdx, idx in enumerate(np.array_split(x, row_indices))], axis=1)
+            non_zero = dm.df.sum(axis=0) != 0
+            dm.df = dm.df[dm.df.columns[non_zero]]
+            dm.X = dm.df.values
         if issparse(dm.X):
             dm.X = hstack([dm.X.multiply(lil_matrix(np.in1d(x, idx).astype(int)).T) for idx in np.array_split(x, row_indices)], format='lil')
             non_zero = dm.X.sum(axis=0) != 0
@@ -221,13 +228,14 @@ class DesignMatrix():
         else:
             dm = self.copy()
 
-        if isinstance(dm.X, pd.DataFrame):
-            df_nan = dm.X.replace(0, np.nan)
+        if isinstance(dm.df, pd.DataFrame):
+            df_nan = dm.df.replace(0, np.nan)
             mean = df_nan.mean()
             std = df_nan.std()
             mean[std == 0] = 0
             std[std == 0] = 1
-            dm.X = ((df_nan - mean) / std).fillna(0)
+            dm.df = ((df_nan - mean) / std).fillna(0)
+            dm.X = dm.df.values
 
         if issparse(dm.X):
             idx, jdx, v = find(dm.X)
@@ -283,7 +291,8 @@ class DesignMatrix():
         else:
             dm = self.copy()
         if isinstance(dm.X, pd.DataFrame):
-            dm.X.insert(dm.shape[1], 'offset', 1, allow_duplicates=False)
+            dm.df.insert(dm.shape[1], 'offset', 1, allow_duplicates=False)
+            dm.X = dm.df.values
         else:
             dm.X = hstack([dm.X, lil_matrix(np.ones(dm.shape[0])).T], format='lil')
         dm.prior_mu = np.append(dm.prior_mu, prior_mu)
@@ -317,7 +326,7 @@ class DesignMatrix():
         """2D numpy array containing the matrix values."""
         if issparse(self.X):
             return self.X.toarray()
-        return self.X.values
+        return self.X
 
     # def __getitem__(self, key):
     #     return self.df[key]
@@ -349,7 +358,16 @@ class DesignMatrixCollection():
         if self._sparse:
              return hstack([m.X for m in self.matrices], format='csr')
         else:
-             return pd.concat([m.X for m in self.matrices], axis=1)
+             return np.hstack([m.X for m in self.matrices])
+
+    @property
+    def df(self):
+        """Stack of X as either np.array or sparse array"""
+        if np.all([d.df is not None for d in self]):
+             return pd.concat([m.df for m in self.matrices], axis=1)
+        else:
+            return None
+
 
     @property
     def prior_mu(self):
@@ -380,7 +398,7 @@ class DesignMatrixCollection():
         `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        temp_dm = DesignMatrix(pd.concat([d.df for d in self], axis=1))
+        temp_dm = self.flatten()
         ax = temp_dm.plot(**kwargs)
         ax.set_title("Design Matrix Collection")
         return ax
@@ -474,7 +492,7 @@ class DesignMatrixCollection():
 # Functions to create commonly-used design matrices.
 ####################################################
 
-def create_spline_matrix(x, n_knots=20, degree=3, name='spline',
+def create_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline',
                          include_intercept=True):
     """Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.
 
@@ -497,11 +515,18 @@ def create_spline_matrix(x, n_knots=20, degree=3, name='spline',
         Design matrix object with shape (len(x), n_knots*degree).
     """
     from patsy import dmatrix  # local import because it's rarely-used
-    dm_formula = "bs(x, df={}, degree={}, include_intercept={}) - 1" \
+    if knots is not None:
+        dm_formula = "bs(x, knots={}, degree={}, include_intercept={}) - 1" \
+                     "".format(knots, degree, include_intercept)
+        spline_dm = np.asarray(dmatrix(dm_formula, {"x": x}))
+        df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
+                                              for idx in range(spline_dm.shape[1])])
+    else:
+        dm_formula = "bs(x, df={}, degree={}, include_intercept={}) - 1" \
                  "".format(n_knots, degree, include_intercept)
-    spline_dm = np.asarray(dmatrix(dm_formula, {"x": x}))
-    df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
-                                          for idx in range(n_knots)])
+        spline_dm = np.asarray(dmatrix(dm_formula, {"x": x}))
+        df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
+                                              for idx in range(n_knots)])
     return DesignMatrix(df, name=name)
 
 
@@ -530,7 +555,9 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
         Design matrix object with shape (len(x), n_knots*degree).
     """
     if (knots is None)  and (n_knots is not None):
-        knots = np.asarray([s[-1] for s in np.array_split(np.sort(x), n_knots - 2)])
+        knots = np.asarray([s[-1] for s in np.array_split(np.argsort(x), n_knots)[1:-1]])
+        knots = [np.mean([x[k], x[k + 1]]) for k in knots]
+
 #        knots = np.linspace(x.min(), x.max(), n_knots - 2)
     elif (knots is None)  and (n_knots is None):
         raise ValueError('Pass either `n_knots` or `knots`.')
