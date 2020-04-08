@@ -331,7 +331,7 @@ class DesignMatrix():
 class DesignMatrixCollection():
     """A set of design matrices."""
     def __init__(self, matrices):
-        if np.all([m._sparse for m in matrices]):
+        if np.all([issparse(m.X) for m in matrices]):
             self._sparse = True
 #            self._sparse_values = hstack([m.values for m in matrices], format='lil')
         else:
@@ -341,14 +341,15 @@ class DesignMatrixCollection():
     @property
     def values(self):
         """2D numpy array containing the matrix values."""
-#       if self._sparse:
-#            return self._sparse_values
-        return np.hstack(tuple(m.values if isinstance(m.values, np.ndarray) else m.values.toarray() for m in self.matrices))
+        return np.hstack(tuple(m.values for m in self.matrices))
 
-
+    @property
     def X(self):
         """Stack of X as either np.array or sparse array"""
-        return None
+        if self._sparse:
+             return hstack([m.X for m in self.matrices], format='csr')
+        else:
+             return pd.concat([m.X for m in self.matrices], axis=1)
 
     @property
     def prior_mu(self):
@@ -440,7 +441,16 @@ class DesignMatrixCollection():
     @property
     def columns(self):
         """List of column names."""
-        return np.hstack([d.columns for d in self])
+        if np.all([d.columns is not None for d in self]):
+            return np.hstack([d.columns for d in self])
+        return None
+
+    def flatten(self, name=None):
+        """Flatten a DesignMatrixCollection into a DesignMatrix"""
+        if name is None:
+            name = self.matrices[0].name
+        return DesignMatrix(self.X, columns=self.columns, prior_mu=self.prior_mu, prior_sigma=self.prior_sigma,
+                            name=name, sparse=self._sparse)
 
     def __getitem__(self, key):
         try:
@@ -465,7 +475,7 @@ class DesignMatrixCollection():
 ####################################################
 
 def create_spline_matrix(x, n_knots=20, degree=3, name='spline',
-                         include_intercept=False, sparse=True):
+                         include_intercept=True):
     """Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.
 
     Parameters
@@ -492,12 +502,11 @@ def create_spline_matrix(x, n_knots=20, degree=3, name='spline',
     spline_dm = np.asarray(dmatrix(dm_formula, {"x": x}))
     df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
                                           for idx in range(n_knots)])
-    return DesignMatrix(df, name=name, sparse=sparse)
+    return DesignMatrix(df, name=name)
 
 
 
-def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline',
-                         include_intercept=False, sparse=True):
+def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline'):
     """Returns a `.DesignMatrix` which models which are
 
     Parameters
@@ -521,7 +530,8 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
         Design matrix object with shape (len(x), n_knots*degree).
     """
     if (knots is None)  and (n_knots is not None):
-        knots = np.linspace(x.min(), x.max(), n_knots - 2)
+        knots = np.asarray([s[-1] for s in np.array_split(np.sort(x), n_knots - 2)])
+#        knots = np.linspace(x.min(), x.max(), n_knots - 2)
     elif (knots is None)  and (n_knots is None):
         raise ValueError('Pass either `n_knots` or `knots`.')
     knots_wbounds = np.append(np.append([x.min()] * (degree - 1), knots), [x.max()] * (degree))
@@ -541,7 +551,7 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
         return B
 
     spline_dm = vstack([lil_matrix(basis(x, degree, idx, knots_wbounds)) for idx in np.arange(-1, len(knots_wbounds) - degree - 1)], format='lil').T
-    return spline_dm
+    return DesignMatrix(spline_dm, name=name)
     # df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
     #                                       for idx in range(n_knots)])
     # return DesignMatrix(df, name=name, sparse=sparse)

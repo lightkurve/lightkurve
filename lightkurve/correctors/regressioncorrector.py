@@ -105,7 +105,9 @@ class RegressionCorrector(Corrector):
     @property
     def X(self):
         """Shorthand for self.design_matrix_collection."""
-        return self.design_matrix_collection
+        if self.design_matrix_collection is None:
+            raise ValueError('Set `design_matrix_collection` by using the `correct` method.')
+        return self.design_matrix_collection.X
 
     def _fit_coefficients(self, cadence_mask=None, prior_mu=None,
                           prior_sigma=None, propagate_errors=False):
@@ -125,13 +127,13 @@ class RegressionCorrector(Corrector):
             The best fit model coefficients to the data.
         """
         if prior_mu is not None:
-            if len(prior_mu) != self.X.values.shape[1]:
+            if len(prior_mu) != self.X.shape[1]:
                 raise ValueError('`prior_mu` must have shape {}'
-                                 ''.format(self.X.values.shape[1]))
+                                 ''.format(self.X.shape[1]))
         if prior_sigma is not None:
-            if len(prior_sigma) != self.X.values.shape[1]:
+            if len(prior_sigma) != self.X.shape[1]:
                 raise ValueError('`prior_sigma` must have shape {}'
-                                 ''.format(self.X.values.shape[1]))
+                                 ''.format(self.X.shape[1]))
             if np.any(prior_sigma <= 0):
                 raise ValueError('`prior_sigma` values cannot be smaller than '
                                  'or equal to zero')
@@ -146,7 +148,7 @@ class RegressionCorrector(Corrector):
             cadence_mask = np.ones(len(self.lc.flux), bool)
 
         # Retrieve the design matrix (X) as a numpy array
-        X = self.X.values[cadence_mask]
+        X = self.X[cadence_mask]
 
         # If flux errors are not all finite numbers, then default to array of ones
         if np.all(~np.isfinite(self.lc.flux_err)):
@@ -154,7 +156,7 @@ class RegressionCorrector(Corrector):
         else:
             flux_err = self.lc.flux_err[cadence_mask]
 
-        if self.X._sparse:
+        if self.design_matrix_collection._sparse:
             # If flux errors are not all finite numbers, then default to array of ones
             sigma_f_inv = sparse.csr_matrix(1/flux_err[:, None]**2)
             # Compute `X^T cov^-1 X + 1/prior_sigma^2`
@@ -230,10 +232,15 @@ class RegressionCorrector(Corrector):
         for count in range(niters):
             coefficients, coefficients_err = \
                 self._fit_coefficients(cadence_mask=cadence_mask & clean_cadences,
-                                       prior_mu=self.X.prior_mu,
-                                       prior_sigma=self.X.prior_sigma,
+                                       prior_mu=self.design_matrix_collection.prior_mu,
+                                       prior_sigma=self.design_matrix_collection.prior_sigma,
                                        propagate_errors=propagate_errors)
-            model = np.ma.masked_array(data=self.X.values.dot(coefficients),
+
+            if self.design_matrix_collection._sparse:
+                model_flux = self.X.dot(coefficients)
+            else:
+                model_flux = (self.X.values).dot(coefficients)
+            model = np.ma.masked_array(data=np.copy(model_flux),
                                        mask=~(cadence_mask & clean_cadences))
             residuals = self.lc.flux - model
             clean_cadences = ~sigma_clip(residuals, sigma=sigma).mask
@@ -243,16 +250,19 @@ class RegressionCorrector(Corrector):
 
         self.coefficients = coefficients
         self.coefficients_err = coefficients_err
-
-        model_flux = self.X.values.dot(coefficients)
         model_flux -= np.median(model_flux)
         if propagate_errors:
             with warnings.catch_warnings():
                 # ignore "RuntimeWarning: covariance is not symmetric positive-semidefinite."
                 warnings.simplefilter("ignore", RuntimeWarning)
-                samples = np.asarray(
-                    [self.X.values.dot(np.random.multivariate_normal(coefficients, coefficients_err))
-                     for idx in range(100)]).T
+                if self.design_matrix_collection._sparse:
+                    samples = np.asarray(
+                        [self.X.dot(np.random.multivariate_normal(coefficients, coefficients_err))
+                         for idx in range(100)]).T
+                else:
+                    samples = np.asarray(
+                        [self.X.values.dot(np.random.multivariate_normal(coefficients, coefficients_err))
+                         for idx in range(100)]).T
             model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
         else:
             model_err = np.zeros(len(model_flux))
@@ -273,9 +283,9 @@ class RegressionCorrector(Corrector):
             raise ValueError("you need to call `correct()` first")
 
         lcs = {}
-        for idx, submatrix in enumerate(self.X.matrices):
+        for idx, submatrix in enumerate(self.design_matrix_collection.matrices):
             # What is the index of the first column for the submatrix?
-            firstcol_idx = sum([m.shape[1] for m in self.X.matrices[:idx]])
+            firstcol_idx = sum([m.shape[1] for m in self.design_matrix_collection.matrices[:idx]])
             submatrix_coefficients = self.coefficients[firstcol_idx:firstcol_idx+submatrix.shape[1]]
             # submatrix_coefficients_err = self.coefficients_err[firstcol_idx:firstcol_idx+submatrix.shape[1], firstcol_idx:firstcol_idx+submatrix.shape[1]]
             # samples = np.asarray([np.dot(submatrix.values, np.random.multivariate_normal(submatrix_coefficients, submatrix_coefficients_err)) for idx in range(100)]).T
@@ -341,9 +351,9 @@ class RegressionCorrector(Corrector):
                                   sharey=True)
             if not hasattr(axs, '__iter__'):
                 axs = [axs]
-            for idx, ax, X in zip(range(len(names)), axs, self.X):
+            for idx, ax, X in zip(range(len(names)), axs, self.design_matrix_collection):
                 X.plot_priors(ax=ax)
-                firstcol_idx = sum([m.shape[1] for m in self.X.matrices[:idx]])
+                firstcol_idx = sum([m.shape[1] for m in self.design_matrix_collection.matrices[:idx]])
                 submatrix_coefficients = self.coefficients[firstcol_idx:firstcol_idx+X.shape[1]]
                 [ax.axvline(s, color='red', zorder=-1) for s in submatrix_coefficients]
         return axs

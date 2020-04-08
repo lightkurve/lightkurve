@@ -13,7 +13,7 @@ from astropy.modeling import models, fitting
 
 from . import DesignMatrix, DesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
-from .designmatrix import create_spline_matrix
+from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
 
 from .. import MPLSTYLE
 from ..utils import LightkurveWarning
@@ -170,12 +170,13 @@ class SFFCorrector(RegressionCorrector):
 
         # long term
         n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
-        s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots, include_intercept=True, sparse=sparse)
 
         if sparse:
-            means = [np.average(self.lc.flux, weights=s_dm.values[:, idx].toarray()[:, 0]) for idx in range(s_dm.shape[1])]
+            s_dm = create_sparse_spline_matrix(self.lc.time, n_knots=n_knots)
         else:
-            means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
+            s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots)
+
+        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
         s_dm.prior_mu = np.asarray(means)
 
         # I'm putting WEAK priors on the spline that it must be around 1
