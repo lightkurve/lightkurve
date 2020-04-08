@@ -8,7 +8,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.sparse import csr_matrix, hstack
+from scipy.sparse import lil_matrix, hstack, vstack
 
 from .. import MPLSTYLE
 from ..utils import LightkurveWarning, plot_image
@@ -52,7 +52,7 @@ class DesignMatrix():
         self.name = name
         self._sparse = sparse
         if self._sparse:
-            self._sparse_values = csr_matrix(self.df.values)
+            self._sparse_values = lil_matrix(self.df.values)
         if prior_mu is None:
             prior_mu = np.zeros(len(df.T))
         if prior_sigma is None:
@@ -196,7 +196,7 @@ class DesignMatrix():
         if inplace:
             self.df = df
             if self._sparse:
-                self._sparse_values = csr_matrix(self.df.values)
+                self._sparse_values = lil_matrix(self.df.values)
             return self
         return DesignMatrix(df, name=self.name, sparse=self._sparse)
 
@@ -240,18 +240,15 @@ class DesignMatrix():
             named "offset".
         """
         if inplace:
-            self.df.insert(self.df.shape[1], 'offset', 1, allow_duplicates=False)
-            self.prior_mu = np.append(self.prior_mu, prior_mu)
-            self.prior_sigma = np.append(self.prior_sigma, prior_sigma)
-            if self._sparse:
-                self._sparse_values = hstack([self.values, csr_matrix(np.ones(self.values.shape[0])).T], format='csr')
-            return self
+            dm = self
         else:
-            df = self.df.copy()
-            df.insert(self.df.shape[1], 'offset', 1, allow_duplicates=False)
-            return DesignMatrix(df, prior_mu=np.append(self.prior_mu, prior_mu),
-                                prior_sigma=np.append(self.prior_sigma, prior_sigma), name=self.name,
-                                sparse=self._sparse)
+            dm = self.copy()
+        dm.df.insert(self.df.shape[1], 'offset', 1, allow_duplicates=False)
+        dm.prior_mu = np.append(self.prior_mu, prior_mu)
+        dm.prior_sigma = np.append(self.prior_sigma, prior_sigma)
+        if self._sparse:
+            self._sparse_values = hstack([self.values, lil_matrix(np.ones(self.values.shape[0])).T], format='lil')
+        return dm
 
     def _validate(self):
         """Raises a `LightkurveWarning` if the matrix has a low rank."""
@@ -303,7 +300,7 @@ class DesignMatrixCollection():
     def __init__(self, matrices):
         if np.all([m._sparse for m in matrices]):
             self._sparse = True
-            self._sparse_values = hstack([m.values for m in matrices], format='csr')
+            self._sparse_values = hstack([m.values for m in matrices], format='lil')
         else:
             self._sparse = False
 
@@ -459,3 +456,55 @@ def create_spline_matrix(x, n_knots=20, degree=3, name='spline',
     df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
                                           for idx in range(n_knots)])
     return DesignMatrix(df, name=name, sparse=sparse)
+
+
+
+def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline',
+                         include_intercept=False, sparse=True):
+    """Returns a `.DesignMatrix` which models which are
+
+    Parameters
+    ----------
+    x : np.ndarray
+        vector to spline
+    n_knots: int
+        Number of knots (default: 20).
+    knots : np.ndarray [optional]
+        Optional array containing knots
+    degree: int
+        Polynomial degree.
+    name: string
+        Name to pass to `.DesignMatrix` (default: 'spline').
+    include_intercept: bool
+        Whether to include row of ones to find intercept. Default False.
+
+    Returns
+    -------
+    dm: `.DesignMatrix`
+        Design matrix object with shape (len(x), n_knots*degree).
+    """
+    if (knots is None)  and (n_knots is not None):
+        knots = np.linspace(x.min(), x.max(), n_knots - 2)
+    elif (knots is None)  and (n_knots is None):
+        raise ValueError('Pass either `n_knots` or `knots`.')
+    knots_wbounds = np.append(np.append([x.min()] * (degree - 1), knots), [x.max()] * (degree))
+
+    zeros_dense = np.zeros(len(x))
+    def basis(x, degree, i, knots):
+        if degree == 0:
+            B = zeros_dense.copy()
+            B[(x >= knots[i]) & (x <= knots[i+1])] = 1
+        else:
+            alpha1, alpha2 = 0, 0
+            if ((knots[degree + i] - knots[i]) != 0):
+                alpha1 = (x - knots[i])/(knots[degree + i] - knots[i])
+            if ((knots[i+degree+1] - knots[i+1]) != 0):
+                alpha2 = (knots[i + degree + 1] - x)/(knots[i + degree + 1] - knots[i + 1])
+            B = alpha1 * basis(x, (degree-1), i, knots) + alpha2 * basis(x, (degree-1), (i+1), knots)
+        return B
+
+    spline_dm = vstack([lil_matrix(basis(x, degree, idx, knots_wbounds)) for idx in np.arange(-1, len(knots_wbounds) - degree - 1)], format='lil').T
+    return spline_dm
+    # df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
+    #                                       for idx in range(n_knots)])
+    # return DesignMatrix(df, name=name, sparse=sparse)
