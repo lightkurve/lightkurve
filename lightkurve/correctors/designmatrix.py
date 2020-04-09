@@ -346,19 +346,15 @@ class DesignMatrixCollection():
         else:
             self._sparse = False
         self.matrices = matrices
+        if self._sparse:
+             self.X = hstack([m.X for m in matrices], format='csr')
+        else:
+             self.X = np.hstack([m.X for m in matrices])
 
     @property
     def values(self):
         """2D numpy array containing the matrix values."""
         return np.hstack(tuple(m.values for m in self.matrices))
-
-    @property
-    def X(self):
-        """Stack of X as either np.array or sparse array"""
-        if self._sparse:
-             return hstack([m.X for m in self.matrices], format='csr')
-        else:
-             return np.hstack([m.X for m in self.matrices])
 
     @property
     def df(self):
@@ -577,7 +573,8 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
             B = alpha1 * basis(x, (degree-1), i, knots) + alpha2 * basis(x, (degree-1), (i+1), knots)
         return B
 
-    spline_dm = vstack([lil_matrix(basis(x, degree, idx, knots_wbounds)) for idx in np.arange(-1, len(knots_wbounds) - degree - 1)], format='lil').T
+    matrices = [lil_matrix(basis(x, degree, idx, knots_wbounds)) for idx in np.arange(-1, len(knots_wbounds) - degree - 1)]
+    spline_dm = vstack([m for m in matrices], format='lil').T
     return DesignMatrix(spline_dm, name=name)
     # df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
     #                                       for idx in range(n_knots)])

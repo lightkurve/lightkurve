@@ -150,8 +150,8 @@ class SFFCorrector(RegressionCorrector):
 
         dms = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
-            knots = list(np.percentile(self.arclength[a:b], np.linspace(0, 100, bins+1)[1:-1]))
             ar = np.copy(self.arclength)
+            knots = list(np.percentile(ar[a:b], np.linspace(0, 100, bins+1)[1:-1]))
             ar[~np.in1d(ar, ar[a:b])] = 0
             #import pdb; pdb.set_trace()
             if sparse:
@@ -170,7 +170,7 @@ class SFFCorrector(RegressionCorrector):
             dm.prior_sigmas = ps
             dms.append(dm)
 
-        sff_dm = DesignMatrixCollection(dms).flatten().standardize()
+        sff_dm = DesignMatrixCollection(dms).flatten()#.standardize()
 
         # long term
         n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
@@ -180,8 +180,8 @@ class SFFCorrector(RegressionCorrector):
         else:
             s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots, name='sff')
 
-        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
-        s_dm.prior_mu = np.asarray(means)
+#        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
+#        s_dm.prior_mu = np.asarray(means)
 
         # I'm putting WEAK priors on the spline that it must be around 1
         s_dm.prior_sigma = np.ones(len(s_dm.prior_mu)) * 1000 * self.lc.flux.std() + 1e-6
@@ -197,6 +197,8 @@ class SFFCorrector(RegressionCorrector):
         else:
             dm = DesignMatrixCollection([s_dm, sff_dm])
 
+        print(dm)
+        dm.plot()
         # correct
         clc = super(SFFCorrector, self).correct(dm, **kwargs)
 
