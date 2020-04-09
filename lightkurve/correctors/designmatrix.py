@@ -61,8 +61,7 @@ class DesignMatrix():
                 X = pd.DataFrame(input)
             else:
                 X = deepcopy(input)
-            if not sparse:
-                self.df = X
+            self.df = X
 
             if columns is not None:
                 self.columns = columns
@@ -183,10 +182,12 @@ class DesignMatrix():
         dm.prior_mu = np.concatenate([list(self.prior_mu) * (len(row_indices) + 1)])
         dm.prior_sigma = np.concatenate([list(self.prior_sigma) * (len(row_indices) + 1)])
         if isinstance(dm.df, pd.DataFrame):
-            dm.df = pd.concat([((dm.X * np.atleast_2d(np.in1d(x, idx).astype(int)).T)).add_suffix('_{}'.format(jdx)) for jdx, idx in enumerate(np.array_split(x, row_indices))], axis=1)
+            dm.df = pd.concat([((dm.df * np.atleast_2d(np.in1d(x, idx).astype(int)).T)).add_suffix('_{}'.format(jdx)) for jdx, idx in enumerate(np.array_split(x, row_indices))], axis=1)
             non_zero = dm.df.sum(axis=0) != 0
             dm.df = dm.df[dm.df.columns[non_zero]]
-            dm.X = dm.df.values
+            dm.df = dm.df.values
+            if not self._sparse:
+                dm.X = dm.df.values
         if issparse(dm.X):
             dm.X = hstack([dm.X.multiply(lil_matrix(np.in1d(x, idx).astype(int)).T) for idx in np.array_split(x, row_indices)], format='lil')
             non_zero = dm.X.sum(axis=0) != 0
@@ -550,6 +551,10 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
     dm: `.DesignMatrix`
         Design matrix object with shape (len(x), n_knots*degree).
     """
+
+    if not isinstance(n_knots, int):
+        raise ValueError('`n_knots` must be an integer.')
+
     if (knots is None)  and (n_knots is not None):
         knots = np.asarray([s[-1] for s in np.array_split(np.argsort(x), n_knots)[1:-1]])
         knots = [np.mean([x[k], x[k + 1]]) for k in knots]
@@ -574,7 +579,7 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
         return B
 
     matrices = [lil_matrix(basis(x, degree, idx, knots_wbounds)) for idx in np.arange(-1, len(knots_wbounds) - degree - 1)]
-    spline_dm = vstack([m for m in matrices], format='lil').T
+    spline_dm = vstack([m for m in matrices if (m.sum() != 0) ], format='lil').T
     return DesignMatrix(spline_dm, name=name)
     # df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
     #                                       for idx in range(n_knots)])
