@@ -146,7 +146,8 @@ class LightCurve(object):
                                  "".format(len(self), len(other)))
             if np.any(self.time != other.time):
                 warnings.warn("Two LightCurve objects with inconsistent time "
-                              "values are being added.")
+                              "values are being added.",
+                              LightkurveWarning)
             newlc.flux = self.flux + other.flux
             newlc.flux_err = np.hypot(self.flux_err, other.flux_err)
         else:
@@ -171,7 +172,8 @@ class LightCurve(object):
                                  "".format(len(self), len(other)))
             if np.any(self.time != other.time):
                 warnings.warn("Two LightCurve objects with inconsistent time "
-                              "values are being multiplied.")
+                              "values are being multiplied.",
+                              LightkurveWarning)
             newlc.flux = self.flux * other.flux
             # Applying standard uncertainty propagation, cf.
             # https://en.wikipedia.org/wiki/Propagation_of_uncertainty#Example_formulae
@@ -196,7 +198,8 @@ class LightCurve(object):
                                  "".format(len(self), len(other)))
             if np.any(self.time != other.time):
                 warnings.warn("Two LightCurve objects with inconsistent time "
-                              "values are being divided.")
+                              "values are being divided.",
+                              LightkurveWarning)
             newlc.flux = other.flux / self.flux
             newlc.flux_err = abs(newlc.flux) * np.hypot(self.flux_err / self.flux, other.flux_err / other.flux)
         else:
@@ -392,7 +395,8 @@ class LightCurve(object):
         if not flag:
             warnings.warn(
                 "append is being applied to LightCurve objects with "
-                "inconsistent values for `extra_columns`"
+                "inconsistent values for `extra_columns`",
+                LightkurveWarning
             )
 
         for i in range(len(others)):
