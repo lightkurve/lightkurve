@@ -1,6 +1,7 @@
 1.10.dev (unreleased)
 ==================
 
+- Added the ``extra_columns`` attribute to ``LightCurve`` objects. [#724]
 
 
 

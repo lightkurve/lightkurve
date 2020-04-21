@@ -70,6 +70,8 @@ class LightCurve(object):
     >>> lc.bin(binsize=2).flux
     array([0.99, 1.01])
     """
+    extra_columns = ()
+
     def __init__(self, time=None, flux=None, flux_err=None, flux_unit=None,
                  time_format=None, time_scale=None, targetid=None, label=None,
                  meta=None):
@@ -128,6 +130,8 @@ class LightCurve(object):
         copy_self.time = self.time[key]
         copy_self.flux = self.flux[key]
         copy_self.flux_err = self.flux_err[key]
+        for k in self.extra_columns:
+            setattr(copy_self, k, getattr(self, k)[key])
         return copy_self
 
     def __len__(self):
@@ -142,7 +146,8 @@ class LightCurve(object):
                                  "".format(len(self), len(other)))
             if np.any(self.time != other.time):
                 warnings.warn("Two LightCurve objects with inconsistent time "
-                              "values are being added.")
+                              "values are being added.",
+                              LightkurveWarning)
             newlc.flux = self.flux + other.flux
             newlc.flux_err = np.hypot(self.flux_err, other.flux_err)
         else:
@@ -167,7 +172,8 @@ class LightCurve(object):
                                  "".format(len(self), len(other)))
             if np.any(self.time != other.time):
                 warnings.warn("Two LightCurve objects with inconsistent time "
-                              "values are being multiplied.")
+                              "values are being multiplied.",
+                              LightkurveWarning)
             newlc.flux = self.flux * other.flux
             # Applying standard uncertainty propagation, cf.
             # https://en.wikipedia.org/wiki/Propagation_of_uncertainty#Example_formulae
@@ -192,7 +198,8 @@ class LightCurve(object):
                                  "".format(len(self), len(other)))
             if np.any(self.time != other.time):
                 warnings.warn("Two LightCurve objects with inconsistent time "
-                              "values are being divided.")
+                              "values are being divided.",
+                              LightkurveWarning)
             newlc.flux = other.flux / self.flux
             newlc.flux_err = abs(newlc.flux) * np.hypot(self.flux_err / self.flux, other.flux_err / other.flux)
         else:
@@ -377,18 +384,36 @@ class LightCurve(object):
         else:
             new_lc = self.copy()
 
+        # Find the intersection of all the extra_columns values
+        extra_columns = set(new_lc.extra_columns)
+        flag = True
+        for other in others:
+            next_columns = set(other.extra_columns)
+            extra_columns &= next_columns
+            flag &= extra_columns == next_columns
+        flag &= set(new_lc.extra_columns) == extra_columns
+        if not flag:
+            warnings.warn(
+                "append is being applied to LightCurve objects with "
+                "inconsistent values for `extra_columns`",
+                LightkurveWarning
+            )
+
         for i in range(len(others)):
             new_lc.time = np.append(new_lc.time, others[i].time)
             new_lc.flux = np.append(new_lc.flux, others[i].flux)
             new_lc.flux_err = np.append(new_lc.flux_err, others[i].flux_err)
-            if hasattr(new_lc, 'cadenceno'):
-                new_lc.cadenceno = np.append(new_lc.cadenceno, others[i].cadenceno)  # KJM
-            if hasattr(new_lc, 'quality'):
-                new_lc.quality = np.append(new_lc.quality, others[i].quality)
-            if hasattr(new_lc, 'centroid_col'):
-                new_lc.centroid_col = np.append(new_lc.centroid_col, others[i].centroid_col)
-            if hasattr(new_lc, 'centroid_row'):
-                new_lc.centroid_row = np.append(new_lc.centroid_row, others[i].centroid_row)
+
+            for column in extra_columns:
+                setattr(
+                    new_lc,
+                    column,
+                    np.append(
+                        getattr(new_lc, column),
+                        getattr(others[i], column)
+                    )
+                )
+
         return new_lc
 
     def copy(self):
@@ -783,14 +808,14 @@ class LightCurve(object):
             quality[in_original] = np.copy(lc.quality)
             quality[~in_original] += 65536
             nlc.quality = quality
-        if hasattr(lc, 'centroid_col'):
-            col = np.zeros(len(ntime)) * np.nan
-            col[in_original] = np.copy(lc.centroid_col)
-            nlc.centroid_col = col
-        if hasattr(lc, 'centroid_row'):
-            row = np.zeros(len(ntime)) * np.nan
-            row[in_original] = np.copy(lc.centroid_row)
-            nlc.centroid_row = row
+        for column in lc.extra_columns:
+            if column == "quality":
+                continue
+            old_values = getattr(lc, column)
+            new_values = np.empty(len(ntime), dtype=old_values.dtype)
+            new_values[~in_original] = np.nan
+            new_values[in_original] = np.copy(old_values)
+            setattr(nlc, column, new_values)
 
         return nlc
 
@@ -963,11 +988,14 @@ class LightCurve(object):
                             'quality': quality_func,
                             'centroid_row': centroid_func,
                             'centroid_col': centroid_func,
-                            'flux_err': rmse_func,
-                            'cadenceno': lambda x: np.nan}
+                            'flux_err': rmse_func}
         statistic_mapper = {key: value
                             for key, value in statistic_mapper.items()
                             if hasattr(self, key)}
+        for column in self.extra_columns:
+            if column in statistic_mapper:
+                continue
+            statistic_mapper[column] = lambda x: np.nan
 
         # Now create the new binned light curve object
         binned_lc = self.copy()
@@ -1954,6 +1982,10 @@ class KeplerLightCurve(LightCurve):
     targetid : int
         Kepler ID number
     """
+
+    extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
+
+
     def __init__(self, time=None, flux=None, flux_err=None,
                  flux_unit=u.Unit('electron/second'), time_format='bkjd', time_scale='tdb',
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
@@ -1973,15 +2005,6 @@ class KeplerLightCurve(LightCurve):
         self.mission = mission
         self.ra = ra
         self.dec = dec
-
-    def __getitem__(self, key):
-        lc = super(KeplerLightCurve, self).__getitem__(key)
-        # Compared to `LightCurve`, we need to slice a few additional arrays:
-        lc.quality = self.quality[key]
-        lc.cadenceno = self.cadenceno[key]
-        lc.centroid_col = self.centroid_col[key]
-        lc.centroid_row = self.centroid_row[key]
-        return lc
 
     def __repr__(self):
         return('KeplerLightCurve(ID: {})'.format(self.targetid))
@@ -2106,6 +2129,9 @@ class TessLightCurve(LightCurve):
     targetid : int
         Tess Input Catalog ID number
     """
+
+    extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
+
     def __init__(self, time=None, flux=None, flux_err=None,
                  flux_unit=u.Unit('electron/second'), time_format='btjd', time_scale='tdb',
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
@@ -2125,15 +2151,6 @@ class TessLightCurve(LightCurve):
         self.ccd = ccd
         self.ra = ra
         self.dec = dec
-
-    def __getitem__(self, key):
-        lc = super(TessLightCurve, self).__getitem__(key)
-        # Compared to `LightCurve`, we need to slice a few additional arrays:
-        lc.quality = self.quality[key]
-        lc.cadenceno = self.cadenceno[key]
-        lc.centroid_col = self.centroid_col[key]
-        lc.centroid_row = self.centroid_row[key]
-        return lc
 
     def __repr__(self):
         return('TessLightCurve(TICID: {})'.format(self.targetid))

@@ -254,6 +254,19 @@ def test_lightcurve_append_multiple():
     assert_array_equal(lc.time, 4*[1, 2, 3])
 
 
+def test_lightcurve_append_inconsistent_columns():
+    """Test ``LightCurve.append()`` for different sub-classes.
+
+    Compared to the base `LightCurve`, `KeplerLightCurve` has extra columns
+    such as `centroid_col` and `cadenceno`.  This test checks whether
+    appending such two objects raises a warning.
+    """
+    lc1 = KeplerLightCurve(time=[1, 2, 3], flux=[1, .5, 1])
+    lc2 = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
+    with pytest.warns(LightkurveWarning, match='extra_columns'):
+        lc = lc1.append(lc2)
+
+
 def test_lightcurve_copy():
     """Test ``LightCurve.copy()``."""
     time = np.array([1, 2, 3, 4])
