@@ -295,11 +295,13 @@ class DesignMatrix():
             dm = self
         else:
             dm = self.copy()
-        if isinstance(dm.X, pd.DataFrame):
+        if issparse(dm.X):
+            dm.X = hstack([dm.X, lil_matrix(np.ones(dm.shape[0])).T], format='lil')
+        elif isinstance(dm.df, pd.DataFrame):
             dm.df.insert(dm.shape[1], 'offset', 1, allow_duplicates=False)
             dm.X = dm.df.values
         else:
-            dm.X = hstack([dm.X, lil_matrix(np.ones(dm.shape[0])).T], format='lil')
+            raise NotImplementedError("Need to implement for numpy only")
         dm.prior_mu = np.append(dm.prior_mu, prior_mu)
         dm.prior_sigma = np.append(dm.prior_sigma, prior_sigma)
         return dm

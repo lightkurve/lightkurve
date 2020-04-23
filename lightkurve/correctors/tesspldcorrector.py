@@ -14,7 +14,7 @@ import numpy as np
 
 from . import DesignMatrix, DesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
-from .designmatrix import create_spline_matrix
+from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
 from .. import MPLSTYLE
 
 
@@ -53,7 +53,7 @@ class TessPLDCorrector(RegressionCorrector):
         return 'TessPLDCorrector (LC: {})'.format(self.lc.label)
 
     def _create_design_matrix(self, background_mask, pixel_components,
-                              spline_n_knots, spline_degree):
+                              spline_n_knots, spline_degree, sparse=False):
         """Returns a `DesignMatrixCollection`."""
         # First, we estimate the per-pixel background flux over time by
         # (i) subtracting a mean image from each cadence;
@@ -69,16 +69,22 @@ class TessPLDCorrector(RegressionCorrector):
         pixels = (self.tpf.flux.transpose([1, 2, 0]) - simple_bkg
                     ).transpose([2, 0, 1])[:, background_mask]
 
-        dm_pixels = DesignMatrix(pixels, name='pixel_series').pca(pixel_components)
-        dm_bkg = DesignMatrix(simple_bkg, name='background_model')
-        dm_spline = create_spline_matrix(self.lc.time,
+        dm_pixels = DesignMatrix(pixels, name='pixel_series', sparse=sparse).pca(pixel_components)
+        dm_bkg = DesignMatrix(simple_bkg, name='background_model', sparse=sparse)
+        if sparse:
+            dm_spline = create_sparse_spline_matrix(self.lc.time,
+                                                 n_knots=spline_n_knots,
+                                                 degree=spline_degree)
+        else:
+            dm_spline = create_spline_matrix(self.lc.time,
                                          n_knots=spline_n_knots,
-                                         degree=spline_degree).append_constant()
+                                         degree=spline_degree)
+        dm_spline.append_constant(inplace=True)
         dm = DesignMatrixCollection([dm_pixels, dm_bkg, dm_spline])
         return dm
 
     def correct(self, pixel_components=3, spline_n_knots=100, spline_degree=3,
-                background_mask=None, restore_trend=True, **kwargs):
+                background_mask=None, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -102,7 +108,8 @@ class TessPLDCorrector(RegressionCorrector):
         dm = self._create_design_matrix(background_mask=background_mask,
                                         pixel_components=pixel_components,
                                         spline_n_knots=spline_n_knots,
-                                        spline_degree=spline_degree)
+                                        spline_degree=spline_degree,
+                                        sparse=sparse)
         clc = super(TessPLDCorrector, self).correct(dm, **kwargs)
         if restore_trend:
             clc += self.diagnostic_lightcurves['spline']
