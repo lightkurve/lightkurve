@@ -1,5 +1,18 @@
-1.9.1 (unreleased)
+1.10.dev (unreleased)
 ==================
+
+- Added the ``extra_columns`` attribute to ``LightCurve`` objects. [#724]
+
+
+
+1.9.1 (2020-03-25)
+==================
+
+- Increased the speed of ``search_lightcurvefile()`` and
+  ``search_targetpixelfile()`` by a factor ~10x. [#715]
+
+- Fixed an issue which caused ``interact()`` and ``interact_bls()`` to be
+  incompatible with Bokeh v2.0.0. [#716]
 
 - Fixed a bug in `LightCurve.bin()` which caused the method to fail if the
   ``quality`` array has a floating point data type. [#705]

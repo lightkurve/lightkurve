@@ -23,6 +23,7 @@ Direct code contributions and bugfixes:
 - `Szabo Pal <https://github.com/zabop>`_
 - `Sam Lee <https://github.com/orionlee>`_
 - `Jeff Smith <https://github.com/jcsmithhere>`_
+- `Daniel Foreman-Mackey <https://github.com/dfm>`_
 
 
 Comments, corrections & suggestions:
@@ -52,10 +53,10 @@ Comments, corrections & suggestions:
 - `Dag Evensberget <https://github.com/svaberg>`_
 - `Natalie Gosnell <https://github.com/nattieg>`_
 - `Richard Elkins <https://github.com/texadactyl>`_
-- `Daniel Foreman-Mackey <https://github.com/dfm>`_
 - `Saeed Hojjatpanah <https://github.com/saeedm31>`_
 - `Simon J Murphy <https://github.com/SimonJMurphy>`_
 - `Alex Lyttle <https://github.com/alexlyttle>`_
 - `ansainbdg <https://github.com/ansainbdg>`_
 - `newxr <https://github.com/newxr>`_
 - `Tony (Yu-Ching) Chen <https://github.com/xyz3919>`_
+- `Nuno Ramos Carvalho <https://github.com/nunorc>`_

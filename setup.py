@@ -6,6 +6,7 @@ from setuptools import setup
 # Prepare and send a new release to PyPI
 if "release" in sys.argv[-1]:
     os.system("python setup.py sdist")
+    os.system("python setup.py bdist_wheel")
     os.system("twine upload dist/*")
     os.system("rm -rf dist/lightkurve*")
     sys.exit()
@@ -33,8 +34,8 @@ setup(name='lightkurve',
       description="A friendly package for Kepler & TESS time series analysis "
                   "in Python.",
       long_description=open('README.rst').read(),
-      author='KeplerGO',
-      author_email='keplergo@mail.arc.nasa.gov',
+      author='Geert Barentsen',
+      author_email='geert@barentsen.be',
       url='https://docs.lightkurve.org',
       license='MIT',
       package_dir={
