@@ -5,10 +5,12 @@ design matrix more easy.
 """
 import warnings
 
+from numba import jit
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.sparse import lil_matrix, csr_matrix, hstack, vstack, issparse, find
+from scipy.sparse import lil_matrix, csr_matrix, hstack, vstack, issparse, find, csc_matrix
 from copy import deepcopy
 
 from .. import MPLSTYLE
@@ -528,6 +530,31 @@ def create_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline',
 
 
 
+
+@jit(nopython=True)
+def basis(x, degree, i, knots):
+    if degree == 0:
+        B = np.zeros(len(x))
+        B[(x >= knots[i]) & (x <= knots[i+1])] = 1
+        #B = (B)
+    else:
+#        alpha1, alpha2 = 0, 0
+        da = (knots[degree + i] - knots[i])
+        db = (knots[i + degree + 1] - knots[i + 1])
+        if ((knots[degree + i] - knots[i]) != 0):
+            alpha1 = ((x - knots[i])/da)
+        else:
+            alpha1 = np.zeros(len(x))
+        if ((knots[i+degree+1] - knots[i+1]) != 0):
+            alpha2 = ((knots[i + degree + 1] - x)/db)
+        else:
+            alpha2 = np.zeros(len(x))
+        B = (basis(x, (degree-1), i, knots)) * (alpha1) + (basis(x, (degree-1), (i+1), knots)) * (alpha2)
+    return B
+
+
+
+
 def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline'):
     """Returns a `.DesignMatrix` which models which are
 
@@ -552,6 +579,10 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
         Design matrix object with shape (len(x), n_knots*degree).
     """
 
+    # To use jit we have to use float64
+    x = np.asarray(x, np.float64)
+
+
     if not isinstance(n_knots, int):
         raise ValueError('`n_knots` must be an integer.')
 
@@ -564,22 +595,8 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
         raise ValueError('Pass either `n_knots` or `knots`.')
     knots_wbounds = np.append(np.append([x.min()] * (degree - 1), knots), [x.max()] * (degree))
 
-    zeros_dense = np.zeros(len(x))
-    def basis(x, degree, i, knots):
-        if degree == 0:
-            B = zeros_dense.copy()
-            B[(x >= knots[i]) & (x <= knots[i+1])] = 1
-        else:
-            alpha1, alpha2 = 0, 0
-            if ((knots[degree + i] - knots[i]) != 0):
-                alpha1 = (x - knots[i])/(knots[degree + i] - knots[i])
-            if ((knots[i+degree+1] - knots[i+1]) != 0):
-                alpha2 = (knots[i + degree + 1] - x)/(knots[i + degree + 1] - knots[i + 1])
-            B = alpha1 * basis(x, (degree-1), i, knots) + alpha2 * basis(x, (degree-1), (i+1), knots)
-        return B
-
-    matrices = [lil_matrix(basis(x, degree, idx, knots_wbounds)) for idx in np.arange(-1, len(knots_wbounds) - degree - 1)]
-    spline_dm = vstack([m for m in matrices if (m.sum() != 0) ], format='lil').T
+    matrices = [csr_matrix(basis(x, degree, idx, knots_wbounds)) for idx in np.arange(-1, len(knots_wbounds) - degree - 1)]
+    spline_dm = vstack([m for m in matrices if (m.sum() != 0) ], format='csr').T
     return DesignMatrix(spline_dm, name=name)
     # df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
     #                                       for idx in range(n_knots)])
