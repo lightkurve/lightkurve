@@ -144,10 +144,6 @@ class SFFCorrector(RegressionCorrector):
         lower_idx = np.asarray(np.append(0, self.window_points), int)
         upper_idx = np.asarray(np.append(self.window_points, len(self.lc.time)), int)
 
-        #stack = []
-        #columns = []
-        #prior_sigmas = []
-
         dms = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
             ar = np.copy(self.arclength)
@@ -158,9 +154,6 @@ class SFFCorrector(RegressionCorrector):
                 dm = create_sparse_spline_matrix(ar, knots=knots, degree=degree).copy()
             else:
                 dm = create_spline_matrix(ar, knots=knots, degree=degree).copy()
-#            dm = np.asarray(dmatrix("bs(x, knots={}, degree={}, include_intercept={}) - 1"
-#                                    "".format(knots, degree, True), {"x": ar}))
-#            stack.append(dm)
             dm.columns = ['window{}_bin{}'.format(idx+1, jdx+1)
                                         for jdx in range(dm.shape[1])]
 

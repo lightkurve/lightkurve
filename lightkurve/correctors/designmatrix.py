@@ -537,7 +537,7 @@ def create_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline',
 
 @jit(nopython=True)
 def basis(x, degree, i, knots):
-    """Create a spline basis for an input x, for the ith knot
+    """Create a spline basis vector for an input x, for the ith knot.
 
     Parameters
     ----------
@@ -549,6 +549,11 @@ def basis(x, degree, i, knots):
         The index of the knot to calculate the basis for
     knots : np.ndarray
         Array of all knots
+
+    Returns
+    -------
+    B : np.ndarray
+        A vector of same length as x containing the spline basis for the ith knot
     """
     if degree == 0:
         B = np.zeros(len(x))
@@ -597,7 +602,6 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
     # To use jit we have to use float64
     x = np.asarray(x, np.float64)
 
-
     if not isinstance(n_knots, int):
         raise ValueError('`n_knots` must be an integer.')
     if n_knots - degree <= 0:
@@ -614,6 +618,3 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
     matrices = [csr_matrix(basis(x, degree, idx, knots_wbounds)) for idx in np.arange(-1, len(knots_wbounds) - degree - 1)]
     spline_dm = vstack([m for m in matrices if (m.sum() != 0) ], format='csr').T
     return DesignMatrix(spline_dm, name=name)
-    # df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
-    #                                       for idx in range(n_knots)])
-    # return DesignMatrix(df, name=name, sparse=sparse)

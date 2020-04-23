@@ -16,3 +16,4 @@ def test_basics():
     corrector = TessPLDCorrector(tpf)
     corrector.correct(spline_n_knots=3, spline_degree=2, pixel_components=1)
     corrector.diagnose()
+    corrector.correct(spline_n_knots=3, spline_degree=2, pixel_components=1, sparse=True)
