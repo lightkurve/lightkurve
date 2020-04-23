@@ -585,11 +585,12 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
 
     if not isinstance(n_knots, int):
         raise ValueError('`n_knots` must be an integer.')
-
+    if n_knots - degree <= 0:
+        raise ValueError('n_knots must be greater than degree.')
     if (knots is None)  and (n_knots is not None):
-        knots = np.asarray([s[-1] for s in np.array_split(np.argsort(x), n_knots)[1:-1]])
+        knots = np.asarray([s[-1] for s in np.array_split(np.argsort(x), n_knots - degree)[:-1]])
         knots = [np.mean([x[k], x[k + 1]]) for k in knots]
-
+        knots = np.append(np.append(x.min(), knots), x.max())
 #        knots = np.linspace(x.min(), x.max(), n_knots - 2)
     elif (knots is None)  and (n_knots is None):
         raise ValueError('Pass either `n_knots` or `knots`.')
