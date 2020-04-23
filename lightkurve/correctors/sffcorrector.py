@@ -176,7 +176,7 @@ class SFFCorrector(RegressionCorrector):
         n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
 
         if sparse:
-            s_dm = create_sparse_spline_matrix(self.lc.time, n_knots=n_knots, name='sff').append_constant()
+            s_dm = create_sparse_spline_matrix(self.lc.time, n_knots=n_knots, name='sff')
         else:
             s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots, name='sff')
 
@@ -197,8 +197,6 @@ class SFFCorrector(RegressionCorrector):
         else:
             dm = DesignMatrixCollection([s_dm, sff_dm])
 
-        print(dm)
-        dm.plot()
         # correct
         clc = super(SFFCorrector, self).correct(dm, **kwargs)
 

@@ -590,10 +590,10 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
     if (knots is None)  and (n_knots is not None):
         knots = np.asarray([s[-1] for s in np.array_split(np.argsort(x), n_knots - degree)[:-1]])
         knots = [np.mean([x[k], x[k + 1]]) for k in knots]
-        knots = np.append(np.append(x.min(), knots), x.max())
-#        knots = np.linspace(x.min(), x.max(), n_knots - 2)
     elif (knots is None)  and (n_knots is None):
         raise ValueError('Pass either `n_knots` or `knots`.')
+    knots = np.append(np.append(x.min(), knots), x.max())
+    knots = np.unique(knots)
     knots_wbounds = np.append(np.append([x.min()] * (degree - 1), knots), [x.max()] * (degree))
 
     matrices = [csr_matrix(basis(x, degree, idx, knots_wbounds)) for idx in np.arange(-1, len(knots_wbounds) - degree - 1)]
