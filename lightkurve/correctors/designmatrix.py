@@ -69,7 +69,7 @@ class DesignMatrix():
                 self.columns = columns
             else:
                 if hasattr(X, 'columns'):
-                    self.columns = X.columns
+                    self.columns = list(X.columns)
 
             if self._sparse:
                 self.X = lil_matrix(X.values)
@@ -169,12 +169,12 @@ class DesignMatrix():
             A new design matrix with shape (n_rows, len(row_indices)*n_columns).
         """
         if not hasattr(row_indices, '__iter__'):
-            row_indices = list(row_indices)
+            row_indices = [row_indices]
+
+        # You can't split on the first or last index
+        row_indices = list(np.asarray(row_indices)[~np.in1d(row_indices, [0, self.shape[0]])])
         if len(row_indices) == 0:
             return self
-        if (row_indices == [0]) or (row_indices == [self.shape[0]]):
-            return self
-
         if inplace:
             dm = self
         else:
@@ -187,15 +187,17 @@ class DesignMatrix():
             dm.df = pd.concat([((dm.df * np.atleast_2d(np.in1d(x, idx).astype(int)).T)).add_suffix('_{}'.format(jdx)) for jdx, idx in enumerate(np.array_split(x, row_indices))], axis=1)
             non_zero = dm.df.sum(axis=0) != 0
             dm.df = dm.df[dm.df.columns[non_zero]]
-            dm.df = dm.df.values
+            dm.df = dm.df
             if not self._sparse:
                 dm.X = dm.df.values
+            dm.columns = list(dm.df.columns)
         if issparse(dm.X):
             dm.X = hstack([dm.X.multiply(lil_matrix(np.in1d(x, idx).astype(int)).T) for idx in np.array_split(x, row_indices)], format='lil')
             non_zero = dm.X.sum(axis=0) != 0
             non_zero = np.asarray(non_zero).ravel()
             dm.X = dm.X[:, non_zero]
-
+            if dm.columns is not None:
+                dm.columns = list(np.asarray([['{}_{}'.format(c, idx) for c in dm.columns] for idx in range(len(row_indices))]).ravel())
         dm.prior_mu = dm.prior_mu[non_zero]
         dm.prior_sigma = dm.prior_sigma[non_zero]
         return dm
@@ -533,6 +535,19 @@ def create_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline',
 
 @jit(nopython=True)
 def basis(x, degree, i, knots):
+    """Create a spline basis for an input x, for the ith knot
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Input x
+    degree : int
+        Degree of spline to calculate basis for
+    i : int
+        The index of the knot to calculate the basis for
+    knots : np.ndarray
+        Array of all knots
+    """
     if degree == 0:
         B = np.zeros(len(x))
         B[(x >= knots[i]) & (x <= knots[i+1])] = 1
@@ -551,8 +566,6 @@ def basis(x, degree, i, knots):
             alpha2 = np.zeros(len(x))
         B = (basis(x, (degree-1), i, knots)) * (alpha1) + (basis(x, (degree-1), (i+1), knots)) * (alpha2)
     return B
-
-
 
 
 def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline'):

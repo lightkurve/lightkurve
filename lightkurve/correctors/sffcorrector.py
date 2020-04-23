@@ -167,25 +167,24 @@ class SFFCorrector(RegressionCorrector):
             # I'm putting VERY weak priors on the SFF motion vectors
             # (1e-6 is being added to prevent sigma from being zero)
             ps = np.ones(dm.shape[1]) * 10000 * self.lc[a:b].flux.std() + 1e-6
-            dm.prior_sigmas = ps
+            dm.prior_sigma = ps
             dms.append(dm)
 
-        sff_dm = DesignMatrixCollection(dms).flatten()#.standardize()
+        sff_dm = DesignMatrixCollection(dms).flatten(name='sff')#.standardize()
 
         # long term
         n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
 
         if sparse:
-            s_dm = create_sparse_spline_matrix(self.lc.time, n_knots=n_knots, name='sff')
+            s_dm = create_sparse_spline_matrix(self.lc.time, n_knots=n_knots, name='spline')
         else:
-            s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots, name='sff')
+            s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots, name='spline')
 
-#        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
-#        s_dm.prior_mu = np.asarray(means)
+        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
+        s_dm.prior_mu = np.asarray(means)
 
         # I'm putting WEAK priors on the spline that it must be around 1
         s_dm.prior_sigma = np.ones(len(s_dm.prior_mu)) * 1000 * self.lc.flux.std() + 1e-6
-
         # additional
         if additional_design_matrix is not None:
             if not isinstance(additional_design_matrix, DesignMatrix):

@@ -13,18 +13,18 @@ def test_designmatrix_basics():
     """Can we create a design matrix from a dataframe?"""
     size, name = 10, 'testmatrix'
     df = pd.DataFrame({'vector1': np.ones(size),
-                       'vector2': np.zeros(size),
+                       'vector2': np.arange(size),
                        'vector3': np.ones(size)})
     dm = DesignMatrix(df, name=name)
     assert dm.columns == ['vector1', 'vector2', 'vector3']
     assert dm.name == name
     assert dm.shape == (size, 3)
-    assert (dm['vector1'] == df['vector1']).all()
+    assert (dm.values[:, 0] == df['vector1']).all()
     dm.plot()
     dm.plot_priors()
     assert dm.append_constant().shape == (size, 4)  # expect one column more
     assert dm.pca(nterms=2).shape == (size, 2)      # expect one column less
-    assert dm.split([10]).shape == (size, 6)        # expect double columns
+    assert dm.split([5]).shape == (size, 6)        # expect double columns
     dm.__repr__()
 
     # Test sparse
@@ -32,12 +32,12 @@ def test_designmatrix_basics():
     assert dm.columns == ['vector1', 'vector2', 'vector3']
     assert dm.name == name
     assert dm.shape == (size, 3)
-    assert (dm['vector1'] == df['vector1']).all()
+    assert (dm.values[:, 0] == df['vector1']).all()
     dm.plot()
     dm.plot_priors()
     assert dm.append_constant().shape == (size, 4)  # expect one column more
     assert dm.pca(nterms=2).shape == (size, 2)      # expect one column less
-    assert dm.split([10]).shape == (size, 6)        # expect double columns
+    assert dm.split([5]).shape == (size, 6)        # expect double columns
     dm.__repr__()
 
 
@@ -47,7 +47,9 @@ def test_designmatrix_from_numpy():
     dm = DesignMatrix(np.ones((size, 2)))
     assert dm.columns == [0, 1]
     assert dm.name == 'unnamed_matrix'
-    assert (dm[0] == np.ones(size)).all()
+    # Design matrices no longer support indexing in this way. Use dm.values
+#    assert (dm[0] == np.ones(size)).all()
+    assert (dm.values[:, 0] == np.ones(size)).all()
 
 
 def test_designmatrix_from_dict():
@@ -57,7 +59,8 @@ def test_designmatrix_from_dict():
                        'centroid_row': np.ones(size)},
                       name='motion_systematics')
     assert dm.shape == (size, 2)
-    assert (dm['centroid_col'] == np.ones(size)).all()
+    # Design matrices no longer support indexing in this way
+#    assert (dm['centroid_col'] == np.ones(size)).all()
 
 
 def test_split():
@@ -84,19 +87,19 @@ def test_standardize():
     """Verifies DesignMatrix.standardize()"""
     # A column with zero standard deviation remains unchanged
     dm = DesignMatrix({'const': np.ones(10)})
-    assert (dm.standardize()['const'].values == dm['const'].values).all()
+    assert (dm.standardize().values == np.ones(10)).all()
     # Normally-distributed columns will become Normal(0, 1)
     dm = DesignMatrix({'normal': np.random.normal(loc=5, scale=3, size=1000)})
-    assert np.round(dm.standardize()['normal'].median(), 1) == 0
-    assert np.round(dm.standardize()['normal'].std(), 1) == 1
+    assert np.round(np.median(dm.standardize().values), 1) == 0
+    assert np.round(dm.standardize().values.std(), 1) == 1
 
     # A column with zero standard deviation remains unchanged
     dm = DesignMatrix({'const': np.ones(10)}, sparse=True)
-    assert (dm.standardize()['const'].values == dm['const'].values).all()
+    assert (dm.standardize().values == np.ones(10)).all()
     # Normally-distributed columns will become Normal(0, 1)
     dm = DesignMatrix({'normal': np.random.normal(loc=5, scale=3, size=1000)})
-    assert np.round(dm.standardize()['normal'].median(), 1) == 0
-    assert np.round(dm.standardize()['normal'].std(), 1) == 1
+    assert np.round(np.median(dm.standardize().values), 1) == 0
+    assert np.round(dm.standardize().values.std(), 1) == 1
 
 
 def test_pca():
@@ -124,7 +127,7 @@ def test_collection_basics():
     """Can we create a design matrix collection when one is sparse?"""
     size = 5
     dm1 = DesignMatrix(np.ones((size, 1)), columns=['col1'], name='matrix1', sparse=True)
-    dm2 = DesignMatrix(np.zeros((size, 2)), columns=['col2', 'col3'], name='matrix2')
+    dm2 = DesignMatrix(np.zeros((size, 2)), columns=['col2', 'col3'], name='matrix2', sparse=True)
     dmc = DesignMatrixCollection([dm1, dm2])
     dmc.plot()
     dmc.__repr__()
