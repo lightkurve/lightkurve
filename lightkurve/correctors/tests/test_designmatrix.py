@@ -7,7 +7,7 @@ import pandas as pd
 
 from .. import DesignMatrix, DesignMatrixCollection
 from ... import LightkurveWarning
-
+from ..designmatrix import create_sparse_spline_matrix, create_spline_matrix
 
 def test_designmatrix_basics():
     """Can we create a design matrix from a dataframe?"""
@@ -155,3 +155,12 @@ def test_designmatrix_rank():
     assert dm.rank == 2
     with pytest.warns(LightkurveWarning, match='rank'):
         dm._validate()
+
+
+def test_splines():
+    """Do splines work as expected?"""
+    # Dense and sparse splines should produce the same answer.
+    x = np.linspace(0, 1, 100)
+    spline_dense = create_sparse_spline_matrix(x, knots=[0.1, 0.3, 0.6, 0.9], degree=2)
+    spline_sparse =create_spline_matrix(x, knots=[0.1, 0.3, 0.6, 0.9], degree=2)
+    assert np.allclose(spline_dense.values, spline_sparse.values)
