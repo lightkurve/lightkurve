@@ -724,16 +724,6 @@ class LightCurve(object):
 
         return lc
 
-    def trim(self, trim_mask):
-        """Trims cadences form a light curve using trim_mask
-
-        Returns
-        -------
-        trimmed_lightcurve : `LightCurve`
-            A new light curve object from where trimmed cadences have been removed.
-        """
-        return self[trim_mask]  # This will return a sliced copy
-
     def remove_nans(self):
         """Removes cadences where the flux is NaN.
 

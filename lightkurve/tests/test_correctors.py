@@ -7,7 +7,7 @@ from numpy.testing import assert_almost_equal
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile
-from ..correctors import KeplerCBVCorrector, PLDCorrector
+from ..correctors import PLDCorrector
 from ..search import search_targetpixelfile
 
 from .test_lightcurve import TABBY_Q8
@@ -18,23 +18,6 @@ try:
     import fbpca
 except ImportError:
     bad_optional_imports = True
-
-@pytest.mark.remote_data
-def test_kepler_cbv_fit():
-    """Verify that the two methods to do cbv fit are the nearly the same."""
-    cbv = KeplerCBVCorrector(TABBY_Q8)
-    cbv_lc = cbv.correct()
-    assert_almost_equal(cbv.coeffs, [0.102, 0.006], decimal=3)
-    lcf = KeplerLightCurveFile(TABBY_Q8)
-#    cbv_lcf = lcf.compute_cotrended_lightcurve()
-#    assert_almost_equal(cbv_lc.flux, cbv_lcf.flux)
-    cbv_lcf = KeplerCBVCorrector(lcf).correct()
-
-    lc = KeplerLightCurveFile(TABBY_Q8).SAP_FLUX
-    cbv = KeplerCBVCorrector(lc)
-    cbv_lc_2 = cbv.correct()
-    assert_almost_equal(cbv_lcf.flux, cbv_lc_2.flux)
-
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
