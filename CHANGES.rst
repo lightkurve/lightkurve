@@ -1,7 +1,9 @@
 1.10.dev (unreleased)
-==================
+=====================
 
 - Added the ``extra_columns`` attribute to ``LightCurve`` objects. [#724]
+
+- Fixed the URL to the Point Response Function (PRF) files in ``KeplerPRF``. [#727]
 
 
 

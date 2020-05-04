@@ -47,8 +47,7 @@ class KeplerPRF(object):
     >>> import matplotlib.pyplot as plt
     >>> from lightkurve import KeplerPRF
     >>> kepprf = KeplerPRF(channel=44, shape=(10, 10), column=5, row=5) # doctest: +SKIP
-    Downloading http://archive.stsci.edu/missions/kepler/fpc/prf
-    /extracted/kplr13.4_2011265_prf.fits [Done]
+    Downloading http://archive.stsci.edu/missions/kepler/fpc/prf/kplr13.4_2011265_prf.fits [Done]
     >>> prf = kepprf(flux=1000, center_col=10, center_row=10,
     ...              scale_row=0.7, scale_col=0.7, rotation_angle=math.pi/2) # doctest: +SKIP
     >>> plt.imshow(prf, origin='lower') # doctest: +SKIP
@@ -195,7 +194,7 @@ class KeplerPRF(object):
             prefix = 'kplr0'
         else:
             prefix = 'kplr'
-        prfs_url_path = "http://archive.stsci.edu/missions/kepler/fpc/prf/extracted/"
+        prfs_url_path = "http://archive.stsci.edu/missions/kepler/fpc/prf/"
         prffile = prfs_url_path + prefix + str(module) + '.' + str(output) + '_2011265_prf.fits'
 
         # read PRF images
