@@ -60,3 +60,4 @@ Comments, corrections & suggestions:
 - `newxr <https://github.com/newxr>`_
 - `Tony (Yu-Ching) Chen <https://github.com/xyz3919>`_
 - `Nuno Ramos Carvalho <https://github.com/nunorc>`_
+- George Jacoby
