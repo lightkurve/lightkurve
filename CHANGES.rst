@@ -5,6 +5,8 @@
 
 - Fixed the URL to the Point Response Function (PRF) files in ``KeplerPRF``. [#727]
 
+- Fixed a bug which caused searches to fail with Astroquery v0.4.1 and later. [#728]
+
 
 
 1.9.1 (2020-03-25)
