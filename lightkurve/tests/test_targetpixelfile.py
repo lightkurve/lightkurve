@@ -36,6 +36,7 @@ TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
              "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000"
             "/004/176/tess2019128220341-0000000417699452-0016-s_tp.fits")
+asteroid_TPF = get_pkg_data_filename("data/asteroid_test.fits")
 
 
 @pytest.mark.remote_data
@@ -555,3 +556,14 @@ def test_aperture_photometry_nan():
     assert ~np.isnan(lc.flux_err[1])
     assert np.isnan(lc.flux[2])
     assert np.isnan(lc.flux_err[2])
+
+@pytest.mark.remote_data
+def test_SSOs():
+    # TESS test
+    tpf = TessTargetPixelFile(asteroid_TPF)
+    result = tpf.query_solar_system_objects(cadence_mask='all', cache=False)
+    assert(len(result) == 1)
+    result = tpf.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=False)
+    assert(len(result) == 1)
+    result, mask = tpf.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=True, return_mask=True)
+    assert(len(mask) == len(tpf.flux))

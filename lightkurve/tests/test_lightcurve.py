@@ -32,6 +32,7 @@ filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits
 filename_tess_custom = get_pkg_data_filename("data/test_TESS_interact_generated_custom-lc.fits")
 filename_K2_custom = get_pkg_data_filename("data/test_K2_interact_generated_custom-lc.fits")
 
+asteroid_TPF = get_pkg_data_filename("data/asteroid_test.fits")
 
 def test_invalid_lightcurve():
     """Invalid LightCurves should not be allowed."""
@@ -1009,3 +1010,15 @@ def test_bin_issue705():
     """Regression test for #705: binning failed."""
     lc = TessLightCurve(time=np.arange(50), flux=np.ones(50), quality=np.zeros(50))
     lc.bin(binsize=15)
+
+
+@pytest.mark.remote_data
+def test_SSOs():
+    # TESS test
+    lc = TessTargetPixelFile(asteroid_TPF).to_lightcurve(aperture_mask='all')
+    result = lc.query_solar_system_objects(cadence_mask='all', cache=False)
+    assert(len(result) == 1)
+    result = lc.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=False)
+    assert(len(result) == 1)
+    result, mask = lc.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=True, return_mask=True)
+    assert(len(mask) == len(lc.flux))
