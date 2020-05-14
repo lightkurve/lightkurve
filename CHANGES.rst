@@ -1,14 +1,19 @@
 1.10.dev (unreleased)
 =====================
 
+- Added the `query_solar_system_objects()` method to search for solar system objects in
+  ``TargetPixelFile`` and ``LightCurve`` objects. [#714]
+
 - Added the ``extra_columns`` attribute to ``LightCurve`` objects. [#724]
 
 - Fixed the URL to the Point Response Function (PRF) files in ``KeplerPRF``. [#727]
 
 - Fixed a bug which caused searches to fail with Astroquery v0.4.1 and later. [#728]
 
-- Added the `query_solar_system_objects` method to search for solar system objects in
-  ``TargetPixelFile`` and ``LightCurve`` objects. [#714]
+- Fixed a bug in ``TargetPixelFile.interact_sky()`` which caused high proper
+  motion stars to be shown at incorrect locations. [#730]
+
+
 
 1.9.1 (2020-03-25)
 ==================
