@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -40,7 +41,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.9</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.10</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -88,23 +89,23 @@
 </nav>
 </header>
 
-<div class="container"  role="main">
+<div class="container">
     
   
 <style>
 /* CSS for nbsphinx extension */
 
 /* remove conflicting styling from Sphinx themes */
-div.nbinput,
-div.nbinput div.prompt,
-div.nbinput div.input_area,
-div.nbinput div[class*=highlight],
-div.nbinput div[class*=highlight] pre,
-div.nboutput,
-div.nbinput div.prompt,
-div.nbinput div.output_area,
-div.nboutput div[class*=highlight],
-div.nboutput div[class*=highlight] pre {
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
     background: none;
     border: none;
     padding: 0 0;
@@ -113,13 +114,13 @@ div.nboutput div[class*=highlight] pre {
 }
 
 /* avoid gaps between output lines */
-div.nboutput div[class*=highlight] pre {
+div.nboutput.container div[class*=highlight] pre {
     line-height: normal;
 }
 
 /* input/output containers */
-div.nbinput,
-div.nboutput {
+div.nbinput.container,
+div.nboutput.container {
     display: -webkit-flex;
     display: flex;
     align-items: flex-start;
@@ -127,92 +128,104 @@ div.nboutput {
     width: 100%;
 }
 @media (max-width: 540px) {
-    div.nbinput,
-    div.nboutput {
+    div.nbinput.container,
+    div.nboutput.container {
         flex-direction: column;
     }
 }
 
 /* input container */
-div.nbinput {
+div.nbinput.container {
     padding-top: 5px;
 }
 
 /* last container */
-div.nblast {
+div.nblast.container {
     padding-bottom: 5px;
 }
 
 /* input prompt */
-div.nbinput div.prompt pre {
+div.nbinput.container div.prompt pre {
     color: #307FC1;
 }
 
 /* output prompt */
-div.nboutput div.prompt pre {
+div.nboutput.container div.prompt pre {
     color: #BF5B3D;
 }
 
 /* all prompts */
-div.nbinput div.prompt,
-div.nboutput div.prompt {
-    min-width: 7ex;
-    padding-top: 0.4em;
-    padding-right: 0.4em;
-    text-align: right;
-    flex: 0;
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
 }
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
 @media (max-width: 540px) {
-    div.nbinput div.prompt,
-    div.nboutput div.prompt {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
         text-align: left;
         padding: 0.4em;
     }
-    div.nboutput div.prompt.empty {
+    div.nboutput.container div.prompt.empty {
         padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
     }
 }
 
 /* disable scrollbars on prompts */
-div.nbinput div.prompt pre,
-div.nboutput div.prompt pre {
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
     overflow: hidden;
 }
 
 /* input/output area */
-div.nbinput div.input_area,
-div.nboutput div.output_area {
-    padding: 0.4em;
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
     -webkit-flex: 1;
     flex: 1;
     overflow: auto;
 }
 @media (max-width: 540px) {
-    div.nbinput div.input_area,
-    div.nboutput div.output_area {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
         width: 100%;
     }
 }
 
 /* input area */
-div.nbinput div.input_area {
+div.nbinput.container div.input_area {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
     background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
-div.nboutput div[class*=MathJax] {
+div.nboutput.container div[class*=MathJax] {
     text-align: left !important;
 }
 
 /* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput div.math p {
+div.nboutput.container div.math p {
     text-align: left;
 }
 
 /* standard error */
-div.nboutput div.output_area.stderr {
+div.nboutput.container div.output_area.stderr {
     background: #fdd;
 }
 
@@ -255,6 +268,27 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
 
 /* Some additional styling taken form the Jupyter notebook CSS */
 div.rendered_html table {
@@ -357,10 +391,10 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>astropy.io.fits.hdu.hdulist.HDUList
-</pre></div>
-</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+astropy.io.fits.hdu.hdulist.HDUList
+</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -396,8 +430,9 @@ No.    Name      Ver    Type      Cards   Dimensions   Format
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>SIMPLE  =                    T / conforms to FITS standards
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+SIMPLE  =                    T / conforms to FITS standards
 BITPIX  =                    8 / array data type
 NAXIS   =                    0 / number of array dimensions
 EXTEND  =                    T / file contains extensions
@@ -422,8 +457,7 @@ DATE-OBS= &#39;2009-09-18T17:53:34.165&#39;
 QUARTER =                    3
 CHECKSUM= &#39;RiUOTZTORfTORZTO&#39;   / HDU checksum updated 2020-02-03T16:54:18
 DATASUM = &#39;0       &#39;           / data unit checksum updated 2020-02-03T16:54:18
-</pre></div>
-</div>
+</pre></div></div>
 </div>
 <p>Looks like it has all the correct information about the target. What about the second extension?</p>
 <div class="nbinput docutils container">
@@ -439,8 +473,9 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2020-02-03T1
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>XTENSION= &#39;BINTABLE&#39;           / binary table extension
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+XTENSION= &#39;BINTABLE&#39;           / binary table extension
 BITPIX  =                    8 / array data type
 NAXIS   =                    2 / number of array dimensions
 NAXIS1  =                   44 / length of dimension 1
@@ -468,8 +503,7 @@ TFORM7  = &#39;D       &#39;
 EXTNAME = &#39;LIGHTCURVE&#39;
 CHECKSUM= &#39;Y8EAa8C8T8CAY8C7&#39;   / HDU checksum updated 2020-02-03T16:54:18
 DATASUM = &#39;390244549&#39;          / data unit checksum updated 2020-02-03T16:54:18
-</pre></div>
-</div>
+</pre></div></div>
 </div>
 <p>This extension has 7 columns, <code class="docutils literal notranslate"><span class="pre">TIME</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX_ERR</span></code>, <code class="docutils literal notranslate"><span class="pre">SAP_QUALITY</span></code>, <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code>, <code class="docutils literal notranslate"><span class="pre">MOM_CENTR1</span></code>, and <code class="docutils literal notranslate"><span class="pre">MOM_CENTR2</span></code>. What if we wanted to add new keywords to our fits file? HLSP products require some extra keywords. Let’s add some keywords to explain who made the data, and what our HLSP is.</p>
 <div class="nbinput nblast docutils container">
@@ -507,8 +541,9 @@ DATASUM = &#39;390244549&#39;          / data unit checksum updated 2020-02-03T1
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>SIMPLE  =                    T / conforms to FITS standards
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+SIMPLE  =                    T / conforms to FITS standards
 BITPIX  =                    8 / array data type
 NAXIS   =                    0 / number of array dimensions
 EXTEND  =                    T / file contains extensions
@@ -536,8 +571,7 @@ DATE-OBS= &#39;2009-09-18T17:53:34.165&#39;
 QUARTER =                    3
 CHECKSUM= &#39;nMqboLnbnLnbnLnb&#39;   / HDU checksum updated 2020-02-03T16:54:18
 DATASUM = &#39;0       &#39;           / data unit checksum updated 2020-02-03T16:54:18
-</pre></div>
-</div>
+</pre></div></div>
 </div>
 <p>Now our new keywords are included in the primary header! What about if we want to add more <strong>data columns</strong> to our fits file? We can simply add data columns in the same way. Let’s add the data quality to our fits file.</p>
 <div class="nbinput docutils container">
@@ -554,11 +588,11 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2020-02-03T1
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>array([-0.49992399, -0.49952132, -0.49932792, ...,  0.49923243,
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([-0.49992399, -0.49952132, -0.49932792, ...,  0.49923243,
         0.49957413,  0.49988861])
-</pre></div>
-</div>
+</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
@@ -596,8 +630,9 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2020-02-03T1
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>ColDefs(
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ColDefs(
     name = &#39;TIME&#39;; format = &#39;D&#39;; unit = &#39;bkjd&#39;
     name = &#39;FLUX&#39;; format = &#39;E&#39;; unit = &#39;counts&#39;
     name = &#39;FLUX_ERR&#39;; format = &#39;E&#39;; unit = &#39;counts&#39;
@@ -607,8 +642,7 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2020-02-03T1
     name = &#39;MOM_CENTR1&#39;; format = &#39;D&#39;
     name = &#39;MOM_CENTR2&#39;; format = &#39;D&#39;
 )
-</pre></div>
-</div>
+</pre></div></div>
 </div>
 <p>The vector is populated as a data column in the HDU extension. Once all your lightcurves are saved as fits files and you have a README file, you can consider submitting your data products to MAST.</p>
 </div>

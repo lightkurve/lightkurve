@@ -14,8 +14,12 @@ TessLightCurveFile
       ~TessLightCurveFile.PDCSAP_FLUX
       ~TessLightCurveFile.SAP_FLUX
       ~TessLightCurveFile.cadenceno
+      ~TessLightCurveFile.camera
+      ~TessLightCurveFile.ccd
       ~TessLightCurveFile.dec
+      ~TessLightCurveFile.mission
       ~TessLightCurveFile.ra
+      ~TessLightCurveFile.sector
       ~TessLightCurveFile.time
 
    .. rubric:: Methods Summary
@@ -23,6 +27,7 @@ TessLightCurveFile
    .. autosummary::
 
       ~TessLightCurveFile.errorbar
+      ~TessLightCurveFile.get_keyword
       ~TessLightCurveFile.get_lightcurve
       ~TessLightCurveFile.header
       ~TessLightCurveFile.plot
@@ -34,13 +39,18 @@ TessLightCurveFile
    .. autoattribute:: PDCSAP_FLUX
    .. autoattribute:: SAP_FLUX
    .. autoattribute:: cadenceno
+   .. autoattribute:: camera
+   .. autoattribute:: ccd
    .. autoattribute:: dec
+   .. autoattribute:: mission
    .. autoattribute:: ra
+   .. autoattribute:: sector
    .. autoattribute:: time
 
    .. rubric:: Methods Documentation
 
    .. automethod:: errorbar
+   .. automethod:: get_keyword
    .. automethod:: get_lightcurve
    .. automethod:: header
    .. automethod:: plot
