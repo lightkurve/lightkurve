@@ -7,6 +7,10 @@
 
 - Fixed a bug which caused searches to fail with Astroquery v0.4.1 and later. [#728]
 
+- Fixed a bug in `TargetPixelFile.interact_sky()` which caused high proper
+  motion stars to be shown at incorrect locations. [#730]
+
+
 
 
 1.9.1 (2020-03-25)
