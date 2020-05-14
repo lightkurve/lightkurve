@@ -61,3 +61,5 @@ Comments, corrections & suggestions:
 - `Tony (Yu-Ching) Chen <https://github.com/xyz3919>`_
 - `Nuno Ramos Carvalho <https://github.com/nunorc>`_
 - George Jacoby
+- `Attila Bódi <https://github.com/astrobatty>`_
+
