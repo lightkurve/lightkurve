@@ -1,8 +1,8 @@
-1.10.dev (unreleased)
-=====================
+1.10.0 (2015-05-14)
+===================
 
-- Added the `query_solar_system_objects()` method to search for solar system objects in
-  ``TargetPixelFile`` and ``LightCurve`` objects. [#714]
+- Added the ``query_solar_system_objects()`` method to search for solar system
+  objects in ``TargetPixelFile`` and ``LightCurve`` objects. [#714]
 
 - Added the ``extra_columns`` attribute to ``LightCurve`` objects. [#724]
 
