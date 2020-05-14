@@ -32,6 +32,8 @@ filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits
 filename_tess_custom = get_pkg_data_filename("data/test_TESS_interact_generated_custom-lc.fits")
 filename_K2_custom = get_pkg_data_filename("data/test_K2_interact_generated_custom-lc.fits")
 
+
+# `asteroid_test.fits` is a single cadence of TESS FFI data which contains a known solar system object
 asteroid_TPF = get_pkg_data_filename("data/asteroid_test.fits")
 
 def test_invalid_lightcurve():
