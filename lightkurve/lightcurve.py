@@ -14,6 +14,8 @@ from scipy.interpolate import interp1d
 from scipy.stats import binned_statistic
 from matplotlib import pyplot as plt
 from copy import deepcopy
+from tqdm import tqdm
+import pandas as pd
 
 from astropy.stats import sigma_clip
 from astropy.table import Table
@@ -22,10 +24,10 @@ from astropy.time import Time
 from astropy import units as u
 
 from . import PACKAGEDIR, MPLSTYLE
-from .utils import (
-    running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
-    LightkurveWarning, validate_method
+from .utils import (running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
+    LightkurveWarning, validate_method, _query_solar_system_objects
 )
+
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve', 'FoldedLightCurve']
 
@@ -1097,6 +1099,106 @@ class LightCurve(object):
         mean = running_mean(data=cleaned_lc.flux, window_size=transit_duration)
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
+
+    def query_solar_system_objects(self, cadence_mask='outliers', radius=None,
+                                   sigma=3, location=None, cache=True, return_mask=False):
+        """Returns a list of asteroids or comets which affected the light curve.
+
+        Light curves of stars or galaxies are frequently affected by solar
+        system bodies (e.g. asteroids, comets, planets).  These objects can move
+        across a target's photometric aperture mask on time scales of hours to
+        days.  When they pass through a mask, they tend to cause a brief spike
+        in the brightness of the target.  They can also cause dips by moving
+        through a local background aperture mask (if any is used).
+
+        The artifical spikes and dips introduced by asteroids are frequently
+        confused with stellar flares, planet transits, etc.  This method helps
+        to identify false signals injects by asteroids by providing a list of
+        the solar system objects (name, brightness, time) that passed in the
+        vicinity of the target during the span of the light curve.
+
+        This method queries the `SkyBot API <http://vo.imcce.fr/webservices/skybot/>`_,
+        which returns a list of asteroids/comets/planets given a location, time,
+        and search cone.
+
+        Notes:
+        * This method will use the `ra` and `dec` properties of the `LightCurve`
+          object to determine the position of the search cone.
+        * The size of the search cone is 15 spacecraft pixels by default. You
+          can change this by passing the `radius` parameter (unit: degrees).
+        * This method will only search points in time during which he light
+          curve showed 3-sigma outliers in flux. You can override this behavior
+          and search all times by passing the `cadence_mask='all'` argument,
+          but this will be much slower.
+
+        Parameters
+        ----------
+        cadence_mask : str or bool
+            mask in time to select which frames or points should be searched for SSOs.
+            Default "outliers" will search for SSOs at points that are `sigma` from the mean.
+            "all" will search all cadences. Pass a boolean array with values of "True"
+            for times to search for SSOs.
+        radius : optional, float
+            Radius in degrees to search for bodies. If None, will search for
+            SSOs within 15 pixels.
+        sigma : optional, float
+            If `cadence_mask` is set to `"outlier"`, `sigma` will be used to identify
+            outliers.
+        cache : optional, bool
+            If True will cache the search result in the astropy cache. Set to False
+            to request the search again.
+        return_mask: bool
+            If True will return a boolean mask in time alongside the result
+
+        Returns
+        -------
+        result : `pandas.DataFrame`
+            DataFrame object which lists the Solar System objects in frames
+            that were identified to contain SSOs.  Returns `None` if no objects
+            were found.
+        """
+        for attr in ['ra', 'dec']:
+            if not hasattr(self, '{}'.format(attr)):
+                raise ValueError('Input does not have a `{}` attribute.'.format(attr))
+
+        # Validate `cadence_mask`
+        if isinstance(cadence_mask, str):
+            if cadence_mask == 'outliers':
+                cadence_mask = self.remove_outliers(sigma=sigma, return_mask=True)[1]
+            elif cadence_mask == 'all':
+                cadence_mask = np.ones(len(self.time)).astype(bool)
+        elif not isinstance(cadence_mask, np.ndarray):
+            raise ValueError('the `cadence_mask` argument is missing or invalid')
+        # Avoid searching times with NaN flux; this is necessary because e.g.
+        # `remove_outliers` includes NaNs in its mask.
+        cadence_mask &= ~np.isnan(self.flux)
+
+        # Validate `location`
+        if location is None:
+            if hasattr(self, 'mission') and self.mission:
+                location = self.mission.lower()
+            else:
+                raise ValueError('you must pass a value for `location`.')
+
+        # Validate `radius`
+        if radius is None:
+            # 15 pixels has been chosen as a reasonable default.
+            # Comets have long tails which have tripped up users.
+            if (location == 'kepler') | (location == 'k2'):
+                radius = (4*15)*u.arcsecond.to(u.deg)
+            elif location == 'tess':
+                radius = (27*15)*u.arcsecond.to(u.deg)
+            else:
+                radius = 15*u.arcsecond.to(u.deg)
+
+        res = _query_solar_system_objects(ra=self.ra, dec=self.dec,
+                                          times=self.astropy_time.jd[cadence_mask],
+                                          location=location, radius=radius, cache=cache)
+        if return_mask:
+            return res, np.in1d(self.astropy_time.jd, res.epoch)
+        return res
+
+
 
     def _create_plot(self, method='plot', ax=None, normalize=False,
                      xlabel=None, ylabel=None, title='', style='lightkurve',

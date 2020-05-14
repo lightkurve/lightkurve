@@ -14,6 +14,7 @@ from astropy.wcs import WCS
 from astropy.utils.exceptions import AstropyWarning
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
+import astropy.units as u
 
 from matplotlib import patches
 import matplotlib.pyplot as plt
@@ -21,6 +22,7 @@ import numpy as np
 from scipy.ndimage import label
 from tqdm import tqdm
 from copy import deepcopy
+import pandas as pd
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
@@ -28,9 +30,12 @@ from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
                    LightkurveWarning, detect_filetype, validate_method, \
-                   centroid_quadratic
+                   centroid_quadratic, _query_solar_system_objects
+
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
+
+
 log = logging.getLogger(__name__)
 
 
@@ -590,6 +595,98 @@ class TargetPixelFile(object):
             flux_err[is_allnan] = np.nan
 
         return flux, flux_err, centroid_col, centroid_row
+
+    def query_solar_system_objects(self, cadence_mask='outliers', radius=None,
+                                        sigma=3, cache=True, return_mask=False):
+        """Returns a list of asteroids or comets which affected the target pixel files.
+
+        Light curves of stars or galaxies are frequently affected by solar
+        system bodies (e.g. asteroids, comets, planets).  These objects can move
+        across a target's photometric aperture mask on time scales of hours to
+        days.  When they pass through a mask, they tend to cause a brief spike
+        in the brightness of the target.  They can also cause dips by moving
+        through a local background aperture mask (if any is used).
+
+        The artifical spikes and dips introduced by asteroids are frequently
+        confused with stellar flares, planet transits, etc.  This method helps
+        to identify false signals injects by asteroids by providing a list of
+        the solar system objects (name, brightness, time) that passed in the
+        vicinity of the target during the span of the light curve.
+
+        This method queries the `SkyBot API <http://vo.imcce.fr/webservices/skybot/>`_,
+        which returns a list of asteroids/comets/planets given a location, time,
+        and search cone.
+
+        Notes:
+        * This method will use the `ra` and `dec` properties of the `LightCurve`
+          object to determine the position of the search cone.
+        * The size of the search cone is 15 spacecraft pixels by default. You
+          can change this by passing the `radius` parameter (unit: degrees).
+        * This method will only search points in time during which he light
+          curve showed 3-sigma outliers in flux. You can override this behavior
+          and search all times by passing the `cadence_mask='all'` argument,
+          but this will be much slower.
+
+
+        Parameters
+        ----------
+        cadence_mask : str or bool
+            mask in time to select which frames or points should be searched for SSOs.
+            Default "outliers" will search for SSOs at points that are `sigma` from the mean.
+            "all" will search all cadences. Pass a boolean array with values of "True"
+            for times to search for SSOs.
+        radius : optional, float
+            Radius to search for bodies. If None, will search for SSOs within 5 pixels of
+            all pixels in the TPF.
+        sigma : optional, float
+            If `cadence_mask` is set to `"outlier"`, `sigma` will be used to identify
+            outliers.
+        cache : optional, bool
+            If True will cache the search result in the astropy cache. Set to False
+            to request the search again.
+        return_mask: bool
+            If True will return a boolean mask in time alongside the result
+
+        Returns
+        -------
+        result : pandas.DataFrame
+            DataFrame containing the list objects in frames that were identified to contain
+            SSOs.
+        """
+
+        for attr in ['mission', 'ra', 'dec']:
+            if not hasattr(self, '{}'.format(attr)):
+                raise ValueError('Input does not have a `{}` attribute.'.format(attr))
+
+        location = self.mission.lower()
+
+        if isinstance(cadence_mask, str):
+            if cadence_mask == 'outliers':
+                aper = self.pipeline_mask
+                if aper.sum() == 0:
+                    aper = 'all'
+                lc = self.to_lightcurve(aperture_mask=aper)
+                cadence_mask = lc.remove_outliers(sigma=sigma, return_mask=True)[1]
+
+            if cadence_mask == 'all':
+                cadence_mask = np.ones(len(self.time)).astype(bool)
+
+        elif not isinstance(cadence_mask, np.ndarray):
+            raise ValueError('Pass a cadence_mask method or a cadence_mask')
+
+        if (location == 'kepler') | (location == 'k2'):
+            pixel_scale = 4
+        if location == 'tess':
+            pixel_scale = 27
+
+        if radius == None:
+            radius = (2**0.5*(pixel_scale * np.max(self.shape[1:])) + 5)*u.arcsecond.to(u.deg)
+
+        res = _query_solar_system_objects(ra=self.ra, dec=self.dec, times=self.astropy_time.jd[cadence_mask],
+                                      location=location, radius=radius, cache=cache)
+        if return_mask:
+            return res, np.in1d(self.astropy_time.jd, res.epoch)
+        return res
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
              show_colorbar=True, mask_color='pink', title=None, style='lightkurve',

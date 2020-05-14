@@ -4,14 +4,20 @@ import logging
 import sys
 import os
 import warnings
+import numpy as np
+import pandas as pd
 
+from astropy.utils.data import download_file
+from astropy.coordinates import SkyCoord
+import astropy.units as u
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LinearStretch)
 from astropy.time import Time
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-import numpy as np
 from functools import wraps
+
+from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
@@ -639,3 +645,66 @@ def centroid_quadratic(data, mask=None):
     xm = - (2 * f * b - c * e) / det
     ym = - (2 * d * c - b * e) / det
     return xx + xm, yy + ym
+
+
+def _query_solar_system_objects(ra, dec, times, radius=0.1, location='kepler',
+                                cache=True):
+    """Returns a list of asteroids/comets given a position and time.
+
+    This function relies on The Virtual Observatory Sky Body Tracker (SkyBot)
+    service which can be found at http://vo.imcce.fr/webservices/skybot/
+
+    Parameters
+    ----------
+    ra : float
+        Right Ascension in degrees.
+    dec : float
+        Declination in degrees.
+    times : array of float
+        Times in Julian Date.
+    radius : float
+        Search radius in degrees.
+    location : str
+        Spacecraft location. Options include `'kepler'` and `'tess'`.
+    cache : bool
+        Whether to cache the search result. Default is True.
+
+    Returns
+    -------
+    result : `pandas.DataFrame`
+        DataFrame containing the list of known solar system objects at the
+        requested time and location.
+    """
+    if (location.lower() == 'kepler') or (location.lower() == 'k2'):
+        location = 'C55'
+    elif location.lower() == 'tess':
+        location = 'C57'
+
+    url = 'http://vo.imcce.fr/webservices/skybot/skybotconesearch_query.php?'
+    url += '-mime=text&'
+    url += '-ra={}&'.format(ra)
+    url += '-dec={}&'.format(dec)
+    url += '-bd={}&'.format(radius)
+    url += '-loc={}&'.format(location)
+
+    df = None
+    times = np.atleast_1d(times)
+    for time in tqdm(times, desc='Querying for SSOs'):
+        url_queried = url + 'EPOCH={}'.format(time)
+        response = download_file(url_queried, cache=cache)
+        if open(response).read(10) == '# Flag: -1':  # error code detected?
+            raise IOError("SkyBot Solar System query failed.\n"
+                          "URL used:\n" + url_queried + "\n"
+                          "Response received:\n" + open(response).read())
+        res = pd.read_csv(response, delimiter='|', skiprows=2)
+        if len(res) > 0:
+            res['epoch'] = time
+            res.rename({'# Num ':'Num', ' Name ':'Name', ' Class ':'Class', ' Mv ':'Mv'}, inplace=True, axis='columns')
+            res = res[['Num', 'Name', 'Class', 'Mv', 'epoch']].reset_index(drop=True)
+            if df is None:
+                df = res
+            else:
+                df = df.append(res)
+    if df is not None:
+        df.reset_index(drop=True)
+    return df
