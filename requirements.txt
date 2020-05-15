@@ -11,3 +11,4 @@ pandas
 uncertainties
 patsy>=0.5.1
 fbpca>=1.0
+numba>=0.39.0
