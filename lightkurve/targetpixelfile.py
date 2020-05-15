@@ -955,11 +955,7 @@ class TargetPixelFile(object):
         if center is None:
             x, y = imshape[0]//2, imshape[1]//2
         elif isinstance(center, SkyCoord):
-            try:
-                x, y = self.wcs.world_to_pixel(center)
-            except AttributeError:
-                # Python 2 compatibility (i.e. syntax of older AstroPy versions)
-                x, y = self.wcs.all_world2pix([[center.ra.value, center.dec.value]], 1)[0]
+            x, y = self.wcs.world_to_pixel(center)
         elif isinstance(center, (tuple, list, np.ndarray)):
             x, y = center
         col = int(x)
