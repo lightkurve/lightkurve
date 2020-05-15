@@ -204,7 +204,7 @@ class RegressionCorrector(Corrector):
                 design_matrix_collection = SparseDesignMatrixCollection([design_matrix_collection])
             elif isinstance(design_matrix_collection, DesignMatrix):
                 design_matrix_collection = DesignMatrixCollection([design_matrix_collection])
-        design_matrix_collection._validate()
+        design_matrix_collection.validate()
         self.design_matrix_collection = design_matrix_collection
 
         if cadence_mask is None:
@@ -221,7 +221,7 @@ class RegressionCorrector(Corrector):
                                        prior_mu=self.X.prior_mu,
                                        prior_sigma=self.X.prior_sigma,
                                        propagate_errors=propagate_errors)
-            model = np.ma.masked_array(data=np.dot(self.X.values, coefficients),
+            model = np.ma.masked_array(data=self.X.X.dot(coefficients),
                                        mask=~(cadence_mask & clean_cadences))
             residuals = self.lc.flux - model
             clean_cadences = ~sigma_clip(residuals, sigma=sigma).mask
@@ -232,15 +232,14 @@ class RegressionCorrector(Corrector):
         self.coefficients = coefficients
         self.coefficients_err = coefficients_err
 
-        model_flux = np.dot(self.X.values, coefficients)
+        model_flux = self.X.X.dot(coefficients)
         model_flux -= np.median(model_flux)
         if propagate_errors:
             with warnings.catch_warnings():
                 # ignore "RuntimeWarning: covariance is not symmetric positive-semidefinite."
                 warnings.simplefilter("ignore", RuntimeWarning)
                 samples = np.asarray(
-                    [np.dot(self.X.values,
-                            np.random.multivariate_normal(coefficients, coefficients_err))
+                    [self.X.X.dot(np.random.multivariate_normal(coefficients, coefficients_err))
                      for idx in range(100)]).T
             model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
         else:
@@ -269,7 +268,7 @@ class RegressionCorrector(Corrector):
             # submatrix_coefficients_err = self.coefficients_err[firstcol_idx:firstcol_idx+submatrix.shape[1], firstcol_idx:firstcol_idx+submatrix.shape[1]]
             # samples = np.asarray([np.dot(submatrix.values, np.random.multivariate_normal(submatrix_coefficients, submatrix_coefficients_err)) for idx in range(100)]).T
             # model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
-            model_flux = np.dot(submatrix.values, submatrix_coefficients)
+            model_flux = submatrix.X.dot(submatrix_coefficients)
             lcs[submatrix.name] = LightCurve(self.lc.time, model_flux, np.zeros(len(model_flux)), label=submatrix.name)
         return lcs
 

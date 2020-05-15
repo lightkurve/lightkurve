@@ -60,7 +60,7 @@ class DesignMatrix():
             prior_sigma = np.ones(len(df.T)) * np.inf
         self.prior_mu = prior_mu
         self.prior_sigma = prior_sigma
-        self._validate()
+        self.validate()
 
     def copy(self):
         """Returns a deepcopy of DesignMatrix"""
@@ -242,17 +242,18 @@ class DesignMatrix():
         return DesignMatrix(new_df, name=self.name,
                             prior_mu=prior_mu, prior_sigma=prior_sigma)
 
-    def _validate(self):
-        """Raises a `LightkurveWarning` if the matrix has a low rank."""
+    def _validate(self, rank=True):
+        """Helper function for validating."""
         # Matrix rank shouldn't be significantly smaller than the # of columns
-        if self.rank < (0.5*self.shape[1]):
-            warnings.warn("The design matrix has low rank ({}) compared to the "
-                          "number of columns ({}), which suggests that the "
-                          "matrix contains duplicate or correlated columns. "
-                          "This may prevent the regression from succeeding. "
-                          "Consider reducing the dimensionality by calling the "
-                          "`pca()` method.".format(self.rank, self.shape[1]),
-                          LightkurveWarning)
+        if rank:
+            if self.rank < (0.5*self.shape[1]):
+                warnings.warn("The design matrix has low rank ({}) compared to the "
+                              "number of columns ({}), which suggests that the "
+                              "matrix contains duplicate or correlated columns. "
+                              "This may prevent the regression from succeeding. "
+                              "Consider reducing the dimensionality by calling the "
+                              "`pca()` method.".format(self.rank, self.shape[1]),
+                              LightkurveWarning)
         if self.prior_mu is not None:
             if len(self.prior_mu) != self.shape[1]:
                 raise ValueError('`prior_mu` must have shape {}'
@@ -265,6 +266,9 @@ class DesignMatrix():
                 raise ValueError('`prior_sigma` values cannot be smaller than '
                                  'or equal to zero')
 
+    def validate(self, rank=True):
+        """Raises a `LightkurveWarning` if the matrix has a low rank, or priors that are the wrong shape."""
+        self._validate()
 
     @property
     def rank(self):
@@ -319,7 +323,7 @@ class DesignMatrixCollection():
             self.matrices = matrices
         self.X = np.hstack(tuple(m.X for m in self.matrices))
         self._child_class = DesignMatrix
-        self._validate()
+        self.validate()
 
     @property
     def values(self):
@@ -425,8 +429,8 @@ class DesignMatrixCollection():
             arg = np.argwhere([m.name == key for m in self.matrices])
             return self.matrices[arg[0][0]]
 
-    def _validate(self):
-        [d._validate() for d in self]
+    def validate(self):
+        [d.validate() for d in self]
 
     def __repr__(self):
         return 'DesignMatrixCollection:\n' + \
@@ -484,12 +488,18 @@ class SparseDesignMatrix(DesignMatrix):
         self.prior_mu = prior_mu
         self.prior_sigma = prior_sigma
         self._child_class = SparseDesignMatrix
-        self._validate()
+        self.validate()
 
     @property
     def values(self):
         """2D numpy array containing the matrix values."""
         return self.X.toarray()
+
+    def validate(self, rank=False):
+        """Checks if the matrix has the right shapes. Set rank to True to test matrix rank."""
+        # For sparse matrices, calculating the rank is expensive, and completely negates
+        # the benefits of using sparse. Validate will ignore rank by default.
+        self._validate(rank=False)
 
     def split(self, row_indices, inplace=False):
         """Returns a new `.SparseDesignMatrix` with regressors split into multiple
@@ -661,7 +671,7 @@ class SparseDesignMatrixCollection(DesignMatrixCollection):
             self.matrices = matrices
         self.X = hstack([m.X for m in self.matrices], format='csr')
         self._child_class = SparseDesignMatrix
-        self._validate()
+        self.validate()
 
     def plot(self, ax=None, **kwargs):
         """Visualize the design matrix values as an image.
