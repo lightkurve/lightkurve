@@ -9,8 +9,10 @@ import numpy as np
 from astropy.stats import sigma_clip
 
 from .corrector import Corrector
-from .designmatrix import DesignMatrix, DesignMatrixCollection
+from .designmatrix import DesignMatrix, DesignMatrixCollection, SparseDesignMatrix, SparseDesignMatrixCollection
 from ..lightcurve import LightCurve, MPLSTYLE
+
+from scipy.sparse import issparse, csr_matrix
 
 __all__ = ['RegressionCorrector']
 
@@ -123,17 +125,6 @@ class RegressionCorrector(Corrector):
         coefficients : np.ndarray
             The best fit model coefficients to the data.
         """
-        if prior_mu is not None:
-            if len(prior_mu) != len(self.X.values.T):
-                raise ValueError('`prior_mu` must have shape {}'
-                                 ''.format(len(self.X.values.T)))
-        if prior_sigma is not None:
-            if len(prior_sigma) != len(self.X.values.T):
-                raise ValueError('`prior_sigma` must have shape {}'
-                                 ''.format(len(self.X.values.T)))
-            if np.any(prior_sigma <= 0):
-                raise ValueError('`prior_sigma` values cannot be smaller than '
-                                 'or equal to zero')
 
         # If prior_mu is specified, prior_sigma must be specified
         if not ((prior_mu is None) & (prior_sigma is None)) | \
@@ -151,15 +142,24 @@ class RegressionCorrector(Corrector):
             flux_err = self.lc.flux_err[cadence_mask]
 
         # Retrieve the design matrix (X) as a numpy array
-        X = self.X.values[cadence_mask]
+        X = self.X.X[cadence_mask]
+        if isinstance(X, np.ndarray):
+            # Compute `X^T cov^-1 X + 1/prior_sigma^2`
+            sigma_w_inv = X.T.dot(X / flux_err[:, None]**2)
+            # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
+            B = np.dot(X.T, self.lc.flux[cadence_mask] / flux_err**2)
 
-        # Compute `X^T cov^-1 X + 1/prior_sigma^2`
-        sigma_w_inv = np.dot(X.T, X / flux_err[:, None]**2)
+        elif issparse(X):
+            sigma_f_inv = csr_matrix(1/flux_err[:, None]**2)
+            # Compute `X^T cov^-1 X + 1/prior_sigma^2`
+            sigma_w_inv = X.T.dot(X.multiply(sigma_f_inv))
+            # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
+            B = X.T.dot((self.lc.flux[cadence_mask]/flux_err**2))
+            sigma_w_inv = sigma_w_inv.toarray()
+
+
         if prior_sigma is not None:
             sigma_w_inv += np.diag(1. / prior_sigma**2)
-
-        # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
-        B = np.dot(X.T, self.lc.flux[cadence_mask] / flux_err**2)
         if prior_sigma is not None:
             B += (prior_mu / prior_sigma**2)
 
@@ -199,9 +199,11 @@ class RegressionCorrector(Corrector):
         `.LightCurve`
             Corrected light curve, with noise removed.
         """
-
-        if isinstance(design_matrix_collection, DesignMatrix):
-            design_matrix_collection = DesignMatrixCollection([design_matrix_collection])
+        if not isinstance(design_matrix_collection, DesignMatrixCollection):
+            if isinstance(design_matrix_collection, SparseDesignMatrix):
+                design_matrix_collection = SparseDesignMatrixCollection([design_matrix_collection])
+            elif isinstance(design_matrix_collection, DesignMatrix):
+                design_matrix_collection = DesignMatrixCollection([design_matrix_collection])
         design_matrix_collection._validate()
         self.design_matrix_collection = design_matrix_collection
 

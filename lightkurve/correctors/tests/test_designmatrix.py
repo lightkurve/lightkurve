@@ -66,11 +66,11 @@ def test_standardize():
     """Verifies DesignMatrix.standardize()"""
     # A column with zero standard deviation remains unchanged
     dm = DesignMatrix({'const': np.ones(10)})
-    assert (dm.standardize()['const'].values == dm['const'].values).all()
+    assert (dm.standardize()['const'] == dm['const']).all()
     # Normally-distributed columns will become Normal(0, 1)
     dm = DesignMatrix({'normal': np.random.normal(loc=5, scale=3, size=100)})
-    assert np.round(dm.standardize()['normal'].median(), 3) == 0
-    assert np.round(dm.standardize()['normal'].std(), 1) == 1
+    assert np.round(np.median(dm.standardize()['normal']), 3) == 0
+    assert np.round(np.std(dm.standardize()['normal']), 1) == 1
 
 
 def test_pca():
