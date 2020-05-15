@@ -79,9 +79,7 @@ class TargetPixelFile(object):
         with warnings.catch_warnings():
             # Ignore warnings about empty fields
             warnings.simplefilter('ignore', UserWarning)
-            # AstroPy added `HDUList.copy()` in v3.1, but we don't want to make
-            # v3.1 a minimum requirement yet, so we copy in a funny way.
-            copy = fits.HDUList([myhdu.copy() for myhdu in self.hdu])
+            copy = self.hdu.copy()
             copy[1].data = copy[1].data[selected_idx]
         return self.__class__(copy, quality_bitmask=self.quality_bitmask, targetid=self.targetid)
 

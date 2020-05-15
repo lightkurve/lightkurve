@@ -286,12 +286,6 @@ def test_corrupt_download_handling():
 
 def test_filenotfound():
     """Regression test for #540; ensure lk.open() yields `FileNotFoundError`."""
-    # Python 2 uses IOError instead of FileNotFoundError;
-    # the block below can be removed when we drop Python 2 support.
-    try:
-        FileNotFoundError
-    except NameError:
-        FileNotFoundError = IOError
     with pytest.raises(FileNotFoundError):
         open("DOESNOTEXIST")
 

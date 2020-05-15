@@ -1055,8 +1055,5 @@ def _open_downloaded_file(path, **kwargs):
 def _resolve_object(target):
     """Ask MAST to resolve an object string to a set of coordinates."""
     from astroquery.mast import MastClass
-    # `_resolve_object` was renamed `resolve_object` in astroquery 0.3.10 (2019)
-    try:
-        return MastClass().resolve_object(target)
-    except AttributeError:
-        return MastClass()._resolve_object(target)
+    # Note: `_resolve_object` was renamed `resolve_object` in astroquery 0.3.10 (2019)
+    return MastClass().resolve_object(target)
