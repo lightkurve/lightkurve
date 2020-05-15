@@ -303,10 +303,11 @@ class DesignMatrix():
 
 class DesignMatrixCollection():
     """A set of design matrices."""
-    def __init__(self, matrices):
+    def __init__(self, matrices, warn=True):
         if np.any([issparse(m.X) for m in matrices]):
-            warnings.warn(('Some matrices are `SparseDesignMatrix` objects. '
-                            'Sparse matrices will be converted to dense matrices.'), LightkurveWarning)
+            if warn:
+                warnings.warn(('Some matrices are `SparseDesignMatrix` objects. '
+                                'Sparse matrices will be converted to dense matrices.'), LightkurveWarning)
             dense_matrices = []
             for m in matrices:
                 if isinstance(m, SparseDesignMatrix):
@@ -317,6 +318,7 @@ class DesignMatrixCollection():
         else:
             self.matrices = matrices
         self.X = np.hstack(tuple(m.X for m in self.matrices))
+        self._child_class = DesignMatrix
         self._validate()
 
     @property
@@ -431,6 +433,13 @@ class DesignMatrixCollection():
                     ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
 
 
+    def flatten(self, name=None):
+        """Flatten a DesignMatrixCollection into a DesignMatrix"""
+        if name is None:
+            name = self.matrices[0].name
+        return self._child_class(self.X, columns=self.columns, prior_mu=self.prior_mu, prior_sigma=self.prior_sigma,
+                            name=name)
+
 class SparseDesignMatrix(DesignMatrix):
     """A matrix of column vectors for use in linear regression.
 
@@ -474,6 +483,7 @@ class SparseDesignMatrix(DesignMatrix):
         self.X = X
         self.prior_mu = prior_mu
         self.prior_sigma = prior_sigma
+        self._child_class = SparseDesignMatrix
         self._validate()
 
     @property
@@ -635,10 +645,11 @@ class SparseDesignMatrix(DesignMatrix):
 
 class SparseDesignMatrixCollection(DesignMatrixCollection):
     """A set of design matrices."""
-    def __init__(self, matrices):
+    def __init__(self, matrices, warn=True):
         if not np.all([issparse(m.X) for m in matrices]):
-            warnings.warn(('Not all matrices are `SparseDesignMatrix` objects. '
-                            'Dense matrices will be converted to sparse matrices.'), LightkurveWarning)
+            if warn:
+                warnings.warn(('Not all matrices are `SparseDesignMatrix` objects. '
+                                'Dense matrices will be converted to sparse matrices.'), LightkurveWarning)
             sparse_matrices = []
             for m in matrices:
                 if isinstance(m, DesignMatrix):
