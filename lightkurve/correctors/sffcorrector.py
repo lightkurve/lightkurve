@@ -170,8 +170,8 @@ class SFFCorrector(RegressionCorrector):
         n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
 
         s_dm = spline(self.lc.time, n_knots=n_knots, name='spline')
-
-        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
+        means = [np.average(chunk) for chunk in np.array_split(self.lc.flux, n_knots)]
+#        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
         s_dm.prior_mu = np.asarray(means)
 
         # I'm putting WEAK priors on the spline that it must be around 1
