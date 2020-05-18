@@ -1,8 +1,8 @@
-1.11.dev (unreleased)
-=====================
+1.10.1 (unreleased)
+===================
 
-
-
+- Fixed a bug in ``tpf.interact_sky()`` which caused star positions to be off
+  by half a pixel. [#734]
 
 
 1.10.0 (2015-05-14)
