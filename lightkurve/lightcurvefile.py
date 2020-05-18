@@ -41,7 +41,35 @@ class LightCurveFile(object):
             self.hdu = pyfits.open(self.path, **kwargs)
 
     def header(self, ext=0):
-        """Header of the object at extension `ext`"""
+        """DEPRECATED. Please use ``get_header()`` instead."""
+        warnings.warn("`LightCurveFile.header` is deprecated, please use "
+                      "`LightCurveFile.get_header()` instead.",
+                      LightkurveWarning)
+        return self.hdu[ext].header
+
+    def get_header(self, ext=0):
+        """Returns the metadata embedded in the file.
+
+        Light Curve Files contain embedded metadata headers spread across three
+        different FITS extensions:
+
+        1. The "PRIMARY" extension (``ext=0``) provides a metadata header
+           providing details on the target and its CCD position.
+        2. The "LIGHTCURVE" extension (``ext=1``) provides details on the
+           data columns and the systematics removal.
+        3. The "APERTURE" extension (``ext=2``) provides details on the
+           aperture pixel mask and the expected coordinate system (WCS).
+
+        Parameters
+        ----------
+        ext : int or str
+            FITS extension name or number.
+
+        Returns
+        -------
+        header : `~astropy.io.fits.header.Header`
+            Header object containing metadata keywords.
+        """
         return self.hdu[ext].header
 
     def get_keyword(self, keyword, hdu=0, default=None):
