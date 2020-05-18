@@ -33,6 +33,8 @@ The following GitHub members directly contributed code and bugfixes:
 - `Sam Lee <https://github.com/orionlee>`_
 - `Jeff Smith <https://github.com/jcsmithhere>`_
 - `Daniel Foreman-Mackey <https://github.com/dfm>`_
+- `Michael Higgins <Higgins00>`_
+- `Rebekah Hounsell <https://github.com/rebekah9969>`_
 
 
 Community
