@@ -118,8 +118,36 @@ class TargetPixelFile(object):
 
     @property
     def header(self):
-        """Returns the header of the primary extension."""
+        """DEPRECATED. Please use ``get_header()`` instead."""
+        warnings.warn("`TargetPixelFile.header` is deprecated, please use "
+                      "`TargetPixelFile.get_header()` instead.",
+                      LightkurveWarning)
         return self.hdu[0].header
+
+    def get_header(self, ext=0):
+        """Returns the metadata embedded in the file.
+
+        Target Pixel Files contain embedded metadata headers spread across three
+        different FITS extensions:
+
+        1. The "PRIMARY" extension (``ext=0``) provides a metadata header
+           providing details on the target and its CCD position.
+        2. The "PIXELS" extension (``ext=1``) provides details on the
+           data column and their coordinate system (WCS).
+        3. The "APERTURE" extension (``ext=2``) provides details on the
+           aperture pixel mask and the expected coordinate system (WCS).
+
+        Parameters
+        ----------
+        ext : int or str
+            FITS extension name or number.
+
+        Returns
+        -------
+        header : `~astropy.io.fits.header.Header`
+            Header object containing metadata keywords.
+        """
+        return self.hdu[ext].header
 
     @property
     def ra(self):

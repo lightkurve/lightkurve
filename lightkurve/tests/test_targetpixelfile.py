@@ -303,7 +303,7 @@ def test_tpf_factory():
 
     # Can we add our own keywords?
     tpf = factory.get_tpf(hdu0_keywords={'creator': 'Christina TargetPixelFileWriter'})
-    assert tpf.header['CREATOR'] == 'Christina TargetPixelFileWriter'
+    assert tpf.get_keyword('CREATOR') == 'Christina TargetPixelFileWriter'
 
 
 def _create_image_array(header=None, shape=(5, 5)):
@@ -567,3 +567,14 @@ def test_SSOs():
     assert(len(result) == 1)
     result, mask = tpf.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=True, return_mask=True)
     assert(len(mask) == len(tpf.flux))
+
+
+def test_get_header():
+    """Test the basic functionality of ``tpf.get_header()``"""
+    tpf = lkopen(filename_tpf_one_center)
+    assert tpf.get_header()['CHANNEL'] == tpf.get_keyword("CHANNEL")
+    assert tpf.get_header(0)['MISSION'] == tpf.get_keyword("MISSION")
+    assert tpf.get_header(ext=2)['EXTNAME'] == "APERTURE"
+    # ``tpf.header`` is deprecated
+    with pytest.warns(LightkurveWarning, match='deprecated'):
+        tpf.header

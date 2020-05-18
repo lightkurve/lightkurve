@@ -19,6 +19,7 @@ from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..utils import LightkurveWarning
 from .test_targetpixelfile import TABBY_TPF
 
+
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
@@ -428,7 +429,7 @@ def test_cdpp_tabby():
     lcf = KeplerLightCurveFile(TABBY_Q8)
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
     lc = LightCurve(lcf.PDCSAP_FLUX.time[:1000], lcf.PDCSAP_FLUX.flux[:1000])
-    assert(np.abs(lc.estimate_cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
+    assert(np.abs(lc.estimate_cdpp() - lcf.get_header(ext=1)['CDPP6_0']) < 30)
 
 
 # TEMPORARILY SKIP, cf. https://github.com/KeplerGO/lightkurve/issues/663
@@ -1024,3 +1025,13 @@ def test_SSOs():
     assert(len(result) == 1)
     result, mask = lc.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=True, return_mask=True)
     assert(len(mask) == len(lc.flux))
+
+
+def test_get_header():
+    """Test the basic functionality of ``tpf.get_header()``"""
+    lcf = TessLightCurveFile(filename_tess_custom)
+    assert lcf.get_header()['CREATOR'] == lcf.get_keyword("CREATOR")
+    assert lcf.get_header(ext=2)['EXTNAME'] == "APERTURE"
+    # ``tpf.header`` is deprecated
+    with pytest.warns(LightkurveWarning, match='deprecated'):
+        lcf.header()

@@ -1,8 +1,13 @@
-1.10.1 (unreleased)
+1.11.0 (unreleased)
 ===================
+
+- Deprecated the ``TargetPixelFile.header`` property and ``LightCurveFile.header()``
+  method in favor of a consistent ``get_header()`` method. [#736]
 
 - Fixed a bug in ``tpf.interact_sky()`` which caused star positions to be off
   by half a pixel. [#734]
+
+
 
 
 1.10.0 (2015-05-14)
