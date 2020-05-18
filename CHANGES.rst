@@ -2,7 +2,7 @@
 ===================
 
 - Deprecated the ``TargetPixelFile.header`` property and ``LightCurveFile.header()``
-  a method in favor of consistent ``get_header()`` methods. [#TBD]
+  method in favor of a consistent ``get_header()`` method. [#736]
 
 - Fixed a bug in ``tpf.interact_sky()`` which caused star positions to be off
   by half a pixel. [#734]
