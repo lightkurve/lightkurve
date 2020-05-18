@@ -50,6 +50,7 @@ TessTargetPixelFile
       ~TessTargetPixelFile.interact
       ~TessTargetPixelFile.interact_sky
       ~TessTargetPixelFile.plot
+      ~TessTargetPixelFile.query_solar_system_objects
       ~TessTargetPixelFile.show_properties
       ~TessTargetPixelFile.to_corrector
       ~TessTargetPixelFile.to_fits
@@ -95,6 +96,7 @@ TessTargetPixelFile
    .. automethod:: interact
    .. automethod:: interact_sky
    .. automethod:: plot
+   .. automethod:: query_solar_system_objects
    .. automethod:: show_properties
    .. automethod:: to_corrector
    .. automethod:: to_fits

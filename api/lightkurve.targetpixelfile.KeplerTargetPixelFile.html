@@ -286,16 +286,19 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_lightcurve</span></code></a>(self, \*\*kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_solar_system_objects</span></code></a>(self[, …])</p></td>
+<td><p>Returns a list of asteroids or comets which affected the target pixel files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>(self)</p></td>
 <td><p>Prints a description of all non-callable attributes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector</span></code></a>(self[, method])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector</span></code></a>(self[, method])</p></td>
 <td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> instance to remove systematics.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>(self[, output_fn, overwrite])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>(self[, output_fn, overwrite])</p></td>
 <td><p>Writes the TPF to a FITS file on disk.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve</span></code></a>(self[, method])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve</span></code></a>(self[, method])</p></td>
 <td><p>Performs photometry on the pixel data and returns a LightCurve object.</p></td>
 </tr>
 </tbody>
@@ -897,6 +900,68 @@ Lightkurve’s custom stylesheet is used by default.</p>
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve">
 <code class="sig-name descname">prf_lightcurve</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects">
+<code class="sig-name descname">query_solar_system_objects</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">cadence_mask='outliers'</em>, <em class="sig-param">radius=None</em>, <em class="sig-param">sigma=3</em>, <em class="sig-param">cache=True</em>, <em class="sig-param">return_mask=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of asteroids or comets which affected the target pixel files.</p>
+<p>Light curves of stars or galaxies are frequently affected by solar
+system bodies (e.g. asteroids, comets, planets).  These objects can move
+across a target’s photometric aperture mask on time scales of hours to
+days.  When they pass through a mask, they tend to cause a brief spike
+in the brightness of the target.  They can also cause dips by moving
+through a local background aperture mask (if any is used).</p>
+<p>The artifical spikes and dips introduced by asteroids are frequently
+confused with stellar flares, planet transits, etc.  This method helps
+to identify false signals injects by asteroids by providing a list of
+the solar system objects (name, brightness, time) that passed in the
+vicinity of the target during the span of the light curve.</p>
+<p>This method queries the <a class="reference external" href="http://vo.imcce.fr/webservices/skybot/">SkyBot API</a>,
+which returns a list of asteroids/comets/planets given a location, time,
+and search cone.</p>
+<p>Notes:
+* This method will use the <a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.ra" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a> and <a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.dec" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.dec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code></a> properties of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></p>
+<blockquote>
+<div><p>object to determine the position of the search cone.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>The size of the search cone is 15 spacecraft pixels by default. You
+can change this by passing the <code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code> parameter (unit: degrees).</p></li>
+<li><p>This method will only search points in time during which he light
+curve showed 3-sigma outliers in flux. You can override this behavior
+and search all times by passing the <code class="xref py py-obj docutils literal notranslate"><span class="pre">cadence_mask='all'</span></code> argument,
+but this will be much slower.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cadence_mask</strong><span class="classifier">str or bool</span></dt><dd><p>mask in time to select which frames or points should be searched for SSOs.
+Default “outliers” will search for SSOs at points that are <code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma</span></code> from the mean.
+“all” will search all cadences. Pass a boolean array with values of “True”
+for times to search for SSOs.</p>
+</dd>
+<dt><strong>radius</strong><span class="classifier">optional, float</span></dt><dd><p>Radius to search for bodies. If None, will search for SSOs within 5 pixels of
+all pixels in the TPF.</p>
+</dd>
+<dt><strong>sigma</strong><span class="classifier">optional, float</span></dt><dd><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">cadence_mask</span></code> is set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">&quot;outlier&quot;</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma</span></code> will be used to identify
+outliers.</p>
+</dd>
+<dt><strong>cache</strong><span class="classifier">optional, bool</span></dt><dd><p>If True will cache the search result in the astropy cache. Set to False
+to request the search again.</p>
+</dd>
+<dt><strong>return_mask: bool</strong></dt><dd><p>If True will return a boolean mask in time alongside the result</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>result</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>DataFrame containing the list objects in frames that were identified to contain
+SSOs.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties">

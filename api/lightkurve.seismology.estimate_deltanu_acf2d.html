@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>estimate_deltanu_acf2d &#8212; Lightkurve</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
+
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
+
+  </head><body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.10</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExample07">
+
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
+        </form>
+
+        <!-- GitHub icon -->
+        
+          <a href="https://github.com/KeplerGO/Lightkurve">
+            <svg class="github-icon" viewBox="0 0 16 16" version="1.1" height="22" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          </a>
+        
+    </div>
+  </div>
+</nav>
+</header>
+
+<div class="container">
+    
+  <div class="section" id="estimate-deltanu-acf2d">
+<h1>estimate_deltanu_acf2d<a class="headerlink" href="#estimate-deltanu-acf2d" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="lightkurve.seismology.estimate_deltanu_acf2d">
+<code class="sig-prename descclassname">lightkurve.seismology.</code><code class="sig-name descname">estimate_deltanu_acf2d</code><span class="sig-paren">(</span><em class="sig-param">periodogram</em>, <em class="sig-param">numax</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.estimate_deltanu_acf2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the average value of the large frequency spacing, DeltaNu,
+of the seismic oscillations of the target, using an autocorrelation
+function.</p>
+<p>There are many papers on the topic of autocorrelation functions for
+estimating seismic parameters, including but not limited to:
+Roxburgh &amp; Vorontsov (2006), Roxburgh (2009), Mosser &amp; Appourchaux (2009),
+Huber et al. (2009), Verner &amp; Roxburgh (2011) &amp; Viani et al. (2019).</p>
+<p>We base this approach first and foremost off the approach taken in
+Mosser &amp; Appourchaux (2009). Given a known numax, a window around this
+numax is taken of one estimated full-width-half-maximum (FWHM) of the
+seismic mode envelope either side of numax. This width is chosen so that
+the autocorrelation includes all of the visible mode peaks.</p>
+<p>The autocorrelation (numpy.correlate) is given as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where s is a window of the signal-to-noise spectrum. When shifting
+the spectrum over itself, C will increase when two mode peaks are
+overlapping. Because of the method of this calculation, we need to first
+rescale the power by subtracting its mean, placing its mean around 0. This
+decreases the noise levels in the ACF, as the autocorrelation of the noise
+with itself will be close to zero.</p>
+<p>As is done in Mosser &amp; Appourchaux, we rescale the value of C in terms
+of the noise level in the ACF spectrum as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="p">(</span><span class="o">|</span><span class="n">C</span><span class="o">^</span><span class="mi">2</span><span class="o">|</span> <span class="o">/</span> <span class="o">|</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">^</span><span class="mi">2</span><span class="o">|</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>The method will autocorrelate the region around the estimated numax
+expected to contain seismic oscillation modes. Repeating peaks in the
+autocorrelation implies an evenly spaced structure of modes.
+The peak closest to an empirical estimate of deltanu is taken as the true
+value. The peak finding algorithm is limited by a minimum spacing
+between peaks of 0.5 times the empirical value for deltanu.</p>
+<p>Our empirical estimate for numax is taken from Stello et al. (2009) as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deltanu</span> <span class="o">=</span> <span class="mf">0.294</span> <span class="o">*</span> <span class="n">numax</span><span class="o">^</span><span class="mf">0.772</span>
+</pre></div>
+</div>
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">numax</span></code> is None, a numax is calculated using the estimate_numax()
+function with default settings.</p>
+<p>NOTE: This function is intended for use with solar like Main Sequence
+and Red Giant Branch oscillators only.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>numax</strong><span class="classifier">float</span></dt><dd><p>An estimated numax value of the mode envelope in the periodogram. If
+not given units it is assumed to be in units of the periodogram
+frequency attribute.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>deltanu</strong><span class="classifier"><a class="reference internal" href="lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity" title="lightkurve.seismology.SeismologyQuantity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeismologyQuantity</span></code></a></span></dt><dd><p>The average large frequency spacing of the seismic oscillation modes.
+In units of the periodogram frequency attribute.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+</div>
+<div class="container footer">
+    <hr>
+    <p class="text-center">
+      
+        Created with ♥ by the Lightkurve collaboration.
+                      Please <a href="/about/citing.html">cite us</a> or
+                      <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
+    </p>
+</div>
+  </body>
+</html>

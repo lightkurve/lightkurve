@@ -11,6 +11,7 @@ KeplerLightCurve
    .. autosummary::
 
       ~KeplerLightCurve.astropy_time
+      ~KeplerLightCurve.extra_columns
       ~KeplerLightCurve.flux_quantity
       ~KeplerLightCurve.flux_unit
 
@@ -31,6 +32,8 @@ KeplerLightCurve
       ~KeplerLightCurve.interact_bls
       ~KeplerLightCurve.normalize
       ~KeplerLightCurve.plot
+      ~KeplerLightCurve.plot_river
+      ~KeplerLightCurve.query_solar_system_objects
       ~KeplerLightCurve.remove_nans
       ~KeplerLightCurve.remove_outliers
       ~KeplerLightCurve.scatter
@@ -48,6 +51,7 @@ KeplerLightCurve
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: astropy_time
+   .. autoattribute:: extra_columns
    .. autoattribute:: flux_quantity
    .. autoattribute:: flux_unit
 
@@ -66,6 +70,8 @@ KeplerLightCurve
    .. automethod:: interact_bls
    .. automethod:: normalize
    .. automethod:: plot
+   .. automethod:: plot_river
+   .. automethod:: query_solar_system_objects
    .. automethod:: remove_nans
    .. automethod:: remove_outliers
    .. automethod:: scatter

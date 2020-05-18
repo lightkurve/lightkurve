@@ -1,0 +1,6 @@
+diagnose_deltanu_acf2d
+======================
+
+.. currentmodule:: lightkurve.seismology
+
+.. autofunction:: diagnose_deltanu_acf2d

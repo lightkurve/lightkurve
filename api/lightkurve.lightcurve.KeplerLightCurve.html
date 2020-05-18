@@ -150,10 +150,13 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.astropy_time" title="lightkurve.lightcurve.KeplerLightCurve.astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy_time</span></code></a></p></td>
 <td><p>Returns the time values as an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.flux_quantity" title="lightkurve.lightcurve.KeplerLightCurve.flux_quantity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_quantity</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.extra_columns" title="lightkurve.lightcurve.KeplerLightCurve.extra_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extra_columns</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.flux_quantity" title="lightkurve.lightcurve.KeplerLightCurve.flux_quantity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_quantity</span></code></a></p></td>
 <td><p>Returns the flux as an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.flux_unit" title="lightkurve.lightcurve.KeplerLightCurve.flux_unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_unit</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.flux_unit" title="lightkurve.lightcurve.KeplerLightCurve.flux_unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_unit</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -204,6 +207,12 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.plot" title="lightkurve.lightcurve.KeplerLightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self, \*\*kwargs)</p></td>
 <td><p>Plot the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.plot_river" title="lightkurve.lightcurve.KeplerLightCurve.plot_river"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_river</span></code></a>(self, period[, t0, ax, …])</p></td>
+<td><p>Plot the light curve as a river plot.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.query_solar_system_objects" title="lightkurve.lightcurve.KeplerLightCurve.query_solar_system_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_solar_system_objects</span></code></a>(self[, …])</p></td>
+<td><p>Returns a list of asteroids or comets which affected the light curve.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.remove_nans" title="lightkurve.lightcurve.KeplerLightCurve.remove_nans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_nans</span></code></a>(self)</p></td>
 <td><p>Removes cadences where the flux is NaN.</p></td>
 </tr>
@@ -232,7 +241,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td><p>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_seismology" title="lightkurve.lightcurve.KeplerLightCurve.to_seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_seismology</span></code></a>(self, \*\*kwargs)</p></td>
-<td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code> object for estimating quick-look asteroseismic quantities.</p></td>
+<td><p>Returns a <a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object for estimating quick-look asteroseismic quantities.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_stingray" title="lightkurve.lightcurve.KeplerLightCurve.to_stingray"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_stingray</span></code></a>(self)</p></td>
 <td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">stingray.Lightcurve</span></code> object.</p></td>
@@ -303,6 +312,11 @@ that correspond to the raw time values:</p>
 </pre></div>
 </div>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.lightcurve.KeplerLightCurve.extra_columns">
+<code class="sig-name descname">extra_columns</code><em class="property"> = ('quality', 'cadenceno', 'centroid_col', 'centroid_row')</em><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.extra_columns" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.flux_quantity">
@@ -798,6 +812,115 @@ Lightkurve’s custom stylesheet is used by default.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lightkurve.lightcurve.KeplerLightCurve.plot_river">
+<code class="sig-name descname">plot_river</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">period</em>, <em class="sig-param">t0=0</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">bin_points=1</em>, <em class="sig-param">minimum_phase=-0.5</em>, <em class="sig-param">maximum_phase=0.5</em>, <em class="sig-param">method='mean'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.plot_river" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the light curve as a river plot.</p>
+<p>A river plot uses colors to represent the light curve values in
+chronological order, relative to the period of an interesting signal.
+Each row in the plot represents a full period cycle, and each column
+represents a fixed phase.  This type of plot is often used to visualize
+Transit Timing Variations (TTVs) in the light curves of exoplanets.</p>
+<p>All extra keywords supplied are passed on to Matplotlib’s
+<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.pcolormesh.html#matplotlib.pyplot.pcolormesh" title="(in Matplotlib v3.2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pcolormesh</span></code></a> function.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+</dd>
+<dt><strong>period: float</strong></dt><dd><p>Period at which to fold the light curve</p>
+</dd>
+<dt><strong>t0</strong><span class="classifier">float</span></dt><dd><p>Phase mid point for plotting</p>
+</dd>
+<dt><strong>bin_points</strong><span class="classifier">int</span></dt><dd><p>How many points should be in each bin.</p>
+</dd>
+<dt><strong>minimum_phase</strong><span class="classifier">float</span></dt><dd><p>The minimum phase to plot.</p>
+</dd>
+<dt><strong>maximum_phase</strong><span class="classifier">float</span></dt><dd><p>The maximum phase to plot.</p>
+</dd>
+<dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>The river method. Choose from <code class="xref py py-obj docutils literal notranslate"><span class="pre">'mean'</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">'median'</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">'sigma'</span></code>.
+If <code class="xref py py-obj docutils literal notranslate"><span class="pre">'mean'</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">'median'</span></code>, the plot will display the average value in each bin.
+If <code class="xref py py-obj docutils literal notranslate"><span class="pre">'sigma'</span></code>, the plot will display the average in the bin divided by
+the error in each bin, in order to show the data in terms of standard
+deviation.</p>
+</dd>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed on to Matplotlib’s
+<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.pcolormesh.html#matplotlib.pyplot.pcolormesh" title="(in Matplotlib v3.2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pcolormesh</span></code></a> function.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.lightcurve.KeplerLightCurve.query_solar_system_objects">
+<code class="sig-name descname">query_solar_system_objects</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">cadence_mask='outliers'</em>, <em class="sig-param">radius=None</em>, <em class="sig-param">sigma=3</em>, <em class="sig-param">location=None</em>, <em class="sig-param">cache=True</em>, <em class="sig-param">return_mask=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.query_solar_system_objects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of asteroids or comets which affected the light curve.</p>
+<p>Light curves of stars or galaxies are frequently affected by solar
+system bodies (e.g. asteroids, comets, planets).  These objects can move
+across a target’s photometric aperture mask on time scales of hours to
+days.  When they pass through a mask, they tend to cause a brief spike
+in the brightness of the target.  They can also cause dips by moving
+through a local background aperture mask (if any is used).</p>
+<p>The artifical spikes and dips introduced by asteroids are frequently
+confused with stellar flares, planet transits, etc.  This method helps
+to identify false signals injects by asteroids by providing a list of
+the solar system objects (name, brightness, time) that passed in the
+vicinity of the target during the span of the light curve.</p>
+<p>This method queries the <a class="reference external" href="http://vo.imcce.fr/webservices/skybot/">SkyBot API</a>,
+which returns a list of asteroids/comets/planets given a location, time,
+and search cone.</p>
+<p>Notes:
+* This method will use the <code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code> properties of the <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></p>
+<blockquote>
+<div><p>object to determine the position of the search cone.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>The size of the search cone is 15 spacecraft pixels by default. You
+can change this by passing the <code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code> parameter (unit: degrees).</p></li>
+<li><p>This method will only search points in time during which he light
+curve showed 3-sigma outliers in flux. You can override this behavior
+and search all times by passing the <code class="xref py py-obj docutils literal notranslate"><span class="pre">cadence_mask='all'</span></code> argument,
+but this will be much slower.</p></li>
+</ul>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cadence_mask</strong><span class="classifier">str or bool</span></dt><dd><p>mask in time to select which frames or points should be searched for SSOs.
+Default “outliers” will search for SSOs at points that are <code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma</span></code> from the mean.
+“all” will search all cadences. Pass a boolean array with values of “True”
+for times to search for SSOs.</p>
+</dd>
+<dt><strong>radius</strong><span class="classifier">optional, float</span></dt><dd><p>Radius in degrees to search for bodies. If None, will search for
+SSOs within 15 pixels.</p>
+</dd>
+<dt><strong>sigma</strong><span class="classifier">optional, float</span></dt><dd><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">cadence_mask</span></code> is set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">&quot;outlier&quot;</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma</span></code> will be used to identify
+outliers.</p>
+</dd>
+<dt><strong>cache</strong><span class="classifier">optional, bool</span></dt><dd><p>If True will cache the search result in the astropy cache. Set to False
+to request the search again.</p>
+</dd>
+<dt><strong>return_mask: bool</strong></dt><dd><p>If True will return a boolean mask in time alongside the result</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>result</strong><span class="classifier"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.0.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt><dd><p>DataFrame object which lists the Solar System objects in frames
+that were identified to contain SSOs.  Returns <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> if no objects
+were found.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.remove_nans">
 <code class="sig-name descname">remove_nans</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.remove_nans" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes cadences where the flux is NaN.</p>
@@ -1095,13 +1218,13 @@ and <code class="docutils literal notranslate"><span class="pre">'boxleastsquare
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.to_seismology">
 <code class="sig-name descname">to_seismology</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.to_seismology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code> object for estimating
+<dd><p>Returns a <a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object for estimating
 quick-look asteroseismic quantities.</p>
 <p>All <code class="xref py py-obj docutils literal notranslate"><span class="pre">**kwargs</span></code> will be passed to the <a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_periodogram" title="lightkurve.lightcurve.KeplerLightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodogram()</span></code></a> method.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl>
-<dt><strong>seismology</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code> object</span></dt><dd><p>Object which can be used to estimate quick-look asteroseismic quantities.</p>
+<dt><strong>seismology</strong><span class="classifier"><a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object</span></dt><dd><p>Object which can be used to estimate quick-look asteroseismic quantities.</p>
 </dd>
 </dl>
 </dd>

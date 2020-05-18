@@ -27,6 +27,7 @@ TessQualityFlags
       ~TessQualityFlags.STRINGS
       ~TessQualityFlags.SafeMode
       ~TessQualityFlags.Straylight
+      ~TessQualityFlags.Straylight2
 
    .. rubric:: Methods Summary
 
@@ -54,6 +55,7 @@ TessQualityFlags
    .. autoattribute:: STRINGS
    .. autoattribute:: SafeMode
    .. autoattribute:: Straylight
+   .. autoattribute:: Straylight2
 
    .. rubric:: Methods Documentation
 

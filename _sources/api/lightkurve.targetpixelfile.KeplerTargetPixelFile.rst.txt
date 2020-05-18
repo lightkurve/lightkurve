@@ -57,6 +57,7 @@ KeplerTargetPixelFile
       ~KeplerTargetPixelFile.interact_sky
       ~KeplerTargetPixelFile.plot
       ~KeplerTargetPixelFile.prf_lightcurve
+      ~KeplerTargetPixelFile.query_solar_system_objects
       ~KeplerTargetPixelFile.show_properties
       ~KeplerTargetPixelFile.to_corrector
       ~KeplerTargetPixelFile.to_fits
@@ -109,6 +110,7 @@ KeplerTargetPixelFile
    .. automethod:: interact_sky
    .. automethod:: plot
    .. automethod:: prf_lightcurve
+   .. automethod:: query_solar_system_objects
    .. automethod:: show_properties
    .. automethod:: to_corrector
    .. automethod:: to_fits

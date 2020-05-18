@@ -1,0 +1,35 @@
+Seismology
+==========
+
+.. currentmodule:: lightkurve.seismology
+
+.. autoclass:: Seismology
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Seismology.diagnose_deltanu
+      ~Seismology.diagnose_numax
+      ~Seismology.estimate_deltanu
+      ~Seismology.estimate_logg
+      ~Seismology.estimate_mass
+      ~Seismology.estimate_numax
+      ~Seismology.estimate_radius
+      ~Seismology.from_lightcurve
+      ~Seismology.interact_echelle
+      ~Seismology.plot_echelle
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: diagnose_deltanu
+   .. automethod:: diagnose_numax
+   .. automethod:: estimate_deltanu
+   .. automethod:: estimate_logg
+   .. automethod:: estimate_mass
+   .. automethod:: estimate_numax
+   .. automethod:: estimate_radius
+   .. automethod:: from_lightcurve
+   .. automethod:: interact_echelle
+   .. automethod:: plot_echelle
