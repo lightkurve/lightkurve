@@ -373,6 +373,7 @@ class Periodogram(object):
         snr_pg = self / bkg.power
         snr = SNRPeriodogram(snr_pg.frequency, snr_pg.power,
                              nyquist=self.nyquist, targetid=self.targetid,
+                             xunit=self.xunit,
                              label=self.label, meta=self.meta)
         if return_trend:
             return snr, bkg
