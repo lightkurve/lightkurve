@@ -281,6 +281,48 @@ class PLDCorrector(Corrector):
         corrected_lc.flux_err = flux_err
         return corrected_lc
 
-    def create_design_matrix(self):
-        """ """
-        pass
+    def create_design_matrix(self, tpf=None, aperture_mask=None, pld_aperture_mask=None):
+        """
+        words.
+
+
+        Parameters
+        ----------
+        tpf : `.TargetPixelFile`
+            Target pixel file for target.
+        aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used to generate the raw flux light curve.
+            If 'all' is passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If `None` or 'threshold' are passed, all pixels brighter than
+            3-sigma above the median flux will be used.
+        pld_aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used when selecting the PLD basis vectors.
+            If `all` is passed in, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If `None` or 'threshold' are passed, all pixels brighter than
+            3-sigma above the median flux will be used.
+
+        Returns
+        -------
+        dm : `.DesignMatrix`
+            Matrix of column vectors to perform linear regression.
+        """
+        if tpf is None:
+            tpf = self.tpf
+
+        if aperture_mask is None:
+            aperture_mask = tpf._parse_aperture_mask('all')
+            log.debug('No aperture mask provided; using a threshold mask.')
+        if pld_aperture_mask is None:
+            pld_aperture_mask = ~aperture_mask
+            log.debug('No PLD aperture mask provided; using a threshold mask.')
+
+        regressors = tpf[:, pld_aperture_mask]
+        dm = lk.DesignMatrix(regressors, name='regressors')
+        
+        return dm
