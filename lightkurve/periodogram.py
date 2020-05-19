@@ -812,9 +812,9 @@ class LombScarglePeriodogram(Periodogram):
         if maximum_period is not None and not isinstance(maximum_period, u.Quantity):
             maximum_period *= u.day
         if minimum_frequency is not None and not isinstance(minimum_frequency, u.Quantity):
-            minimum_frequency *= u.microhertz
+            minimum_frequency *= xunit
         if maximum_frequency is not None and not isinstance(maximum_frequency, u.Quantity):
-            maximum_frequency *= u.microhertz
+            maximum_frequency *= xunit
 
         if maximum_period is not None:
             minimum_frequency = 1. / maximum_period
