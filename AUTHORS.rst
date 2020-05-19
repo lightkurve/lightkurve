@@ -14,7 +14,7 @@ Direct code contributions and bugfixes:
 - `Emma Turtelboom <https://github.com/Emmavt>`_
 - `Johnny Zhang <https://github.com/johnnyzhang295>`_
 - `Ann Marie Cody <https://github.com/amcody>`_
-- `Daniel Hey <https://github.com/danielhey>`_
+- `Daniel Hey <https://github.com/danhey>`_
 - `Guy Davies <https://github.com/grd349>`_
 - `Brennan Vincello <https://github.com/brennv>`_
 - `Anand Sundaram <https://github.com/anand-sundaram-zocdoc>`_
