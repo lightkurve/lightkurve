@@ -34,7 +34,7 @@ class PLDCorrector(Corrector):
 
         .. math::
 
-            m_i = \alpha + \beta t_i + \gamma t_i^2 + \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...
+            m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...
         where
 
           - :math:`m_i` is the noise model at time :math:`t_i`
@@ -42,8 +42,6 @@ class PLDCorrector(Corrector):
           - :math:`a_l` is the first-order PLD coefficient on the linear term
           - :math:`b_{lm}` is the second-order PLD coefficient on the :math:`l^\text{th}`,
             :math:`m^\text{th}` pixel pair
-          - :math:`\alpha`, :math:`\beta`, and :math:`\gamma` are the
-            Gaussian Process terms applied to capture long-period variability.
 
         We perform Principal Component Analysis (PCA) to reduce the number of
         vectors in our final model to limit the set to best capture instrumental
