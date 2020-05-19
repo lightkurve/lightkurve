@@ -54,20 +54,20 @@ class Periodogram(object):
         Human-friendly object label, e.g. "KIC 123456789".
     targetid : str
         Identifier of the target.
-    default_xunit : str or `~astropy.units.quantity.Quantity`
+    xunit : str or `~astropy.units.quantity.Quantity`
         Default unit to show on the X axis of plots.
-    default_yunit : str or `~astropy.units.quantity.Quantity`
+    yunit : str or `~astropy.units.quantity.Quantity`
         Default unit to show on the Y axis of plots.
     meta : dict
         Free-form metadata associated with the Periodogram.
     """
     def __init__(self, frequency, power, nyquist=None, label=None,
-                 targetid=None, default_xunit="day", default_yunit="",
+                 targetid=None, xunit="day", yunit="",
                  meta={}, **kwargs):
         # The `default_view` argument was removed in Lightkurve v1.10
         if "default_view" in kwargs:
             warnings.warn("the `default_view` argument has been removed, "
-                          "please use `default_xunit` and `default_yunit` instead.",
+                          "please use `xunit` and `yunit` instead.",
                           LightkurveWarning)
 
         # Input validation
@@ -91,8 +91,8 @@ class Periodogram(object):
         self.nyquist = nyquist
         self.label = label
         self.targetid = targetid
-        self.default_xunit = _validate_unit(default_xunit)
-        self.default_yunit = _validate_unit(default_yunit)
+        self.xunit = _validate_unit(xunit)
+        self.yunit = _validate_unit(yunit)
         self.meta = meta
 
     @property
@@ -290,8 +290,8 @@ class Periodogram(object):
                 xunit = "day" if kwargs.pop("view") == "period" else "microhertz"
 
         # Validate units
-        xunit = _validate_unit(xunit, default=self.default_xunit)
-        yunit = _validate_unit(yunit, default=self.default_yunit)
+        xunit = _validate_unit(xunit, default=self.xunit)
+        yunit = _validate_unit(yunit, default=self.yunit)
         xunit_type = _unit2label(xunit)
         yunit_type = _unit2label(yunit)
 
@@ -582,7 +582,7 @@ class LombScarglePeriodogram(Periodogram):
                         normalization='amplitude', minimum_period=None, maximum_period=None,
                         frequency=None, period=None, nterms=1, nyquist_factor=1,
                         oversample_factor=None, ls_method='fast',
-                        default_xunit=None, default_yunit=None,
+                        xunit=None, yunit=None,
                         **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
@@ -639,10 +639,10 @@ class LombScarglePeriodogram(Periodogram):
         model. Setting the Nyquist_factor to be greater than 1 will sample the
         space beyond the Nyquist frequency, which may introduce aliasing.
 
-        The `default_xunit` parameter allows a request for alternative units in frequency
+        The `xunit` parameter allows a request for alternative units in frequency
         space. By default frequency is in (1/day) and power in (amplitude).
         Asteroseismologists for example may want frequency in (microHz)
-        in which case they would pass `default_xunit="microhertz"`.
+        in which case they would pass `xunit="microhertz"`.
 
         By default this method uses the LombScargle 'fast' method, which assumes
         a regular grid. If a regular grid of periods (i.e. an irregular grid of
@@ -701,9 +701,9 @@ class LombScarglePeriodogram(Periodogram):
         ls_method : str
             Default: `'fast'`. Passed to the `method` keyword of
             `astropy.stats.LombScargle()`.
-        default_xunit : str or `astropy.units.Unit`
+        xunit : str or `astropy.units.Unit`
             Default frequency or period unit to show.
-        default_yunit : str or `astropy.units.Unit`
+        yunit : str or `astropy.units.Unit`
             Default power or amplitude unit to show.
         kwargs : dict
             Keyword arguments passed to `astropy.stats.LombScargle()`
@@ -719,10 +719,10 @@ class LombScarglePeriodogram(Periodogram):
         # Deprecation warnings
         if "freq_unit" in kwargs:
             warnings.warn("`freq_unit` keyword is deprecated, "
-                          "please use `default_xunit` instead.",
+                          "please use `xunit` instead.",
                           LightkurveWarning)
-            if default_xunit is None:
-                default_xunit = kwargs.pop("freq_unit")
+            if xunit is None:
+                xunit = kwargs.pop("freq_unit")
             else:
                 kwargs.pop("freq_unit")
         if "min_period" in kwargs:
@@ -746,19 +746,19 @@ class LombScarglePeriodogram(Periodogram):
                           LightkurveWarning)
             maximum_frequency = kwargs.pop("max_frequency", None)
         
-        if default_xunit is None:
-            default_xunit = "1/day" if normalization == 'amplitude' else "microhertz"
-        if default_yunit is None:
-            default_yunit = "ppm" if normalization == 'amplitude' else "ppm^2/uHz"
+        if xunit is None:
+            xunit = "1/day" if normalization == 'amplitude' else "microhertz"
+        if yunit is None:
+            yunit = "ppm" if normalization == 'amplitude' else "ppm^2/uHz"
 
         # Validate user input
-        default_xunit = _validate_unit(default_xunit)
-        default_yunit = _validate_unit(default_yunit)
+        xunit = _validate_unit(xunit)
+        yunit = _validate_unit(yunit)
 
         # Ensure the light curve is normalized if the requested yunit is dimensionless
         # or 'time' (because ppm**2/hz is a unit of time)
         if lc.flux_unit is not None and lc.flux_unit.physical_type != 'dimensionless':
-            if default_yunit.physical_type in ['dimensionless', 'time']:
+            if yunit.physical_type in ['dimensionless', 'time']:
                 lc = lc.normalize()
 
         # Default oversample factor
@@ -787,10 +787,10 @@ class LombScarglePeriodogram(Periodogram):
         # DETERMINE THE FREQUENCY GRID
 
         # What unit will the frequency grid be in?
-        if default_xunit.physical_type == "frequency":
-            freq_unit = default_xunit
+        if xunit.physical_type == "frequency":
+            freq_unit = xunit
         else:  # time unit
-            freq_unit = 1./default_xunit
+            freq_unit = 1./xunit
 
         # Ensure the time stamps are in days
         if lc.time_format in ['bkjd', 'btjd', 'd', 'days', 'day', None]:
@@ -876,16 +876,16 @@ class LombScarglePeriodogram(Periodogram):
             lspower = LS.power(frequency, method=ls_method, normalization='psd')
 
         if normalization == 'psd':  # Power spectral density
-            power =  (lspower * 2. / (len(lc.time) * oversample_factor * fs)).to(default_yunit)
+            power =  (lspower * 2. / (len(lc.time) * oversample_factor * fs)).to(yunit)
         elif normalization == 'amplitude':
-            power = (np.sqrt(lspower) * np.sqrt(4./len(lc.time))).to(default_yunit)
+            power = (np.sqrt(lspower) * np.sqrt(4./len(lc.time))).to(yunit)
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
                                       targetid=lc.targetid, label=lc.label,
                                       ls_obj=LS,
                                       nterms=nterms, ls_method=ls_method,
-                                      default_xunit=default_xunit, default_yunit=default_yunit,
+                                      xunit=xunit, yunit=yunit,
                                       normalization=normalization)
 
     def model(self, time, frequency=None):
@@ -1014,7 +1014,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
         return BoxLeastSquaresPeriodogram(frequency=1. / result.period,
                                           power=result.power,
-                                          default_xunit='day',
+                                          xunit='day',
                                           label=lc.label,
                                           targetid=lc.targetid,
                                           transit_time=result.transit_time,
