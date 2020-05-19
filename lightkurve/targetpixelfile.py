@@ -716,7 +716,7 @@ class TargetPixelFile(object):
             return res, np.in1d(self.astropy_time.jd, res.epoch)
         return res
 
-    def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
+    def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, add_bkg=False, aperture_mask=None,
              show_colorbar=True, mask_color='pink', title=None, style='lightkurve',
              **kwargs):
         """Plot the pixel data for a single frame (i.e. at a single time).
@@ -734,8 +734,11 @@ class TargetPixelFile(object):
         cadenceno : int, optional
             Alternatively, a cadence number can be provided.
             This argument has priority over frame number.
-        bkg : bool
+        bkg: bool
+            If True, plot the background pixel values only.
+        add_bkg : bool
             If True, background will be added to the pixel values.
+            Can not be True if 'bkg' is True.
         aperture_mask : ndarray or str
             Highlight pixels selected by aperture_mask.
         show_colorbar : bool
@@ -764,8 +767,10 @@ class TargetPixelFile(object):
                                  "must be in the range {}-{}.".format(
                                      cadenceno, self.cadenceno[0], self.cadenceno[-1]))
         try:
-            if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
+            if add_bkg and np.any(np.isfinite(self.flux_bkg[frame])):
                 pflux = self.flux[frame] + self.flux_bkg[frame]
+            elif bkg and np.any(np.isfinite(self.flux_bkg[frame])):
+                pflux = self.flux_bkg[frame]
             else:
                 pflux = self.flux[frame]
         except IndexError:
