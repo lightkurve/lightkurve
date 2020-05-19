@@ -281,7 +281,9 @@ class PLDCorrector(Corrector):
         corrected_lc.flux_err = flux_err
         return corrected_lc
 
-    def create_design_matrix(self, tpf=None, aperture_mask=None, pld_aperture_mask=None):
+    def create_pld_design_matrix(self, tpf=None, aperture_mask=None,
+                                 pld_aperture_mask=None, pld_order=2,
+                                 n_pca_terms=10):
         """
         words.
 
@@ -309,20 +311,36 @@ class PLDCorrector(Corrector):
 
         Returns
         -------
-        dm : `.DesignMatrix`
+        X : `.DesignMatrix`
             Matrix of column vectors to perform linear regression.
         """
         if tpf is None:
             tpf = self.tpf
 
+        # parse apertures
         if aperture_mask is None:
-            aperture_mask = tpf._parse_aperture_mask('all')
+            aperture_mask = tpf._parse_aperture_mask('threshold')
             log.debug('No aperture mask provided; using a threshold mask.')
+        else:
+            aperture_mask = tpf._parse_aperture_mask(aperture_mask)
         if pld_aperture_mask is None:
-            pld_aperture_mask = ~aperture_mask
+            pld_aperture_mask = ~tpf._parse_aperture_mask('threshold')
             log.debug('No PLD aperture mask provided; using a threshold mask.')
+        else:
+            pld_aperture_mask = tpf._parse_aperture_mask(pld_aperture_mask)
 
-        regressors = tpf[:, pld_aperture_mask]
-        dm = lk.DesignMatrix(regressors, name='regressors')
-        
-        return dm
+        # build initial 1st order PLD design matrix
+        regressors = tpf.flux[:, pld_aperture_mask]
+        X = DesignMatrix(regressors, name='PLD Design Matrix')
+
+        # PCA
+        # TODO: gotta get rid of those nans first
+        # X.pca(n_pca_terms)
+
+        # higher order
+        # whaaaaaat do I do here? Find out next time.
+
+        # append constant
+        X.append_constant()
+
+        return X
