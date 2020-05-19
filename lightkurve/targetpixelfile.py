@@ -994,7 +994,7 @@ class TargetPixelFile(object):
             if label in hdu.header:
                 hdu.header[label] = fits.card.Undefined()
 
-        keys = np.asarray([k for k in self.header.keys()])
+        keys = np.asarray([k for k in self.get_header().keys()])
         if 'KEPLERID' in keys:
             hdu.header['KEPLERID'] = '{}{}'.format(hdu.header['KEPLERID'], '_CUTOUT')
         if 'TICID' in keys:
@@ -1112,7 +1112,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 bitmask=quality_bitmask)
 
         # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.header)
+        filetype = detect_filetype(self.get_header())
         if filetype == 'TessTargetPixelFile':
             warnings.warn("A TESS data product is being opened using the "
                           "`KeplerTargetPixelFile` class. "
@@ -1125,7 +1125,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Use the KEPLERID keyword as the default targetid
         if self.targetid is None:
             try:
-                self.targetid = self.header['KEPLERID']
+                self.targetid = self.get_header()['KEPLERID']
             except KeyError:
                 pass
 
@@ -1220,7 +1220,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.header['OBJECT'],
+                'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 flux=flux,
@@ -1242,7 +1242,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.header['OBJECT'],
+                'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
@@ -1765,7 +1765,7 @@ class TessTargetPixelFile(TargetPixelFile):
             self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
 
         # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.header)
+        filetype = detect_filetype(self.get_header())
         if filetype == 'KeplerTargetPixelFile':
             warnings.warn("A Kepler data product is being opened using the "
                           "`TessTargetPixelFile` class. "
@@ -1778,7 +1778,7 @@ class TessTargetPixelFile(TargetPixelFile):
         # Use the TICID keyword as the default targetid
         if self.targetid is None:
             try:
-                self.targetid = self.header['TICID']
+                self.targetid = self.get_header()['TICID']
             except KeyError:
                 pass
 
@@ -1869,7 +1869,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.header['OBJECT'],
+                'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
