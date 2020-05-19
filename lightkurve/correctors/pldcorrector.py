@@ -9,6 +9,8 @@ from itertools import combinations_with_replacement as multichoose
 import numpy as np
 
 from .corrector import Corrector
+from .designmatrix import DesignMatrix, DesignMatrixCollection
+from .regressioncorrector import RegressionCorrector
 
 log = logging.getLogger(__name__)
 
@@ -278,3 +280,7 @@ class PLDCorrector(Corrector):
         corrected_lc.flux = self.detrended_flux
         corrected_lc.flux_err = flux_err
         return corrected_lc
+
+    def create_design_matrix(self):
+        """ """
+        pass
