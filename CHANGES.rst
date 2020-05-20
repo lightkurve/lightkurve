@@ -1,7 +1,7 @@
 2.0.dev (unreleased)
 =====================
 
-- Removed support for Python 2.
+- Removed support for Python 2. [#733]
 
 
 
