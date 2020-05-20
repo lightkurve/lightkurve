@@ -769,8 +769,8 @@ class TargetPixelFile(object):
         try:
             if column not in ('FLUX','FLUX_ERR','FLUX_BKG','FLUX_BKG_ERR',
                                 'COSMIC_RAYS','RAW_CNTS'):
-                raise ValueError("column must be one of the following: ('FLUX','FLUX_ERR',\
-                                    'FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS')")
+                raise ValueError("column must be one of the following: ('FLUX','FLUX_ERR',"
+                                 "'FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS')")
             if column == 'FLUX':
                 if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
                     pflux = self.flux[frame] + self.flux_bkg[frame]
