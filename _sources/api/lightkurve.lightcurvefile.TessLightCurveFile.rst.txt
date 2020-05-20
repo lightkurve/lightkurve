@@ -27,6 +27,7 @@ TessLightCurveFile
    .. autosummary::
 
       ~TessLightCurveFile.errorbar
+      ~TessLightCurveFile.get_header
       ~TessLightCurveFile.get_keyword
       ~TessLightCurveFile.get_lightcurve
       ~TessLightCurveFile.header
@@ -50,6 +51,7 @@ TessLightCurveFile
    .. rubric:: Methods Documentation
 
    .. automethod:: errorbar
+   .. automethod:: get_header
    .. automethod:: get_keyword
    .. automethod:: get_lightcurve
    .. automethod:: header

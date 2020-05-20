@@ -46,6 +46,7 @@ TessTargetPixelFile
       ~TessTargetPixelFile.extract_aperture_photometry
       ~TessTargetPixelFile.get_bkg_lightcurve
       ~TessTargetPixelFile.get_coordinates
+      ~TessTargetPixelFile.get_header
       ~TessTargetPixelFile.get_keyword
       ~TessTargetPixelFile.interact
       ~TessTargetPixelFile.interact_sky
@@ -92,6 +93,7 @@ TessTargetPixelFile
    .. automethod:: extract_aperture_photometry
    .. automethod:: get_bkg_lightcurve
    .. automethod:: get_coordinates
+   .. automethod:: get_header
    .. automethod:: get_keyword
    .. automethod:: interact
    .. automethod:: interact_sky

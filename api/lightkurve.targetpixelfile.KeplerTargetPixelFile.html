@@ -41,7 +41,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.10</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.11</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -185,7 +185,7 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.header" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a></p></td>
-<td><p>Returns the header of the primary extension.</p></td>
+<td><p>DEPRECATED.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.mission" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.mission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mission</span></code></a></p></td>
 <td><p>‘Kepler’ or ‘K2’.</p></td>
@@ -265,40 +265,43 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_coordinates" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_coordinates</span></code></a>(self[, cadence])</p></td>
 <td><p>Returns two 3D arrays of RA and Dec values in decimal degrees.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_keyword" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code></a>(self, keyword[, hdu, default])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_header" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_header</span></code></a>(self[, ext])</p></td>
+<td><p>Returns the metadata embedded in the file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_keyword" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code></a>(self, keyword[, hdu, default])</p></td>
 <td><p>Returns a header keyword value.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_model</span></code></a>(self[, star_priors])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_model</span></code></a>(self[, star_priors])</p></td>
 <td><p>Returns a default <code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModel</span></code> object for PRF fitting.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_prf_model</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_prf_model</span></code></a>(self)</p></td>
 <td><p>Returns an object of KeplerPRF initialized using the necessary metadata in the tpf object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>(self[, notebook_url, max_cadences, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>(self[, notebook_url, max_cadences, …])</p></td>
 <td><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact_sky" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact_sky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_sky</span></code></a>(self[, notebook_url, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact_sky" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact_sky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_sky</span></code></a>(self[, notebook_url, …])</p></td>
 <td><p>Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, ax, frame, cadenceno, bkg, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, ax, frame, cadenceno, bkg, …])</p></td>
 <td><p>Plot the pixel data for a single frame (i.e.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_lightcurve</span></code></a>(self, \*\*kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_lightcurve</span></code></a>(self, \*\*kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_solar_system_objects</span></code></a>(self[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_solar_system_objects</span></code></a>(self[, …])</p></td>
 <td><p>Returns a list of asteroids or comets which affected the target pixel files.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>(self)</p></td>
 <td><p>Prints a description of all non-callable attributes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector</span></code></a>(self[, method])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector</span></code></a>(self[, method])</p></td>
 <td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> instance to remove systematics.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>(self[, output_fn, overwrite])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>(self[, output_fn, overwrite])</p></td>
 <td><p>Writes the TPF to a FITS file on disk.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve</span></code></a>(self[, method])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve</span></code></a>(self[, method])</p></td>
 <td><p>Performs photometry on the pixel data and returns a LightCurve object.</p></td>
 </tr>
 </tbody>
@@ -371,7 +374,7 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.header">
 <code class="sig-name descname">header</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the header of the primary extension.</p>
+<dd><p>DEPRECATED. Please use <code class="docutils literal notranslate"><span class="pre">get_header()</span></code> instead.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -709,6 +712,36 @@ Uses the WCS solution and the POS_CORR data from TPF header.</p>
 <dt><strong>ra</strong><span class="classifier">numpy array, same shape as tpf.flux[cadence]</span></dt><dd><p>Array containing RA values for every pixel, for every cadence.</p>
 </dd>
 <dt><strong>dec</strong><span class="classifier">numpy array, same shape as tpf.flux[cadence]</span></dt><dd><p>Array containing Dec values for every pixel, for every cadence.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_header">
+<code class="sig-name descname">get_header</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ext=0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the metadata embedded in the file.</p>
+<p>Target Pixel Files contain embedded metadata headers spread across three
+different FITS extensions:</p>
+<ol class="arabic simple">
+<li><p>The “PRIMARY” extension (<code class="docutils literal notranslate"><span class="pre">ext=0</span></code>) provides a metadata header
+providing details on the target and its CCD position.</p></li>
+<li><p>The “PIXELS” extension (<code class="docutils literal notranslate"><span class="pre">ext=1</span></code>) provides details on the
+data column and their coordinate system (WCS).</p></li>
+<li><p>The “APERTURE” extension (<code class="docutils literal notranslate"><span class="pre">ext=2</span></code>) provides details on the
+aperture pixel mask and the expected coordinate system (WCS).</p></li>
+</ol>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ext</strong><span class="classifier">int or str</span></dt><dd><p>FITS extension name or number.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>header</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Header</span></code></span></dt><dd><p>Header object containing metadata keywords.</p>
 </dd>
 </dl>
 </dd>

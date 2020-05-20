@@ -41,7 +41,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.10</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.11</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -149,16 +149,19 @@ Also accepts a FITS file object already opened using AstroPy.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.errorbar" title="lightkurve.lightcurvefile.LightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.errorbar" title="lightkurve.lightcurvefile.LightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.get_keyword" title="lightkurve.lightcurvefile.LightCurveFile.get_keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code></a>(self, keyword[, hdu, default])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.get_header" title="lightkurve.lightcurvefile.LightCurveFile.get_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_header</span></code></a>(self[, ext])</p></td>
+<td><p>Returns the metadata embedded in the file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.get_keyword" title="lightkurve.lightcurvefile.LightCurveFile.get_keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code></a>(self, keyword[, hdu, default])</p></td>
 <td><p>Returns a header keyword value.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.header" title="lightkurve.lightcurvefile.LightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
-<td><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.header" title="lightkurve.lightcurvefile.LightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
+<td><p>DEPRECATED.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="lightkurve.lightcurvefile.LightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="lightkurve.lightcurvefile.LightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="lightkurve.lightcurvefile.LightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.scatter" title="lightkurve.lightcurvefile.LightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(self[, flux_types, style])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.scatter" title="lightkurve.lightcurvefile.LightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.scatter" title="lightkurve.lightcurvefile.LightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 </tbody>
@@ -250,6 +253,36 @@ Lightkurve’s custom stylesheet is used by default.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lightkurve.lightcurvefile.LightCurveFile.get_header">
+<code class="sig-name descname">get_header</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ext=0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.get_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the metadata embedded in the file.</p>
+<p>Light Curve Files contain embedded metadata headers spread across three
+different FITS extensions:</p>
+<ol class="arabic simple">
+<li><p>The “PRIMARY” extension (<code class="docutils literal notranslate"><span class="pre">ext=0</span></code>) provides a metadata header
+providing details on the target and its CCD position.</p></li>
+<li><p>The “LIGHTCURVE” extension (<code class="docutils literal notranslate"><span class="pre">ext=1</span></code>) provides details on the
+data columns and the systematics removal.</p></li>
+<li><p>The “APERTURE” extension (<code class="docutils literal notranslate"><span class="pre">ext=2</span></code>) provides details on the
+aperture pixel mask and the expected coordinate system (WCS).</p></li>
+</ol>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ext</strong><span class="classifier">int or str</span></dt><dd><p>FITS extension name or number.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>header</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Header</span></code></span></dt><dd><p>Header object containing metadata keywords.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="lightkurve.lightcurvefile.LightCurveFile.get_keyword">
 <code class="sig-name descname">get_keyword</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">keyword</em>, <em class="sig-param">hdu=0</em>, <em class="sig-param">default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.get_keyword" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a header keyword value.</p>
@@ -260,7 +293,7 @@ then return <code class="docutils literal notranslate"><span class="pre">default
 <dl class="method">
 <dt id="lightkurve.lightcurvefile.LightCurveFile.header">
 <code class="sig-name descname">header</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ext=0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p>
+<dd><p>DEPRECATED. Please use <code class="docutils literal notranslate"><span class="pre">get_header()</span></code> instead.</p>
 </dd></dl>
 
 <dl class="method">
