@@ -776,11 +776,6 @@ class TargetPixelFile(object):
                     pflux = self.flux[frame] + self.flux_bkg[frame]
                 else:
                     pflux = self.flux[frame]
-            elif column == 'COSMIC_RAYS':
-                try:
-                    pflux = self.hdu[3].data[column]
-                except KeyError:
-                    raise ValueError("no COSMIC_RAYS data for this file")
             else:
                 pflux = self.hdu[1].data[column][self.quality_mask][frame]
         except IndexError:

@@ -89,7 +89,7 @@ def test_tpf_plot():
         tpf.plot(column='FLUX_BKG') 
         tpf.plot(column='FLUX_BKG_ERR') 
         tpf.plot(column='RAW_CNTS') 
-        # tpf.plot(column='COSMIC_RAYS') 
+        tpf.plot(column='COSMIC_RAYS') 
         with pytest.raises(ValueError):
             tpf.plot(column='not a column')
 
