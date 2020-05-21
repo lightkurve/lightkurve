@@ -3,6 +3,9 @@
 
 - Removed support for Python 2. [#733]
 
+- Added ``SparseDesignMatrix`` and modified ``RegressionCorrector`` to enable
+  systematics removal methods to benefit from ``scipy.sparse`` speed-ups. [#732]
+
 - Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
   ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
 

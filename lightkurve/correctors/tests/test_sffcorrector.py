@@ -22,6 +22,7 @@ def test_remote_data(path):
     lcf = KeplerLightCurveFile(path, quality_bitmask=None)
     sff = SFFCorrector(lcf.PDCSAP_FLUX.remove_nans())
     sff.correct(windows=10, bins=5, timescale=0.5)
+    sff.correct(windows=10, bins=5, timescale=0.5, sparse=True)
 
 
 def test_sff_knots():
