@@ -2,7 +2,6 @@
 
 from __future__ import division, print_function
 
-import copy
 import os
 import datetime
 import logging
@@ -14,8 +13,6 @@ from scipy.interpolate import interp1d
 from scipy.stats import binned_statistic
 from matplotlib import pyplot as plt
 from copy import deepcopy
-from tqdm import tqdm
-import pandas as pd
 
 from astropy.stats import sigma_clip
 from astropy.table import Table
@@ -23,6 +20,7 @@ from astropy.io import fits
 from astropy.time import Time
 from astropy import units as u
 from astropy.timeseries import TimeSeries
+from astropy.table import vstack
 
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
@@ -92,10 +90,13 @@ class LightCurve(TimeSeries):
         # Ensure the required columns are available
         if flux is None:
             flux = np.nan * np.ones_like(time)
-        if flux_err is None:
-            flux_err = np.nan * np.ones_like(time)
         if "flux" not in self.columns:
             self.add_column(flux, name="flux")
+
+        if flux_err is None:
+            flux_err = np.nan * np.ones_like(time)
+            if self.flux.unit:
+                flux_err *= self.flux.unit
         if "flux_err" not in self.columns:
             self.add_column(flux_err, name="flux_err")
 
@@ -104,23 +105,37 @@ class LightCurve(TimeSeries):
 
         self._validate()
 
+    def _validate(self):
+        # Trigger warning if time=NaN are present
+        if np.isnan(self['time'].value).any():
+            warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
+
+    @property
+    def time(self):
+        """The time values."""
+        return self['time']
+
+    @time.setter
+    def time(self, time):
+        self['time'] = time
+
     @property
     def flux(self):
+        """The brightness values."""
         return self['flux']
 
     @flux.setter
-    def flux_setter(self, flux):
+    def flux(self, flux):
         self['flux'] = flux
 
     @property
     def flux_err(self):
+        """The brightness uncertainty."""
         return self['flux_err']
 
-    def _validate(self, time):
-        # Trigger warning if time=NaN are present
-        if np.isnan(time).any():
-            warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
-        return time
+    @flux_err.setter
+    def flux_err(self, flux_err):
+        self['flux_err'] = flux_err
 
     def __add__(self, other):
         newlc = self.copy()
@@ -198,98 +213,6 @@ class LightCurve(TimeSeries):
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
 
-    @property
-    def flux_unit(self):
-        return self._flux_unit
-
-    @flux_unit.setter
-    def flux_unit(self, flux_unit):
-        # Validate user input for `flux_unit`
-        if flux_unit is None:
-            self._flux_unit = None
-        else:
-            try:
-                self._flux_unit = u.Unit(flux_unit)
-            except ValueError as e:
-                raise ValueError("invalid `flux_unit`: {}".format(e))
-
-    @property
-    def flux_quantity(self):
-        """Returns the flux as an Astropy `~astropy.units.Quantity` object."""
-        if isinstance(self.flux_unit, u.UnitBase):
-            return self.flux * self.flux_unit
-        else:
-            return self.flux * u.dimensionless_unscaled
-
-    @property
-    def astropy_time(self):
-        """Returns the time values as an Astropy `~astropy.time.Time` object.
-
-        The Time object will be created based on the values of the light curve's
-        `time`, `time_format`, and `time_scale` attributes.
-
-        Examples
-        --------
-        The section below demonstrates working with time values using the TESS
-        light curve of Pi Mensae as an example, which we obtained as follows::
-
-            >>> import lightkurve as lk
-            >>> lc = lk.search_lightcurvefile("Pi Mensae", mission="TESS", sector=1).download().PDCSAP_FLUX  # doctest: +SKIP
-            >>> lc  # doctest: +SKIP
-            TessLightCurve(TICID: 261136679)
-
-        Every `LightCurve` object has a `time` attribute, which provides access
-        to the original array of time values given in the native format and
-        scale used by the data product from which the light curve was obtained::
-
-            >>> lc.time  # doctest: +SKIP
-            array([1325.29698328, 1325.29837215, 1325.29976102, ..., 1353.17431099,
-                   1353.17569985, 1353.17708871])
-            >>> lc.time_format  # doctest: +SKIP
-            'btjd'
-            >>> lc.time_scale  # doctest: +SKIP
-            'tdb'
-
-        To enable users to convert these time values to different formats or
-        scales, Lightkurve provides an easy way to access the time values
-        as an `AstroPy Time object <http://docs.astropy.org/en/stable/time/>`_::
-
-            >>> lc.astropy_time  # doctest: +SKIP
-            <Time object: scale='tdb' format='jd' value=[2458325.29698328 2458325.29837215 2458325.29976102 ... 2458353.17431099
-            2458353.17569985 2458353.17708871]>
-
-        This is convenient because AstroPy Time objects provide a lot of useful
-        features. For example, we can now obtain the Julian Day or ISO values
-        that correspond to the raw time values::
-
-            >>> lc.astropy_time.iso  # doctest: +SKIP
-            array(['2018-07-25 19:07:39.356', '2018-07-25 19:09:39.354',
-                   '2018-07-25 19:11:39.352', ..., '2018-08-22 16:11:00.470',
-                   '2018-08-22 16:13:00.467', '2018-08-22 16:15:00.464'], dtype='<U23')
-            >>> lc.astropy_time.jd   # doctest: +SKIP
-            array([2458325.29698328, 2458325.29837215, 2458325.29976102, ...,
-                   2458353.17431099, 2458353.17569985, 2458353.17708871])
-
-
-        Raises
-        ------
-        ValueError
-            If the ``time_format`` attribute is not set or not one of the formats
-            allowed by AstroPy.
-        """
-        if self.time_format is None:
-            raise ValueError("To retrieve a `Time` object the `time_format` "
-                             "attribute must be set on the LightCurve object, "
-                             "e.g. `lightcurve.time_format = 'jd'`.")
-        # AstroPy does not support BKJD, so we call a function to convert to JD.
-        # In the future, we should think about making an AstroPy-compatible
-        # `TimeFormat` class for BKJD.
-        if self.time_format == 'bkjd':
-            return bkjd_to_astropy_time(self.time)
-        elif self.time_format == 'btjd':  # TESS
-            return btjd_to_astropy_time(self.time)
-        return Time(self.time, format=self.time_format, scale=self.time_scale)
-
     def show_properties(self):
         """Prints a description of all non-callable attributes.
 
@@ -363,56 +286,15 @@ class LightCurve(TimeSeries):
             Light curve which has the other light curves appened to it.
         """
         if not hasattr(others, '__iter__'):
-            others = [others]
+            others = (others,)
+
         if inplace:
             new_lc = self
         else:
             new_lc = self.copy()
 
-        # Find the intersection of all the extra_columns values
-        extra_columns = set(new_lc.extra_columns)
-        flag = True
-        for other in others:
-            next_columns = set(other.extra_columns)
-            extra_columns &= next_columns
-            flag &= extra_columns == next_columns
-        flag &= set(new_lc.extra_columns) == extra_columns
-        if not flag:
-            warnings.warn(
-                "append is being applied to LightCurve objects with "
-                "inconsistent values for `extra_columns`",
-                LightkurveWarning
-            )
-
-        for i in range(len(others)):
-            new_lc.time = np.append(new_lc.time, others[i].time)
-            new_lc.flux = np.append(new_lc.flux, others[i].flux)
-            new_lc.flux_err = np.append(new_lc.flux_err, others[i].flux_err)
-
-            for column in extra_columns:
-                setattr(
-                    new_lc,
-                    column,
-                    np.append(
-                        getattr(new_lc, column),
-                        getattr(others[i], column)
-                    )
-                )
-
+        new_lc = vstack((self, *others))
         return new_lc
-
-    def copy(self):
-        """Returns a copy of this `LightCurve` object.
-
-        This method uses Python's `copy.deepcopy` function to ensure that all
-        objects stored within the LightCurve instance are fully copied.
-
-        Returns
-        -------
-        lc_copy : `LightCurve`
-            A new light curve object which is a copy of the original.
-        """
-        return copy.deepcopy(self)
 
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
                 break_tolerance=5, niters=3, sigma=3, mask=None, **kwargs):
@@ -676,8 +558,7 @@ class LightCurve(TimeSeries):
                           "not what you want".format(median_flux),
                           LightkurveWarning)
         # Warn if the light curve is already in relative units.
-        if isinstance(self._flux_unit, u.UnitBase) and \
-            self._flux_unit.is_equivalent(u.dimensionless_unscaled):
+        if self.flux.unit and self.flux.unit.is_equivalent(u.dimensionless_unscaled):
             warnings.warn("The light curve already appears to be in relative "
                           "units; `normalize()` will convert the light curve "
                           "into relative units for a second time, which is "
@@ -688,24 +569,21 @@ class LightCurve(TimeSeries):
         lc = self.copy()
         lc.flux = lc.flux / median_flux
         lc.flux_err = lc.flux_err / median_flux
-        lc.flux_unit = u.dimensionless_unscaled
+        if not lc.flux.unit:
+            lc.flux *= u.dimensionless_unscaled
+        if not lc.flux_err.unit:
+            lc.flux_err *= u.dimensionless_unscaled
 
         # Set the desired relative (dimensionless) units
-        if unit == 'unscaled':
-            lc.flux_unit = u.dimensionless_unscaled
-        elif unit == 'percent':
-            lc.flux_unit = u.percent
-            lc.flux *= 100
-            lc.flux_err *= 100
+        if unit == 'percent':
+            lc.flux = lc.flux.to(u.percent)
+            lc.flux_err = lc.flux_err.to(u.percent)
         elif unit == 'ppt':  # parts per thousand
             # ppt is not included in astropy, so we define it here
-            lc.flux_unit = u.def_unit(['ppt', 'parts per thousand'], u.Unit(1e-3))
-            lc.flux *= 1000
-            lc.flux_err *= 1000
+            ppt = u.def_unit(['ppt', 'parts per thousand'], u.Unit(1e-3))
+            lc.flux = lc.flux.to(ppt)
         elif unit == 'ppm':  # parts per million
-            lc.flux_unit = u.cds.ppm
-            lc.flux *= 1000000
-            lc.flux_err *= 1000000
+            lc.flux = lc.flux.to(u.cds.ppm)
 
         return lc
 
