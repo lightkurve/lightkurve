@@ -354,7 +354,8 @@ class DesignMatrixCollection():
     >>> import lightkurve as lk
     >>> dm1 = lk.designmatrix.create_spline_matrix(np.arange(100), n_knots=5, name='spline')
     >>> dm2 = lk.DesignMatrix(np.arange(100), name='slope')
-    >>> lk.DesignMatrixCollection([dm1, dm2])
+    >>> dmc = lk.DesignMatrixCollection([dm1, dm2])
+    >>> dmc
     DesignMatrixCollection:
     	spline DesignMatrix (100, 5)
     	slope DesignMatrix (100, 1)
