@@ -753,7 +753,10 @@ class SparseDesignMatrixCollection(DesignMatrixCollection):
 
 @jit(nopython=True)
 def _spline_basis_vector(x, degree, i, knots):
-    """Create a spline basis vector for an input x, for the ith knot.
+    """Recursive function to create a single spline basis vector for an input x, for the ith knot.
+
+    See https://en.wikipedia.org/wiki/B-spline for definition of B-spline basis vectors
+
     Parameters
     ----------
     x : np.ndarray
@@ -789,7 +792,13 @@ def _spline_basis_vector(x, degree, i, knots):
     return B
 
 def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline'):
-    """Returns a `.SparseDesignMatrix` which models which are
+    """Creates a piecewise polynomial function, creating a continuous, smooth function in x
+
+    See https://en.wikipedia.org/wiki/B-spline for the definitions of Basis Splines
+
+    B-spline vectors of degree higher than 0 are created using recursion, using the
+    `_spline_basis_vector` function to evaluate the basis vectors for x, for each knot.
+
     Parameters
     ----------
     x : np.ndarray
