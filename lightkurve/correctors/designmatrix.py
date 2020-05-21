@@ -1,8 +1,4 @@
-"""Defines `DesignMatrix` and `DesignMatrixCollection`.
-
-These classes are intended to make linear regression problems with a large
-design matrix more easy.
-"""
+"""Defines `DesignMatrix`, `DesignMatrixCollection`, `SparseDesignMatrix` and `SparseDesignMatrixCollection`"""
 
 import warnings
 import numpy as np
