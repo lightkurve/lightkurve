@@ -31,6 +31,14 @@ def test_designmatrix_basics():
     assert dm.split([5]).shape == (size, 6)        # expect double columns
     dm.__repr__()
 
+    dm = SparseDesignMatrix(X, name=name, columns=['vector1', 'vector2', 'vector3'])
+    dm.append_constant(inplace=True)
+    assert dm.shape == (size, 4)  # expect one column more
+
+    dm = SparseDesignMatrix(X, name=name, columns=['vector1', 'vector2', 'vector3'])
+    dm.split([5], inplace=True)
+    assert dm.shape == (size, 6)        # expect double columns
+
 
 def test_split():
     """Can we split a design matrix correctly?"""
@@ -59,7 +67,7 @@ def test_standardize():
 
     assert np.round(np.mean(dm.standardize()['normal']), 3) == 0
     assert np.round(np.std(dm.standardize()['normal']), 1) == 1
-
+    dm.standardize(inplace=True)
 
 def test_pca():
     """Verifies DesignMatrix.pca()"""
@@ -76,12 +84,18 @@ def test_collection_basics():
     size = 5
     dm1 = DesignMatrix(np.ones((size, 1)), columns=['col1'], name='matrix1').to_sparse()
     dm2 = DesignMatrix(np.zeros((size, 2)), columns=['col2', 'col3'], name='matrix2').to_sparse()
+
     dmc = SparseDesignMatrixCollection([dm1, dm2])
     assert_array_equal(dmc['matrix1'].values, dm1.values)
     assert_array_equal(dmc['matrix2'].values, dm2.values)
     assert_array_equal(dmc.values, np.hstack((dm1.values, dm2.values)))
     dmc.plot()
     dmc.__repr__()
+
+    dmc = dm1.join(dm2)
+    assert_array_equal(dmc['matrix1'].values, dm1.values)
+    assert_array_equal(dmc['matrix2'].values, dm2.values)
+    assert_array_equal(dmc.values, np.hstack((dm1.values, dm2.values)))
 
     """Can we create a design matrix collection when one is sparse?"""
     size = 5
@@ -102,6 +116,8 @@ def test_collection_basics():
 
     dmc.plot()
     dmc.__repr__()
+
+    assert isinstance(dmc.to_designmatrix(), SparseDesignMatrix)
 
 
 

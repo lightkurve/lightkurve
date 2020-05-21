@@ -27,6 +27,14 @@ def test_designmatrix_basics():
     assert dm.split([10]).shape == (size, 6)        # expect double columns
     dm.__repr__()
 
+    dm = DesignMatrix(df, name=name)
+    dm.append_constant(inplace=True)
+    assert dm.shape == (size, 4)  # expect one column more
+
+    dm = DesignMatrix(df, name=name)
+    dm.split([10], inplace=True)
+    assert dm.shape == (size, 6)        # expect double columns
+
 
 def test_designmatrix_from_numpy():
     """Can we create a design matrix from an ndarray?"""
@@ -71,7 +79,7 @@ def test_standardize():
     dm = DesignMatrix({'normal': np.random.normal(loc=5, scale=3, size=100)})
     assert np.round(np.median(dm.standardize()['normal']), 3) == 0
     assert np.round(np.std(dm.standardize()['normal']), 1) == 1
-
+    dm.standardize(inplace=True)
 
 def test_pca():
     """Verifies DesignMatrix.pca()"""
@@ -88,12 +96,20 @@ def test_collection_basics():
     size = 5
     dm1 = DesignMatrix(np.ones((size, 1)), columns=['col1'], name='matrix1')
     dm2 = DesignMatrix(np.zeros((size, 2)), columns=['col2', 'col3'], name='matrix2')
+
     dmc = DesignMatrixCollection([dm1, dm2])
     assert_array_equal(dmc['matrix1'].values, dm1.values)
     assert_array_equal(dmc['matrix2'].values, dm2.values)
     assert_array_equal(dmc.values, np.hstack((dm1.values, dm2.values)))
     dmc.plot()
     dmc.__repr__()
+
+    dmc = dm1.join(dm2)
+    assert_array_equal(dmc['matrix1'].values, dm1.values)
+    assert_array_equal(dmc['matrix2'].values, dm2.values)
+    assert_array_equal(dmc.values, np.hstack((dm1.values, dm2.values)))
+
+    assert isinstance(dmc.to_designmatrix(), DesignMatrix)
 
 
 def test_designmatrix_rank():
