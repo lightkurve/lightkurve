@@ -1,20 +1,22 @@
-"""Defines RegressionCorrector."""
-from __future__ import division  # necessary for math in `_fit_coefficients`
-
+"""Defines `RegressionCorrector` to solve large linear regression problems
+with user-defined Gaussian priors in a fast, analytical way.
+"""
 import logging
 import warnings
 
+from astropy.stats import sigma_clip
 import matplotlib.pyplot as plt
 import numpy as np
-from astropy.stats import sigma_clip
-
-from .corrector import Corrector
-from .designmatrix import DesignMatrix, DesignMatrixCollection, SparseDesignMatrix, SparseDesignMatrixCollection
-from ..lightcurve import LightCurve, MPLSTYLE
-
 from scipy.sparse import issparse, csr_matrix
 
+from .corrector import Corrector
+from .designmatrix import DesignMatrix, DesignMatrixCollection, \
+                          SparseDesignMatrix, SparseDesignMatrixCollection
+from ..lightcurve import LightCurve, MPLSTYLE
+
+
 __all__ = ['RegressionCorrector']
+
 
 log = logging.getLogger(__name__)
 
@@ -156,7 +158,6 @@ class RegressionCorrector(Corrector):
             # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
             B = X.T.dot((self.lc.flux[cadence_mask]/flux_err**2))
             sigma_w_inv = sigma_w_inv.toarray()
-
 
         if prior_sigma is not None:
             sigma_w_inv += np.diag(1. / prior_sigma**2)

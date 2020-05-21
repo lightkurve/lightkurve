@@ -1,18 +1,24 @@
-"""Defines `DesignMatrix`, `DesignMatrixCollection`, `SparseDesignMatrix` and `SparseDesignMatrixCollection`"""
+"""Defines design matrix objects to aid linear regression problems.
 
+Specifically, this module adds the `DesignMatrix`, `DesignMatrixCollection`,
+`SparseDesignMatrix`, and `SparseDesignMatrixCollection` classes which
+are design to work with the `RegressionCorrector` class.
+"""
+from copy import deepcopy
 import warnings
+
+import matplotlib.pyplot as plt
+from numba import jit
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from copy import deepcopy
+from scipy.sparse import lil_matrix, csr_matrix, hstack, vstack, issparse, find
 
 from .. import MPLSTYLE
 from ..utils import LightkurveWarning, plot_image
 
-from numba import jit
-from scipy.sparse import lil_matrix, csr_matrix, hstack, vstack, issparse, find, csc_matrix
 
-__all__ = ['DesignMatrix', 'DesignMatrixCollection', 'SparseDesignMatrix', 'SparseDesignMatrixCollection']
+__all__ = ['DesignMatrix', 'SparseDesignMatrix',
+           'DesignMatrixCollection', 'SparseDesignMatrixCollection']
 
 
 class DesignMatrix():
@@ -73,7 +79,6 @@ class DesignMatrix():
     def copy(self):
         """Returns a deepcopy of DesignMatrix"""
         return deepcopy(self)
-
 
     def plot(self, ax=None, **kwargs):
         """Visualize the design matrix values as an image.
@@ -206,7 +211,6 @@ class DesignMatrix():
         `.DesignMatrix`
             A new design matrix with median-subtracted & sigma-divided columns.
         """
-
         ar = np.asarray(np.copy(self.df))
         ar[ar == 0] = np.nan
         # If a column has zero standard deviation, it will not change!
@@ -293,14 +297,14 @@ class DesignMatrix():
                                  'or equal to zero')
 
     def validate(self, rank=True):
-        """Raises a `LightkurveWarning` if the matrix has a low rank, or priors that are the wrong shape.
+        """Emits `LightkurveWarning` if matrix has low rank or priors have incorrect shape.
 
-        Note that for SparseDesignMatrix objects, calculating the rank will force the design matrix
-        to be evaluated and stored in memory, reducing the speed and memory savings of SparseDesignMatrix.
+        Note that for `SparseDesignMatrix` objects, calculating the rank will
+        force the design matrix to be evaluated and stored in memory, reducing
+        the speed and memory savings of SparseDesignMatrix.
 
-        For SparseDesignMatrix, rank checks will be turned off by default.
+        For `SparseDesignMatrix`, rank checks will be turned off by default.
         """
-
         self._validate()
 
     @property
@@ -325,7 +329,7 @@ class DesignMatrix():
         return '{} DesignMatrix {}'.format(self.name, self.shape)
 
     def to_sparse(self):
-        """ Convert a dense DesignMatrix object to a SparseDesignMatrix
+        """Convert this dense matrix object to a `SparseDesignMatrix`.
 
         The values of this design matrix will be converted to a
         `scipy.sparse.csr_matrix`, which stores the values in a
@@ -342,7 +346,6 @@ class DesignMatrix():
         return DesignMatrixCollection([self, matrix])
 
 
-
 class DesignMatrixCollection():
     """Object which stores multiple design matrices.
 
@@ -357,16 +360,18 @@ class DesignMatrixCollection():
     >>> dmc = lk.DesignMatrixCollection([dm1, dm2])
     >>> dmc
     DesignMatrixCollection:
-    	spline DesignMatrix (100, 5)
-    	slope DesignMatrix (100, 1)
+        spline DesignMatrix (100, 5)
+        slope DesignMatrix (100, 1)
     >>> dmc.matrices
     [spline DesignMatrix (100, 5), slope DesignMatrix (100, 1)]
     """
     def __init__(self, matrices):
         if np.any([issparse(m.X) for m in matrices]):
-            # This collection is designed for dense matrices, so we raise a warning if a SparseDesignMatrix is passed
+            # This collection is designed for dense matrices, so we warn if a
+            # SparseDesignMatrix is passed
             warnings.warn(('Some matrices are `SparseDesignMatrix` objects. '
-                            'Sparse matrices will be converted to dense matrices.'), LightkurveWarning)
+                           'Sparse matrices will be converted to dense matrices.'),
+                          LightkurveWarning)
             dense_matrices = []
             for m in matrices:
                 if isinstance(m, SparseDesignMatrix):
@@ -491,13 +496,16 @@ class DesignMatrixCollection():
         return 'DesignMatrixCollection:\n' + \
                     ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
 
-
     def to_designmatrix(self, name=None):
-        """Flatten a DesignMatrixCollection into a DesignMatrix"""
+        """Flatten a `DesignMatrixCollection` into a `DesignMatrix`."""
         if name is None:
             name = self.matrices[0].name
-        return self._child_class(self.X, columns=self.columns, prior_mu=self.prior_mu, prior_sigma=self.prior_sigma,
-                            name=name)
+        return self._child_class(self.X,
+                                 columns=self.columns,
+                                 prior_mu=self.prior_mu,
+                                 prior_sigma=self.prior_sigma,
+                                 name=name)
+
 
 class SparseDesignMatrix(DesignMatrix):
     """A matrix of column vectors for use in linear regression.
@@ -528,7 +536,6 @@ class SparseDesignMatrix(DesignMatrix):
     """
     def __init__(self, X, columns=None, name='unnamed_matrix', prior_mu=None,
                  prior_sigma=None):
-
         if not issparse(X):
             raise ValueError('Must pass a `scipy.sparse` matrix (e.g. `scipy.sparse.csr_matrix`)')
         if columns is None:
@@ -557,9 +564,9 @@ class SparseDesignMatrix(DesignMatrix):
 
     def validate(self, rank=False):
         """Checks if the matrix has the right shapes. Set rank to True to test matrix rank."""
-        # For sparse matrices, calculating the rank is expensive, and completely negates
+        # For sparse matrices, calculating the rank is expensive, and negates
         # the benefits of using sparse. Validate will ignore rank by default.
-        self._validate(rank=False)
+        self._validate(rank=rank)
 
     def split(self, row_indices, inplace=False):
         """Returns a new `.SparseDesignMatrix` with regressors split into multiple
@@ -605,7 +612,6 @@ class SparseDesignMatrix(DesignMatrix):
         dm.prior_mu = dm.prior_mu[non_zero]
         dm.prior_sigma = dm.prior_sigma[non_zero]
         return dm
-
 
     def standardize(self, inplace=False):
         """Returns a new `.SparseDesignMatrix` in which the columns have been
@@ -702,7 +708,7 @@ class SparseDesignMatrix(DesignMatrix):
         """
         return DesignMatrix(self.values, name=self.name,
                             columns=self.columns, prior_mu=self.prior_mu,
-                             prior_sigma=self.prior_sigma)
+                            prior_sigma=self.prior_sigma)
 
 
 class SparseDesignMatrixCollection(DesignMatrixCollection):
@@ -759,12 +765,13 @@ class SparseDesignMatrixCollection(DesignMatrixCollection):
 # Functions to create commonly-used design matrices.
 ####################################################
 
-
 @jit(nopython=True)
 def _spline_basis_vector(x, degree, i, knots):
-    """Recursive function to create a single spline basis vector for an input x, for the ith knot.
+    """Recursive function to create a single spline basis vector for an input x,
+    for the ith knot.
 
-    See https://en.wikipedia.org/wiki/B-spline for definition of B-spline basis vectors
+    See https://en.wikipedia.org/wiki/B-spline for a definition of B-spline
+    basis vectors
 
     Parameters
     ----------
@@ -776,6 +783,7 @@ def _spline_basis_vector(x, degree, i, knots):
         The index of the knot to calculate the basis for
     knots : np.ndarray
         Array of all knots
+
     Returns
     -------
     B : np.ndarray
@@ -784,9 +792,7 @@ def _spline_basis_vector(x, degree, i, knots):
     if degree == 0:
         B = np.zeros(len(x))
         B[(x >= knots[i]) & (x <= knots[i+1])] = 1
-        #B = (B)
     else:
-#        alpha1, alpha2 = 0, 0
         da = (knots[degree + i] - knots[i])
         db = (knots[i + degree + 1] - knots[i + 1])
         if ((knots[degree + i] - knots[i]) != 0):
@@ -799,6 +805,7 @@ def _spline_basis_vector(x, degree, i, knots):
             alpha2 = np.zeros(len(x))
         B = (_spline_basis_vector(x, (degree-1), i, knots)) * (alpha1) + (_spline_basis_vector(x, (degree-1), (i+1), knots)) * (alpha2)
     return B
+
 
 def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline'):
     """Creates a piecewise polynomial function, creating a continuous, smooth function in x
@@ -822,12 +829,12 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
         Name to pass to `.SparseDesignMatrix` (default: 'spline').
     include_intercept: bool
         Whether to include row of ones to find intercept. Default False.
+
     Returns
     -------
     dm: `.SparseDesignMatrix`
         Design matrix object with shape (len(x), n_knots*degree).
     """
-
     # To use jit we have to use float64
     x = np.asarray(x, np.float64)
 
