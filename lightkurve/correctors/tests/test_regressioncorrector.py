@@ -28,7 +28,7 @@ def test_regressioncorrector_priors():
             # No prior
             rc.correct(dm)
             assert_almost_equal(rc.coefficients, [0, 5])
-            
+
             # Strict prior centered on correct solution
             dm.prior_mu = [0, 5]
             dm.prior_sigma = [1e-6, 1e-6]
@@ -58,8 +58,8 @@ def test_sinusoid_noise():
     # Noisy light curve has a sinusoid single added
     noisy_lc = LightCurve(time, true_flux+noise, flux_err=true_lc.flux_err)
     design_matrix = DesignMatrix({'noise': noise,
-                       'offset': np.ones(len(time))},
-                      name='noise_model')
+                                  'offset': np.ones(len(time))},
+                                  name='noise_model')
 
     for dm in [design_matrix, design_matrix.to_sparse()]:
         # Can we recover the true light curve?

@@ -43,13 +43,19 @@ class DesignMatrix():
     prior_sigma : array
         Prior standard deviations of the coefficients associated with each
         column in a linear regression problem.
+
+    Examples
+    --------
+    >>> lk.DesignMatrix(np.arange(100), name='slope')
+    slope DesignMatrix (100, 1)
+    >>> lk.designmatrix.create_spline_matrix(np.arange(100), n_knots=5, name='spline')
+    spline DesignMatrix (100, 5)
     """
     def __init__(self, df, columns=None, name='unnamed_matrix', prior_mu=None,
                  prior_sigma=None):
         if not isinstance(df, pd.DataFrame):
             df = pd.DataFrame(df)
         self.df = df
-        self.X = self.df.values
         if columns is not None:
             df.columns = columns
         self.columns = list(df.columns)
@@ -61,6 +67,11 @@ class DesignMatrix():
         self.prior_mu = prior_mu
         self.prior_sigma = prior_sigma
         self.validate()
+
+    @property
+    def X(self):
+        """Design matrix "X" to be used in RegressionCorrector objects"""
+        return self.df.values
 
     def copy(self):
         """Returns a deepcopy of DesignMatrix"""
@@ -173,7 +184,6 @@ class DesignMatrix():
             dm = self.copy()
         dm.df = pd.concat(dfs, axis=1).fillna(0)
         dm.columns = dm.df.columns
-        dm.X = dm.df.values
         dm.prior_mu = prior_mu
         dm.prior_sigma = prior_sigma
         return dm
@@ -213,7 +223,6 @@ class DesignMatrix():
         else:
             dm = self.copy()
         dm.df = new_df
-        dm.X = dm.df.values
         return dm
 
     def pca(self, nterms=6):
@@ -258,7 +267,6 @@ class DesignMatrix():
             dm = self.copy()
         extra_df = pd.DataFrame(np.atleast_2d(np.ones(self.shape[0])).T, columns=['offset'])
         dm.df = pd.concat([self.df, extra_df], axis=1)
-        dm.X = dm.df.values
         dm.prior_mu = np.append(self.prior_mu, prior_mu)
         dm.prior_sigma = np.append(self.prior_sigma, prior_sigma)
         return dm
@@ -319,9 +327,11 @@ class DesignMatrix():
         `scipy.sparse.csr_matrix`, which stores the values in a
         lower memory matrix. This is not recommended for dense matrices.
         """
-        return SparseDesignMatrix(csr_matrix(self.values), name=self.name,
-                            columns=self.columns, prior_mu=self.prior_mu,
-                             prior_sigma=self.prior_sigma)
+        return SparseDesignMatrix(csr_matrix(self.values),
+                                  name=self.name,
+                                  columns=self.columns,
+                                  prior_mu=self.prior_mu,
+                                  prior_sigma=self.prior_sigma)
 
     def join(self, matrix):
         """ Join two designmatrices, return a design matrix collection """
@@ -330,9 +340,26 @@ class DesignMatrix():
 
 
 class DesignMatrixCollection():
-    """A set of design matrices."""
+    """Object which stores multiple design matrices.
+
+    DesignMatrixCollection objects are useful when users want to regress against
+    multiple different systematics, but still keep the different systematics distinct.
+
+    Examples
+    --------
+    >>> import lightkurve as lk
+    >>> dm1 = lk.designmatrix.create_spline_matrix(np.arange(100), n_knots=5, name='spline')
+    >>> dm2 = lk.DesignMatrix(np.arange(100), name='slope')
+    >>> dmc = lk.DesignMatrixCollection([dm1, dm2])
+    DesignMatrixCollection:
+    	spline DesignMatrix (100, 5)
+    	slope DesignMatrix (100, 1)
+    >>> dmc.matrices
+    [spline DesignMatrix (100, 5), slope DesignMatrix (100, 1)]
+    """
     def __init__(self, matrices):
         if np.any([issparse(m.X) for m in matrices]):
+            # This collection is designed for dense matrices, so we raise a warning if a SparseDesignMatrix is passed
             warnings.warn(('Some matrices are `SparseDesignMatrix` objects. '
                             'Sparse matrices will be converted to dense matrices.'), LightkurveWarning)
             dense_matrices = []
@@ -507,11 +534,16 @@ class SparseDesignMatrix(DesignMatrix):
             prior_mu = np.zeros(X.shape[1])
         if prior_sigma is None:
             prior_sigma = np.ones(X.shape[1]) * np.inf
-        self.X = X
+        self._X = X
         self.prior_mu = prior_mu
         self.prior_sigma = prior_sigma
         self._child_class = SparseDesignMatrix
         self.validate()
+
+    @property
+    def X(self):
+        """Design matrix "X" to be used in RegressionCorrector objects"""
+        return self._X
 
     @property
     def values(self):
@@ -559,10 +591,10 @@ class SparseDesignMatrix(DesignMatrix):
         x = np.arange(dm.shape[0])
         dm.prior_mu = np.concatenate([list(self.prior_mu) * (len(row_indices) + 1)])
         dm.prior_sigma = np.concatenate([list(self.prior_sigma) * (len(row_indices) + 1)])
-        dm.X = hstack([dm.X.multiply(lil_matrix(np.in1d(x, idx).astype(int)).T) for idx in np.array_split(x, row_indices)], format='lil')
+        dm._X = hstack([dm.X.multiply(lil_matrix(np.in1d(x, idx).astype(int)).T) for idx in np.array_split(x, row_indices)], format='lil')
         non_zero = dm.X.sum(axis=0) != 0
         non_zero = np.asarray(non_zero).ravel()
-        dm.X = dm.X[:, non_zero]
+        dm._X = dm.X[:, non_zero]
         if dm.columns is not None:
             dm.columns = list(np.asarray([['{}_{}'.format(c, idx) for c in dm.columns] for idx in range(len(row_indices) + 1)]).ravel())
         dm.prior_mu = dm.prior_mu[non_zero]
@@ -604,7 +636,7 @@ class SparseDesignMatrix(DesignMatrix):
         mean[std == 0] = 0
         std[std == 0] = 1
         white = (dm.X - vstack([lil_matrix(mean)] * dm.shape[0])).multiply(vstack([lil_matrix(1/std)] * dm.shape[0]))
-        dm.X = white.multiply(weights)
+        dm._X = white.multiply(weights)
         return dm
 
     def pca(self, nterms=6, **kwargs):
@@ -638,7 +670,7 @@ class SparseDesignMatrix(DesignMatrix):
             dm = self
         else:
             dm = self.copy()
-        dm.X = hstack([dm.X, lil_matrix(np.ones(dm.shape[0])).T], format='lil')
+        dm._X = hstack([dm.X, lil_matrix(np.ones(dm.shape[0])).T], format='lil')
         dm.prior_mu = np.append(dm.prior_mu, prior_mu)
         dm.prior_sigma = np.append(dm.prior_sigma, prior_sigma)
         return dm
@@ -672,6 +704,7 @@ class SparseDesignMatrixCollection(DesignMatrixCollection):
     """A set of design matrices."""
     def __init__(self, matrices):
         if not np.all([issparse(m.X) for m in matrices]):
+            # This collection is designed for sparse matrices, so we raise a warning if a dense DesignMatrix is passed
             warnings.warn(('Not all matrices are `SparseDesignMatrix` objects. '
                             'Dense matrices will be converted to sparse matrices.'), LightkurveWarning)
             sparse_matrices = []

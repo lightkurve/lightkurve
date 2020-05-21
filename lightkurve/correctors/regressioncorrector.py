@@ -104,7 +104,7 @@ class RegressionCorrector(Corrector):
         return 'RegressionCorrector (ID: {})'.format(self.lc.targetid)
 
     @property
-    def X(self):
+    def dmc(self):
         """Shorthand for self.design_matrix_collection."""
         return self.design_matrix_collection
 
@@ -142,7 +142,7 @@ class RegressionCorrector(Corrector):
             flux_err = self.lc.flux_err[cadence_mask]
 
         # Retrieve the design matrix (X) as a numpy array
-        X = self.X.X[cadence_mask]
+        X = self.dmc.X[cadence_mask]
         if isinstance(X, np.ndarray):
             # Compute `X^T cov^-1 X + 1/prior_sigma^2`
             sigma_w_inv = X.T.dot(X / flux_err[:, None]**2)
@@ -218,10 +218,10 @@ class RegressionCorrector(Corrector):
         for count in range(niters):
             coefficients, coefficients_err = \
                 self._fit_coefficients(cadence_mask=cadence_mask & clean_cadences,
-                                       prior_mu=self.X.prior_mu,
-                                       prior_sigma=self.X.prior_sigma,
+                                       prior_mu=self.dmc.prior_mu,
+                                       prior_sigma=self.dmc.prior_sigma,
                                        propagate_errors=propagate_errors)
-            model = np.ma.masked_array(data=self.X.X.dot(coefficients),
+            model = np.ma.masked_array(data=self.dmc.X.dot(coefficients),
                                        mask=~(cadence_mask & clean_cadences))
             residuals = self.lc.flux - model
             clean_cadences = ~sigma_clip(residuals, sigma=sigma).mask
@@ -232,14 +232,14 @@ class RegressionCorrector(Corrector):
         self.coefficients = coefficients
         self.coefficients_err = coefficients_err
 
-        model_flux = self.X.X.dot(coefficients)
+        model_flux = self.dmc.X.dot(coefficients)
         model_flux -= np.median(model_flux)
         if propagate_errors:
             with warnings.catch_warnings():
                 # ignore "RuntimeWarning: covariance is not symmetric positive-semidefinite."
                 warnings.simplefilter("ignore", RuntimeWarning)
                 samples = np.asarray(
-                    [self.X.X.dot(np.random.multivariate_normal(coefficients, coefficients_err))
+                    [self.dmc.X.dot(np.random.multivariate_normal(coefficients, coefficients_err))
                      for idx in range(100)]).T
             model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
         else:
@@ -261,9 +261,9 @@ class RegressionCorrector(Corrector):
             raise ValueError("you need to call `correct()` first")
 
         lcs = {}
-        for idx, submatrix in enumerate(self.X.matrices):
+        for idx, submatrix in enumerate(self.dmc.matrices):
             # What is the index of the first column for the submatrix?
-            firstcol_idx = sum([m.shape[1] for m in self.X.matrices[:idx]])
+            firstcol_idx = sum([m.shape[1] for m in self.dmc.matrices[:idx]])
             submatrix_coefficients = self.coefficients[firstcol_idx:firstcol_idx+submatrix.shape[1]]
             # submatrix_coefficients_err = self.coefficients_err[firstcol_idx:firstcol_idx+submatrix.shape[1], firstcol_idx:firstcol_idx+submatrix.shape[1]]
             # samples = np.asarray([np.dot(submatrix.values, np.random.multivariate_normal(submatrix_coefficients, submatrix_coefficients_err)) for idx in range(100)]).T
@@ -323,15 +323,15 @@ class RegressionCorrector(Corrector):
         if not hasattr(self, 'corrected_lc'):
             raise ValueError('Please call the `correct()` method before trying to diagnose.')
 
-        names = [X.name for X in self.X]
+        names = [dm.name for dm in self.dmc]
         with plt.style.context(MPLSTYLE):
             _, axs = plt.subplots(1, len(names), figsize=(len(names)*4, 4),
                                   sharey=True)
             if not hasattr(axs, '__iter__'):
                 axs = [axs]
-            for idx, ax, X in zip(range(len(names)), axs, self.X):
+            for idx, ax, X in zip(range(len(names)), axs, self.dmc):
                 X.plot_priors(ax=ax)
-                firstcol_idx = sum([m.shape[1] for m in self.X.matrices[:idx]])
+                firstcol_idx = sum([m.shape[1] for m in self.dmc.matrices[:idx]])
                 submatrix_coefficients = self.coefficients[firstcol_idx:firstcol_idx+X.shape[1]]
                 [ax.axvline(s, color='red', zorder=-1) for s in submatrix_coefficients]
         return axs
