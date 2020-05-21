@@ -329,7 +329,7 @@ class DesignMatrix():
                                   prior_mu=self.prior_mu,
                                   prior_sigma=self.prior_sigma)
 
-    def join(self, matrix):
+    def collect(self, matrix):
         """ Join two designmatrices, return a design matrix collection """
         return DesignMatrixCollection([self, matrix])
 
@@ -680,7 +680,7 @@ class SparseDesignMatrix(DesignMatrix):
     def __repr__(self):
         return '{} SparseDesignMatrix {}'.format(self.name, self.shape)
 
-    def join(self, matrix):
+    def collect(self, matrix):
         """ Join two designmatrices, return a design matrix collection """
         return SparseDesignMatrixCollection([self, matrix])
 

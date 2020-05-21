@@ -92,7 +92,7 @@ def test_collection_basics():
     dmc.plot()
     dmc.__repr__()
 
-    dmc = dm1.join(dm2)
+    dmc = dm1.collect(dm2)
     assert_array_equal(dmc['matrix1'].values, dm1.values)
     assert_array_equal(dmc['matrix2'].values, dm2.values)
     assert_array_equal(dmc.values, np.hstack((dm1.values, dm2.values)))
