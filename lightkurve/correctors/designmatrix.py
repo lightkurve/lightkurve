@@ -293,7 +293,14 @@ class DesignMatrix():
                                  'or equal to zero')
 
     def validate(self, rank=True):
-        """Raises a `LightkurveWarning` if the matrix has a low rank, or priors that are the wrong shape."""
+        """Raises a `LightkurveWarning` if the matrix has a low rank, or priors that are the wrong shape.
+
+        Note that for SparseDesignMatrix objects, calculating the rank will force the design matrix
+        to be evaluated and stored in memory, reducing the speed and memory savings of SparseDesignMatrix.
+
+        For SparseDesignMatrix, rank checks will be turned off by default.
+        """
+
         self._validate()
 
     @property
