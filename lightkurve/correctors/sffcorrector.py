@@ -162,7 +162,7 @@ class SFFCorrector(RegressionCorrector):
             dm.prior_sigma = ps
             dms.append(dm)
 
-        sff_dm = DMC(dms).flatten(name='sff')#.standardize()
+        sff_dm = DMC(dms).to_designmatrix(name='sff')#.standardize()
 
 
 

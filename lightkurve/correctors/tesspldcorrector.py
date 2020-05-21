@@ -17,6 +17,7 @@ from .regressioncorrector import RegressionCorrector
 from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
 from .. import MPLSTYLE
 
+import warnings
 
 __all__ = ['TessPLDCorrector']
 
@@ -77,7 +78,9 @@ class TessPLDCorrector(RegressionCorrector):
         dm_bkg = DesignMatrix(simple_bkg, name='background_model')
         dm_spline = spline(self.lc.time, n_knots=spline_n_knots,
                              degree=spline_degree).append_constant()
-        dm = DMC([dm_pixels, dm_bkg, dm_spline], warn=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            dm = DMC([dm_pixels, dm_bkg, dm_spline])
         return dm
 
     def correct(self, pixel_components=3, spline_n_knots=100, spline_degree=3,
