@@ -117,6 +117,26 @@ class LightCurve(TimeSeries):
         self['time'] = time
 
     @property
+    def time_format(self):
+        # TODO: Add deprecation warning
+        return self.time.format
+
+    @property
+    def time_scale(self):
+        # TODO: Add deprecation warning
+        return self.time.scale
+
+    @property
+    def astropy_time(self):
+        # TODO: Add deprecation warning
+        return self.time
+
+    @property
+    def flux_unit(self):
+        # TODO: Add deprecation warning
+        return self.flux.unit
+
+    @property
     def flux(self):
         """The brightness values."""
         return self['flux']
@@ -354,14 +374,14 @@ class LightCurve(TimeSeries):
                 log.warning("polyorder must be smaller than window_length, "
                             "using polyorder={}.".format(polyorder))
             # Split the lightcurve into segments by finding large gaps in time
-            dt = self.time[mask][1:] - self.time[mask][0:-1]
+            dt = self.time.value[mask][1:] - self.time.value[mask][0:-1]
             with warnings.catch_warnings():  # Ignore warnings due to NaNs
                 warnings.simplefilter("ignore", RuntimeWarning)
                 cut = np.where(dt > break_tolerance * np.nanmedian(dt))[0] + 1
             low = np.append([0], cut)
             high = np.append(cut, len(self.time[mask]))
             # Then, apply the savgol_filter to each segment separately
-            trend_signal = np.zeros(len(self.time[mask]))
+            trend_signal = np.zeros(len(self.time[mask]))*self.flux.unit
             for l, h in zip(low, high):
                 # Reduce `window_length` and `polyorder` for short segments;
                 # this prevents `savgol_filter` from raising an exception
@@ -372,16 +392,16 @@ class LightCurve(TimeSeries):
                     # Scipy outputs a warning here that is not useful, will be fixed in version 1.2
                     with warnings.catch_warnings():
                         warnings.simplefilter('ignore', FutureWarning)
-                        trend_signal[l:h] = signal.savgol_filter(x=self.flux[mask][l:h],
+                        trend_signal[l:h] = signal.savgol_filter(x=self.flux.value[mask][l:h],
                                                                  window_length=window_length,
                                                                  polyorder=polyorder,
-                                                                 **kwargs)
+                                                                 **kwargs)*self.flux.unit
             # Ignore outliers; note we add `1e-14` below to avoid detecting
             # outliers which are merely caused by numerical noise.
             mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
-                    (np.nanstd(self.flux[mask] - trend_signal) * sigma + 1e-14)
-            f = interp1d(self.time[mask][mask1], trend_signal[mask1], fill_value='extrapolate')
-            trend_signal = f(self.time)
+                    (np.nanstd(self.flux[mask] - trend_signal) * sigma + 1e-14*self.flux.unit)
+            f = interp1d(self.time.value[mask][mask1], trend_signal[mask1], fill_value='extrapolate')
+            trend_signal = f(self.time.value)
             mask[mask] &= mask1
 
         flatten_lc = self.copy()
@@ -1106,7 +1126,7 @@ class LightCurve(TimeSeries):
             if ax is None:
                 fig, ax = plt.subplots(1)
             if method == 'scatter':
-                sc = ax.scatter(self.time, flux, **kwargs)
+                sc = ax.scatter(self.time.value, flux, **kwargs)
                 # Colorbars should only be plotted if the user specifies, and there is
                 # a color specified that is not a string (e.g. 'C1') and is iterable.
                 if show_colorbar and ('c' in kwargs) and \
@@ -1116,9 +1136,9 @@ class LightCurve(TimeSeries):
                     cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
                     cbar.ax.minorticks_off()
             elif method == 'errorbar':
-                ax.errorbar(x=self.time, y=flux, yerr=flux_err, **kwargs)
+                ax.errorbar(x=self.time.value, y=flux, yerr=flux_err, **kwargs)
             else:
-                ax.plot(self.time, flux, **kwargs)
+                ax.plot(self.time.value, flux, **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
