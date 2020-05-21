@@ -22,6 +22,7 @@ from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
 from astropy import units as u
+from astropy.timeseries import TimeSeries
 
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
@@ -34,8 +35,12 @@ __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve', 'FoldedLightCurve
 log = logging.getLogger(__name__)
 
 
-class LightCurve(object):
+class LightCurve(TimeSeries):
     """Generic light curve object to hold time series photometry for one target.
+
+    Compared to the generic `~astropy.timeseries.TimeSeries` class, `LightCurve`
+    ensures that each object has `time`, `flux`, and `flux_err` columns,
+    in addition to `targetid` and `label` properties.
 
     Attributes
     ----------
@@ -45,21 +50,12 @@ class LightCurve(object):
         Flux values for every time point.
     flux_err : array-like
         Uncertainty on each flux data point.
-    flux_unit : `~astropy.units.Unit` or str
-        Unit of the flux values.  If a string is passed, it will be passed
-        on to `~astropy.units.Unit`.
-    time_format : str
-        String specifying how an instant of time is represented,
-        e.g. 'bkjd' or 'jd'.
-    time_scale : str
-        String which specifies how the time is measured,
-        e.g. 'tdb', 'tt', 'ut1', or 'utc'.
     targetid : str
         Identifier of the target.
     label : str
         Human-friendly object label, e.g. "KIC 123456789".
-    meta : dict
-        Free-form metadata associated with the LightCurve.
+    **kwargs : dict
+        Additional keyword arguments that are passed to `~astropy.timeseries.TimeSeries`.
 
     Examples
     --------
@@ -72,72 +68,59 @@ class LightCurve(object):
     >>> lc.bin(binsize=2).flux
     array([0.99, 1.01])
     """
-    extra_columns = ()
+    def __init__(self, data=None, time=None, flux=None, flux_err=None,
+                 targetid=None, label=None, **kwargs):
+        # We are tolerant of missing time if flux is given
+        if time is None and flux is not None:
+            time = np.arange(len(flux))
+        # We are tolerant of missing time format
+        if time is not None and not isinstance(time, Time):
+            time = Time(time, format='mjd')  # Default to MJD
 
-    def __init__(self, time=None, flux=None, flux_err=None, flux_unit=None,
-                 time_format=None, time_scale=None, targetid=None, label=None,
-                 meta=None):
-        if time is None and flux is None:
-            raise ValueError('either time or flux must be given')
-        if time is None:
-            self.time = np.arange(len(flux))
-        else:
-            self.time = self._validate_time(time)
-        self.flux = self._validate_array(flux, name='flux')
-        self.flux_err = self._validate_array(flux_err, name='flux_err')
-        # If `time` or `flux` are astropy objects, we will retrieve
-        # `time_format`, `time_scale,` and `flux_unit` from them.
-        if isinstance(flux, u.Quantity):
-            flux_unit = flux.unit
-        if isinstance(time, Time):
-            time_format = time.format
-            time_scale = time.scale
-        self.flux_unit = flux_unit  # @flux_unit.setter will validate this
-        self.time_format = time_format
-        self.time_scale = time_scale
+        super().__init__(data=data, time=time, **kwargs)
+
+        # For some operations, an empty time series needs to be created, then
+        # columns added one by one. We should check that when columns are added
+        # manually, time is added first and is of the right type.
+        if data is None and time is None and flux is None:
+            self._required_columns_relax = True
+            return
+
+        # TODO: `flux_unit`, `time_format`, `time_scale` are deprecated
+        # raise a warning here if given?
+
+        # Ensure the required columns are available
+        if flux is None:
+            flux = np.nan * np.ones_like(time)
+        if flux_err is None:
+            flux_err = np.nan * np.ones_like(time)
+        if "flux" not in self.columns:
+            self.add_column(flux, name="flux")
+        if "flux_err" not in self.columns:
+            self.add_column(flux_err, name="flux_err")
+
         self.targetid = targetid
         self.label = label
-        if meta is None:
-            self.meta = {}
-        else:
-            self.meta = meta
 
-    @classmethod
-    def _validate_time(cls, time):
-        """Ensure the `time` user input is valid."""
-        if isinstance(time, Time):  # Support Astropy Time objects
-            time = time.value
-        time = np.asarray(time)
+        self._validate()
+
+    @property
+    def flux(self):
+        return self['flux']
+
+    @flux.setter
+    def flux_setter(self, flux):
+        self['flux'] = flux
+
+    @property
+    def flux_err(self):
+        return self['flux_err']
+
+    def _validate(self, time):
         # Trigger warning if time=NaN are present
         if np.isnan(time).any():
             warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
         return time
-
-    def _validate_array(self, arr, name='array'):
-        """Ensure the input flux/centroid/quality/etc arrays are valid and have
-        the exact same length as `self.time`."""
-        if arr is None:  # arrays default to NaN arrays of length time
-            arr = np.nan * np.ones_like(self.time)
-        else:
-            arr = np.asarray(arr)
-
-        if not (len(self.time) == len(arr)):
-            raise ValueError("Input arrays have different lengths."
-                             " len(time)={}, len({})={}"
-                             .format(len(self.time), name, len(arr)))
-        return arr
-
-    def __getitem__(self, key):
-        copy_self = self.copy()
-        copy_self.time = self.time[key]
-        copy_self.flux = self.flux[key]
-        copy_self.flux_err = self.flux_err[key]
-        for k in self.extra_columns:
-            setattr(copy_self, k, getattr(self, k)[key])
-        return copy_self
-
-    def __len__(self):
-        return len(self.time)
 
     def __add__(self, other):
         newlc = self.copy()
