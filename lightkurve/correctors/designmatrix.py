@@ -42,6 +42,7 @@ class DesignMatrix():
 
     Examples
     --------
+    >>> import lightkurve as lk
     >>> lk.DesignMatrix(np.arange(100), name='slope')
     slope DesignMatrix (100, 1)
     >>> lk.designmatrix.create_spline_matrix(np.arange(100), n_knots=5, name='spline')
