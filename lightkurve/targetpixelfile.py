@@ -767,26 +767,25 @@ class TargetPixelFile(object):
                                  "must be in the range {}-{}.".format(
                                      cadenceno, self.cadenceno[0], self.cadenceno[-1]))      
         try:
-            if column not in ('FLUX','FLUX_ERR','FLUX_BKG','FLUX_BKG_ERR',
-                                'COSMIC_RAYS','RAW_CNTS'):
-                raise ValueError("column must be one of the following: ('FLUX','FLUX_ERR',"
-                                 "'FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS')")
             if column == 'FLUX':
                 if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
-                    pflux = self.flux[frame] + self.flux_bkg[frame]
+                    data_to_plot = self.flux[frame] + self.flux_bkg[frame]
                 else:
-                    pflux = self.flux[frame]
+                    data_to_plot = self.flux[frame]
             else:
-                pflux = self.hdu[1].data[column][self.quality_mask][frame]
+                data_to_plot = self.hdu[1].data[column][self.quality_mask][frame]
+        except KeyError:
+            raise ValueError("column must be one of the following: ('FLUX','FLUX_ERR',"
+                                "'FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS')")
         except IndexError:
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
 
         # Make list of preset colour labels
         clabels = {'FLUX': 'Flux ($e^{-}s^{-1}$)',
-                'FLUX_ERR': 'Flux Err ($e^{-}s^{-1}$)',
-                'FLUX_BKG': 'Background Flux Err ($e^{-}s^{-1}$)',
-                'FLUX_BKG_ERR': 'Background Flux Err ($e^{-}s^{-1}$)',
+                'FLUX_ERR': 'Flux Err. ($e^{-}s^{-1}$)',
+                'FLUX_BKG': 'Background Flux ($e^{-}s^{-1}$)',
+                'FLUX_BKG_ERR': 'Background Flux Err. ($e^{-}s^{-1}$)',
                 'COSMIC_RAYS': 'Cosmic Ray Flux ($e^{-}s^{-1}$)', 
                 'RAW_CNTS': 'Raw Counts'}
 
@@ -795,7 +794,7 @@ class TargetPixelFile(object):
                 title = 'Target ID: {}, Cadence: {}'.format(self.targetid, self.cadenceno[frame])
             img_extent = (self.column, self.column + self.shape[2],
                           self.row, self.row + self.shape[1])
-            ax = plot_image(pflux, ax=ax, title=title, extent=img_extent,
+            ax = plot_image(data_to_plot, ax=ax, title=title, extent=img_extent,
                             show_colorbar=show_colorbar, clabel = clabels[column], **kwargs)
             ax.grid(False)
         if aperture_mask is not None:
