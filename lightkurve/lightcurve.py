@@ -1,7 +1,4 @@
 """Defines LightCurve, KeplerLightCurve, and TessLightCurve."""
-
-from __future__ import division, print_function
-
 import os
 import datetime
 import logging
@@ -103,12 +100,12 @@ class LightCurve(TimeSeries):
         self.targetid = targetid
         self.label = label
 
-        self._validate()
+        #self._validate()
 
-    def _validate(self):
-        # Trigger warning if time=NaN are present
-        if np.isnan(self['time'].value).any():
-            warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
+    #def _validate(self):
+    #    # Trigger warning if time=NaN are present
+    #    if np.isnan(self['time'].value).any():
+    #        warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
 
     @property
     def time(self):
