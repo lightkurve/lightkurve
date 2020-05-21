@@ -3,6 +3,9 @@
 
 - Removed support for Python 2. [#733]
 
+- Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
+  ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
+
 
 
 1.11.0 (2015-05-20)

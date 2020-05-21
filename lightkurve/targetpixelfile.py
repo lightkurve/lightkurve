@@ -22,7 +22,6 @@ import numpy as np
 from scipy.ndimage import label
 from tqdm import tqdm
 from copy import deepcopy
-import pandas as pd
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
@@ -31,6 +30,7 @@ from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
                    LightkurveWarning, detect_filetype, validate_method, \
                    centroid_quadratic, _query_solar_system_objects
+
 
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
@@ -84,6 +84,47 @@ class TargetPixelFile(object):
             copy = fits.HDUList([myhdu.copy() for myhdu in self.hdu])
             copy[1].data = copy[1].data[selected_idx]
         return self.__class__(copy, quality_bitmask=self.quality_bitmask, targetid=self.targetid)
+
+    def __len__(self):
+        return len(self.time)
+
+    def __add__(self, other):
+        hdu = deepcopy(self.hdu)
+        hdu[1].data['FLUX'][self.quality_mask] += other
+        return type(self)(hdu, quality_bitmask=self.quality_bitmask)
+
+    def __mul__(self, other):
+        hdu = deepcopy(self.hdu)
+        hdu[1].data['FLUX'][self.quality_mask] *= other
+        hdu[1].data['FLUX_ERR'][self.quality_mask] *= other
+        return type(self)(hdu, quality_bitmask=self.quality_bitmask)
+
+    def __rtruediv__(self, other):
+        hdu = deepcopy(self.hdu)
+        hdu[1].data['FLUX'][self.quality_mask] /= other
+        hdu[1].data['FLUX_ERR'][self.quality_mask] /= other
+        return type(self)(hdu, quality_bitmask=self.quality_bitmask)
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        return self.__add__(-1 * other)
+
+    def __rsub__(self, other):
+        return (-1 * self).__add__(other)
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __truediv__(self, other):
+        return self.__mul__(1. / other)
+
+    def __div__(self, other):
+        return self.__truediv__(other)
+
+    def __rdiv__(self, other):
+        return self.__rtruediv__(other)
 
     @property
     def hdu(self):
