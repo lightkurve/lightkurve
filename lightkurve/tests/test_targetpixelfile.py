@@ -119,6 +119,15 @@ def test_tpf_plot():
         tpf.plot(scale="log")
         with pytest.raises(ValueError):
             tpf.plot(scale="blabla")
+        tpf.plot(column='FLUX')
+        tpf.plot(column='FLUX_ERR') 
+        tpf.plot(column='FLUX_BKG') 
+        tpf.plot(column='FLUX_BKG_ERR') 
+        tpf.plot(column='RAW_CNTS') 
+        tpf.plot(column='COSMIC_RAYS') 
+        with pytest.raises(ValueError):
+            tpf.plot(column='not a column')
+
         plt.close('all')
 
 

@@ -757,7 +757,7 @@ class TargetPixelFile(object):
             return res, np.in1d(self.astropy_time.jd, res.epoch)
         return res
 
-    def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
+    def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, column='FLUX', aperture_mask=None,
              show_colorbar=True, mask_color='pink', title=None, style='lightkurve',
              **kwargs):
         """Plot the pixel data for a single frame (i.e. at a single time).
@@ -776,7 +776,10 @@ class TargetPixelFile(object):
             Alternatively, a cadence number can be provided.
             This argument has priority over frame number.
         bkg : bool
-            If True, background will be added to the pixel values.
+            If True and `column="FLUX"`, background will be added to the pixel values.
+        column : str
+            Choose the FITS data column to be plotted. May be one of ('FLUX',
+            'FLUX_ERR','FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS').
         aperture_mask : ndarray or str
             Highlight pixels selected by aperture_mask.
         show_colorbar : bool
@@ -805,20 +808,35 @@ class TargetPixelFile(object):
                                  "must be in the range {}-{}.".format(
                                      cadenceno, self.cadenceno[0], self.cadenceno[-1]))
         try:
-            if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
-                pflux = self.flux[frame] + self.flux_bkg[frame]
+            if column == 'FLUX':
+                if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
+                    data_to_plot = self.flux[frame] + self.flux_bkg[frame]
+                else:
+                    data_to_plot = self.flux[frame]
             else:
-                pflux = self.flux[frame]
+                data_to_plot = self.hdu[1].data[column][self.quality_mask][frame]
+        except KeyError:
+            raise ValueError("column must be one of the following: ('FLUX','FLUX_ERR',"
+                             "'FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS')")
         except IndexError:
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
+
+        # Make list of preset colour labels
+        clabels = {'FLUX': 'Flux ($e^{-}s^{-1}$)',
+                'FLUX_ERR': 'Flux Err. ($e^{-}s^{-1}$)',
+                'FLUX_BKG': 'Background Flux ($e^{-}s^{-1}$)',
+                'FLUX_BKG_ERR': 'Background Flux Err. ($e^{-}s^{-1}$)',
+                'COSMIC_RAYS': 'Cosmic Ray Flux ($e^{-}s^{-1}$)', 
+                'RAW_CNTS': 'Raw Counts'}
+
         with plt.style.context(style):
             if title is None:
                 title = 'Target ID: {}, Cadence: {}'.format(self.targetid, self.cadenceno[frame])
             img_extent = (self.column, self.column + self.shape[2],
                           self.row, self.row + self.shape[1])
-            ax = plot_image(pflux, ax=ax, title=title, extent=img_extent,
-                            show_colorbar=show_colorbar, **kwargs)
+            ax = plot_image(data_to_plot, ax=ax, title=title, extent=img_extent,
+                            show_colorbar=show_colorbar, clabel = clabels.get(column, column), **kwargs)
             ax.grid(False)
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
