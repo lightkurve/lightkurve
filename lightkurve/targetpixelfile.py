@@ -734,9 +734,9 @@ class TargetPixelFile(object):
         cadenceno : int, optional
             Alternatively, a cadence number can be provided.
             This argument has priority over frame number.
-        bkg: bool
-            If True, background will be added to the pixel values.
-        column :
+        bkg : bool
+            If True and `column="FLUX"`, background will be added to the pixel values.
+        column : str
             Choose the FITS data column to be plotted. May be one of ('FLUX',
             'FLUX_ERR','FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS').
         aperture_mask : ndarray or str
@@ -765,7 +765,7 @@ class TargetPixelFile(object):
             except IndexError:
                 raise ValueError("cadenceno {} is out of bounds, "
                                  "must be in the range {}-{}.".format(
-                                     cadenceno, self.cadenceno[0], self.cadenceno[-1]))      
+                                     cadenceno, self.cadenceno[0], self.cadenceno[-1]))
         try:
             if column == 'FLUX':
                 if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
@@ -776,7 +776,7 @@ class TargetPixelFile(object):
                 data_to_plot = self.hdu[1].data[column][self.quality_mask][frame]
         except KeyError:
             raise ValueError("column must be one of the following: ('FLUX','FLUX_ERR',"
-                                "'FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS')")
+                             "'FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS')")
         except IndexError:
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
@@ -795,7 +795,7 @@ class TargetPixelFile(object):
             img_extent = (self.column, self.column + self.shape[2],
                           self.row, self.row + self.shape[1])
             ax = plot_image(data_to_plot, ax=ax, title=title, extent=img_extent,
-                            show_colorbar=show_colorbar, clabel = clabels[column], **kwargs)
+                            show_colorbar=show_colorbar, clabel = clabels.get(column, column), **kwargs)
             ax.grid(False)
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
