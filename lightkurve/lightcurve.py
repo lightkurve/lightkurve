@@ -63,8 +63,11 @@ class LightCurve(TimeSeries):
     >>> lc.bin(binsize=2).flux
     array([0.99, 1.01])
     """
-    def __init__(self, data=None, time=None, flux=None, flux_err=None,
-                 targetid=None, label=None, **kwargs):
+    def __init__(self, data=None, time=None, flux=None, flux_err=None, **kwargs):
+        # Backwards compatibility
+        targetid = kwargs.pop("targetid", None)
+        label = kwargs.pop("label", None)
+
         # We are tolerant of missing time if flux is given
         if time is None and flux is not None:
             time = np.arange(len(flux))
@@ -97,8 +100,10 @@ class LightCurve(TimeSeries):
         if "flux_err" not in self.columns:
             self.add_column(flux_err, name="flux_err")
 
-        self.targetid = targetid
-        self.label = label
+        if targetid:
+            self.meta['targetid'] = targetid
+        if label:
+            self.meta['label'] = label
 
         #self._validate()
 
@@ -106,6 +111,28 @@ class LightCurve(TimeSeries):
     #    # Trigger warning if time=NaN are present
     #    if np.isnan(self['time'].value).any():
     #        warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
+
+    """
+    def copy(self):
+        #Returns a copy.
+        cp = super().copy()
+        cp.targetid = self.targetid
+        cp.label = self.label
+        return cp
+    """
+
+    def __getattr__(self, name, **kwargs):
+        """Expose all meta keywords as attributed."""
+        if name in self.meta:
+            return self.meta[name]
+        raise AttributeError(f"object has no attribute {name}")
+
+    def __setattr__(self, name, value, **kwargs):
+        """To get copied, attributes have to be stored in the meta dictionary!"""
+        if ('_meta' in self.__dict__) and (name in self.__dict__['_meta']):
+            self.__dict__['_meta'][name] = value
+        else:
+            super().__setattr__(name, value, **kwargs)
 
     @property
     def time(self):
@@ -502,7 +529,7 @@ class LightCurve(TimeSeries):
                               'however the light curve time uses BTJD '
                               '(i.e. JD - 2457000).', LightkurveWarning)
         phase = (t0 % period) / period
-        fold_time = (((self.time - phase * period) / period) % 1)
+        fold_time = (((self.time.value - phase * period) / period) % 1)
         # fold time domain from -.5 to .5
         fold_time[fold_time > 0.5] -= 1
         sorted_args = np.argsort(fold_time)
@@ -514,7 +541,6 @@ class LightCurve(TimeSeries):
                                 period=period,
                                 t0=t0,
                                 label=self.label,
-                                flux_unit=self.flux_unit,
                                 meta=self.meta)
 
     def normalize(self, unit='unscaled'):
@@ -634,12 +660,13 @@ class LightCurve(TimeSeries):
             have been filled.
         """
         lc = self.copy().remove_nans()
-        nlc = lc.copy()
+        #nlc = lc.copy()
+        newdata = {}
 
         # Find missing time points
         # Most precise method, taking into account time variation due to orbit
         if hasattr(lc, 'cadenceno'):
-            dt = lc.time - np.median(np.diff(lc.time)) * lc.cadenceno
+            dt = lc.time.value - np.median(np.diff(lc.time.value)) * lc.cadenceno
             ncad = np.arange(lc.cadenceno[0], lc.cadenceno[-1] + 1, 1)
             in_original = np.in1d(ncad, lc.cadenceno)
             ncad = ncad[~in_original]
@@ -648,56 +675,58 @@ class LightCurve(TimeSeries):
             ncad = np.append(ncad, lc.cadenceno)
             ndt = np.append(ndt, dt)
             ncad, ndt = ncad[np.argsort(ncad)], ndt[np.argsort(ncad)]
-            ntime = ndt + np.median(np.diff(lc.time)) * ncad
-            nlc.cadenceno = ncad
+            ntime = ndt + np.median(np.diff(lc.time.value)) * ncad
+            newdata['cadenceno'] = ncad
         else:
             # Less precise method
-            dt = np.nanmedian(lc.time[1::] - lc.time[:-1:])
-            ntime = [lc.time[0]]
-            for t in lc.time[1::]:
+            dt = np.nanmedian(lc.time.value[1::] - lc.time.value[:-1:])
+            ntime = [lc.time.value[0]]
+            for t in lc.time.value[1::]:
                 prevtime = ntime[-1]
                 while (t - prevtime) > 1.2*dt:
                     ntime.append(prevtime + dt)
                     prevtime = ntime[-1]
                 ntime.append(t)
             ntime = np.asarray(ntime, float)
-            in_original = np.in1d(ntime, lc.time)
+            in_original = np.in1d(ntime, lc.time.value)
+        
         # Fill in time points
-
-        nlc.time = ntime
+        newdata['time'] = Time(ntime, format=lc.time.format, scale=lc.time.scale)
         f = np.zeros(len(ntime))
         f[in_original] = np.copy(lc.flux)
         fe = np.zeros(len(ntime))
         fe[in_original] = np.copy(lc.flux_err)
 
-        fe[~in_original] = np.interp(ntime[~in_original], lc.time, lc.flux_err)
+        fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err)
         if method == 'gaussian_noise':
             try:
                 std = lc.estimate_cdpp()*1e-6
             except:
                 std = lc.flux.std()
-            f[~in_original] = np.random.normal(lc.flux.mean(), std, (~in_original).sum())
+            f[~in_original] = np.random.normal(lc.flux.value.mean(), std.value, (~in_original).sum())
         else:
             raise NotImplementedError("No such method as {}".format(method))
 
-        nlc.flux = f
-        nlc.flux_err = fe
+        newdata['flux'] = f
+        newdata['flux_err'] = fe
 
         if hasattr(lc, 'quality'):
             quality = np.zeros(len(ntime), dtype=lc.quality.dtype)
             quality[in_original] = np.copy(lc.quality)
             quality[~in_original] += 65536
-            nlc.quality = quality
-        for column in lc.extra_columns:
-            if column == "quality":
+            newdata['quality'] = quality
+        """
+        # TODO: add support for other columns
+        for column in lc.columns:
+            if column in ("time", "flux", "flux_err", "quality"):
                 continue
-            old_values = getattr(lc, column)
+            old_values = lc[column]
             new_values = np.empty(len(ntime), dtype=old_values.dtype)
             new_values[~in_original] = np.nan
             new_values[in_original] = np.copy(old_values)
-            setattr(nlc, column, new_values)
-
-        return nlc
+            newdata[column] = new_values
+        """
+        return LightCurve(data=newdata)
 
     def remove_outliers(self, sigma=5., sigma_lower=None, sigma_upper=None,
                         return_mask=False, **kwargs):
@@ -791,8 +820,8 @@ class LightCurve(TimeSeries):
                                       **kwargs).mask
         # Second, we return the masked light curve and optionally the mask itself
         if return_mask:
-            return self[~outlier_mask], outlier_mask
-        return self[~outlier_mask]
+            return self.copy()[~outlier_mask], outlier_mask
+        return self.copy()[~outlier_mask]
 
     def bin(self, binsize=None, bins=None, method='mean'):
         """Bins a lightcurve in chunks defined by ``binsize`` or ``bins``.
@@ -872,10 +901,13 @@ class LightCurve(TimeSeries):
         statistic_mapper = {key: value
                             for key, value in statistic_mapper.items()
                             if hasattr(self, key)}
+
+        """TODO: restore support for extra columns
         for column in self.extra_columns:
             if column in statistic_mapper:
                 continue
             statistic_mapper[column] = lambda x: np.nan
+        """
 
         # Now create the new binned light curve object
         binned_lc = self.copy()

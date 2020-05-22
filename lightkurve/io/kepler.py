@@ -40,7 +40,7 @@ def read_kepler_lightcurve(filename, flux_column="pdcsap_flux",
     tab = tab[~nans]
 
     time = Time(tab['time'].data,
-                scale=hdu.header['TIMESYS'].lower(),  # Should be TDB
+                scale=hdu.header['TIMESYS'].lower(),
                 format='bkjd')
 
     # Remove original time column
