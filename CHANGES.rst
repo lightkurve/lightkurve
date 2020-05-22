@@ -9,6 +9,10 @@
 - Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
   ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
 
+- Added the ``column`` parameter to ``TargetPixelFile.plot()`` to enable all
+  columns in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
+
+
 
 
 1.11.0 (2015-05-20)
