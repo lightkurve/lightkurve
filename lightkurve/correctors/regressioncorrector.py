@@ -79,7 +79,7 @@ class RegressionCorrector(Corrector):
     """
     def __init__(self, lc):
         # We don't accept NaN in time or flux.
-        if np.any([~np.isfinite(lc.time), ~np.isfinite(lc.flux)]):
+        if np.any([~np.isfinite(lc.time.value), ~np.isfinite(lc.flux)]):
             raise ValueError('Input light curve has NaNs in time or flux. '
                              'Please remove NaNs before correction '
                              '(e.g. using `lc = lc.remove_nans()`).')

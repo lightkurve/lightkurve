@@ -122,14 +122,18 @@ class LightCurve(TimeSeries):
     """
 
     def __getattr__(self, name, **kwargs):
-        """Expose all meta keywords as attributed."""
-        if name in self.meta:
-            return self.meta[name]
+        """Expose all columns and meta keywords as attributes."""
+        if name in self.columns:
+            return self[name]
+        elif ('_meta' in self.__dict__) and (name in self.__dict__['_meta']):
+            return self.__dict__['_meta'][name]
         raise AttributeError(f"object has no attribute {name}")
 
     def __setattr__(self, name, value, **kwargs):
         """To get copied, attributes have to be stored in the meta dictionary!"""
-        if ('_meta' in self.__dict__) and (name in self.__dict__['_meta']):
+        if ('columns' in self.__dict__) and (name in self.__dict__['columns']):
+            self.replace_column(name, value)
+        elif ('_meta' in self.__dict__) and (name in self.__dict__['_meta']):
             self.__dict__['_meta'][name] = value
         else:
             super().__setattr__(name, value, **kwargs)
@@ -162,6 +166,11 @@ class LightCurve(TimeSeries):
     def flux_unit(self):
         # TODO: Add deprecation warning
         return self.flux.unit
+
+    @property
+    def flux_quantity(self):
+        # TODO: Add deprecation warning
+        return self.flux
 
     @property
     def flux(self):
@@ -726,7 +735,7 @@ class LightCurve(TimeSeries):
             new_values[in_original] = np.copy(old_values)
             newdata[column] = new_values
         """
-        return LightCurve(data=newdata)
+        return LightCurve(data=newdata, meta=self.meta)
 
     def remove_outliers(self, sigma=5., sigma_lower=None, sigma_upper=None,
                         return_mask=False, **kwargs):
@@ -1005,10 +1014,9 @@ class LightCurve(TimeSeries):
 
         detrended_lc = self.flatten(window_length=savgol_window,
                                     polyorder=savgol_polyorder)
-        cleaned_lc = detrended_lc.remove_outliers(sigma=sigma)
+        cleaned_lc = detrended_lc.remove_outliers(sigma=sigma).normalize("ppm")
         mean = running_mean(data=cleaned_lc.flux, window_size=transit_duration)
-        cdpp_ppm = np.std(mean) * 1e6
-        return cdpp_ppm
+        return np.std(mean)
 
     def query_solar_system_objects(self, cadence_mask='outliers', radius=None,
                                    sigma=3, location=None, cache=True, return_mask=False):
@@ -1054,6 +1062,8 @@ class LightCurve(TimeSeries):
         sigma : optional, float
             If `cadence_mask` is set to `"outlier"`, `sigma` will be used to identify
             outliers.
+        location : str
+            Spacecraft location. Options include `'kepler'` and `'tess'`.
         cache : optional, bool
             If True will cache the search result in the astropy cache. Set to False
             to request the search again.
@@ -1107,8 +1117,6 @@ class LightCurve(TimeSeries):
         if return_mask:
             return res, np.in1d(self.astropy_time.jd, res.epoch)
         return res
-
-
 
     def _create_plot(self, method='plot', ax=None, normalize=False,
                      xlabel=None, ylabel=None, title='', style='lightkurve',
@@ -1336,37 +1344,21 @@ class LightCurve(TimeSeries):
                                     maximum_period=maximum_period, resolution=resolution)
 
     def to_table(self):
-        """Converts the light curve to an Astropy `~astropy.table.Table` object.
-
-        Returns
-        -------
-        table : `astropy.table.Table`
-            An AstroPy Table with columns 'time', 'flux', and 'flux_err'.
+        """DEPRECATED. `LightCurve` objects are now sub-class instances of
+        `~astropy.table.Table` so a conversion no longer makes sense.
         """
-        tbl = Table.from_pandas(self.to_pandas())
-        if self.time_format is not None:
-            tbl['time'] = self.astropy_time  # Ensure 'time' is an AstroPy `Time` object
-        tbl.meta = self.meta
-        return tbl
+        warnings.warn('`to_table()` has been deprecated. As of Lightkurve v2.0,'
+                      '`LightCurve` is now a sub-class of Astropy Table.',
+                      LightkurveWarning)
+        return self
 
     def to_timeseries(self):
-        """Converts the light curve to an AstroPy
-        `~astropy.timeseries.TimeSeries` object.
-
-        This feature requires AstroPy v3.2 or later (released in 2019).
-        An `ImportError` will be raised if this version is not available.
-
-        Returns
-        -------
-        timeseries : `~astropy.timeseries.TimeSeries`
-            An AstroPy TimeSeries object.
+        """DEPRECATED. `LightCurve` objects are now sub-class instances of
+        `~astropy.timeseries.TimeSeries` so a conversion no longer makes sense.
         """
-        try:
-            from astropy.timeseries import TimeSeries
-        except ImportError:
-            raise ImportError("You need to install AstroPy v3.2 or later to "
-                              "use the LightCurve.to_timeseries() method.")
-        return TimeSeries(self.to_table())
+        warnings.warn('`to_table()` has been deprecated. As of Lightkurve v2.0,'
+                      '`LightCurve` is now a sub-class of Astropy TimeSeries.',
+                      LightkurveWarning)
 
     @staticmethod
     def from_timeseries(ts):
@@ -1398,7 +1390,7 @@ class LightCurve(TimeSeries):
         except ImportError:
             raise ImportError("You need to install Stingray to use "
                               "the LightCurve.to_stringray() method.")
-        return StingrayLightcurve(time=self.time, counts=self.flux,
+        return StingrayLightcurve(time=self.time.value, counts=self.flux,
                                   err=self.flux_err, input_counts=False)
 
     @staticmethod
@@ -1411,43 +1403,6 @@ class LightCurve(TimeSeries):
             A stingray Lightcurve object.
         """
         return LightCurve(time=lc.time, flux=lc.counts, flux_err=lc.counts_err)
-
-    def to_pandas(self, columns=('time', 'flux', 'flux_err')):
-        """Converts the light curve to a Pandas `~pandas.DataFrame` object.
-
-        By default, the object returned will contain the columns 'time', 'flux',
-        and 'flux_err'.  This can be changed using the `columns` parameter.
-
-        Parameters
-        ----------
-        columns : tuple of str
-            List of columns to include in the DataFrame.  The names must match
-            attributes of the `LightCurve` object (e.g. ``time``, ``flux``).
-
-        Returns
-        -------
-        dataframe : `pandas.DataFrame`
-            A data frame indexed by `time` and containing the columns ``flux``
-            and ``flux_err``.
-        """
-        try:
-            import pandas as pd
-        # lightkurve does not require pandas, so check for import success.
-        except ImportError:
-            raise ImportError("You need to install pandas to use the "
-                              "LightCurve.to_pandas() method.")
-        data = {}
-        for col in columns:
-            if hasattr(self, col):
-                data[col] = vars(self)[col]
-                # We need to ensure pandas gets the native byteorder.
-                # x86 uses little endian, so it is reasonable to assume that
-                # we always want little endian, even though FITS uses big endian!
-                # See https://github.com/KeplerGO/lightkurve/issues/188
-                if data[col].dtype.byteorder == '>':  # is big endian?
-                    data[col] = data[col].byteswap().newbyteorder()
-        df = pd.DataFrame(data=data, columns=columns)
-        return df
 
     def to_csv(self, path_or_buf=None, **kwargs):
         """Writes the light curve to a CSV file.
@@ -1604,7 +1559,7 @@ class LightCurve(TimeSeries):
             cols = []
             if ~np.asarray(['TIME' in k.upper() for k in extra_data.keys()]).any():
                 cols.append(fits.Column(name='TIME', format='D', unit=self.time_format,
-                                        array=self.time))
+                                        array=self.time.value))
             if ~np.asarray([flux_column_name in k.upper() for k in extra_data.keys()]).any():
                 cols.append(fits.Column(name=flux_column_name, format='E',
                                         unit='counts', array=self.flux))
@@ -1725,9 +1680,9 @@ class LightCurve(TimeSeries):
             bin_func = lambda y, e: ((np.nanmean(y) - 1)/(np.nansum(e**2)**0.5/len(e)), np.nan)
 
         if hasattr(self, 'time_original'):
-            time = self.time_original
+            time = self.time_original.value
         else:
-            time = self.time
+            time = self.time.value
 
         s = np.argsort(time)
         x, y, e = time[s], self.flux[s], self.flux_err[s]
@@ -1774,7 +1729,7 @@ class LightCurve(TimeSeries):
 
         # If the method is average we need to denormalize the plot
         if method in ['mean', 'median']:
-            ar *= np.nanmedian(self.flux)
+            ar *= np.nanmedian(self.flux.value)
 
         d = np.max([np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 5)),
                     np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 95))])

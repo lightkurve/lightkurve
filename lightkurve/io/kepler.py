@@ -4,9 +4,11 @@ import numpy as np
 
 from astropy.io import registry, fits
 from astropy.table import Table
-from astropy.time import Time, TimeDelta
+from astropy.time import Time
 
 from ..lightcurve import LightCurve
+from ..time import TimeBKJD
+
 
 __all__ = ["read_kepler_lightcurve"]
 
@@ -45,13 +47,15 @@ def read_kepler_lightcurve(filename, flux_column="pdcsap_flux",
 
     # Remove original time column
     tab.remove_column('time')
+    tab.meta['targetid'] = hdulist[0].header['KEPLERID']
+    tab.meta['label'] = hdulist[0].header['OBJECT']
+    tab.meta['ra'] = hdulist[0].header['RA_OBJ']
+    tab.meta['dec'] = hdulist[0].header['DEC_OBJ']
 
     return LightCurve(time=time,
                       flux=tab[flux_column],
                       flux_err=tab[flux_err_column],
-                      data=tab,
-                      targetid=hdulist[0].header['KEPLERID'],
-                      label=hdulist[0].header['OBJECT'])
+                      data=tab)
 
 
 from astropy.io.registry import IORegistryError
