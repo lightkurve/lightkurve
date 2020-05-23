@@ -63,10 +63,14 @@ class LightCurve(TimeSeries):
     >>> lc.bin(binsize=2).flux
     array([0.99, 1.01])
     """
+    old_keywords = ('targetid', 'label')
+
     def __init__(self, data=None, time=None, flux=None, flux_err=None, **kwargs):
-        # Backwards compatibility
-        targetid = kwargs.pop("targetid", None)
-        label = kwargs.pop("label", None)
+        # For backwards compatibility with Lightkurve v1.x,
+        # we'll make sure these attributes exist below.
+        oldkw = {}
+        for kw in self.old_keywords:
+            oldkw[kw] = kwargs.pop("kw", None)
 
         # We are tolerant of missing time if flux is given
         if time is None and flux is not None:
@@ -100,10 +104,11 @@ class LightCurve(TimeSeries):
         if "flux_err" not in self.columns:
             self.add_column(flux_err, name="flux_err")
 
-        if targetid:
-            self.meta['targetid'] = targetid
-        if label:
-            self.meta['label'] = label
+        # Make sure flux and flux_err are the first columns
+
+        # Backwards compatibility with Lightkurve v1.x
+        for kw in oldkw:
+            self.meta[kw] = oldkw[kw]
 
         #self._validate()
 
@@ -1347,8 +1352,9 @@ class LightCurve(TimeSeries):
         """DEPRECATED. `LightCurve` objects are now sub-class instances of
         `~astropy.table.Table` so a conversion no longer makes sense.
         """
-        warnings.warn('`to_table()` has been deprecated. As of Lightkurve v2.0,'
-                      '`LightCurve` is now a sub-class of Astropy Table.',
+        warnings.warn('`to_table()` has been deprecated. `LightCurve` is a '
+                      'sub-class of Astropy Table as of Lightkurve v2.0 '
+                      'and no longer needs to be converted.',
                       LightkurveWarning)
         return self
 
@@ -1356,8 +1362,9 @@ class LightCurve(TimeSeries):
         """DEPRECATED. `LightCurve` objects are now sub-class instances of
         `~astropy.timeseries.TimeSeries` so a conversion no longer makes sense.
         """
-        warnings.warn('`to_table()` has been deprecated. As of Lightkurve v2.0,'
-                      '`LightCurve` is now a sub-class of Astropy TimeSeries.',
+        warnings.warn('`to_timeseries()` has been deprecated. `LightCurve` is a '
+                      'sub-class of Astropy TimeSeries as of Lightkurve v2.0 '
+                      'and no longer needs to be converted.',
                       LightkurveWarning)
 
     @staticmethod
@@ -1949,54 +1956,15 @@ class KeplerLightCurve(LightCurve):
     targetid : int
         Kepler ID number
     """
+    old_keywords = ('targetid', 'label', 'quality_bitmask', 'channel',
+                    'campaign', 'quarter', 'mission', 'ra', 'dec')
+    #extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
 
-    extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
-
-
-    def __init__(self, time=None, flux=None, flux_err=None,
-                 flux_unit=u.Unit('electron/second'), time_format='bkjd', time_scale='tdb',
-                 centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
-                 channel=None, campaign=None, quarter=None, mission=None,
-                 cadenceno=None, targetid=None, ra=None, dec=None, label=None, meta=None):
-        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
-                                               time_format=time_format, time_scale=time_scale,
-                                               targetid=targetid, label=label, meta=meta)
-        self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
-        self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
-        self.quality = self._validate_array(quality, name='quality')
-        self.cadenceno = self._validate_array(cadenceno, name='cadenceno')
-        self.quality_bitmask = quality_bitmask
-        self.channel = channel
-        self.campaign = campaign
-        self.quarter = quarter
-        self.mission = mission
-        self.ra = ra
-        self.dec = dec
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return('KeplerLightCurve(ID: {})'.format(self.targetid))
-
-    def to_pandas(self, columns=('time', 'flux', 'flux_err', 'quality',
-                                 'centroid_col', 'centroid_row')):
-        """Converts the light curve to a Pandas `~pandas.DataFrame` object.
-
-        By default, the object returned will contain the columns 'time', 'flux',
-        'flux_err', 'quality', 'centroid_col', and 'centroid_row'.
-        This can be changed using the `columns` parameter.
-
-        Parameters
-        ----------
-        columns : list of str
-            List of columns to include in the DataFrame.  The names must match
-            attributes of the `LightCurve` object (e.g. `time`, `flux`).
-
-        Returns
-        -------
-        dataframe : `pandas.DataFrame` object
-            A dataframe indexed by `time` and containing the columns `flux`
-            and `flux_err`.
-        """
-        return super(KeplerLightCurve, self).to_pandas(columns=columns)
 
     def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX',
                 aperture_mask=None,**extra_data):
@@ -2096,32 +2064,15 @@ class TessLightCurve(LightCurve):
     targetid : int
         Tess Input Catalog ID number
     """
+    old_keywords = ('targetid', 'label', 'quality_bitmask', 'sector',
+                    'camera', 'ccd', 'mission', 'ra', 'dec')
+    #extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
 
-    extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
-
-    def __init__(self, time=None, flux=None, flux_err=None,
-                 flux_unit=u.Unit('electron/second'), time_format='btjd', time_scale='tdb',
-                 centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
-                 cadenceno=None, sector=None, camera=None, ccd=None,
-                 targetid=None, ra=None, dec=None, label=None, meta=None):
-        super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
-                                             time_format=time_format, time_scale=time_scale,
-                                             targetid=targetid, label=label, meta=meta)
-        self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
-        self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
-        self.quality = self._validate_array(quality, name='quality')
-        self.cadenceno = self._validate_array(cadenceno)
-        self.quality_bitmask = quality_bitmask
-        self.mission = "TESS"
-        self.sector = sector
-        self.camera = camera
-        self.ccd = ccd
-        self.ra = ra
-        self.dec = dec
-
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+   
     def __repr__(self):
         return('TessLightCurve(TICID: {})'.format(self.targetid))
-
 
     def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX',
                 aperture_mask=None, **extra_data):
