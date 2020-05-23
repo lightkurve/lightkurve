@@ -30,7 +30,7 @@ def read_kepler_lightcurve(filename, flux_column="pdcsap_flux",
         tab.rename_column("T", "TIME")
 
     for colname in tab.colnames:
-        # Fix units
+        # Ensure units have the correct format
         if tab[colname].unit == 'e-/s':
             tab[colname].unit = 'electron/s'
         if tab[colname].unit == 'pixels':
@@ -49,7 +49,7 @@ def read_kepler_lightcurve(filename, flux_column="pdcsap_flux",
                 scale=hdu.header['TIMESYS'].lower(),
                 format='bkjd')
 
-    # Remove original time column
+    # Time will be passed to TimeSeries as a separate argument
     tab.remove_column('time')
 
     # For backwards compatibility with Lightkurve v1.x,
