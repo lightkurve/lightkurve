@@ -20,32 +20,32 @@ def test_regressioncorrector_priors():
     """
     lc1 = LightCurve(flux=[5, 10])
     lc2 = LightCurve(flux=[5, 10], flux_err=[1, 1])
-    dm = DesignMatrix(pd.DataFrame({'a':[1, 1], 'b':[1, 2]}))
-    for lc in [lc1, lc2]:
-        rc = RegressionCorrector(lc)
+    design_matrix = DesignMatrix(pd.DataFrame({'a':[1, 1], 'b':[1, 2]}))
+    for dm in [design_matrix, design_matrix.to_sparse()]:
+        for lc in [lc1, lc2]:
+            rc = RegressionCorrector(lc)
 
-        # No prior
-        rc.correct(dm)
-        assert_almost_equal(rc.coefficients, [0, 5])
+            # No prior
+            rc.correct(dm)
+            assert_almost_equal(rc.coefficients, [0, 5])
 
-        # Strict prior centered on correct solution
-        dm.prior_mu = [0, 5]
-        dm.prior_sigma = [1e-6, 1e-6]
-        rc.correct(dm)
-        assert_almost_equal(rc.coefficients, [0, 5])
+            # Strict prior centered on correct solution
+            dm.prior_mu = [0, 5]
+            dm.prior_sigma = [1e-6, 1e-6]
+            rc.correct(dm)
+            assert_almost_equal(rc.coefficients, [0, 5])
 
-        # Strict prior centered on incorrect solution
-        dm.prior_mu = [99, 99]
-        dm.prior_sigma = [1e-6, 1e-6]
-        rc.correct(dm)
-        assert_almost_equal(rc.coefficients, [99, 99])
+            # Strict prior centered on incorrect solution
+            dm.prior_mu = [99, 99]
+            dm.prior_sigma = [1e-6, 1e-6]
+            rc.correct(dm)
+            assert_almost_equal(rc.coefficients, [99, 99])
 
-        # Wide prior centered on incorrect solution
-        dm.prior_mu = [9, 9]
-        dm.prior_sigma = [1e6, 1e6]
-        rc.correct(dm)
-        assert_almost_equal(rc.coefficients, [0, 5])
-
+            # Wide prior centered on incorrect solution
+            dm.prior_mu = [9, 9]
+            dm.prior_sigma = [1e6, 1e6]
+            rc.correct(dm)
+            assert_almost_equal(rc.coefficients, [0, 5])
 
 def test_sinusoid_noise():
     """Can we remove simple sinusoid noise added to a flat light curve?"""
@@ -57,28 +57,29 @@ def test_sinusoid_noise():
     true_lc = LightCurve(time, true_flux, flux_err=0.1*np.ones(size))
     # Noisy light curve has a sinusoid single added
     noisy_lc = LightCurve(time, true_flux+noise, flux_err=true_lc.flux_err)
-    dm = DesignMatrix({'noise': noise,
-                       'offset': np.ones(len(time))},
-                      name='noise_model')
+    design_matrix = DesignMatrix({'noise': noise,
+                                  'offset': np.ones(len(time))},
+                                  name='noise_model')
 
-    # Can we recover the true light curve?
-    rc = RegressionCorrector(noisy_lc)
-    corrected_lc = rc.correct(dm)
-    assert_almost_equal(corrected_lc.normalize().flux, true_lc.flux)
+    for dm in [design_matrix, design_matrix.to_sparse()]:
+        # Can we recover the true light curve?
+        rc = RegressionCorrector(noisy_lc)
+        corrected_lc = rc.correct(dm)
+        assert_almost_equal(corrected_lc.normalize().flux, true_lc.flux)
 
-    # Can we produce the diagnostic plot?
-    rc.diagnose()
+        # Can we produce the diagnostic plot?
+        rc.diagnose()
 
-    # Does it work when we set priors?
-    dm.prior_mu = [0.1, 0.1]
-    dm.prior_sigma = [1e6, 1e6]
-    corrected_lc = RegressionCorrector(noisy_lc).correct(dm)
-    assert_almost_equal(corrected_lc.normalize().flux, true_lc.flux)
+        # Does it work when we set priors?
+        dm.prior_mu = [0.1, 0.1]
+        dm.prior_sigma = [1e6, 1e6]
+        corrected_lc = RegressionCorrector(noisy_lc).correct(dm)
+        assert_almost_equal(corrected_lc.normalize().flux, true_lc.flux)
 
-    # Does it work when `flux_err` isn't available?
-    noisy_lc = LightCurve(time=time, flux=true_flux+noise)
-    corrected_lc = RegressionCorrector(noisy_lc).correct(dm)
-    assert_almost_equal(corrected_lc.normalize().flux, true_lc.flux)
+        # Does it work when `flux_err` isn't available?
+        noisy_lc = LightCurve(time=time, flux=true_flux+noise)
+        corrected_lc = RegressionCorrector(noisy_lc).correct(dm)
+        assert_almost_equal(corrected_lc.normalize().flux, true_lc.flux)
 
 
 def test_nan_input():

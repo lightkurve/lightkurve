@@ -61,6 +61,41 @@ def test_tpf_shapes():
         assert tpf.quality_mask.shape == tpf.hdu[1].data['TIME'].shape
         assert tpf.flux.shape == tpf.flux_err.shape
 
+def test_tpf_math():
+    """Can you add, subtract, multiply and divide?"""
+    with warnings.catch_warnings():
+        # Ignore the "TELESCOP is not equal to TESS" warning
+        warnings.simplefilter("ignore", LightkurveWarning)
+        tpfs = [KeplerTargetPixelFile(filename_tpf_all_zeros),
+                TessTargetPixelFile(filename_tpf_all_zeros)]
+    # These should work
+    for tpf in tpfs:
+        for other in [1, np.ones(tpf.flux.shape[1:]), np.ones(tpf.shape)]:
+            tpf + other
+            tpf - other
+            tpf * other
+            tpf / other
+
+
+            tpf += other
+            tpf -= other
+            tpf *= other
+            tpf /= other
+
+    # These should fail with a value error because their shape is wrong.
+    for tpf in tpfs:
+        for other in [np.asarray([1, 2]), np.arange(len(tpf.time) - 1), np.ones([100, 1]), np.ones([1, 2, 3])]:
+            with pytest.raises(ValueError):
+                tpf + other
+
+    # Check the values are correct
+    assert np.all(((tpf.flux + 2) == (tpf + 2).flux)[np.isfinite(tpf.flux)])
+    assert np.all(((tpf.flux - 2) == (tpf - 2).flux)[np.isfinite(tpf.flux)])
+    assert np.all(((tpf.flux * 2) == (tpf * 2).flux)[np.isfinite(tpf.flux)])
+    assert np.all(((tpf.flux / 2) == (tpf / 2).flux)[np.isfinite(tpf.flux)])
+    assert np.all(((tpf.flux_err * 2) == (tpf * 2).flux_err)[np.isfinite(tpf.flux)])
+    assert np.all(((tpf.flux_err / 2) == (tpf / 2).flux_err)[np.isfinite(tpf.flux)])
+
 
 def test_tpf_plot():
     """Sanity check to verify that tpf plotting works"""
@@ -84,6 +119,15 @@ def test_tpf_plot():
         tpf.plot(scale="log")
         with pytest.raises(ValueError):
             tpf.plot(scale="blabla")
+        tpf.plot(column='FLUX')
+        tpf.plot(column='FLUX_ERR') 
+        tpf.plot(column='FLUX_BKG') 
+        tpf.plot(column='FLUX_BKG_ERR') 
+        tpf.plot(column='RAW_CNTS') 
+        tpf.plot(column='COSMIC_RAYS') 
+        with pytest.raises(ValueError):
+            tpf.plot(column='not a column')
+
         plt.close('all')
 
 
@@ -303,7 +347,7 @@ def test_tpf_factory():
 
     # Can we add our own keywords?
     tpf = factory.get_tpf(hdu0_keywords={'creator': 'Christina TargetPixelFileWriter'})
-    assert tpf.header['CREATOR'] == 'Christina TargetPixelFileWriter'
+    assert tpf.get_keyword('CREATOR') == 'Christina TargetPixelFileWriter'
 
 
 def _create_image_array(header=None, shape=(5, 5)):
@@ -567,3 +611,14 @@ def test_SSOs():
     assert(len(result) == 1)
     result, mask = tpf.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=True, return_mask=True)
     assert(len(mask) == len(tpf.flux))
+
+
+def test_get_header():
+    """Test the basic functionality of ``tpf.get_header()``"""
+    tpf = lkopen(filename_tpf_one_center)
+    assert tpf.get_header()['CHANNEL'] == tpf.get_keyword("CHANNEL")
+    assert tpf.get_header(0)['MISSION'] == tpf.get_keyword("MISSION")
+    assert tpf.get_header(ext=2)['EXTNAME'] == "APERTURE"
+    # ``tpf.header`` is deprecated
+    with pytest.warns(LightkurveWarning, match='deprecated'):
+        tpf.header

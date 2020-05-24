@@ -26,3 +26,9 @@ notebooks:
 upload:
 	ghp-import -m "Update docs" $(BUILDDIR)/html
 	git push origin gh-pages
+
+clean:
+	# Remove previous output
+	-rm -rf $(BUILDDIR)/*
+	# Force autogenerating the API docs
+	-rm source/api/lightkurve.*

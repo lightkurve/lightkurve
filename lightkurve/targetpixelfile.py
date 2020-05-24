@@ -22,7 +22,6 @@ import numpy as np
 from scipy.ndimage import label
 from tqdm import tqdm
 from copy import deepcopy
-import pandas as pd
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
@@ -31,6 +30,7 @@ from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
                    LightkurveWarning, detect_filetype, validate_method, \
                    centroid_quadratic, _query_solar_system_objects
+
 
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
@@ -85,6 +85,47 @@ class TargetPixelFile(object):
             copy[1].data = copy[1].data[selected_idx]
         return self.__class__(copy, quality_bitmask=self.quality_bitmask, targetid=self.targetid)
 
+    def __len__(self):
+        return len(self.time)
+
+    def __add__(self, other):
+        hdu = deepcopy(self.hdu)
+        hdu[1].data['FLUX'][self.quality_mask] += other
+        return type(self)(hdu, quality_bitmask=self.quality_bitmask)
+
+    def __mul__(self, other):
+        hdu = deepcopy(self.hdu)
+        hdu[1].data['FLUX'][self.quality_mask] *= other
+        hdu[1].data['FLUX_ERR'][self.quality_mask] *= other
+        return type(self)(hdu, quality_bitmask=self.quality_bitmask)
+
+    def __rtruediv__(self, other):
+        hdu = deepcopy(self.hdu)
+        hdu[1].data['FLUX'][self.quality_mask] /= other
+        hdu[1].data['FLUX_ERR'][self.quality_mask] /= other
+        return type(self)(hdu, quality_bitmask=self.quality_bitmask)
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        return self.__add__(-1 * other)
+
+    def __rsub__(self, other):
+        return (-1 * self).__add__(other)
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __truediv__(self, other):
+        return self.__mul__(1. / other)
+
+    def __div__(self, other):
+        return self.__truediv__(other)
+
+    def __rdiv__(self, other):
+        return self.__rtruediv__(other)
+
     @property
     def hdu(self):
         return self._hdu
@@ -118,8 +159,36 @@ class TargetPixelFile(object):
 
     @property
     def header(self):
-        """Returns the header of the primary extension."""
+        """DEPRECATED. Please use ``get_header()`` instead."""
+        warnings.warn("`TargetPixelFile.header` is deprecated, please use "
+                      "`TargetPixelFile.get_header()` instead.",
+                      LightkurveWarning)
         return self.hdu[0].header
+
+    def get_header(self, ext=0):
+        """Returns the metadata embedded in the file.
+
+        Target Pixel Files contain embedded metadata headers spread across three
+        different FITS extensions:
+
+        1. The "PRIMARY" extension (``ext=0``) provides a metadata header
+           providing details on the target and its CCD position.
+        2. The "PIXELS" extension (``ext=1``) provides details on the
+           data column and their coordinate system (WCS).
+        3. The "APERTURE" extension (``ext=2``) provides details on the
+           aperture pixel mask and the expected coordinate system (WCS).
+
+        Parameters
+        ----------
+        ext : int or str
+            FITS extension name or number.
+
+        Returns
+        -------
+        header : `~astropy.io.fits.header.Header`
+            Header object containing metadata keywords.
+        """
+        return self.hdu[ext].header
 
     @property
     def ra(self):
@@ -688,7 +757,7 @@ class TargetPixelFile(object):
             return res, np.in1d(self.astropy_time.jd, res.epoch)
         return res
 
-    def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
+    def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, column='FLUX', aperture_mask=None,
              show_colorbar=True, mask_color='pink', title=None, style='lightkurve',
              **kwargs):
         """Plot the pixel data for a single frame (i.e. at a single time).
@@ -707,7 +776,10 @@ class TargetPixelFile(object):
             Alternatively, a cadence number can be provided.
             This argument has priority over frame number.
         bkg : bool
-            If True, background will be added to the pixel values.
+            If True and `column="FLUX"`, background will be added to the pixel values.
+        column : str
+            Choose the FITS data column to be plotted. May be one of ('FLUX',
+            'FLUX_ERR','FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS').
         aperture_mask : ndarray or str
             Highlight pixels selected by aperture_mask.
         show_colorbar : bool
@@ -736,20 +808,35 @@ class TargetPixelFile(object):
                                  "must be in the range {}-{}.".format(
                                      cadenceno, self.cadenceno[0], self.cadenceno[-1]))
         try:
-            if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
-                pflux = self.flux[frame] + self.flux_bkg[frame]
+            if column == 'FLUX':
+                if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
+                    data_to_plot = self.flux[frame] + self.flux_bkg[frame]
+                else:
+                    data_to_plot = self.flux[frame]
             else:
-                pflux = self.flux[frame]
+                data_to_plot = self.hdu[1].data[column][self.quality_mask][frame]
+        except KeyError:
+            raise ValueError("column must be one of the following: ('FLUX','FLUX_ERR',"
+                             "'FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS')")
         except IndexError:
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
+
+        # Make list of preset colour labels
+        clabels = {'FLUX': 'Flux ($e^{-}s^{-1}$)',
+                'FLUX_ERR': 'Flux Err. ($e^{-}s^{-1}$)',
+                'FLUX_BKG': 'Background Flux ($e^{-}s^{-1}$)',
+                'FLUX_BKG_ERR': 'Background Flux Err. ($e^{-}s^{-1}$)',
+                'COSMIC_RAYS': 'Cosmic Ray Flux ($e^{-}s^{-1}$)', 
+                'RAW_CNTS': 'Raw Counts'}
+
         with plt.style.context(style):
             if title is None:
                 title = 'Target ID: {}, Cadence: {}'.format(self.targetid, self.cadenceno[frame])
             img_extent = (self.column, self.column + self.shape[2],
                           self.row, self.row + self.shape[1])
-            ax = plot_image(pflux, ax=ax, title=title, extent=img_extent,
-                            show_colorbar=show_colorbar, **kwargs)
+            ax = plot_image(data_to_plot, ax=ax, title=title, extent=img_extent,
+                            show_colorbar=show_colorbar, clabel = clabels.get(column, column), **kwargs)
             ax.grid(False)
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -927,11 +1014,7 @@ class TargetPixelFile(object):
         if center is None:
             x, y = imshape[0]//2, imshape[1]//2
         elif isinstance(center, SkyCoord):
-            try:
-                x, y = self.wcs.world_to_pixel(center)
-            except AttributeError:
-                # Python 2 compatibility (i.e. syntax of older AstroPy versions)
-                x, y = self.wcs.all_world2pix([[center.ra.value, center.dec.value]], 1)[0]
+            x, y = self.wcs.world_to_pixel(center)
         elif isinstance(center, (tuple, list, np.ndarray)):
             x, y = center
         col = int(x)
@@ -966,7 +1049,7 @@ class TargetPixelFile(object):
             if label in hdu.header:
                 hdu.header[label] = fits.card.Undefined()
 
-        keys = np.asarray([k for k in self.header.keys()])
+        keys = np.asarray([k for k in self.get_header().keys()])
         if 'KEPLERID' in keys:
             hdu.header['KEPLERID'] = '{}{}'.format(hdu.header['KEPLERID'], '_CUTOUT')
         if 'TICID' in keys:
@@ -1084,7 +1167,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 bitmask=quality_bitmask)
 
         # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.header)
+        filetype = detect_filetype(self.get_header())
         if filetype == 'TessTargetPixelFile':
             warnings.warn("A TESS data product is being opened using the "
                           "`KeplerTargetPixelFile` class. "
@@ -1097,7 +1180,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Use the KEPLERID keyword as the default targetid
         if self.targetid is None:
             try:
-                self.targetid = self.header['KEPLERID']
+                self.targetid = self.get_header()['KEPLERID']
             except KeyError:
                 pass
 
@@ -1192,7 +1275,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.header['OBJECT'],
+                'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 flux=flux,
@@ -1214,7 +1297,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.header['OBJECT'],
+                'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
@@ -1737,7 +1820,7 @@ class TessTargetPixelFile(TargetPixelFile):
             self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
 
         # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.header)
+        filetype = detect_filetype(self.get_header())
         if filetype == 'KeplerTargetPixelFile':
             warnings.warn("A Kepler data product is being opened using the "
                           "`TessTargetPixelFile` class. "
@@ -1750,7 +1833,7 @@ class TessTargetPixelFile(TargetPixelFile):
         # Use the TICID keyword as the default targetid
         if self.targetid is None:
             try:
-                self.targetid = self.header['TICID']
+                self.targetid = self.get_header()['TICID']
             except KeyError:
                 pass
 
@@ -1841,7 +1924,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.header['OBJECT'],
+                'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),

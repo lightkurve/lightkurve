@@ -3,6 +3,8 @@
 from __future__ import division, print_function
 
 from astropy.utils.data import get_pkg_data_filename
+from astropy.stats.bls import BoxLeastSquares
+
 import numpy as np
 import pytest
 from scipy import stats
@@ -14,14 +16,6 @@ from ..correctors import SFFCorrector, PLDCorrector
 filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sinusoid.targ.fits.gz")
 filename_synthetic_transit = get_pkg_data_filename("data/synthetic/synthetic-k2-planet.targ.fits.gz")
 filename_synthetic_flat = get_pkg_data_filename("data/synthetic/synthetic-k2-flat.targ.fits.gz")
-
-# BLS is only available in Python 3 versions of AstroPy;
-# so we will need to skip BLS-based tests below when in Python 2.
-lacks_bls = False
-try:
-    from astropy.stats.bls import BoxLeastSquares
-except ImportError:
-    lacks_bls = True
 
 
 def test_sine_sff():
@@ -59,7 +53,6 @@ def test_sine_sff():
             (fractional_amplitude < true_amplitude*1.1) )
 
 
-@pytest.mark.skipif(lacks_bls, reason="Astropy BLS requires Python 3")
 def test_transit_sff():
     """Can we recover a synthetic exoplanet signal using SFF and BLS?"""
     # Retrieve the custom, known signal properties
@@ -88,7 +81,6 @@ def test_transit_sff():
             (pg.depth_at_max_power < max_depth))
 
 
-@pytest.mark.skipif(lacks_bls, reason="Astropy BLS requires Python 3")
 def test_transit_pld():
     """Can we recover a synthetic exoplanet signal using PLD and BLS?"""
     # Retrieve the custom, known signal properties

@@ -1,7 +1,28 @@
-1.11.dev (unreleased)
+2.0.dev (unreleased)
 =====================
 
+- Removed support for Python 2. [#733]
 
+- Added ``SparseDesignMatrix`` and modified ``RegressionCorrector`` to enable
+  systematics removal methods to benefit from ``scipy.sparse`` speed-ups. [#732]
+
+- Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
+  ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
+
+- Added the ``column`` parameter to ``TargetPixelFile.plot()`` to enable all
+  columns in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
+
+
+
+
+1.11.0 (2015-05-20)
+===================
+
+- Deprecated the ``TargetPixelFile.header`` property and ``LightCurveFile.header()``
+  method in favor of a consistent ``get_header()`` method. [#736]
+
+- Fixed a bug in ``tpf.interact_sky()`` which caused star positions to be off
+  by half a pixel. [#734]
 
 
 
