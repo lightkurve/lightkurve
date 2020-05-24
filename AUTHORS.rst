@@ -1,20 +1,29 @@
-Direct code contributions and bugfixes:
+Core developers
+---------------
 
-- `Geert Barentsen <https://github.com/barentsen>`_
+Core developers have been granted commit privileges to the Lightkurve repository based on their sustained contributions.  The core developers aim to govern the project by consensus. If you believe you meet the criteria to be added as a core developer, please open an issue!
+
+- `Geert Barentsen <https://github.com/barentsen>`_ (lead maintainer)
 - `Christina Hedges <https://github.com/christinahedges>`_
 - `José Vinícius de Miranda Cardoso <https://github.com/mirca>`_
+- `Thomas Barclay <https://github.com/mrtommyb>`_
+- `Jessie Dotson <https://github.com/jessie-dotson>`_
 - `Nicholas Saunders <https://github.com/nksaunders>`_
 - `Michael Gully-Santiago <https://github.com/gully>`_
+- `Daniel Hey <https://github.com/danielhey>`_
 - `Oliver Hall <https://github.com/ojhall94>`_
+
+Contributors
+------------
+The following GitHub members directly contributed code and bugfixes:
+
 - `Keaton Bell <https://github.com/keatonb>`_
 - `Sheila Sagear <https://github.com/ssagear>`_
-- `Thomas Barclay <https://github.com/mrtommyb>`_
 - `Ken Mighell <https://github.com/KenMighell>`_
 - `Jose A. Lerma III <https://github.com/JoseALermaIII>`_
 - `Emma Turtelboom <https://github.com/Emmavt>`_
 - `Johnny Zhang <https://github.com/johnnyzhang295>`_
 - `Ann Marie Cody <https://github.com/amcody>`_
-- `Daniel Hey <https://github.com/danielhey>`_
 - `Guy Davies <https://github.com/grd349>`_
 - `Brennan Vincello <https://github.com/brennv>`_
 - `Anand Sundaram <https://github.com/anand-sundaram-zocdoc>`_
@@ -26,11 +35,12 @@ Direct code contributions and bugfixes:
 - `Daniel Foreman-Mackey <https://github.com/dfm>`_
 
 
-Comments, corrections & suggestions:
+Community
+---------
+We are grateful to the following community members for sharing corrections & suggestions which led to improvements to the package:
 
 - `Clare Brasseur <https://github.com/ceb8>`_
 - `Doug Caldwell <https://github.com/dacmess>`_
-- `Jessie Dotson <https://github.com/jessie-dotson>`_
 - `Scott Fleming <https://github.com/scfleming>`_
 - TJ Jaffe
 - `Susan Mullally <https://github.com/mustaric>`_
@@ -63,3 +73,4 @@ Comments, corrections & suggestions:
 - George Jacoby
 - `Attila Bódi <https://github.com/astrobatty>`_
 
+This list is incomplete. Please open an issue if your name is missing!
