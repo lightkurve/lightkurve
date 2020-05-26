@@ -338,7 +338,7 @@ class PLDCorrector(Corrector):
         # X.pca(n_pca_terms)
 
         # higher order
-        # whaaaaaat do I do here? Find out next time.
+        # TODO: add multichoose to DesignMatrix to make this a simple call
 
         # append constant
         X.append_constant()
