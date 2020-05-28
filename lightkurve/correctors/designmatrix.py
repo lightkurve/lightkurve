@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 from numba import jit
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from itertools import combinations_with_replacement as multichoose
 from scipy.sparse import lil_matrix, csr_matrix, hstack, vstack, issparse, find
 
 from .. import MPLSTYLE
@@ -271,6 +273,26 @@ class DesignMatrix():
         dm.prior_mu = np.append(self.prior_mu, prior_mu)
         dm.prior_sigma = np.append(self.prior_sigma, prior_sigma)
         return dm
+
+    def multichoose(self, order=2, nterms=10, prior_mu=0, prior_sigma=np.inf):
+        """Append products of columns as new columns in `DesignMatrix`.
+
+        Returns
+        -------
+        `.DesignMatrix`
+            New design matrix with products of columns appended as new columns.
+        """
+        # higher order PLD design matrices
+        new_dms = [self]
+        for i in range(2, order+1):
+            regressors = np.product(list(multichoose(self.values.T, order)), axis=1).T
+            prior_mu = prior_mu*np.ones(nterms)
+            prior_sigma = prior_sigma*np.ones(nterms)
+            high_order_dm = DesignMatrix(regressors, name=f'Order={order}',
+                            prior_mu=prior_mu, prior_sigma=prior_sigma).pca(nterms)
+            new_dms.append(high_order_dm)
+
+        return DesignMatrixCollection(new_dms)
 
     def _validate(self, rank=True):
         """Helper function for validating."""

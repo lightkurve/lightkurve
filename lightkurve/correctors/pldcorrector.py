@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 __all__ = ['PLDCorrector']
 
 
-class PLDCorrector(Corrector):
+class PLDCorrector(RegressionCorrector):
     r"""Implements the Pixel Level Decorrelation (PLD) systematics removal method.
 
         Pixel Level Decorrelation (PLD) was developed by [1]_ to remove
@@ -92,6 +92,7 @@ class PLDCorrector(Corrector):
         self.flux_err = tpf.flux_err
         self.time = tpf.time
 
+<<<<<<< HEAD
     def correct(self, aperture_mask=None, cadence_mask=None, gp_timescale=30,
                 use_gp=True, pld_order=2, n_pca_terms=10, pld_aperture_mask=None):
         r"""Returns a PLD systematics-corrected LightCurve.
@@ -284,6 +285,11 @@ class PLDCorrector(Corrector):
     def create_pld_design_matrix(self, tpf=None, aperture_mask=None,
                                  pld_aperture_mask=None, pld_order=2,
                                  n_pca_terms=10):
+=======
+    def create_design_matrix(self, tpf=None, aperture_mask=None,
+                             pld_aperture_mask=None, pld_order=2,
+                             n_pca_terms=10, prior_mu=0, prior_sigma=np.inf):
+>>>>>>> subclass RegressionCorrector
         """
         words.
 
@@ -323,24 +329,93 @@ class PLDCorrector(Corrector):
             log.debug('No aperture mask provided; using a threshold mask.')
         else:
             aperture_mask = tpf._parse_aperture_mask(aperture_mask)
+
         if pld_aperture_mask is None:
             pld_aperture_mask = ~tpf._parse_aperture_mask('threshold')
             log.debug('No PLD aperture mask provided; using a threshold mask.')
         else:
             pld_aperture_mask = tpf._parse_aperture_mask(pld_aperture_mask)
 
+        # generate flux light curve from desired pixels
+        lc = self.tpf.to_lightcurve(aperture_mask=aperture_mask)
+        self.lc = lc
+        rawflux = lc.flux
+        rawflux_err = lc.flux_err
+
+        # create nan mask
+        nanmask = np.isfinite(self.time)
+        nanmask &= np.isfinite(rawflux)
+        nanmask &= np.isfinite(rawflux_err)
+        nanmask &= np.abs(rawflux_err) > 1e-12
+
+        # mask out nan values
+        rawflux = rawflux[nanmask]
+        rawflux_err = rawflux_err[nanmask]
+        self.flux = self.flux[nanmask]
+        self.flux_err = self.flux_err[nanmask]
+        self.time = self.time[nanmask]
+
+        # find pixel bounds of aperture on tpf
+        xmin, xmax = min(np.where(pld_aperture_mask)[0]),  max(np.where(pld_aperture_mask)[0])
+        ymin, ymax = min(np.where(pld_aperture_mask)[1]),  max(np.where(pld_aperture_mask)[1])
+
+        # crop data cube to include only desired pixels
+        # this is required for superstamps to ensure matrix is invertable
+        cropped_flux = self.flux[:, xmin:xmax+1, ymin:ymax+1]
+        cropped_flux_err = self.flux_err[:, xmin:xmax+1, ymin:ymax+1]
+        cropped_pld_aperture = pld_aperture_mask[xmin:xmax+1, ymin:ymax+1]
+
+        # calculate errors (ignore warnings related to zero or negative errors)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_err = np.nansum(cropped_flux_err[:, cropped_pld_aperture]**2, axis=1)**0.5
+
         # build initial 1st order PLD design matrix
-        regressors = tpf.flux[:, pld_aperture_mask]
-        X = DesignMatrix(regressors, name='PLD Design Matrix')
+        regressors = cropped_flux[:, cropped_pld_aperture]
+
+        # remove NaN pixels
+        regressors = regressors[:, np.isfinite(regressors).all(axis=0)]
+        X = DesignMatrix(regressors, name='PLD Design Matrix',
+                         prior_mu=prior_mu, prior_sigma=prior_sigma)
 
         # PCA
         # TODO: gotta get rid of those nans first
-        # X.pca(n_pca_terms)
-
-        # higher order
-        # TODO: add multichoose to DesignMatrix to make this a simple call
+        X = X.pca(n_pca_terms)
 
         # append constant
-        X.append_constant()
+        X = X.append_constant(prior_mu=prior_mu, prior_sigma=prior_sigma)
+
+        # higher order
+        if pld_order > 1:
+            X = X.multichoose(order=pld_order, nterms=n_pca_terms,
+                              prior_mu=prior_mu, prior_sigma=prior_sigma)
 
         return X
+
+    def correct(self, pixel_components=3, spline_n_knots=100, spline_degree=3,
+                background_mask=None, restore_trend=True, **kwargs):
+        """Returns a systematics-corrected light curve.
+
+        Parameters
+        ----------
+        pixel_components : int
+            Number of principal components derived from the background pixel
+            time series to utilize.
+        background_mask : array-like or None
+            A boolean array flagging the background pixels such that `True` means
+            that the pixel will be used to generate the background systematics model.
+            If `None`, all pixels which are fainter than 1-sigma above the median
+            flux will be used.
+        restore_trend : bool
+            Whether to restore the long term spline trend to the light curve.
+        """
+        if background_mask is None:
+            # Default to pixels <1-sigma above the background
+            background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
+        self.background_mask = background_mask
+
+        dm = self.create_design_matrix()
+        clc = super(PLDCorrector, self).correct(dm, **kwargs)
+        # if restore_trend:
+        #     clc += self.diagnostic_lightcurves['spline']
+        return clc
