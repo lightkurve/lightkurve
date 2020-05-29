@@ -18,6 +18,7 @@ from astropy.time import Time
 from astropy import units as u
 from astropy.timeseries import TimeSeries
 from astropy.table import vstack
+from astropy.utils.decorators import deprecated_renamed_argument
 
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
@@ -63,13 +64,16 @@ class LightCurve(TimeSeries):
     >>> lc.bin(binsize=2).flux
     array([0.99, 1.01])
     """
-    old_keywords = ('targetid', 'label')
+
+    # The `TimeSeries` base class will enforce the presence of these columns:
+    _required_columns = ['time', 'flux', 'flux_err']
+    _deprecated_keywords = ('targetid', 'label')
 
     def __init__(self, data=None, time=None, flux=None, flux_err=None, **kwargs):
         # For backwards compatibility with Lightkurve v1.x,
-        # we'll make sure these attributes exist below.
+        # we support passing a few deprecated keywords via **kwargs.
         oldkw = {}
-        for kw in self.old_keywords:
+        for kw in self._deprecated_keywords:
             oldkw[kw] = kwargs.pop("kw", None)
 
         # We are tolerant of missing time if flux is given
@@ -110,13 +114,6 @@ class LightCurve(TimeSeries):
         for kw in oldkw:
             self.meta[kw] = oldkw[kw]
 
-        #self._validate()
-
-    #def _validate(self):
-    #    # Trigger warning if time=NaN are present
-    #    if np.isnan(self['time'].value).any():
-    #        warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
-
     """
     def copy(self):
         #Returns a copy.
@@ -128,7 +125,11 @@ class LightCurve(TimeSeries):
 
     def __getattr__(self, name, **kwargs):
         """Expose all columns and meta keywords as attributes."""
-        if name in self.columns:
+        if name in self.__dict__:
+            return self.__dict__[name]
+        elif name in self.__class__.__dict__:
+            return self.__class__.__dict__[name].__get__(self)
+        elif name in self.columns:
             return self[name]
         elif ('_meta' in self.__dict__) and (name in self.__dict__['_meta']):
             return self.__dict__['_meta'][name]
@@ -142,6 +143,16 @@ class LightCurve(TimeSeries):
             self.__dict__['_meta'][name] = value
         else:
             super().__setattr__(name, value, **kwargs)
+
+    def _base_repr_(self, descr_vals=None, **kwargs):
+        """Defines the description shown by `__repr__` and `_html_repr_`."""
+        if descr_vals is None:
+            descr_vals = [self.__class__.__name__]
+            if self.masked:
+                descr_vals.append('masked=True')
+            descr_vals.append(f'targetid={self.targetid}')
+            descr_vals.append('length={}'.format(len(self)))
+        return super()._base_repr_(descr_vals=descr_vals, **kwargs)
 
     @property
     def time(self):
@@ -457,105 +468,79 @@ class LightCurve(TimeSeries):
             return flatten_lc, trend_lc
         return flatten_lc
 
-    def fold(self, period, t0=None, transit_midpoint=None):
-        """Folds the lightcurve at a specified `period` and reference time `t0`.
-
-        This method returns a `~lightkurve.lightcurve.FoldedLightCurve` object
-        in which the time values range between -0.5 to +0.5 (i.e. the phase).
-        Data points which occur exactly at ``t0`` or an integer multiple of
-        ``t0 + n*period`` will have phase value 0.0.
-
-        Examples
-        --------
-        The example below shows a light curve with a period dip which occurs near
-        time value 1001 and has a period of 5 days. Calling the `fold` method
-        will transform the light curve into a
-        `~lightkurve.lightcurve.FoldedLightCurve` object::
-
-            >>> import lightkurve as lk
-            >>> lc = lk.LightCurve(time=range(1001, 1012), flux=[0.5, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 0.5])
-            >>> folded_lc = lc.fold(period=5., t0=1006.)
-            >>> folded_lc   # doctest: +SKIP
-            <lightkurve.lightcurve.FoldedLightCurve>
-
-        An object of type `~lightkurve.lightcurve.FoldedLightCurve` is useful
-        because it provides convenient access to the phase values and the
-        phase-folded fluxes::
-
-            >>> folded_lc.phase
-            array([-0.4, -0.4, -0.2, -0.2,  0. ,  0. ,  0. ,  0.2,  0.2,  0.4,  0.4])
-            >>> folded_lc.flux
-            array([1. , 1. , 1. , 1. , 0.5, 0.5, 0.5, 1. , 1. , 1. , 1. ])
-
-        We can still access the original time values as well::
-
-            >>> folded_lc.time_original
-            array([1004, 1009, 1005, 1010, 1001, 1006, 1011, 1002, 1007, 1003, 1008])
-
-        A `~lightkurve.lightcurve.FoldedLightCurve` inherits all the features
-        of a standard `LightCurve` object. For example, we can very quickly
-        obtain a phase-folded plot using:
-
-            >>> folded_lc.plot()    # doctest: +SKIP
-
+    @deprecated_renamed_argument('transit_midpoint', 'epoch_time', '2.0')
+    @deprecated_renamed_argument('t0', 'epoch_time', '2.0')
+    def fold(self, period=None, epoch_time=None, epoch_phase=0,
+             wrap_phase=None, normalize_phase=False):
+        """
+        Return a new `~lightkurve.lightcurve.FoldedLightCurve` folded with a
+        period and epoch.
 
         Parameters
         ----------
-        period : float
-            The period upon which to fold, in the same units as this
-            LightCurve's ``time`` attribute.
-        t0 : float, optional
-            Time corresponding to zero phase, in the same units as this
-            LightCurve's ``time`` attribute.  Defaults to 0 if not set.
-        transit_midpoint : float, optional
-            Deprecated.  Use `t0` instead.
+        period : `~astropy.units.Quantity`
+            The period to use for folding
+        epoch_time : `~astropy.time.Time`
+            The time to use as the reference epoch, at which the relative time
+            offset / phase will be ``epoch_phase``. Defaults to the first time
+            in the time series.
+        epoch_phase : float or `~astropy.units.Quantity`
+            Phase of ``epoch_time``. If ``normalize_phase`` is `True`, this
+            should be a dimensionless value, while if ``normalize_phase`` is
+            ``False``, this should be a `~astropy.units.Quantity` with time
+            units. Defaults to 0.
+        wrap_phase : float or `~astropy.units.Quantity`
+            The value of the phase above which values are wrapped back by one
+            period. If ``normalize_phase`` is `True`, this should be a
+            dimensionless value, while if ``normalize_phase`` is ``False``,
+            this should be a `~astropy.units.Quantity` with time units.
+            Defaults to half the period, so that the resulting time series goes
+            from ``-period / 2`` to ``period / 2`` (if ``normalize_phase`` is
+            `False`) or -0.5 to 0.5 (if ``normalize_phase`` is `True`).
+        normalize_phase : bool
+            If `False` phase is returned as `~astropy.time.TimeDelta`,
+            otherwise as a dimensionless `~astropy.units.Quantity`.
 
         Returns
         -------
         folded_lightcurve : `~lightkurve.lightcurve.FoldedLightCurve`
-            A new light curve object in which the data are folded and sorted by
-            phase. The object contains an extra ``phase`` attribute.
+            The folded time series object with phase as the ``time`` column.
         """
-        # Input validation.  (Note: Quantities are simply ignored for now;
-        # we should consider adding extra validation here.)
-        if isinstance(period, u.quantity.Quantity):
-            period = period.value
-        if isinstance(t0, u.quantity.Quantity):
-            t0 = t0.value
+        # Lightkurve v1.x assumed that `period` was given in days if no unit
+        # was specified.  We maintain this behavior for backwards-compatibility.
+        # TODO: Raise warning that we'll drop this behavior in the future?
+        if period and not isinstance(period, u.quantity.Quantity):
+            period *= u.day
 
-        # `transit_midpoint` is deprecated
-        if transit_midpoint is not None:
-            warnings.warn('`transit_midpoint` is deprecated, please use `t0` instead.',
-                          LightkurveWarning)
-            if t0 is None:
-                t0 = transit_midpoint
+        ts = super().fold(period=period, epoch_time=epoch_time,
+                          epoch_phase=epoch_phase, wrap_phase=wrap_phase,
+                          normalize_phase=normalize_phase)
 
-        if t0 is None:
-            t0 = 0.
+        # The folded time would pass the `TimeSeries` validation check if
+        # `normalize_phase=True`, so creating a `FoldedLightCurve` object
+        # requires the following three-step workaround:
+        # 1. Give the folded light curve a valid time column again
+        with ts._delay_required_column_checks():
+            folded_time = ts.time.copy()
+            ts.remove_column('time')
+            ts.add_column(self.time, name='time', index=0)
+        # 2. Create the folded object
+        lc = FoldedLightCurve(data=ts)
+        # 3. Restore the folded time
+        with lc._delay_required_column_checks():
+            lc.remove_column('time')
+            lc.add_column(folded_time, name='time', index=0)
 
-        if (t0 > 2450000):
-            if self.time_format == 'bkjd':
-                warnings.warn('`t0` appears to be given in JD, '
-                              'however the light curve time uses BKJD '
-                              '(i.e. JD - 2454833).', LightkurveWarning)
-            elif self.time_format == 'btjd':
-                warnings.warn('`t0` appears to be given in JD, '
-                              'however the light curve time uses BTJD '
-                              '(i.e. JD - 2457000).', LightkurveWarning)
-        phase = (t0 % period) / period
-        fold_time = (((self.time.value - phase * period) / period) % 1)
-        # fold time domain from -.5 to .5
-        fold_time[fold_time > 0.5] -= 1
-        sorted_args = np.argsort(fold_time)
-        return FoldedLightCurve(time=fold_time[sorted_args],
-                                flux=self.flux[sorted_args],
-                                flux_err=self.flux_err[sorted_args],
-                                time_original=self.time[sorted_args],
-                                targetid=self.targetid,
-                                period=period,
-                                t0=t0,
-                                label=self.label,
-                                meta=self.meta)
+        # Add extra column and meta data specific to FoldedLightCurve
+        lc.add_column(self.time.copy(), name="time_original", index=len(self._required_columns))
+        lc._meta['period'] = period
+        lc._meta['epoch_time'] = epoch_time
+        lc._meta['epoch_phase'] = epoch_phase
+        lc._meta['wrap_phase'] = wrap_phase
+        lc._meta['normalize_phase'] = normalize_phase
+        lc.sort('time')
+
+        return lc
 
     def normalize(self, unit='unscaled'):
         """Returns a normalized version of the light curve.
@@ -1139,19 +1124,21 @@ class LightCurve(TimeSeries):
             style = MPLSTYLE
         # Default xlabel
         if xlabel is None:
-            if self.time_format == 'bkjd':
+            if not hasattr(self.time, 'format'):
+                xlabel = "Phase"
+            elif self.time.format == 'bkjd':
                 xlabel = 'Time - 2454833 [BKJD days]'
-            elif self.time_format == 'btjd':
+            elif self.time.format == 'btjd':
                 xlabel = 'Time - 2457000 [BTJD days]'
-            elif self.time_format == 'jd':
+            elif self.time.format == 'jd':
                 xlabel = 'Time [JD]'
             else:
                 xlabel = 'Time'
         # Default ylabel
         if ylabel is None:
-            if normalize or (self.flux_unit == u.dimensionless_unscaled):
+            if normalize or (self.flux.unit == u.dimensionless_unscaled):
                 ylabel = 'Normalized Flux'
-            elif self.flux_unit is None:
+            elif self.flux.unit is None:
                 ylabel = 'Flux'
             else:
                 ylabel = 'Flux [{}]'.format(self.flux_unit.to_string("latex_inline"))
@@ -1785,18 +1772,14 @@ class FoldedLightCurve(LightCurve):
     in which the ``time`` parameter represents phase values.
 
     Compared to the `~lightkurve.lightcurve.LightCurve` base class, this class
-    takes three extra parameters (``period``, ``t0``, ``time_original``),
-    offers extra properties (`phase`, `odd_mask`, `even_mask`),
+    has extra meta data attributes (``period``, ``epoch_time``, ``epoch_phase``,
+    ``wrap_phase``, ``normalize_phase``), one extra column (``time_original``),
+    extra properties (``phase``, ``odd_mask``, ``even_mask``),
     and implements different plotting defaults.
     """
 
-    def __init__(self, time=None, flux=None, flux_err=None, period=None, t0=None,
-                 time_original=None, *args, **kwargs):
-        self.period = period
-        self.t0 = t0
-        self.time_original = time_original
-        super(FoldedLightCurve, self).__init__(time=time, flux=flux,
-            flux_err=flux_err, *args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     @property
     def phase(self):
@@ -1822,8 +1805,8 @@ class FoldedLightCurve(LightCurve):
             >>> f[f.odd_mask].scatter()  # doctest: +SKIP
             >>> f[f.even_mask].scatter()  # doctest: +SKIP
         """
-        cycle = (self.time_original - self.time * (self.period) - self.period * 0.5) / (self.period * 2)
-        return (cycle % 1) < 0.5
+        cycle = (self.time_original - self.time.value * (self.period) - self.period * 0.5) / (self.period * 2)
+        return (cycle.value % 1) < 0.5
 
     @property
     def even_mask(self):
@@ -1956,15 +1939,12 @@ class KeplerLightCurve(LightCurve):
     targetid : int
         Kepler ID number
     """
-    old_keywords = ('targetid', 'label', 'quality_bitmask', 'channel',
-                    'campaign', 'quarter', 'mission', 'ra', 'dec')
+    _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'channel',
+                            'campaign', 'quarter', 'mission', 'ra', 'dec')
     #extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-    def __repr__(self):
-        return('KeplerLightCurve(ID: {})'.format(self.targetid))
 
     def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX',
                 aperture_mask=None,**extra_data):
@@ -2064,16 +2044,13 @@ class TessLightCurve(LightCurve):
     targetid : int
         Tess Input Catalog ID number
     """
-    old_keywords = ('targetid', 'label', 'quality_bitmask', 'sector',
-                    'camera', 'ccd', 'mission', 'ra', 'dec')
+    _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'sector',
+                            'camera', 'ccd', 'mission', 'ra', 'dec')
     #extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
    
-    def __repr__(self):
-        return('TessLightCurve(TICID: {})'.format(self.targetid))
-
     def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX',
                 aperture_mask=None, **extra_data):
         """Writes the KeplerLightCurve to a FITS file.
