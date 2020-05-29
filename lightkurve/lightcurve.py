@@ -95,14 +95,14 @@ class LightCurve(TimeSeries):
         if flux is None:
             flux = np.nan * np.ones_like(time)
         if "flux" not in self.columns:
-            self.add_column(flux, name="flux")
+            self.add_column(flux, name="flux", index=0)
 
         if flux_err is None:
             flux_err = np.nan * np.ones_like(time)
             if self.flux.unit:
                 flux_err *= self.flux.unit
         if "flux_err" not in self.columns:
-            self.add_column(flux_err, name="flux_err")
+            self.add_column(flux_err, name="flux_err", index=1)
 
         # Make sure flux and flux_err are the first columns
 

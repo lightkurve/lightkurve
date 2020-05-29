@@ -54,11 +54,11 @@ def read_kepler_lightcurve(filename, flux_column="pdcsap_flux",
 
     # For backwards compatibility with Lightkurve v1.x,
     # we make sure standard columns and attributes exist.
-    tab.add_column(tab[flux_column], name="flux")
-    tab.add_column(tab[flux_err_column], name="flux_err")
-    tab.add_column(tab['mom_centr1'], name="centroid_col")
-    tab.add_column(tab['mom_centr2'], name="centroid_row")
-    tab.add_column(tab['sap_quality'], name="quality")
+    tab.add_column(tab[flux_column], name="flux", index=0)
+    tab.add_column(tab[flux_err_column], name="flux_err", index=1)
+    tab.add_column(tab['sap_quality'], name="quality", index=2)
+    tab.add_column(tab['mom_centr1'], name="centroid_col", index=3)
+    tab.add_column(tab['mom_centr2'], name="centroid_row", index=4)
 
     tab.meta['targetid'] = hdulist[0].header['KEPLERID']
     tab.meta['label'] = hdulist[0].header['OBJECT']
