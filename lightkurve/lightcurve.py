@@ -16,7 +16,8 @@ from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
 from astropy import units as u
-from astropy.timeseries import TimeSeries
+from astropy.units import Quantity
+from astropy.timeseries import TimeSeries, aggregate_downsample
 from astropy.table import vstack
 from astropy.utils.decorators import deprecated_renamed_argument
 
@@ -76,6 +77,9 @@ class LightCurve(TimeSeries):
         for kw in self._deprecated_keywords:
             oldkw[kw] = kwargs.pop("kw", None)
 
+        self._required_columns = kwargs.pop("_required_columns",
+                                            self._required_columns)
+
         # We are tolerant of missing time if flux is given
         if time is None and flux is not None:
             time = np.arange(len(flux))
@@ -108,11 +112,10 @@ class LightCurve(TimeSeries):
         if "flux_err" not in self.columns:
             self.add_column(flux_err, name="flux_err", index=1)
 
-        # Make sure flux and flux_err are the first columns
-
         # Backwards compatibility with Lightkurve v1.x
         for kw in oldkw:
-            self.meta[kw] = oldkw[kw]
+            if kw not in self.meta:
+                self.meta[kw] = oldkw[kw]
 
     """
     def copy(self):
@@ -150,7 +153,8 @@ class LightCurve(TimeSeries):
             descr_vals = [self.__class__.__name__]
             if self.masked:
                 descr_vals.append('masked=True')
-            descr_vals.append(f'targetid={self.targetid}')
+            if hasattr(self, "targetid"):
+                descr_vals.append(f'targetid={self.targetid}')
             descr_vals.append('length={}'.format(len(self)))
         return super()._base_repr_(descr_vals=descr_vals, **kwargs)
 
@@ -508,8 +512,7 @@ class LightCurve(TimeSeries):
         """
         # Lightkurve v1.x assumed that `period` was given in days if no unit
         # was specified.  We maintain this behavior for backwards-compatibility.
-        # TODO: Raise warning that we'll drop this behavior in the future?
-        if period and not isinstance(period, u.quantity.Quantity):
+        if period and not isinstance(period, Quantity):
             period *= u.day
 
         ts = super().fold(period=period, epoch_time=epoch_time,
@@ -822,7 +825,7 @@ class LightCurve(TimeSeries):
             return self.copy()[~outlier_mask], outlier_mask
         return self.copy()[~outlier_mask]
 
-    def bin(self, binsize=None, bins=None, method='mean'):
+    def bin(self, binsize=None, bins=None, method='mean', time_bin_start=None):
         """Bins a lightcurve in chunks defined by ``binsize`` or ``bins``.
 
         The flux value of the bins will be computed by taking the mean
@@ -870,17 +873,30 @@ class LightCurve(TimeSeries):
             raise ValueError('Both binsize and bins kwargs were passed to '
                              '`.bin()`.  Must assign only one of these.')
 
-        # Only recent versions of AstroPy (>Dec 2018) provide ``calculate_bin_edges``
-        if bins is not None:
-            try:
-                from astropy.stats import calculate_bin_edges
-            except ImportError:
-                from astropy import __version__ as astropy_version
-                raise ImportError("The `bins=` parameter requires astropy >=3.1 or >=2.10, "
-                                  "you currently have astropy version {}. "
-                                  "Update astropy or use the `binsize` argument instead."
-                                  "".format(astropy_version))
+        # If binsize has no units, we'll default to days
+        if binsize and not isinstance(binsize, Quantity):
+            binsize *= u.day
 
+        aggregate_func = np.__dict__['nan' + method]
+
+        ts = aggregate_downsample(self,
+                                  time_bin_size=binsize,
+                                  n_bins=bins,
+                                  aggregate_func=aggregate_func,
+                                  time_bin_start=time_bin_start)
+
+        # Prepare a LightCurve object
+        ts._required_columns = []
+        ts.add_column(ts.time_bin_start + ts.time_bin_size / 2., name="time")
+
+        # Ensure the required columns appear in the correct order
+        for idx, colname in enumerate(LightCurve._required_columns):
+            tmpcol = ts[colname]
+            ts.remove_column(colname)
+            ts.add_column(tmpcol, name=colname, index=idx)
+
+        return LightCurve(ts)
+        """
         # Define and map the functions to be applied to each bin
         method_func = np.__dict__['nan' + method]
         quality_func = lambda x: np.bitwise_or.reduce(x) \
@@ -900,13 +916,6 @@ class LightCurve(TimeSeries):
         statistic_mapper = {key: value
                             for key, value in statistic_mapper.items()
                             if hasattr(self, key)}
-
-        """TODO: restore support for extra columns
-        for column in self.extra_columns:
-            if column in statistic_mapper:
-                continue
-            statistic_mapper[column] = lambda x: np.nan
-        """
 
         # Now create the new binned light curve object
         binned_lc = self.copy()
@@ -943,6 +952,7 @@ class LightCurve(TimeSeries):
                 setattr(binned_lc, attr, binned_stat)
 
         return binned_lc
+        """
 
     def estimate_cdpp(self, transit_duration=13, savgol_window=101,
                       savgol_polyorder=2, sigma=5.):
