@@ -274,25 +274,45 @@ class DesignMatrix():
         dm.prior_sigma = np.append(self.prior_sigma, prior_sigma)
         return dm
 
-    def multichoose(self, order=2, nterms=10, prior_mu=0, prior_sigma=np.inf):
-        """Append products of columns as new columns in `DesignMatrix`.
+    def calculate_regressor_products(self, order=2, n_pca_terms=None, prior_mu=0,
+                                     prior_sigma=np.inf):
+        """Calculate products of columns in `DesignMatrix` and create a new
+        `DesignMatrix` for each order of products. Returns a
+        `DesignMatrixCollection` with one entry per order.
 
         Returns
         -------
         `.DesignMatrix`
             New design matrix with products of columns appended as new columns.
         """
-        # higher order PLD design matrices
+        # higher order design matrices
         new_dms = [self]
         for i in range(2, order+1):
             regressors = np.product(list(multichoose(self.values.T, order)), axis=1).T
-            prior_mu = prior_mu*np.ones(nterms)
-            prior_sigma = prior_sigma*np.ones(nterms)
-            high_order_dm = DesignMatrix(regressors, name=f'Order={order}',
-                            prior_mu=prior_mu, prior_sigma=prior_sigma).pca(nterms)
+
+            # make high order design matrix
+            high_order_dm = DesignMatrix(regressors)
+
+            # apply PCA
+            if n_pca_terms is not None:
+                high_order_dm = high_order_dm.pca(n_pca_terms)
+
             new_dms.append(high_order_dm)
 
-        return DesignMatrixCollection(new_dms)
+        full_df = pd.concat([d.df for d in new_dms], axis=1)
+
+        # TEMP FIX: ensure priors have the right shape
+        # we need to figure out how to handle priors after doing pca
+        if isinstance(prior_mu, (int, float)):
+            prior_mu = prior_mu * np.ones(full_df.shape[1])
+        if isinstance(prior_sigma, (int, float)):
+            prior_sigma = prior_sigma * np.ones(full_df.shape[1])
+
+        full_dm = DesignMatrix(full_df,
+                               name=f'Order={order}',
+                               prior_mu=prior_mu,
+                               prior_sigma=prior_sigma)
+        return full_dm
 
     def _validate(self, rank=True):
         """Helper function for validating."""
