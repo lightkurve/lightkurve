@@ -1332,8 +1332,8 @@ class LightCurve(TimeSeries):
         display the BLS tool as follows:
 
             >>> import lightkurve as lk
-            >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()  # doctest: +SKIP
-            >>> lc = lc.PDCSAP_FLUX.normalize().flatten()  # doctest: +SKIP
+            >>> lc = lk.search_lightcurve('kepler-10', quarter=3).download()  # doctest: +SKIP
+            >>> lc = lc.normalize().flatten()  # doctest: +SKIP
             >>> lc.interact_bls()  # doctest: +SKIP
 
         References
@@ -1909,7 +1909,7 @@ class FoldedLightCurve(LightCurve):
 
 class KeplerLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
-    which holds extra data specific to the Kepler mission.
+    which holds extra data specific to the Kepler and K2 mission.
 
     Attributes
     ----------

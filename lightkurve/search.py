@@ -10,19 +10,22 @@ from requests import HTTPError
 import numpy as np
 from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
-from astropy.io import ascii, fits
+from astropy.io import ascii
 from astropy import units as u
 from astropy.utils.exceptions import AstropyWarning
+from astropy.utils import deprecated
 
 from .targetpixelfile import TargetPixelFile
-from .collections import TargetPixelFileCollection, LightCurveFileCollection
-from .utils import suppress_stdout, LightkurveWarning, detect_filetype
+from .collections import TargetPixelFileCollection
+from .utils import suppress_stdout, LightkurveWarning, LightkurveDeprecationWarning
+from .io import read
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_tesscut',
-           'open', 'SearchResult']
+__all__ = ['search_targetpixelfile', 'search_lightcurve',
+           'search_lightcurvefile', 'search_tesscut',
+           'SearchResult']
 
 
 class SearchError(Exception):
@@ -31,7 +34,7 @@ class SearchError(Exception):
 
 class SearchResult(object):
     """Container for the results returned by `search_targetpixelfile`,
-    `search_lightcurvefile`, or `search_tesscut`.
+    `search_lightcurve`, or `search_tesscut`.
 
     The purpose of this class is to provide a convenient way to inspect and
     download products that have been identified using one of the data search
@@ -132,7 +135,7 @@ class SearchResult(object):
         """Private method used by `download()` and `download_all()` to download
         exactly one file from the MAST archive.
 
-        Always returns a `TargetPixelFile` or `LightCurveFile` object.
+        Always returns a `TargetPixelFile` or `LightCurve` object.
         """
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
@@ -180,7 +183,7 @@ class SearchResult(object):
 
     @suppress_stdout
     def download(self, quality_bitmask='default', download_dir=None, cutout_size=None):
-        """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
+        """Returns a single `LightCurve` or `TargetPixelFile` object.
 
         If multiple files are present in `SearchResult.table`, only the first
         will be downloaded.
@@ -210,7 +213,7 @@ class SearchResult(object):
 
         Returns
         -------
-        data : `TargetPixelFile` or `LightCurveFile` object
+        data : `TargetPixelFile` or `LightCurve` object
             The first entry in the products table.
 
         Raises
@@ -240,7 +243,7 @@ class SearchResult(object):
     @suppress_stdout
     def download_all(self, quality_bitmask='default', download_dir=None, cutout_size=None):
         """Returns a `~lightkurve.collections.TargetPixelFileCollection` or
-        `~lightkurve.collections.LightCurveFileCollection`.
+        `~lightkurve.collections.LightCurveCollection`.
 
          Parameters
          ----------
@@ -268,7 +271,7 @@ class SearchResult(object):
         Returns
         -------
         collection : `~lightkurve.collections.Collection` object
-            Returns a `~lightkurve.collections.LightCurveFileCollection` or
+            Returns a `~lightkurve.collections.LightCurveCollection` or
             `~lightkurve.collections.TargetPixelFileCollection`,
             containing all entries in the products table
 
@@ -294,7 +297,7 @@ class SearchResult(object):
         if isinstance(products[0], TargetPixelFile):
             return TargetPixelFileCollection(products)
         else:
-            return LightCurveFileCollection(products)
+            return LightCurveCollection(products)
 
     def _default_download_dir(self):
         """Returns the default path to the directory where files will be downloaded.
@@ -483,11 +486,16 @@ def search_targetpixelfile(target, radius=None, cadence='long',
         return SearchResult(None)
 
 
-def search_lightcurvefile(target, radius=None, cadence='long',
-                          mission=('Kepler', 'K2', 'TESS'), quarter=None,
-                          month=None, campaign=None, sector=None, limit=None):
+@deprecated("2.0", alternative="search_lightcurve()", warning_type=LightkurveDeprecationWarning)
+def search_lightcurvefile(*args, **kwargs):
+    return search_lightcurve(*args, **kwargs)
+
+
+def search_lightcurve(target, radius=None, cadence='long',
+                      mission=('Kepler', 'K2', 'TESS'), quarter=None,
+                      month=None, campaign=None, sector=None, limit=None):
     """Searches the `public data archive at MAST <https://archive.stsci.edu>`_ for a Kepler or TESS
-    :class:`LightCurveFile <lightkurve.lightcurvefile.LightCurveFile>`.
+    :class:`LightCurve <lightkurve.lightcurve.LightCurve>`.
 
     This function fetches a data table that lists the Light Curve Files
     that fall within a region of sky centered around the position of `target`
@@ -529,10 +537,10 @@ def search_lightcurvefile(target, radius=None, cadence='long',
 
     Examples
     --------
-    This example demonstrates how to use the `search_lightcurvefile()` function to
-    query and download data. Before instantiating a `KeplerLightCurveFile` object or
+    This example demonstrates how to use the `search_lightcurve()` function to
+    query and download data. Before instantiating a `KeplerLightCurve` object or
     downloading any science products, we can identify potential desired targets with
-    `search_lightcurvefile`::
+    `search_lightcurve`::
 
         >>> from lightkurve import search_lightcurvefile  # doctest: +SKIP
         >>> search_result = search_lightcurvefile("Kepler-10")  # doctest: +SKIP
@@ -984,68 +992,12 @@ def _mask_tess_products(products, sector=None, filetype='Target Pixel'):
     return mask
 
 
-def open(path_or_url, **kwargs):
-    """Opens any valid Kepler or TESS data file and returns an instance of
-    `~lightkurve.lightcurvefile.LightCurveFile` or
-    `~lightkurve.targetpixelfile.TargetPixelFile`.
-
-    This function will use the `detect_filetype()` function to
-    automatically detect the type of the data product, and return the
-    appropriate object. File types currently supported are::
-
-        * `KeplerTargetPixelFile` (typical suffix "-targ.fits.gz");
-        * `KeplerLightCurveFile` (typical suffix "llc.fits");
-        * `TessTargetPixelFile` (typical suffix "_tp.fits");
-        * `TessLightCurveFile` (typical suffix "_lc.fits").
-
-    Parameters
-    ----------
-    path_or_url : str
-        Path or URL of a FITS file.
-
-    Returns
-    -------
-    data : a subclass of  `~lightkurve.targetpixelfile.TargetPixelFile` or
-        `~lightkurve.lightcurvefile.LightCurveFile`, depending on the detected file type.
-
-    Raises
-    ------
-    ValueError : raised if the data product is not recognized as a Kepler or
-        TESS product.
-
-    Examples
-    --------
-    To open a target pixel file using its path or URL, simply use:
-
-        >>> tpf = open("mytpf.fits")  # doctest: +SKIP
-    """
-    log.debug("Opening {}.".format(path_or_url))
-    # pass header into `detect_filetype()`
-    try:
-        with fits.open(path_or_url) as temp:
-            filetype = detect_filetype(temp[0].header)
-            log.debug("Detected filetype: '{}'.".format(filetype))
-    except OSError as e:
-        filetype = None
-        # Raise an explicit FileNotFoundError if file not found
-        if 'No such file' in str(e):
-            raise e
-
-    # if the filetype is recognized, instantiate a class of that name
-    if filetype is not None:
-        return getattr(__import__('lightkurve'), filetype)(path_or_url, **kwargs)
-    else:
-        # if these keywords don't exist, raise `ValueError`
-        raise ValueError("Not recognized as a Kepler or TESS data product: "
-                         "{}".format(path_or_url))
-
-
 def _open_downloaded_file(path, **kwargs):
     """Wrapper around `open()` which yields a more clear error message when
     the file was downloaded from MAST but corrupted, e.g. due to the
     download having been interrupted."""
     try:
-        return open(path, **kwargs)
+        return read(path, **kwargs)
     except ValueError:
         raise SearchError("Failed to open the downloaded file ({}). "
                           "The file was likely only partially downloaded. "

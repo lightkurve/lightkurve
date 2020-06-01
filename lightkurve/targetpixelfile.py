@@ -28,8 +28,9 @@ from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
-                   LightkurveWarning, detect_filetype, validate_method, \
+                   LightkurveWarning, validate_method, \
                    centroid_quadratic, _query_solar_system_objects
+from .io import detect_filetype
 
 
 

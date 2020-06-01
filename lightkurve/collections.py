@@ -7,18 +7,15 @@ import numpy as np
 
 from . import MPLSTYLE
 from .utils import LightkurveWarning
-from .lightcurvefile import LightCurveFile
 from .targetpixelfile import TargetPixelFile
 
 log = logging.getLogger(__name__)
 
-__all__ = ['LightCurveCollection', 'LightCurveFileCollection',
-           'TargetPixelFileCollection']
+__all__ = ['LightCurveCollection', 'TargetPixelFileCollection']
 
 
 class Collection(object):
-    """Base class for `LightCurveCollection`, `LightCurveFileCollection`,
-    and `TargetPixelFileCollection`.
+    """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
 
     Attributes
     ----------
@@ -49,9 +46,7 @@ class Collection(object):
 
     def __repr__(self):
         result = "{} of {} objects:\n".format(self.__class__.__name__, len(self.data))
-        if (isinstance(self[0], LightCurveFile)):
-            labels = np.asarray([lcf.SAP_FLUX.label for lcf in self])
-        elif (isinstance(self[0], TargetPixelFile)):
+        if (isinstance(self[0], TargetPixelFile)):
             labels = np.asarray([tpf.targetid for tpf in self])
         else:
             labels = np.asarray([lcf.label for lcf in self])
@@ -174,71 +169,6 @@ class LightCurveCollection(Collection):
                         (self[jdx].normalize() + idx*offset).plot(ax=ax, c='C{}'.format(idx), normalize=False, **kwargs)
                     else:
                         (self[jdx].normalize() + idx*offset).plot(ax=ax, c='C{}'.format(idx), normalize=False, label='', **kwargs)
-        return ax
-
-
-class LightCurveFileCollection(Collection):
-    """Class to hold a collection of LightCurveFile objects.
-
-    Parameters
-    ----------
-    lightcurvefiles : array-like
-        List of KeplerLightCurveFile or TessLightCurveFile objects.
-    """
-
-    def __init__(self, lightcurvefiles):
-        super(LightCurveFileCollection, self).__init__(lightcurvefiles)
-
-    @property
-    def PDCSAP_FLUX(self):
-        return LightCurveCollection([lcf.PDCSAP_FLUX for lcf in self])
-
-    @property
-    def SAP_FLUX(self):
-        return LightCurveCollection([lcf.SAP_FLUX for lcf in self])
-
-    def stitch(self):
-        """Combine all `PDCSAP_FLUX` extensions in the collection into a single
-        `lightkurve.lightcurve.LightCurve` object.
-
-        This is a shorthand for `LightCurveFileCollection.PDCSAP_FLUX.stitch()`.
-        If you want to combine SAP_FLUX light curves instead, use
-        `LightCurveFileCollection.SAP_FLUX.stitch()`.
-        """
-        try:
-            warnings.warn("Stitching a `LightCurveFileCollection` which contains "
-                          "both SAP and PDCSAP_FLUX. Using PDCSAP_FLUX. "
-                          "You can remove this warning by explicitely using "
-                          "`LightCurveFileCollection.PDCSAP_FLUX.stitch()`.",
-                          LightkurveWarning)
-            return self.PDCSAP_FLUX.stitch()
-        except ValueError:
-            return self.SAP_FLUX.stitch()
-
-    def plot(self, ax=None, **kwargs):
-        """Plot all PDCSAP_FLUX light curves in the collection on a single axes.
-
-        This a shorthand for `LightCurveFileCollection.PDCSAP_FLUX.plot()`.
-
-        Parameters
-        ----------
-        ax : `~matplotlib.axes.Axes`
-            A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be created.
-
-        Returns
-        -------
-        ax : `~matplotlib.axes.Axes`
-            The matplotlib axes object.
-        """
-        try:
-            warnings.warn('Plotting a `LightCurveFileCollection` which contains both SAP and '
-                          'PDCSAP_FLUX. Plotting PDCSAP_FLUX. You can remove this warning by '
-                          'using `LightCurveFileCollection.PDCSAP_FLUX.plot()`.',
-                         LightkurveWarning)
-            ax = self.PDCSAP_FLUX.plot(ax=ax)
-        except ValueError:
-            ax = self.SAP_FLUX.plot(ax=ax)
         return ax
 
 

@@ -3,30 +3,29 @@ import logging
 import warnings
 
 from astropy.io import fits
+from astropy.utils import deprecated
 
 from ..lightcurve import KeplerLightCurve, TessLightCurve
-from ..utils import validate_method, LightkurveWarning
+from ..utils import validate_method, LightkurveWarning, LightkurveDeprecationWarning
 
 log = logging.getLogger(__name__)
 
-__all__ = ['open', 'read', 'read_k2sff', 'read_everest']
+__all__ = ['open', 'read', 'read_k2sff', 'read_everest', 'detect_filetype']
 
 
+@deprecated("2.0", alternative="read()", warning_type=LightkurveDeprecationWarning)
 def open(path_or_url, **kwargs):
     """DEPRECATED. Please use `lk.read()` instead.
 
     This function has been deprecated because its name collides with Python's
     built-in `open()` function.
     """
-    warnings.warn("`lightkurve.open()` is deprecated, please use "
-                  "`lightkurve.read()` instead.",
-                    LightkurveWarning)
     return read(path_or_url, **kwargs)
 
 
 def read(path_or_url, **kwargs):
     """Reads any valid Kepler or TESS data file and returns an instance of
-    `~lightkurve.lightcurvefile.LightCurveFile` or
+    `~lightkurve.lightcurve.LightCurve` or
     `~lightkurve.targetpixelfile.TargetPixelFile`.
 
     This function will use the `detect_filetype()` function to
@@ -34,9 +33,9 @@ def read(path_or_url, **kwargs):
     appropriate object. File types currently supported are::
 
         * `KeplerTargetPixelFile` (typical suffix "-targ.fits.gz");
-        * `KeplerLightCurveFile` (typical suffix "llc.fits");
+        * `KeplerLightCurve` (typical suffix "llc.fits");
         * `TessTargetPixelFile` (typical suffix "_tp.fits");
-        * `TessLightCurveFile` (typical suffix "_lc.fits").
+        * `TessLightCurve` (typical suffix "_lc.fits").
 
     Parameters
     ----------
@@ -46,7 +45,7 @@ def read(path_or_url, **kwargs):
     Returns
     -------
     data : a subclass of  `~lightkurve.targetpixelfile.TargetPixelFile` or
-        `~lightkurve.lightcurvefile.LightCurveFile`, depending on the detected file type.
+        `~lightkurve.lightcurve.LightCurve`, depending on the detected file type.
 
     Raises
     ------
@@ -72,10 +71,10 @@ def read(path_or_url, **kwargs):
             raise e
 
     # Community-provided science products
-    if filetype == "KeplerLightCurveFile":
-        return KeplerLightCurve.read(path_or_url, format='kepler')
-    elif filetype == "TessLightCurveFile":
-        return TessLightCurve.read(path_or_url, format='tess')
+    if filetype == "KeplerLightCurve":
+        return KeplerLightCurve.read(path_or_url, format='kepler', **kwargs)
+    elif filetype == "TessLightCurve":
+        return TessLightCurve.read(path_or_url, format='tess', **kwargs)
     elif filetype == "K2SFF":
         return read_k2sff(path_or_url, **kwargs)
     elif filetype == "EVEREST":
@@ -177,8 +176,8 @@ def detect_filetype(hdulist):
 
         * `'KeplerTargetPixelFile'`
         * `'TessTargetPixelFile'`
-        * `'KeplerLightCurveFile'`
-        * `'TessLightCurveFile'`
+        * `'KeplerLightCurve'`
+        * `'TessLightCurve'`
 
     In addition, community-provided data products such as K2SFF are supported.
 
@@ -230,14 +229,14 @@ def detect_filetype(hdulist):
             # Kepler LCFs will contain "FluxExporter2PipelineModule"
             elif ('fluxexporter' in creator or 'lightcurve' in creator
                 or 'lightcurve' in creator):
-                return 'KeplerLightCurveFile'
+                return 'KeplerLightCurve'
         elif telescop == 'tess':
             # TESS TPFs will contain "TargetPixelExporterPipelineModule"
             if 'targetpixel' in creator:
                 return 'TessTargetPixelFile'
             # TESS LCFs will contain "LightCurveExporterPipelineModule"
             elif 'lightcurve' in creator:
-                return 'TessLightCurveFile'
+                return 'TessLightCurve'
             # Early versions of TESScut did not set a good CREATOR keyword
             elif 'stsci' in origin:
                 return 'TessTargetPixelFile'
