@@ -4,8 +4,8 @@ import warnings
 
 from astropy.io import fits
 
-from .lightcurve import KeplerLightCurve
-from .utils import validate_method, LightkurveWarning
+from ..lightcurve import KeplerLightCurve, TessLightCurve
+from ..utils import validate_method, LightkurveWarning
 
 log = logging.getLogger(__name__)
 
@@ -72,7 +72,11 @@ def read(path_or_url, **kwargs):
             raise e
 
     # Community-provided science products
-    if filetype == "K2SFF":
+    if filetype == "KeplerLightCurveFile":
+        return KeplerLightCurve.read(path_or_url, format='kepler')
+    elif filetype == "TessLightCurveFile":
+        return TessLightCurve.read(path_or_url, format='tess')
+    elif filetype == "K2SFF":
         return read_k2sff(path_or_url, **kwargs)
     elif filetype == "EVEREST":
         return read_everest(path_or_url, **kwargs)
