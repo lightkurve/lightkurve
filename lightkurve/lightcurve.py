@@ -68,14 +68,23 @@ class LightCurve(TimeSeries):
 
     # The `TimeSeries` base class will enforce the presence of these columns:
     _required_columns = ['time', 'flux', 'flux_err']
-    _deprecated_keywords = ('targetid', 'label')
+    _deprecated_keywords = ['targetid', 'label']
+    _removed_keywords = ['time_format', 'time_scale', 'flux_unit']
 
     def __init__(self, data=None, time=None, flux=None, flux_err=None, **kwargs):
+        # Delay checking for required columns until the end
+        self._required_columns_relax = True
+
         # For backwards compatibility with Lightkurve v1.x,
         # we support passing a few deprecated keywords via **kwargs.
-        oldkw = {}
+        deprecated_kws = {}
         for kw in self._deprecated_keywords:
-            oldkw[kw] = kwargs.pop("kw", None)
+            deprecated_kws[kw] = kwargs.pop(kw, None)
+        removed_kws = {}
+        for kw in self._removed_keywords:
+            if kw in kwargs:
+                removed_kws[kw] = kwargs.pop(kw)
+
 
         self._required_columns = kwargs.pop("_required_columns",
                                             self._required_columns)
@@ -85,37 +94,42 @@ class LightCurve(TimeSeries):
             time = np.arange(len(flux))
         # We are tolerant of missing time format
         if time is not None and not isinstance(time, Time):
-            time = Time(time, format='mjd')  # Default to MJD
+            # Lightkurve v1.x supported specifying the time_format
+            # as a constructor kwarg
+            time = Time(time,
+                        format=removed_kws.get("time_format", "bkjd"),
+                        scale=removed_kws.get("time_scale", "tdb"))
 
         super().__init__(data=data, time=time, **kwargs)
 
         # For some operations, an empty time series needs to be created, then
         # columns added one by one. We should check that when columns are added
         # manually, time is added first and is of the right type.
-        if data is None and time is None and flux is None:
+        if data is None and time is None and flux is None and flux_err is None:
             self._required_columns_relax = True
             return
-
-        # TODO: `flux_unit`, `time_format`, `time_scale` are deprecated
-        # raise a warning here if given?
 
         # Ensure the required columns are available
         if flux is None:
             flux = np.nan * np.ones_like(time)
         if "flux" not in self.columns:
-            self.add_column(flux, name="flux", index=0)
+            self.add_column(flux, name="flux", index=1)
 
         if flux_err is None:
             flux_err = np.nan * np.ones_like(time)
             if self.flux.unit:
                 flux_err *= self.flux.unit
         if "flux_err" not in self.columns:
-            self.add_column(flux_err, name="flux_err", index=1)
+            self.add_column(flux_err, name="flux_err", index=2)
 
         # Backwards compatibility with Lightkurve v1.x
-        for kw in oldkw:
+        for kw in deprecated_kws:
             if kw not in self.meta:
-                self.meta[kw] = oldkw[kw]
+                self.meta[kw] = deprecated_kws[kw]
+
+        self._required_columns_relax = False
+        self._check_required_columns()
+
 
     """
     def copy(self):
@@ -514,6 +528,8 @@ class LightCurve(TimeSeries):
         # was specified.  We maintain this behavior for backwards-compatibility.
         if period and not isinstance(period, Quantity):
             period *= u.day
+        if epoch_time and not isinstance(epoch_time, Time):
+            epoch_time = Time(epoch_time, format=self.time.format, scale=self.time.scale)
 
         ts = super().fold(period=period, epoch_time=epoch_time,
                           epoch_phase=epoch_phase, wrap_phase=wrap_phase,
@@ -1953,8 +1969,8 @@ class KeplerLightCurve(LightCurve):
                             'campaign', 'quarter', 'mission', 'ra', 'dec')
     #extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX',
                 aperture_mask=None,**extra_data):

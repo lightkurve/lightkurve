@@ -13,8 +13,8 @@ import pytest
 import tempfile
 import warnings
 
+from ..io import read
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
-from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..utils import LightkurveWarning
 from .test_targetpixelfile import TABBY_TPF
@@ -37,29 +37,20 @@ filename_K2_custom = get_pkg_data_filename("data/test_K2_interact_generated_cust
 # `asteroid_test.fits` is a single cadence of TESS FFI data which contains a known solar system object
 asteroid_TPF = get_pkg_data_filename("data/asteroid_test.fits")
 
+
 def test_invalid_lightcurve():
     """Invalid LightCurves should not be allowed."""
-    err_string = ("Input arrays have different lengths."
-                  " len(time)=5, len(flux)=4")
     time = np.array([1, 2, 3, 4, 5])
     flux = np.array([1, 2, 3, 4])
     with pytest.raises(ValueError) as err:
         LightCurve(time=time, flux=flux)
-    assert err_string == err.value.args[0]
-
-
-def test_empty_lightcurve():
-    """LightCurves with no data should not be allowed."""
-    err_string = ("either time or flux must be given")
-    with pytest.raises(ValueError) as err:
-        LightCurve()
-    assert err_string == err.value.args[0]
+    assert err.value.args[0] == "Inconsistent data column lengths"
 
 
 def test_lc_nan_time():
     time = np.array([1, 2, 3, np.nan])
     flux = np.array([1, 2, 3, 4])
-    with pytest.warns(LightkurveWarning, match='contains NaN times'):
+    with pytest.raises(ValueError):
         LightCurve(time=time, flux=flux)
 
 
@@ -176,12 +167,8 @@ def test_TessLightCurveFile(quality_bitmask):
                                                      (1, 3279), (100, 3252), (2096639, 2661)])
 def test_bitmasking(quality_bitmask, answer):
     """Test whether the bitmasking behaves like it should"""
-    lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=quality_bitmask)
-    with warnings.catch_warnings():
-        # Ignore "LightCurve contains NaN times" warnings triggered by liberal masks
-        warnings.simplefilter("ignore", LightkurveWarning)
-        flux = lcf.get_lightcurve('SAP_FLUX').flux
-    assert len(flux) == answer
+    lc = read(TABBY_Q8, quality_bitmask=quality_bitmask)
+    assert len(lc) == answer
 
 
 def test_lightcurve_fold():
@@ -194,7 +181,8 @@ def test_lightcurve_fold():
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
     assert fold.targetid == lc.targetid
     assert fold.label == lc.label
-    assert fold.meta == lc.meta
+    assert set(lc.meta).issubset(set(fold.meta))
+    assert lc.meta['ccd'] == fold.meta['ccd']
     assert_array_equal(np.sort(fold.time_original), lc.time)
     assert len(fold.time_original) == len(lc.time)
     fold = lc.fold(period=1, t0=-0.1)

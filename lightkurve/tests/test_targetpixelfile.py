@@ -22,7 +22,7 @@ from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactor
 from ..targetpixelfile import TessTargetPixelFile
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning
-from ..search import open as lkopen
+from ..io import read as lkopen
 
 from .test_synthetic_data import filename_synthetic_flat
 
