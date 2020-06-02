@@ -18,7 +18,7 @@ from astropy import units as u
 from astropy.units import Quantity
 from astropy.timeseries import TimeSeries, aggregate_downsample
 from astropy.table import vstack
-from astropy.utils.decorators import deprecated_renamed_argument
+from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
@@ -120,9 +120,9 @@ class LightCurve(TimeSeries):
             self.add_column(flux, name="flux", index=1)
 
         if flux_err is None:
-            flux_err = np.nan * np.ones_like(time)
-            if self.flux.unit:
-                flux_err *= self.flux.unit
+            flux_err = Quantity(np.nan * np.ones_like(time), unit=self.flux.unit)
+            #if self.flux.unit:
+            #    flux_err *= self.flux.unit
         if "flux_err" not in self.columns:
             self.add_column(flux_err, name="flux_err", index=2)
 
@@ -138,16 +138,6 @@ class LightCurve(TimeSeries):
 
         self._required_columns_relax = False
         self._check_required_columns()
-
-
-    """
-    def copy(self):
-        #Returns a copy.
-        cp = super().copy()
-        cp.targetid = self.targetid
-        cp.label = self.label
-        return cp
-    """
 
     def __getattr__(self, name, **kwargs):
         """Expose all columns and meta keywords as attributes."""
@@ -180,6 +170,33 @@ class LightCurve(TimeSeries):
                 descr_vals.append(f'targetid={self.targetid}')
             descr_vals.append('length={}'.format(len(self)))
         return super()._base_repr_(descr_vals=descr_vals, **kwargs)
+
+    @property
+    @deprecated("2.0")
+    def hdu(self):
+        return fits.open(self.filename)
+
+    @property
+    @deprecated("2.0")
+    def SAP_FLUX(self):
+        """A copy of the light curve in which `lc.flux = lc.sap_flux`
+        and `lc.flux_err = lc.sap_flux_err`.  It is provided for backwards-
+        compatibility with Lightkurve v1.x and will be removed soon."""
+        lc = self.copy()
+        lc['flux'] = lc['sap_flux']
+        lc['flux_err'] = lc['sap_flux_err']
+        return lc
+
+    @property
+    @deprecated("2.0")
+    def PDCSAP_FLUX(self):
+        """A copy of the light curve in which `lc.flux = lc.pdcsap_flux`
+        and `lc.flux_err = lc.pdcsap_flux_err`.  It is provided for backwards-
+        compatibility with Lightkurve v1.x and will be removed soon."""
+        lc = self.copy()
+        lc['flux'] = lc['pdcsap_flux']
+        lc['flux_err'] = lc['pdcsap_flux_err']
+        return lc
 
     @property
     def time(self):
@@ -460,7 +477,7 @@ class LightCurve(TimeSeries):
             low = np.append([0], cut)
             high = np.append(cut, len(self.time[mask]))
             # Then, apply the savgol_filter to each segment separately
-            trend_signal = np.zeros(len(self.time[mask]))*self.flux.unit
+            trend_signal = Quantity(np.zeros(len(self.time[mask])), unit=self.flux.unit)
             for l, h in zip(low, high):
                 # Reduce `window_length` and `polyorder` for short segments;
                 # this prevents `savgol_filter` from raising an exception
@@ -471,14 +488,14 @@ class LightCurve(TimeSeries):
                     # Scipy outputs a warning here that is not useful, will be fixed in version 1.2
                     with warnings.catch_warnings():
                         warnings.simplefilter('ignore', FutureWarning)
-                        trend_signal[l:h] = signal.savgol_filter(x=self.flux.value[mask][l:h],
+                        trend_signal[l:h] = signal.savgol_filter(x=self.flux[mask][l:h],
                                                                  window_length=window_length,
                                                                  polyorder=polyorder,
-                                                                 **kwargs)*self.flux.unit
+                                                                 **kwargs)
             # Ignore outliers; note we add `1e-14` below to avoid detecting
             # outliers which are merely caused by numerical noise.
             mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
-                    (np.nanstd(self.flux[mask] - trend_signal) * sigma + 1e-14*self.flux.unit)
+                    (np.nanstd(self.flux[mask] - trend_signal) * sigma + Quantity(1e-14, self.flux.unit))
             f = interp1d(self.time.value[mask][mask1], trend_signal[mask1], fill_value='extrapolate')
             trend_signal = f(self.time.value)
             mask[mask] &= mask1
@@ -643,7 +660,7 @@ class LightCurve(TimeSeries):
             warnings.warn("The light curve already appears to be in relative "
                           "units; `normalize()` will convert the light curve "
                           "into relative units for a second time, which is "
-                          "probably not what you want.".format(self._flux_unit),
+                          "probably not what you want.".format(self.flux.unit),
                           LightkurveWarning)
 
         # Create a new light curve instance and normalize its values
@@ -741,7 +758,7 @@ class LightCurve(TimeSeries):
                 std = lc.estimate_cdpp()*1e-6
             except:
                 std = lc.flux.std()
-            f[~in_original] = np.random.normal(lc.flux.value.mean(), std.value, (~in_original).sum())
+            f[~in_original] = np.random.normal(lc.flux.mean(), std.value, (~in_original).sum())
         else:
             raise NotImplementedError("No such method as {}".format(method))
 
@@ -861,7 +878,7 @@ class LightCurve(TimeSeries):
             return self.copy()[~outlier_mask], outlier_mask
         return self.copy()[~outlier_mask]
 
-    def bin(self, binsize=None, bins=None, method='mean', time_bin_start=None):
+    def bin(self, time_bin_size, time_bin_start=None, n_bins=None, aggregate_func=None):
         """Bins a lightcurve in chunks defined by ``binsize`` or ``bins``.
 
         The flux value of the bins will be computed by taking the mean
@@ -901,94 +918,23 @@ class LightCurve(TimeSeries):
         - If the original lightcurve contains a quality attribute, then the
           bitwise OR of the quality flags will be returned per bin.
         """
-        # Validate user input
-        method = validate_method(method, supported_methods=['mean', 'median'])
-        if (binsize is None) and (bins is None):
-            binsize = 13
-        elif (binsize is not None) and (bins is not None):
-            raise ValueError('Both binsize and bins kwargs were passed to '
-                             '`.bin()`.  Must assign only one of these.')
-
-        # If binsize has no units, we'll default to days
-        if binsize and not isinstance(binsize, Quantity):
-            binsize *= u.day
-
-        aggregate_func = np.__dict__['nan' + method]
-
         ts = aggregate_downsample(self,
-                                  time_bin_size=binsize,
-                                  n_bins=bins,
+                                  time_bin_size=time_bin_size,
+                                  n_bins=n_bins,
                                   aggregate_func=aggregate_func,
                                   time_bin_start=time_bin_start)
 
-        # Prepare a LightCurve object
+        # Prepare a LightCurve object by ensuring there is a time column
         ts._required_columns = []
         ts.add_column(ts.time_bin_start + ts.time_bin_size / 2., name="time")
 
         # Ensure the required columns appear in the correct order
-        for idx, colname in enumerate(LightCurve._required_columns):
+        for idx, colname in enumerate(self.__class__._required_columns):
             tmpcol = ts[colname]
             ts.remove_column(colname)
             ts.add_column(tmpcol, name=colname, index=idx)
 
-        return LightCurve(ts)
-        """
-        # Define and map the functions to be applied to each bin
-        method_func = np.__dict__['nan' + method]
-        quality_func = lambda x: np.bitwise_or.reduce(x) \
-                                 if np.issubdtype(x.dtype, np.integer) and np.all(np.isfinite(x)) \
-                                 else np.nan
-        centroid_func = lambda x: method_func(x) \
-                                  if np.any(np.isfinite(x)) else np.nan
-        # Assume the errors combine as the root-mean-square
-        rmse_func = lambda x: np.sqrt(np.nansum(x**2))/len(x) \
-                              if np.any(np.isfinite(x)) else np.nan
-        statistic_mapper = {'flux': method_func,
-                            'time': method_func,
-                            'quality': quality_func,
-                            'centroid_row': centroid_func,
-                            'centroid_col': centroid_func,
-                            'flux_err': rmse_func}
-        statistic_mapper = {key: value
-                            for key, value in statistic_mapper.items()
-                            if hasattr(self, key)}
-
-        # Now create the new binned light curve object
-        binned_lc = self.copy()
-        if bins is None:  # use ``binsize```
-            n_bins = self.flux.size // binsize
-            bin_by_array = np.arange(len(self.time))
-            #bin_edges = calculate_bin_edges(bin_by_array, bins=n_bins)
-            bin_edges = np.linspace(bin_by_array.min(), bin_by_array.max(),
-                        n_bins + 1, endpoint=True)
-        else:  # ``bins``` was assigned
-            bin_by_array = self.time
-            bin_edges = calculate_bin_edges(bin_by_array, bins=bins)
-            n_bins = len(bin_edges) - 1
-            # Trigger a warning if the bin edges make no sense
-            if ((np.max(bin_edges) < np.nanmin(self.time)) or
-                    (np.nanmax(self.time) < np.nanmin(bin_edges))):
-                warnings.warn("the range of the bin edges ({}-{}) does not "
-                              "fall in the light curve's time range ({}-{})"
-                              "".format(np.min(bin_edges), np.max(bin_edges),
-                                        np.nanmin(self.time), np.nanmax(self.time)),
-                               LightkurveWarning)
-
-        for attr, bin_function in statistic_mapper.items():
-            values_to_bin = getattr(self, attr)
-            # Override error propagation if flux_err is all NaN
-            if (attr == 'flux_err') & ~np.any(np.isfinite(self.flux_err)):
-                values_to_bin = self.flux
-                bin_function = np.nanstd
-
-            with warnings.catch_warnings():  # Ignore empty slice warnings
-                warnings.simplefilter("ignore", RuntimeWarning)
-                binned_stat = binned_statistic(bin_by_array, values_to_bin,
-                    statistic=bin_function, bins=bin_edges).statistic
-                setattr(binned_lc, attr, binned_stat)
-
-        return binned_lc
-        """
+        return self.__class__(ts)
 
     def estimate_cdpp(self, transit_duration=13, savgol_window=101,
                       savgol_polyorder=2, sigma=5.):
@@ -1457,7 +1403,7 @@ class LightCurve(TimeSeries):
         path_or_buf : string or file handle
             File path or object. By default, the result is returned as a string.
         **kwargs : dict
-            Dictionary of arguments to be passed to `pandas.DataFrame.to_csv()`.
+            Dictionary of arguments to be passed to `TimeSeries.write()`.
 
         Returns
         -------
@@ -1465,7 +1411,15 @@ class LightCurve(TimeSeries):
             Returns a csv-formatted string if ``path_or_buf=None``.
             Returns `None` otherwise.
         """
-        return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
+        use_stringio = False
+        if path_or_buf is None:
+            use_stringio = True
+            from io import StringIO
+            path_or_buf = StringIO()
+        result = self.write(path_or_buf, format="ascii.csv", **kwargs)
+        if use_stringio:
+            return path_or_buf.getvalue()
+        return result
 
     def to_periodogram(self, method="lombscargle", **kwargs):
         """Converts the light curve to a `~lightkurve.periodogram.Periodogram`
@@ -1602,11 +1556,11 @@ class LightCurve(TimeSeries):
                                         array=self.time.value))
             if ~np.asarray([flux_column_name in k.upper() for k in extra_data.keys()]).any():
                 cols.append(fits.Column(name=flux_column_name, format='E',
-                                        unit='counts', array=self.flux))
+                                        unit='e-/s', array=self.flux))
             if 'flux_err' in dir(self):
                 if ~(flux_column_name.upper() + '_ERR' in extra_data.keys()):
                     cols.append(fits.Column(name=flux_column_name.upper() + '_ERR', format='E',
-                                            unit='counts', array=self.flux_err))
+                                            unit='e-/s', array=self.flux_err))
             if 'cadenceno' in dir(self):
                 if ~np.asarray(['CADENCENO' in k.upper() for k in extra_data.keys()]).any():
                     cols.append(fits.Column(name='CADENCENO', format='J',
@@ -1824,8 +1778,8 @@ class FoldedLightCurve(LightCurve):
     and implements different plotting defaults.
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    #def __init__(self, *args, **kwargs):
+    #    super().__init__(*args, **kwargs)
 
     @property
     def phase(self):
@@ -1986,16 +1940,16 @@ class KeplerLightCurve(LightCurve):
         Kepler ID number
     """
     _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'channel',
-                                      'campaign', 'quarter', 'mission', 'ra', 'dec')
+                            'campaign', 'quarter', 'mission', 'ra', 'dec')
     #extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    #def __init__(self, *args, **kwargs):
+    #    super().__init__(*args, **kwargs)
 
     @classmethod
-    def read(self, *args, **kwargs):
+    def read(cls, *args, **kwargs):
         # Default to Kepler file format
-        if kwargs.pop("format", None) is None:
+        if kwargs.get("format") is None:
             kwargs['format'] = "kepler"
         return super().read(*args, **kwargs)
 
@@ -2098,16 +2052,16 @@ class TessLightCurve(LightCurve):
         Tess Input Catalog ID number
     """
     _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'sector',
-                                      'camera', 'ccd', 'mission', 'ra', 'dec')
+                            'camera', 'ccd', 'mission', 'ra', 'dec')
     #extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    #def __init__(self, *args, **kwargs):
+    #    super().__init__(*args, **kwargs)
 
     @classmethod
-    def read(self, *args, **kwargs):
+    def read(cls, *args, **kwargs):
         # Default to TESS file format
-        if kwargs.pop("format", None) is None:
+        if kwargs.get("format") is None:
             kwargs['format'] = "tess"
         return super().read(*args, **kwargs)
 

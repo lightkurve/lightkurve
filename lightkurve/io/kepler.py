@@ -78,10 +78,10 @@ def _read_lightcurve_fits_file(filename, flux_column, flux_err_column,
     if 'centroid_row' not in tab.columns and centroid_row_column in tab.columns:
         tab.add_column(tab[centroid_row_column], name="centroid_row", index=4)
 
-    tab.meta['label'] = hdulist[0].header['OBJECT']
-    tab.meta['mission'] = hdulist[0].header['TELESCOP']
-    tab.meta['ra'] = hdulist[0].header['RA_OBJ']
-    tab.meta['dec'] = hdulist[0].header['DEC_OBJ']
+    tab.meta['label'] = hdulist[0].header.get('OBJECT')
+    tab.meta['mission'] = hdulist[0].header.get('MISSION', hdulist[0].header.get('TELESCOP'))
+    tab.meta['ra'] = hdulist[0].header.get('RA_OBJ')
+    tab.meta['dec'] = hdulist[0].header.get('DEC_OBJ')
     tab.meta['filename'] = filename
 
     return LightCurve(time=time, data=tab)
@@ -131,7 +131,7 @@ def read_kepler_lightcurve(filename,
                                 bitmask=quality_bitmask)
     lc = lc[quality_mask]
 
-    lc.meta['targetid'] = lc.meta['KEPLERID']
+    lc.meta['targetid'] = lc.meta.get('KEPLERID')
     lc.meta['quality_bitmask'] = quality_bitmask
     lc.meta['quality_mask'] = quality_mask
     return KeplerLightCurve(data=lc)
@@ -180,7 +180,7 @@ def read_tess_lightcurve(filename,
                                 bitmask=quality_bitmask)
     lc = lc[quality_mask]
 
-    lc.meta['targetid'] = lc.meta['TICID']
+    lc.meta['targetid'] = lc.meta.get('TICID')
     lc.meta['quality_bitmask'] = quality_bitmask
     lc.meta['quality_mask'] = quality_mask
     return TessLightCurve(data=lc)
