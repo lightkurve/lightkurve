@@ -314,6 +314,57 @@ class DesignMatrix():
                                prior_sigma=prior_sigma)
         return full_dm
 
+    def apply_gp_inverse(self, lc, gp_timescale=30, return_gp=False,
+                         cadence_mask=None, ridge_value=1e-8):
+        """ """
+        X = self.X
+        rawflux = lc.flux
+        rawflux_err = lc.flux_err
+
+        try:
+            import celerite
+        except ImportError:
+            log.error("PLD uses the `celerite` Python package. "
+                      "See the installation instructions at "
+                      "https://docs.lightkurve.org/about/install.html. "
+                      "`use_gp` has been set to `False`.")
+
+        # set default transit mask
+        if cadence_mask is None:
+            cadence_mask = np.ones_like(lc.time, dtype=bool)
+        M = lambda x: x[cadence_mask]
+
+        # We use a Gaussian Process to model the long term trend.
+        # We do this by estimating the long term trend y by applying the
+        # preliminary PLD model defined above and subtracting it from the raw light curve.
+        # The "in transit" cadences are masked out in this step to prevent the
+        # long term approximation from over-fitting the transits.
+        XTX = np.dot(X.T, X)
+        XTX[np.diag_indices_from(XTX)] += ridge_value
+        XTy = np.dot(X.T, M(rawflux))
+        y = M(rawflux) - np.dot(X, np.linalg.solve(XTX, XTy))
+
+        # Estimate the amplitude parameter of a Matern-3/2 kernel GP
+        # by computing the standard deviation of y.
+        amp = np.nanstd(y)
+        tau = gp_timescale  # tau is a user-defined parameter
+        # set up gaussian process using celerite
+        # we use a Matern-3/2 kernel for its flexibility and non-periodicity
+        kernel = celerite.terms.Matern32Term(np.log(amp), np.log(tau))
+        gp = celerite.GP(kernel)
+        gp.compute(M(lc.time), M(rawflux_err))
+
+        if return_gp:
+            return gp.apply_inverse(X), gp
+        else:
+            return gp.apply_inverse(X)
+
+    def mask(self, cadence_mask):
+        """ """
+        masked_X = self.X[cadence_mask]
+        return DesignMatrix(masked_X, name=f'{self.name} (masked)')
+
+
     def _validate(self, rank=True):
         """Helper function for validating."""
         # Matrix rank shouldn't be significantly smaller than the # of columns
