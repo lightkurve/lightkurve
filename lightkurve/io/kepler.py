@@ -18,7 +18,11 @@ __all__ = ["read_kepler_lightcurve", "read_tess_lightcurve"]
 log = logging.getLogger(__name__)
 
 
-def _read_lightcurve_fits_file(filename, flux_column, flux_err_column):
+def _read_lightcurve_fits_file(filename, flux_column, flux_err_column,
+                               quality_column='quality',
+                               centroid_col_column='mom_centr1',
+                               centroid_row_column='mom_centr2',
+                               time_format=None):
     """Generic helper function to convert a Kepler ot TESS light curve file
     into a generic `LightCurve` object.
     """
@@ -49,25 +53,30 @@ def _read_lightcurve_fits_file(filename, flux_column, flux_err_column):
     tab = tab[~nans]
 
     # Prepare a special time column
-    if hdu.header['BJDREFI'] == 2454833:
-        time_format = 'bkjd'
-    elif hdu.header['BJDREFI'] == 2457000:
-        time_format = 'btjd'
-    else:
-        raise ValueError(f"Input file has unclear time format: {filename}")
+    if not time_format:
+        if hdu.header.get('BJDREFI') == 2454833:
+            time_format = 'bkjd'
+        elif hdu.header.get('BJDREFI') == 2457000:
+            time_format = 'btjd'
+        else:
+            raise ValueError(f"Input file has unclear time format: {filename}")
     time = Time(tab['time'].data,
-                scale=hdu.header['TIMESYS'].lower(),
+                scale=hdu.header.get('TIMESYS', 'tdb').lower(),
                 format=time_format)
     tab.remove_column('time')
 
     # For backwards compatibility with Lightkurve v1.x,
     # we make sure standard columns and attributes exist.
-    tab.add_column(tab[flux_column], name="flux", index=0)
-    tab.add_column(tab[flux_err_column], name="flux_err", index=1)
-    if "quality" not in tab.columns:  # TESS files have a quality column by default
-        tab.add_column(tab['sap_quality'], name="quality", index=2)
-    tab.add_column(tab['mom_centr1'], name="centroid_col", index=3)
-    tab.add_column(tab['mom_centr2'], name="centroid_row", index=4)
+    if 'flux' not in tab.columns:
+        tab.add_column(tab[flux_column], name="flux", index=0)
+    if 'flux_err' not in tab.columns:
+        tab.add_column(tab[flux_err_column], name="flux_err", index=1)
+    if 'quality' not in tab.columns and quality_column in tab.columns:
+        tab.add_column(tab[quality_column], name="quality", index=2)
+    if 'centroid_col' not in tab.columns and centroid_col_column in tab.columns:
+        tab.add_column(tab[centroid_col_column], name="centroid_col", index=3)
+    if 'centroid_row' not in tab.columns and centroid_row_column in tab.columns:
+        tab.add_column(tab[centroid_row_column], name="centroid_row", index=4)
 
     tab.meta['label'] = hdulist[0].header['OBJECT']
     tab.meta['mission'] = hdulist[0].header['TELESCOP']
@@ -107,7 +116,11 @@ def read_kepler_lightcurve(filename,
 
         See the :class:`KeplerQualityFlags` class for details on the bitmasks.
     """
-    lc = _read_lightcurve_fits_file(filename, flux_column=flux_column, flux_err_column=flux_err_column)
+    lc = _read_lightcurve_fits_file(filename,
+                                    flux_column=flux_column,
+                                    flux_err_column=flux_err_column,
+                                    quality_column='sap_quality',
+                                    time_format='bkjd')
 
     # Filter out poor-quality data
     # NOTE: Unfortunately Astropy Table masking does not yet work for columns
@@ -153,8 +166,10 @@ def read_tess_lightcurve(filename,
 
         See the :class:`KeplerQualityFlags` class for details on the bitmasks.
     """
-    lc = _read_lightcurve_fits_file(filename, flux_column=flux_column,
-                                    flux_err_column=flux_err_column)
+    lc = _read_lightcurve_fits_file(filename,
+                                    flux_column=flux_column,
+                                    flux_err_column=flux_err_column,
+                                    time_format='btjd')
 
     # Filter out poor-quality data
     # NOTE: Unfortunately Astropy Table masking does not yet work for columns

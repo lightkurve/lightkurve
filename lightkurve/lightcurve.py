@@ -7,7 +7,6 @@ import warnings
 import numpy as np
 from scipy import signal
 from scipy.interpolate import interp1d
-from scipy.stats import binned_statistic
 from matplotlib import pyplot as plt
 from copy import deepcopy
 
@@ -68,23 +67,28 @@ class LightCurve(TimeSeries):
 
     # The `TimeSeries` base class will enforce the presence of these columns:
     _required_columns = ['time', 'flux', 'flux_err']
-    _deprecated_keywords = ['targetid', 'label']
-    _removed_keywords = ['time_format', 'time_scale', 'flux_unit']
+
+    # The following keywords were removed in Lightkurve v2.0.
+    # Their use will trigger a warning.
+    _deprecated_keywords = ['targetid', 'label', 'time_format', 'time_scale', 'flux_unit']
+    _deprecated_column_keywords = ['centroid_col', 'centroid_row',
+                                   'cadenceno', 'quality']
 
     def __init__(self, data=None, time=None, flux=None, flux_err=None, **kwargs):
         # Delay checking for required columns until the end
         self._required_columns_relax = True
 
         # For backwards compatibility with Lightkurve v1.x,
-        # we support passing a few deprecated keywords via **kwargs.
+        # we support passing deprecated keywords via **kwargs.
         deprecated_kws = {}
         for kw in self._deprecated_keywords:
-            deprecated_kws[kw] = kwargs.pop(kw, None)
-        removed_kws = {}
-        for kw in self._removed_keywords:
             if kw in kwargs:
-                removed_kws[kw] = kwargs.pop(kw)
+                deprecated_kws[kw] = kwargs.pop(kw)
 
+        deprecated_column_kws = {}
+        for kw in self._deprecated_column_keywords:
+            if kw in kwargs:
+                deprecated_column_kws[kw] = kwargs.pop(kw)
 
         self._required_columns = kwargs.pop("_required_columns",
                                             self._required_columns)
@@ -97,8 +101,8 @@ class LightCurve(TimeSeries):
             # Lightkurve v1.x supported specifying the time_format
             # as a constructor kwarg
             time = Time(time,
-                        format=removed_kws.get("time_format", "bkjd"),
-                        scale=removed_kws.get("time_scale", "tdb"))
+                        format=deprecated_kws.get("time_format", "bkjd"),
+                        scale=deprecated_kws.get("time_scale", "tdb"))
 
         super().__init__(data=data, time=time, **kwargs)
 
@@ -123,9 +127,14 @@ class LightCurve(TimeSeries):
             self.add_column(flux_err, name="flux_err", index=2)
 
         # Backwards compatibility with Lightkurve v1.x
+        # Ensure attributes are set if passed via deprecated kwargs
         for kw in deprecated_kws:
             if kw not in self.meta:
                 self.meta[kw] = deprecated_kws[kw]
+        # Ensure columns are set if passed via deprecated kwargs
+        for kw in deprecated_column_kws:
+            if kw not in self.meta and kw not in self.columns:
+                self.add_column(deprecated_column_kws[kw], name=kw)
 
         self._required_columns_relax = False
         self._check_required_columns()
@@ -531,6 +540,17 @@ class LightCurve(TimeSeries):
         if epoch_time and not isinstance(epoch_time, Time):
             epoch_time = Time(epoch_time, format=self.time.format, scale=self.time.scale)
 
+        # Warn if `epoch_time` appears to use the wrong format
+        if epoch_time and epoch_time.value > 2450000:
+            if self.time.format == 'bkjd':
+                warnings.warn('`t0` appears to be given in JD, '
+                              'however the light curve time uses BKJD '
+                              '(i.e. JD - 2454833).', LightkurveWarning)
+            elif self.time.format == 'btjd':
+                warnings.warn('`t0` appears to be given in JD, '
+                              'however the light curve time uses BTJD '
+                              '(i.e. JD - 2457000).', LightkurveWarning)
+
         ts = super().fold(period=period, epoch_time=epoch_time,
                           epoch_phase=epoch_phase, wrap_phase=wrap_phase,
                           normalize_phase=normalize_phase)
@@ -552,11 +572,11 @@ class LightCurve(TimeSeries):
 
         # Add extra column and meta data specific to FoldedLightCurve
         lc.add_column(self.time.copy(), name="time_original", index=len(self._required_columns))
-        lc._meta['period'] = period
-        lc._meta['epoch_time'] = epoch_time
-        lc._meta['epoch_phase'] = epoch_phase
-        lc._meta['wrap_phase'] = wrap_phase
-        lc._meta['normalize_phase'] = normalize_phase
+        lc.meta['period'] = period
+        lc.meta['epoch_time'] = epoch_time
+        lc.meta['epoch_phase'] = epoch_phase
+        lc.meta['wrap_phase'] = wrap_phase
+        lc.meta['normalize_phase'] = normalize_phase
         lc.sort('time')
 
         return lc
@@ -1966,11 +1986,18 @@ class KeplerLightCurve(LightCurve):
         Kepler ID number
     """
     _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'channel',
-                            'campaign', 'quarter', 'mission', 'ra', 'dec')
+                                      'campaign', 'quarter', 'mission', 'ra', 'dec')
     #extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    @classmethod
+    def read(self, *args, **kwargs):
+        # Default to Kepler file format
+        if kwargs.pop("format", None) is None:
+            kwargs['format'] = "kepler"
+        return super().read(*args, **kwargs)
 
     def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX',
                 aperture_mask=None,**extra_data):
@@ -2071,12 +2098,19 @@ class TessLightCurve(LightCurve):
         Tess Input Catalog ID number
     """
     _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'sector',
-                            'camera', 'ccd', 'mission', 'ra', 'dec')
+                                      'camera', 'ccd', 'mission', 'ra', 'dec')
     #extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-   
+
+    @classmethod
+    def read(self, *args, **kwargs):
+        # Default to TESS file format
+        if kwargs.pop("format", None) is None:
+            kwargs['format'] = "tess"
+        return super().read(*args, **kwargs)
+
     def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX',
                 aperture_mask=None, **extra_data):
         """Writes the KeplerLightCurve to a FITS file.

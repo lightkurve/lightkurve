@@ -222,7 +222,7 @@ def test_lightcurve_append():
     """Test ``LightCurve.append()``."""
     lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1], flux_err=[0.1, 0.2, 0.3])
     lc = lc.append(lc)
-    assert_array_equal(lc.time, 2*[1, 2, 3])
+    assert_array_equal(lc.time.value, 2*[1, 2, 3])
     assert_array_equal(lc.flux, 2*[1, .5, 1])
     assert_array_equal(lc.flux_err, 2*[0.1, 0.2, 0.3])
     # KeplerLightCurve has extra data
@@ -230,7 +230,7 @@ def test_lightcurve_append():
                           centroid_col=[4, 5, 6], centroid_row=[7, 8, 9],
                           cadenceno=[10, 11, 12], quality=[10, 20, 30])
     lc = lc.append(lc)
-    assert_array_equal(lc.time, 2*[1, 2, 3])
+    assert_array_equal(lc.time.value, 2*[1, 2, 3])
     assert_array_equal(lc.flux, 2*[1, .5, 1])
     assert_array_equal(lc.centroid_col, 2*[4, 5, 6])
     assert_array_equal(lc.centroid_row, 2*[7, 8, 9])
@@ -243,20 +243,7 @@ def test_lightcurve_append_multiple():
     lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
     lc = lc.append([lc, lc, lc])
     assert_array_equal(lc.flux, 4*[1, .5, 1])
-    assert_array_equal(lc.time, 4*[1, 2, 3])
-
-
-def test_lightcurve_append_inconsistent_columns():
-    """Test ``LightCurve.append()`` for different sub-classes.
-
-    Compared to the base `LightCurve`, `KeplerLightCurve` has extra columns
-    such as `centroid_col` and `cadenceno`.  This test checks whether
-    appending such two objects raises a warning.
-    """
-    lc1 = KeplerLightCurve(time=[1, 2, 3], flux=[1, .5, 1])
-    lc2 = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
-    with pytest.warns(LightkurveWarning, match='extra_columns'):
-        lc = lc1.append(lc2)
+    assert_array_equal(lc.time.value, 4*[1, 2, 3])
 
 
 def test_lightcurve_copy():
@@ -321,15 +308,16 @@ def test_lightcurve_copy():
     with pytest.raises(AssertionError, match=r'ismatch.*33\.3+'):
         assert_array_equal(lc.quality, nlc.quality)
 
+
 @pytest.mark.parametrize("path, mission", [(filename_tess_custom, "TESS"),
                                            (filename_K2_custom, "K2")])
 def test_custom_lightcurve_file(path, mission):
     """Test whether we can read in custom interact()-produced lightcurvefiles"""
     if mission == "K2":
-        lcf_custom = KeplerLightCurveFile(path)
+        lcf_custom = KeplerLightCurve.read(path)
     elif mission == "TESS":
-        with pytest.warns(LightkurveWarning):
-            lcf_custom = TessLightCurveFile(path)
+        #with pytest.warns(LightkurveWarning):
+        lcf_custom = TessLightCurve.read(path)
     assert lcf_custom.hdu[2].name == 'APERTURE'
     assert lcf_custom.cadenceno[0] >= 0
     assert lcf_custom.dec == lcf_custom.dec
