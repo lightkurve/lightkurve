@@ -98,6 +98,15 @@ class PLDCorrector(RegressionCorrector):
         self.rawflux_err = rawflux_err[self.nanmask]
         self.lc = lc[self.nanmask]
 
+        self.rawflux = self.lc.flux
+        self.rawflux_err = self.lc.flux_err
+
+        # create nan mask
+        self.nanmask = np.isfinite(self.time)
+        self.nanmask &= np.isfinite(self.rawflux)
+        self.nanmask &= np.isfinite(self.rawflux_err)
+        self.nanmask &= np.abs(self.rawflux_err) > 1e-12
+
         super(PLDCorrector, self).__init__(lc=self.lc)
 
     def __repr__(self):
@@ -107,9 +116,53 @@ class PLDCorrector(RegressionCorrector):
     def X(self):
         return self.dm
 
+<<<<<<< HEAD
     def create_design_matrix(self, background_mask=None, pld_order=1, n_pca_terms=6,
                              pixel_components=3, spline_n_knots=100, spline_degree=3, sparse=False):
         """Returns a `DesignMatrixCollection`."""
+=======
+        Returns
+        -------
+        X : `.DesignMatrix`
+            Matrix of column vectors to perform linear regression.
+        """
+        if tpf is None:
+            tpf = self.tpf
+
+        # parse apertures
+        if aperture_mask is None:
+            aperture_mask = tpf._parse_aperture_mask('threshold')
+            log.debug('No aperture mask provided; using a threshold mask.')
+        else:
+            aperture_mask = tpf._parse_aperture_mask(aperture_mask)
+
+        if pld_aperture_mask is None:
+            pld_aperture_mask = ~tpf._parse_aperture_mask('threshold')
+            log.debug('No PLD aperture mask provided; using a threshold mask.')
+        else:
+            pld_aperture_mask = tpf._parse_aperture_mask(pld_aperture_mask)
+
+        # generate flux light curve from desired pixels
+        lc = self.lc
+
+        # find pixel bounds of aperture on tpf
+        xmin, xmax = min(np.where(pld_aperture_mask)[0]),  max(np.where(pld_aperture_mask)[0])
+        ymin, ymax = min(np.where(pld_aperture_mask)[1]),  max(np.where(pld_aperture_mask)[1])
+
+        # crop data cube to include only desired pixels
+        # this is required for superstamps to ensure matrix is invertable
+        cropped_flux = self.flux[:, xmin:xmax+1, ymin:ymax+1]
+        cropped_flux_err = self.flux_err[:, xmin:xmax+1, ymin:ymax+1]
+        cropped_pld_aperture = pld_aperture_mask[xmin:xmax+1, ymin:ymax+1]
+
+        # calculate errors (ignore warnings related to zero or negative errors)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_err = np.nansum(cropped_flux_err[:, cropped_pld_aperture]**2, axis=1)**0.5
+
+        # build initial 1st order PLD design matrix
+        regressors = cropped_flux[:, cropped_pld_aperture]
+>>>>>>> add option to correct with gp
 
         if background_mask is None:
             # Default to pixels <1-sigma above the background
@@ -185,6 +238,50 @@ class PLDCorrector(RegressionCorrector):
         if restore_trend:
             clc += self.diagnostic_lightcurves['spline']
         return clc
+
+    def _correct_with_gp(self, cadence_mask=None, ridge_value=1e-8, **kwargs):
+        """ """
+
+        try:
+            import celerite
+        except ImportError:
+            log.error("PLD uses the `celerite` Python package. "
+                      "See the installation instructions at "
+                      "https://docs.lightkurve.org/about/install.html. "
+                      "`use_gp` has been set to `False`.")
+
+        X = self.create_design_matrix(**kwargs)
+
+        # set default transit mask
+        if cadence_mask is None:
+            cadence_mask = np.ones_like(self.lc.time, dtype=bool)
+        M = lambda x: x[cadence_mask[self.nanmask]]
+
+        # mask transits in design matrix
+        MX = X.mask(cadence_mask)
+
+        X_gp, gp = MX.apply_gp_inverse(self.lc, ridge_value=ridge_value, return_gp=True,
+                                   cadence_mask=cadence_mask[self.nanmask])
+        y_gp = gp.apply_inverse(M(self.rawflux)[:, None])[:, 0]
+
+        # compute the coefficients C on the basis vectors;
+        # the PLD design matrix will be dotted with C to solve for the noise model.
+        A = np.dot(MX.X.T, X_gp)
+        B = np.dot(MX.X.T, y_gp)
+
+        A[np.diag_indices_from(A)] += ridge_value
+        C = np.linalg.solve(A, B)
+
+        # compute detrended light curve
+        model = np.dot(X.X, C)
+        self.detrended_flux = self.rawflux - (model - np.nanmean(model))
+
+        # Create and return a new LightCurve object with the corrected flux
+        corrected_lc = self.lc.copy()[self.nanmask]
+        corrected_lc.flux = self.detrended_flux
+        corrected_lc.flux_err = self.flux_err
+
+        return corrected_lc
 
     def diagnose(self):
         """Returns diagnostic plots to assess the most recent call to `correct()`.
@@ -336,3 +433,9 @@ class KeplerPLDCorrector(PLDCorrector):
         if restore_trend:
             clc += self.diagnostic_lightcurves['spline']
         return clc
+=======
+    def create_design_matrix(self):
+        """ """
+
+        pass
+>>>>>>> add option to correct with gp
