@@ -22,8 +22,9 @@ from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
-    LightkurveWarning, validate_method, _query_solar_system_objects
+    validate_method, _query_solar_system_objects
 )
+from .utils import LightkurveWarning, LightkurveDeprecationWarning
 
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve', 'FoldedLightCurve']
@@ -116,13 +117,15 @@ class LightCurve(TimeSeries):
         # Ensure the required columns are available
         if flux is None:
             flux = np.nan * np.ones_like(time)
+        if not isinstance(flux, Quantity):
+            flux = Quantity(flux, deprecated_kws.get("flux_unit"))
         if "flux" not in self.columns:
             self.add_column(flux, name="flux", index=1)
 
         if flux_err is None:
-            flux_err = Quantity(np.nan * np.ones_like(time), unit=self.flux.unit)
-            #if self.flux.unit:
-            #    flux_err *= self.flux.unit
+            flux_err = np.nan * np.ones_like(time)
+        if not isinstance(flux_err, Quantity):
+            flux_err = Quantity(flux_err, deprecated_kws.get("flux_unit"))
         if "flux_err" not in self.columns:
             self.add_column(flux_err, name="flux_err", index=2)
 
@@ -488,10 +491,11 @@ class LightCurve(TimeSeries):
                     # Scipy outputs a warning here that is not useful, will be fixed in version 1.2
                     with warnings.catch_warnings():
                         warnings.simplefilter('ignore', FutureWarning)
-                        trend_signal[l:h] = signal.savgol_filter(x=self.flux[mask][l:h],
+                        trsig = signal.savgol_filter(x=self.flux.value[mask][l:h],
                                                                  window_length=window_length,
                                                                  polyorder=polyorder,
                                                                  **kwargs)
+                        trend_signal[l:h] = Quantity(trsig, trend_signal.unit)
             # Ignore outliers; note we add `1e-14` below to avoid detecting
             # outliers which are merely caused by numerical noise.
             mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
@@ -1136,7 +1140,7 @@ class LightCurve(TimeSeries):
                 ylabel = 'Flux [{}]'.format(self.flux_unit.to_string("latex_inline"))
         # Default legend label
         if ('label' not in kwargs):
-            kwargs['label'] = self.label
+            kwargs['label'] = self.meta.get('label')
 
         # Normalize the data if requested
         if normalize:
@@ -1337,14 +1341,16 @@ class LightCurve(TimeSeries):
                       LightkurveWarning)
         return self
 
+    @deprecated("2.0",
+                message='`to_timeseries()` has been deprecated. `LightCurve` is a '
+                        'sub-class of Astropy TimeSeries as of Lightkurve v2.0 '
+                        'and no longer needs to be converted.',
+                warning_type=LightkurveDeprecationWarning)
     def to_timeseries(self):
         """DEPRECATED. `LightCurve` objects are now sub-class instances of
         `~astropy.timeseries.TimeSeries` so a conversion no longer makes sense.
         """
-        warnings.warn('`to_timeseries()` has been deprecated. `LightCurve` is a '
-                      'sub-class of Astropy TimeSeries as of Lightkurve v2.0 '
-                      'and no longer needs to be converted.',
-                      LightkurveWarning)
+        return self
 
     @staticmethod
     def from_timeseries(ts):
@@ -1760,7 +1766,7 @@ class LightCurve(TimeSeries):
             ax.set_xlabel("Phase")
             ax.set_ylabel("Cycle")
             ax.set_ylim(cyc.max(), 0)
-            ax.set_title(self.label)
+            ax.set_title(self.meta.get("label"))
             a = cyc.max() * 0.1 / 12.
             b = (cyc.max() - cyc.min()) / (bs.max() - bs.min())
             ax.set_aspect(a/b)

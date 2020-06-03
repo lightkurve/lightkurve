@@ -22,6 +22,7 @@ from .version import __version__
 from .time import *
 from .prf import *
 from .lightcurve import *
+from .lightcurvefile import *
 from .correctors import *
 from .targetpixelfile import *
 from .utils import *

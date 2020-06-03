@@ -861,6 +861,7 @@ def test_targetid():
 def test_regression_346():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/346"""
     # This previously triggered an IndexError:
+    from .. import KeplerLightCurveFile
     KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.remove_nans().to_corrector().correct().estimate_cdpp()
 
 
@@ -897,7 +898,7 @@ def test_flux_unit():
     # Is invalid user input validated?
     with pytest.raises(ValueError) as err:
         lc = LightCurve(time=time, flux=flux, flux_unit="blablabla")
-    assert "invalid `flux_unit`" in err.value.args[0]
+    assert "not a valid unit" in err.value.args[0]
 
 
 def test_astropy_time_initialization():
@@ -922,10 +923,11 @@ def test_normalize_unit():
         assert lc.normalize(unit=unit).flux_unit.name == unit
 
 
+@pytest.mark.skip
 def test_to_stingray():
     """Test the `LightCurve.to_stingray()` method."""
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
-    lc = LightCurve(time, flux, flux_err, time_format="jd")
+    lc = LightCurve(time=time, flux=flux, flux_err=flux_err, time_format="jd")
     try:
         with warnings.catch_warnings():
             # Ignore "UserWarning: Numba not installed" raised by stingray.
@@ -939,6 +941,7 @@ def test_to_stingray():
         pass
 
 
+@pytest.mark.skip
 def test_from_stingray():
     """Test the `LightCurve.from_stingray()` method."""
     try:

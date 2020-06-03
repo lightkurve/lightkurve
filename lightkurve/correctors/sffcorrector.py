@@ -128,9 +128,9 @@ class SFFCorrector(RegressionCorrector):
                           LightkurveWarning)
 
         if centroid_col is None:
-            centroid_col = self.lc.centroid_col
+            centroid_col = self.lc.centroid_col.value
         if centroid_row is None:
-            centroid_row = self.lc.centroid_row
+            centroid_row = self.lc.centroid_row.value
 
         if np.any([~np.isfinite(centroid_row), ~np.isfinite(centroid_col)]):
             raise ValueError('Centroids contain NaN values.')
@@ -167,9 +167,9 @@ class SFFCorrector(RegressionCorrector):
 
 
         # long term
-        n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
+        n_knots = int((self.lc.time.value[-1] - self.lc.time.value[0])/timescale)
 
-        s_dm = spline(self.lc.time, n_knots=n_knots, name='spline')
+        s_dm = spline(self.lc.time.value, n_knots=n_knots, name='spline')
         means = [np.average(chunk) for chunk in np.array_split(self.lc.flux, n_knots)]
 #        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
         s_dm.prior_mu = np.asarray(means)
@@ -204,7 +204,7 @@ class SFFCorrector(RegressionCorrector):
         most recent call to `correct()`."""
         axs = self._diagnostic_plot()
         for t in self.window_points:
-            axs[0].axvline(self.lc.time[t], color='r', ls='--', alpha=0.3)
+            axs[0].axvline(self.lc.time.value[t], color='r', ls='--', alpha=0.3)
 
     def diagnose_arclength(self):
         """Returns a diagnostic plot which visualizes arclength vs flux
@@ -425,6 +425,6 @@ def _estimate_arclength(centroid_col, centroid_row):
     col = centroid_col - np.nanmin(centroid_col)
     row = centroid_row  - np.nanmin(centroid_row)
     # Force c to be correlated not anticorrelated
-    if np.polyfit(col, row, 1)[0] < 0:
+    if np.polyfit(col.data, row.data, 1)[0] < 0:
         col = np.nanmax(col) - col
     return (col**2 + row**2)**0.5
