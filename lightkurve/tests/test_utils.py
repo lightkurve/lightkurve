@@ -10,10 +10,11 @@ import os
 from ..utils import KeplerQualityFlags, TessQualityFlags
 from ..utils import module_output_to_channel, channel_to_module_output
 from ..utils import LightkurveWarning
-from ..utils import running_mean, detect_filetype, validate_method
+from ..utils import running_mean, validate_method
 from ..utils import bkjd_to_astropy_time, btjd_to_astropy_time
 from ..utils import centroid_quadratic
 from ..lightcurve import LightCurve
+from ..io import detect_filetype
 
 from .. import PACKAGEDIR
 
@@ -80,6 +81,7 @@ def test_quality_mask():
     assert "not supported" in err.value.args[0]
 
 
+@pytest.mark.xfail  # Lightkurve v2.x no longer support NaNs in time values
 def test_lightkurve_warning():
     """Can we ignore Lightkurve warnings?"""
     with warnings.catch_warnings(record=True) as warns:
@@ -94,8 +96,8 @@ def test_detect_filetype():
     """Can we detect the correct filetype?"""
     k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
     tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
-    assert detect_filetype(fits.open(k2_path)[0].header) == 'KeplerTargetPixelFile'
-    assert detect_filetype(fits.open(tess_path)[0].header) == 'TessTargetPixelFile'
+    assert detect_filetype(fits.open(k2_path)) == 'KeplerTargetPixelFile'
+    assert detect_filetype(fits.open(tess_path)) == 'TessTargetPixelFile'
 
 
 def test_validate_method():

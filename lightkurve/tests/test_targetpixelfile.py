@@ -139,13 +139,13 @@ def test_tpf_zeros():
         warnings.simplefilter("ignore", LightkurveWarning)
         lc = tpf.to_lightcurve()
     # If you don't mask out bad data, time contains NaNs
-    assert np.any(lc.time != tpf.time)  # Using the property that NaN does not equal NaN
+    assert np.any(lc.time.value != tpf.time)  # Using the property that NaN does not equal NaN
     # When you do mask out bad data everything should work.
-    assert (tpf.astropy_time.jd == 0).any()
+    assert (tpf.astropy_time.value == 0).any()
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask='hard')
     lc = tpf.to_lightcurve(aperture_mask="all")
     assert len(lc.time) == len(lc.flux)
-    assert np.all(lc.time == tpf.time)
+    assert np.all(lc.time == tpf.astropy_time)
     assert np.all(lc.flux == 0)
     # The default QUALITY bitmask should have removed all NaNs in the TIME
     assert ~np.any(np.isnan(tpf.time))
@@ -540,7 +540,7 @@ def test_tpf_tess():
     assert tpf.background_mask.sum() == 30
     lc = tpf.to_lightcurve()
     assert isinstance(lc, TessLightCurve)
-    assert_array_equal(lc.time, tpf.time)
+    assert_array_equal(lc.time.value, tpf.time)
     assert tpf.astropy_time.scale == 'tdb'
     assert tpf.flux.shape == tpf.flux_err.shape
     tpf.wcs

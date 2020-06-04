@@ -353,13 +353,10 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
         Resulting time object.
     """
     bkjd = np.atleast_1d(bkjd)
-    jd = bkjd + bjdref
     # Some data products have missing time values;
     # we need to set these to zero or `Time` cannot be instantiated.
-    jd[~np.isfinite(jd)] = 0
-    if isinstance(bkjd, float):  # If user entered a float, return a float
-        jd = jd[0]
-    return Time(jd, format='jd', scale='tdb')
+    bkjd[~np.isfinite(bkjd)] = 0
+    return Time(bkjd, format='bkjd', scale='tdb')
 
 
 def btjd_to_astropy_time(btjd, bjdref=2457000.):
@@ -385,11 +382,8 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
         Resulting time object.
     """
     btjd = np.atleast_1d(btjd)
-    jd = btjd + bjdref
-    jd[~np.isfinite(jd)] = 0
-    if isinstance(btjd, float):  # If user entered a float, return a float
-        jd = jd[0]
-    return Time(jd, format='jd', scale='tdb')
+    btjd[~np.isfinite(btjd)] = 0
+    return Time(btjd, format='btjd', scale='tdb')
 
 
 def plot_image(image, ax=None, scale='linear', origin='lower',
