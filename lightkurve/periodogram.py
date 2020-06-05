@@ -811,7 +811,7 @@ class LombScarglePeriodogram(Periodogram):
                 maximum_frequency = nyquist * nyquist_factor
 
             # Create frequency grid evenly spaced in frequency
-            frequency = np.arange(minimum_frequency.value, maximum_frequency.value, fs.to(freq_unit).value)
+            frequency = np.arange(minimum_frequency.value, maximum_frequency.value, fs.value)
 
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
@@ -832,11 +832,11 @@ class LombScarglePeriodogram(Periodogram):
             nterms = 1
 
         if float(astropy.__version__[0]) >= 3:
-            LS = LombScargle(time, lc.flux_quantity,
+            LS = LombScargle(time, lc.flux,
                              nterms=nterms, normalization='psd', **kwargs)
             power = LS.power(frequency, method=ls_method)
         else:
-            LS = LombScargle(time, lc.flux_quantity,
+            LS = LombScargle(time, lc.flux,
                              nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization='psd')
 
