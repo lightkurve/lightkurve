@@ -849,7 +849,8 @@ class LombScarglePeriodogram(Periodogram):
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
-                                      targetid=lc.targetid, label=lc.label,
+                                      targetid=lc.meta.get('targetid'),
+                                      label=lc.meta.get('label'),
                                       default_view=default_view, ls_obj=LS,
                                       nterms=nterms, ls_method=ls_method)
 
@@ -933,12 +934,12 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         if minimum_period is None:
             if period is None:
                 minimum_period = np.max([np.median(np.diff(lc.time)) * 4,
-                                         np.max(duration) + np.median(np.diff(lc.time))])
+                                         np.max(duration) + np.median(np.diff(lc.time.value))])
             else:
                 minimum_period = np.min(period)
         if maximum_period is None:
             if period is None:
-                maximum_period = (np.max(lc.time) - np.min(lc.time)) / 3.
+                maximum_period = (np.max(lc.time.value) - np.min(lc.time.value)) / 3.
             else:
                 maximum_period = np.max(period)
 
@@ -949,7 +950,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
         # Validate user input for `frequency_factor`
         frequency_factor = kwargs.pop("frequency_factor", 10)
-        df = frequency_factor * np.min(duration) / (np.max(lc.time) - np.min(lc.time))**2
+        df = frequency_factor * np.min(duration) / (np.max(lc.time.value) - np.min(lc.time.value))**2
         npoints = int(((1/minimum_period) - (1/maximum_period))/df)
         if npoints > 1e7:
             raise ValueError('`period` contains {} points.'
@@ -980,8 +981,8 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         return BoxLeastSquaresPeriodogram(frequency=1. / result.period,
                                           power=result.power,
                                           default_view='period',
-                                          label=lc.label,
-                                          targetid=lc.targetid,
+                                          label=lc.meta.get('label'),
+                                          targetid=lc.meta.get('targetid'),
                                           transit_time=result.transit_time,
                                           duration=result.duration,
                                           depth=result.depth,
@@ -1057,8 +1058,8 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
         model_flux = self._BLS_object.model(self.time, u.Quantity(period, 'd').value,
                                             u.Quantity(duration, 'd').value,
-                                            u.Quantity(transit_time, 'd').value)
-        model = LightCurve(self.time, model_flux, label='Transit Model Flux')
+                                            transit_time)
+        model = LightCurve(time=self.time, flux=model_flux, label='Transit Model Flux')
         return model
 
     def get_transit_mask(self, period=None, duration=None, transit_time=None):

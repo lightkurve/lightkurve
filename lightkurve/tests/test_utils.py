@@ -116,13 +116,13 @@ def test_import():
 def test_btjd_bkjd_input():
     """Regression test for #607: are the bkjd/btjd functions tolerant?"""
     # Kepler
-    assert bkjd_to_astropy_time(0).value == 2454833.
+    assert bkjd_to_astropy_time(0).jd[0] == 2454833.
     for user_input in [[0], np.array([0])]:
-        assert_array_equal(bkjd_to_astropy_time(user_input).value, np.array([2454833.]))
+        assert_array_equal(bkjd_to_astropy_time(user_input).jd, np.array([2454833.]))
     # TESS
-    assert btjd_to_astropy_time(0).value == 2457000.
+    assert btjd_to_astropy_time(0).jd[0] == 2457000.
     for user_input in [[0], np.array([0])]:
-        assert_array_equal(btjd_to_astropy_time(user_input).value, np.array([2457000.]))
+        assert_array_equal(btjd_to_astropy_time(user_input).jd, np.array([2457000.]))
 
 
 def test_centroid_quadratic():

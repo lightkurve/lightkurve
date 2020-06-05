@@ -18,7 +18,8 @@ from astropy.table import Table
 
 from ..utils import LightkurveWarning
 from ..search import search_lightcurvefile, search_targetpixelfile, \
-                     search_tesscut, SearchResult, SearchError, open, log
+                     search_tesscut, SearchResult, SearchError, log
+from ..io import open
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
 from .. import PACKAGEDIR

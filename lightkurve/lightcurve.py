@@ -57,13 +57,13 @@ class LightCurve(TimeSeries):
     Examples
     --------
     >>> import lightkurve as lk
-    >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.97, 1.01, 1.03, 0.99])
+    >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.98, 1.02, 1.03, 0.97])
     >>> lc.time
-    array([1, 2, 3, 4])
+    <Time object: scale='tdb' format='bkjd' value=[1. 2. 3. 4.]>
     >>> lc.flux
-    array([0.97, 1.01, 1.03, 0.99])
-    >>> lc.bin(binsize=2).flux
-    array([0.99, 1.01])
+    <Quantity [0.98, 1.02, 1.03, 0.97]>
+    >>> lc.bin(time_bin_size=2, time_bin_start=0.5).flux
+    <Quantity [0.97, 1.01, 1.03, 0.99]>
     """
 
     # The `TimeSeries` base class will enforce the presence of these columns:
@@ -922,6 +922,8 @@ class LightCurve(TimeSeries):
         - If the original lightcurve contains a quality attribute, then the
           bitwise OR of the quality flags will be returned per bin.
         """
+        if time_bin_size and not isinstance(time_bin_size, Quantity):
+            time_bin_size *= u.day
         ts = aggregate_downsample(self,
                                   time_bin_size=time_bin_size,
                                   n_bins=n_bins,

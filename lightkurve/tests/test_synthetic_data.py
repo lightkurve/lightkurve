@@ -42,8 +42,8 @@ def test_sine_sff():
     # Verify that we get the amplitude to within 10%
     n_cad = len(tpf.time)
     design_matrix = np.vstack([np.ones(n_cad),
-                              np.sin(2.0*np.pi*cor_lc.time/ret_period),
-                              np.cos(2.0*np.pi*cor_lc.time/ret_period)]).T
+                              np.sin(2.0*np.pi*cor_lc.time.value/ret_period),
+                              np.cos(2.0*np.pi*cor_lc.time.value/ret_period)]).T
     ATA = np.dot(design_matrix.T,  design_matrix / cor_lc.flux_err[:, None]**2)
     least_squares_coeffs = np.linalg.solve(ATA, np.dot(design_matrix.T, cor_lc.flux/cor_lc.flux_err**2 ))
     const, sin_weight, cos_weight = least_squares_coeffs
@@ -134,8 +134,8 @@ def test_sine_pld():
     # Verify that we get the amplitude to within 20%
     n_cad = len(tpf.time)
     design_matrix = np.vstack([np.ones(n_cad),
-                              np.sin(2.0*np.pi*cor_lc.time/ret_period),
-                              np.cos(2.0*np.pi*cor_lc.time/ret_period)]).T
+                              np.sin(2.0*np.pi*cor_lc.time.value/ret_period),
+                              np.cos(2.0*np.pi*cor_lc.time.value/ret_period)]).T
     ATA = np.dot(design_matrix.T,  design_matrix / cor_lc.flux_err[:, None]**2)
     least_squares_coeffs = np.linalg.solve(ATA, np.dot(design_matrix.T, cor_lc.flux/cor_lc.flux_err**2 ))
     const, sin_weight, cos_weight = least_squares_coeffs

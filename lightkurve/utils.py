@@ -328,7 +328,7 @@ def running_mean(data, window_size):
     return (cumsum[window_size:] - cumsum[:-window_size]) / float(window_size)
 
 
-def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
+def bkjd_to_astropy_time(bkjd):
     """Converts Kepler Barycentric Julian Day (BKJD) time values to an
     `astropy.time.Time` object.
 
@@ -344,8 +344,6 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
     ----------
     bkjd : float or array of floats
         Barycentric Kepler Julian Day.
-    bjdref : float
-        BJD reference date, for Kepler this is 2454833.
 
     Returns
     -------
@@ -359,7 +357,7 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
     return Time(bkjd, format='bkjd', scale='tdb')
 
 
-def btjd_to_astropy_time(btjd, bjdref=2457000.):
+def btjd_to_astropy_time(btjd):
     """Converts TESS Barycentric Julian Day (BTJD) values to an
     `astropy.time.Time` object.
 
@@ -373,8 +371,6 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
     ----------
     btjd : float or array of floats
         Barycentric TESS Julian Day
-    bjdref : float
-        BJD reference date.
 
     Returns
     -------
