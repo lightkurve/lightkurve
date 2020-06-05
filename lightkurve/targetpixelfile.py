@@ -1028,10 +1028,10 @@ class TargetPixelFile(object):
 
         # Find the TPF edges
         col_edges = np.asarray([np.max([0, col-s[0]]),
-                                np.min([col+s[0], imshape[1] - 1])],
+                                np.min([col+s[0], imshape[1]])],
                                dtype=int)
         row_edges = np.asarray([np.max([0, row-s[1]]),
-                                np.min([row+s[1], imshape[0] - 1])],
+                                np.min([row+s[1], imshape[0]])],
                                dtype=int)
 
         # Make a copy of the data extension
