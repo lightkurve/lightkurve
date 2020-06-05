@@ -1023,7 +1023,7 @@ def open(path_or_url, **kwargs):
     # pass header into `detect_filetype()`
     try:
         with fits.open(path_or_url) as temp:
-            filetype = detect_filetype(temp[0].header)
+            filetype = detect_filetype(temp[0].get_header())
             log.debug("Detected filetype: '{}'.".format(filetype))
     except OSError as e:
         filetype = None
