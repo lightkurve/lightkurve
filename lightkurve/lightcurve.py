@@ -59,7 +59,7 @@ class LightCurve(TimeSeries):
     >>> import lightkurve as lk
     >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.98, 1.02, 1.03, 0.97])
     >>> lc.time
-    <Time object: scale='tdb' format='bkjd' value=[1. 2. 3. 4.]>
+    <Time object: scale='tdb' format='jd' value=[1. 2. 3. 4.]>
     >>> lc.flux
     <Quantity [0.98, 1.02, 1.03, 0.97]>
     >>> lc.bin(time_bin_size=2, time_bin_start=0.5).flux
@@ -74,6 +74,9 @@ class LightCurve(TimeSeries):
     _deprecated_keywords = ['targetid', 'label', 'time_format', 'time_scale', 'flux_unit']
     _deprecated_column_keywords = ['centroid_col', 'centroid_row',
                                    'cadenceno', 'quality']
+
+    _default_time_format = "jd"
+    _default_time_scale = "tdb"
 
     def __init__(self, data=None, time=None, flux=None, flux_err=None, **kwargs):
         # Delay checking for required columns until the end
@@ -102,8 +105,8 @@ class LightCurve(TimeSeries):
             # Lightkurve v1.x supported specifying the time_format
             # as a constructor kwarg
             time = Time(time,
-                        format=deprecated_kws.get("time_format", "bkjd"),
-                        scale=deprecated_kws.get("time_scale", "tdb"))
+                        format=deprecated_kws.get("time_format", self._default_time_format),
+                        scale=deprecated_kws.get("time_scale", self._default_time_scale))
 
         super().__init__(data=data, time=time, **kwargs)
 
@@ -1949,7 +1952,8 @@ class KeplerLightCurve(LightCurve):
     """
     _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'channel',
                             'campaign', 'quarter', 'mission', 'ra', 'dec')
-    #extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
+
+    _default_time_format = 'bkjd'
 
     #def __init__(self, *args, **kwargs):
     #    super().__init__(*args, **kwargs)
@@ -2061,7 +2065,8 @@ class TessLightCurve(LightCurve):
     """
     _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'sector',
                             'camera', 'ccd', 'mission', 'ra', 'dec')
-    #extra_columns = ("quality", "cadenceno", "centroid_col", "centroid_row")
+
+    _default_time_format = 'btjd'
 
     #def __init__(self, *args, **kwargs):
     #    super().__init__(*args, **kwargs)
