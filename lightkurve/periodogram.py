@@ -15,6 +15,7 @@ from astropy.table import Table
 from astropy import units as u
 from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel
+from astropy.time import Time
 
 # LombScargle was moved from astropy.stats to astropy.timeseries in AstroPy v3.2
 try:
@@ -933,7 +934,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             raise ValueError("`period` parameter contains illegal nan or inf value(s)")
         if minimum_period is None:
             if period is None:
-                minimum_period = np.max([np.median(np.diff(lc.time)) * 4,
+                minimum_period = np.max([np.median(np.diff(lc.time.value)) * 4,
                                          np.max(duration) + np.median(np.diff(lc.time.value))])
             else:
                 minimum_period = np.min(period)
@@ -1021,9 +1022,12 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         if transit_time is None:
             transit_time = self.transit_time_at_max_power
             log.warning('No transit time specified. Using transit time at max power')
+        if not isinstance(transit_time, Time):
+            transit_time = Time(transit_time, format=self.time.format, scale=self.time.scale)
+
         return self._BLS_object.compute_stats(u.Quantity(period, 'd').value,
                                               u.Quantity(duration, 'd').value,
-                                              u.Quantity(transit_time, 'd').value)
+                                              transit_time)
 
     def get_transit_model(self, period=None, duration=None, transit_time=None):
         """Computes the transit model using the BLS, returns a lightkurve.LightCurve
@@ -1055,6 +1059,8 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         if transit_time is None:
             transit_time = self.transit_time_at_max_power
             log.warning('No transit time specified. Using transit time at max power')
+        if not isinstance(transit_time, Time):
+            transit_time = Time(transit_time, format=self.time.format, scale=self.time.scale)
 
         model_flux = self._BLS_object.model(self.time, u.Quantity(period, 'd').value,
                                             u.Quantity(duration, 'd').value,
