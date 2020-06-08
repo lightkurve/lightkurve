@@ -758,10 +758,7 @@ class LombScarglePeriodogram(Periodogram):
             raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
                              ' to remove NaN values from a LightCurve.')
 
-        if lc.time_format in ['bkjd', 'btjd', 'd', 'days', 'day', None]:
-            time = lc.time.copy()
-        else:
-            raise NotImplementedError('time in format {} is not supported.'.format(lc.time_format))
+        time = lc.time.copy()
 
         # Approximate Nyquist Frequency and frequency bin width in terms of days
         nyquist = 0.5 * (1./(np.median(np.diff(time))))
