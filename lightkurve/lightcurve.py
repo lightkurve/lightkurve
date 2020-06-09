@@ -119,14 +119,16 @@ class LightCurve(TimeSeries):
 
         # Ensure the required columns are available
         if flux is None:
-            flux = np.nan * np.ones_like(time)
+            flux = np.empty(len(self))
+            flux[:] = np.nan
         if not isinstance(flux, Quantity):
             flux = Quantity(flux, deprecated_kws.get("flux_unit"))
         if "flux" not in self.columns:
             self.add_column(flux, name="flux", index=1)
 
         if flux_err is None:
-            flux_err = np.nan * np.ones_like(time)
+            flux_err = np.empty(len(self))
+            flux_err[:] = np.nan
         if not isinstance(flux_err, Quantity):
             flux_err = Quantity(flux_err, deprecated_kws.get("flux_unit"))
         if "flux_err" not in self.columns:
