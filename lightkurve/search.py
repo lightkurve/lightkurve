@@ -16,7 +16,7 @@ from astropy.utils.exceptions import AstropyWarning
 from astropy.utils import deprecated
 
 from .targetpixelfile import TargetPixelFile
-from .collections import TargetPixelFileCollection
+from .collections import TargetPixelFileCollection, LightCurveCollection
 from .utils import suppress_stdout, LightkurveWarning, LightkurveDeprecationWarning
 from .io import read
 from . import PACKAGEDIR

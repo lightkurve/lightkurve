@@ -86,7 +86,7 @@ class KeplerCBVCorrector(Corrector):
         # this enables `lc` to be either a string
         # or a KeplerLightCurve object
         if isinstance(value, str):
-            self._lc = read(value)
+            self._lc = KeplerLightCurve.read(value)
         elif isinstance(value, KeplerLightCurve):
             self._lc = value
         else:

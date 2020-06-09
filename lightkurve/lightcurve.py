@@ -142,8 +142,12 @@ class LightCurve(TimeSeries):
         # Ensure columns are set if passed via deprecated kwargs
         for kw in deprecated_column_kws:
             if kw not in self.meta and kw not in self.columns:
-                arr = np.atleast_1d(deprecated_column_kws[kw])
-                self.add_column(Quantity(arr, dtype=arr.dtype), name=kw)
+                self.add_column(deprecated_column_kws[kw], name=kw)
+
+        # Ensure all columns are Quantity objects
+        for col in self.columns:
+            if not isinstance(self[col], (Quantity, Time)):
+                self.replace_column(col, Quantity(self[col], dtype=self[col].dtype))
 
         self._required_columns_relax = False
         self._check_required_columns()
@@ -163,6 +167,8 @@ class LightCurve(TimeSeries):
     def __setattr__(self, name, value, **kwargs):
         """To get copied, attributes have to be stored in the meta dictionary!"""
         if ('columns' in self.__dict__) and (name in self.__dict__['columns']):
+            if not isinstance(value, Quantity):
+                value = Quantity(value, dtype=value.dtype)
             self.replace_column(name, value)
         elif ('_meta' in self.__dict__) and (name in self.__dict__['_meta']):
             self.__dict__['_meta'][name] = value
@@ -240,6 +246,8 @@ class LightCurve(TimeSeries):
     def flux_quantity(self):
         # TODO: Add deprecation warning
         return self.flux
+
+    # Define flux and flux_err as properties to enable IDE auto-completion
 
     @property
     def flux(self):
@@ -2123,14 +2131,14 @@ class TessLightCurve(LightCurve):
         """
         tess_specific_data = {
             'OBJECT': '{}'.format(self.targetid),
-            'MISSION': self.mission,
-            'RA_OBJ': self.ra,
-            'TELESCOP': self.mission,
-            'CAMERA': self.camera,
-            'CCD': self.ccd,
-            'SECTOR': self.sector,
-            'TARGETID': self.targetid,
-            'DEC_OBJ': self.dec,
+            'MISSION': self.meta.get('mission'),
+            'RA_OBJ': self.meta.get('ra'),
+            'TELESCOP': self.meta.get('mission'),
+            'CAMERA': self.meta.get('camera'),
+            'CCD': self.meta.get('ccd'),
+            'SECTOR': self.meta.get('sector'),
+            'TARGETID': self.meta.get('targetid'),
+            'DEC_OBJ': self.meta.get('dec'),
             'MOM_CENTR1': self.centroid_col,
             'MOM_CENTR2': self.centroid_row}
 

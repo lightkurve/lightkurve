@@ -65,7 +65,9 @@ def prepare_lightcurve_datasource(lc):
 
     # Convert binary quality numbers into human readable strings
     qual_strings = []
-    for bitmask in lc.quality.value:
+    for bitmask in lc.quality:
+        if isinstance(bitmask, u.Quantity):
+            bitmask = bitmask.value
         flag_str_list = KeplerQualityFlags.decode(bitmask)
         if len(flag_str_list) == 0:
             qual_strings.append(' ')

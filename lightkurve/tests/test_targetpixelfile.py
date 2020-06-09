@@ -601,6 +601,8 @@ def test_aperture_photometry_nan():
     assert np.isnan(lc.flux[2])
     assert np.isnan(lc.flux_err[2])
 
+
+@pytest.mark.xfail  # As of June 2020 the SkyBot service is returning MySQL errors
 @pytest.mark.remote_data
 def test_SSOs():
     # TESS test

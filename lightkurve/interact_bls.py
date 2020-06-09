@@ -237,7 +237,7 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
         fig.xaxis.axis_label = 'Time - 2457000 (days)'
     else:
         fig.xaxis.axis_label = 'Time (days)'
-    ylims = [np.nanmin(lc.flux), np.nanmax(lc.flux)]
+    ylims = [np.nanmin(lc.flux.value), np.nanmax(lc.flux.value)]
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
 
     # Add light curve
@@ -347,8 +347,8 @@ def make_bls_figure_elements(result, bls_source, help_source):
     fig.title.offset = -10
     fig.yaxis.axis_label = 'Power'
     fig.xaxis.axis_label = 'Period [days]'
-    fig.y_range = Range1d(start=result.power.min() * 0.95, end=result.power.max() * 1.05)
-    fig.x_range = Range1d(start=result.period.min(), end=result.period.max())
+    fig.y_range = Range1d(start=result.power.min().value * 0.95, end=result.power.max().value * 1.05)
+    fig.x_range = Range1d(start=result.period.min().value, end=result.period.max().value)
 
     # Add circles for the selection of new period. These are always hidden
     fig.circle('period', 'power',

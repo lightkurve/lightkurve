@@ -26,7 +26,10 @@ def _read_lightcurve_fits_file(filename, flux_column,
     """Generic helper function to convert a Kepler ot TESS light curve file
     into a generic `LightCurve` object.
     """
-    hdulist = fits.open(filename)
+    if isinstance(filename, fits.HDUList):
+        hdulist = filename  # Allow HDUList to be passed
+    else:
+        hdulist = fits.open(filename)
     hdu = hdulist[1]
     tab = Table.read(hdu, format='fits')
 

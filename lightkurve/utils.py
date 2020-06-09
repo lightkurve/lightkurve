@@ -80,6 +80,8 @@ class QualityFlags(object):
         # Return an array filled with `True` by default (i.e. ignore nothing)
         if bitmask is None:
             return np.ones(len(quality_array), dtype=bool)
+        if isinstance(quality_array, u.Quantity):
+            quality_array = quality_array.value
         # A few pre-defined bitmasks can be specified as strings
         if isinstance(bitmask, str):
             try:
