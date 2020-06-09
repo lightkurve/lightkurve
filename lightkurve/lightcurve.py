@@ -140,7 +140,8 @@ class LightCurve(TimeSeries):
         # Ensure columns are set if passed via deprecated kwargs
         for kw in deprecated_column_kws:
             if kw not in self.meta and kw not in self.columns:
-                self.add_column(deprecated_column_kws[kw], name=kw)
+                arr = np.atleast_1d(deprecated_column_kws[kw])
+                self.add_column(Quantity(arr, dtype=arr.dtype), name=kw)
 
         self._required_columns_relax = False
         self._check_required_columns()
@@ -563,11 +564,11 @@ class LightCurve(TimeSeries):
         # Warn if `epoch_time` appears to use the wrong format
         if epoch_time and epoch_time.value > 2450000:
             if self.time.format == 'bkjd':
-                warnings.warn('`t0` appears to be given in JD, '
+                warnings.warn('`epoch_time` appears to be given in JD, '
                               'however the light curve time uses BKJD '
                               '(i.e. JD - 2454833).', LightkurveWarning)
             elif self.time.format == 'btjd':
-                warnings.warn('`t0` appears to be given in JD, '
+                warnings.warn('`epoch_time` appears to be given in JD, '
                               'however the light curve time uses BTJD '
                               '(i.e. JD - 2457000).', LightkurveWarning)
 
@@ -1632,9 +1633,10 @@ class LightCurve(TimeSeries):
             from .correctors import SFFCorrector
             return SFFCorrector(self)
 
-    def plot_river(self, period, t0=0, ax=None, bin_points=1,
-                       minimum_phase=-0.5, maximum_phase=0.5, method='mean',
-                       **kwargs):
+    @deprecated_renamed_argument('t0', 'epoch_time', '2.0')
+    def plot_river(self, period, epoch_time=0, ax=None, bin_points=1,
+                   minimum_phase=-0.5, maximum_phase=0.5, method='mean',
+                   **kwargs):
         """Plot the light curve as a river plot.
 
         A river plot uses colors to represent the light curve values in
@@ -1652,7 +1654,7 @@ class LightCurve(TimeSeries):
             The matplotlib axes object.
         period: float
             Period at which to fold the light curve
-        t0 : float
+        epoch_time : float
             Phase mid point for plotting
         bin_points : int
             How many points should be in each bin.
@@ -1675,6 +1677,13 @@ class LightCurve(TimeSeries):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
+        # Lightkurve v1.x assumed that `period` was given in days if no unit
+        # was specified.  We maintain this behavior for backwards-compatibility.
+        if period and not isinstance(period, Quantity):
+            period *= u.day
+        if epoch_time and not isinstance(epoch_time, Time):
+            epoch_time = Time(epoch_time, format=self.time.format, scale=self.time.scale)
+
         method = validate_method(method, supported_methods=['mean', 'median', 'sigma'])
         if (bin_points == 1) and (method in ['mean', 'median']):
             bin_func = lambda y, e: (y[0], e[0])
@@ -1701,19 +1710,19 @@ class LightCurve(TimeSeries):
         # Here `ph` is the phase of each time point x
         # cyc is the number of cycles that have occured at each time point x
         # since the phase 0 before x[0]
-        n = int(period/np.nanmedian(np.diff(x)) * (maximum_phase - minimum_phase)/bin_points)
+        n = int(period.value/np.nanmedian(np.diff(x)) * (maximum_phase - minimum_phase)/bin_points)
         if n == 1:
-            bin_points = int(maximum_phase - minimum_phase)/(2 / int(period/np.nanmedian(np.diff(x))))
+            bin_points = int(maximum_phase - minimum_phase)/(2 / int(period.value/np.nanmedian(np.diff(x))))
             warnings.warn('`bin_points` is too high to plot a phase curve, resetting to {}'.format(bin_points),
                           LightkurveWarning)
             n = 2
-        ph = x/period % 1
-        cyc = np.asarray((x - x % period)/period, int)
+        ph = x/period.value % 1
+        cyc = np.asarray((x - x % period.value)/period.value, int)
         cyc -= np.min(cyc)
 
-        phase = (t0 % period) / period
-        ph = ((x - (phase * period)) / period) % 1
-        cyc = np.asarray((x - ((x - phase * period) % period))/period, int)
+        phase = (epoch_time.value % period.value) / period.value
+        ph = ((x - (phase * period.value)) / period.value) % 1
+        cyc = np.asarray((x - ((x - phase * period.value) % period.value))/period.value, int)
         cyc -= np.min(cyc)
         ph[ph > 0.5] -= 1
 
@@ -1907,7 +1916,7 @@ class FoldedLightCurve(LightCurve):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        ax = super(FoldedLightCurve, self).plot_river(self.period, self.t0, **kwargs)
+        ax = super(FoldedLightCurve, self).plot_river(period=self.period, epoch_time=self.epoch_time, **kwargs)
         return ax
 
 

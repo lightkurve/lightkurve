@@ -9,7 +9,9 @@ import warnings
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+
 from astropy.modeling import models, fitting
+from astropy.units import Quantity
 
 from . import DesignMatrix, DesignMatrixCollection, SparseDesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
@@ -148,10 +150,13 @@ class SFFCorrector(RegressionCorrector):
 
         dms = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
-            ar = np.copy(self.arclength)
+            if isinstance(self.arclength, Quantity):
+                ar = np.copy(self.arclength.value)
+            else:
+                ar = np.copy(self.arclength)
             knots = list(np.percentile(ar[a:b], np.linspace(0, 100, bins+1)[1:-1]))
             ar[~np.in1d(ar, ar[a:b])] = 0
-            #import pdb; pdb.set_trace()
+
             dm = spline(ar, knots=knots, degree=degree).copy()
             dm.columns = ['window{}_bin{}'.format(idx+1, jdx+1)
                                         for jdx in range(dm.shape[1])]
@@ -304,7 +309,10 @@ def _get_thruster_firings(arclength):
     thrusters: np.ndarray of bools
         True at times where thrusters were fired.
     """
-    arc = np.copy(arclength)
+    if isinstance(arclength, Quantity):
+        arc = np.copy(arclength.value)
+    else:
+        arc = np.copy(arclength)
     # Rate of change of rate of change of arclength wrt time
     d2adt2 = (np.gradient(np.gradient(arc)))
     # Fit a Gaussian, most points lie in a tight region, thruster firings are outliers

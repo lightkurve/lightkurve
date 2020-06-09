@@ -65,7 +65,7 @@ def prepare_lightcurve_datasource(lc):
 
     # Convert binary quality numbers into human readable strings
     qual_strings = []
-    for bitmask in lc.quality:
+    for bitmask in lc.quality.value:
         flag_str_list = KeplerQualityFlags.decode(bitmask)
         if len(flag_str_list) == 0:
             qual_strings.append(' ')
@@ -75,11 +75,11 @@ def prepare_lightcurve_datasource(lc):
             qual_strings.append("; ".join(flag_str_list))
 
     lc_source = ColumnDataSource(data=dict(
-                                 time=lc.time,
+                                 time=lc.time.value,
                                  time_iso=human_time,
-                                 flux=lc.flux,
-                                 cadence=lc.cadenceno,
-                                 quality_code=lc.quality,
+                                 flux=lc.flux.value,
+                                 cadence=lc.cadenceno.value,
+                                 quality_code=lc.quality.value,
                                  quality=np.array(qual_strings)))
     return lc_source
 
@@ -146,13 +146,14 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     step_renderer : GlyphRenderer
     vertical_line : Span
     """
-    if lc.mission == 'K2':
+    mission = lc.meta.get('mission')
+    if mission == 'K2':
         title = "Lightcurve for {} (K2 C{})".format(
             lc.label, lc.campaign)
-    elif lc.mission == 'Kepler':
+    elif mission == 'Kepler':
         title = "Lightcurve for {} (Kepler Q{})".format(
             lc.label, lc.quarter)
-    elif lc.mission == 'TESS':
+    elif mission == 'TESS':
         title = "Lightcurve for {} (TESS Sec. {})".format(
             lc.label, lc.sector)
     else:
@@ -203,7 +204,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
                             mode='mouse', point_policy="snap_to_data"))
 
     # Vertical line to indicate the cadence
-    vertical_line = Span(location=lc.time[0], dimension='height',
+    vertical_line = Span(location=lc.time[0].value, dimension='height',
                          line_color='firebrick', line_width=4, line_alpha=0.5)
     fig.add_layout(vertical_line)
 

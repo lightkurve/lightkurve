@@ -995,7 +995,7 @@ def test_SSOs():
 
 def test_get_header():
     """Test the basic functionality of ``tpf.get_header()``"""
-    lcf = TessLightCurveFile(filename_tess_custom)
+    lcf = TessLightCurve.read(filename_tess_custom)
     assert lcf.get_header()['CREATOR'] == lcf.get_keyword("CREATOR")
     assert lcf.get_header(ext=2)['EXTNAME'] == "APERTURE"
     # ``tpf.header`` is deprecated
