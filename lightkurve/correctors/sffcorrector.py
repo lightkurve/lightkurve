@@ -128,9 +128,9 @@ class SFFCorrector(RegressionCorrector):
                           LightkurveWarning)
 
         if centroid_col is None:
-            centroid_col = self.lc.centroid_col.value
+            centroid_col = self.lc.centroid_col
         if centroid_row is None:
-            centroid_row = self.lc.centroid_row.value
+            centroid_row = self.lc.centroid_row
 
         if np.any([~np.isfinite(centroid_row), ~np.isfinite(centroid_col)]):
             raise ValueError('Centroids contain NaN values.')

@@ -63,7 +63,7 @@ class LightCurve(TimeSeries):
     >>> lc.flux
     <Quantity [0.98, 1.02, 1.03, 0.97]>
     >>> lc.bin(time_bin_size=2, time_bin_start=0.5).flux
-    <Quantity [0.97, 1.01, 1.03, 0.99]>
+    <Quantity [1., 1.]>
     """
 
     # The `TimeSeries` base class will enforce the presence of these columns:
@@ -388,7 +388,7 @@ class LightCurve(TimeSeries):
                     idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
-    def append(self, others, inplace=False):
+    def append(self, others, inplace=None):
         """Append one or more other `LightCurve` object(s) to this one.
 
         Parameters
@@ -404,16 +404,12 @@ class LightCurve(TimeSeries):
         new_lc : `LightCurve`
             Light curve which has the other light curves appened to it.
         """
+        if inplace:
+            raise ValueError("the `inplace` parameter is no longer supported "
+                             "as of Lightkurve v2.0")
         if not hasattr(others, '__iter__'):
             others = (others,)
-
-        if inplace:
-            new_lc = self
-        else:
-            new_lc = self.copy()
-
-        new_lc = vstack((self, *others))
-        return new_lc
+        return vstack((self, *others))
 
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
                 break_tolerance=5, niters=3, sigma=3, mask=None, **kwargs):
@@ -625,9 +621,9 @@ class LightCurve(TimeSeries):
             >>> lc = lk.LightCurve(time=[1, 2, 3], flux=[25945.7, 25901.5, 25931.2], flux_err=[6.8, 4.6, 6.2])
             >>> normalized_lc = lc.normalize()
             >>> normalized_lc.flux
-            array([1.00055917, 0.99885466, 1.        ])
+            <Quantity [1.00055917, 0.99885466, 1.        ]>
             >>> normalized_lc.flux_err
-            array([0.00026223, 0.00017739, 0.00023909])
+            <Quantity [0.00026223, 0.00017739, 0.00023909]>
 
         Returns
         -------
@@ -850,9 +846,9 @@ class LightCurve(TimeSeries):
             >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
             >>> lc_clean = lc.remove_outliers(sigma=1)
             >>> lc_clean.time
-            array([1, 3, 5])
+            <Time object: scale='tdb' format='jd' value=[1. 3. 5.]>
             >>> lc_clean.flux
-            array([1, 1, 1])
+            <Quantity [1., 1., 1.]>
 
         Instead of specifying `sigma`, you may specify separate `sigma_lower`
         and `sigma_upper` parameters to remove only outliers above or below
@@ -861,9 +857,9 @@ class LightCurve(TimeSeries):
             >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
             >>> lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
             >>> lc_clean.time
-            array([1, 3, 4, 5])
+            <Time object: scale='tdb' format='jd' value=[1. 3. 4. 5.]>
             >>> lc_clean.flux
-            array([    1,     1, -1000,     1])
+            <Quantity [    1.,     1., -1000.,     1.]>
 
         Optionally, you may use the `return_mask` parameter to return a boolean
         array which flags the outliers identified by the method. For example::
@@ -925,8 +921,15 @@ class LightCurve(TimeSeries):
         - If the original lightcurve contains a quality attribute, then the
           bitwise OR of the quality flags will be returned per bin.
         """
-        if time_bin_size and not isinstance(time_bin_size, Quantity):
+        if time_bin_size is None:
+            time_bin_size = 0.5*u.day
+        if not isinstance(time_bin_size, Quantity):
             time_bin_size *= u.day
+        if time_bin_start is None:
+            time_bin_start = self.time[0]
+        if not isinstance(time_bin_start, Time):
+            time_bin_start = Time(time_bin_start, format=self.time.format, scale=self.time.scale)
+        
         ts = aggregate_downsample(self,
                                   time_bin_size=time_bin_size,
                                   n_bins=n_bins,

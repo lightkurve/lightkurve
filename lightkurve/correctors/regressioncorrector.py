@@ -160,7 +160,7 @@ class RegressionCorrector(Corrector):
             sigma_w_inv = sigma_w_inv.toarray()
 
         if prior_sigma is not None:
-            sigma_w_inv += np.diag(1. / prior_sigma**2)
+            sigma_w_inv = sigma_w_inv + np.diag(1. / prior_sigma**2)
         if prior_sigma is not None:
             B += (prior_mu / prior_sigma**2)
 

@@ -54,9 +54,9 @@ def test_sinusoid_noise():
     true_flux = np.ones(size)
     noise = np.sin(time/5)
     # True light curve is flat, i.e. flux=1 at all time steps
-    true_lc = LightCurve(time, true_flux, flux_err=0.1*np.ones(size))
+    true_lc = LightCurve(time=time, flux=true_flux, flux_err=0.1*np.ones(size))
     # Noisy light curve has a sinusoid single added
-    noisy_lc = LightCurve(time, true_flux+noise, flux_err=true_lc.flux_err)
+    noisy_lc = LightCurve(time=time, flux=true_flux+noise, flux_err=true_lc.flux_err)
     design_matrix = DesignMatrix({'noise': noise,
                                   'offset': np.ones(len(time))},
                                   name='noise_model')
@@ -88,8 +88,7 @@ def test_nan_input():
         # Instantiating light curves with NaN times will yield a warning
         warnings.simplefilter("ignore", LightkurveWarning)
         lcs = [LightCurve(flux=[5, 10], flux_err=[np.nan, 1]),
-               LightCurve(flux=[np.nan, 10], flux_err=[1, 1]),
-               LightCurve(time=[1, np.nan], flux=[5, 10], flux_err=[1, 1])]
+               LightCurve(flux=[np.nan, 10], flux_err=[1, 1])]
 
     # Passing these to RegressionCorrector should raise a ValueError
     for lc in lcs:

@@ -5,6 +5,8 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 
+from astropy.table import vstack
+
 from . import MPLSTYLE
 from .utils import LightkurveWarning
 from .targetpixelfile import TargetPixelFile
@@ -49,7 +51,7 @@ class Collection(object):
         if (isinstance(self[0], TargetPixelFile)):
             labels = np.asarray([tpf.targetid for tpf in self])
         else:
-            labels = np.asarray([lcf.label for lcf in self])
+            labels = np.asarray([lc.meta.get('label') for lc in self])
 
         try:
             unique_labels = np.sort(np.unique(labels))
@@ -119,7 +121,7 @@ class LightCurveCollection(Collection):
             corrector_func = lambda x: x
 
         try:
-            targets = np.unique([lc.label for lc in self])
+            targets = np.unique([lc.meta.get('label') for lc in self])
         except TypeError:
             targets = [None]
 
@@ -127,9 +129,7 @@ class LightCurveCollection(Collection):
             raise ValueError('This collection contains more than one target, '
                              'please reduce to a single target before calling `stitch()`.')
         lcs = [corrector_func(lc) for lc in self]
-        lc = lcs[0]
-        [lc.append(lc1, inplace=True) for lc1 in lcs[1:]]
-        return lc
+        return vstack(lcs)
 
     def plot(self, ax=None, offset=0.1, **kwargs):
         """Plots all light curves in the collection on a single plot.
@@ -155,7 +155,7 @@ class LightCurveCollection(Collection):
                 if kwarg in kwargs:
                     kwargs.pop(kwarg)
 
-            labels = np.asarray([lcf.label for lcf in self])
+            labels = np.asarray([lc.meta.get('label') for lc in self])
             try:
                 unique_labels = np.sort(np.unique(labels))
             except TypeError:
