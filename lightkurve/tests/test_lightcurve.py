@@ -362,7 +362,7 @@ def test_lightcurve_scatter():
 
     # get an array of original times, in the same order as the folded lightcurve
     foldkw = dict(period=0.837491)
-    originaltime = LightCurve(lc.time, lc.time)
+    originaltime = LightCurve(time=lc.time, flux=lc.flux)
     foldedtimeinorder = originaltime.fold(**foldkw).flux
 
     # plot a grid of phase-folded and not, with colors
@@ -370,7 +370,7 @@ def test_lightcurve_scatter():
     scatterkw = dict( s=5, cmap='winter')
     lc.scatter(ax=ax[0,0])
     lc.fold(**foldkw).scatter(ax=ax[0,1])
-    lc.scatter(ax=ax[1,0], c=lc.time, **scatterkw)
+    lc.scatter(ax=ax[1,0], c=lc.time.value, **scatterkw)
     lc.fold(**foldkw).scatter(ax=ax[1,1], c=foldedtimeinorder, **scatterkw)
     plt.ylim(0.999, 1.001)
 
@@ -394,8 +394,8 @@ def test_cdpp_tabby():
     """Compare the cdpp noise metric against the pipeline value."""
     lcf = KeplerLightCurve.read(TABBY_Q8)
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
-    lc = LightCurve(lcf.PDCSAP_FLUX.time[:1000], lcf.PDCSAP_FLUX.flux[:1000])
-    assert(np.abs(lc.estimate_cdpp() - lcf.get_header(ext=1)['CDPP6_0']) < 30)
+    lc = LightCurve(time=lcf.PDCSAP_FLUX.time[:1000], flux=lcf.PDCSAP_FLUX.flux[:1000])
+    assert(np.abs(lc.estimate_cdpp().value - lcf.cdpp6_0) < 30)
 
 
 # TEMPORARILY SKIP, cf. https://github.com/KeplerGO/lightkurve/issues/663

@@ -78,7 +78,7 @@ class LightCurve(TimeSeries):
     _default_time_format = "jd"
     _default_time_scale = "tdb"
 
-    def __init__(self, data=None, time=None, flux=None, flux_err=None, **kwargs):
+    def __init__(self, data=None, *, time=None, flux=None, flux_err=None, **kwargs):
         # Delay checking for required columns until the end
         self._required_columns_relax = True
 
@@ -1585,7 +1585,7 @@ class LightCurve(TimeSeries):
             for kw in extra_data:
                 if isinstance(extra_data[kw], (np.ndarray, list)):
                     cols.append(fits.Column(name='{}'.format(kw).upper(),
-                                            format=typedir[type(extra_data[kw][0])],
+                                            format=typedir[extra_data[kw].dtype.type],
                                             array=extra_data[kw]))
             if 'SAP_QUALITY' not in extra_data:
                 cols.append(fits.Column(name='SAP_QUALITY',
