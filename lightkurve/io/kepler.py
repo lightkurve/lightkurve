@@ -18,7 +18,7 @@ __all__ = ["read_kepler_lightcurve", "read_tess_lightcurve"]
 log = logging.getLogger(__name__)
 
 
-def _read_lightcurve_fits_file(filename, flux_column, flux_err_column,
+def _read_lightcurve_fits_file(filename, flux_column,
                                quality_column='quality',
                                centroid_col_column='mom_centr1',
                                centroid_row_column='mom_centr2',
@@ -74,9 +74,15 @@ def _read_lightcurve_fits_file(filename, flux_column, flux_err_column,
     # For backwards compatibility with Lightkurve v1.x,
     # we make sure standard columns and attributes exist.
     if 'flux' not in tab.columns:
-        tab.add_column(tab[flux_column], name="flux", index=0)
-    if 'flux_err' not in tab.columns:
-        tab.add_column(tab[flux_err_column], name="flux_err", index=1)
+        flux = tab[flux_column]
+        flux_err = tab[f"{flux_column}_err"] 
+        if flux_column == 'sap_flux':
+            flux /= hdu.header.get('FLFRCSAP', 1)
+            flux /= hdu.header.get('CROWDSAP', 1)
+            flux_err /= hdu.header.get('FLFRCSAP', 1)
+            flux_err /= hdu.header.get('CROWDSAP', 1)
+        tab.add_column(flux, name="flux", index=0)
+        tab.add_column(flux_err, name="flux_err", index=1)
     if 'quality' not in tab.columns and quality_column in tab.columns:
         tab.add_column(tab[quality_column], name="quality", index=2)
     if 'centroid_col' not in tab.columns and centroid_col_column in tab.columns:
@@ -95,7 +101,6 @@ def _read_lightcurve_fits_file(filename, flux_column, flux_err_column,
 
 def read_kepler_lightcurve(filename,
                            flux_column="pdcsap_flux",
-                           flux_err_column="pdcsap_flux_err",
                            quality_bitmask="default"):
     """Returns a KeplerLightCurve.
 
@@ -105,8 +110,6 @@ def read_kepler_lightcurve(filename,
         Local path or remote url of a Kepler light curve FITS file.
     flux_column : 'pdcsap_flux' or 'sap_flux'
         Which column in the FITS file contains the preferred flux data?
-    flux_err_column : 'pdcsap_flux_err' or 'sap_flux_err'
-            Which column in the FITS file contains the preferred flux_err data?
     quality_bitmask : str or int
         Bitmask (integer) which identifies the quality flag bitmask that should
         be used to mask out bad cadences. If a string is passed, it has the
@@ -124,7 +127,6 @@ def read_kepler_lightcurve(filename,
     """
     lc = _read_lightcurve_fits_file(filename,
                                     flux_column=flux_column,
-                                    flux_err_column=flux_err_column,
                                     quality_column='sap_quality',
                                     time_format='bkjd')
 
@@ -145,7 +147,6 @@ def read_kepler_lightcurve(filename,
 
 def read_tess_lightcurve(filename,
                          flux_column="pdcsap_flux",
-                         flux_err_column="pdcsap_flux_err",
                          quality_bitmask="default"):
     """Returns a `TessLightCurve`.
 
@@ -155,8 +156,6 @@ def read_tess_lightcurve(filename,
         Local path or remote url of a Kepler light curve FITS file.
     flux_column : 'pdcsap_flux' or 'sap_flux'
         Which column in the FITS file contains the preferred flux data?
-    flux_err_column : 'pdcsap_flux_err' or 'sap_flux_err'
-            Which column in the FITS file contains the preferred flux_err data?
     quality_bitmask : str or int
         Bitmask (integer) which identifies the quality flag bitmask that should
         be used to mask out bad cadences. If a string is passed, it has the
@@ -174,7 +173,6 @@ def read_tess_lightcurve(filename,
     """
     lc = _read_lightcurve_fits_file(filename,
                                     flux_column=flux_column,
-                                    flux_err_column=flux_err_column,
                                     time_format='btjd')
 
     # Filter out poor-quality data

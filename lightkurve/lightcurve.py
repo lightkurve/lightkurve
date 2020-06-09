@@ -179,12 +179,12 @@ class LightCurve(TimeSeries):
         return super()._base_repr_(descr_vals=descr_vals, **kwargs)
 
     @property
-    @deprecated("2.0")
+    @deprecated("2.0", warning_type=LightkurveDeprecationWarning)
     def hdu(self):
         return fits.open(self.filename)
 
     @property
-    @deprecated("2.0")
+    @deprecated("2.0", warning_type=LightkurveDeprecationWarning)
     def SAP_FLUX(self):
         """A copy of the light curve in which `lc.flux = lc.sap_flux`
         and `lc.flux_err = lc.sap_flux_err`.  It is provided for backwards-
@@ -195,7 +195,7 @@ class LightCurve(TimeSeries):
         return lc
 
     @property
-    @deprecated("2.0")
+    @deprecated("2.0", warning_type=LightkurveDeprecationWarning)
     def PDCSAP_FLUX(self):
         """A copy of the light curve in which `lc.flux = lc.pdcsap_flux`
         and `lc.flux_err = lc.pdcsap_flux_err`.  It is provided for backwards-
@@ -516,8 +516,8 @@ class LightCurve(TimeSeries):
             return flatten_lc, trend_lc
         return flatten_lc
 
-    @deprecated_renamed_argument('transit_midpoint', 'epoch_time', '2.0')
-    @deprecated_renamed_argument('t0', 'epoch_time', '2.0')
+    @deprecated_renamed_argument('transit_midpoint', 'epoch_time', '2.0', warning_type=LightkurveDeprecationWarning)
+    @deprecated_renamed_argument('t0', 'epoch_time', '2.0', warning_type=LightkurveDeprecationWarning)
     def fold(self, period=None, epoch_time=None, epoch_phase=0,
              wrap_phase=None, normalize_phase=False):
         """
@@ -1633,7 +1633,7 @@ class LightCurve(TimeSeries):
             from .correctors import SFFCorrector
             return SFFCorrector(self)
 
-    @deprecated_renamed_argument('t0', 'epoch_time', '2.0')
+    @deprecated_renamed_argument('t0', 'epoch_time', '2.0', warning_type=LightkurveDeprecationWarning)
     def plot_river(self, period, epoch_time=0, ax=None, bin_points=1,
                    minimum_phase=-0.5, maximum_phase=0.5, method='mean',
                    **kwargs):

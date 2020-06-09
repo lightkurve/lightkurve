@@ -101,7 +101,7 @@ def test_rmath_operators():
 @pytest.mark.remote_data
 @pytest.mark.parametrize("path, mission", [(TABBY_Q8, "Kepler"), (K2_C08, "K2")])
 def test_KeplerLightCurveFile(path, mission):
-    lc = KeplerLightCurveFile(path, quality_bitmask=None)
+    lc = KeplerLightCurveFile(path, flux_column="sap_flux", quality_bitmask=None)
     assert lc.obsmode == 'long cadence'
     assert len(lc.pos_corr1) == len(lc.pos_corr2)
 
@@ -111,9 +111,9 @@ def test_KeplerLightCurveFile(path, mission):
         assert lc.quarter == 8
     elif lc.mission.lower() == 'k2':
         assert lc.campaign == 8
-        assert lc.quarter is None
-    assert lc.time_format == 'bkjd'
-    assert lc.time_scale == 'tdb'
+        assert lc.meta.get('quarter') is None
+    assert lc.time.format == 'bkjd'
+    assert lc.time.scale == 'tdb'
     assert lc.astropy_time.scale == 'tdb'
     assert lc.flux_unit == u.electron / u.second
 
@@ -130,7 +130,7 @@ def test_KeplerLightCurveFile(path, mission):
                          ['hardest', 'hard', 'default', None,
                           1, 100, 2096639])
 def test_TessLightCurveFile(quality_bitmask):
-    tess_file = TessLightCurveFile(TESS_SIM, quality_bitmask=quality_bitmask)
+    tess_file = TessLightCurveFile.read(TESS_SIM, quality_bitmask=quality_bitmask)
     hdu = pyfits.open(TESS_SIM)
     lc = tess_file.SAP_FLUX
 
@@ -145,17 +145,17 @@ def test_TessLightCurveFile(quality_bitmask):
     assert lc.ra == hdu[0].header['RA_OBJ']
     assert lc.dec == hdu[0].header['DEC_OBJ']
 
-    assert_array_equal(lc.time[0:10], hdu[1].data['TIME'][0:10])
-    assert_array_equal(lc.flux[0:10], hdu[1].data['SAP_FLUX'][0:10])
+    assert_array_equal(lc.time[0:10].value, hdu[1].data['TIME'][0:10])
+    assert_array_equal(lc.flux[0:10].value, hdu[1].data['SAP_FLUX'][0:10])
 
     # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
-    assert np.isnan(lc.time).sum() == 0
+    assert np.isnan(lc.time.value).sum() == 0
 
 
 @pytest.mark.remote_data
 @pytest.mark.parametrize("quality_bitmask, answer", [('hardest', 2661),
-                                                     ('hard', 2706), ('default', 3113), (None, 3279),
-                                                     (1, 3279), (100, 3252), (2096639, 2661)])
+                                                     ('hard', 2706), ('default', 3113), (None, 3143),
+                                                     (1, 3143), (100, 3116), (2096639, 2661)])
 def test_bitmasking(quality_bitmask, answer):
     """Test whether the bitmasking behaves like it should"""
     lc = read(TABBY_Q8, quality_bitmask=quality_bitmask)
