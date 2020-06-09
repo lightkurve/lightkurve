@@ -1173,9 +1173,9 @@ class LightCurve(TimeSeries):
                     cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
                     cbar.ax.minorticks_off()
             elif method == 'errorbar':
-                ax.errorbar(x=self.time.value, y=flux, yerr=flux_err, **kwargs)
+                ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
             else:
-                ax.plot(self.time.value, flux, **kwargs)
+                ax.plot(self.time.value, flux.value, **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set

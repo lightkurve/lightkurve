@@ -343,14 +343,13 @@ def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
     for lcf in [KeplerLightCurve.read(TABBY_Q8), TessLightCurve.read(TESS_SIM)]:
         lcf.plot()
-        lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
         lcf.scatter()
         lcf.errorbar()
         lcf.SAP_FLUX.plot()
         lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
         lcf.SAP_FLUX.scatter()
         lcf.SAP_FLUX.scatter(c='C3')
-        lcf.SAP_FLUX.scatter(c=lcf.SAP_FLUX.time, show_colorbar=True, colorbar_label='Time')
+        lcf.SAP_FLUX.scatter(c=lcf.SAP_FLUX.time.value, show_colorbar=True, colorbar_label='Time')
         lcf.SAP_FLUX.errorbar()
         plt.close('all')
 
@@ -971,6 +970,7 @@ def test_bin_issue705():
     lc.bin(binsize=15)
 
 
+@pytest.mark.xfail  # As of June 2020 the SkyBot service is returning MySQL errors
 @pytest.mark.remote_data
 def test_SSOs():
     # TESS test
