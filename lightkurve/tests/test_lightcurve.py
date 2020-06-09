@@ -15,6 +15,7 @@ import warnings
 
 from ..io import read
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
+from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..utils import LightkurveWarning
 from .test_targetpixelfile import TABBY_TPF
@@ -100,18 +101,13 @@ def test_rmath_operators():
 @pytest.mark.remote_data
 @pytest.mark.parametrize("path, mission", [(TABBY_Q8, "Kepler"), (K2_C08, "K2")])
 def test_KeplerLightCurveFile(path, mission):
-    lcf = KeplerLightCurveFile(path, quality_bitmask=None)
-    assert lcf.obsmode == 'long cadence'
-    assert len(lcf.pos_corr1) == len(lcf.pos_corr2)
+    lc = KeplerLightCurveFile(path, quality_bitmask=None)
+    assert lc.obsmode == 'long cadence'
+    assert len(lc.pos_corr1) == len(lc.pos_corr2)
 
-    # The liberal bitmask will cause the lightcurve to contain NaN times
-    with pytest.warns(LightkurveWarning, match='NaN times'):
-        lc = lcf.get_lightcurve('SAP_FLUX')
-
-    assert lc.channel == lcf.channel
     assert lc.mission.lower() == mission.lower()
     if lc.mission.lower() == 'kepler':
-        assert lc.campaign is None
+        assert lc.meta.get('campaign') is None
         assert lc.quarter == 8
     elif lc.mission.lower() == 'k2':
         assert lc.campaign == 8
@@ -124,11 +120,9 @@ def test_KeplerLightCurveFile(path, mission):
     # Does the data match what one would obtain using pyfits.open?
     hdu = pyfits.open(path)
     assert lc.label == hdu[0].header['OBJECT']
-    assert_array_equal(lc.time, hdu[1].data['TIME'])
-    assert_array_equal(lc.flux, hdu[1].data['SAP_FLUX'] / ((hdu[1].header['CROWDSAP'] * hdu[1].header['FLFRCSAP'])))
-
-    with pytest.raises(KeyError):
-        lcf.get_lightcurve('BLABLA')
+    nanmask = ~np.isnan(hdu[1].data['TIME'])
+    assert_array_equal(lc.time.value, hdu[1].data['TIME'][nanmask])
+    assert_array_equal(lc.flux.value, hdu[1].data['SAP_FLUX'][nanmask] / ((hdu[1].header['CROWDSAP'] * hdu[1].header['FLFRCSAP'])))
 
 
 @pytest.mark.remote_data
@@ -156,9 +150,6 @@ def test_TessLightCurveFile(quality_bitmask):
 
     # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
     assert np.isnan(lc.time).sum() == 0
-
-    with pytest.raises(KeyError):
-        tess_file.get_lightcurve('DOESNOTEXIST')
 
 
 @pytest.mark.remote_data
@@ -350,7 +341,7 @@ def test_custom_lightcurve_file(path, mission):
 @pytest.mark.remote_data
 def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
-    for lcf in [KeplerLightCurveFile(TABBY_Q8), TessLightCurveFile(TESS_SIM)]:
+    for lcf in [KeplerLightCurve.read(TABBY_Q8), TessLightCurve.read(TESS_SIM)]:
         lcf.plot()
         lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
         lcf.scatter()
@@ -367,7 +358,7 @@ def test_lightcurve_plots():
 @pytest.mark.remote_data
 def test_lightcurve_scatter():
     """Sanity check to verify that lightcurve scatter plotting works"""
-    lcf = KeplerLightCurveFile(KEPLER10)
+    lcf = KeplerLightCurve.read(KEPLER10)
     lc = lcf.PDCSAP_FLUX.flatten()
 
     # get an array of original times, in the same order as the folded lightcurve
@@ -402,7 +393,7 @@ def test_cdpp():
 @pytest.mark.remote_data
 def test_cdpp_tabby():
     """Compare the cdpp noise metric against the pipeline value."""
-    lcf = KeplerLightCurveFile(TABBY_Q8)
+    lcf = KeplerLightCurve.read(TABBY_Q8)
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
     lc = LightCurve(lcf.PDCSAP_FLUX.time[:1000], lcf.PDCSAP_FLUX.flux[:1000])
     assert(np.abs(lc.estimate_cdpp() - lcf.get_header(ext=1)['CDPP6_0']) < 30)
@@ -594,9 +585,9 @@ def test_to_csv():
 @pytest.mark.remote_data
 def test_to_fits():
     """Test the KeplerLightCurve.to_fits() method"""
-    lcf = KeplerLightCurveFile(TABBY_Q8)
+    lcf = KeplerLightCurve.read(TABBY_Q8)
     hdu = lcf.PDCSAP_FLUX.to_fits()
-    KeplerLightCurveFile(hdu)  # Regression test for #233
+    KeplerLightCurve.read(hdu)  # Regression test for #233
     assert type(hdu).__name__ is 'HDUList'
     assert len(hdu) == 2
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
@@ -608,7 +599,7 @@ def test_to_fits():
     hdu = LightCurve([0, 1, 2, 3, 4], [1, 1, 1, 1, 1]).to_fits()
 
     # Test "round-tripping": can we read-in what we write
-    lcf_new = LightCurveFile(hdu)  # Regression test for #233
+    lcf_new = LightCurve.read(hdu)  # Regression test for #233
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
     assert hdu[1].header['EXTNAME'] == 'LIGHTCURVE'
     assert hdu[1].header['TTYPE1'] == 'TIME'
@@ -642,7 +633,7 @@ def test_to_fits():
 @pytest.mark.remote_data
 def test_astropy_time():
     '''Test the `astropy_time` property'''
-    lcf = KeplerLightCurveFile(TABBY_Q8)
+    lcf = KeplerLightCurve.read(TABBY_Q8)
     astropy_time = lcf.astropy_time
     iso = astropy_time.iso
     assert astropy_time.scale == 'tdb'
@@ -672,10 +663,10 @@ def test_lightcurve_repr():
 @pytest.mark.remote_data
 def test_lightcurvefile_repr():
     """Do __str__ and __repr__ work?"""
-    lcf = KeplerLightCurveFile(TABBY_Q8)
+    lcf = KeplerLightCurve.read(TABBY_Q8)
     str(lcf)
     repr(lcf)
-    lcf = TessLightCurveFile(TESS_SIM)
+    lcf = TessLightCurve.read(TESS_SIM)
     str(lcf)
     repr(lcf)
 
@@ -755,8 +746,7 @@ def test_remove_outliers():
 def test_properties(capfd):
     '''Test if the describe function produces an output.
     The output is 624 characters at the moment, but we might add more properties.'''
-    lcf = KeplerLightCurveFile(TABBY_Q8)
-    kplc = lcf.get_lightcurve('SAP_FLUX')
+    kplc = KeplerLightCurve.read(TABBY_Q8, flux_column="sap_flux")
     kplc.show_properties()
     out, _ = capfd.readouterr()
     assert len(out) > 500
@@ -993,9 +983,10 @@ def test_SSOs():
     assert(len(mask) == len(lc.flux))
 
 
+@pytest.mark.xfail  # LightCurveFile was removed in Lightkurve v2.x
 def test_get_header():
     """Test the basic functionality of ``tpf.get_header()``"""
-    lcf = TessLightCurve.read(filename_tess_custom)
+    lcf = TessLightCurveFile(filename_tess_custom)
     assert lcf.get_header()['CREATOR'] == lcf.get_keyword("CREATOR")
     assert lcf.get_header(ext=2)['EXTNAME'] == "APERTURE"
     # ``tpf.header`` is deprecated

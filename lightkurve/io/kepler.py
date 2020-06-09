@@ -30,6 +30,12 @@ def _read_lightcurve_fits_file(filename, flux_column, flux_err_column,
     hdu = hdulist[1]
     tab = Table.read(hdu, format='fits')
 
+    # Make sure the meta data also includes header fields from extension #0
+    tab.meta.update(hdulist[0].header)
+
+    # Use lowercase for meta data fields
+    tab.meta = {k.lower(): v for k, v in tab.meta.items()}
+
     # Some KEPLER files used to have a T column instead of TIME.
     if "T" in tab.colnames:
         tab.rename_column("T", "TIME")
