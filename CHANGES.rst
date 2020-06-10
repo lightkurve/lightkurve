@@ -1,3 +1,11 @@
+1.11.1 (unreleased)
+===================
+
+- Fixed a bug in ``TargetPixelFile.cutout()`` which prevented image edges from
+  being included in cut-outs. [#749]
+
+
+
 1.11.0 (2015-05-20)
 ===================
 

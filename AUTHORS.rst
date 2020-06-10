@@ -1,7 +1,10 @@
 Core developers
 ---------------
 
-Core developers have been granted commit privileges to the Lightkurve repository based on their sustained contributions.  The core developers aim to govern the project by consensus. If you believe you meet the criteria to be added as a core developer, please open an issue!
+Core developers have commit privileges to the Lightkurve repository based on
+their sustained contributions.  The core developers aim to govern the project
+by consensus. If you believe you meet the criteria to be added as a core
+developer, please open an issue!
 
 - `Geert Barentsen <https://github.com/barentsen>`_ (lead maintainer)
 - `Christina Hedges <https://github.com/christinahedges>`_
@@ -12,6 +15,7 @@ Core developers have been granted commit privileges to the Lightkurve repository
 - `Michael Gully-Santiago <https://github.com/gully>`_
 - `Daniel Hey <https://github.com/danielhey>`_
 - `Oliver Hall <https://github.com/ojhall94>`_
+
 
 Contributors
 ------------
@@ -35,6 +39,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Daniel Foreman-Mackey <https://github.com/dfm>`_
 - `Michael Higgins <Higgins00>`_
 - `Rebekah Hounsell <https://github.com/rebekah9969>`_
+- `Isabel Coleman <https://github.com/astrobel>`_
 
 
 Community
