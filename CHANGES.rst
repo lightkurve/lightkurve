@@ -12,6 +12,9 @@
 - Added the ``column`` parameter to ``TargetPixelFile.plot()`` to enable all
   columns in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
 
+- Fixed a bug in ``TargetPixelFile.cutout()`` which prevented image edges from
+  being included in cut-outs. [#749]
+
 
 
 
