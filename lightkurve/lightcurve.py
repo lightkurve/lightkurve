@@ -186,8 +186,65 @@ class LightCurve(TimeSeries):
             descr_vals.append('length={}'.format(len(self)))
         return super()._base_repr_(descr_vals=descr_vals, **kwargs)
 
+    # Define `time`, `flux`, `flux_err` as class attributes to enable IDE
+    # of these required columns auto-completion.
+
     @property
-    @deprecated("2.0", warning_type=LightkurveDeprecationWarning)
+    def time(self):
+        """The time values."""
+        return self['time']
+
+    @time.setter
+    def time(self, time):
+        self['time'] = time
+
+    @property
+    def flux(self):
+        """The brightness values."""
+        return self['flux']
+
+    @flux.setter
+    def flux(self, flux):
+        self['flux'] = flux
+
+    @property
+    def flux_err(self):
+        """The brightness uncertainty."""
+        return self['flux_err']
+
+    @flux_err.setter
+    def flux_err(self, flux_err):
+        self['flux_err'] = flux_err
+
+    # Define deprecated attributes for compatibility with Lightkurve v1.x:
+
+    @property
+    @deprecated("2.0", alternative="time.format", warning_type=LightkurveDeprecationWarning)
+    def time_format(self):
+        return self.time.format
+
+    @property
+    @deprecated("2.0", alternative="time.scale", warning_type=LightkurveDeprecationWarning)
+    def time_scale(self):
+        return self.time.scale
+
+    @property
+    @deprecated("2.0", alternative="time", warning_type=LightkurveDeprecationWarning)
+    def astropy_time(self):
+        return self.time
+
+    @property
+    @deprecated("2.0", alternative="flux.unit", warning_type=LightkurveDeprecationWarning)
+    def flux_unit(self):
+        return self.flux.unit
+
+    @property
+    @deprecated("2.0", alternative="flux", warning_type=LightkurveDeprecationWarning)
+    def flux_quantity(self):
+        return self.flux
+
+    @property
+    @deprecated("2.0", alternative="fits.open(lc.filename)", warning_type=LightkurveDeprecationWarning)
     def hdu(self):
         return fits.open(self.filename)
 
@@ -212,60 +269,6 @@ class LightCurve(TimeSeries):
         lc['flux'] = lc['pdcsap_flux']
         lc['flux_err'] = lc['pdcsap_flux_err']
         return lc
-
-    @property
-    def time(self):
-        """The time values."""
-        return self['time']
-
-    @time.setter
-    def time(self, time):
-        self['time'] = time
-
-    @property
-    def time_format(self):
-        # TODO: Add deprecation warning
-        return self.time.format
-
-    @property
-    def time_scale(self):
-        # TODO: Add deprecation warning
-        return self.time.scale
-
-    @property
-    def astropy_time(self):
-        # TODO: Add deprecation warning
-        return self.time
-
-    @property
-    def flux_unit(self):
-        # TODO: Add deprecation warning
-        return self.flux.unit
-
-    @property
-    def flux_quantity(self):
-        # TODO: Add deprecation warning
-        return self.flux
-
-    # Define flux and flux_err as properties to enable IDE auto-completion
-
-    @property
-    def flux(self):
-        """The brightness values."""
-        return self['flux']
-
-    @flux.setter
-    def flux(self, flux):
-        self['flux'] = flux
-
-    @property
-    def flux_err(self):
-        """The brightness uncertainty."""
-        return self['flux_err']
-
-    @flux_err.setter
-    def flux_err(self, flux_err):
-        self['flux_err'] = flux_err
 
     def __add__(self, other):
         newlc = self.copy()
@@ -1350,14 +1353,12 @@ class LightCurve(TimeSeries):
         return show_interact_widget(clean, notebook_url=notebook_url, minimum_period=minimum_period,
                                     maximum_period=maximum_period, resolution=resolution)
 
+    @deprecated("2.0",
+                message='`to_timeseries()` has been deprecated. `LightCurve` is a '
+                        'sub-class of Astropy TimeSeries as of Lightkurve v2.0 '
+                        'and no longer needs to be converted.',
+                warning_type=LightkurveDeprecationWarning)
     def to_table(self):
-        """DEPRECATED. `LightCurve` objects are now sub-class instances of
-        `~astropy.table.Table` so a conversion no longer makes sense.
-        """
-        warnings.warn('`to_table()` has been deprecated. `LightCurve` is a '
-                      'sub-class of Astropy Table as of Lightkurve v2.0 '
-                      'and no longer needs to be converted.',
-                      LightkurveWarning)
         return self
 
     @deprecated("2.0",
@@ -1366,9 +1367,6 @@ class LightCurve(TimeSeries):
                         'and no longer needs to be converted.',
                 warning_type=LightkurveDeprecationWarning)
     def to_timeseries(self):
-        """DEPRECATED. `LightCurve` objects are now sub-class instances of
-        `~astropy.timeseries.TimeSeries` so a conversion no longer makes sense.
-        """
         return self
 
     @staticmethod
@@ -1805,14 +1803,11 @@ class FoldedLightCurve(LightCurve):
     in which the ``time`` parameter represents phase values.
 
     Compared to the `~lightkurve.lightcurve.LightCurve` base class, this class
-    has extra meta data attributes (``period``, ``epoch_time``, ``epoch_phase``,
-    ``wrap_phase``, ``normalize_phase``), one extra column (``time_original``),
+    has extra meta data entries (``period``, ``epoch_time``, ``epoch_phase``,
+    ``wrap_phase``, ``normalize_phase``), an extra column (``time_original``),
     extra properties (``phase``, ``odd_mask``, ``even_mask``),
     and implements different plotting defaults.
     """
-
-    #def __init__(self, *args, **kwargs):
-    #    super().__init__(*args, **kwargs)
 
     @property
     def phase(self):

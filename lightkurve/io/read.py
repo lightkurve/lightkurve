@@ -1,6 +1,5 @@
 """Functions for reading light curve data."""
 import logging
-import warnings
 
 from astropy.io import fits
 from astropy.utils import deprecated
@@ -10,7 +9,7 @@ from ..utils import validate_method, LightkurveWarning, LightkurveDeprecationWar
 
 log = logging.getLogger(__name__)
 
-__all__ = ['open', 'read', 'read_k2sff', 'read_everest', 'detect_filetype']
+__all__ = ['open', 'read', 'detect_filetype']
 
 
 @deprecated("2.0", alternative="read()", warning_type=LightkurveDeprecationWarning)
@@ -75,10 +74,6 @@ def read(path_or_url, **kwargs):
         return KeplerLightCurve.read(path_or_url, format='kepler', **kwargs)
     elif filetype == "TessLightCurve":
         return TessLightCurve.read(path_or_url, format='tess', **kwargs)
-    elif filetype == "K2SFF":
-        return read_k2sff(path_or_url, **kwargs)
-    elif filetype == "EVEREST":
-        return read_everest(path_or_url, **kwargs)
 
     # Official data products;
     # if the filetype is recognized, instantiate a class of that name
@@ -88,82 +83,6 @@ def read(path_or_url, **kwargs):
         # if these keywords don't exist, raise `ValueError`
         raise ValueError("Not recognized as a Kepler or TESS data product: "
                          "{}".format(path_or_url))
-
-
-def read_k2sff(path_or_url, ext="BESTAPER", **kwargs):
-    """Read a K2SFF light curve file.
-
-    More information: https://archive.stsci.edu/hlsp/k2sff
-
-    Parameters
-    ----------
-    path_or_url : str
-        Path or URL of a K2SFF light curve FITS file.
-    ext : str
-        Version of the light curve to use.  Valid options include "BESTAPER",
-        "CIRC_APER0" through "CIRC_APER9", and "PRF_APER0" through "PRF_APER9".
-
-    Returns
-    -------
-    lc : `KeplerLightCurve`
-        A populated light curve object.
-    """
-    f = fits.open(path_or_url)
-
-    # Raise an exception if the requested extension is invalid
-    validate_method(ext, supported_methods=[hdu.name.lower() for hdu in f])
-
-    args = {
-        "time": f[ext].data['T'],
-        "flux": f[ext].data['FCOR'],
-        "flux_unit": "",  # SFF light curves are normalized
-        "cadenceno": f[ext].data['CADENCENO'],
-        "targetid": f[0].header["KEPLERID"],
-        "channel": f[0].header["CHANNEL"],
-        "campaign": f[0].header["CAMPAIGN"],
-        "mission": f[0].header["MISSION"],
-        "ra": f[0].header["RA_OBJ"],
-        "dec": f[0].header["DEC_OBJ"],
-        "label": '{} (K2SFF)'.format(f[0].header["OBJECT"])
-    }
-    return KeplerLightCurve(**args)
-
-
-def read_everest(path_or_url, **kwargs):
-    """Read an EVEREST light curve file.
-
-    More information: https://archive.stsci.edu/hlsp/everest
-
-    Parameters
-    ----------
-    path_or_url : str
-        Path or URL of a K2SFF light curve FITS file.
-    ext : str
-        Version of the light curve to use.  Valid options include "BESTAPER",
-        "CIRC_APER0" through "CIRC_APER9", and "PRF_APER0" through "PRF_APER9".
-
-    Returns
-    -------
-    lc : `KeplerLightCurve`
-        A populated light curve object.
-    """
-    f = fits.open(path_or_url)
-
-    args = {
-        "time": f[1].data['TIME'],
-        "flux": f[1].data['FCOR'],
-        "flux_err": f[1].data['FRAW_ERR'],
-        "cadenceno": f[1].data['CADN'],
-        "quality": f[1].data['QUALITY'],
-        "targetid": f[0].header["KEPLERID"],
-        "channel": f[0].header["CHANNEL"],
-        "campaign": f[0].header["CAMPAIGN"],
-        "mission": f[0].header["MISSION"],
-        "ra": f[0].header["RA_OBJ"],
-        "dec": f[0].header["DEC_OBJ"],
-        "label": '{} (EVEREST)'.format(f[0].header["OBJECT"])
-    }
-    return KeplerLightCurve(**args)
 
 
 def detect_filetype(hdulist):
