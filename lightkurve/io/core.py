@@ -142,7 +142,7 @@ def read_kepler_lightcurve(filename,
                                 bitmask=quality_bitmask)
     lc = lc[quality_mask]
 
-    lc.meta['targetid'] = lc.meta.get('KEPLERID')
+    lc.meta['targetid'] = lc.meta.get('keplerid')
     lc.meta['quality_bitmask'] = quality_bitmask
     lc.meta['quality_mask'] = quality_mask
     return KeplerLightCurve(data=lc)
@@ -187,7 +187,7 @@ def read_tess_lightcurve(filename,
                                 bitmask=quality_bitmask)
     lc = lc[quality_mask]
 
-    lc.meta['targetid'] = lc.meta.get('TICID')
+    lc.meta['targetid'] = lc.meta.get('ticid')
     lc.meta['quality_bitmask'] = quality_bitmask
     lc.meta['quality_mask'] = quality_mask
     return TessLightCurve(data=lc)
