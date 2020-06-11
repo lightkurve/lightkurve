@@ -1159,7 +1159,7 @@ class LightCurve(TimeSeries):
             elif self.flux.unit is None:
                 ylabel = 'Flux'
             else:
-                ylabel = 'Flux [{}]'.format(self.flux_unit.to_string("latex_inline"))
+                ylabel = 'Flux [{}]'.format(self.flux.unit.to_string("latex_inline"))
         # Default legend label
         if ('label' not in kwargs):
             kwargs['label'] = self.meta.get('label')
@@ -1773,9 +1773,9 @@ class LightCurve(TimeSeries):
             cbar = plt.colorbar(im, ax=ax)
             if method in ['mean', 'median']:
                 unit = '[Normalized Flux]'
-                if self.flux_unit is not None:
-                    if (self.flux_unit != u.dimensionless_unscaled):
-                        unit = '[{}]'.format(self.flux_unit.to_string('latex'))
+                if self.flux.unit is not None:
+                    if (self.flux.unit != u.dimensionless_unscaled):
+                        unit = '[{}]'.format(self.flux.unit.to_string('latex'))
                 if bin_points == 1:
                     cbar.set_label("Flux {}".format(unit))
                 else:
