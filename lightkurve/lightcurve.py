@@ -78,9 +78,18 @@ class LightCurve(TimeSeries):
     _default_time_format = "jd"
     _default_time_scale = "tdb"
 
-    def __init__(self, data=None, *, time=None, flux=None, flux_err=None, **kwargs):
+    def __init__(self, data=None, *args, time=None, flux=None, flux_err=None, **kwargs):
         # Delay checking for required columns until the end
         self._required_columns_relax = True
+
+        # Lightkurve v1.x supported passing time, flux, and flux_err as
+        # position arguments.  We support it here for backwards compatibility.
+        if len(args) in [1, 2]:
+            time = data
+            flux = args[0]
+            data = None
+        if len(args) == 2:
+            flux_err = args[1]
 
         # For backwards compatibility with Lightkurve v1.x,
         # we support passing deprecated keywords via **kwargs.
