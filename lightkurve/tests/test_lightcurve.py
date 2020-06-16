@@ -3,7 +3,8 @@ from __future__ import division, print_function
 from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
 from astropy import units as u
-from astropy.time import Time
+from astropy.time import Time, TimeDelta
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -991,3 +992,23 @@ def test_get_header():
     # ``tpf.header`` is deprecated
     with pytest.warns(LightkurveWarning, match='deprecated'):
         lcf.header()
+
+
+def test_fold_v2():
+    """The API of LightCurve.fold() changed in Lightkurve v2.x when we adopted
+    AstroPy's TimeSeries.fold() method. This test verifies the new API."""
+    lc = LightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1)
+
+    # Can period be passed as a float?
+    fld = lc.fold(period=1)
+    fld2 = lc.fold(period=1*u.day)
+    assert_array_equal(fld.phase, fld2.phase)
+    assert isinstance(fld.time, TimeDelta)
+    fld.plot_river()
+    plt.close()
+
+    # Does phase normalization work?
+    fld = lc.fold(period=1, normalize_phase=True)
+    assert isinstance(fld.time, u.Quantity)
+    fld.plot_river()
+    plt.close()

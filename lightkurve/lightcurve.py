@@ -538,18 +538,23 @@ class LightCurve(TimeSeries):
             return flatten_lc, trend_lc
         return flatten_lc
 
-    @deprecated_renamed_argument('transit_midpoint', 'epoch_time', '2.0', warning_type=LightkurveDeprecationWarning)
-    @deprecated_renamed_argument('t0', 'epoch_time', '2.0', warning_type=LightkurveDeprecationWarning)
+    @deprecated_renamed_argument('transit_midpoint', 'epoch_time', '2.0',
+                                 warning_type=LightkurveDeprecationWarning)
+    @deprecated_renamed_argument('t0', 'epoch_time', '2.0',
+                                 warning_type=LightkurveDeprecationWarning)
     def fold(self, period=None, epoch_time=None, epoch_phase=0,
              wrap_phase=None, normalize_phase=False):
-        """
-        Return a new `~lightkurve.lightcurve.FoldedLightCurve` folded with a
-        period and epoch.
+        """Returns a `FoldedLightCurve` object folded on a period and epoch.
+
+        This method is identical to AstroPy's `~astropy.timeseries.TimeSeries.fold()`
+        method, except it returns a `FoldedLightCurve` object which offers
+        convenient plotting methods.
 
         Parameters
         ----------
-        period : `~astropy.units.Quantity`
-            The period to use for folding
+        period : float `~astropy.units.Quantity`
+            The period to use for folding.  If a ``float`` is passed we'll
+            assume it is in units of days.
         epoch_time : `~astropy.time.Time`
             The time to use as the reference epoch, at which the relative time
             offset / phase will be ``epoch_phase``. Defaults to the first time
@@ -573,11 +578,12 @@ class LightCurve(TimeSeries):
 
         Returns
         -------
-        folded_lightcurve : `~lightkurve.lightcurve.FoldedLightCurve`
-            The folded time series object with phase as the ``time`` column.
+        folded_lightcurve : `FoldedLightCurve`
+            The folded light curve object in which the ``time`` column
+            holds the phase values.
         """
         # Lightkurve v1.x assumed that `period` was given in days if no unit
-        # was specified.  We maintain this behavior for backwards-compatibility.
+        # was specified. We maintain this behavior for backwards-compatibility.
         if period and not isinstance(period, Quantity):
             period *= u.day
         if epoch_time and not isinstance(epoch_time, Time):
@@ -1651,7 +1657,7 @@ class LightCurve(TimeSeries):
             return SFFCorrector(self)
 
     @deprecated_renamed_argument('t0', 'epoch_time', '2.0', warning_type=LightkurveDeprecationWarning)
-    def plot_river(self, period, epoch_time=0, ax=None, bin_points=1,
+    def plot_river(self, period, epoch_time=None, ax=None, bin_points=1,
                    minimum_phase=-0.5, maximum_phase=0.5, method='mean',
                    **kwargs):
         """Plot the light curve as a river plot.
@@ -1694,11 +1700,14 @@ class LightCurve(TimeSeries):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
+        if not epoch_time:
+            epoch_time = self.time[0]
+
         # Lightkurve v1.x assumed that `period` was given in days if no unit
         # was specified.  We maintain this behavior for backwards-compatibility.
         if period and not isinstance(period, Quantity):
             period *= u.day
-        if epoch_time and not isinstance(epoch_time, Time):
+        if epoch_time and not isinstance(epoch_time, (Time, Quantity)):
             epoch_time = Time(epoch_time, format=self.time.format, scale=self.time.scale)
 
         method = validate_method(method, supported_methods=['mean', 'median', 'sigma'])
