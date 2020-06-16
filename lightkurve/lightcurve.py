@@ -13,7 +13,7 @@ from copy import deepcopy
 from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
-from astropy.time import Time
+from astropy.time import Time, TimeDelta
 from astropy import units as u
 from astropy.units import Quantity
 from astropy.timeseries import TimeSeries, aggregate_downsample
@@ -1853,6 +1853,16 @@ class FoldedLightCurve(LightCurve):
         """
         return ~self.odd_mask
 
+    def _set_xlabel(self, kwargs):
+        """Helper function for plot, scatter, and errorbar.
+        Ensures the xlabel is correctly set for folded light curves.
+        """
+        if 'xlabel' not in kwargs:
+            kwargs['xlabel'] = "Phase"
+            if isinstance(self.time, TimeDelta):
+                kwargs['xlabel'] += f" [{self.time.format.upper()}]"
+        return kwargs
+
     def plot(self, **kwargs):
         """Plot the folded light curve using matplotlib's
         `~matplotlib.pyplot.plot` method.
@@ -1869,10 +1879,8 @@ class FoldedLightCurve(LightCurve):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        ax = super(FoldedLightCurve, self).plot(**kwargs)
-        if 'xlabel' not in kwargs:
-            ax.set_xlabel("Phase")
-        return ax
+        kwargs = self._set_xlabel(kwargs)
+        return super(FoldedLightCurve, self).plot(**kwargs)
 
     def scatter(self, **kwargs):
         """Plot the folded light curve using matplotlib's `~matplotlib.pyplot.scatter` method.
@@ -1889,10 +1897,8 @@ class FoldedLightCurve(LightCurve):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        ax = super(FoldedLightCurve, self).scatter(**kwargs)
-        if 'xlabel' not in kwargs:
-            ax.set_xlabel("Phase")
-        return ax
+        kwargs = self._set_xlabel(kwargs)
+        return super(FoldedLightCurve, self).scatter(**kwargs)
 
     def errorbar(self, **kwargs):
         """Plot the folded light curve using matplotlib's
@@ -1910,10 +1916,8 @@ class FoldedLightCurve(LightCurve):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        ax = super(FoldedLightCurve, self).errorbar(**kwargs)
-        if 'xlabel' not in kwargs:
-            ax.set_xlabel("Phase")
-        return ax
+        kwargs = self._set_xlabel(kwargs)
+        return super(FoldedLightCurve, self).errorbar(**kwargs)
 
     def plot_river(self, **kwargs):
         """Plot the folded light curve in a river style.

@@ -193,7 +193,6 @@ def test_lightcurve_fold():
     assert (ax.get_xlabel() == 'Phase')
     plt.close('all')
 
-
     odd = fold.odd_mask
     even = fold.even_mask
     assert len(odd) == len(fold.time)
@@ -203,6 +202,7 @@ def test_lightcurve_fold():
     # if user tries a t0 in JD but time is in BKJD
     with pytest.warns(LightkurveWarning, match='appears to be given in JD'):
         lc.fold(10, 2456600)
+
 
 def test_lightcurve_fold_issue520():
     """Regression test for #520; accept quantities in `fold()`."""
