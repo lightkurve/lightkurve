@@ -70,15 +70,19 @@ class LightCurve(TimeSeries):
     <Quantity [1., 1.]>
     """
 
-    # The `TimeSeries` base class will enforce the presence of these columns:
+    # The constructor of the `TimeSeries` base class will enforce the presence
+    # of these columns:
     _required_columns = ['time', 'flux', 'flux_err']
 
     # The following keywords were removed in Lightkurve v2.0.
     # Their use will trigger a warning.
-    _deprecated_keywords = ['targetid', 'label', 'time_format', 'time_scale', 'flux_unit']
+    _deprecated_keywords = ['targetid', 'label', 'time_format', 'time_scale',
+                            'flux_unit']
     _deprecated_column_keywords = ['centroid_col', 'centroid_row',
                                    'cadenceno', 'quality']
 
+    # If an iterable is passed for ``time``, we will initialize an AstroPy
+    # ``Time`` object using the following format and scale:
     _default_time_format = "jd"
     _default_time_scale = "tdb"
 
@@ -87,8 +91,11 @@ class LightCurve(TimeSeries):
         self._required_columns_relax = True
 
         # Lightkurve v1.x supported passing time, flux, and flux_err as
-        # position arguments.  We support it here for backwards compatibility.
+        # positional arguments. We support it here for backwards compatibility.
         if len(args) in [1, 2]:
+            warnings.warn("passing flux as a positional argument is deprecated"
+                          ", please use ``flux=...`` instead.",
+                          LightkurveDeprecationWarning)
             time = data
             flux = args[0]
             data = None
@@ -232,32 +239,38 @@ class LightCurve(TimeSeries):
     # Define deprecated attributes for compatibility with Lightkurve v1.x:
 
     @property
-    @deprecated("2.0", alternative="time.format", warning_type=LightkurveDeprecationWarning)
+    @deprecated("2.0", alternative="time.format",
+                warning_type=LightkurveDeprecationWarning)
     def time_format(self):
         return self.time.format
 
     @property
-    @deprecated("2.0", alternative="time.scale", warning_type=LightkurveDeprecationWarning)
+    @deprecated("2.0", alternative="time.scale",
+                warning_type=LightkurveDeprecationWarning)
     def time_scale(self):
         return self.time.scale
 
     @property
-    @deprecated("2.0", alternative="time", warning_type=LightkurveDeprecationWarning)
+    @deprecated("2.0", alternative="time",
+                warning_type=LightkurveDeprecationWarning)
     def astropy_time(self):
         return self.time
 
     @property
-    @deprecated("2.0", alternative="flux.unit", warning_type=LightkurveDeprecationWarning)
+    @deprecated("2.0", alternative="flux.unit",
+                warning_type=LightkurveDeprecationWarning)
     def flux_unit(self):
         return self.flux.unit
 
     @property
-    @deprecated("2.0", alternative="flux", warning_type=LightkurveDeprecationWarning)
+    @deprecated("2.0", alternative="flux",
+                warning_type=LightkurveDeprecationWarning)
     def flux_quantity(self):
         return self.flux
 
     @property
-    @deprecated("2.0", alternative="fits.open(lc.filename)", warning_type=LightkurveDeprecationWarning)
+    @deprecated("2.0", alternative="fits.open(lc.filename)",
+                warning_type=LightkurveDeprecationWarning)
     def hdu(self):
         return fits.open(self.filename)
 
