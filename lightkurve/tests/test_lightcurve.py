@@ -187,11 +187,11 @@ def test_lightcurve_fold():
         fold = lc.fold(period=1, transit_midpoint=-0.1)
     assert_almost_equal(fold.time[0], -0.5, 2)
     ax = fold.plot()
-    assert (ax.get_xlabel() == 'Phase')
+    assert ('Phase' in ax.get_xlabel())
     ax = fold.scatter()
-    assert (ax.get_xlabel() == 'Phase')
+    assert ('Phase' in ax.get_xlabel())
     ax = fold.errorbar()
-    assert (ax.get_xlabel() == 'Phase')
+    assert ('Phase' in ax.get_xlabel())
     plt.close('all')
 
     odd = fold.odd_mask

@@ -1656,7 +1656,8 @@ class LightCurve(TimeSeries):
             from .correctors import SFFCorrector
             return SFFCorrector(self)
 
-    @deprecated_renamed_argument('t0', 'epoch_time', '2.0', warning_type=LightkurveDeprecationWarning)
+    @deprecated_renamed_argument('t0', 'epoch_time', '2.0',
+                                 warning_type=LightkurveDeprecationWarning)
     def plot_river(self, period, epoch_time=None, ax=None, bin_points=1,
                    minimum_phase=-0.5, maximum_phase=0.5, method='mean',
                    **kwargs):
@@ -1666,7 +1667,8 @@ class LightCurve(TimeSeries):
         chronological order, relative to the period of an interesting signal.
         Each row in the plot represents a full period cycle, and each column
         represents a fixed phase.  This type of plot is often used to visualize
-        Transit Timing Variations (TTVs) in the light curves of exoplanets.
+        Transit Timing Variations (TTVs) in the light curves of exoplanets, but
+        it can be used to visualize periodic signals of any origin.
 
         All extra keywords supplied are passed on to Matplotlib's
         `~matplotlib.pyplot.pcolormesh` function.
@@ -1678,7 +1680,7 @@ class LightCurve(TimeSeries):
         period: float
             Period at which to fold the light curve
         epoch_time : float
-            Phase mid point for plotting
+            Phase mid point for plotting. Defaults to the first time value.
         bin_points : int
             How many points should be in each bin.
         minimum_phase : float
@@ -1700,15 +1702,21 @@ class LightCurve(TimeSeries):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        if not epoch_time:
-            epoch_time = self.time[0]
+        if hasattr(self, 'time_original'):  # folded light curve
+            time = self.time_original
+        else:
+            time = self.time
+
+        # epoch_time defaults to the first time value
+        if epoch_time is None:
+            epoch_time = time[0]
 
         # Lightkurve v1.x assumed that `period` was given in days if no unit
         # was specified.  We maintain this behavior for backwards-compatibility.
-        if period and not isinstance(period, Quantity):
+        if period is not None and not isinstance(period, Quantity):
             period *= u.day
-        if epoch_time and not isinstance(epoch_time, (Time, Quantity)):
-            epoch_time = Time(epoch_time, format=self.time.format, scale=self.time.scale)
+        if epoch_time is not None and not isinstance(epoch_time, (Time, Quantity)):
+            epoch_time = Time(epoch_time, format=time.format, scale=time.scale)
 
         method = validate_method(method, supported_methods=['mean', 'median', 'sigma'])
         if (bin_points == 1) and (method in ['mean', 'median']):
@@ -1722,13 +1730,8 @@ class LightCurve(TimeSeries):
         elif method == 'sigma':
             bin_func = lambda y, e: ((np.nanmean(y) - 1)/(np.nansum(e**2)**0.5/len(e)), np.nan)
 
-        if hasattr(self, 'time_original'):
-            time = self.time_original.value
-        else:
-            time = self.time.value
-
-        s = np.argsort(time)
-        x, y, e = time[s], self.flux[s], self.flux_err[s]
+        s = np.argsort(time.value)
+        x, y, e = time.value[s], self.flux[s], self.flux_err[s]
         med = np.nanmedian(self.flux)
         e /= med
         y /= med
