@@ -343,6 +343,7 @@ class TessPLDCorrector(PLDCorrector):
     def correct(self, pixel_components=3, spline_n_knots=100, spline_degree=3,
                 background_mask=None, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
+
         Parameters
         ----------
         pixel_components : int
@@ -382,6 +383,7 @@ class KeplerPLDCorrector(PLDCorrector):
     def correct(self, pld_order=2, pixel_components=15, spline_n_knots=100, spline_degree=3,
                 background_mask=None, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
+
         Parameters
         ----------
         pixel_components : int
@@ -400,12 +402,11 @@ class KeplerPLDCorrector(PLDCorrector):
             background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
         self.background_mask = background_mask
 
-        dm = self.create_design_matrix(background_mask=background_mask,
+        dm = self._create_design_matrix(background_mask=background_mask,
                                         pixel_components=pixel_components,
                                         spline_n_knots=spline_n_knots,
                                         spline_degree=spline_degree,
                                         sparse=sparse)
-        self.dm = dm
         clc = super(TessPLDCorrector, self).correct(dm, **kwargs)
         if restore_trend:
             clc += self.diagnostic_lightcurves['spline']
