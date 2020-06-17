@@ -33,26 +33,30 @@ log = logging.getLogger(__name__)
 
 
 class LightCurve(TimeSeries):
-    """Generic light curve object to hold time series photometry for one target.
+    """Class to hold time series brightness data for an astronomical object.
 
     Compared to the generic `~astropy.timeseries.TimeSeries` class, `LightCurve`
-    ensures that each object has `time`, `flux`, and `flux_err` columns,
-    in addition to `targetid` and `label` properties.
+    ensures that each object has `time`, `flux`, and `flux_err` columns.
+    `LightCurve` objects also provide user-friendly attribute access to
+    columns and meta data.
 
-    Attributes
+    Parameters
     ----------
-    time : array-like
-        Time values.
-    flux : array-like
+    data : numpy ndarray, dict, list, `~astropy.table.Table`, or table-like object, optional
+        Data to initialize time series. This does not need to contain the times
+        or fluxes, which can be provided separately, but if it does contain the
+        times and fluxes they should be in columns called ``'time'``,
+        ``'flux'``, and ``'flux_err'`` to be automatically recognized.
+    time : `~astropy.time.Time` or iterable
+        Time values.  They can either be given directly as a
+        `~astropy.time.Time` array or as any iterable that initializes the
+        `~astropy.time.Time` class.
+    flux : `~astropy.units.Quantity` or iterable
         Flux values for every time point.
-    flux_err : array-like
+    flux_err : `~astropy.units.Quantity` or iterable
         Uncertainty on each flux data point.
-    targetid : str
-        Identifier of the target.
-    label : str
-        Human-friendly object label, e.g. "KIC 123456789".
     **kwargs : dict
-        Additional keyword arguments that are passed to `~astropy.timeseries.TimeSeries`.
+        Additional keyword arguments are passed to `~astropy.table.QTable`.
 
     Examples
     --------
@@ -910,8 +914,9 @@ class LightCurve(TimeSeries):
             return self.copy()[~outlier_mask], outlier_mask
         return self.copy()[~outlier_mask]
 
-    def bin(self, time_bin_size, time_bin_start=None, n_bins=None, aggregate_func=None):
-        """Bins a lightcurve in chunks defined by ``binsize`` or ``bins``.
+    def bin(self, time_bin_size, time_bin_start=None, n_bins=None,
+            aggregate_func=None):
+        """Bins a lightcurve in equally-spaced bins in time.
 
         The flux value of the bins will be computed by taking the mean
         (``method='mean'``) or the median (``method='median'``) of the flux.
@@ -940,9 +945,6 @@ class LightCurve(TimeSeries):
 
         Notes
         -----
-        - If the ratio between the lightcurve length and the binsize is not
-          a whole number, then the remainder of the data points will be
-          ignored.
         - If the original light curve contains flux uncertainties (``flux_err``),
           the binned lightcurve will report the root-mean-square error.
           If no uncertainties are included, the binned curve will return the
@@ -957,13 +959,18 @@ class LightCurve(TimeSeries):
         if time_bin_start is None:
             time_bin_start = self.time[0]
         if not isinstance(time_bin_start, Time):
-            time_bin_start = Time(time_bin_start, format=self.time.format, scale=self.time.scale)
-        
-        ts = aggregate_downsample(self,
-                                  time_bin_size=time_bin_size,
-                                  n_bins=n_bins,
-                                  aggregate_func=aggregate_func,
-                                  time_bin_start=time_bin_start)
+            time_bin_start = Time(time_bin_start, format=self.time.format,
+                                  scale=self.time.scale)
+
+        # Call AstroPy's aggregate_downsample
+        with warnings.catch_warnings():
+            # ignore uninteresting empty slice warnings
+            warnings.simplefilter("ignore", RuntimeWarning)
+            ts = aggregate_downsample(self,
+                                      time_bin_size=time_bin_size,
+                                      n_bins=n_bins,
+                                      aggregate_func=aggregate_func,
+                                      time_bin_start=time_bin_start)
 
         # Prepare a LightCurve object by ensuring there is a time column
         ts._required_columns = []
@@ -1952,53 +1959,12 @@ class FoldedLightCurve(LightCurve):
 
 class KeplerLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
-    which holds extra data specific to the Kepler and K2 mission.
+    to represent data from NASA's Kepler and K2 mission."""
 
-    Attributes
-    ----------
-    time : array-like
-        Time measurements
-    flux : array-like
-        Data flux for every time point
-    flux_err : array-like
-        Uncertainty on each flux data point
-    flux_unit : `~astropy.units.Unit` or str
-        Unit of the flux values.  If a string is passed, it will be passed
-        on the the constructor of `~astropy.units.Unit`.
-    time_format : str
-        String specifying how an instant of time is represented,
-        e.g. 'bkjd' or 'jd'.
-    time_scale : str
-        String which specifies how the time is measured,
-        e.g. tdb', 'tt', 'ut1', or 'utc'.
-    centroid_col : array-like
-        Centroid column coordinates as a function of time
-    centroid_row : array-like
-        Centroid row coordinates as a function of time
-    quality : array-like
-        Array indicating the quality of each data point
-    quality_bitmask : int
-        Bitmask specifying quality flags of cadences that should be ignored
-    channel : int
-        Channel number
-    campaign : int
-        Campaign number
-    quarter : int
-        Quarter number
-    mission : str
-        Mission name
-    cadenceno : array-like
-        Cadence numbers corresponding to every time measurement
-    targetid : int
-        Kepler ID number
-    """
     _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'channel',
                             'campaign', 'quarter', 'mission', 'ra', 'dec')
 
     _default_time_format = 'bkjd'
-
-    #def __init__(self, *args, **kwargs):
-    #    super().__init__(*args, **kwargs)
 
     @classmethod
     def read(cls, *args, **kwargs):
@@ -2075,43 +2041,12 @@ class KeplerLightCurve(LightCurve):
 
 class TessLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
-    which holds extra data specific to the TESS mission.
+    to represent data from NASA's TESS mission."""
 
-    Attributes
-    ----------
-    time : array-like
-        Time measurements
-    flux : array-like
-        Data flux for every time point
-    flux_err : array-like
-        Uncertainty on each flux data point
-    flux_unit : `~astropy.units.Unit` or str
-        Unit of the flux values.  If a string is passed, it will be passed
-        on the the constructor of `~astropy.units.Unit`.
-    time_format : str
-        String specifying how an instant of time is represented,
-        e.g. 'bkjd' or 'jd'.
-    time_scale : str
-        String which specifies how the time is measured,
-        e.g. tdb', 'tt', 'ut1', or 'utc'.
-    centroid_col, centroid_row : array-like, array-like
-        Centroid column and row coordinates as a function of time
-    quality : array-like
-        Array indicating the quality of each data point
-    quality_bitmask : int
-        Bitmask specifying quality flags of cadences that should be ignored
-    cadenceno : array-like
-        Cadence numbers corresponding to every time measurement
-    targetid : int
-        Tess Input Catalog ID number
-    """
     _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'sector',
                             'camera', 'ccd', 'mission', 'ra', 'dec')
 
     _default_time_format = 'btjd'
-
-    #def __init__(self, *args, **kwargs):
-    #    super().__init__(*args, **kwargs)
 
     @classmethod
     def read(cls, *args, **kwargs):
