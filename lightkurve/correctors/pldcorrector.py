@@ -83,26 +83,6 @@ class PLDCorrector(RegressionCorrector):
         time = tpf.time
         rawflux = lc.flux
         rawflux_err = lc.flux_err
-<<<<<<< HEAD
-
-        # create nan mask
-        self.nanmask = np.isfinite(time)
-        self.nanmask &= np.isfinite(rawflux)
-        self.nanmask &= np.isfinite(rawflux_err)
-        self.nanmask &= np.abs(rawflux_err) > 1e-12
-
-        # apply nan mask
-        self.flux = flux[self.nanmask]
-        self.flux_err = flux_err[self.nanmask]
-        self.time = time[self.nanmask]
-        self.rawflux = rawflux[self.nanmask]
-        self.rawflux_err = rawflux_err[self.nanmask]
-        self.lc = lc[self.nanmask]
-
-        self.rawflux = self.lc.flux
-        self.rawflux_err = self.lc.flux_err
-=======
->>>>>>> remove gp attempts
 
         # create nan mask
         self.nanmask = np.isfinite(time)
@@ -123,16 +103,6 @@ class PLDCorrector(RegressionCorrector):
     def __repr__(self):
         return 'PLDCorrector (LC: {})'.format(self.lc.label)
 
-<<<<<<< HEAD
-    @property
-    def X(self):
-        return self.dm
-
-<<<<<<< HEAD
-    def create_design_matrix(self, background_mask=None, pld_order=1, n_pca_terms=6,
-                             pixel_components=3, spline_n_knots=100, spline_degree=3, sparse=False):
-        """Returns a `DesignMatrixCollection`."""
-=======
         Returns
         -------
         X : `.DesignMatrix`
@@ -174,7 +144,6 @@ class PLDCorrector(RegressionCorrector):
 
         # build initial 1st order PLD design matrix
         regressors = cropped_flux[:, cropped_pld_aperture]
->>>>>>> add option to correct with gp
 
         if background_mask is None:
             # Default to pixels <1-sigma above the background
@@ -215,7 +184,7 @@ class PLDCorrector(RegressionCorrector):
             dm = self._create_higher_order_matrix(dm, order=pld_order, n_pca_terms=n_pca_terms)
 
         self.dm = dm
-=======
+
     def create_design_matrix(self, background_mask=None, pixel_components=3,
                              spline_n_knots=100, spline_degree=3, sparse=False):
         """Returns a `DesignMatrixCollection`."""
@@ -254,7 +223,7 @@ class PLDCorrector(RegressionCorrector):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             dm = DMC([dm_pixels, dm_bkg, dm_spline])
->>>>>>> remove gp attempts
+
         return dm
 
     def correct(self, pld_order=1, pixel_components=3, spline_n_knots=100, spline_degree=3,
@@ -285,6 +254,9 @@ class PLDCorrector(RegressionCorrector):
                                        spline_n_knots=spline_n_knots,
                                        spline_degree=spline_degree,
                                        sparse=sparse)
+
+        if pld_order > 1:
+            dm = self._create_higher_order_matrix(dm, order=pld_order, n_pca_terms=n_pca_terms)
 
         clc = super(PLDCorrector, self).correct(dm, **kwargs)
         if restore_trend:
@@ -335,9 +307,9 @@ class PLDCorrector(RegressionCorrector):
             Design matrix collection with products of columns appended as new columns.
         """
         # higher order design matrices
-        new_dms = [dm]
+        new_dms = [X for X in dm]
         for i in range(2, order+1):
-            regressors = np.product(list(multichoose(dm.values.T, order)), axis=1).T
+            regressors = np.product(list(multichoose(dm['pixel_series'].values.T, order)), axis=1).T
 
             # make high order design matrix
             high_order_dm = DesignMatrix(regressors, name=f'PLD Order {i}')
