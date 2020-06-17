@@ -1,5 +1,5 @@
+"""Defines readers for official Kepler/TESS data products."""
 import logging
-import warnings
 
 import numpy as np
 
@@ -9,7 +9,6 @@ from astropy.time import Time
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..utils import KeplerQualityFlags, TessQualityFlags
-from ..time import TimeBKJD, TimeBTJD
 
 
 __all__ = ["read_kepler_lightcurve", "read_tess_lightcurve"]
@@ -194,9 +193,8 @@ def read_tess_lightcurve(filename,
 
 
 """ADD READERS TO THE REGISTRY"""
-from astropy.io.registry import IORegistryError
 try:
     registry.register_reader('kepler', LightCurve, read_kepler_lightcurve)
     registry.register_reader('tess', LightCurve, read_tess_lightcurve)
-except IORegistryError:
+except registry.IORegistryError:
     pass  # necessary to enable autoreload during debugging

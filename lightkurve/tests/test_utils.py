@@ -14,7 +14,6 @@ from ..utils import running_mean, validate_method
 from ..utils import bkjd_to_astropy_time, btjd_to_astropy_time
 from ..utils import centroid_quadratic
 from ..lightcurve import LightCurve
-from ..io import detect_filetype
 
 from .. import PACKAGEDIR
 
@@ -90,14 +89,6 @@ def test_lightkurve_warning():
         flux = np.array([1, 2, 3, 4])
         lc = LightCurve(time=time, flux=flux)
         assert len(warns) == 0
-
-
-def test_detect_filetype():
-    """Can we detect the correct filetype?"""
-    k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
-    tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
-    assert detect_filetype(fits.open(k2_path)) == 'KeplerTargetPixelFile'
-    assert detect_filetype(fits.open(tess_path)) == 'TessTargetPixelFile'
 
 
 def test_validate_method():
