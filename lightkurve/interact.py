@@ -59,7 +59,7 @@ def prepare_lightcurve_datasource(lc):
     # Convert time into human readable strings, breaks with NaN time
     # See https://github.com/KeplerGO/lightkurve/issues/116
     if (lc.time == lc.time).all():
-        human_time = lc.astropy_time.isot
+        human_time = lc.time.isot
     else:
         human_time = [' '] * len(lc.flux)
 
@@ -196,7 +196,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
                       fill_color=None, hover_fill_color="firebrick",
                       hover_alpha=0.9, hover_line_color="white")
     tooltips = [("Cadence", "@cadence"),
-                ("Time ({})".format(lc.time_format.upper()),
+                ("Time ({})".format(lc.time.format.upper()),
                  "@time{0,0.000}"),
                 ("Time (ISO)", "@time_iso"),
                 ("Flux", "@flux"),
