@@ -627,7 +627,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
             if new != []:
                 lc_new = _create_lightcurve_from_pixels(tpf, new, transform_func=transform_func)
-                lc_source.data['flux'] = lc_new.flux
+                lc_source.data['flux'] = lc_new.flux.value
 
                 if ylim_func is None:
                     ylims = get_lightcurve_y_limits(lc_source)
@@ -636,7 +636,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 fig_lc.y_range.start = ylims[0]
                 fig_lc.y_range.end = ylims[1]
             else:
-                lc_source.data['flux'] = lc.flux * 0.0
+                lc_source.data['flux'] = lc.flux.value * 0.0
                 fig_lc.y_range.start = -1
                 fig_lc.y_range.end = 1
 
@@ -649,7 +649,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 frameno = tpf_index_lookup[new]
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
                     [tpf.flux[frameno, :, :] + pedestal]
-                vertical_line.update(location=tpf.time[frameno])
+                vertical_line.update(location=tpf.time[frameno].value)
             else:
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
                     [tpf.flux[0, :, :] * np.NaN]
