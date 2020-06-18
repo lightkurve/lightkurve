@@ -824,11 +824,11 @@ class TargetPixelFile(object):
 
         # Make list of preset colour labels
         clabels = {'FLUX': 'Flux ($e^{-}s^{-1}$)',
-                'FLUX_ERR': 'Flux Err. ($e^{-}s^{-1}$)',
-                'FLUX_BKG': 'Background Flux ($e^{-}s^{-1}$)',
-                'FLUX_BKG_ERR': 'Background Flux Err. ($e^{-}s^{-1}$)',
-                'COSMIC_RAYS': 'Cosmic Ray Flux ($e^{-}s^{-1}$)', 
-                'RAW_CNTS': 'Raw Counts'}
+                   'FLUX_ERR': 'Flux Err. ($e^{-}s^{-1}$)',
+                   'FLUX_BKG': 'Background Flux ($e^{-}s^{-1}$)',
+                   'FLUX_BKG_ERR': 'Background Flux Err. ($e^{-}s^{-1}$)',
+                   'COSMIC_RAYS': 'Cosmic Ray Flux ($e^{-}s^{-1}$)',
+                   'RAW_CNTS': 'Raw Counts'}
 
         with plt.style.context(style):
             if title is None:
@@ -838,16 +838,21 @@ class TargetPixelFile(object):
             img_extent = (self.column - 0.5, self.column + self.shape[2] - 0.5,
                           self.row - 0.5, self.row + self.shape[1] - 0.5)
             ax = plot_image(data_to_plot, ax=ax, title=title, extent=img_extent,
-                            show_colorbar=show_colorbar, clabel = clabels.get(column, column), **kwargs)
+                            show_colorbar=show_colorbar, clabel=clabels.get(column, column),
+                            **kwargs)
             ax.grid(False)
+
+        # Overlay the aperture mask if given
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
             for i in range(self.shape[1]):
                 for j in range(self.shape[2]):
                     if aperture_mask[i, j]:
-                        ax.add_patch(patches.Rectangle((j+self.column, i+self.row),
-                                                       1, 1, color=mask_color, fill=True,
-                                                       alpha=.6))
+                        rect = patches.Rectangle(
+                                        xy=(j+self.column-0.5, i+self.row-0.5),
+                                        width=1, height=1, color=mask_color,
+                                        fill=True, alpha=.6)
+                        ax.add_patch(rect)
         return ax
 
     def to_fits(self, output_fn=None, overwrite=False):
