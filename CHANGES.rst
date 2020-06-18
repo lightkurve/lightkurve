@@ -4,6 +4,9 @@
 - Fixed a bug in ``TargetPixelFile.cutout()`` which prevented image edges from
   being included in cut-outs. [#749]
 
+- Fixed a bug in ``tpf.interact()`` which caused the pixel selection to be off
+  by half a pixel. The bug was introduced in v1.11.0. [#754]
+
 
 
 1.11.0 (2015-05-20)
