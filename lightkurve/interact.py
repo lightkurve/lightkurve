@@ -104,7 +104,7 @@ def prepare_tpf_datasource(tpf, aperture_mask):
     xx = tpf.column + np.arange(tpf.shape[2])
     yy = tpf.row + np.arange(tpf.shape[1])
     xa, ya = np.meshgrid(xx, yy)
-    tpf_source = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5))
+    tpf_source = ColumnDataSource(data=dict(xx=xa.astype(float), yy=ya.astype(float)))
     tpf_source.selected.indices = pixel_index_array[aperture_mask].reshape(-1).tolist()
     return tpf_source
 
@@ -234,25 +234,31 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     result = result[result.Gmag < magnitude_limit]
     if len(result) == 0:
         raise no_targets_found_message
-    radecs = np.vstack([result['RA_ICRS'], result['DE_ICRS']]).T
-    coords = tpf.wcs.all_world2pix(radecs, 0)
+
+    # Apply correction for proper motion
     year = ((tpf.astropy_time[0].jd - 2457206.375) * u.day).to(u.year)
     pmra = ((np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond/u.year) * year).to(u.deg).value
     pmdec = ((np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond/u.year) * year).to(u.deg).value
     result.RA_ICRS += pmra
     result.DE_ICRS += pmdec
 
+    # Convert to pixel coordinates
+    radecs = np.vstack([result['RA_ICRS'], result['DE_ICRS']]).T
+    coords = tpf.wcs.all_world2pix(radecs, 0)
+
     # Gently size the points by their Gaia magnitude
     sizes = 64.0 / 2**(result['Gmag']/5.0)
     one_over_parallax = 1.0 / (result['Plx']/1000.)
     source = ColumnDataSource(data=dict(ra=result['RA_ICRS'],
                                         dec=result['DE_ICRS'],
+                                        pmra=result['pmRA'],
+                                        pmde=result['pmDE'],
                                         source=result['Source'].astype(str),
                                         Gmag=result['Gmag'],
                                         plx=result['Plx'],
                                         one_over_plx=one_over_parallax,
-                                        x=coords[:, 0]+tpf.column,
-                                        y=coords[:, 1]+tpf.row,
+                                        x=coords[:, 0] + tpf.column,
+                                        y=coords[:, 1] + tpf.row,
                                         size=sizes))
 
     r = fig.circle('x', 'y', source=source, fill_alpha=0.3, size='size',
@@ -267,6 +273,8 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
                                       ("Parallax (mas)", "@plx (~@one_over_plx{0,0} pc)"),
                                       ("RA", "@ra{0,0.00000000}"),
                                       ("DEC", "@dec{0,0.00000000}"),
+                                      ("pmRA", "@pmra{0,0.000} mas/yr"),
+                                      ("pmDE", "@pmde{0,0.000} mas/yr"),
                                       ("x", "@x"),
                                       ("y", "@y")],
                             renderers=[r],
@@ -319,9 +327,11 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     else:
         title = "Pixel data"
 
+    # We subtract 0.5 from the range below because pixel coordinates refer to
+    # the middle of a pixel, e.g. (col, row) = (10.0, 20.0) is a pixel center.
     fig = figure(plot_width=plot_width, plot_height=plot_height,
-                 x_range=(tpf.column, tpf.column+tpf.shape[2]),
-                 y_range=(tpf.row, tpf.row+tpf.shape[1]),
+                 x_range=(tpf.column-0.5, tpf.column+tpf.shape[2]-0.5),
+                 y_range=(tpf.row-0.5, tpf.row+tpf.shape[1]-0.5),
                  title=title, tools=tools,
                  toolbar_location="below",
                  border_fill_color="whitesmoke")
@@ -349,7 +359,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
         raise ValueError('Please specify either `linear` or `log` scale for color.')
 
     fig.image([tpf.flux[fiducial_frame, :, :] + pedestal],
-              x=tpf.column, y=tpf.row,
+              x=tpf.column-0.5, y=tpf.row-0.5,
               dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
               color_mapper=color_mapper, name="tpfimg")
 
