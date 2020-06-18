@@ -329,7 +329,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <br style="clear:both;"><div class="section" id="How-to-perform-aperture-photometry-with-custom-apertures?">
 <h1>How to perform aperture photometry with custom apertures?<a class="headerlink" href="#How-to-perform-aperture-photometry-with-custom-apertures?" title="Permalink to this headline">¶</a></h1>
-<p>We have discussed in <a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/1.03-what-are-lightcurves.html">previous tutorials</a> how Simple Aperture Photometry works. We choose a set of pixels in the image and sum those to produce a single flux value. We sum the same pre-selected pixels for every image at each time slice to produce a light curve.</p>
+<p>We have discussed in previous tutorials how Simple Aperture Photometry works. We choose a set of pixels in the image and sum those to produce a single flux value. We sum the same pre-selected pixels for every image at each time slice to produce a light curve.</p>
 <p>The <a class="reference external" href="https://github.com/nasa/kepler-pipeline">Kepler Data Pipeline</a> produces an aperture, which is used by default by lightkurve. However, there are some cases where you might want to produce your own aperture. The field may be crowded, or you may wish to change the aperture size to change the relative contribution of the background. K2 data generally needs larger apertures than the default pipeline mask. Lightkurve offers tools to select pixels programmatically.</p>
 <p>First, let’s load a target pixel file. Let’s choose Kepler planet canidate <a class="reference external" href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname=KOI-2862.01&amp;type=KEPLER_CANDIDATE">KIC 6679295</a>. We’ll use the <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> function to download every target pixel file available for each quarter of this data set.</p>
 <div class="nbinput nblast docutils container">
@@ -345,7 +345,7 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>We’ve now created a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> objects, where each item is a different quarter. We’re going to be able to combine these just like in the <a href="#id1"><span class="problematic" id="id2">`stitching tutorial &lt;&gt;`__</span></a>.</p>
+<p>We’ve now created a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> objects, where each item is a different quarter. We’re going to be able to combine these just like in the <a class="reference external" href="03-appending-lightcurves.html">stitching tutorial</a>.</p>
 <p>Let’s take a look at just one of those target pixel files.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -385,7 +385,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-making-custom-apertures_7_0.png"><img alt="../_images/tutorials_03-making-custom-apertures_7_0.png" src="../_images/tutorials_03-making-custom-apertures_7_0.png" style="width: 789px; height: 375px;" /></a>
+<img alt="../_images/tutorials_03-making-custom-apertures_7_0.png" src="../_images/tutorials_03-making-custom-apertures_7_0.png" />
 </div>
 </div>
 <p>Looks like a great candidate. However, we might just want to check on the pixels. Let’s plot one of the target pixel files.</p>
@@ -402,7 +402,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-making-custom-apertures_9_0.png"><img alt="../_images/tutorials_03-making-custom-apertures_9_0.png" src="../_images/tutorials_03-making-custom-apertures_9_0.png" style="width: 609px; height: 401px;" /></a>
+<img alt="../_images/tutorials_03-making-custom-apertures_9_0.png" src="../_images/tutorials_03-making-custom-apertures_9_0.png" />
 </div>
 </div>
 <p>The Kepler Pipeline aperture is in red. It looks like there is a nearby contaminate star! We might want to check that the signal is not really coming from the bright, nearby contaminant, rather than our target star. Let’s use the top right corner four pixels as our new mask.</p>
@@ -422,7 +422,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-making-custom-apertures_11_0.png"><img alt="../_images/tutorials_03-making-custom-apertures_11_0.png" src="../_images/tutorials_03-making-custom-apertures_11_0.png" style="width: 609px; height: 401px;" /></a>
+<img alt="../_images/tutorials_03-making-custom-apertures_11_0.png" src="../_images/tutorials_03-making-custom-apertures_11_0.png" />
 </div>
 </div>
 <p>The new mask covers the bright star. Now we can iterate through the target pixel files and build the light curve in the same way as before, but this time</p>
@@ -470,7 +470,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-making-custom-apertures_15_1.png"><img alt="../_images/tutorials_03-making-custom-apertures_15_1.png" src="../_images/tutorials_03-making-custom-apertures_15_1.png" style="width: 789px; height: 375px;" /></a>
+<img alt="../_images/tutorials_03-making-custom-apertures_15_1.png" src="../_images/tutorials_03-making-custom-apertures_15_1.png" />
 </div>
 </div>
 <p>Looks like the planet signal is only in the target star and doesn’t belong to the contaminant. This is just one of many checks you might want to perform to validate your planet candidates!</p>
