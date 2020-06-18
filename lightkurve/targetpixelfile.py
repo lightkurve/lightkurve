@@ -833,8 +833,10 @@ class TargetPixelFile(object):
         with plt.style.context(style):
             if title is None:
                 title = 'Target ID: {}, Cadence: {}'.format(self.targetid, self.cadenceno[frame])
-            img_extent = (self.column, self.column + self.shape[2],
-                          self.row, self.row + self.shape[1])
+            # We subtract -0.5 because pixel coordinates refer to the middle of
+            # a pixel, e.g. (col, row) = (10.0, 20.0) is a pixel center.
+            img_extent = (self.column - 0.5, self.column + self.shape[2] - 0.5,
+                          self.row - 0.5, self.row + self.shape[1] - 0.5)
             ax = plot_image(data_to_plot, ax=ax, title=title, extent=img_extent,
                             show_colorbar=show_colorbar, clabel = clabels.get(column, column), **kwargs)
             ax.grid(False)
