@@ -26,6 +26,8 @@
 - Fixed a bug in ``tpf.interact()`` which caused the pixel selection to be off
   by half a pixel. The bug was introduced in v1.11.0. [#754]
 
+- Fixed broken links in tutorials. [#756]
+
 
 
 1.11.0 (2015-05-20)
