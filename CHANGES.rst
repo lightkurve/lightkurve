@@ -10,6 +10,8 @@
 - Fixed ``tpf.plot()`` and ``tpf.interact_sky()`` to reflect that Kepler and
   TESS pixel coordinates refer to pixel centers. [#755]
 
+- Fixed broken links in tutorials. [#756]
+
 
 
 1.11.0 (2015-05-20)

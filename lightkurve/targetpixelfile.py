@@ -781,14 +781,18 @@ class TargetPixelFile(object):
             ax = plot_image(pflux, ax=ax, title=title, extent=img_extent,
                             show_colorbar=show_colorbar, **kwargs)
             ax.grid(False)
+
+        # Overlay the aperture mask if given
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
             for i in range(self.shape[1]):
                 for j in range(self.shape[2]):
                     if aperture_mask[i, j]:
-                        ax.add_patch(patches.Rectangle((j+self.column, i+self.row),
-                                                       1, 1, color=mask_color, fill=True,
-                                                       alpha=.6))
+                        rect = patches.Rectangle(
+                                        xy=(j+self.column-0.5, i+self.row-0.5),
+                                        width=1, height=1, color=mask_color,
+                                        fill=True, alpha=.6)
+                        ax.add_patch(rect)
         return ax
 
     def to_fits(self, output_fn=None, overwrite=False):
