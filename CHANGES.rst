@@ -7,6 +7,9 @@
 - Fixed a bug in ``tpf.interact()`` which caused the pixel selection to be off
   by half a pixel. The bug was introduced in v1.11.0. [#754]
 
+- Fixed ``tpf.plot()`` and ``tpf.interact_sky()`` to reflect that Kepler and
+  TESS pixel coordinates refer to pixel centers. [#755]
+
 
 
 1.11.0 (2015-05-20)
