@@ -320,8 +320,8 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
         title = "Pixel data"
 
     fig = figure(plot_width=plot_width, plot_height=plot_height,
-                 x_range=(tpf.column-0.5, tpf.column-0.5+tpf.shape[2]),
-                 y_range=(tpf.row-0.5, tpf.row-0.5+tpf.shape[1]),
+                 x_range=(tpf.column, tpf.column+tpf.shape[2]),
+                 y_range=(tpf.row, tpf.row+tpf.shape[1]),
                  title=title, tools=tools,
                  toolbar_location="below",
                  border_fill_color="whitesmoke")
@@ -348,7 +348,8 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     else:
         raise ValueError('Please specify either `linear` or `log` scale for color.')
 
-    fig.image([tpf.flux[fiducial_frame, :, :] + pedestal], x=tpf.column-0.5, y=tpf.row-0.5,
+    fig.image([tpf.flux[fiducial_frame, :, :] + pedestal],
+              x=tpf.column, y=tpf.row,
               dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
               color_mapper=color_mapper, name="tpfimg")
 
