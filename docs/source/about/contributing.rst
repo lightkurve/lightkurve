@@ -7,8 +7,7 @@ Reporting issues and proposing changes
 Lightkurve is actively developed on its `GitHub repository <https://github.com/KeplerGO/lightkurve>`_.
 
 If you encounter a problem with Lightkurve, we encourage you to
-`open an issue on the GitHub repository <https://github.com/KeplerGO/lightkurve/issues>`_
-or to e-mail the Kepler/K2 Guest Observer Office at keplergo@mail.arc.nasa.gov.
+`open an issue on the GitHub repository <https://github.com/KeplerGO/lightkurve/issues>`_.
 
 If you would like to contribute a patch for a bugfix, please go ahead and open a pull request.
 

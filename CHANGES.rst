@@ -1,4 +1,4 @@
-1.11.1 (unreleased)
+1.11.1 (2020-06-18)
 ===================
 
 - Fixed a bug in ``TargetPixelFile.cutout()`` which prevented image edges from
@@ -14,7 +14,7 @@
 
 
 
-1.11.0 (2015-05-20)
+1.11.0 (2020-05-20)
 ===================
 
 - Deprecated the ``TargetPixelFile.header`` property and ``LightCurveFile.header()``
@@ -25,7 +25,7 @@
 
 
 
-1.10.0 (2015-05-14)
+1.10.0 (2020-05-14)
 ===================
 
 - Added the ``query_solar_system_objects()`` method to search for solar system
