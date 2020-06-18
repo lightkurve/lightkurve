@@ -12,25 +12,25 @@
 - Added the ``column`` parameter to ``TargetPixelFile.plot()`` to enable all
   columns in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
 
+
+
+1.11.1 (2020-06-18)
+===================
+
 - Fixed a bug in ``TargetPixelFile.cutout()`` which prevented image edges from
   being included in cut-outs. [#749]
 
-
-
-1.12.0 (unreleased)
-===================
+- Fixed a bug in ``tpf.interact()`` which caused the pixel selection to be off
+  by half a pixel. The bug was introduced in v1.11.0. [#754]
 
 - Fixed ``tpf.plot()`` and ``tpf.interact_sky()`` to reflect that Kepler and
   TESS pixel coordinates refer to pixel centers. [#755]
-
-- Fixed a bug in ``tpf.interact()`` which caused the pixel selection to be off
-  by half a pixel. The bug was introduced in v1.11.0. [#754]
 
 - Fixed broken links in tutorials. [#756]
 
 
 
-1.11.0 (2015-05-20)
+1.11.0 (2020-05-20)
 ===================
 
 - Deprecated the ``TargetPixelFile.header`` property and ``LightCurveFile.header()``
@@ -41,7 +41,7 @@
 
 
 
-1.10.0 (2015-05-14)
+1.10.0 (2020-05-14)
 ===================
 
 - Added the ``query_solar_system_objects()`` method to search for solar system
