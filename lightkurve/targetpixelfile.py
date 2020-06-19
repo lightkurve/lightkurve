@@ -834,11 +834,11 @@ class TargetPixelFile(object):
 
         # Make list of preset colour labels
         clabels = {'FLUX': 'Flux ($e^{-}s^{-1}$)',
-                   'FLUX_ERR': 'Flux Err. ($e^{-}s^{-1}$)',
-                   'FLUX_BKG': 'Background Flux ($e^{-}s^{-1}$)',
-                   'FLUX_BKG_ERR': 'Background Flux Err. ($e^{-}s^{-1}$)',
-                   'COSMIC_RAYS': 'Cosmic Ray Flux ($e^{-}s^{-1}$)',
-                   'RAW_CNTS': 'Raw Counts'}
+                'FLUX_ERR': 'Flux Err. ($e^{-}s^{-1}$)',
+                'FLUX_BKG': 'Background Flux ($e^{-}s^{-1}$)',
+                'FLUX_BKG_ERR': 'Background Flux Err. ($e^{-}s^{-1}$)',
+                'COSMIC_RAYS': 'Cosmic Ray Flux ($e^{-}s^{-1}$)',
+                'RAW_CNTS': 'Raw Counts'}
 
         with plt.style.context(style):
             if title is None:
