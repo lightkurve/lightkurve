@@ -80,5 +80,6 @@ We are grateful to the following community members for sharing corrections & sug
 - George Jacoby
 - `Attila Bódi <https://github.com/astrobatty>`_
 - Jennifer Burt
+- Joshua Pepper
 
 This list is incomplete. Please open an issue if your name is missing!
