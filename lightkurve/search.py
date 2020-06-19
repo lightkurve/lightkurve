@@ -400,7 +400,7 @@ def search_targetpixelfile(target, radius=None, cadence='long',
                            mission=('Kepler', 'K2', 'TESS'), quarter=None,
                            month=None, campaign=None, sector=None, limit=None):
     """Searches the `public data archive at MAST <https://archive.stsci.edu>`_
-    for a Kepler or TESS `~lightkurve.targetpixelfile.TargetPixelFile`.
+    for target pixel files.
 
     This function fetches a data table that lists the Target Pixel Files (TPFs)
     that fall within a region of sky centered around the position of `target`
