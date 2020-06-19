@@ -103,90 +103,12 @@ class PLDCorrector(RegressionCorrector):
     def __repr__(self):
         return 'PLDCorrector (LC: {})'.format(self.lc.label)
 
-        Returns
-        -------
-        X : `.DesignMatrix`
-            Matrix of column vectors to perform linear regression.
-        """
-        if tpf is None:
-            tpf = self.tpf
+    @property
+    def X(self):
+        return self.dm
 
-        # parse apertures
-        if aperture_mask is None:
-            aperture_mask = tpf._parse_aperture_mask('threshold')
-            log.debug('No aperture mask provided; using a threshold mask.')
-        else:
-            aperture_mask = tpf._parse_aperture_mask(aperture_mask)
-
-        if pld_aperture_mask is None:
-            pld_aperture_mask = ~tpf._parse_aperture_mask('threshold')
-            log.debug('No PLD aperture mask provided; using a threshold mask.')
-        else:
-            pld_aperture_mask = tpf._parse_aperture_mask(pld_aperture_mask)
-
-        # generate flux light curve from desired pixels
-        lc = self.lc
-
-        # find pixel bounds of aperture on tpf
-        xmin, xmax = min(np.where(pld_aperture_mask)[0]),  max(np.where(pld_aperture_mask)[0])
-        ymin, ymax = min(np.where(pld_aperture_mask)[1]),  max(np.where(pld_aperture_mask)[1])
-
-        # crop data cube to include only desired pixels
-        # this is required for superstamps to ensure matrix is invertable
-        cropped_flux = self.flux[:, xmin:xmax+1, ymin:ymax+1]
-        cropped_flux_err = self.flux_err[:, xmin:xmax+1, ymin:ymax+1]
-        cropped_pld_aperture = pld_aperture_mask[xmin:xmax+1, ymin:ymax+1]
-
-        # calculate errors (ignore warnings related to zero or negative errors)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RuntimeWarning)
-            flux_err = np.nansum(cropped_flux_err[:, cropped_pld_aperture]**2, axis=1)**0.5
-
-        # build initial 1st order PLD design matrix
-        regressors = cropped_flux[:, cropped_pld_aperture]
-
-        if background_mask is None:
-            # Default to pixels <1-sigma above the background
-            background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
-        self.background_mask = background_mask
-
-        DMC, spline = DesignMatrixCollection, create_spline_matrix
-        if sparse:
-            DMC, spline = SparseDesignMatrixCollection, create_sparse_spline_matrix
-        # First, we estimate the per-pixel background flux over time by
-        # (i) subtracting a mean image from each cadence;
-        # (ii) computing the median pixel value in the residual images;
-        # (iii) assume that the 5%-percentile of those medians gives us the
-        # exact background level. This assumption appears to work well for TESS
-        # but it has not been validated in detail yet.
-        simple_bkg = (self.tpf.flux - np.nanmean(self.tpf.flux, axis=0))
-        simple_bkg = np.nanmedian(simple_bkg[:, background_mask], axis=1)
-        simple_bkg -= np.percentile(simple_bkg, 5)
-
-        # Background-corrected pixel time series
-        pixels = (self.tpf.flux.transpose([1, 2, 0]) - simple_bkg
-                    ).transpose([2, 0, 1])[:, background_mask]
-
-        # make sure no columns have nans
-        nanmask = np.isfinite(pixels)
-        zipped = zip(pixels, nanmask)
-        pixels = np.array([p[n] for p,n in zipped])
-
-        dm_pixels = DesignMatrix(pixels, name='pixel_series').pca(pixel_components)
-        dm_bkg = DesignMatrix(simple_bkg, name='background_model')
-        dm_spline = spline(self.lc.time, n_knots=spline_n_knots,
-                             degree=spline_degree).append_constant()
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            dm = DMC([dm_pixels.standardize(), dm_bkg.standardize(), dm_spline])
-
-        if pld_order > 1:
-            dm = self._create_higher_order_matrix(dm, order=pld_order, n_pca_terms=n_pca_terms)
-
-        self.dm = dm
-
-    def create_design_matrix(self, background_mask=None, pixel_components=3,
-                             spline_n_knots=100, spline_degree=3, sparse=False):
+    def create_design_matrix(self, background_mask=None, pld_order=1, n_pca_terms=6,
+                             pixel_components=3, spline_n_knots=100, spline_degree=3, sparse=False):
         """Returns a `DesignMatrixCollection`."""
 
         if background_mask is None:
@@ -216,7 +138,7 @@ class PLDCorrector(RegressionCorrector):
         zipped = zip(pixels, nanmask)
         pixels = np.array([p[n] for p,n in zipped])
 
-        dm_pixels = DesignMatrix(pixels, name='pixel_series').pca(pixel_components)
+        dm_pixels = DesignMatrix(pixels, name='pixel_series').pca(pixel_components).standardize()
         dm_bkg = DesignMatrix(simple_bkg, name='background_model')
         dm_spline = spline(self.lc.time, n_knots=spline_n_knots,
                              degree=spline_degree).append_constant()
@@ -224,6 +146,10 @@ class PLDCorrector(RegressionCorrector):
             warnings.simplefilter('ignore')
             dm = DMC([dm_pixels, dm_bkg, dm_spline])
 
+        if pld_order > 1:
+            dm = self._create_higher_order_matrix(dm, order=pld_order, n_pca_terms=n_pca_terms)
+
+        self.dm = dm
         return dm
 
     def correct(self, pld_order=1, pixel_components=3, spline_n_knots=100, spline_degree=3,
@@ -254,9 +180,6 @@ class PLDCorrector(RegressionCorrector):
                                        spline_n_knots=spline_n_knots,
                                        spline_degree=spline_degree,
                                        sparse=sparse)
-
-        if pld_order > 1:
-            dm = self._create_higher_order_matrix(dm, order=pld_order, n_pca_terms=n_pca_terms)
 
         clc = super(PLDCorrector, self).correct(dm, **kwargs)
         if restore_trend:
@@ -290,8 +213,9 @@ class PLDCorrector(RegressionCorrector):
 
             ax = axs[2]
             self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
-            self.corrected_lc.scatter(normalize=False, c='r', marker='x',
-                                      s=10, label='Outliers', ax=ax)
+            self.corrected_lc.scatter(
+                                            normalize=False, c='r', marker='x',
+                                            s=10, label='Outliers', ax=ax)
             self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
 
@@ -307,7 +231,8 @@ class PLDCorrector(RegressionCorrector):
             Design matrix collection with products of columns appended as new columns.
         """
         # higher order design matrices
-        new_dms = [X for X in dm]
+        all_dms = [X for X in dm if X.name != 'pixel_series']
+        new_dms = [dm['pixel_series']]
         for i in range(2, order+1):
             regressors = np.product(list(multichoose(dm['pixel_series'].values.T, order)), axis=1).T
 
@@ -330,7 +255,10 @@ class PLDCorrector(RegressionCorrector):
 
             new_dms.append(high_order_dm)
 
-        return DesignMatrixCollection(new_dms)
+        pld_dm = DesignMatrixCollection(new_dms).to_designmatrix(name='pixel_series')
+        all_dms.insert(0, pld_dm)
+
+        return DesignMatrixCollection(all_dms)
 
 class TessPLDCorrector(PLDCorrector):
     """
@@ -402,11 +330,12 @@ class KeplerPLDCorrector(PLDCorrector):
             background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
         self.background_mask = background_mask
 
-        dm = self._create_design_matrix(background_mask=background_mask,
+        dm = self.create_design_matrix(background_mask=background_mask,
                                         pixel_components=pixel_components,
                                         spline_n_knots=spline_n_knots,
                                         spline_degree=spline_degree,
                                         sparse=sparse)
+        self.dm = dm
         clc = super(TessPLDCorrector, self).correct(dm, **kwargs)
         if restore_trend:
             clc += self.diagnostic_lightcurves['spline']
