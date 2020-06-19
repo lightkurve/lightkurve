@@ -19,6 +19,7 @@ from astropy.units import Quantity
 from astropy.timeseries import TimeSeries, aggregate_downsample
 from astropy.table import vstack
 from astropy.utils.decorators import deprecated, deprecated_renamed_argument
+from astropy.utils.exceptions import AstropyUserWarning
 
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
@@ -601,13 +602,17 @@ class LightCurve(TimeSeries):
         """
         # Lightkurve v1.x assumed that `period` was given in days if no unit
         # was specified. We maintain this behavior for backwards-compatibility.
-        if period and not isinstance(period, Quantity):
+        if period is not None and not isinstance(period, Quantity):
             period *= u.day
-        if epoch_time and not isinstance(epoch_time, Time):
+        if epoch_time is not None and not isinstance(epoch_time, Time):
             epoch_time = Time(epoch_time, format=self.time.format, scale=self.time.scale)
+        if epoch_phase is not None and not isinstance(epoch_phase, Quantity):
+            epoch_phase *= u.day
+        if wrap_phase is not None and not isinstance(wrap_phase, Quantity):
+            wrap_phase *= u.day
 
         # Warn if `epoch_time` appears to use the wrong format
-        if epoch_time and epoch_time.value > 2450000:
+        if epoch_time is not None and epoch_time.value > 2450000:
             if self.time.format == 'bkjd':
                 warnings.warn('`epoch_time` appears to be given in JD, '
                               'however the light curve time uses BKJD '
@@ -978,7 +983,7 @@ class LightCurve(TimeSeries):
         # Call AstroPy's aggregate_downsample
         with warnings.catch_warnings():
             # ignore uninteresting empty slice warnings
-            warnings.simplefilter("ignore", RuntimeWarning)
+            warnings.simplefilter("ignore", (RuntimeWarning, AstropyUserWarning))
             ts = aggregate_downsample(self,
                                       time_bin_size=time_bin_size,
                                       n_bins=n_bins,

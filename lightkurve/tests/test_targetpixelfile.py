@@ -160,11 +160,11 @@ def test_tpf_ones(centroid_method):
                 TessTargetPixelFile(filename_tpf_one_center)]
     for tpf in tpfs:
         lc = tpf.to_lightcurve(aperture_mask='all', centroid_method=centroid_method)
-        assert np.all(lc.flux == 1)
-        assert np.all((lc.centroid_col < tpf.column+tpf.shape[1]).all()
-                      * (lc.centroid_col > tpf.column).all())
-        assert np.all((lc.centroid_row < tpf.row+tpf.shape[2]).all()
-                      * (lc.centroid_row > tpf.row).all())
+        assert np.all(lc.flux.value == 1)
+        assert np.all((lc.centroid_col.value < tpf.column+tpf.shape[1]).all()
+                      * (lc.centroid_col.value > tpf.column).all())
+        assert np.all((lc.centroid_row.value < tpf.row+tpf.shape[2]).all()
+                      * (lc.centroid_row.value > tpf.row).all())
 
 
 @pytest.mark.parametrize("quality_bitmask,answer", [(None, 1290), ('none', 1290),
@@ -199,8 +199,8 @@ def test_wcs_tabby(method):
     tpf.wcs
     ra, dec = tpf.get_coordinates(0)
     col, row = tpf.estimate_centroids(method=method)
-    col -= tpf.column
-    row -= tpf.row
+    col = col.value - tpf.column
+    row = row.value - tpf.row
     y, x = int(np.round(col[0])), int(np.round(row[1]))
     # Compare with RA and Dec from Simbad
     assert np.isclose(ra[x, y], 301.5643971, 1e-4)
@@ -515,7 +515,7 @@ def test_threshold_aperture_mask():
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.plot(aperture_mask='threshold')
     lc = tpf.to_lightcurve(aperture_mask=tpf.create_threshold_mask(threshold=1))
-    assert (lc.flux == 1).all()
+    assert (lc.flux.value == 1).all()
     # The TESS file shows three pixel regions above a 2-sigma threshold;
     # let's make sure the `reference_pixel` argument allows them to be selected.
     tpf = TessTargetPixelFile(filename_tess)

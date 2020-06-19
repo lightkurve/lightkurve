@@ -594,7 +594,7 @@ class TargetPixelFile(object):
 
         Returns
         -------
-        columns, rows : array, array
+        columns, rows : `~astropy.units.Quantity`, `~astropy.units.Quantity`
             Arrays containing the column and row positions for the centroid
             for each cadence, or NaN for cadences where the estimation failed.
         """
@@ -617,6 +617,8 @@ class TargetPixelFile(object):
             warnings.simplefilter("ignore", RuntimeWarning)
             col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
             row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+        col_centr = u.Quantity(col_centr, unit='pixel')
+        row_centr = u.Quantity(row_centr, unit='pixel')
         return col_centr, row_centr
 
     def _estimate_centroids_via_quadratic(self, aperture_mask):
@@ -632,6 +634,8 @@ class TargetPixelFile(object):
         # pixels are centered at .5, 1.5, 2.5, ...
         col_centr = np.asfarray(col_centr) + self.column + .5
         row_centr = np.asfarray(row_centr) + self.row + .5
+        col_centr = u.Quantity(col_centr, unit='pixel')
+        row_centr = u.Quantity(row_centr, unit='pixel')
         return col_centr, row_centr
 
     def _aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
@@ -663,6 +667,10 @@ class TargetPixelFile(object):
             flux_err = np.nansum(self.flux_err[:, apmask]**2, axis=1)**0.5
             is_allnan = ~np.any(np.isfinite(self.flux_err[:, apmask]), axis=1)
             flux_err[is_allnan] = np.nan
+
+        if self.get_header(1)['TUNIT5'] == 'e-/s':
+            flux = u.Quantity(flux, unit='electron/s')
+            flux_err = u.Quantity(flux_err, unit='electron/s')
 
         return flux, flux_err, centroid_col, centroid_row
 
@@ -1335,10 +1343,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Set up the model
         if 'star_priors' not in kwargs:
             centr_col, centr_row = self.estimate_centroids()
-            star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col),
-                                                       var=np.nanstd(centr_col)**2),
-                                     row=GaussianPrior(mean=np.nanmedian(centr_row),
-                                                       var=np.nanstd(centr_row)**2),
+            star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col.value),
+                                                       var=np.nanstd(centr_col.value)**2),
+                                     row=GaussianPrior(mean=np.nanmedian(centr_row.value),
+                                                       var=np.nanstd(centr_row.value)**2),
                                      flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0]),
                                                        ub=2*np.nansum(self.flux[0]) + 1e-10),
                                      targetid=self.targetid)]

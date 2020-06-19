@@ -195,6 +195,6 @@ def test_centroids():
         ynorm = yraw - np.median(yraw)
         xposc = tpf.pos_corr2 - np.median(tpf.pos_corr2)
         yposc = tpf.pos_corr1 - np.median(tpf.pos_corr1)
-        rmax = np.max(np.sqrt((xnorm-xposc)**2 + (ynorm-yposc)**2))
+        rmax = np.max(np.sqrt((xnorm.value-xposc)**2 + (ynorm.value-yposc)**2))
         # The centroids should agree to within a hundredth of a pixel.
         assert rmax < 0.01

@@ -5,6 +5,7 @@ import logging
 import warnings
 
 from astropy.stats import sigma_clip
+from astropy import units as u
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.sparse import issparse, csr_matrix
@@ -224,6 +225,7 @@ class RegressionCorrector(Corrector):
                                        propagate_errors=propagate_errors)
             model = np.ma.masked_array(data=self.dmc.X.dot(coefficients),
                                        mask=~(cadence_mask & clean_cadences))
+            model = u.Quantity(model, unit=self.lc.flux.unit)
             residuals = self.lc.flux - model
             clean_cadences = ~sigma_clip(residuals, sigma=sigma).mask
             log.debug("correct(): iteration {}: clipped {} cadences"
@@ -245,7 +247,9 @@ class RegressionCorrector(Corrector):
             model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
         else:
             model_err = np.zeros(len(model_flux))
-        self.model_lc = LightCurve(time=self.lc.time, flux=model_flux, flux_err=model_err)
+        self.model_lc = LightCurve(time=self.lc.time,
+                                   flux=u.Quantity(model_flux, unit=self.lc.flux.unit),
+                                   flux_err=u.Quantity(model_err, unit=self.lc.flux.unit))
         self.corrected_lc = self.lc.copy()
         self.corrected_lc.flux = self.lc.flux - self.model_lc.flux
         self.corrected_lc.flux_err = (self.lc.flux_err**2 + model_err**2)**0.5
@@ -269,8 +273,10 @@ class RegressionCorrector(Corrector):
             # submatrix_coefficients_err = self.coefficients_err[firstcol_idx:firstcol_idx+submatrix.shape[1], firstcol_idx:firstcol_idx+submatrix.shape[1]]
             # samples = np.asarray([np.dot(submatrix.values, np.random.multivariate_normal(submatrix_coefficients, submatrix_coefficients_err)) for idx in range(100)]).T
             # model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
-            model_flux = submatrix.X.dot(submatrix_coefficients)
-            lcs[submatrix.name] = LightCurve(time=self.lc.time, flux=model_flux, flux_err=np.zeros(len(model_flux)), label=submatrix.name)
+            model_flux = u.Quantity(submatrix.X.dot(submatrix_coefficients), unit=self.lc.flux.unit)
+            model_flux_err = u.Quantity(np.zeros(len(model_flux)), unit=self.lc.flux.unit)
+            lcs[submatrix.name] = LightCurve(time=self.lc.time, flux=model_flux,
+                                             flux_err=model_flux_err, label=submatrix.name)
         return lcs
 
     def _diagnostic_plot(self):
