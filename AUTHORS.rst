@@ -79,5 +79,6 @@ We are grateful to the following community members for sharing corrections & sug
 - `Nuno Ramos Carvalho <https://github.com/nunorc>`_
 - George Jacoby
 - `Attila Bódi <https://github.com/astrobatty>`_
+- Jennifer Burt
 
 This list is incomplete. Please open an issue if your name is missing!
