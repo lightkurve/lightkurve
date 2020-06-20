@@ -138,7 +138,7 @@ def test_TessLightCurveFile(quality_bitmask):
     assert lc.label == hdu[0].header['OBJECT']
     assert lc.time_format == 'btjd'
     assert lc.time_scale == 'tdb'
-    assert lc.flux_unit == u.electron / u.second
+    assert lc.flux.unit == u.electron / u.second
     assert lc.sector == hdu[0].header['SECTOR']
     assert lc.camera == hdu[0].header['CAMERA']
     assert lc.ccd == hdu[0].header['CCD']
@@ -402,33 +402,36 @@ def test_cdpp_tabby():
 @pytest.mark.xfail
 def test_bin():
     """Does binning work?"""
-    lc = LightCurve(time=np.arange(10),
-                    flux=2*np.ones(10),
-                    flux_err=2**.5*np.ones(10))
-    binned_lc = lc.bin(binsize=2)
-    assert_allclose(binned_lc.flux, 2*np.ones(5))
-    assert_allclose(binned_lc.flux_err, np.ones(5))
-    assert len(binned_lc.time) == 5
-    with pytest.raises(ValueError):
-        lc.bin(method='doesnotexist')
-    # If `flux_err` is missing, the errors on the bins should be the stddev
-    lc = LightCurve(time=np.arange(10),
-                    flux=2*np.ones(10))
-    binned_lc = lc.bin(binsize=2)
-    assert_allclose(binned_lc.flux_err, np.zeros(5))
-    # Regression test for #377
-    lc = KeplerLightCurve(time=np.arange(10),
-                          flux=2*np.ones(10))
-    lc.bin(5).remove_outliers()
-    # Second regression test for #377
-    lc = KeplerLightCurve(time=np.arange(1000) * 0.02,
-                          flux=1*np.ones(1000) + np.random.normal(0, 1e-6, 1000),
-                          cadenceno=np.arange(1000))
-    assert np.isclose(lc.bin(2).estimate_cdpp(), 1, rtol=1)
-    # Regression test for #500
-    lc = LightCurve(time=np.arange(2000),
-                    flux=np.random.normal(loc=42, scale=0.01, size=2000))
-    assert np.round(lc.bin(2000).flux_err[0], 2) == 0.01
+    with warnings.catch_warnings():  # binsize is deprecated
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+
+        lc = LightCurve(time=np.arange(10),
+                        flux=2*np.ones(10),
+                        flux_err=2**.5*np.ones(10))
+        binned_lc = lc.bin(binsize=2)
+        assert_allclose(binned_lc.flux, 2*np.ones(5))
+        assert_allclose(binned_lc.flux_err, np.ones(5))
+        assert len(binned_lc.time) == 5
+        with pytest.raises(ValueError):
+            lc.bin(method='doesnotexist')
+        # If `flux_err` is missing, the errors on the bins should be the stddev
+        lc = LightCurve(time=np.arange(10),
+                        flux=2*np.ones(10))
+        binned_lc = lc.bin(binsize=2)
+        assert_allclose(binned_lc.flux_err, np.zeros(5))
+        # Regression test for #377
+        lc = KeplerLightCurve(time=np.arange(10),
+                            flux=2*np.ones(10))
+        lc.bin(5).remove_outliers()
+        # Second regression test for #377
+        lc = KeplerLightCurve(time=np.arange(1000) * 0.02,
+                            flux=1*np.ones(1000) + np.random.normal(0, 1e-6, 1000),
+                            cadenceno=np.arange(1000))
+        assert np.isclose(lc.bin(2).estimate_cdpp(), 1, rtol=1)
+        # Regression test for #500
+        lc = LightCurve(time=np.arange(2000),
+                        flux=np.random.normal(loc=42, scale=0.01, size=2000))
+        assert np.round(lc.bin(2000).flux_err[0], 2) == 0.01
 
 
 @pytest.mark.xfail
@@ -626,16 +629,6 @@ def test_to_fits():
         lc_out = lc - bkg_lc.flux * (thresh_mask.sum()/bkg_mask.sum())
         lc_out.to_fits(aperture_mask=thresh_mask, path=tempfile.NamedTemporaryFile().name,
                        overwrite=True, extra_data={'BKG': bkg_lc.flux})
-
-
-@pytest.mark.remote_data
-def test_astropy_time():
-    '''Test the `astropy_time` property'''
-    lc = KeplerLightCurve.read(TABBY_Q8)
-    assert lc.time.scale == 'tdb'
-    assert len(lc.time.iso) == len(lc.time)
-    #assert iso[0] == '2011-01-06 20:45:08.811'
-    #assert iso[-1] == '2011-03-14 20:18:16.734'
 
 
 def test_astropy_time_bkjd():
@@ -867,26 +860,28 @@ def test_to_timeseries():
 
 def test_flux_unit():
     """Checks the use of lc.flux_unit and lc.flux_quantity."""
-    unit_obj = u.Unit("electron/second")
-    # Can we set flux units using a Unit object?
-    time, flux = range(3), np.ones(3)
-    lc = LightCurve(time=time, flux=flux, flux_unit=unit_obj)
-    assert lc.flux.unit == unit_obj
-    # Can we set flux units using a string?
-    lc = LightCurve(time=time, flux=flux, flux_unit="electron/second")
-    assert lc.flux.unit == unit_obj
-    # Can we pass a quantity to flux?
-    lc = LightCurve(time=time, flux=flux*unit_obj)
-    assert lc.flux.unit == unit_obj
-    # Can we retrieve correct flux quantities?
-    with warnings.catch_warnings():  # flux_quantity is deprecated
+    with warnings.catch_warnings():  # We deprecated `flux_unit` in v2.0
         warnings.simplefilter("ignore", LightkurveDeprecationWarning)
-        assert lc.flux_quantity.unit ==unit_obj
-        assert_array_equal(lc.flux_quantity.value, flux)
-    # Is invalid user input validated?
-    with pytest.raises(ValueError) as err:
-        lc = LightCurve(time=time, flux=flux, flux_unit="blablabla")
-    assert "not a valid unit" in err.value.args[0]
+        unit_obj = u.Unit("electron/second")
+        # Can we set flux units using a Unit object?
+        time, flux = range(3), np.ones(3)
+        lc = LightCurve(time=time, flux=flux, flux_unit=unit_obj)
+        assert lc.flux.unit == unit_obj
+        # Can we set flux units using a string?
+        lc = LightCurve(time=time, flux=flux, flux_unit="electron/second")
+        assert lc.flux.unit == unit_obj
+        # Can we pass a quantity to flux?
+        lc = LightCurve(time=time, flux=flux*unit_obj)
+        assert lc.flux.unit == unit_obj
+        # Can we retrieve correct flux quantities?
+        with warnings.catch_warnings():  # flux_quantity is deprecated
+            warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+            assert lc.flux_quantity.unit ==unit_obj
+            assert_array_equal(lc.flux_quantity.value, flux)
+        # Is invalid user input validated?
+        with pytest.raises(ValueError) as err:
+            lc = LightCurve(time=time, flux=flux, flux_unit="blablabla")
+        assert "not a valid unit" in err.value.args[0]
 
 
 def test_astropy_time_initialization():
@@ -895,20 +890,24 @@ def test_astropy_time_initialization():
     lc = LightCurve(time=Time(time, format='jd', scale='utc'))
     assert lc.time_format == 'jd'
     assert lc.time_scale == 'utc'
-    assert lc.astropy_time.format == 'jd'
-    assert lc.astropy_time.scale == 'utc'
+    with warnings.catch_warnings():  # we deprecated `astropy_time` in v2.0
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        assert lc.astropy_time.format == 'jd'
+        assert lc.astropy_time.scale == 'utc'
     lc = LightCurve(time=time, time_format='jd', time_scale='utc')
     assert lc.time_format == 'jd'
     assert lc.time_scale == 'utc'
-    assert lc.astropy_time.format == 'jd'
-    assert lc.astropy_time.scale == 'utc'
+    with warnings.catch_warnings():  # we deprecated `astropy_time` in v2.0
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        assert lc.astropy_time.format == 'jd'
+        assert lc.astropy_time.scale == 'utc'
 
 
 def test_normalize_unit():
     """Can the units of a normalized light curve be set?"""
     lc = LightCurve(flux=[1, 2, 3])
     for unit in ['percent', 'ppt', 'ppm']:
-        assert lc.normalize(unit=unit).flux_unit.name == unit
+        assert lc.normalize(unit=unit).flux.unit.name == unit
 
 
 @pytest.mark.skip
@@ -966,7 +965,9 @@ def test_river():
 def test_bin_issue705():
     """Regression test for #705: binning failed."""
     lc = TessLightCurve(time=np.arange(50), flux=np.ones(50), quality=np.zeros(50))
-    lc.bin(binsize=15)
+    with warnings.catch_warnings():  # binsize is deprecated
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        lc.bin(binsize=15)
 
 
 @pytest.mark.xfail  # As of June 2020 the SkyBot service is returning MySQL errors

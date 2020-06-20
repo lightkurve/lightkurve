@@ -7,6 +7,8 @@ if no internet connection is available.
 """
 import os
 import pytest
+import warnings
+
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 import tempfile
@@ -19,7 +21,7 @@ from astropy.table import Table
 from ..utils import LightkurveWarning
 from ..search import search_lightcurvefile, search_targetpixelfile, \
                      search_tesscut, SearchResult, SearchError, log
-from ..io import open
+from ..io import read
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
 from .. import PACKAGEDIR
@@ -230,24 +232,27 @@ def test_empty_searchresult():
 
 
 def test_open():
-    # define paths to k2 and  tess data
-    k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
-    tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
-    # Ensure files are read in as the correct object
-    k2tpf = open(k2_path)
-    assert(isinstance(k2tpf, KeplerTargetPixelFile))
-    tesstpf = open(tess_path)
-    assert(isinstance(tesstpf, TessTargetPixelFile))
-    # Open should fail if the filetype is not recognized
-    try:
-        open(os.path.join(PACKAGEDIR, "data", "lightkurve.mplstyle"))
-    except (ValueError, IOError):
-        pass
-    # Can you instantiate with a path?
-    assert(isinstance(KeplerTargetPixelFile(k2_path), KeplerTargetPixelFile))
-    assert(isinstance(TessTargetPixelFile(tess_path), TessTargetPixelFile))
-    # Can open take a quality_bitmask argument?
-    assert(open(k2_path, quality_bitmask='hard').quality_bitmask == 'hard')
+    from ..io import open
+    with warnings.catch_warnings():  # lk.open is deprecated
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        # define paths to k2 and tess data
+        k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
+        tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
+        # Ensure files are read in as the correct object
+        k2tpf = open(k2_path)
+        assert(isinstance(k2tpf, KeplerTargetPixelFile))
+        tesstpf = open(tess_path)
+        assert(isinstance(tesstpf, TessTargetPixelFile))
+        # Open should fail if the filetype is not recognized
+        try:
+            open(os.path.join(PACKAGEDIR, "data", "lightkurve.mplstyle"))
+        except (ValueError, IOError):
+            pass
+        # Can you instantiate with a path?
+        assert(isinstance(KeplerTargetPixelFile(k2_path), KeplerTargetPixelFile))
+        assert(isinstance(TessTargetPixelFile(tess_path), TessTargetPixelFile))
+        # Can open take a quality_bitmask argument?
+        assert(open(k2_path, quality_bitmask='hard').quality_bitmask == 'hard')
 
 
 @pytest.mark.remote_data
@@ -286,9 +291,9 @@ def test_corrupt_download_handling():
 
 
 def test_filenotfound():
-    """Regression test for #540; ensure lk.open() yields `FileNotFoundError`."""
+    """Regression test for #540; ensure lk.read() yields `FileNotFoundError`."""
     with pytest.raises(FileNotFoundError):
-        open("DOESNOTEXIST")
+        read("DOESNOTEXIST")
 
 
 @pytest.mark.remote_data
