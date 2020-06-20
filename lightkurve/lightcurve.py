@@ -709,8 +709,8 @@ class LightCurve(TimeSeries):
                           "number and invert the light curve, which is probably"
                           "not what you want".format(median_flux),
                           LightkurveWarning)
-        # Warn if the light curve is already in relative units.
-        if self.flux.unit and self.flux.unit.is_equivalent(u.dimensionless_unscaled):
+        # Warn if the light curve was already normalized before
+        if self.meta.get("normalized"):
             warnings.warn("The light curve already appears to be in relative "
                           "units; `normalize()` will convert the light curve "
                           "into relative units for a second time, which is "
@@ -737,6 +737,7 @@ class LightCurve(TimeSeries):
         elif unit == 'ppm':  # parts per million
             lc.flux = lc.flux.to(u.cds.ppm)
 
+        lc.meta['normalized'] = True
         return lc
 
     def remove_nans(self):

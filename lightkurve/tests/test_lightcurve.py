@@ -207,7 +207,7 @@ def test_lightcurve_fold():
 def test_lightcurve_fold_issue520():
     """Regression test for #520; accept quantities in `fold()`."""
     lc = LightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1)
-    lc.fold(period=1*u.day, t0=5*u.day)
+    lc.fold(period=1*u.day, epoch_time=5*u.day)
 
 def test_lightcurve_append():
     """Test ``LightCurve.append()``."""
@@ -309,17 +309,10 @@ def test_custom_lightcurve_file(path, mission):
     elif mission == "TESS":
         #with pytest.warns(LightkurveWarning):
         lc = TessLightCurve.read(path)
-    assert lc.hdu[2].name == 'APERTURE'
     assert lc.cadenceno[0] >= 0
     assert lc.dec == lc.dec
     assert lc.time[-1] > lc.time[0]
-    # .interact() files currently define FLUX, and not SAP_FLUX nor PDCSAP_FLUX
-    #lc = lcf_custom.get_lightcurve('FLUX')
     assert len(lc.flux) > 0
-    with pytest.raises(KeyError):
-        lc.SAP_FLUX
-    with pytest.raises(KeyError):
-        lc.PDCSAP_FLUX
 
     assert lc.mission.lower() == mission.lower()
     # Does the data match what one would obtain using pyfits.open?
@@ -341,24 +334,24 @@ def test_custom_lightcurve_file(path, mission):
 @pytest.mark.remote_data
 def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
-    for lcf in [KeplerLightCurve.read(TABBY_Q8), TessLightCurve.read(TESS_SIM)]:
-        lcf.plot()
-        lcf.scatter()
-        lcf.errorbar()
-        lcf.SAP_FLUX.plot()
-        lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
-        lcf.SAP_FLUX.scatter()
-        lcf.SAP_FLUX.scatter(c='C3')
-        lcf.SAP_FLUX.scatter(c=lcf.SAP_FLUX.time.value, show_colorbar=True, colorbar_label='Time')
-        lcf.SAP_FLUX.errorbar()
+    for lc in [KeplerLightCurve.read(TABBY_Q8), TessLightCurve.read(TESS_SIM)]:
+        lc.plot()
+        lc.scatter()
+        lc.errorbar()
+        lc.plot()
+        lc.plot(normalize=False, title="Not the default")
+        lc.scatter()
+        lc.scatter(c='C3')
+        lc.scatter(c=lc.time.value, show_colorbar=True, colorbar_label='Time')
+        lc.errorbar()
         plt.close('all')
 
 
 @pytest.mark.remote_data
 def test_lightcurve_scatter():
     """Sanity check to verify that lightcurve scatter plotting works"""
-    lcf = KeplerLightCurve.read(KEPLER10)
-    lc = lcf.PDCSAP_FLUX.flatten()
+    lc = KeplerLightCurve.read(KEPLER10)
+    lc = lc.flatten()
 
     # get an array of original times, in the same order as the folded lightcurve
     foldkw = dict(period=0.837491)
@@ -392,10 +385,10 @@ def test_cdpp():
 @pytest.mark.remote_data
 def test_cdpp_tabby():
     """Compare the cdpp noise metric against the pipeline value."""
-    lcf = KeplerLightCurve.read(TABBY_Q8)
+    lc = KeplerLightCurve.read(TABBY_Q8)
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
-    lc = LightCurve(time=lcf.PDCSAP_FLUX.time[:1000], flux=lcf.PDCSAP_FLUX.flux[:1000])
-    assert(np.abs(lc.estimate_cdpp().value - lcf.cdpp6_0) < 30)
+    lc = LightCurve(time=lc.time[:1000], flux=lc.flux[:1000])
+    assert(np.abs(lc.estimate_cdpp().value - lc.cdpp6_0) < 30)
 
 
 # TEMPORARILY SKIP, cf. https://github.com/KeplerGO/lightkurve/issues/663
@@ -587,8 +580,8 @@ def test_to_csv():
 @pytest.mark.remote_data
 def test_to_fits():
     """Test the KeplerLightCurve.to_fits() method"""
-    lcf = KeplerLightCurve.read(TABBY_Q8)
-    hdu = lcf.PDCSAP_FLUX.to_fits()
+    lc = KeplerLightCurve.read(TABBY_Q8)
+    hdu = lc.to_fits()
     KeplerLightCurve.read(hdu)  # Regression test for #233
     assert type(hdu).__name__ is 'HDUList'
     assert len(hdu) == 2
@@ -600,7 +593,7 @@ def test_to_fits():
     hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
 
     # Test "round-tripping": can we read-in what we write
-    lcf_new = KeplerLightCurve.read(hdu)  # Regression test for #233
+    lc_new = KeplerLightCurve.read(hdu)  # Regression test for #233
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
     assert hdu[1].header['EXTNAME'] == 'LIGHTCURVE'
     assert hdu[1].header['TTYPE1'] == 'TIME'
@@ -615,7 +608,7 @@ def test_to_fits():
         lc.to_fits(path=tempfile.NamedTemporaryFile().name, aperture_mask=random_mask)
 
         lc.to_fits(path=tempfile.NamedTemporaryFile().name, overwrite=True,
-                  flux_column_name='SAP_FLUX')
+                   flux_column_name='SAP_FLUX')
 
         lc = tpf[0:2].to_lightcurve(aperture_mask=thresh_mask)
         lc.to_fits(aperture_mask=thresh_mask, path=tempfile.NamedTemporaryFile().name)
@@ -840,8 +833,10 @@ def test_targetid():
 def test_regression_346():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/346"""
     # This previously triggered an IndexError:
-    from .. import KeplerLightCurveFile
-    KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.remove_nans().to_corrector().correct().estimate_cdpp()
+    with warnings.catch_warnings():  # KeplerLightCurveFile is deprecated
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        from .. import KeplerLightCurveFile
+        KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.remove_nans().to_corrector().correct().estimate_cdpp()
 
 
 def test_to_timeseries():
