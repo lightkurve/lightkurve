@@ -45,13 +45,8 @@ class SFFCorrector(RegressionCorrector):
                           LightkurveWarning)
 
         self.raw_lc = lc
-        if hasattr(lc, 'flux_unit'):
-            if lc.flux_unit is None:
-                lc = lc.copy()
-            elif lc.flux_unit.to_string() == '':
-                lc = lc.copy()
-            else:
-                lc = lc.copy().normalize()
+        if lc.flux.unit.to_string() == '':
+            lc = lc.copy()
         else:
             lc = lc.copy().normalize()
 

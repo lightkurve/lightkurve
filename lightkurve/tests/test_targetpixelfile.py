@@ -21,7 +21,7 @@ from astropy.utils.exceptions import AstropyWarning
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
 from ..lightcurve import TessLightCurve
-from ..utils import LightkurveWarning
+from ..utils import LightkurveWarning, LightkurveDeprecationWarning
 from ..io import read as lkopen
 
 from .test_synthetic_data import filename_synthetic_flat
@@ -622,5 +622,5 @@ def test_get_header():
     assert tpf.get_header(0)['MISSION'] == tpf.get_keyword("MISSION")
     assert tpf.get_header(ext=2)['EXTNAME'] == "APERTURE"
     # ``tpf.header`` is deprecated
-    with pytest.warns(LightkurveWarning, match='deprecated'):
+    with pytest.warns(LightkurveDeprecationWarning, match='deprecated'):
         tpf.header

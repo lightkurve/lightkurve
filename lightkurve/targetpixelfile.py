@@ -14,6 +14,7 @@ from astropy.wcs import WCS
 from astropy.utils.exceptions import AstropyWarning
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
+from astropy.utils.decorators import deprecated
 import astropy.units as u
 
 from matplotlib import patches
@@ -28,8 +29,9 @@ from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
-                   LightkurveWarning, validate_method, \
-                   centroid_quadratic, _query_solar_system_objects
+                   LightkurveWarning, LightkurveDeprecationWarning, \
+                   validate_method, centroid_quadratic, \
+                   _query_solar_system_objects
 from .io import detect_filetype
 
 
@@ -159,11 +161,10 @@ class TargetPixelFile(object):
         return kw
 
     @property
+    @deprecated("2.0", alternative="get_header()",
+                warning_type=LightkurveDeprecationWarning)
     def header(self):
         """DEPRECATED. Please use ``get_header()`` instead."""
-        warnings.warn("`TargetPixelFile.header` is deprecated, please use "
-                      "`TargetPixelFile.get_header()` instead.",
-                      LightkurveWarning)
         return self.hdu[0].header
 
     def get_header(self, ext=0):
@@ -377,7 +378,7 @@ class TargetPixelFile(object):
         """
         attrs = {}
         for attr in dir(self):
-            if not attr.startswith('_'):
+            if not attr.startswith('_') and attr != "header":
                 res = getattr(self, attr)
                 if callable(res):
                     continue
