@@ -15,7 +15,6 @@ from astropy.io import fits as pyfits
 from .. import MPLSTYLE
 from ..utils import channel_to_module_output
 from ..lightcurve import KeplerLightCurve
-from ..lightcurvefile import KeplerLightCurveFile
 from .corrector import Corrector
 
 log = logging.getLogger(__name__)
@@ -32,8 +31,8 @@ class KeplerCBVCorrector(Corrector):
 
     Attributes
     ----------
-    lc : KeplerLightCurveFile, KeplerLightCurve object or str
-        An instance from KeplerLightCurveFile or a path for the .fits
+    lc : KeplerLightCurve object or str
+        An instance from KeplerLightCurve or a path for the .fits
         file of a NASA's Kepler/K2 light curve.
     likelihood : oktopus.Likelihood subclass
         A class that describes a cost function.
@@ -43,14 +42,14 @@ class KeplerCBVCorrector(Corrector):
     Examples
     --------
     >>> import matplotlib.pyplot as plt
-    >>> from lightkurve import KeplerCBVCorrector, KeplerLightCurveFile
+    >>> from lightkurve import KeplerCBVCorrector, read
     >>> fn = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
     ...       "0084/008462852/kplr008462852-2011073133259_llc.fits") # doctest: +SKIP
     >>> cbv = KeplerCBVCorrector(fn) # doctest: +SKIP
     Downloading https://archive.stsci.edu/missions/kepler/lightcurves/0084/008462852/kplr008462852-2011073133259_llc.fits [Done]
     >>> cbv_lc = cbv.correct() # doctest: +SKIP
     Downloading http://archive.stsci.edu/missions/kepler/cbv/kplr2011073133259-q08-d25_lcbv.fits [Done]
-    >>> sap_lc = KeplerLightCurveFile(fn).SAP_FLUX # doctest: +SKIP
+    >>> sap_lc = read(fn, flux_column="sap_flux", flux_err_column="sap_flux_err") # doctest: +SKIP
     >>> plt.plot(sap_lc.time, sap_lc.flux, 'x', markersize=1, label='SAP_FLUX') # doctest: +SKIP
     >>> plt.plot(cbv_lc.time, cbv_lc.flux, 'o', markersize=1, label='CBV_FLUX') # doctest: +SKIP
     >>> plt.legend() # doctest: +SKIP
@@ -85,16 +84,14 @@ class KeplerCBVCorrector(Corrector):
     @lc.setter
     def lc(self, value):
         # this enables `lc` to be either a string
-        # or an object from KeplerLightCurveFile
+        # or a KeplerLightCurve object
         if isinstance(value, str):
-            self._lc = KeplerLightCurveFile(value).PDCSAP_FLUX
-        elif isinstance(value, KeplerLightCurveFile):
-            self._lc = value.SAP_FLUX
+            self._lc = KeplerLightCurve.read(value)
         elif isinstance(value, KeplerLightCurve):
             self._lc = value
         else:
-            raise ValueError("lc must be either a string, a KeplerLightCurve or a"
-                             " KeplerLightCurveFile instance, got {}.".format(value))
+            raise ValueError("lc must be either a string or a KeplerLightCurve "
+                             "instance, got {}.".format(value))
 
     @property
     def coeffs(self):

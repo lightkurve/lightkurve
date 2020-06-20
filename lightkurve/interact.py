@@ -59,13 +59,15 @@ def prepare_lightcurve_datasource(lc):
     # Convert time into human readable strings, breaks with NaN time
     # See https://github.com/KeplerGO/lightkurve/issues/116
     if (lc.time == lc.time).all():
-        human_time = lc.astropy_time.isot
+        human_time = lc.time.isot
     else:
         human_time = [' '] * len(lc.flux)
 
     # Convert binary quality numbers into human readable strings
     qual_strings = []
     for bitmask in lc.quality:
+        if isinstance(bitmask, u.Quantity):
+            bitmask = bitmask.value
         flag_str_list = KeplerQualityFlags.decode(bitmask)
         if len(flag_str_list) == 0:
             qual_strings.append(' ')
@@ -75,11 +77,11 @@ def prepare_lightcurve_datasource(lc):
             qual_strings.append("; ".join(flag_str_list))
 
     lc_source = ColumnDataSource(data=dict(
-                                 time=lc.time,
+                                 time=lc.time.value,
                                  time_iso=human_time,
-                                 flux=lc.flux,
-                                 cadence=lc.cadenceno,
-                                 quality_code=lc.quality,
+                                 flux=lc.flux.value,
+                                 cadence=lc.cadenceno.value,
+                                 quality_code=lc.quality.value,
                                  quality=np.array(qual_strings)))
     return lc_source
 
@@ -146,13 +148,14 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     step_renderer : GlyphRenderer
     vertical_line : Span
     """
-    if lc.mission == 'K2':
+    mission = lc.meta.get('mission')
+    if mission == 'K2':
         title = "Lightcurve for {} (K2 C{})".format(
             lc.label, lc.campaign)
-    elif lc.mission == 'Kepler':
+    elif mission == 'Kepler':
         title = "Lightcurve for {} (Kepler Q{})".format(
             lc.label, lc.quarter)
-    elif lc.mission == 'TESS':
+    elif mission == 'TESS':
         title = "Lightcurve for {} (TESS Sec. {})".format(
             lc.label, lc.sector)
     else:
@@ -193,7 +196,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
                       fill_color=None, hover_fill_color="firebrick",
                       hover_alpha=0.9, hover_line_color="white")
     tooltips = [("Cadence", "@cadence"),
-                ("Time ({})".format(lc.time_format.upper()),
+                ("Time ({})".format(lc.time.format.upper()),
                  "@time{0,0.000}"),
                 ("Time (ISO)", "@time_iso"),
                 ("Flux", "@flux"),
@@ -203,7 +206,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
                             mode='mouse', point_policy="snap_to_data"))
 
     # Vertical line to indicate the cadence
-    vertical_line = Span(location=lc.time[0], dimension='height',
+    vertical_line = Span(location=lc.time[0].value, dimension='height',
                          line_color='firebrick', line_width=4, line_alpha=0.5)
     fig.add_layout(vertical_line)
 
@@ -624,7 +627,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
             if new != []:
                 lc_new = _create_lightcurve_from_pixels(tpf, new, transform_func=transform_func)
-                lc_source.data['flux'] = lc_new.flux
+                lc_source.data['flux'] = lc_new.flux.value
 
                 if ylim_func is None:
                     ylims = get_lightcurve_y_limits(lc_source)
@@ -633,7 +636,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 fig_lc.y_range.start = ylims[0]
                 fig_lc.y_range.end = ylims[1]
             else:
-                lc_source.data['flux'] = lc.flux * 0.0
+                lc_source.data['flux'] = lc.flux.value * 0.0
                 fig_lc.y_range.start = -1
                 fig_lc.y_range.end = 1
 
@@ -646,7 +649,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 frameno = tpf_index_lookup[new]
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
                     [tpf.flux[frameno, :, :] + pedestal]
-                vertical_line.update(location=tpf.time[frameno])
+                vertical_line.update(location=tpf.time[frameno].value)
             else:
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
                     [tpf.flux[0, :, :] * np.NaN]

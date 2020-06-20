@@ -1,20 +1,16 @@
 import pytest
-from astropy import units as u
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.testing import assert_almost_equal, assert_array_equal
+
+from astropy import units as u
+from astropy.time import Time
+from astropy.stats.bls import BoxLeastSquares
 
 from ..lightcurve import LightCurve
 from ..periodogram import Periodogram
 from ..utils import LightkurveWarning
 import sys
-
-
-bad_optional_imports = False
-try:
-    from astropy.stats.bls import BoxLeastSquares
-except ImportError:
-    bad_optional_imports = True
 
 
 def test_periodogram_basics():
@@ -84,7 +80,7 @@ def test_periodogram_can_find_periods():
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
     # Add a 100 day period signal
-    lc.flux += np.sin((lc.time/float(lc.time.max())) * 20 * np.pi)
+    lc.flux += np.sin((lc.time.value/float(lc.time.value.max())) * 20 * np.pi)
     lc = lc.normalize()
     p = lc.to_periodogram(normalization='amplitude')
     assert np.isclose(p.period_at_max_power.value, 100, rtol=1e-3)
@@ -218,8 +214,6 @@ def test_index():
     assert len(p[mask].frequency) == mask.sum()
 
 
-@pytest.mark.skipif(bad_optional_imports,
-                    reason="requires bokeh and astropy.stats.bls")
 def test_bls(caplog):
     ''' Test that BLS periodogram works and gives reasonable errors
     '''
@@ -277,11 +271,10 @@ def test_bls(caplog):
 
     assert isinstance(p.period_at_max_power, u.Quantity)
     assert isinstance(p.duration_at_max_power, u.Quantity)
-    assert isinstance(p.transit_time_at_max_power, float)
-    assert isinstance(p.depth_at_max_power, float)
+    assert isinstance(p.transit_time_at_max_power, Time)
+    assert isinstance(p.depth_at_max_power, u.Quantity)
 
 
-@pytest.mark.skipif(bad_optional_imports, reason="requires astropy.stats.bls")
 def test_bls_period_recovery():
     """Can BLS Periodogram recover the period of a synthetic light curve?"""
     # Planet parameters
@@ -297,7 +290,7 @@ def test_bls_period_recovery():
     transit_mask = np.abs((time-transit_time+0.5*period) % period-0.5*period) < 0.5*duration
     flux[transit_mask] = 1.0 - depth
     flux += flux_err * np.random.randn(len(time))
-    synthetic_lc = LightCurve(time, flux)
+    synthetic_lc = LightCurve(time=time, flux=flux)
 
     # Can BLS recover the period?
     bls_period = synthetic_lc.to_periodogram("bls").period_at_max_power
@@ -385,7 +378,6 @@ def test_error_messages():
     assert("method 'not-implemented' is not supported" in err.value.args[0])
 
 
-@pytest.mark.skipif(bad_optional_imports, reason="requires astropy.stats.bls")
 def test_bls_period():
     """Regression test for #514."""
     lc = LightCurve(time=[1, 2, 3], flux=[4, 5, 6])

@@ -14,6 +14,7 @@ from astropy.wcs import WCS
 from astropy.utils.exceptions import AstropyWarning
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
+from astropy.utils.decorators import deprecated
 import astropy.units as u
 
 from matplotlib import patches
@@ -28,8 +29,10 @@ from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
-                   LightkurveWarning, detect_filetype, validate_method, \
-                   centroid_quadratic, _query_solar_system_objects
+                   LightkurveWarning, LightkurveDeprecationWarning, \
+                   validate_method, centroid_quadratic, \
+                   _query_solar_system_objects
+from .io import detect_filetype
 
 
 
@@ -158,11 +161,10 @@ class TargetPixelFile(object):
         return kw
 
     @property
+    @deprecated("2.0", alternative="get_header()",
+                warning_type=LightkurveDeprecationWarning)
     def header(self):
         """DEPRECATED. Please use ``get_header()`` instead."""
-        warnings.warn("`TargetPixelFile.header` is deprecated, please use "
-                      "`TargetPixelFile.get_header()` instead.",
-                      LightkurveWarning)
         return self.hdu[0].header
 
     def get_header(self, ext=0):
@@ -376,7 +378,7 @@ class TargetPixelFile(object):
         """
         attrs = {}
         for attr in dir(self):
-            if not attr.startswith('_'):
+            if not attr.startswith('_') and attr != "header":
                 res = getattr(self, attr)
                 if callable(res):
                     continue
@@ -593,7 +595,7 @@ class TargetPixelFile(object):
 
         Returns
         -------
-        columns, rows : array, array
+        columns, rows : `~astropy.units.Quantity`, `~astropy.units.Quantity`
             Arrays containing the column and row positions for the centroid
             for each cadence, or NaN for cadences where the estimation failed.
         """
@@ -616,6 +618,8 @@ class TargetPixelFile(object):
             warnings.simplefilter("ignore", RuntimeWarning)
             col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
             row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+        col_centr = u.Quantity(col_centr, unit='pixel')
+        row_centr = u.Quantity(row_centr, unit='pixel')
         return col_centr, row_centr
 
     def _estimate_centroids_via_quadratic(self, aperture_mask):
@@ -631,6 +635,8 @@ class TargetPixelFile(object):
         # pixels are centered at .5, 1.5, 2.5, ...
         col_centr = np.asfarray(col_centr) + self.column + .5
         row_centr = np.asfarray(row_centr) + self.row + .5
+        col_centr = u.Quantity(col_centr, unit='pixel')
+        row_centr = u.Quantity(row_centr, unit='pixel')
         return col_centr, row_centr
 
     def _aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
@@ -662,6 +668,10 @@ class TargetPixelFile(object):
             flux_err = np.nansum(self.flux_err[:, apmask]**2, axis=1)**0.5
             is_allnan = ~np.any(np.isfinite(self.flux_err[:, apmask]), axis=1)
             flux_err[is_allnan] = np.nan
+
+        if self.get_header(1)['TUNIT5'] == 'e-/s':
+            flux = u.Quantity(flux, unit='electron/s')
+            flux_err = u.Quantity(flux_err, unit='electron/s')
 
         return flux, flux_err, centroid_col, centroid_row
 
@@ -1174,7 +1184,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 bitmask=quality_bitmask)
 
         # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.get_header())
+        filetype = detect_filetype(self.hdu)
         if filetype == 'TessTargetPixelFile':
             warnings.warn("A TESS data product is being opened using the "
                           "`KeplerTargetPixelFile` class. "
@@ -1284,7 +1294,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
-        return KeplerLightCurve(time=self.time,
+        return KeplerLightCurve(time=self.astropy_time,
                                 flux=flux,
                                 flux_err=flux_err,
                                 **keys)
@@ -1306,7 +1316,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
-        return KeplerLightCurve(time=self.time,
+        return KeplerLightCurve(time=self.astropy_time,
                                 flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                                 flux_err=flux_bkg_err,
                                 **keys)
@@ -1334,10 +1344,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Set up the model
         if 'star_priors' not in kwargs:
             centr_col, centr_row = self.estimate_centroids()
-            star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col),
-                                                       var=np.nanstd(centr_col)**2),
-                                     row=GaussianPrior(mean=np.nanmedian(centr_row),
-                                                       var=np.nanstd(centr_row)**2),
+            star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col.value),
+                                                       var=np.nanstd(centr_col.value)**2),
+                                     row=GaussianPrior(mean=np.nanmedian(centr_row.value),
+                                                       var=np.nanstd(centr_row.value)**2),
                                      flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0]),
                                                        ub=2*np.nansum(self.flux[0]) + 1e-10),
                                      targetid=self.targetid)]
@@ -1396,7 +1406,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'ra': self.ra,
                 'dec': self.dec,
                 'targetid': self.targetid}
-        return KeplerLightCurve(time=self.time,
+        return KeplerLightCurve(time=self.astropy_time,
                                 flux=lc.flux,
                                 **keys)
 
@@ -1827,7 +1837,7 @@ class TessTargetPixelFile(TargetPixelFile):
             self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
 
         # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.get_header())
+        filetype = detect_filetype(self.hdu)
         if filetype == 'KeplerTargetPixelFile':
             warnings.warn("A Kepler data product is being opened using the "
                           "`TessTargetPixelFile` class. "
@@ -1913,7 +1923,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_keyword('OBJECT'),
                 'targetid': self.targetid}
-        return TessLightCurve(time=self.time,
+        return TessLightCurve(time=self.astropy_time,
                               flux=flux,
                               flux_err=flux_err,
                               **keys)
@@ -1933,7 +1943,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
-        return TessLightCurve(time=self.time,
+        return TessLightCurve(time=self.astropy_time,
                               flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                               flux_err=flux_bkg_err,
                               **keys)

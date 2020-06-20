@@ -82,7 +82,7 @@ def test_full_widget():
                     reason="requires bokeh and astropy.stats.bls")
 def test_tess_widget():
     '''Test if we can run the widget with the keywords'''
-    lcf = TessLightCurveFile(TESS_SIM)
+    lcf = TessLightCurveFile.read(TESS_SIM)
     lc = lcf.PDCSAP_FLUX.normalize().remove_nans().flatten()
     lc.interact_bls()
     lc.interact_bls(minimum_period=4)

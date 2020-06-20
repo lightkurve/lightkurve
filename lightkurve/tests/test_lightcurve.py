@@ -3,7 +3,8 @@ from __future__ import division, print_function
 from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
 from astropy import units as u
-from astropy.time import Time
+from astropy.time import Time, TimeDelta
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -13,10 +14,11 @@ import pytest
 import tempfile
 import warnings
 
+from ..io import read
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
-from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
+from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from ..utils import LightkurveWarning
+from ..utils import LightkurveWarning, LightkurveDeprecationWarning
 from .test_targetpixelfile import TABBY_TPF
 
 
@@ -37,29 +39,20 @@ filename_K2_custom = get_pkg_data_filename("data/test_K2_interact_generated_cust
 # `asteroid_test.fits` is a single cadence of TESS FFI data which contains a known solar system object
 asteroid_TPF = get_pkg_data_filename("data/asteroid_test.fits")
 
+
 def test_invalid_lightcurve():
     """Invalid LightCurves should not be allowed."""
-    err_string = ("Input arrays have different lengths."
-                  " len(time)=5, len(flux)=4")
     time = np.array([1, 2, 3, 4, 5])
     flux = np.array([1, 2, 3, 4])
     with pytest.raises(ValueError) as err:
         LightCurve(time=time, flux=flux)
-    assert err_string == err.value.args[0]
-
-
-def test_empty_lightcurve():
-    """LightCurves with no data should not be allowed."""
-    err_string = ("either time or flux must be given")
-    with pytest.raises(ValueError) as err:
-        LightCurve()
-    assert err_string == err.value.args[0]
+    assert err.value.args[0] == "Inconsistent data column lengths"
 
 
 def test_lc_nan_time():
     time = np.array([1, 2, 3, np.nan])
     flux = np.array([1, 2, 3, 4])
-    with pytest.warns(LightkurveWarning, match='contains NaN times'):
+    with pytest.raises(ValueError):
         LightCurve(time=time, flux=flux)
 
 
@@ -109,35 +102,27 @@ def test_rmath_operators():
 @pytest.mark.remote_data
 @pytest.mark.parametrize("path, mission", [(TABBY_Q8, "Kepler"), (K2_C08, "K2")])
 def test_KeplerLightCurveFile(path, mission):
-    lcf = KeplerLightCurveFile(path, quality_bitmask=None)
-    assert lcf.obsmode == 'long cadence'
-    assert len(lcf.pos_corr1) == len(lcf.pos_corr2)
+    lc = KeplerLightCurveFile(path, flux_column="sap_flux", quality_bitmask=None)
+    assert lc.obsmode == 'long cadence'
+    assert len(lc.pos_corr1) == len(lc.pos_corr2)
 
-    # The liberal bitmask will cause the lightcurve to contain NaN times
-    with pytest.warns(LightkurveWarning, match='NaN times'):
-        lc = lcf.get_lightcurve('SAP_FLUX')
-
-    assert lc.channel == lcf.channel
     assert lc.mission.lower() == mission.lower()
     if lc.mission.lower() == 'kepler':
-        assert lc.campaign is None
+        assert lc.meta.get('campaign') is None
         assert lc.quarter == 8
     elif lc.mission.lower() == 'k2':
         assert lc.campaign == 8
-        assert lc.quarter is None
-    assert lc.time_format == 'bkjd'
-    assert lc.time_scale == 'tdb'
-    assert lc.astropy_time.scale == 'tdb'
-    assert lc.flux_unit == u.electron / u.second
+        assert lc.meta.get('quarter') is None
+    assert lc.time.format == 'bkjd'
+    assert lc.time.scale == 'tdb'
+    assert lc.flux.unit == u.electron / u.second
 
     # Does the data match what one would obtain using pyfits.open?
     hdu = pyfits.open(path)
     assert lc.label == hdu[0].header['OBJECT']
-    assert_array_equal(lc.time, hdu[1].data['TIME'])
-    assert_array_equal(lc.flux, hdu[1].data['SAP_FLUX'] / ((hdu[1].header['CROWDSAP'] * hdu[1].header['FLFRCSAP'])))
-
-    with pytest.raises(KeyError):
-        lcf.get_lightcurve('BLABLA')
+    nanmask = ~np.isnan(hdu[1].data['TIME'])
+    assert_array_equal(lc.time.value, hdu[1].data['TIME'][nanmask])
+    assert_array_equal(lc.flux.value, hdu[1].data['SAP_FLUX'][nanmask] / ((hdu[1].header['CROWDSAP'] * hdu[1].header['FLFRCSAP'])))
 
 
 @pytest.mark.remote_data
@@ -145,7 +130,7 @@ def test_KeplerLightCurveFile(path, mission):
                          ['hardest', 'hard', 'default', None,
                           1, 100, 2096639])
 def test_TessLightCurveFile(quality_bitmask):
-    tess_file = TessLightCurveFile(TESS_SIM, quality_bitmask=quality_bitmask)
+    tess_file = TessLightCurveFile.read(TESS_SIM, quality_bitmask=quality_bitmask)
     hdu = pyfits.open(TESS_SIM)
     lc = tess_file.SAP_FLUX
 
@@ -153,35 +138,28 @@ def test_TessLightCurveFile(quality_bitmask):
     assert lc.label == hdu[0].header['OBJECT']
     assert lc.time_format == 'btjd'
     assert lc.time_scale == 'tdb'
-    assert lc.flux_unit == u.electron / u.second
+    assert lc.flux.unit == u.electron / u.second
     assert lc.sector == hdu[0].header['SECTOR']
     assert lc.camera == hdu[0].header['CAMERA']
     assert lc.ccd == hdu[0].header['CCD']
     assert lc.ra == hdu[0].header['RA_OBJ']
     assert lc.dec == hdu[0].header['DEC_OBJ']
 
-    assert_array_equal(lc.time[0:10], hdu[1].data['TIME'][0:10])
-    assert_array_equal(lc.flux[0:10], hdu[1].data['SAP_FLUX'][0:10])
+    assert_array_equal(lc.time[0:10].value, hdu[1].data['TIME'][0:10])
+    assert_array_equal(lc.flux[0:10].value, hdu[1].data['SAP_FLUX'][0:10])
 
     # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
-    assert np.isnan(lc.time).sum() == 0
-
-    with pytest.raises(KeyError):
-        tess_file.get_lightcurve('DOESNOTEXIST')
+    assert np.isnan(lc.time.value).sum() == 0
 
 
 @pytest.mark.remote_data
 @pytest.mark.parametrize("quality_bitmask, answer", [('hardest', 2661),
-                                                     ('hard', 2706), ('default', 3113), (None, 3279),
-                                                     (1, 3279), (100, 3252), (2096639, 2661)])
+                                                     ('hard', 2706), ('default', 3113), (None, 3143),
+                                                     (1, 3143), (100, 3116), (2096639, 2661)])
 def test_bitmasking(quality_bitmask, answer):
     """Test whether the bitmasking behaves like it should"""
-    lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=quality_bitmask)
-    with warnings.catch_warnings():
-        # Ignore "LightCurve contains NaN times" warnings triggered by liberal masks
-        warnings.simplefilter("ignore", LightkurveWarning)
-        flux = lcf.get_lightcurve('SAP_FLUX').flux
-    assert len(flux) == answer
+    lc = read(TABBY_Q8, quality_bitmask=quality_bitmask)
+    assert len(lc) == answer
 
 
 def test_lightcurve_fold():
@@ -194,7 +172,8 @@ def test_lightcurve_fold():
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
     assert fold.targetid == lc.targetid
     assert fold.label == lc.label
-    assert fold.meta == lc.meta
+    assert set(lc.meta).issubset(set(fold.meta))
+    assert lc.meta['ccd'] == fold.meta['ccd']
     assert_array_equal(np.sort(fold.time_original), lc.time)
     assert len(fold.time_original) == len(lc.time)
     fold = lc.fold(period=1, t0=-0.1)
@@ -207,13 +186,12 @@ def test_lightcurve_fold():
         fold = lc.fold(period=1, transit_midpoint=-0.1)
     assert_almost_equal(fold.time[0], -0.5, 2)
     ax = fold.plot()
-    assert (ax.get_xlabel() == 'Phase')
+    assert ('Phase' in ax.get_xlabel())
     ax = fold.scatter()
-    assert (ax.get_xlabel() == 'Phase')
+    assert ('Phase' in ax.get_xlabel())
     ax = fold.errorbar()
-    assert (ax.get_xlabel() == 'Phase')
+    assert ('Phase' in ax.get_xlabel())
     plt.close('all')
-
 
     odd = fold.odd_mask
     even = fold.even_mask
@@ -225,16 +203,17 @@ def test_lightcurve_fold():
     with pytest.warns(LightkurveWarning, match='appears to be given in JD'):
         lc.fold(10, 2456600)
 
+
 def test_lightcurve_fold_issue520():
     """Regression test for #520; accept quantities in `fold()`."""
     lc = LightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1)
-    lc.fold(period=1*u.day, t0=5*u.day)
+    lc.fold(period=1*u.day, epoch_time=5*u.day)
 
 def test_lightcurve_append():
     """Test ``LightCurve.append()``."""
     lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1], flux_err=[0.1, 0.2, 0.3])
     lc = lc.append(lc)
-    assert_array_equal(lc.time, 2*[1, 2, 3])
+    assert_array_equal(lc.time.value, 2*[1, 2, 3])
     assert_array_equal(lc.flux, 2*[1, .5, 1])
     assert_array_equal(lc.flux_err, 2*[0.1, 0.2, 0.3])
     # KeplerLightCurve has extra data
@@ -242,7 +221,7 @@ def test_lightcurve_append():
                           centroid_col=[4, 5, 6], centroid_row=[7, 8, 9],
                           cadenceno=[10, 11, 12], quality=[10, 20, 30])
     lc = lc.append(lc)
-    assert_array_equal(lc.time, 2*[1, 2, 3])
+    assert_array_equal(lc.time.value, 2*[1, 2, 3])
     assert_array_equal(lc.flux, 2*[1, .5, 1])
     assert_array_equal(lc.centroid_col, 2*[4, 5, 6])
     assert_array_equal(lc.centroid_row, 2*[7, 8, 9])
@@ -255,20 +234,7 @@ def test_lightcurve_append_multiple():
     lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
     lc = lc.append([lc, lc, lc])
     assert_array_equal(lc.flux, 4*[1, .5, 1])
-    assert_array_equal(lc.time, 4*[1, 2, 3])
-
-
-def test_lightcurve_append_inconsistent_columns():
-    """Test ``LightCurve.append()`` for different sub-classes.
-
-    Compared to the base `LightCurve`, `KeplerLightCurve` has extra columns
-    such as `centroid_col` and `cadenceno`.  This test checks whether
-    appending such two objects raises a warning.
-    """
-    lc1 = KeplerLightCurve(time=[1, 2, 3], flux=[1, .5, 1])
-    lc2 = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
-    with pytest.warns(LightkurveWarning, match='extra_columns'):
-        lc = lc1.append(lc2)
+    assert_array_equal(lc.time.value, 4*[1, 2, 3])
 
 
 def test_lightcurve_copy():
@@ -333,42 +299,34 @@ def test_lightcurve_copy():
     with pytest.raises(AssertionError, match=r'ismatch.*33\.3+'):
         assert_array_equal(lc.quality, nlc.quality)
 
+
 @pytest.mark.parametrize("path, mission", [(filename_tess_custom, "TESS"),
                                            (filename_K2_custom, "K2")])
 def test_custom_lightcurve_file(path, mission):
     """Test whether we can read in custom interact()-produced lightcurvefiles"""
     if mission == "K2":
-        lcf_custom = KeplerLightCurveFile(path)
+        lc = KeplerLightCurve.read(path)
     elif mission == "TESS":
-        with pytest.warns(LightkurveWarning):
-            lcf_custom = TessLightCurveFile(path)
-    assert lcf_custom.hdu[2].name == 'APERTURE'
-    assert lcf_custom.cadenceno[0] >= 0
-    assert lcf_custom.dec == lcf_custom.dec
-    assert lcf_custom.time[-1] > lcf_custom.time[0]
-    # .interact() files currently define FLUX, and not SAP_FLUX nor PDCSAP_FLUX
-    lc = lcf_custom.get_lightcurve('FLUX')
+        #with pytest.warns(LightkurveWarning):
+        lc = TessLightCurve.read(path)
+    assert lc.cadenceno[0] >= 0
+    assert lc.dec == lc.dec
+    assert lc.time[-1] > lc.time[0]
     assert len(lc.flux) > 0
-    with pytest.raises(KeyError):
-        lcf_custom.get_lightcurve('BLABLA')
-    with pytest.raises(KeyError):
-        lcf_custom.SAP_FLUX
-    with pytest.raises(KeyError):
-        lcf_custom.PDCSAP_FLUX
 
     assert lc.mission.lower() == mission.lower()
     # Does the data match what one would obtain using pyfits.open?
     hdu = pyfits.open(path)
     assert lc.label == hdu[0].header['OBJECT']
-    assert_array_equal(lc.time, hdu[1].data['TIME'])
-    assert_array_equal(lc.flux, hdu[1].data['FLUX'])
+    assert_array_equal(lc.time.value, hdu[1].data['TIME'])
+    assert_array_equal(lc.flux.value, hdu[1].data['FLUX'])
 
     # TESS has QUALITY while Kepler/K2 has SAP_QUALITY:
     if mission == "TESS":
-        assert "QUALITY" in lcf_custom.hdu[1].columns.names
+        assert "QUALITY" in lc.hdu[1].columns.names
         assert_array_equal(lc.quality, hdu[1].data['QUALITY'])
     if mission in ["K2", "Kepler"]:
-        assert "SAP_QUALITY" in lcf_custom.hdu[1].columns.names
+        assert "SAP_QUALITY" in lc.hdu[1].columns.names
         assert_array_equal(lc.quality, hdu[1].data['SAP_QUALITY'])
 
 
@@ -376,29 +334,28 @@ def test_custom_lightcurve_file(path, mission):
 @pytest.mark.remote_data
 def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
-    for lcf in [KeplerLightCurveFile(TABBY_Q8), TessLightCurveFile(TESS_SIM)]:
-        lcf.plot()
-        lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
-        lcf.scatter()
-        lcf.errorbar()
-        lcf.SAP_FLUX.plot()
-        lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
-        lcf.SAP_FLUX.scatter()
-        lcf.SAP_FLUX.scatter(c='C3')
-        lcf.SAP_FLUX.scatter(c=lcf.SAP_FLUX.time, show_colorbar=True, colorbar_label='Time')
-        lcf.SAP_FLUX.errorbar()
+    for lc in [KeplerLightCurve.read(TABBY_Q8), TessLightCurve.read(TESS_SIM)]:
+        lc.plot()
+        lc.scatter()
+        lc.errorbar()
+        lc.plot()
+        lc.plot(normalize=False, title="Not the default")
+        lc.scatter()
+        lc.scatter(c='C3')
+        lc.scatter(c=lc.time.value, show_colorbar=True, colorbar_label='Time')
+        lc.errorbar()
         plt.close('all')
 
 
 @pytest.mark.remote_data
 def test_lightcurve_scatter():
     """Sanity check to verify that lightcurve scatter plotting works"""
-    lcf = KeplerLightCurveFile(KEPLER10)
-    lc = lcf.PDCSAP_FLUX.flatten()
+    lc = KeplerLightCurve.read(KEPLER10)
+    lc = lc.flatten()
 
     # get an array of original times, in the same order as the folded lightcurve
     foldkw = dict(period=0.837491)
-    originaltime = LightCurve(lc.time, lc.time)
+    originaltime = LightCurve(time=lc.time, flux=lc.flux)
     foldedtimeinorder = originaltime.fold(**foldkw).flux
 
     # plot a grid of phase-folded and not, with colors
@@ -406,7 +363,7 @@ def test_lightcurve_scatter():
     scatterkw = dict( s=5, cmap='winter')
     lc.scatter(ax=ax[0,0])
     lc.fold(**foldkw).scatter(ax=ax[0,1])
-    lc.scatter(ax=ax[1,0], c=lc.time, **scatterkw)
+    lc.scatter(ax=ax[1,0], c=lc.time.value, **scatterkw)
     lc.fold(**foldkw).scatter(ax=ax[1,1], c=foldedtimeinorder, **scatterkw)
     plt.ylim(0.999, 1.001)
 
@@ -414,10 +371,12 @@ def test_lightcurve_scatter():
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
     # A flat lightcurve should have a CDPP close to zero
-    assert_almost_equal(LightCurve(np.arange(200), np.ones(200)).estimate_cdpp(), 0)
+    lc = LightCurve(time=np.arange(200), flux=np.ones(200))
+    assert_almost_equal(lc.estimate_cdpp(), 0)
     # An artificial lightcurve with sigma=100ppm should have cdpp=100ppm
-    lc = LightCurve(np.arange(10000), np.random.normal(loc=1, scale=100e-6, size=10000))
-    assert_almost_equal(lc.estimate_cdpp(transit_duration=1), 100, decimal=-0.5)
+    lc = LightCurve(time=np.arange(10000),
+                    flux=np.random.normal(loc=1, scale=100e-6, size=10000))
+    assert_almost_equal(lc.estimate_cdpp(transit_duration=1).value, 100, decimal=-0.5)
     # Transit_duration must be an integer (cadences)
     with pytest.raises(ValueError):
         lc.estimate_cdpp(transit_duration=6.5)
@@ -426,77 +385,64 @@ def test_cdpp():
 @pytest.mark.remote_data
 def test_cdpp_tabby():
     """Compare the cdpp noise metric against the pipeline value."""
-    lcf = KeplerLightCurveFile(TABBY_Q8)
+    lc = KeplerLightCurve.read(TABBY_Q8)
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
-    lc = LightCurve(lcf.PDCSAP_FLUX.time[:1000], lcf.PDCSAP_FLUX.flux[:1000])
-    assert(np.abs(lc.estimate_cdpp() - lcf.get_header(ext=1)['CDPP6_0']) < 30)
+    lc2 = LightCurve(time=lc.time[:1000], flux=lc.flux[:1000])
+    assert(np.abs(lc2.estimate_cdpp().value - lc.cdpp6_0) < 30)
 
 
 # TEMPORARILY SKIP, cf. https://github.com/KeplerGO/lightkurve/issues/663
 @pytest.mark.xfail
 def test_bin():
     """Does binning work?"""
-    lc = LightCurve(time=np.arange(10),
-                    flux=2*np.ones(10),
-                    flux_err=2**.5*np.ones(10))
-    binned_lc = lc.bin(binsize=2)
-    assert_allclose(binned_lc.flux, 2*np.ones(5))
-    assert_allclose(binned_lc.flux_err, np.ones(5))
-    assert len(binned_lc.time) == 5
-    with pytest.raises(ValueError):
-        lc.bin(method='doesnotexist')
-    # If `flux_err` is missing, the errors on the bins should be the stddev
-    lc = LightCurve(time=np.arange(10),
-                    flux=2*np.ones(10))
-    binned_lc = lc.bin(binsize=2)
-    assert_allclose(binned_lc.flux_err, np.zeros(5))
-    # Regression test for #377
-    lc = KeplerLightCurve(time=np.arange(10),
-                          flux=2*np.ones(10))
-    lc.bin(5).remove_outliers()
-    # Second regression test for #377
-    lc = KeplerLightCurve(time=np.arange(1000) * 0.02,
-                          flux=1*np.ones(1000) + np.random.normal(0, 1e-6, 1000),
-                          cadenceno=np.arange(1000))
-    assert np.isclose(lc.bin(2).estimate_cdpp(), 1, rtol=1)
-    # Regression test for #500
-    lc = LightCurve(time=np.arange(2000),
-                    flux=np.random.normal(loc=42, scale=0.01, size=2000))
-    assert np.round(lc.bin(2000).flux_err[0], 2) == 0.01
+    with warnings.catch_warnings():  # binsize is deprecated
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+
+        lc = LightCurve(time=np.arange(10),
+                        flux=2*np.ones(10),
+                        flux_err=2**.5*np.ones(10))
+        binned_lc = lc.bin(binsize=2)
+        assert_allclose(binned_lc.flux, 2*np.ones(5))
+        assert_allclose(binned_lc.flux_err, np.ones(5))
+        assert len(binned_lc.time) == 5
+        with pytest.raises(ValueError):
+            lc.bin(method='doesnotexist')
+        # If `flux_err` is missing, the errors on the bins should be the stddev
+        lc = LightCurve(time=np.arange(10),
+                        flux=2*np.ones(10))
+        binned_lc = lc.bin(binsize=2)
+        assert_allclose(binned_lc.flux_err, np.zeros(5))
+        # Regression test for #377
+        lc = KeplerLightCurve(time=np.arange(10),
+                            flux=2*np.ones(10))
+        lc.bin(5).remove_outliers()
+        # Second regression test for #377
+        lc = KeplerLightCurve(time=np.arange(1000) * 0.02,
+                            flux=1*np.ones(1000) + np.random.normal(0, 1e-6, 1000),
+                            cadenceno=np.arange(1000))
+        assert np.isclose(lc.bin(2).estimate_cdpp(), 1, rtol=1)
+        # Regression test for #500
+        lc = LightCurve(time=np.arange(2000),
+                        flux=np.random.normal(loc=42, scale=0.01, size=2000))
+        assert np.round(lc.bin(2000).flux_err[0], 2) == 0.01
 
 
+@pytest.mark.xfail
 def test_bins_kwarg():
     """Does binning work with user-defined bin placement?"""
-    # The bins feature requires astropy >3.1 or >2.10;
-    # so we'll ignore this test if those versions are not available.
-    # We should remove this check once we upgrade the minimum requirements.
-    try:
-        from astropy.stats import calculate_bin_edges
-    except ImportError:
-        return
-
     n_times = 3800
-    time_points = np.sort(np.random.uniform(low=0.0, high=80.0, size=n_times))
+    end_time = 80.
+    time_points = np.sort(np.random.uniform(low=0.0, high=end_time, size=n_times))
     lc = LightCurve(time=time_points, flux=1.0+np.random.normal(0, 0.1, n_times),
                     flux_err=0.1*np.ones(n_times))
     # Do the shapes of binned lightcurves make sense?
-    binned_lc = lc.bin(binsize=10)
-    assert len(binned_lc) == n_times // 10
-    binned_lc = lc.bin(binsize=11)
-    # Resulting length with binsize may depend on implementation:
-    #   Allowing for under-filled bins at boundary conditions
-    assert ((len(binned_lc) >= (n_times // 11) ) &
-            (len(binned_lc) <= (n_times // 11 +1) ) )
-    #   Not allowing for under-filled bins at boundary conditions
-    assert len(binned_lc) == (n_times // 11)
-    # Resulting length with `bins=N` yields exactly N bins every time
-    binned_lc = lc.bin(bins=38)
+    binned_lc = lc.bin(time_bin_size=10*u.day)
+    assert len(binned_lc) == np.ceil(end_time / 10)
+    binned_lc = lc.bin(time_bin_size=11*u.day)
+    assert len(binned_lc) == np.ceil(end_time / 11)
+    # Resulting length with `n_bins=N` yields exactly N bins every time
+    binned_lc = lc.bin(time_bin_size=10*u.day, n_bins=38)
     assert len(binned_lc) == 38
-    # Can't provide both a binsize= and a bins=; pick only one
-    with pytest.raises(ValueError):
-        binned_lc = lc.bin(binsize=10, bins=38)
-    with pytest.raises(ValueError):
-        binned_lc = lc.bin(10, 38, 'mean')
     # The `bins=`` kwarg can support a list or array
     time_bin_edges = [0,10,20,30,40,50,60,70,80]
     binned_lc = lc.bin(bins=time_bin_edges)
@@ -582,10 +528,9 @@ def test_invalid_normalize():
 def test_to_pandas():
     """Test the `LightCurve.to_pandas()` method."""
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
-    lc = LightCurve(time, flux, flux_err)
+    lc = LightCurve(time=time, flux=flux, flux_err=flux_err)
     try:
         df = lc.to_pandas()
-        assert_allclose(df.index, time)
         assert_allclose(df.flux, flux)
         assert_allclose(df.flux_err, flux_err)
         df.describe() # Will fail if for Endianness bugs
@@ -598,7 +543,7 @@ def test_to_pandas_kepler():
     """When to_pandas() is executed on a KeplerLightCurve, it should include
     extra columns such as `quality`."""
     time, flux, quality = range(3), np.ones(3), np.zeros(3)
-    lc = KeplerLightCurve(time, flux, quality=quality)
+    lc = KeplerLightCurve(time=time, flux=flux, quality=quality)
     try:
         df = lc.to_pandas()
         assert_allclose(df.quality, quality)
@@ -610,19 +555,23 @@ def test_to_pandas_kepler():
 def test_to_table():
     """Test the `LightCurve.to_table()` method."""
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
-    lc = LightCurve(time, flux, flux_err)
+    lc = LightCurve(time=time, flux=flux, flux_err=flux_err)
     tbl = lc.to_table()
-    assert_allclose(tbl['time'], time)
+    assert_allclose(tbl['time'].value, time)
     assert_allclose(tbl['flux'], flux)
     assert_allclose(tbl['flux_err'], flux_err)
 
 
+# Looks like `to_pandas` forces the time field to become an ISO datetime;
+# it may not be worth fixing this because we may want to deprecate
+# this function in favor of `Table.write()`.
+@pytest.mark.xfail
 def test_to_csv():
     """Test the `LightCurve.to_csv()` method."""
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
     try:
-        lc = LightCurve(time, flux, flux_err)
-        assert(lc.to_csv(index=False, line_terminator='\n') == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
+        lc = LightCurve(time=time, flux=flux, flux_err=flux_err)
+        assert(lc.to_csv(line_terminator='\n') == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
     except ImportError:
         # pandas is an optional dependency
         pass
@@ -631,9 +580,9 @@ def test_to_csv():
 @pytest.mark.remote_data
 def test_to_fits():
     """Test the KeplerLightCurve.to_fits() method"""
-    lcf = KeplerLightCurveFile(TABBY_Q8)
-    hdu = lcf.PDCSAP_FLUX.to_fits()
-    KeplerLightCurveFile(hdu)  # Regression test for #233
+    lc = KeplerLightCurve.read(TABBY_Q8)
+    hdu = lc.to_fits()
+    KeplerLightCurve.read(hdu)  # Regression test for #233
     assert type(hdu).__name__ is 'HDUList'
     assert len(hdu) == 2
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
@@ -641,11 +590,10 @@ def test_to_fits():
     assert hdu[1].header['TTYPE1'] == 'TIME'
     assert hdu[1].header['TTYPE2'] == 'FLUX'
     assert hdu[1].header['TTYPE3'] == 'FLUX_ERR'
-    assert hdu[1].header['TTYPE4'] == 'CADENCENO'
-    hdu = LightCurve([0, 1, 2, 3, 4], [1, 1, 1, 1, 1]).to_fits()
+    hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
 
     # Test "round-tripping": can we read-in what we write
-    lcf_new = LightCurveFile(hdu)  # Regression test for #233
+    lc_new = KeplerLightCurve.read(hdu)  # Regression test for #233
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
     assert hdu[1].header['EXTNAME'] == 'LIGHTCURVE'
     assert hdu[1].header['TTYPE1'] == 'TIME'
@@ -660,7 +608,7 @@ def test_to_fits():
         lc.to_fits(path=tempfile.NamedTemporaryFile().name, aperture_mask=random_mask)
 
         lc.to_fits(path=tempfile.NamedTemporaryFile().name, overwrite=True,
-                  flux_column_name='SAP_FLUX')
+                   flux_column_name='SAP_FLUX')
 
         lc = tpf[0:2].to_lightcurve(aperture_mask=thresh_mask)
         lc.to_fits(aperture_mask=thresh_mask, path=tempfile.NamedTemporaryFile().name)
@@ -676,43 +624,31 @@ def test_to_fits():
                        overwrite=True, extra_data={'BKG': bkg_lc.flux})
 
 
-@pytest.mark.remote_data
-def test_astropy_time():
-    '''Test the `astropy_time` property'''
-    lcf = KeplerLightCurveFile(TABBY_Q8)
-    astropy_time = lcf.astropy_time
-    iso = astropy_time.iso
-    assert astropy_time.scale == 'tdb'
-    assert len(iso) == len(lcf.time)
-    #assert iso[0] == '2011-01-06 20:45:08.811'
-    #assert iso[-1] == '2011-03-14 20:18:16.734'
-
-
 def test_astropy_time_bkjd():
     """Does `LightCurve.astropy_time` support bkjd?"""
     bkjd = np.array([100, 200])
     lc = LightCurve(time=[100, 200], time_format='bkjd')
-    assert_allclose(lc.astropy_time.jd, bkjd + 2454833.)
+    assert_allclose(lc.time.jd, bkjd + 2454833.)
 
 
 def test_lightcurve_repr():
     """Do __str__ and __repr__ work?"""
     time, flux = range(3), np.ones(3)
-    str(LightCurve(time, flux))
-    str(KeplerLightCurve(time, flux))
-    str(TessLightCurve(time, flux))
-    repr(LightCurve(time, flux))
-    repr(KeplerLightCurve(time, flux))
-    repr(TessLightCurve(time, flux))
+    str(LightCurve(time=time, flux=flux))
+    str(KeplerLightCurve(time=time, flux=flux))
+    str(TessLightCurve(time=time, flux=flux))
+    repr(LightCurve(time=time, flux=flux))
+    repr(KeplerLightCurve(time=time, flux=flux))
+    repr(TessLightCurve(time=time, flux=flux))
 
 
 @pytest.mark.remote_data
 def test_lightcurvefile_repr():
     """Do __str__ and __repr__ work?"""
-    lcf = KeplerLightCurveFile(TABBY_Q8)
+    lcf = KeplerLightCurve.read(TABBY_Q8)
     str(lcf)
     repr(lcf)
-    lcf = TessLightCurveFile(TESS_SIM)
+    lcf = TessLightCurve.read(TESS_SIM)
     str(lcf)
     repr(lcf)
 
@@ -722,8 +658,8 @@ def test_slicing():
     time = np.linspace(0, 10, 10)
     flux = np.linspace(100, 200, 10)
     flux_err = np.linspace(5, 50, 10)
-    lc = LightCurve(time, flux, flux_err)
-    assert_array_equal(lc[0:5].time, time[0:5])
+    lc = LightCurve(time=time, flux=flux, flux_err=flux_err)
+    assert_array_equal(lc[0:5].time.value, time[0:5])
     assert_array_equal(lc[2::2].flux, flux[2::2])
     assert_array_equal(lc[5:9:-1].flux_err, flux_err[5:9:-1])
 
@@ -732,7 +668,7 @@ def test_slicing():
     centroid_row = np.linspace(50, 60, 10)
     quality = np.linspace(70, 80, 10)
     cadenceno = np.linspace(90, 100, 10)
-    lc = KeplerLightCurve(time, flux, flux_err,
+    lc = KeplerLightCurve(time=time, flux=flux, flux_err=flux_err,
                           centroid_col=centroid_col,
                           centroid_row=centroid_row,
                           cadenceno=cadenceno,
@@ -743,7 +679,7 @@ def test_slicing():
     assert_array_equal(lc[3:6].cadenceno, cadenceno[3:6])
 
     # The same is true for TessLightCurve
-    lc = TessLightCurve(time, flux, flux_err,
+    lc = TessLightCurve(time=time, flux=flux, flux_err=flux_err,
                         centroid_col=centroid_col,
                         centroid_row=centroid_row,
                         cadenceno=cadenceno,
@@ -757,7 +693,7 @@ def test_slicing():
 def test_boolean_masking():
     lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, 1, 10],
                           quality=[0, 0, 200], cadenceno=[5, 6, 7])
-    assert_array_equal(lc[lc.flux < 5].time, [1, 2])
+    assert_array_equal(lc[lc.flux < 5].time.value, [1, 2])
     assert_array_equal(lc[lc.flux < 5].flux, [1, 1])
     assert_array_equal(lc[lc.flux < 5].quality, [0, 0])
     assert_array_equal(lc[lc.flux < 5].cadenceno, [5, 6])
@@ -766,16 +702,16 @@ def test_boolean_masking():
 def test_remove_nans():
     """Does LightCurve.__getitem__() allow slicing?"""
     time, flux = [1, 2, 3, 4], [100, np.nan, 102, np.nan]
-    lc_clean = LightCurve(time, flux).remove_nans()
-    assert_array_equal(lc_clean.time, [1, 3])
+    lc_clean = LightCurve(time=time, flux=flux).remove_nans()
+    assert_array_equal(lc_clean.time.value, [1, 3])
     assert_array_equal(lc_clean.flux, [100, 102])
 
 
 def test_remove_outliers():
     # Does `remove_outliers()` remove outliers?
-    lc = LightCurve([1, 2, 3, 4], [1, 1, 1000, 1])
+    lc = LightCurve(time=[1, 2, 3, 4], flux=[1, 1, 1000, 1])
     lc_clean = lc.remove_outliers(sigma=1)
-    assert_array_equal(lc_clean.time, [1, 2, 4])
+    assert_array_equal(lc_clean.time.value, [1, 2, 4])
     assert_array_equal(lc_clean.flux, [1, 1, 1])
     # It should also be possible to return the outlier mask
     lc_clean, outlier_mask = lc.remove_outliers(sigma=1, return_mask=True)
@@ -784,7 +720,7 @@ def test_remove_outliers():
     # Can we set sigma_lower and sigma_upper?
     lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
     lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
-    assert_array_equal(lc_clean.time, [1, 3, 4, 5])
+    assert_array_equal(lc_clean.time.value, [1, 3, 4, 5])
     assert_array_equal(lc_clean.flux, [1, 1, -1000, 1])
 
 
@@ -792,8 +728,7 @@ def test_remove_outliers():
 def test_properties(capfd):
     '''Test if the describe function produces an output.
     The output is 624 characters at the moment, but we might add more properties.'''
-    lcf = KeplerLightCurveFile(TABBY_Q8)
-    kplc = lcf.get_lightcurve('SAP_FLUX')
+    kplc = KeplerLightCurve.read(TABBY_Q8, flux_column="sap_flux")
     kplc.show_properties()
     out, _ = capfd.readouterr()
     assert len(out) > 500
@@ -813,7 +748,7 @@ def test_flatten_with_nans():
 def test_flatten_robustness():
     """Test various special cases for flatten()."""
     # flatten should work with integer fluxes
-    lc = LightCurve([1, 2, 3, 4, 5, 6], [10, 20, 30, 40, 50, 60])
+    lc = LightCurve(time=[1, 2, 3, 4, 5, 6], flux=[10, 20, 30, 40, 50, 60])
     expected_result = np.array([1.,  1.,  1.,  1.,  1., 1.])
     flat_lc = lc.flatten(window_length=3, polyorder=1)
     assert_allclose(flat_lc.flux, expected_result)
@@ -829,7 +764,7 @@ def test_flatten_robustness():
     flat_lc = lc.flatten(window_length=3, break_tolerance=None)
     assert_allclose(flat_lc.flux, expected_result)
     flat_lc, trend_lc = lc.flatten(return_trend=True)
-    assert_allclose(flat_lc.time, trend_lc.time)
+    assert_allclose(flat_lc.time.value, trend_lc.time.value)
     assert_allclose(lc.flux, flat_lc.flux * trend_lc.flux)
 
 
@@ -839,7 +774,7 @@ def test_iterative_flatten():
     x = np.arange(2000)
     y = np.sin(x/200)/100 + 1
     y[250] -= 0.01
-    lc = LightCurve(x, y)
+    lc = LightCurve(time=x, flux=y)
     # Flatten it
     c, f = lc.flatten(window_length=25, niters=2, sigma=3, return_trend=True)
     # Only one outlier should remain.
@@ -854,26 +789,26 @@ def test_iterative_flatten():
 
 
 def test_fill_gaps():
-    lc = LightCurve([1,2,3,4,6,7,8], [1,1,1,1,1,1,1])
+    lc = LightCurve(time=[1,2,3,4,6,7,8], flux=[1,1,1,1,1,1,1])
     nlc = lc.fill_gaps()
     assert(len(lc.time) < len(nlc.time))
-    assert(np.any(nlc.time == 5))
+    assert(np.any(nlc.time.value == 5))
     assert(np.all(nlc.flux == 1))
 
-    lc = LightCurve([1,2,3,4,6,7,8], [1,1,np.nan,1,1,1,1])
+    lc = LightCurve(time=[1,2,3,4,6,7,8], flux=[1,1,np.nan,1,1,1,1])
     nlc = lc.fill_gaps()
     assert(len(lc.time) < len(nlc.time))
-    assert(np.any(nlc.time == 5))
+    assert(np.any(nlc.time.value == 5))
     assert(np.all(nlc.flux == 1))
     assert(np.all(np.isfinite(nlc.flux)))
 
     # Because fill_gaps() uses pandas, check that it works regardless of endianness
     # For details see https://github.com/KeplerGO/lightkurve/issues/188
-    lc = LightCurve(np.array([1, 2, 3, 4, 6, 7, 8], dtype='>f8'),
-                    np.array([1, 1, 1, np.nan, np.nan, 1, 1], dtype='>f8'))
+    lc = LightCurve(time=np.array([1, 2, 3, 4, 6, 7, 8], dtype='>f8'),
+                    flux=np.array([1, 1, 1, np.nan, np.nan, 1, 1], dtype='>f8'))
     lc.fill_gaps()
-    lc = LightCurve(np.array([1, 2, 3, 4, 6, 7, 8], dtype='<f8'),
-                    np.array([1, 1, 1, np.nan, np.nan, 1, 1], dtype='<f8'))
+    lc = LightCurve(time=np.array([1, 2, 3, 4, 6, 7, 8], dtype='<f8'),
+                    flux=np.array([1, 1, 1, np.nan, np.nan, 1, 1], dtype='<f8'))
     lc.fill_gaps()
 
 
@@ -898,13 +833,16 @@ def test_targetid():
 def test_regression_346():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/346"""
     # This previously triggered an IndexError:
-    KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.remove_nans().to_corrector().correct().estimate_cdpp()
+    with warnings.catch_warnings():  # KeplerLightCurveFile is deprecated
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        from .. import KeplerLightCurveFile
+        KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.remove_nans().to_corrector().correct().estimate_cdpp()
 
 
 def test_to_timeseries():
     """Test the `LightCurve.to_timeseries()` method."""
     time, flux, flux_err = np.arange(3)+2457576.4, np.ones(3), np.ones(3)*0.01
-    lc = LightCurve(time, flux, flux_err, time_format="jd")
+    lc = LightCurve(time=time, flux=flux, flux_err=flux_err, time_format="jd")
     try:
         ts = lc.to_timeseries()
         assert_allclose(ts['time'].value, time)
@@ -917,24 +855,28 @@ def test_to_timeseries():
 
 def test_flux_unit():
     """Checks the use of lc.flux_unit and lc.flux_quantity."""
-    unit_obj = u.Unit("electron/second")
-    # Can we set flux units using a Unit object?
-    time, flux = range(3), np.ones(3)
-    lc = LightCurve(time, flux, flux_unit=unit_obj)
-    assert lc.flux_unit == unit_obj
-    # Can we set flux units using a string?
-    lc = LightCurve(time, flux, flux_unit="electron/second")
-    assert lc.flux_unit == unit_obj
-    # Can we pass a quantity to flux?
-    lc = LightCurve(time, flux*unit_obj)
-    assert lc.flux_unit == unit_obj
-    # Can we retrieve correct flux quantities?
-    assert lc.flux_quantity.unit ==unit_obj
-    assert_array_equal(lc.flux_quantity.value, flux)
-    # Is invalid user input validated?
-    with pytest.raises(ValueError) as err:
-        lc = LightCurve(time, flux, flux_unit="blablabla")
-    assert "invalid `flux_unit`" in err.value.args[0]
+    with warnings.catch_warnings():  # We deprecated `flux_unit` in v2.0
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        unit_obj = u.Unit("electron/second")
+        # Can we set flux units using a Unit object?
+        time, flux = range(3), np.ones(3)
+        lc = LightCurve(time=time, flux=flux, flux_unit=unit_obj)
+        assert lc.flux.unit == unit_obj
+        # Can we set flux units using a string?
+        lc = LightCurve(time=time, flux=flux, flux_unit="electron/second")
+        assert lc.flux.unit == unit_obj
+        # Can we pass a quantity to flux?
+        lc = LightCurve(time=time, flux=flux*unit_obj)
+        assert lc.flux.unit == unit_obj
+        # Can we retrieve correct flux quantities?
+        with warnings.catch_warnings():  # flux_quantity is deprecated
+            warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+            assert lc.flux_quantity.unit ==unit_obj
+            assert_array_equal(lc.flux_quantity.value, flux)
+        # Is invalid user input validated?
+        with pytest.raises(ValueError) as err:
+            lc = LightCurve(time=time, flux=flux, flux_unit="blablabla")
+        assert "not a valid unit" in err.value.args[0]
 
 
 def test_astropy_time_initialization():
@@ -943,26 +885,31 @@ def test_astropy_time_initialization():
     lc = LightCurve(time=Time(time, format='jd', scale='utc'))
     assert lc.time_format == 'jd'
     assert lc.time_scale == 'utc'
-    assert lc.astropy_time.format == 'jd'
-    assert lc.astropy_time.scale == 'utc'
+    with warnings.catch_warnings():  # we deprecated `astropy_time` in v2.0
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        assert lc.astropy_time.format == 'jd'
+        assert lc.astropy_time.scale == 'utc'
     lc = LightCurve(time=time, time_format='jd', time_scale='utc')
     assert lc.time_format == 'jd'
     assert lc.time_scale == 'utc'
-    assert lc.astropy_time.format == 'jd'
-    assert lc.astropy_time.scale == 'utc'
+    with warnings.catch_warnings():  # we deprecated `astropy_time` in v2.0
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        assert lc.astropy_time.format == 'jd'
+        assert lc.astropy_time.scale == 'utc'
 
 
 def test_normalize_unit():
     """Can the units of a normalized light curve be set?"""
     lc = LightCurve(flux=[1, 2, 3])
     for unit in ['percent', 'ppt', 'ppm']:
-        assert lc.normalize(unit=unit).flux_unit.name == unit
+        assert lc.normalize(unit=unit).flux.unit.name == unit
 
 
+@pytest.mark.skip
 def test_to_stingray():
     """Test the `LightCurve.to_stingray()` method."""
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
-    lc = LightCurve(time, flux, flux_err, time_format="jd")
+    lc = LightCurve(time=time, flux=flux, flux_err=flux_err, time_format="jd")
     try:
         with warnings.catch_warnings():
             # Ignore "UserWarning: Numba not installed" raised by stingray.
@@ -976,6 +923,7 @@ def test_to_stingray():
         pass
 
 
+@pytest.mark.skip
 def test_from_stingray():
     """Test the `LightCurve.from_stingray()` method."""
     try:
@@ -1012,9 +960,12 @@ def test_river():
 def test_bin_issue705():
     """Regression test for #705: binning failed."""
     lc = TessLightCurve(time=np.arange(50), flux=np.ones(50), quality=np.zeros(50))
-    lc.bin(binsize=15)
+    with warnings.catch_warnings():  # binsize is deprecated
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        lc.bin(binsize=15)
 
 
+@pytest.mark.xfail  # As of June 2020 the SkyBot service is returning MySQL errors
 @pytest.mark.remote_data
 def test_SSOs():
     # TESS test
@@ -1027,6 +978,7 @@ def test_SSOs():
     assert(len(mask) == len(lc.flux))
 
 
+@pytest.mark.xfail  # LightCurveFile was removed in Lightkurve v2.x
 def test_get_header():
     """Test the basic functionality of ``tpf.get_header()``"""
     lcf = TessLightCurveFile(filename_tess_custom)
@@ -1035,3 +987,23 @@ def test_get_header():
     # ``tpf.header`` is deprecated
     with pytest.warns(LightkurveWarning, match='deprecated'):
         lcf.header()
+
+
+def test_fold_v2():
+    """The API of LightCurve.fold() changed in Lightkurve v2.x when we adopted
+    AstroPy's TimeSeries.fold() method. This test verifies the new API."""
+    lc = LightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1)
+
+    # Can period be passed as a float?
+    fld = lc.fold(period=1)
+    fld2 = lc.fold(period=1*u.day)
+    assert_array_equal(fld.phase, fld2.phase)
+    assert isinstance(fld.time, TimeDelta)
+    fld.plot_river()
+    plt.close()
+
+    # Does phase normalization work?
+    fld = lc.fold(period=1, normalize_phase=True)
+    assert isinstance(fld.time, u.Quantity)
+    fld.plot_river()
+    plt.close()

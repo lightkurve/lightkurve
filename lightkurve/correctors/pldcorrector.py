@@ -163,8 +163,8 @@ class PLDCorrector(Corrector):
 
         # generate flux light curve from desired pixels
         lc = self.tpf.to_lightcurve(aperture_mask=aperture)
-        rawflux = lc.flux
-        rawflux_err = lc.flux_err
+        rawflux = lc.flux.value
+        rawflux_err = lc.flux_err.value
 
         # create nan mask
         nanmask = np.isfinite(self.time)

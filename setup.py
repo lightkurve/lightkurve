@@ -39,6 +39,7 @@ setup(name='lightkurve',
       license='MIT',
       package_dir={
             'lightkurve': 'lightkurve',
+            'lightkurve.io': 'lightkurve/io',
             'lightkurve.correctors': 'lightkurve/correctors',
             'lightkurve.seismology': 'lightkurve/seismology',
             'lightkurve.prf': 'lightkurve/prf'},

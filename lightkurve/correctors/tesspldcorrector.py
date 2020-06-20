@@ -76,7 +76,7 @@ class TessPLDCorrector(RegressionCorrector):
 
         dm_pixels = DesignMatrix(pixels, name='pixel_series').pca(pixel_components)
         dm_bkg = DesignMatrix(simple_bkg, name='background_model')
-        dm_spline = spline(self.lc.time, n_knots=spline_n_knots,
+        dm_spline = spline(self.lc.time.value, n_knots=spline_n_knots,
                              degree=spline_degree).append_constant()
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')

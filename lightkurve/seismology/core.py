@@ -43,7 +43,7 @@ class Seismology(object):
     Download the TESS light curve for HIP 116158:
 
         >>> import lightkurve as lk
-        >>> lc = lk.search_lightcurvefile("HIP 116158", sector=2).download().PDCSAP_FLUX  # doctest: +SKIP
+        >>> lc = lk.search_lightcurve("HIP 116158", sector=2).download()  # doctest: +SKIP
         >>> lc = lc.normalize().remove_nans().remove_outliers()  # doctest: +SKIP
 
     Create a Lomb-Scargle periodogram:

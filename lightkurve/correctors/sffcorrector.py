@@ -9,7 +9,9 @@ import warnings
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+
 from astropy.modeling import models, fitting
+from astropy.units import Quantity
 
 from . import DesignMatrix, DesignMatrixCollection, SparseDesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
@@ -43,13 +45,8 @@ class SFFCorrector(RegressionCorrector):
                           LightkurveWarning)
 
         self.raw_lc = lc
-        if hasattr(lc, 'flux_unit'):
-            if lc.flux_unit is None:
-                lc = lc.copy()
-            elif lc.flux_unit.to_string() == '':
-                lc = lc.copy()
-            else:
-                lc = lc.copy().normalize()
+        if lc.flux.unit.to_string() == '':
+            lc = lc.copy()
         else:
             lc = lc.copy().normalize()
 
@@ -148,10 +145,13 @@ class SFFCorrector(RegressionCorrector):
 
         dms = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
-            ar = np.copy(self.arclength)
+            if isinstance(self.arclength, Quantity):
+                ar = np.copy(self.arclength.value)
+            else:
+                ar = np.copy(self.arclength)
             knots = list(np.percentile(ar[a:b], np.linspace(0, 100, bins+1)[1:-1]))
             ar[~np.in1d(ar, ar[a:b])] = 0
-            #import pdb; pdb.set_trace()
+
             dm = spline(ar, knots=knots, degree=degree).copy()
             dm.columns = ['window{}_bin{}'.format(idx+1, jdx+1)
                                         for jdx in range(dm.shape[1])]
@@ -167,9 +167,9 @@ class SFFCorrector(RegressionCorrector):
 
 
         # long term
-        n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
+        n_knots = int((self.lc.time.value[-1] - self.lc.time.value[0])/timescale)
 
-        s_dm = spline(self.lc.time, n_knots=n_knots, name='spline')
+        s_dm = spline(self.lc.time.value, n_knots=n_knots, name='spline')
         means = [np.average(chunk) for chunk in np.array_split(self.lc.flux, n_knots)]
 #        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
         s_dm.prior_mu = np.asarray(means)
@@ -204,7 +204,7 @@ class SFFCorrector(RegressionCorrector):
         most recent call to `correct()`."""
         axs = self._diagnostic_plot()
         for t in self.window_points:
-            axs[0].axvline(self.lc.time[t], color='r', ls='--', alpha=0.3)
+            axs[0].axvline(self.lc.time.value[t], color='r', ls='--', alpha=0.3)
 
     def diagnose_arclength(self):
         """Returns a diagnostic plot which visualizes arclength vs flux
@@ -304,7 +304,10 @@ def _get_thruster_firings(arclength):
     thrusters: np.ndarray of bools
         True at times where thrusters were fired.
     """
-    arc = np.copy(arclength)
+    if isinstance(arclength, Quantity):
+        arc = np.copy(arclength.value)
+    else:
+        arc = np.copy(arclength)
     # Rate of change of rate of change of arclength wrt time
     d2adt2 = (np.gradient(np.gradient(arc)))
     # Fit a Gaussian, most points lie in a tight region, thruster firings are outliers
@@ -425,6 +428,6 @@ def _estimate_arclength(centroid_col, centroid_row):
     col = centroid_col - np.nanmin(centroid_col)
     row = centroid_row  - np.nanmin(centroid_row)
     # Force c to be correlated not anticorrelated
-    if np.polyfit(col, row, 1)[0] < 0:
+    if np.polyfit(col.data, row.data, 1)[0] < 0:
         col = np.nanmax(col) - col
     return (col**2 + row**2)**0.5

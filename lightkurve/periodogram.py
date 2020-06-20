@@ -15,6 +15,7 @@ from astropy.table import Table
 from astropy import units as u
 from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel
+from astropy.time import Time
 
 # LombScargle was moved from astropy.stats to astropy.timeseries in AstroPy v3.2
 try:
@@ -757,10 +758,7 @@ class LombScarglePeriodogram(Periodogram):
             raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
                              ' to remove NaN values from a LightCurve.')
 
-        if lc.time_format in ['bkjd', 'btjd', 'd', 'days', 'day', None]:
-            time = lc.time.copy() * u.day
-        else:
-            raise NotImplementedError('time in format {} is not supported.'.format(lc.time_format))
+        time = lc.time.copy()
 
         # Approximate Nyquist Frequency and frequency bin width in terms of days
         nyquist = 0.5 * (1./(np.median(np.diff(time))))
@@ -810,7 +808,7 @@ class LombScarglePeriodogram(Periodogram):
                 maximum_frequency = nyquist * nyquist_factor
 
             # Create frequency grid evenly spaced in frequency
-            frequency = np.arange(minimum_frequency.value, maximum_frequency.value, fs.to(freq_unit).value)
+            frequency = np.arange(minimum_frequency.value, maximum_frequency.value, fs.value)
 
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
@@ -831,11 +829,11 @@ class LombScarglePeriodogram(Periodogram):
             nterms = 1
 
         if float(astropy.__version__[0]) >= 3:
-            LS = LombScargle(time, lc.flux_quantity,
+            LS = LombScargle(time, lc.flux,
                              nterms=nterms, normalization='psd', **kwargs)
             power = LS.power(frequency, method=ls_method)
         else:
-            LS = LombScargle(time, lc.flux_quantity,
+            LS = LombScargle(time, lc.flux,
                              nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization='psd')
 
@@ -849,7 +847,8 @@ class LombScarglePeriodogram(Periodogram):
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
-                                      targetid=lc.targetid, label=lc.label,
+                                      targetid=lc.meta.get('targetid'),
+                                      label=lc.meta.get('label'),
                                       default_view=default_view, ls_obj=LS,
                                       nterms=nterms, ls_method=ls_method)
 
@@ -932,13 +931,13 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             raise ValueError("`period` parameter contains illegal nan or inf value(s)")
         if minimum_period is None:
             if period is None:
-                minimum_period = np.max([np.median(np.diff(lc.time)) * 4,
-                                         np.max(duration) + np.median(np.diff(lc.time))])
+                minimum_period = np.max([np.median(np.diff(lc.time.value)) * 4,
+                                         np.max(duration) + np.median(np.diff(lc.time.value))])
             else:
                 minimum_period = np.min(period)
         if maximum_period is None:
             if period is None:
-                maximum_period = (np.max(lc.time) - np.min(lc.time)) / 3.
+                maximum_period = (np.max(lc.time.value) - np.min(lc.time.value)) / 3.
             else:
                 maximum_period = np.max(period)
 
@@ -949,7 +948,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
         # Validate user input for `frequency_factor`
         frequency_factor = kwargs.pop("frequency_factor", 10)
-        df = frequency_factor * np.min(duration) / (np.max(lc.time) - np.min(lc.time))**2
+        df = frequency_factor * np.min(duration) / (np.max(lc.time.value) - np.min(lc.time.value))**2
         npoints = int(((1/minimum_period) - (1/maximum_period))/df)
         if npoints > 1e7:
             raise ValueError('`period` contains {} points.'
@@ -980,8 +979,8 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         return BoxLeastSquaresPeriodogram(frequency=1. / result.period,
                                           power=result.power,
                                           default_view='period',
-                                          label=lc.label,
-                                          targetid=lc.targetid,
+                                          label=lc.meta.get('label'),
+                                          targetid=lc.meta.get('targetid'),
                                           transit_time=result.transit_time,
                                           duration=result.duration,
                                           depth=result.depth,
@@ -1020,9 +1019,12 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         if transit_time is None:
             transit_time = self.transit_time_at_max_power
             log.warning('No transit time specified. Using transit time at max power')
+        if not isinstance(transit_time, Time):
+            transit_time = Time(transit_time, format=self.time.format, scale=self.time.scale)
+
         return self._BLS_object.compute_stats(u.Quantity(period, 'd').value,
                                               u.Quantity(duration, 'd').value,
-                                              u.Quantity(transit_time, 'd').value)
+                                              transit_time)
 
     def get_transit_model(self, period=None, duration=None, transit_time=None):
         """Computes the transit model using the BLS, returns a lightkurve.LightCurve
@@ -1054,11 +1056,13 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         if transit_time is None:
             transit_time = self.transit_time_at_max_power
             log.warning('No transit time specified. Using transit time at max power')
+        if not isinstance(transit_time, Time):
+            transit_time = Time(transit_time, format=self.time.format, scale=self.time.scale)
 
         model_flux = self._BLS_object.model(self.time, u.Quantity(period, 'd').value,
                                             u.Quantity(duration, 'd').value,
-                                            u.Quantity(transit_time, 'd').value)
-        model = LightCurve(self.time, model_flux, label='Transit Model Flux')
+                                            transit_time)
+        model = LightCurve(time=self.time, flux=model_flux, label='Transit Model Flux')
         return model
 
     def get_transit_mask(self, period=None, duration=None, transit_time=None):

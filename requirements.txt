@@ -1,5 +1,5 @@
 numpy>=1.11
-astropy>=3.1
+astropy>=3.2
 scipy>=0.19.0,!=1.4.0,!=1.4.1
 matplotlib>=1.5.3
 astroquery>=0.3.10

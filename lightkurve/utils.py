@@ -61,8 +61,8 @@ class QualityFlags(object):
     def create_quality_mask(cls, quality_array, bitmask=None):
         """Returns a boolean array which flags good cadences given a bitmask.
 
-        This method is used by the constructors of :class:`KeplerTargetPixelFile`
-        and :class:`KeplerLightCurveFile` to initialize their `quality_mask`
+        This method is used by the readers of :class:`KeplerTargetPixelFile`
+        and :class:`KeplerLightCurve` to initialize their `quality_mask`
         class attribute which is used to ignore bad-quality data.
 
         Parameters
@@ -80,6 +80,8 @@ class QualityFlags(object):
         # Return an array filled with `True` by default (i.e. ignore nothing)
         if bitmask is None:
             return np.ones(len(quality_array), dtype=bool)
+        if isinstance(quality_array, u.Quantity):
+            quality_array = quality_array.value
         # A few pre-defined bitmasks can be specified as strings
         if isinstance(bitmask, str):
             try:
@@ -328,7 +330,7 @@ def running_mean(data, window_size):
     return (cumsum[window_size:] - cumsum[:-window_size]) / float(window_size)
 
 
-def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
+def bkjd_to_astropy_time(bkjd):
     """Converts Kepler Barycentric Julian Day (BKJD) time values to an
     `astropy.time.Time` object.
 
@@ -344,8 +346,6 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
     ----------
     bkjd : float or array of floats
         Barycentric Kepler Julian Day.
-    bjdref : float
-        BJD reference date, for Kepler this is 2454833.
 
     Returns
     -------
@@ -353,16 +353,13 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
         Resulting time object.
     """
     bkjd = np.atleast_1d(bkjd)
-    jd = bkjd + bjdref
     # Some data products have missing time values;
     # we need to set these to zero or `Time` cannot be instantiated.
-    jd[~np.isfinite(jd)] = 0
-    if isinstance(bkjd, float):  # If user entered a float, return a float
-        jd = jd[0]
-    return Time(jd, format='jd', scale='tdb')
+    bkjd[~np.isfinite(bkjd)] = 0
+    return Time(bkjd, format='bkjd', scale='tdb')
 
 
-def btjd_to_astropy_time(btjd, bjdref=2457000.):
+def btjd_to_astropy_time(btjd):
     """Converts TESS Barycentric Julian Day (BTJD) values to an
     `astropy.time.Time` object.
 
@@ -376,8 +373,6 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
     ----------
     btjd : float or array of floats
         Barycentric TESS Julian Day
-    bjdref : float
-        BJD reference date.
 
     Returns
     -------
@@ -385,11 +380,8 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
         Resulting time object.
     """
     btjd = np.atleast_1d(btjd)
-    jd = btjd + bjdref
-    jd[~np.isfinite(jd)] = 0
-    if isinstance(btjd, float):  # If user entered a float, return a float
-        jd = jd[0]
-    return Time(jd, format='jd', scale='tdb')
+    btjd[~np.isfinite(btjd)] = 0
+    return Time(btjd, format='btjd', scale='tdb')
 
 
 def plot_image(image, ax=None, scale='linear', origin='lower',
@@ -467,6 +459,11 @@ class LightkurveWarning(Warning):
     pass
 
 
+class LightkurveDeprecationWarning(LightkurveWarning):
+    """Class for all Lightkurve deprecation warnings."""
+    pass
+
+
 def suppress_stdout(f, *args, **kwargs):
     """A simple decorator to suppress function print outputs."""
     @wraps(f)
@@ -481,67 +478,6 @@ def suppress_stdout(f, *args, **kwargs):
             finally:
                 sys.stdout = old_out
     return wrapper
-
-
-def detect_filetype(header):
-    """Returns Kepler and TESS file types given their primary header.
-
-    This function will detect the file type by looking at both the TELESCOP and
-    CREATOR keywords in the first extension of the FITS header. If the file is
-    recognized as a Kepler or TESS data product, one of the following strings
-    will be returned:
-
-        * `'KeplerTargetPixelFile'`
-        * `'TessTargetPixelFile'`
-        * `'KeplerLightCurveFile'`
-        * `'TessLightCurveFile'`
-
-    If the file is not recognized as a Kepler or TESS data product, then
-    `None` will be returned.
-
-    Parameters
-    ----------
-    header : astropy.io.fits.Header object
-        The primary header of a FITS file.
-
-    Returns
-    -------
-    filetype : str or None
-        A string describing the detected filetype. If the filetype is not
-        recognized, `None` will be returned.
-    """
-    try:
-        # use `telescop` keyword to determine mission
-        # and `creator` to determine tpf or lc
-        if 'TELESCOP' in header.keys():
-            telescop = header['telescop'].lower()
-        else:
-            # Some old custom TESS data did not define the `TELESCOP` card
-            telescop = header['mission'].lower()
-        creator = header['creator'].lower()
-        origin = header['origin'].lower()
-        if telescop == 'kepler':
-            # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
-            if 'targetpixel' in creator:
-                return 'KeplerTargetPixelFile'
-            # Kepler LCFs will contain "FluxExporter2PipelineModule"
-            elif ('fluxexporter' in creator or 'lightcurve' in creator
-                or 'lightcurve' in creator):
-                return 'KeplerLightCurveFile'
-        elif telescop == 'tess':
-            # TESS TPFs will contain "TargetPixelExporterPipelineModule"
-            if 'targetpixel' in creator:
-                return 'TessTargetPixelFile'
-            # TESS LCFs will contain "LightCurveExporterPipelineModule"
-            elif 'lightcurve' in creator:
-                return 'TessLightCurveFile'
-            # Early versions of TESScut did not set a good CREATOR keyword
-            elif 'stsci' in origin:
-                return 'TessTargetPixelFile'
-    # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
-    # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
-    except (KeyError, AttributeError):
-        return None
 
 
 def validate_method(method, supported_methods):

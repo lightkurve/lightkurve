@@ -21,8 +21,8 @@ from astropy.utils.exceptions import AstropyWarning
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
 from ..lightcurve import TessLightCurve
-from ..utils import LightkurveWarning
-from ..search import open as lkopen
+from ..utils import LightkurveWarning, LightkurveDeprecationWarning
+from ..io import read as lkopen
 
 from .test_synthetic_data import filename_synthetic_flat
 
@@ -139,13 +139,13 @@ def test_tpf_zeros():
         warnings.simplefilter("ignore", LightkurveWarning)
         lc = tpf.to_lightcurve()
     # If you don't mask out bad data, time contains NaNs
-    assert np.any(lc.time != tpf.time)  # Using the property that NaN does not equal NaN
+    assert np.any(lc.time.value != tpf.time)  # Using the property that NaN does not equal NaN
     # When you do mask out bad data everything should work.
-    assert (tpf.astropy_time.jd == 0).any()
+    assert (tpf.astropy_time.value == 0).any()
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask='hard')
     lc = tpf.to_lightcurve(aperture_mask="all")
     assert len(lc.time) == len(lc.flux)
-    assert np.all(lc.time == tpf.time)
+    assert np.all(lc.time == tpf.astropy_time)
     assert np.all(lc.flux == 0)
     # The default QUALITY bitmask should have removed all NaNs in the TIME
     assert ~np.any(np.isnan(tpf.time))
@@ -160,11 +160,11 @@ def test_tpf_ones(centroid_method):
                 TessTargetPixelFile(filename_tpf_one_center)]
     for tpf in tpfs:
         lc = tpf.to_lightcurve(aperture_mask='all', centroid_method=centroid_method)
-        assert np.all(lc.flux == 1)
-        assert np.all((lc.centroid_col < tpf.column+tpf.shape[1]).all()
-                      * (lc.centroid_col > tpf.column).all())
-        assert np.all((lc.centroid_row < tpf.row+tpf.shape[2]).all()
-                      * (lc.centroid_row > tpf.row).all())
+        assert np.all(lc.flux.value == 1)
+        assert np.all((lc.centroid_col.value < tpf.column+tpf.shape[1]).all()
+                      * (lc.centroid_col.value > tpf.column).all())
+        assert np.all((lc.centroid_row.value < tpf.row+tpf.shape[2]).all()
+                      * (lc.centroid_row.value > tpf.row).all())
 
 
 @pytest.mark.parametrize("quality_bitmask,answer", [(None, 1290), ('none', 1290),
@@ -199,8 +199,8 @@ def test_wcs_tabby(method):
     tpf.wcs
     ra, dec = tpf.get_coordinates(0)
     col, row = tpf.estimate_centroids(method=method)
-    col -= tpf.column
-    row -= tpf.row
+    col = col.value - tpf.column
+    row = row.value - tpf.row
     y, x = int(np.round(col[0])), int(np.round(row[1]))
     # Compare with RA and Dec from Simbad
     assert np.isclose(ra[x, y], 301.5643971, 1e-4)
@@ -258,7 +258,7 @@ def test_to_lightcurve():
         tpf.to_lightcurve(aperture_mask=None)
         tpf.to_lightcurve(aperture_mask='all')
         lc = tpf.to_lightcurve(aperture_mask='pipeline')
-        assert lc.astropy_time.scale == 'tdb'
+        assert lc.time.scale == 'tdb'
         assert lc.label == tpf.hdu[0].header['OBJECT']
 
 
@@ -268,7 +268,7 @@ def test_bkg_lightcurve():
         lc = tpf.get_bkg_lightcurve()
         lc = tpf.get_bkg_lightcurve(aperture_mask=None)
         lc = tpf.get_bkg_lightcurve(aperture_mask='all')
-        assert lc.astropy_time.scale == 'tdb'
+        assert lc.time.scale == 'tdb'
         assert lc.flux.shape == lc.flux_err.shape
         assert len(lc.time) == len(lc.flux)
 
@@ -515,7 +515,7 @@ def test_threshold_aperture_mask():
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.plot(aperture_mask='threshold')
     lc = tpf.to_lightcurve(aperture_mask=tpf.create_threshold_mask(threshold=1))
-    assert (lc.flux == 1).all()
+    assert (lc.flux.value == 1).all()
     # The TESS file shows three pixel regions above a 2-sigma threshold;
     # let's make sure the `reference_pixel` argument allows them to be selected.
     tpf = TessTargetPixelFile(filename_tess)
@@ -540,7 +540,7 @@ def test_tpf_tess():
     assert tpf.background_mask.sum() == 30
     lc = tpf.to_lightcurve()
     assert isinstance(lc, TessLightCurve)
-    assert_array_equal(lc.time, tpf.time)
+    assert_array_equal(lc.time.value, tpf.time)
     assert tpf.astropy_time.scale == 'tdb'
     assert tpf.flux.shape == tpf.flux_err.shape
     tpf.wcs
@@ -601,6 +601,8 @@ def test_aperture_photometry_nan():
     assert np.isnan(lc.flux[2])
     assert np.isnan(lc.flux_err[2])
 
+
+@pytest.mark.xfail  # As of June 2020 the SkyBot service is returning MySQL errors
 @pytest.mark.remote_data
 def test_SSOs():
     # TESS test
@@ -620,5 +622,5 @@ def test_get_header():
     assert tpf.get_header(0)['MISSION'] == tpf.get_keyword("MISSION")
     assert tpf.get_header(ext=2)['EXTNAME'] == "APERTURE"
     # ``tpf.header`` is deprecated
-    with pytest.warns(LightkurveWarning, match='deprecated'):
+    with pytest.warns(LightkurveDeprecationWarning, match='deprecated'):
         tpf.header
