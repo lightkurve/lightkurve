@@ -18,7 +18,7 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astropy.table import Table
 
-from ..utils import LightkurveWarning
+from ..utils import LightkurveWarning, LightkurveDeprecationWarning
 from ..search import search_lightcurvefile, search_targetpixelfile, \
                      search_tesscut, SearchResult, SearchError, log
 from ..io import read
