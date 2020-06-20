@@ -18,7 +18,7 @@ from ..io import read
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from ..utils import LightkurveWarning
+from ..utils import LightkurveWarning, LightkurveDeprecationWarning
 from .test_targetpixelfile import TABBY_TPF
 
 
@@ -115,8 +115,7 @@ def test_KeplerLightCurveFile(path, mission):
         assert lc.meta.get('quarter') is None
     assert lc.time.format == 'bkjd'
     assert lc.time.scale == 'tdb'
-    assert lc.astropy_time.scale == 'tdb'
-    assert lc.flux_unit == u.electron / u.second
+    assert lc.flux.unit == u.electron / u.second
 
     # Does the data match what one would obtain using pyfits.open?
     hdu = pyfits.open(path)
@@ -632,11 +631,9 @@ def test_to_fits():
 @pytest.mark.remote_data
 def test_astropy_time():
     '''Test the `astropy_time` property'''
-    lcf = KeplerLightCurve.read(TABBY_Q8)
-    astropy_time = lcf.astropy_time
-    iso = astropy_time.iso
-    assert astropy_time.scale == 'tdb'
-    assert len(iso) == len(lcf.time)
+    lc = KeplerLightCurve.read(TABBY_Q8)
+    assert lc.time.scale == 'tdb'
+    assert len(lc.time.iso) == len(lc.time)
     #assert iso[0] == '2011-01-06 20:45:08.811'
     #assert iso[-1] == '2011-03-14 20:18:16.734'
 
@@ -645,7 +642,7 @@ def test_astropy_time_bkjd():
     """Does `LightCurve.astropy_time` support bkjd?"""
     bkjd = np.array([100, 200])
     lc = LightCurve(time=[100, 200], time_format='bkjd')
-    assert_allclose(lc.astropy_time.jd, bkjd + 2454833.)
+    assert_allclose(lc.time.jd, bkjd + 2454833.)
 
 
 def test_lightcurve_repr():
@@ -874,16 +871,18 @@ def test_flux_unit():
     # Can we set flux units using a Unit object?
     time, flux = range(3), np.ones(3)
     lc = LightCurve(time=time, flux=flux, flux_unit=unit_obj)
-    assert lc.flux_unit == unit_obj
+    assert lc.flux.unit == unit_obj
     # Can we set flux units using a string?
     lc = LightCurve(time=time, flux=flux, flux_unit="electron/second")
-    assert lc.flux_unit == unit_obj
+    assert lc.flux.unit == unit_obj
     # Can we pass a quantity to flux?
     lc = LightCurve(time=time, flux=flux*unit_obj)
-    assert lc.flux_unit == unit_obj
+    assert lc.flux.unit == unit_obj
     # Can we retrieve correct flux quantities?
-    assert lc.flux_quantity.unit ==unit_obj
-    assert_array_equal(lc.flux_quantity.value, flux)
+    with warnings.catch_warnings():  # flux_quantity is deprecated
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        assert lc.flux_quantity.unit ==unit_obj
+        assert_array_equal(lc.flux_quantity.value, flux)
     # Is invalid user input validated?
     with pytest.raises(ValueError) as err:
         lc = LightCurve(time=time, flux=flux, flux_unit="blablabla")

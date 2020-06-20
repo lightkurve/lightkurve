@@ -606,7 +606,7 @@ class LightCurve(TimeSeries):
             period *= u.day
         if epoch_time is not None and not isinstance(epoch_time, Time):
             epoch_time = Time(epoch_time, format=self.time.format, scale=self.time.scale)
-        if epoch_phase is not None and not isinstance(epoch_phase, Quantity):
+        if epoch_phase is not None and not isinstance(epoch_phase, Quantity) and not normalize_phase:
             epoch_phase *= u.day
         if wrap_phase is not None and not isinstance(wrap_phase, Quantity):
             wrap_phase *= u.day
@@ -932,44 +932,43 @@ class LightCurve(TimeSeries):
             return self.copy()[~outlier_mask], outlier_mask
         return self.copy()[~outlier_mask]
 
-    def bin(self, time_bin_size, time_bin_start=None, n_bins=None,
-            aggregate_func=None):
+    @deprecated_renamed_argument('binsize', new_name=None, since='2.0',
+                                 warning_type=LightkurveDeprecationWarning,
+                                 alternative='time_bin_size')
+    def bin(self, time_bin_size=None, time_bin_start=None, n_bins=None,
+            aggregate_func=None, binsize=None):
         """Bins a lightcurve in equally-spaced bins in time.
 
-        The flux value of the bins will be computed by taking the mean
-        (``method='mean'``) or the median (``method='median'``) of the flux.
-        The default is mean.
+        If the original light curve contains flux uncertainties (``flux_err``),
+        the binned lightcurve will report the root-mean-square error.
+        If no uncertainties are included, the binned curve will return the
+        standard deviation of the data.
 
         Parameters
         ----------
-        binsize : int or None
-            Number of cadences to include in every bin.  The default
-            is 13 if neither `bins` nor `binsize` is assigned.
-        bins : int, list of int, str, or None
-            Requires Astropy version >3.1 and >2.10
-            Instruction for how to assign bin locations grouping by the time of
-            samples rather than index; overrides the `binsize=` if given.
-            If ``bins`` is an int, it is the number of bins. If it is a list
-            it is taken to be the bin edges. If it is a string, it must be one
-            of  'blocks', 'knuth', 'scott' or 'freedman'.
-            See `~astropy.stats.histogram` for description of these algorithms.
-        method: str, one of 'mean' or 'median'
-            The summary statistic to return for each bin. Default: 'mean'.
+        time_bin_size : `~astropy.units.Quantity`, float
+            The time interval for the binned time series. (Default unit: days.)
+        time_bin_start : `~astropy.time.Time`, optional
+            The start time for the binned time series. Defaults to the first
+            time in the sampled time series.
+        n_bins : int, optional
+            The number of bins to use. Defaults to the number needed to fit all
+            the original points.
+        aggregate_func : callable, optional
+            The function to use for combining points in the same bin. Defaults
+            to np.nanmean.
+        binsize : int
+            DEPRECATED.
 
         Returns
         -------
         binned_lc : `LightCurve`
             A new light curve which has been binned.
-
-        Notes
-        -----
-        - If the original light curve contains flux uncertainties (``flux_err``),
-          the binned lightcurve will report the root-mean-square error.
-          If no uncertainties are included, the binned curve will return the
-          standard deviation of the data.
-        - If the original lightcurve contains a quality attribute, then the
-          bitwise OR of the quality flags will be returned per bin.
         """
+        # Backwards compatibility with Lightkurve v1.x
+        if time_bin_size is None and binsize is not None:
+            time_bin_size = (self.time[binsize] - self.time[0]).to(u.day)
+
         if time_bin_size is None:
             time_bin_size = 0.5*u.day
         if not isinstance(time_bin_size, Quantity):
@@ -987,8 +986,27 @@ class LightCurve(TimeSeries):
             ts = aggregate_downsample(self,
                                       time_bin_size=time_bin_size,
                                       n_bins=n_bins,
-                                      aggregate_func=aggregate_func,
-                                      time_bin_start=time_bin_start)
+                                      time_bin_start=time_bin_start,
+                                      aggregate_func=aggregate_func)
+
+            # If `flux_err` is populated, assume the errors combine as the root-mean-square
+            if np.any(np.isfinite(self.flux_err)):
+                rmse_func = lambda x: np.sqrt(np.nansum(x**2))/len(np.atleast_1d(x)) \
+                                    if np.any(np.isfinite(x)) else np.nan
+                ts_err = aggregate_downsample(self,
+                                              time_bin_size=time_bin_size,
+                                              n_bins=n_bins,
+                                              time_bin_start=time_bin_start,
+                                              aggregate_func=rmse_func)
+                ts['flux_err'] = ts_err['flux_err']
+            # If `flux_err` is unavailable, populate `flux_err` as nanstd(flux)
+            else:
+                ts_err = aggregate_downsample(self,
+                                              time_bin_size=time_bin_size,
+                                              n_bins=n_bins,
+                                              time_bin_start=time_bin_start,
+                                              aggregate_func=np.nanstd)
+                ts['flux_err'] = ts_err['flux']
 
         # Prepare a LightCurve object by ensuring there is a time column
         ts._required_columns = []
@@ -1393,13 +1411,8 @@ class LightCurve(TimeSeries):
         return show_interact_widget(clean, notebook_url=notebook_url, minimum_period=minimum_period,
                                     maximum_period=maximum_period, resolution=resolution)
 
-    @deprecated("2.0",
-                message='`to_timeseries()` has been deprecated. `LightCurve` is a '
-                        'sub-class of Astropy TimeSeries as of Lightkurve v2.0 '
-                        'and no longer needs to be converted.',
-                warning_type=LightkurveDeprecationWarning)
     def to_table(self):
-        return self
+        return Table(self)
 
     @deprecated("2.0",
                 message='`to_timeseries()` has been deprecated. `LightCurve` is a '
