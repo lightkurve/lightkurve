@@ -387,8 +387,8 @@ def test_cdpp_tabby():
     """Compare the cdpp noise metric against the pipeline value."""
     lc = KeplerLightCurve.read(TABBY_Q8)
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
-    lc = LightCurve(time=lc.time[:1000], flux=lc.flux[:1000])
-    assert(np.abs(lc.estimate_cdpp().value - lc.cdpp6_0) < 30)
+    lc2 = LightCurve(time=lc.time[:1000], flux=lc.flux[:1000])
+    assert(np.abs(lc2.estimate_cdpp().value - lc.cdpp6_0) < 30)
 
 
 # TEMPORARILY SKIP, cf. https://github.com/KeplerGO/lightkurve/issues/663
