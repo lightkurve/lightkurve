@@ -1186,7 +1186,7 @@ class LightCurve(TimeSeries):
         return res
 
     def _create_plot(self, method='plot', ax=None, normalize=False,
-                     xlabel=None, ylabel=None, title='', style='lightkurve',
+                     xlabel=None, ylabel=None, column='flux', title='', style='lightkurve',
                      show_colorbar=True, colorbar_label='',
                      **kwargs):
         """Implements `plot()`, `scatter()`, and `errorbar()` to avoid code duplication.
@@ -1223,12 +1223,22 @@ class LightCurve(TimeSeries):
         if ('label' not in kwargs):
             kwargs['label'] = self.meta.get('label')
 
+        # Create a copy with the appropriate flux and flux_err columns
+        lc_plot = self.copy()
+        lc_plot.flux = lc_plot[column]
+
+        if column in ['flux','sap_flux','sap_bkg','pdscap_flux',
+                        'psf_centr1','psf_centr2','mom_centr1','mom_centr2']:
+            lc_plot.flux_err = lc_plot['{}_err'.format(column)]
+        else:
+            lc_plot.flux_err = np.full(len(lc_plot.flux), np.nan)
+
         # Normalize the data if requested
         if normalize:
-            lc_normed = self.normalize()
+            lc_normed = lc_plot.normalize()
             flux, flux_err = lc_normed.flux, lc_normed.flux_err
         else:
-            flux, flux_err = self.flux, self.flux_err
+            flux, flux_err = lc_plot.flux, lc_plot.flux_err
 
         # Make the plot
         with plt.style.context(style):
@@ -1271,6 +1281,8 @@ class LightCurve(TimeSeries):
             Plot x axis label
         ylabel : str
             Plot y axis label
+        column : str
+            Name of data column to plot. Default `flux`.
         title : str
             Plot set_title
         style : str
