@@ -138,13 +138,13 @@ class PLDCorrector(RegressionCorrector):
         zipped = zip(pixels, nanmask)
         pixels = np.array([p[n] for p,n in zipped])
 
-        dm_pixels = DesignMatrix(pixels, name='pixel_series').pca(pixel_components).standardize()
+        dm_pixels = DesignMatrix(pixels, name='pixel_series').pca(pixel_components)
         dm_bkg = DesignMatrix(simple_bkg, name='background_model')
         dm_spline = spline(self.lc.time, n_knots=spline_n_knots,
                              degree=spline_degree).append_constant()
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
-            dm = DMC([dm_pixels, dm_bkg, dm_spline])
+            dm = DMC([dm_pixels.standardize(), dm_bkg.standardize(), dm_spline])
 
         if pld_order > 1:
             dm = self._create_higher_order_matrix(dm, order=pld_order, n_pca_terms=n_pca_terms)
@@ -213,9 +213,8 @@ class PLDCorrector(RegressionCorrector):
 
             ax = axs[2]
             self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
-            self.corrected_lc.scatter(
-                                            normalize=False, c='r', marker='x',
-                                            s=10, label='Outliers', ax=ax)
+            self.corrected_lc.scatter(normalize=False, c='r', marker='x',
+                                      s=10, label='Outliers', ax=ax)
             self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
 
@@ -237,7 +236,7 @@ class PLDCorrector(RegressionCorrector):
             regressors = np.product(list(multichoose(dm['pixel_series'].values.T, order)), axis=1).T
 
             # make high order design matrix
-            high_order_dm = DesignMatrix(regressors, name=f'PLD Order {i}')
+            high_order_dm = DesignMatrix(regressors, name=f'PLD Order {i}').standardize()
 
             # apply PCA
             if n_pca_terms is not None:
