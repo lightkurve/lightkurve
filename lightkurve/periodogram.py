@@ -850,7 +850,8 @@ class LombScarglePeriodogram(Periodogram):
                                       targetid=lc.meta.get('targetid'),
                                       label=lc.meta.get('label'),
                                       default_view=default_view, ls_obj=LS,
-                                      nterms=nterms, ls_method=ls_method)
+                                      nterms=nterms, ls_method=ls_method,
+                                      meta = lc.meta)
 
     def model(self, time, frequency=None):
         """Obtain the flux model for a given frequency and time
