@@ -343,7 +343,12 @@ def test_lightcurve_plots():
         lc.scatter()
         lc.scatter(c='C3')
         lc.scatter(c=lc.time.value, show_colorbar=True, colorbar_label='Time')
-        lc.errorbar()
+        lc.plot(column='sap_flux')
+        lc.plot(column='sap_bkg', normalize=True)
+        lc.plot(column='cadenceno')
+        lc.errorbar(column='psf_centr1')
+        with pytest.raises(ValueError):
+            lc.errorbar(column='timecorr')      
         plt.close('all')
 
 
