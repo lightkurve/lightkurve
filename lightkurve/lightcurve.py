@@ -1230,8 +1230,12 @@ class LightCurve(TimeSeries):
         if column in ['flux','sap_flux','sap_bkg','pdscap_flux',
                         'psf_centr1','psf_centr2','mom_centr1','mom_centr2']:
             lc_plot.flux_err = lc_plot['{}_err'.format(column)]
+            errors = True
         else:
             lc_plot.flux_err = np.full(len(lc_plot.flux), np.nan)
+            errors = False
+            print('HELLO')
+            print(errors)
 
         # Normalize the data if requested
         if normalize:
@@ -1255,7 +1259,11 @@ class LightCurve(TimeSeries):
                     cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
                     cbar.ax.minorticks_off()
             elif method == 'errorbar':
-                ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
+                if errors:
+                    ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
+                elif errors == False:
+                    print('HELLO')
+                    raise ValueError("The column {} has no associated errors".format(column)))
             else:
                 ax.plot(self.time.value, flux.value, **kwargs)
             ax.set_xlabel(xlabel)
