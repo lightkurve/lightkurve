@@ -1234,8 +1234,6 @@ class LightCurve(TimeSeries):
         else:
             lc_plot.flux_err = np.full(len(lc_plot.flux), np.nan)
             errors = False
-            print('HELLO')
-            print(errors)
 
         # Normalize the data if requested
         if normalize:
@@ -1262,8 +1260,7 @@ class LightCurve(TimeSeries):
                 if errors:
                     ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
                 elif errors == False:
-                    print('HELLO')
-                    raise ValueError("The column {} has no associated errors".format(column)))
+                    raise ValueError("The column {} has no associated errors".format(column))
             else:
                 ax.plot(self.time.value, flux.value, **kwargs)
             ax.set_xlabel(xlabel)
