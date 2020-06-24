@@ -588,7 +588,7 @@ class Seismology(object):
         deltanu = self._validate_deltanu(deltanu)
         return deltanu.diagnostics_plot_method(deltanu, self.periodogram)
 
-    def estimate_radius(self, teff, numax=None, deltanu=None):
+    def estimate_radius(self, teff=None, numax=None, deltanu=None):
         """Returns a stellar radius estimate based on the scaling relations.
 
         This method is implemented by the `~lightkurve.seismology.estimate_radius` function.
@@ -602,11 +602,24 @@ class Seismology(object):
         """
         numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
+        if teff == None:
+            teff = self.periodogram.meta.get('teff')
+            if teff == None:
+                raise ValueError("No effective temperature in metadata."
+                                "Please include effective temperature in function call.")
+            else:
+                warnings.warn("Using value for effective temperature from the Kepler Input Catalogue."
+                        "These temperatue values may sometimes differ significantly from modern estimates.",
+                        LightkurveWarning)
+                continue
+        else:
+            continue
+
         result = stellar_estimators.estimate_radius(numax, deltanu, teff)
         self.radius = result
         return result
 
-    def estimate_mass(self, teff, numax=None, deltanu=None):
+    def estimate_mass(self, teff=None, numax=None, deltanu=None):
         """Returns a stellar mass estimate based on the scaling relations.
 
         This method is implemented by the `~lightkurve.seismology.estimate_mass` function.
@@ -620,11 +633,24 @@ class Seismology(object):
         """
         numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
+        if teff == None:
+            teff = self.periodogram.meta.get('teff')
+            if teff == None:
+                raise ValueError("No effective temperature in metadata."
+                                "Please include effective temperature in function call.")
+            else:
+                warnings.warn("Using value for effective temperature from the Kepler Input Catalogue."
+                        "These temperatue values may sometimes differ significantly from modern estimates.",
+                        LightkurveWarning)
+                continue
+        else:
+            continue
+
         result = stellar_estimators.estimate_mass(numax, deltanu, teff)
         self.mass = result
         return result
 
-    def estimate_logg(self, teff, numax=None):
+    def estimate_logg(self, teff=None, numax=None):
         """Returns a surface gravity estimate based on the scaling relations.
 
         This method is implemented by the `~lightkurve.seismology.estimate_logg` function.
@@ -637,6 +663,18 @@ class Seismology(object):
             Stellar surface gravity estimate.
         """
         numax = self._validate_numax(numax)
+        if teff == None:
+            teff = self.periodogram.meta.get('teff')
+            if teff == None:
+                raise ValueError("No effective temperature in metadata."
+                                "Please include effective temperature in function call.")
+            else:
+                warnings.warn("Using value for effective temperature from the Kepler Input Catalogue."
+                        "These temperatue values may sometimes differ significantly from modern estimates.",
+                        LightkurveWarning)
+                continue
+        else:
+            continue
         result = stellar_estimators.estimate_logg(numax, teff)
         self.logg = result
         return result
