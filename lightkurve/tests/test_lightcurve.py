@@ -122,7 +122,7 @@ def test_KeplerLightCurveFile(path, mission):
     assert lc.label == hdu[0].header['OBJECT']
     nanmask = ~np.isnan(hdu[1].data['TIME'])
     assert_array_equal(lc.time.value, hdu[1].data['TIME'][nanmask])
-    assert_array_equal(lc.flux.value, hdu[1].data['SAP_FLUX'][nanmask] / ((hdu[1].header['CROWDSAP'] * hdu[1].header['FLFRCSAP'])))
+    assert_array_equal(lc.flux.value, hdu[1].data['SAP_FLUX'][nanmask])
 
 
 @pytest.mark.remote_data
@@ -130,9 +130,8 @@ def test_KeplerLightCurveFile(path, mission):
                          ['hardest', 'hard', 'default', None,
                           1, 100, 2096639])
 def test_TessLightCurveFile(quality_bitmask):
-    tess_file = TessLightCurveFile.read(TESS_SIM, quality_bitmask=quality_bitmask)
+    lc = TessLightCurveFile.read(TESS_SIM, quality_bitmask=quality_bitmask, flux_column="sap_flux")
     hdu = pyfits.open(TESS_SIM)
-    lc = tess_file.SAP_FLUX
 
     assert lc.mission == 'TESS'
     assert lc.label == hdu[0].header['OBJECT']
@@ -924,7 +923,9 @@ def test_from_stingray():
 
 
 def test_river():
-    lc = LightCurve(time=np.arange(100), flux=np.random.normal(1, 0.01, 100))
+    lc = LightCurve(time=np.arange(100),
+                    flux=np.random.normal(1, 0.01, 100),
+                    flux_err=np.random.normal(0, 0.01, 100))
     lc.plot_river(10, 1)
     plt.close()
     folded_lc = lc.fold(10, 1)

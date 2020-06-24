@@ -1083,7 +1083,7 @@ class LightCurve(TimeSeries):
                                     polyorder=savgol_polyorder)
         cleaned_lc = detrended_lc.remove_outliers(sigma=sigma)
         with warnings.catch_warnings():  # ignore "already normalized" message
-            warnings.filterwarnings("ignore", message="already")
+            warnings.filterwarnings("ignore", message=".*already.*")
             normalized_lc = cleaned_lc.normalize("ppm")
         mean = running_mean(data=normalized_lc.flux, window_size=transit_duration)
         return np.std(mean)

@@ -76,15 +76,8 @@ def _read_lightcurve_fits_file(filename, flux_column,
     # For backwards compatibility with Lightkurve v1.x,
     # we make sure standard columns and attributes exist.
     if 'flux' not in tab.columns:
-        flux = tab[flux_column]
-        flux_err = tab[f"{flux_column}_err"] 
-        if flux_column == 'sap_flux':
-            flux /= hdu.header.get('FLFRCSAP', 1)
-            flux /= hdu.header.get('CROWDSAP', 1)
-            flux_err /= hdu.header.get('FLFRCSAP', 1)
-            flux_err /= hdu.header.get('CROWDSAP', 1)
-        tab.add_column(flux, name="flux", index=0)
-        tab.add_column(flux_err, name="flux_err", index=1)
+        tab.add_column(tab[flux_column], name="flux", index=0)
+        tab.add_column(tab[f"{flux_column}_err"], name="flux_err", index=1)
     if 'quality' not in tab.columns and quality_column in tab.columns:
         tab.add_column(tab[quality_column], name="quality", index=2)
     if 'centroid_col' not in tab.columns and centroid_col_column in tab.columns:
