@@ -1226,7 +1226,7 @@ class LightCurve(TimeSeries):
                 elif self[column].unit is None:
                     ylabel = '{}'.format(column)
                 else:
-                    ylabel = 'Normalized {} [{}]'.format(column, self[column].unit.to_string("latex_inline"))
+                    ylabel = '{} [{}]'.format(column, self[column].unit.to_string("latex_inline"))
         # Default legend label
         if ('label' not in kwargs):
             kwargs['label'] = self.meta.get('label')
