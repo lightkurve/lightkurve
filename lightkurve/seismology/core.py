@@ -611,9 +611,9 @@ class Seismology(object):
                 warnings.warn("Using value for effective temperature from the Kepler Input Catalogue."
                         "These temperatue values may sometimes differ significantly from modern estimates.",
                         LightkurveWarning)
-                continue
+                pass
         else:
-            continue
+            pass
 
         result = stellar_estimators.estimate_radius(numax, deltanu, teff)
         self.radius = result
@@ -642,9 +642,9 @@ class Seismology(object):
                 warnings.warn("Using value for effective temperature from the Kepler Input Catalogue."
                         "These temperatue values may sometimes differ significantly from modern estimates.",
                         LightkurveWarning)
-                continue
+                pass
         else:
-            continue
+            pass
 
         result = stellar_estimators.estimate_mass(numax, deltanu, teff)
         self.mass = result
@@ -672,9 +672,9 @@ class Seismology(object):
                 warnings.warn("Using value for effective temperature from the Kepler Input Catalogue."
                         "These temperatue values may sometimes differ significantly from modern estimates.",
                         LightkurveWarning)
-                continue
+                pass
         else:
-            continue
+            pass
         result = stellar_estimators.estimate_logg(numax, teff)
         self.logg = result
         return result
