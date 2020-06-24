@@ -1213,20 +1213,22 @@ class LightCurve(TimeSeries):
                 xlabel = 'Time'
         # Default ylabel
         if ylabel is None:
-            if normalize or (self.flux.unit == u.dimensionless_unscaled):
-                ylabel = 'Normalized Flux'
-            elif self.flux.unit is None:
-                ylabel = 'Flux'
+            if column in ['flux','sap_flux','sap_bkg','pdscap_flux']:
+                if normalize or (self.flux.unit == u.dimensionless_unscaled):
+                    ylabel = 'Normalized Flux'
+                elif self.flux.unit is None:
+                    ylabel = 'Flux'
+                else:
+                    ylabel = 'Flux [{}]'.format(self.flux.unit.to_string("latex_inline"))
             else:
-                ylabel = 'Flux [{}]'.format(self.flux.unit.to_string("latex_inline"))
+                ylabel = '{} [{}]'.format(column, self['column'].unit.to_string("latex_inline"))
         # Default legend label
         if ('label' not in kwargs):
             kwargs['label'] = self.meta.get('label')
-
         # Create a copy with the appropriate flux and flux_err columns
         lc_plot = self.copy()
         lc_plot.flux = lc_plot[column]
-
+        # Check if column has associated uncertainties
         if column in ['flux','sap_flux','sap_bkg','pdscap_flux',
                         'psf_centr1','psf_centr2','mom_centr1','mom_centr2']:
             lc_plot.flux_err = lc_plot['{}_err'.format(column)]
@@ -1260,7 +1262,7 @@ class LightCurve(TimeSeries):
                 if errors:
                     ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
                 elif errors == False:
-                    raise ValueError("The column {} has no associated errors".format(column))
+                    raise ValueError("The column `{}` has no associated errors.".format(column))
             else:
                 ax.plot(self.time.value, flux.value, **kwargs)
             ax.set_xlabel(xlabel)
