@@ -176,7 +176,7 @@ def test_lightcurve_fold():
     assert lc.meta['ccd'] == fold.meta['ccd']
     assert_array_equal(np.sort(fold.time_original), lc.time)
     assert len(fold.time_original) == len(lc.time)
-    fold = lc.fold(period=1, t0=-0.1)
+    fold = lc.fold(period=1, epoch_time=-0.1)
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
@@ -323,10 +323,10 @@ def test_custom_lightcurve_file(path, mission):
 
     # TESS has QUALITY while Kepler/K2 has SAP_QUALITY:
     if mission == "TESS":
-        assert "QUALITY" in lc.hdu[1].columns.names
+        assert "QUALITY" in hdu[1].columns.names
         assert_array_equal(lc.quality, hdu[1].data['QUALITY'])
     if mission in ["K2", "Kepler"]:
-        assert "SAP_QUALITY" in lc.hdu[1].columns.names
+        assert "SAP_QUALITY" in hdu[1].columns.names
         assert_array_equal(lc.quality, hdu[1].data['SAP_QUALITY'])
 
 
@@ -625,9 +625,9 @@ def test_to_fits():
 
 
 def test_astropy_time_bkjd():
-    """Does `LightCurve.astropy_time` support bkjd?"""
+    """Does `KeplerLightCurve` support bkjd?"""
     bkjd = np.array([100, 200])
-    lc = LightCurve(time=[100, 200], time_format='bkjd')
+    lc = KeplerLightCurve(time=[100, 200])
     assert_allclose(lc.time.jd, bkjd + 2454833.)
 
 
@@ -839,20 +839,6 @@ def test_regression_346():
         KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.remove_nans().to_corrector().correct().estimate_cdpp()
 
 
-def test_to_timeseries():
-    """Test the `LightCurve.to_timeseries()` method."""
-    time, flux, flux_err = np.arange(3)+2457576.4, np.ones(3), np.ones(3)*0.01
-    lc = LightCurve(time=time, flux=flux, flux_err=flux_err, time_format="jd")
-    try:
-        ts = lc.to_timeseries()
-        assert_allclose(ts['time'].value, time)
-        assert_allclose(ts['flux'], flux)
-        assert_allclose(ts['flux_err'], flux_err)
-    except ImportError:
-        # Requires AstroPy v3.2 or later
-        pass
-
-
 def test_flux_unit():
     """Checks the use of lc.flux_unit and lc.flux_quantity."""
     with warnings.catch_warnings():  # We deprecated `flux_unit` in v2.0
@@ -882,20 +868,20 @@ def test_flux_unit():
 def test_astropy_time_initialization():
     """Does the `LightCurve` constructor accept Astropy time objects?"""
     time = [1, 2, 3]
-    lc = LightCurve(time=Time(time, format='jd', scale='utc'))
-    assert lc.time_format == 'jd'
-    assert lc.time_scale == 'utc'
+    lc = LightCurve(time=Time(2.454e6+np.array(time), format='jd', scale='utc'))
+    assert lc.time.format == 'jd'
+    assert lc.time.scale == 'utc'
     with warnings.catch_warnings():  # we deprecated `astropy_time` in v2.0
         warnings.simplefilter("ignore", LightkurveDeprecationWarning)
         assert lc.astropy_time.format == 'jd'
         assert lc.astropy_time.scale == 'utc'
-    lc = LightCurve(time=time, time_format='jd', time_scale='utc')
-    assert lc.time_format == 'jd'
-    assert lc.time_scale == 'utc'
+    lc = LightCurve(time=time, time_format='bkjd', time_scale='tdb')
+    assert lc.time.format == 'bkjd'
+    assert lc.time.scale == 'tdb'
     with warnings.catch_warnings():  # we deprecated `astropy_time` in v2.0
         warnings.simplefilter("ignore", LightkurveDeprecationWarning)
-        assert lc.astropy_time.format == 'jd'
-        assert lc.astropy_time.scale == 'utc'
+        assert lc.astropy_time.format == 'bkjd'
+        assert lc.astropy_time.scale == 'tdb'
 
 
 def test_normalize_unit():

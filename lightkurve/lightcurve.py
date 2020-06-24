@@ -1081,8 +1081,11 @@ class LightCurve(TimeSeries):
 
         detrended_lc = self.flatten(window_length=savgol_window,
                                     polyorder=savgol_polyorder)
-        cleaned_lc = detrended_lc.remove_outliers(sigma=sigma).normalize("ppm")
-        mean = running_mean(data=cleaned_lc.flux, window_size=transit_duration)
+        cleaned_lc = detrended_lc.remove_outliers(sigma=sigma)
+        with warnings.catch_warnings():  # ignore "already normalized" message
+            warnings.filterwarnings("ignore", message="already")
+            normalized_lc = cleaned_lc.normalize("ppm")
+        mean = running_mean(data=normalized_lc.flux, window_size=transit_duration)
         return np.std(mean)
 
     def query_solar_system_objects(self, cadence_mask='outliers', radius=None,
