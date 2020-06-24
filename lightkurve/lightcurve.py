@@ -1223,7 +1223,7 @@ class LightCurve(TimeSeries):
             else:
                 if normalize:
                     ylabel = 'Normalized {}'.format(column)
-                elif self['column'].unit is None:
+                elif self[column].unit is None:
                     ylabel = '{}'.format(column)
                 else:
                     ylabel = 'Normalized {} [{}]'.format(column, self[column].unit.to_string("latex_inline"))
