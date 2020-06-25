@@ -302,3 +302,15 @@ def test_indexerror_631():
     # This previously triggered an exception:
     result = search_lightcurvefile("KIC 8462852", sector=15)
     assert len(result) == 1
+
+
+@pytest.mark.remote_data
+def test_name_resolving_regression_764():
+    """Due to a bug, MAST resolved "EPIC250105131" to a different position than
+    "EPIC 250105131". This regression test helps us verify that the bug does
+    not re-appear. Details: https://github.com/KeplerGO/lightkurve/issues/764
+    """
+    from astroquery.mast import MastClass
+    c1 = MastClass().resolve_object(objectname="EPIC250105131")
+    c2 = MastClass().resolve_object(objectname="EPIC 250105131")
+    assert c1 == c2
