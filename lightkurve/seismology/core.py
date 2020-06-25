@@ -604,7 +604,7 @@ class Seismology(object):
         deltanu = self._validate_deltanu(deltanu)
         if teff is None:
             teff = self.periodogram.meta.get('teff')
-            if teff == None:
+            if teff is None:
                 raise ValueError("No effective temperature in metadata."
                                 "Please include effective temperature in function call.")
             else:
