@@ -605,8 +605,8 @@ class Seismology(object):
         if teff is None:
             teff = self.periodogram.meta.get('teff')
             if teff is None:
-                raise ValueError("No effective temperature in metadata."
-                                "Please include effective temperature in function call.")
+                raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
+                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
             else:
                 warnings.warn("Using value for effective temperature from the Kepler Input Catalogue."
                         "These temperatue values may sometimes differ significantly from modern estimates.",
@@ -636,8 +636,8 @@ class Seismology(object):
         if teff == None:
             teff = self.periodogram.meta.get('teff')
             if teff == None:
-                raise ValueError("No effective temperature in metadata."
-                                "Please include effective temperature in function call.")
+                raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
+                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
             else:
                 warnings.warn("Using value for effective temperature from the Kepler Input Catalogue."
                         "These temperatue values may sometimes differ significantly from modern estimates.",
@@ -666,8 +666,8 @@ class Seismology(object):
         if teff == None:
             teff = self.periodogram.meta.get('teff')
             if teff == None:
-                raise ValueError("No effective temperature in metadata."
-                                "Please include effective temperature in function call.")
+                raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
+                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
             else:
                 warnings.warn("Using value for effective temperature from the Kepler Input Catalogue."
                         "These temperatue values may sometimes differ significantly from modern estimates.",
