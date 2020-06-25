@@ -665,7 +665,7 @@ class Seismology(object):
         numax = self._validate_numax(numax)
         if teff is None:
             teff = self.periodogram.meta.get('teff')
-            if teff == None:
+            if teff is None:
                 raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
                         "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
             else:
