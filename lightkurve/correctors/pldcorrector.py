@@ -130,8 +130,9 @@ class PLDCorrector(RegressionCorrector):
         simple_bkg -= np.percentile(simple_bkg, 5)
 
         # Background-corrected pixel time series
-        pixels = (self.tpf.flux.transpose([1, 2, 0]) - simple_bkg
-                    ).transpose([2, 0, 1])[:, background_mask]
+        regressors = self.tpf.flux.reshape(len(self.tpf.flux), -1) - simple_bkg
+        regressors = np.array([r[np.isfinite(r)] for r in regressors])
+        pixels = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
 
         # make sure no columns have nans
         nanmask = np.isfinite(pixels)
@@ -288,11 +289,9 @@ class PLDCorrector(RegressionCorrector):
             high_order_dm.prior_sigma = prior_sigma
 
             new_dms.append(high_order_dm)
-            print(high_order_dm)
 
         pld_dm = DesignMatrixCollection(new_dms).to_designmatrix(name='pixel_series')
         all_dms.insert(0, pld_dm)
-        print(all_dms)
 
         return DesignMatrixCollection(all_dms)
 
@@ -349,19 +348,18 @@ class KeplerPLDCorrector(PLDCorrector):
         regressors = self.tpf.flux.reshape(len(self.tpf.flux), -1)
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
         regressors = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
-        regressors = np.append(regressors, np.ones(len(regressors)).reshape(-1,1), axis=-1)
 
         pld_1 = DesignMatrix(regressors).pca(pixel_components)
 
         all_dms = [pld_1]
         for i in range(2, pld_order+1):
             reg_n = np.product(list(multichoose(pld_1.values.T, i)), axis=1).T
-            pld_n = DesignMatrix(reg_n)
+            pld_n = DesignMatrix(reg_n).pca(pixel_components)
             all_dms.append(pld_n)
 
         full_dm = DesignMatrixCollection(all_dms).to_designmatrix(name=f'PLD (order={pld_order})')
 
-        return DesignMatrixCollection([full_dm.append_constant()])
+        return DesignMatrixCollection([full_dm])
 
 
     def correct(self, dm=None, pld_order=2, pixel_components=15, spline_n_knots=100, spline_degree=3,
