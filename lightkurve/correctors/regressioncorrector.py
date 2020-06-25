@@ -102,6 +102,7 @@ class RegressionCorrector(Corrector):
         self.corrected_lc = None
         self.model_lc = None
         self.diagnostic_lightcurves = None
+        self.gp = None
 
     def __repr__(self):
         return 'RegressionCorrector (ID: {})'.format(self.lc.targetid)
@@ -154,6 +155,7 @@ class RegressionCorrector(Corrector):
                 # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
                 B = np.dot(X.T, self.lc.flux.value[cadence_mask] / flux_err**2)
             else:
+                self.gp = covariance_gp
                 # compute GP
                 covariance_gp.compute(self.lc.time.value[cadence_mask],
                                       self.lc.flux_err.value[cadence_mask])
@@ -288,6 +290,14 @@ class RegressionCorrector(Corrector):
             model_flux_err = u.Quantity(np.zeros(len(model_flux)), unit=self.lc.flux.unit)
             lcs[submatrix.name] = LightCurve(time=self.lc.time, flux=model_flux,
                                              flux_err=model_flux_err, label=submatrix.name)
+            # include GP if one was used
+            if self.gp is not None:
+                gp_flux = u.Quantity(self.gp.predict(self.corrected_lc.flux.value)[0], unit=self.lc.flux.unit)
+                gp_flux_err = u.Quantity([np.nan]*self.lc.flux_err.value, unit=self.lc.flux.unit)
+                lcs['gaussian_process'] = LightCurve(time=self.lc.time,
+                                                     flux=gp_flux,
+                                                     flux_err=gp_flux_err,
+                                                     label='gaussian_process')
         return lcs
 
     def _diagnostic_plot(self):

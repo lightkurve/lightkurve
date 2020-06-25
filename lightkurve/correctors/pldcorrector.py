@@ -107,7 +107,7 @@ class PLDCorrector(RegressionCorrector):
     def X(self):
         return self.dm
 
-    def create_design_matrix(self, background_mask=None, pld_order=1, n_pca_terms=6,
+    def create_design_matrix(self, background_mask=None, pld_order=1, n_pca_terms=6, use_gp=False,
                              pixel_components=3, spline_n_knots=100, spline_degree=3, sparse=False):
         """Returns a `DesignMatrixCollection`."""
 
@@ -129,26 +129,31 @@ class PLDCorrector(RegressionCorrector):
         simple_bkg = np.nanmedian(simple_bkg[:, background_mask], axis=1)
         simple_bkg -= np.percentile(simple_bkg, 5)
 
-        # Background-corrected pixel time series
-        regressors = self.tpf.flux.reshape(len(self.tpf.flux), -1) - simple_bkg
+        # Flux-normalzied pixel time series
+        regressors = self.tpf.flux.reshape(len(self.tpf.flux), -1)
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
-        pixels = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
+        regressors = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
 
-        # make sure no columns have nans
-        nanmask = np.isfinite(pixels)
-        zipped = zip(pixels, nanmask)
-        pixels = np.array([p[n] for p,n in zipped])
+        pld_1 = DesignMatrix(regressors).pca(pixel_components)
 
-        dm_pixels = DesignMatrix(pixels, name='pixel_series').pca(pixel_components)
+        all_pld = [pld_1]
+        for i in range(2, pld_order+1):
+            reg_n = np.product(list(multichoose(pld_1.values.T, i)), axis=1).T
+            pld_n = DesignMatrix(reg_n).pca(pixel_components)
+            all_pld.append(pld_n)
+
+        dm_pixels = DesignMatrixCollection(all_pld).to_designmatrix(name='pixel_series')
         dm_bkg = DesignMatrix(simple_bkg, name='background_model')
-        dm_spline = spline(self.lc.time.value, n_knots=spline_n_knots,
-                             degree=spline_degree).append_constant()
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            dm = DMC([dm_pixels, dm_bkg, dm_spline])
-
-        if pld_order > 1:
-            dm = self._create_higher_order_matrix(dm, order=pld_order, n_pca_terms=n_pca_terms)
+        if use_gp:
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                dm = DMC([dm_pixels, dm_bkg])
+        else:
+            dm_spline = spline(self.lc.time.value, n_knots=spline_n_knots,
+                                 degree=spline_degree).append_constant()
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                dm = DMC([dm_pixels, dm_bkg, dm_spline])
 
         self.dm = dm
         return dm
@@ -185,7 +190,7 @@ class PLDCorrector(RegressionCorrector):
                                            sparse=sparse)
 
         if use_gp:
-            covariance_gp = self._get_gp(dm)
+            covariance_gp = self._get_gp(dm['pixel_series'])
             # exclude spline if using GP?
             dm = DesignMatrixCollection([X for X in dm if X.name != 'spline'])
             clc = super(PLDCorrector, self).correct(dm, covariance_gp=covariance_gp, **kwargs)
@@ -233,6 +238,8 @@ class PLDCorrector(RegressionCorrector):
         if not hasattr(self, 'corrected_lc'):
             raise ValueError('Please call the `correct()` method before trying to diagnose.')
 
+        names = self.diagnostic_lightcurves.keys()
+
         with plt.style.context(MPLSTYLE):
             _, axs = plt.subplots(3, figsize=(10, 9), sharex=True)
             ax = axs[0]
@@ -243,13 +250,14 @@ class PLDCorrector(RegressionCorrector):
 
             ax = axs[1]
             self.corrected_lc.plot(ax=ax, normalize=False, label='corrected', alpha=0.4)
-            for key in ['pixel_series', 'spline']:
-                (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
+            for key in names:
+                if key in ['pixel_series', 'spline', 'gaussian_process']:
+                    (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
             ax.set_xlabel('')
 
             ax = axs[2]
             self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
-            self.corrected_lc.scatter(normalize=False, c='r', marker='x',
+            self.corrected_lc[~self.cadence_mask].scatter(normalize=False, c='r', marker='x',
                                       s=10, label='Outliers', ax=ax)
             self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
@@ -325,7 +333,9 @@ class TessPLDCorrector(PLDCorrector):
             background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
         self.background_mask = background_mask
 
-        dm = self._create_design_matrix(background_mask=background_mask,
+        dm = self._create_design_matrix(pld_order=pld_order,
+                                        use_gp=use_gp,
+                                        background_mask=background_mask,
                                         pixel_components=pixel_components,
                                         spline_n_knots=spline_n_knots,
                                         spline_degree=spline_degree,
@@ -342,24 +352,6 @@ class KeplerPLDCorrector(PLDCorrector):
     def __init__(self, tpf):
 
         super(KeplerPLDCorrector, self).__init__(tpf)
-
-    def create_design_matrix(self, pld_order=2, pixel_components=15):
-        """ """
-        regressors = self.tpf.flux.reshape(len(self.tpf.flux), -1)
-        regressors = np.array([r[np.isfinite(r)] for r in regressors])
-        regressors = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
-
-        pld_1 = DesignMatrix(regressors).pca(pixel_components)
-
-        all_dms = [pld_1]
-        for i in range(2, pld_order+1):
-            reg_n = np.product(list(multichoose(pld_1.values.T, i)), axis=1).T
-            pld_n = DesignMatrix(reg_n).pca(pixel_components)
-            all_dms.append(pld_n)
-
-        full_dm = DesignMatrixCollection(all_dms).to_designmatrix(name=f'PLD (order={pld_order})')
-
-        return DesignMatrixCollection([full_dm])
 
 
     def correct(self, dm=None, pld_order=2, pixel_components=15, spline_n_knots=100, spline_degree=3,
@@ -384,8 +376,15 @@ class KeplerPLDCorrector(PLDCorrector):
             background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
         self.background_mask = background_mask
 
-        dm = self.create_design_matrix(pld_order=pld_order, pixel_components=pixel_components)
-        self.dm = dm
+        if dm is None:
+            dm = self.create_design_matrix(pld_order=pld_order,
+                                           use_gp=use_gp,
+                                           background_mask=background_mask,
+                                           pixel_components=pixel_components,
+                                           spline_n_knots=spline_n_knots,
+                                           spline_degree=spline_degree,
+                                           sparse=sparse)
+
         clc = super(KeplerPLDCorrector, self).correct(dm=dm, use_gp=use_gp, **kwargs)
 
         return clc
