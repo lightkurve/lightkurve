@@ -112,7 +112,8 @@ class RegressionCorrector(Corrector):
         return self.design_matrix_collection
 
     def _fit_coefficients(self, cadence_mask=None, prior_mu=None,
-                          prior_sigma=None, propagate_errors=False):
+                          prior_sigma=None, propagate_errors=False,
+                          covariance_gp=None):
         """Fit the linear regression coefficients.
 
         This function will solve a linear regression with Gaussian priors
@@ -136,21 +137,30 @@ class RegressionCorrector(Corrector):
 
         # Default cadence mask
         if cadence_mask is None:
-            cadence_mask = np.ones(len(self.lc.flux), bool)
+            cadence_mask = np.ones(len(self.lc.flux.value), bool)
 
         # If flux errors are not all finite numbers, then default to array of ones
-        if np.all(~np.isfinite(self.lc.flux_err)):
+        if np.all(~np.isfinite(self.lc.flux_err.value)):
             flux_err = np.ones(cadence_mask.sum())
         else:
-            flux_err = self.lc.flux_err[cadence_mask]
+            flux_err = self.lc.flux_err.value[cadence_mask]
 
         # Retrieve the design matrix (X) as a numpy array
         X = self.dmc.X[cadence_mask]
         if isinstance(X, np.ndarray):
-            # Compute `X^T cov^-1 X + 1/prior_sigma^2`
-            sigma_w_inv = X.T.dot(X / flux_err[:, None]**2)
-            # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
-            B = np.dot(X.T, self.lc.flux[cadence_mask] / flux_err**2)
+            if covariance_gp is None:
+                # Compute `X^T cov^-1 X + 1/prior_sigma^2`
+                sigma_w_inv = X.T.dot(X / flux_err[:, None]**2)
+                # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
+                B = np.dot(X.T, self.lc.flux.value[cadence_mask] / flux_err**2)
+            else:
+                # compute GP
+                covariance_gp.compute(self.lc.time.value[cadence_mask],
+                                      self.lc.flux_err.value[cadence_mask])
+                # X^T cov^-1 X
+                sigma_w_inv = np.dot(X.T, covariance_gp.apply_inverse(X))
+                # X^T cov^-1 y
+                B = np.dot(X.T, covariance_gp.apply_inverse(self.lc.flux.value[cadence_mask])[:,0])
 
         elif issparse(X):
             sigma_f_inv = csr_matrix(1/flux_err[:, None]**2)
@@ -175,7 +185,7 @@ class RegressionCorrector(Corrector):
         return w, w_err
 
     def correct(self, design_matrix_collection, cadence_mask=None, sigma=5,
-                niters=5, propagate_errors=False):
+                niters=5, propagate_errors=False, covariance_gp=None):
         """Find the best fit correction for the light curve.
 
         Parameters
@@ -222,7 +232,8 @@ class RegressionCorrector(Corrector):
                 self._fit_coefficients(cadence_mask=cadence_mask & clean_cadences,
                                        prior_mu=self.dmc.prior_mu,
                                        prior_sigma=self.dmc.prior_sigma,
-                                       propagate_errors=propagate_errors)
+                                       propagate_errors=propagate_errors,
+                                       covariance_gp=covariance_gp)
             model = np.ma.masked_array(data=self.dmc.X.dot(coefficients),
                                        mask=~(cadence_mask & clean_cadences))
             model = u.Quantity(model, unit=self.lc.flux.unit)
