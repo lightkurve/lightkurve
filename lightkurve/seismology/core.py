@@ -663,7 +663,7 @@ class Seismology(object):
             Stellar surface gravity estimate.
         """
         numax = self._validate_numax(numax)
-        if teff == None:
+        if teff is None:
             teff = self.periodogram.meta.get('teff')
             if teff == None:
                 raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
