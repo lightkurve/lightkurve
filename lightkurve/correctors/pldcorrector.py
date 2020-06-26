@@ -173,9 +173,9 @@ class PLDCorrector(RegressionCorrector):
         self.dm = dm
         return dm
 
-    def correct(self, dm=None, pld_order=1, pixel_components=3, spline_n_knots=100, spline_degree=3,
-                n_pca_terms=10, background_mask=None, restore_trend=True, sparse=False,
-                use_gp=False, **kwargs):
+    def correct(self, dm=None, pld_order=1, background_mask=None, pixel_components=3,
+                use_gp=False, gp_timescale=30, spline_n_knots=100, spline_degree=3,
+                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
         Parameters
         ----------
@@ -206,7 +206,7 @@ class PLDCorrector(RegressionCorrector):
                                            sparse=sparse)
 
         if use_gp:
-            covariance_gp = self._get_gp(dm['pixel_series'])
+            covariance_gp = self._get_gp(dm['pixel_series'], gp_timescale=gp_timescale)
             # exclude spline if using GP?
             dm = DesignMatrixCollection([X for X in dm if X.name != 'spline'])
             clc = super(PLDCorrector, self).correct(dm, covariance_gp=covariance_gp, **kwargs)
@@ -280,46 +280,6 @@ class PLDCorrector(RegressionCorrector):
             self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
 
-    def _create_higher_order_matrix(self, dm, order=2, n_pca_terms=None, prior_mu=0,
-                                    prior_sigma=np.inf):
-        """Calculate products of columns in `DesignMatrix` and create a new
-        `DesignMatrix` for each order of products. Returns a
-        `DesignMatrixCollection` with one entry per order.
-
-        Returns
-        -------
-        `.DesignMatrixCollection`
-            Design matrix collection with products of columns appended as new columns.
-        """
-        # higher order design matrices
-        all_dms = [X for X in dm if X.name != 'pixel_series']
-        new_dms = [dm['pixel_series']]
-        for i in range(2, order+1):
-            regressors = np.product(list(multichoose(dm['pixel_series'].values.T, order)), axis=1).T
-
-            # make high order design matrix
-            high_order_dm = DesignMatrix(regressors, name=f'PLD Order {i}')
-
-            # apply PCA
-            if n_pca_terms is not None:
-                high_order_dm = high_order_dm.pca(n_pca_terms)
-            else:
-                n_pca_terms = high_order_dm.X.shape[1]
-
-            if isinstance(prior_mu, (int, float)):
-                prior_mu = prior_mu * np.ones(n_pca_terms)
-            if isinstance(prior_sigma, (int, float)):
-                prior_sigma = prior_sigma * np.ones(n_pca_terms)
-
-            high_order_dm.prior_mu = prior_mu
-            high_order_dm.prior_sigma = prior_sigma
-
-            new_dms.append(high_order_dm)
-
-        pld_dm = DesignMatrixCollection(new_dms).to_designmatrix(name='pixel_series')
-        all_dms.insert(0, pld_dm)
-
-        return DesignMatrixCollection(all_dms)
 
 class TessPLDCorrector(PLDCorrector):
     """Correct TESS light curves by detrending against local pixel time series.
@@ -337,9 +297,9 @@ class TessPLDCorrector(PLDCorrector):
     def __init__(self, tpf):
         super(TessPLDCorrector, self).__init__(tpf)
 
-    def correct(self, dm=None, pld_order=1, use_gp=False, pixel_components=3,
-                spline_n_knots=100, spline_degree=3, background_mask=None,
-                restore_trend=True, sparse=False, **kwargs):
+    def correct(self, dm=None, pld_order=1, background_mask=None, pixel_components=3,
+                use_gp=False, gp_timescale=30, spline_n_knots=100, spline_degree=3,
+                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -355,23 +315,22 @@ class TessPLDCorrector(PLDCorrector):
         restore_trend : bool
             Whether to restore the long term spline trend to the light curve.
         """
-        if background_mask is None:
-            # Default to pixels <1-sigma above the background
-            background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
-        self.background_mask = background_mask
 
-        if dm is None:
-            dm = self.create_design_matrix(pld_order=pld_order,
-                                           use_gp=use_gp,
-                                           background_mask=background_mask,
-                                           pixel_components=pixel_components,
-                                           spline_n_knots=spline_n_knots,
-                                           spline_degree=spline_degree,
-                                           sparse=sparse)
-        clc = super(TessPLDCorrector, self).correct(dm, restore_trend=restore_trend,
-                                                    use_gp=use_gp, **kwargs)
+        clc = super(TessPLDCorrector, self).correct(dm=dm,
+                                                    pld_order=pld_order,
+                                                    background_mask=background_mask,
+                                                    pixel_components=pixel_components,
+                                                    use_gp=use_gp,
+                                                    gp_timescale=gp_timescale,
+                                                    spline_n_knots=spline_n_knots,
+                                                    spline_degree=spline_degree,
+                                                    n_pca_terms=n_pca_terms,
+                                                    restore_trend=restore_trend,
+                                                    sparse=sparse,
+                                                    **kwargs)
 
         return clc
+
 
 class KeplerPLDCorrector(PLDCorrector):
     """Correct Kepler light curves by detrending against local pixel time series.
@@ -389,9 +348,9 @@ class KeplerPLDCorrector(PLDCorrector):
     def __init__(self, tpf):
         super(KeplerPLDCorrector, self).__init__(tpf)
 
-    def correct(self, dm=None, pld_order=2, use_gp=True, pixel_components=15,
-                spline_n_knots=100, spline_degree=3, background_mask=None,
-                restore_trend=True, sparse=False, **kwargs):
+    def correct(self, dm=None, pld_order=2, background_mask=None, pixel_components=15,
+                use_gp=True, gp_timescale=30, spline_n_knots=100, spline_degree=3,
+                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -407,21 +366,18 @@ class KeplerPLDCorrector(PLDCorrector):
         restore_trend : bool
             Whether to restore the long term spline trend to the light curve.
         """
-        if background_mask is None:
-            # Default to pixels <1-sigma above the background
-            background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
-        self.background_mask = background_mask
 
-        if dm is None:
-            dm = self.create_design_matrix(pld_order=pld_order,
-                                           use_gp=use_gp,
-                                           background_mask=background_mask,
-                                           pixel_components=pixel_components,
-                                           spline_n_knots=spline_n_knots,
-                                           spline_degree=spline_degree,
-                                           sparse=sparse)
-
-        clc = super(KeplerPLDCorrector, self).correct(dm=dm, restore_trend=restore_trend,
-                                                      use_gp=use_gp, **kwargs)
+        clc = super(KeplerPLDCorrector, self).correct(dm=dm,
+                                                      pld_order=pld_order,
+                                                      background_mask=background_mask,
+                                                      pixel_components=pixel_components,
+                                                      use_gp=use_gp,
+                                                      gp_timescale=gp_timescale,
+                                                      spline_n_knots=spline_n_knots,
+                                                      spline_degree=spline_degree,
+                                                      n_pca_terms=n_pca_terms,
+                                                      restore_trend=restore_trend,
+                                                      sparse=sparse,
+                                                      **kwargs)
 
         return clc
