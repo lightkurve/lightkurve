@@ -313,4 +313,4 @@ def test_name_resolving_regression_764():
     from astroquery.mast import MastClass
     c1 = MastClass().resolve_object(objectname="EPIC250105131")
     c2 = MastClass().resolve_object(objectname="EPIC 250105131")
-    assert c1 == c2
+    assert c1.separation(c2).to("arcsec").value < 0.1
