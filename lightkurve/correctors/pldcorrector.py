@@ -190,6 +190,7 @@ class PLDCorrector(RegressionCorrector):
             dm = self.create_design_matrix(background_mask=background_mask,
                                            pld_order=pld_order,
                                            n_pca_terms=n_pca_terms,
+                                           use_gp=use_gp,
                                            pixel_components=pixel_components,
                                            spline_n_knots=spline_n_knots,
                                            spline_degree=spline_degree,
@@ -200,6 +201,8 @@ class PLDCorrector(RegressionCorrector):
             # exclude spline if using GP?
             dm = DesignMatrixCollection([X for X in dm if X.name != 'spline'])
             clc = super(PLDCorrector, self).correct(dm, covariance_gp=covariance_gp, **kwargs)
+            if not restore_trend:
+                clc -= self.diagnostic_lightcurves['gaussian_process']
         else:
             clc = super(PLDCorrector, self).correct(dm, covariance_gp=None, **kwargs)
             if restore_trend:
@@ -317,8 +320,9 @@ class TessPLDCorrector(PLDCorrector):
 
         super(TessPLDCorrector, self).__init__(tpf)
 
-    def correct(self, pixel_components=3, spline_n_knots=100, spline_degree=3,
-                background_mask=None, restore_trend=True, sparse=False, **kwargs):
+    def correct(self, dm=None, pld_order=1, use_gp=False, pixel_components=3,
+                spline_n_knots=100, spline_degree=3, background_mask=None,
+                restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -339,16 +343,17 @@ class TessPLDCorrector(PLDCorrector):
             background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
         self.background_mask = background_mask
 
-        dm = self._create_design_matrix(pld_order=pld_order,
-                                        use_gp=use_gp,
-                                        background_mask=background_mask,
-                                        pixel_components=pixel_components,
-                                        spline_n_knots=spline_n_knots,
-                                        spline_degree=spline_degree,
-                                        sparse=sparse)
-        clc = super(TessPLDCorrector, self).correct(dm, **kwargs)
-        if restore_trend:
-            clc += self.diagnostic_lightcurves['spline']
+        if dm is None:
+            dm = self.create_design_matrix(pld_order=pld_order,
+                                           use_gp=use_gp,
+                                           background_mask=background_mask,
+                                           pixel_components=pixel_components,
+                                           spline_n_knots=spline_n_knots,
+                                           spline_degree=spline_degree,
+                                           sparse=sparse)
+        clc = super(TessPLDCorrector, self).correct(dm, restore_trend=restore_trend,
+                                                    use_gp=use_gp, **kwargs)
+
         return clc
 
 class KeplerPLDCorrector(PLDCorrector):
@@ -360,8 +365,9 @@ class KeplerPLDCorrector(PLDCorrector):
         super(KeplerPLDCorrector, self).__init__(tpf)
 
 
-    def correct(self, dm=None, pld_order=2, pixel_components=15, spline_n_knots=100, spline_degree=3,
-                background_mask=None, restore_trend=True, sparse=False, use_gp=True, **kwargs):
+    def correct(self, dm=None, pld_order=2, use_gp=True, pixel_components=15,
+                spline_n_knots=100, spline_degree=3, background_mask=None,
+                restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -391,6 +397,7 @@ class KeplerPLDCorrector(PLDCorrector):
                                            spline_degree=spline_degree,
                                            sparse=sparse)
 
-        clc = super(KeplerPLDCorrector, self).correct(dm=dm, use_gp=use_gp, **kwargs)
+        clc = super(KeplerPLDCorrector, self).correct(dm=dm, restore_trend=restore_trend,
+                                                      use_gp=use_gp, **kwargs)
 
         return clc
