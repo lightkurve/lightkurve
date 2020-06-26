@@ -292,9 +292,10 @@ class RegressionCorrector(Corrector):
                                              flux_err=model_flux_err, label=submatrix.name)
             # include GP if one was used
             if self.gp is not None:
-                gp_flux = u.Quantity(self.gp.predict(self.corrected_lc.flux.value)[0], unit=self.lc.flux.unit)
-                gp_flux_err = u.Quantity([np.nan]*self.lc.flux_err.value, unit=self.lc.flux.unit)
-                lcs['gaussian_process'] = LightCurve(time=self.lc.time,
+                gp_flux = u.Quantity(self.gp.predict(self.corrected_lc[self.cadence_mask].flux.value)[0],
+                                                     unit=self.lc.flux.unit)
+                gp_flux_err = u.Quantity([np.nan]*self.lc.flux_err[self.cadence_mask].value, unit=self.lc.flux.unit)
+                lcs['gaussian_process'] = LightCurve(time=self.lc.time[self.cadence_mask],
                                                      flux=gp_flux,
                                                      flux_err=gp_flux_err,
                                                      label='gaussian_process')
