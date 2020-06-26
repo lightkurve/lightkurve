@@ -134,12 +134,18 @@ class PLDCorrector(RegressionCorrector):
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
         regressors = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
 
-        pld_1 = DesignMatrix(regressors).pca(pixel_components)
+        # Create first order design matrix
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            pld_1 = DesignMatrix(regressors).pca(pixel_components)
 
+        # Create higher order matrix
         all_pld = [pld_1]
         for i in range(2, pld_order+1):
             reg_n = np.product(list(multichoose(pld_1.values.T, i)), axis=1).T
-            pld_n = DesignMatrix(reg_n).pca(pixel_components)
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                pld_n = DesignMatrix(reg_n).pca(pixel_components)
             all_pld.append(pld_n)
 
         dm_pixels = DesignMatrixCollection(all_pld).to_designmatrix(name='pixel_series')
