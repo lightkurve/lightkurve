@@ -1629,7 +1629,7 @@ class LightCurve(TimeSeries):
                 extra_data = {}
             cols = []
             if ~np.asarray(['TIME' in k.upper() for k in extra_data.keys()]).any():
-                cols.append(fits.Column(name='TIME', format='D', unit=self.time_format,
+                cols.append(fits.Column(name='TIME', format='D', unit=self.time.format,
                                         array=self.time.value))
             if ~np.asarray([flux_column_name in k.upper() for k in extra_data.keys()]).any():
                 cols.append(fits.Column(name=flux_column_name, format='E',
@@ -2056,12 +2056,8 @@ class KeplerLightCurve(LightCurve):
                                                     overwrite=overwrite,
                                                     **extra_data)
 
-        if ('quarter' in dir(self)) and (self.quarter is not None):
-            hdu[0].header['QUARTER'] = self.quarter
-        elif ('campaign' in dir(self)) and self.campaign is not None:
-            hdu[0].header['CAMPAIGN'] = self.campaign
-        else:
-            log.warning('Cannot find Campaign or Quarter number.')
+        hdu[0].header['QUARTER'] = self.meta.get('quarter')
+        hdu[0].header['CAMPAIGN'] = self.meta.get('campaign')
 
         hdu = _make_aperture_extension(hdu, aperture_mask)
 

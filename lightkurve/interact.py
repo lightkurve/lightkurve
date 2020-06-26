@@ -649,7 +649,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 frameno = tpf_index_lookup[new]
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
                     [tpf.flux[frameno, :, :] + pedestal]
-                vertical_line.update(location=tpf.time[frameno].value)
+                vertical_line.update(location=tpf.time[frameno])
             else:
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
                     [tpf.flux[0, :, :] * np.NaN]
