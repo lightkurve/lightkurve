@@ -22,35 +22,43 @@ __all__ = ['PLDCorrector', 'TessPLDCorrector', 'KeplerPLDCorrector']
 
 class PLDCorrector(RegressionCorrector):
     r"""Implements the Pixel Level Decorrelation (PLD) systematics removal method.
-        Pixel Level Decorrelation (PLD) was developed by [1]_ to remove
-        systematic noise caused by spacecraft jitter for the Spitzer
-        Space Telescope. It was adapted to K2 data by [2]_ and [3]_
-        for the EVEREST pipeline [4]_.
-        For a detailed description and implementation of PLD, please refer to
-        these references. Lightkurve provides a reference implementation
-        of PLD that is less sophisticated than EVEREST, but is suitable
-        for quick-look analyses and detrending experiments.
-        Our simple implementation of PLD is performed by first calculating the
-        noise model for each cadence in time. This function goes up to arbitrary
-        order, and is represented by
-        .. math::
-            m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...
-        where
-          - :math:`m_i` is the noise model at time :math:`t_i`
-          - :math:`f_{il}` is the flux in the :math:`l^\text{th}` pixel at time :math:`t_i`
-          - :math:`a_l` is the first-order PLD coefficient on the linear term
-          - :math:`b_{lm}` is the second-order PLD coefficient on the :math:`l^\text{th}`,
-            :math:`m^\text{th}` pixel pair
-        We perform Principal Component Analysis (PCA) to reduce the number of
-        vectors in our final model to limit the set to best capture instrumental
-        noise. With a PCA-reduced set of vectors, we can construct a design matrix
-        containing fractional pixel fluxes.
-        To solve for the PLD model, we need to minimize the difference squared
-        .. math::
-            \chi^2 = \sum_i \frac{(y_i - m_i)^2}{\sigma_i^2},
-        where :math:`y_i` is the observed flux value at time :math:`t_i`, by solving
-        .. math::
-            \frac{\partial \chi^2}{\partial a_l} = 0.
+
+    Special case of `.RegressionCorrector` where the `.DesignMatrix` is
+    composed of background-corrected pixel time series.
+
+    The design matrix also contains columns representing a spline in time
+    design to capture the intrinsic, long-term variability of the target.
+
+    Pixel Level Decorrelation (PLD) was developed by [1]_ to remove
+    systematic noise caused by spacecraft jitter for the Spitzer
+    Space Telescope. It was adapted to K2 data by [2]_ and [3]_
+    for the EVEREST pipeline [4]_.
+    For a detailed description and implementation of PLD, please refer to
+    these references. Lightkurve provides a reference implementation
+    of PLD that is less sophisticated than EVEREST, but is suitable
+    for quick-look analyses and detrending experiments.
+    Our simple implementation of PLD is performed by first calculating the
+    noise model for each cadence in time. This function goes up to arbitrary
+    order, and is represented by
+    .. math::
+        m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...
+    where
+      - :math:`m_i` is the noise model at time :math:`t_i`
+      - :math:`f_{il}` is the flux in the :math:`l^\text{th}` pixel at time :math:`t_i`
+      - :math:`a_l` is the first-order PLD coefficient on the linear term
+      - :math:`b_{lm}` is the second-order PLD coefficient on the :math:`l^\text{th}`,
+        :math:`m^\text{th}` pixel pair
+    We perform Principal Component Analysis (PCA) to reduce the number of
+    vectors in our final model to limit the set to best capture instrumental
+    noise. With a PCA-reduced set of vectors, we can construct a design matrix
+    containing fractional pixel fluxes.
+    To solve for the PLD model, we need to minimize the difference squared
+    .. math::
+        \chi^2 = \sum_i \frac{(y_i - m_i)^2}{\sigma_i^2},
+    where :math:`y_i` is the observed flux value at time :math:`t_i`, by solving
+    .. math::
+        \frac{\partial \chi^2}{\partial a_l} = 0.
+
     Examples
     --------
     Download the pixel data for GJ 9827 and obtain a PLD-corrected light curve:
@@ -61,6 +69,7 @@ class PLDCorrector(RegressionCorrector):
     >>> lc.plot() # doctest: +SKIP
     However, the above example will over-fit the small transits!
     It is necessary to mask the transits using `corrector.correct(cadence_mask=...)`.
+
     References
     ----------
     .. [1] Deming et al. (2015), ads:2015ApJ...805..132D.
@@ -313,11 +322,19 @@ class PLDCorrector(RegressionCorrector):
         return DesignMatrixCollection(all_dms)
 
 class TessPLDCorrector(PLDCorrector):
-    """
+    """Correct TESS light curves by detrending against local pixel time series.
+
+    Subclass of `.PLDCorrector`, a version of the `.RegressionCorrector` class
+    in which the `.DesignMatrix` is constructed from pixel time series.
+
+    Parameters
+    ----------
+    tpf : `.TargetPixelFile`
+        The target pixel from which a light curve and background model
+        will be extracted.
     """
 
     def __init__(self, tpf):
-
         super(TessPLDCorrector, self).__init__(tpf)
 
     def correct(self, dm=None, pld_order=1, use_gp=False, pixel_components=3,
@@ -357,13 +374,20 @@ class TessPLDCorrector(PLDCorrector):
         return clc
 
 class KeplerPLDCorrector(PLDCorrector):
-    """
+    """Correct Kepler light curves by detrending against local pixel time series.
+
+    Subclass of `.PLDCorrector`, a version of the `.RegressionCorrector` class
+    in which the `.DesignMatrix` is constructed from pixel time series.
+
+    Parameters
+    ----------
+    tpf : `.TargetPixelFile`
+        The target pixel from which a light curve and background model
+        will be extracted.
     """
 
     def __init__(self, tpf):
-
         super(KeplerPLDCorrector, self).__init__(tpf)
-
 
     def correct(self, dm=None, pld_order=2, use_gp=True, pixel_components=15,
                 spline_n_knots=100, spline_degree=3, background_mask=None,
