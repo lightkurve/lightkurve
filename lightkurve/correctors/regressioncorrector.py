@@ -102,7 +102,6 @@ class RegressionCorrector(Corrector):
         self.corrected_lc = None
         self.model_lc = None
         self.diagnostic_lightcurves = None
-        self.gp = None
 
     def __repr__(self):
         return 'RegressionCorrector (ID: {})'.format(self.lc.targetid)
@@ -113,8 +112,7 @@ class RegressionCorrector(Corrector):
         return self.design_matrix_collection
 
     def _fit_coefficients(self, cadence_mask=None, prior_mu=None,
-                          prior_sigma=None, propagate_errors=False,
-                          covariance_gp=None):
+                          prior_sigma=None, propagate_errors=False):
         """Fit the linear regression coefficients.
 
         This function will solve a linear regression with Gaussian priors
@@ -149,20 +147,10 @@ class RegressionCorrector(Corrector):
         # Retrieve the design matrix (X) as a numpy array
         X = self.dmc.X[cadence_mask]
         if isinstance(X, np.ndarray):
-            if covariance_gp is None:
-                # Compute `X^T cov^-1 X + 1/prior_sigma^2`
-                sigma_w_inv = X.T.dot(X / flux_err[:, None]**2)
-                # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
-                B = np.dot(X.T, self.lc.flux.value[cadence_mask] / flux_err**2)
-            else:
-                self.gp = covariance_gp
-                # compute GP
-                covariance_gp.compute(self.lc.time.value[cadence_mask],
-                                      self.lc.flux_err.value[cadence_mask])
-                # X^T cov^-1 X
-                sigma_w_inv = np.dot(X.T, covariance_gp.apply_inverse(X))
-                # X^T cov^-1 y
-                B = np.dot(X.T, covariance_gp.apply_inverse(self.lc.flux.value[cadence_mask])[:,0])
+            # Compute `X^T cov^-1 X + 1/prior_sigma^2`
+            sigma_w_inv = X.T.dot(X / flux_err[:, None]**2)
+            # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
+            B = np.dot(X.T, self.lc.flux.value[cadence_mask] / flux_err**2)
 
         elif issparse(X):
             sigma_f_inv = csr_matrix(1/flux_err[:, None]**2)
@@ -187,7 +175,7 @@ class RegressionCorrector(Corrector):
         return w, w_err
 
     def correct(self, design_matrix_collection, cadence_mask=None, sigma=5,
-                niters=5, propagate_errors=False, covariance_gp=None):
+                niters=5, propagate_errors=False):
         """Find the best fit correction for the light curve.
 
         Parameters
@@ -234,8 +222,7 @@ class RegressionCorrector(Corrector):
                 self._fit_coefficients(cadence_mask=cadence_mask & clean_cadences,
                                        prior_mu=self.dmc.prior_mu,
                                        prior_sigma=self.dmc.prior_sigma,
-                                       propagate_errors=propagate_errors,
-                                       covariance_gp=covariance_gp)
+                                       propagate_errors=propagate_errors)
             model = np.ma.masked_array(data=self.dmc.X.dot(coefficients),
                                        mask=~(cadence_mask & clean_cadences))
             model = u.Quantity(model, unit=self.lc.flux.unit)
@@ -290,15 +277,6 @@ class RegressionCorrector(Corrector):
             model_flux_err = u.Quantity(np.zeros(len(model_flux)), unit=self.lc.flux.unit)
             lcs[submatrix.name] = LightCurve(time=self.lc.time, flux=model_flux,
                                              flux_err=model_flux_err, label=submatrix.name)
-            # include GP if one was used
-            if self.gp is not None:
-                gp_flux = u.Quantity(self.gp.predict(self.corrected_lc[self.cadence_mask].flux.value)[0],
-                                                     unit=self.lc.flux.unit)
-                gp_flux_err = u.Quantity([np.nan]*self.lc.flux_err[self.cadence_mask].value, unit=self.lc.flux.unit)
-                lcs['gaussian_process'] = LightCurve(time=self.lc.time[self.cadence_mask],
-                                                     flux=gp_flux,
-                                                     flux_err=gp_flux_err,
-                                                     label='gaussian_process')
         return lcs
 
     def _diagnostic_plot(self):

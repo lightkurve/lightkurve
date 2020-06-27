@@ -116,7 +116,7 @@ class PLDCorrector(RegressionCorrector):
     def X(self):
         return self.dm
 
-    def create_design_matrix(self, background_mask=None, pld_order=1, n_pca_terms=6, use_gp=False,
+    def create_design_matrix(self, background_mask=None, pld_order=1, n_pca_terms=6,
                              pixel_components=3, spline_n_knots=100, spline_degree=3, sparse=False):
         """Returns a `DesignMatrixCollection`."""
 
@@ -159,22 +159,18 @@ class PLDCorrector(RegressionCorrector):
 
         dm_pixels = DesignMatrixCollection(all_pld).to_designmatrix(name='pixel_series')
         dm_bkg = DesignMatrix(simple_bkg, name='background_model')
-        if use_gp:
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore')
-                dm = DMC([dm_pixels, dm_bkg])
-        else:
-            dm_spline = spline(self.lc.time.value, n_knots=spline_n_knots,
-                                 degree=spline_degree).append_constant()
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore')
-                dm = DMC([dm_pixels, dm_bkg, dm_spline])
+
+        dm_spline = spline(self.lc.time.value, n_knots=spline_n_knots,
+                             degree=spline_degree).append_constant()
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            dm = DMC([dm_pixels, dm_bkg, dm_spline])
 
         self.dm = dm
         return dm
 
     def correct(self, dm=None, pld_order=1, background_mask=None, pixel_components=3,
-                use_gp=False, gp_timescale=30, spline_n_knots=100, spline_degree=3,
+                spline_n_knots=100, spline_degree=3,
                 n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
         Parameters
@@ -199,51 +195,17 @@ class PLDCorrector(RegressionCorrector):
             dm = self.create_design_matrix(background_mask=background_mask,
                                            pld_order=pld_order,
                                            n_pca_terms=n_pca_terms,
-                                           use_gp=use_gp,
                                            pixel_components=pixel_components,
                                            spline_n_knots=spline_n_knots,
                                            spline_degree=spline_degree,
                                            sparse=sparse)
 
-        if use_gp:
-            covariance_gp = self._get_gp(dm['pixel_series'], gp_timescale=gp_timescale)
-            # exclude spline if using GP?
-            dm = DesignMatrixCollection([X for X in dm if X.name != 'spline'])
-            clc = super(PLDCorrector, self).correct(dm, covariance_gp=covariance_gp, **kwargs)
-            if not restore_trend:
-                clc -= self.diagnostic_lightcurves['gaussian_process']
-        else:
-            clc = super(PLDCorrector, self).correct(dm, covariance_gp=None, **kwargs)
-            if restore_trend:
-                clc += self.diagnostic_lightcurves['spline']
+
+        clc = super(PLDCorrector, self).correct(dm, **kwargs)
+        if restore_trend:
+            clc += self.diagnostic_lightcurves['spline']
         self.dm = dm
         return clc
-
-    def _get_gp(self, dm, gp_timescale=30):
-        # Verify optional dependency
-        try:
-            import celerite
-        except ImportError:
-            log.error("PLD uses the `celerite` Python package. "
-                      "See the installation instructions at "
-                      "https://docs.lightkurve.org/about/install.html. "
-                      "`use_gp` has been set to `False`.")
-            return None
-        # prelimiary correction
-        XTX = np.dot(dm.X.T, dm.X)
-        XTX[np.diag_indices_from(XTX)] += 1e-8
-        XTy = np.dot(dm.X.T, self.rawflux.value)
-        y = self.rawflux.value - np.dot(dm.X, np.linalg.solve(XTX, XTy))
-        # Estimate the amplitude parameter of a Matern-3/2 kernel GP
-        # by computing the standard deviation of y.
-        amp = np.nanstd(y)
-        tau = gp_timescale  # tau is a user-defined parameter
-        # set up gaussian process using celerite
-        # we use a Matern-3/2 kernel for its flexibility and non-periodicity
-        kernel = celerite.terms.Matern32Term(np.log(amp), np.log(tau))
-        gp = celerite.GP(kernel)
-
-        return gp
 
     def diagnose(self):
         """Returns diagnostic plots to assess the most recent call to `correct()`.
@@ -269,7 +231,7 @@ class PLDCorrector(RegressionCorrector):
             ax = axs[1]
             self.corrected_lc.plot(ax=ax, normalize=False, label='corrected', alpha=0.4)
             for key in names:
-                if key in ['pixel_series', 'spline', 'gaussian_process']:
+                if key in ['pixel_series', 'spline']:
                     (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
             ax.set_xlabel('')
 
@@ -298,7 +260,7 @@ class TessPLDCorrector(PLDCorrector):
         super(TessPLDCorrector, self).__init__(tpf)
 
     def correct(self, dm=None, pld_order=1, background_mask=None, pixel_components=3,
-                use_gp=False, gp_timescale=30, spline_n_knots=100, spline_degree=3,
+                spline_n_knots=100, spline_degree=3,
                 n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
@@ -320,8 +282,6 @@ class TessPLDCorrector(PLDCorrector):
                                                     pld_order=pld_order,
                                                     background_mask=background_mask,
                                                     pixel_components=pixel_components,
-                                                    use_gp=use_gp,
-                                                    gp_timescale=gp_timescale,
                                                     spline_n_knots=spline_n_knots,
                                                     spline_degree=spline_degree,
                                                     n_pca_terms=n_pca_terms,
@@ -349,7 +309,7 @@ class KeplerPLDCorrector(PLDCorrector):
         super(KeplerPLDCorrector, self).__init__(tpf)
 
     def correct(self, dm=None, pld_order=2, background_mask=None, pixel_components=15,
-                use_gp=True, gp_timescale=30, spline_n_knots=100, spline_degree=3,
+                spline_n_knots=100, spline_degree=3,
                 n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
@@ -371,8 +331,6 @@ class KeplerPLDCorrector(PLDCorrector):
                                                       pld_order=pld_order,
                                                       background_mask=background_mask,
                                                       pixel_components=pixel_components,
-                                                      use_gp=use_gp,
-                                                      gp_timescale=gp_timescale,
                                                       spline_n_knots=spline_n_knots,
                                                       spline_degree=spline_degree,
                                                       n_pca_terms=n_pca_terms,
