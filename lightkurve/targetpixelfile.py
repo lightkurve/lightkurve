@@ -1656,6 +1656,8 @@ class TargetPixelFileFactory(object):
             tpf = TessTargetPixelFile(hdulist, **kwargs)
         elif filetype == 'KeplerTargetPixelFile':
             tpf = KeplerTargetPixelFile(hdulist, **kwargs)
+        else:
+            tpf = TargetPixelFile(hdulist, **kwargs)
         return tpf
     
     def _hdulist(self, hdu0_keywords, ext_info):
