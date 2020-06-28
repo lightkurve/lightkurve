@@ -18,7 +18,7 @@ from astropy.io.fits.card import UNDEFINED
 import astropy.units as u
 from astropy.utils.exceptions import AstropyWarning
 
-from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
+from ..targetpixelfile import KeplerTargetPixelFile, TargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning, LightkurveDeprecationWarning
@@ -297,10 +297,10 @@ def test_tpf_to_fits():
 
 
 def test_tpf_factory():
-    """Can we create TPFs using KeplerTargetPixelFileFactory?"""
+    """Can we create TPFs using TargetPixelFileFactory?"""
     from lightkurve.targetpixelfile import FactoryError
 
-    factory = KeplerTargetPixelFileFactory(n_cadences=10, n_rows=6, n_cols=8)
+    factory = TargetPixelFileFactory(n_cadences=10, n_rows=6, n_cols=8)
     flux_0 = np.ones((6, 8))
     factory.add_cadence(frameno=0, flux=flux_0,
                         header={'TSTART': 0, 'TSTOP': 10})
