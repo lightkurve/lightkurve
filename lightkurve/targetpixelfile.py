@@ -1649,10 +1649,15 @@ class TargetPixelFileFactory(object):
         if ext_info is None:
             ext_info = {}
         self._check_data()
-        return TargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords,
-                                                   ext_info=ext_info),
-                                     **kwargs)
-
+        # Detect filetype
+        hdulist = self._hdulist(hdu0_keywords=hdu0_keywords, ext_info=ext_info)
+        filetype = detect_filetype(hdulist)
+        if filetype == 'TessTargetPixelFile':
+            tpf = TessTargetPixelFile(hdulist, **kwargs)
+        elif filetype == 'KeplerTargetPixelFile':
+            tpf = KeplerTargetPixelFile(hdulist, **kwargs)
+        return tpf
+    
     def _hdulist(self, hdu0_keywords, ext_info):
         """Returns an astropy.io.fits.HDUList object."""
         return fits.HDUList([self._make_primary_hdu(hdu0_keywords=hdu0_keywords),
@@ -1677,7 +1682,7 @@ class TargetPixelFileFactory(object):
         hdu.header['DATE'] = datetime.datetime.now().strftime("%Y-%m-%d")
         hdu.header['CREATOR'] = "lightkurve.TargetPixelFileFactory"
         hdu.header['OBJECT'] = self.target_id
-        if hdu.header.get('TELESCOP', default='').lower() == "kepler":
+        if hdu.header['TELESCOP'] is not None and hdu.header['TELESCOP'] == "kepler":
             hdu.header['KEPLERID'] = self.target_id
         # Empty a bunch of keywords rather than having incorrect info
         for kw in ["PROCVER", "FILEVER", "CHANNEL", "MODULE", "OUTPUT",
