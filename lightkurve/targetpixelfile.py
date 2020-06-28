@@ -1677,7 +1677,7 @@ class TargetPixelFileFactory(object):
         hdu.header['DATE'] = datetime.datetime.now().strftime("%Y-%m-%d")
         hdu.header['CREATOR'] = "lightkurve.TargetPixelFileFactory"
         hdu.header['OBJECT'] = self.target_id
-        if hdu.header['TELESCOP'].lower() == "kepler":
+        if hdu.header.get('TELESCOP', default='').lower() == "kepler":
             hdu.header['KEPLERID'] = self.target_id
         # Empty a bunch of keywords rather than having incorrect info
         for kw in ["PROCVER", "FILEVER", "CHANNEL", "MODULE", "OUTPUT",
