@@ -27,7 +27,7 @@ from copy import deepcopy
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
-from .utils import KeplerQualityFlags, TessQualityFlags, \
+from .utils import QualityFlags, KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
                    LightkurveWarning, LightkurveDeprecationWarning, \
                    validate_method, centroid_quadratic, \
@@ -56,6 +56,10 @@ class TargetPixelFile(object):
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
+        
+        self.quality_mask = QualityFlags.create_quality_mask(
+                                quality_array=self.hdu[1].data['QUALITY'],
+                                bitmask=None)
 
     def __getitem__(self, key):
         """Implements indexing and slicing.
