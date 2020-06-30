@@ -650,8 +650,7 @@ class Seismology(object):
                         "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
             else:
                 log.info("Using value for effective temperature from the Kepler Input Catalogue."
-                        "These temperatue values may sometimes differ significantly from modern estimates.",
-                        LightkurveWarning)
+                        "These temperatue values may sometimes differ significantly from modern estimates.")
                 pass
         else:
             pass
@@ -722,8 +721,7 @@ class Seismology(object):
                         "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
             else:
                 log.info("Using value for effective temperature from the Kepler Input Catalogue."
-                        "These temperatue values may sometimes differ significantly from modern estimates.",
-                        LightkurveWarning)
+                        "These temperatue values may sometimes differ significantly from modern estimates.")
                 pass
         else:
             pass
@@ -792,8 +790,7 @@ class Seismology(object):
                         "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
             else:
                 log.info("Using value for effective temperature from the Kepler Input Catalogue."
-                        "These temperatue values may sometimes differ significantly from modern estimates.",
-                        LightkurveWarning)
+                        "These temperatue values may sometimes differ significantly from modern estimates.")
                 pass
         else:
             pass
