@@ -135,8 +135,8 @@ def test_TessLightCurveFile(quality_bitmask):
 
     assert lc.mission == 'TESS'
     assert lc.label == hdu[0].header['OBJECT']
-    assert lc.time_format == 'btjd'
-    assert lc.time_scale == 'tdb'
+    assert lc.time.format == 'btjd'
+    assert lc.time.scale == 'tdb'
     assert lc.flux.unit == u.electron / u.second
     assert lc.sector == hdu[0].header['SECTOR']
     assert lc.camera == hdu[0].header['CAMERA']
@@ -163,8 +163,8 @@ def test_bitmasking(quality_bitmask, answer):
 
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
-    lc = LightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1,
-                    targetid=999, label='mystar', meta={'ccd': 2}, time_format='bkjd')
+    lc = KeplerLightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1,
+                          targetid=999, label='mystar', meta={'ccd': 2})
     fold = lc.fold(period=1)
     assert_almost_equal(fold.phase[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
@@ -894,7 +894,7 @@ def test_normalize_unit():
 def test_to_stingray():
     """Test the `LightCurve.to_stingray()` method."""
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
-    lc = LightCurve(time=time, flux=flux, flux_err=flux_err, time_format="jd")
+    lc = LightCurve(time=time, flux=flux, flux_err=flux_err)
     try:
         with warnings.catch_warnings():
             # Ignore "UserWarning: Numba not installed" raised by stingray.

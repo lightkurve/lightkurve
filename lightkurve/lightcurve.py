@@ -77,8 +77,8 @@ class LightCurve(TimeSeries):
 
     # The following keywords were removed in Lightkurve v2.0.
     # Their use will trigger a warning.
-    _deprecated_keywords = ['targetid', 'label', 'time_format', 'time_scale',
-                            'flux_unit']
+    _deprecated_keywords = ('targetid', 'label', 'time_format', 'time_scale',
+                            'flux_unit')
     _deprecated_column_keywords = ['centroid_col', 'centroid_row',
                                    'cadenceno', 'quality']
 
@@ -383,25 +383,18 @@ class LightCurve(TimeSeries):
         Prints in order of type (ints, strings, lists, arrays, others).
         """
         attrs = {}
+        deprecated_properties = list(self._deprecated_keywords)
+        deprecated_properties += ['flux_quantity', 'SAP_FLUX', 'PDCSAP_FLUX',
+                                  'astropy_time', 'hdu']
         for attr in dir(self):
-            if not attr.startswith('_'):
+            if not attr.startswith('_') and attr not in deprecated_properties:
                 try:
                     res = getattr(self, attr)
                 except Exception:
                     continue
                 if callable(res):
                     continue
-                if attr == 'hdu':
-                    attrs[attr] = {'res': res, 'type': 'list'}
-                    for idx, r in enumerate(res):
-                        if idx == 0:
-                            attrs[attr]['print'] = '{}'.format(r.header['EXTNAME'])
-                        else:
-                            attrs[attr]['print'] = '{}, {}'.format(
-                                attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
-                    continue
-                else:
-                    attrs[attr] = {'res': res}
+                attrs[attr] = {'res': res}
                 if isinstance(res, int):
                     attrs[attr]['print'] = '{}'.format(res)
                     attrs[attr]['type'] = 'int'
@@ -2000,7 +1993,8 @@ class KeplerLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
     to represent data from NASA's Kepler and K2 mission."""
 
-    _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'channel',
+    _deprecated_keywords = ('targetid', 'label',  'time_format', 'time_scale',
+                            'flux_unit', 'quality_bitmask', 'channel',
                             'campaign', 'quarter', 'mission', 'ra', 'dec')
 
     _default_time_format = 'bkjd'
@@ -2078,7 +2072,8 @@ class TessLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
     to represent data from NASA's TESS mission."""
 
-    _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'sector',
+    _deprecated_keywords = ('targetid', 'label',  'time_format', 'time_scale',
+                            'flux_unit', 'quality_bitmask', 'sector',
                             'camera', 'ccd', 'mission', 'ra', 'dec')
 
     _default_time_format = 'btjd'
