@@ -15,6 +15,8 @@ from astropy.utils.exceptions import AstropyWarning
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
 from astropy.utils.decorators import deprecated
+from astropy.time import Time
+from astropy.units import Quantity
 import astropy.units as u
 
 from matplotlib import patches
@@ -28,7 +30,7 @@ from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
-                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
+                   plot_image, \
                    LightkurveWarning, LightkurveDeprecationWarning, \
                    validate_method, centroid_quadratic, \
                    _query_solar_system_objects
@@ -92,17 +94,23 @@ class TargetPixelFile(object):
         return len(self.time)
 
     def __add__(self, other):
+        if isinstance(other, Quantity):
+            other = other.value
         hdu = deepcopy(self.hdu)
         hdu[1].data['FLUX'][self.quality_mask] += other
         return type(self)(hdu, quality_bitmask=self.quality_bitmask)
 
     def __mul__(self, other):
+        if isinstance(other, Quantity):
+            other = other.value
         hdu = deepcopy(self.hdu)
         hdu[1].data['FLUX'][self.quality_mask] *= other
         hdu[1].data['FLUX_ERR'][self.quality_mask] *= other
         return type(self)(hdu, quality_bitmask=self.quality_bitmask)
 
     def __rtruediv__(self, other):
+        if isinstance(other, Quantity):
+            other = other.value
         hdu = deepcopy(self.hdu)
         hdu[1].data['FLUX'][self.quality_mask] /= other
         hdu[1].data['FLUX_ERR'][self.quality_mask] /= other
@@ -128,6 +136,12 @@ class TargetPixelFile(object):
 
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
+
+    @property
+    @deprecated("2.0", alternative="time", warning_type=LightkurveDeprecationWarning)
+    def astropy_time(self):
+        """Returns an AstroPy Time object for all good-quality cadences."""
+        return self.time
 
     @property
     def hdu(self):
@@ -239,9 +253,24 @@ class TargetPixelFile(object):
         return self.flux.shape
 
     @property
-    def time(self):
+    def time(self) -> Time:
         """Returns the time for all good-quality cadences."""
-        return self.hdu[1].data['TIME'][self.quality_mask]
+        time_values = self.hdu[1].data['TIME'][self.quality_mask]
+        # Some data products have missing time values;
+        # we need to set these to zero or `Time` cannot be instantiated.
+        time_values[~np.isfinite(time_values)] = 0
+
+        bjdrefi = self.hdu[1].header.get('BJDREFI')
+        if bjdrefi == 2454833:
+            time_format = 'bkjd'
+        elif bjdrefi == 2457000:
+            time_format = 'btjd'
+        else:
+            raise ValueError(f"Input file has unclear time format: {filename}")
+
+        return Time(time_values,
+                    scale=self.hdu[1].header.get('TIMESYS', 'tdb').lower(),
+                    format=time_format)
 
     @property
     def cadenceno(self):
@@ -256,26 +285,37 @@ class TargetPixelFile(object):
     @property
     def nan_time_mask(self):
         """Returns a boolean mask flagging cadences whose time is `nan`."""
-        return ~np.isfinite(self.time)
+        return self.time.value == 0
 
     @property
-    def flux(self):
+    def flux(self) -> Quantity:
         """Returns the flux for all good-quality cadences."""
-        return self.hdu[1].data['FLUX'][self.quality_mask]
+        if self.get_header(1)['TUNIT5'] == 'e-/s':
+            unit = 'electron/s'
+        else:
+            unit = 'dimensionless'
+        return Quantity(self.hdu[1].data['FLUX'][self.quality_mask], unit=unit)
 
     @property
-    def flux_err(self):
+    def flux_err(self) -> Quantity:
         """Returns the flux uncertainty for all good-quality cadences."""
-        return self.hdu[1].data['FLUX_ERR'][self.quality_mask]
+        if self.get_header(1)['TUNIT6'] == 'e-/s':
+            unit = 'electron/s'
+        else:
+            unit = 'dimensionless'
+        return Quantity(self.hdu[1].data['FLUX_ERR'][self.quality_mask], unit=unit)
 
     @property
-    def flux_bkg(self):
+    def flux_bkg(self) -> Quantity:
         """Returns the background flux for all good-quality cadences."""
-        return self.hdu[1].data['FLUX_BKG'][self.quality_mask]
+        return Quantity(self.hdu[1].data['FLUX_BKG'][self.quality_mask],
+                        unit='electron/s')
 
     @property
-    def flux_bkg_err(self):
-        return self.hdu[1].data['FLUX_BKG_ERR'][self.quality_mask]
+    def flux_bkg_err(self) -> Quantity:
+        return Quantity(self.hdu[1].data['FLUX_BKG_ERR'][self.quality_mask],
+                        unit='electron/s')
+
 
     @property
     def quality(self):
@@ -378,7 +418,7 @@ class TargetPixelFile(object):
         """
         attrs = {}
         for attr in dir(self):
-            if not attr.startswith('_') and attr != "header":
+            if not attr.startswith('_') and attr != "header" and attr != "astropy_time":
                 res = getattr(self, attr)
                 if callable(res):
                     continue
@@ -618,9 +658,7 @@ class TargetPixelFile(object):
             warnings.simplefilter("ignore", RuntimeWarning)
             col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
             row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
-        col_centr = u.Quantity(col_centr, unit='pixel')
-        row_centr = u.Quantity(row_centr, unit='pixel')
-        return col_centr, row_centr
+        return col_centr*u.pixel, row_centr*u.pixel
 
     def _estimate_centroids_via_quadratic(self, aperture_mask):
         """Estimate centroids by fitting a 2D quadratic to the brightest pixels;
@@ -635,8 +673,8 @@ class TargetPixelFile(object):
         # pixels are centered at .5, 1.5, 2.5, ...
         col_centr = np.asfarray(col_centr) + self.column + .5
         row_centr = np.asfarray(row_centr) + self.row + .5
-        col_centr = u.Quantity(col_centr, unit='pixel')
-        row_centr = u.Quantity(row_centr, unit='pixel')
+        col_centr = Quantity(col_centr, unit='pixel')
+        row_centr = Quantity(row_centr, unit='pixel')
         return col_centr, row_centr
 
     def _aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
@@ -670,8 +708,8 @@ class TargetPixelFile(object):
             flux_err[is_allnan] = np.nan
 
         if self.get_header(1)['TUNIT5'] == 'e-/s':
-            flux = u.Quantity(flux, unit='electron/s')
-            flux_err = u.Quantity(flux_err, unit='electron/s')
+            flux = Quantity(flux, unit='electron/s')
+            flux_err = Quantity(flux_err, unit='electron/s')
 
         return flux, flux_err, centroid_col, centroid_row
 
@@ -761,10 +799,10 @@ class TargetPixelFile(object):
         if radius == None:
             radius = (2**0.5*(pixel_scale * np.max(self.shape[1:])) + 5)*u.arcsecond.to(u.deg)
 
-        res = _query_solar_system_objects(ra=self.ra, dec=self.dec, times=self.astropy_time.jd[cadence_mask],
+        res = _query_solar_system_objects(ra=self.ra, dec=self.dec, times=self.time.jd[cadence_mask],
                                       location=location, radius=radius, cache=cache)
         if return_mask:
-            return res, np.in1d(self.astropy_time.jd, res.epoch)
+            return res, np.in1d(self.time.jd, res.epoch)
         return res
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, column='FLUX', aperture_mask=None,
@@ -1237,11 +1275,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return self.get_keyword('CHANNEL')
 
     @property
-    def astropy_time(self):
-        """Returns an AstroPy Time object for all good-quality cadences."""
-        return bkjd_to_astropy_time(bkjd=self.time)
-
-    @property
     def quarter(self):
         """Kepler quarter number. ('QUARTER' header keyword)"""
         return self.get_keyword('QUARTER')
@@ -1294,7 +1327,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
-        return KeplerLightCurve(time=self.astropy_time,
+        return KeplerLightCurve(time=self.time,
                                 flux=flux,
                                 flux_err=flux_err,
                                 **keys)
@@ -1316,7 +1349,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
-        return KeplerLightCurve(time=self.astropy_time,
+        return KeplerLightCurve(time=self.time,
                                 flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                                 flux_err=flux_bkg_err,
                                 **keys)
@@ -1348,8 +1381,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                        var=np.nanstd(centr_col.value)**2),
                                      row=GaussianPrior(mean=np.nanmedian(centr_row.value),
                                                        var=np.nanstd(centr_row.value)**2),
-                                     flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0]),
-                                                       ub=2*np.nansum(self.flux[0]) + 1e-10),
+                                     flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0].value),
+                                                       ub=2*np.nansum(self.flux[0].value) + 1e-10),
                                      targetid=self.targetid)]
             kwargs['star_priors'] = star_priors
         if 'prfmodel' not in kwargs:
@@ -1357,13 +1390,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if 'background_prior' not in kwargs:
             if np.all(np.isnan(self.flux_bkg)):  # If TargetPixelFile has no background flux data
                 # Use the median of the lower half of flux as an estimate for flux_bkg
-                clipped_flux = np.ma.masked_where(self.flux > np.percentile(self.flux, 50),
-                                                  self.flux)
+                clipped_flux = np.ma.masked_where(self.flux.value > np.percentile(self.flux.value, 50),
+                                                  self.flux.value)
                 flux_prior = GaussianPrior(mean=np.ma.median(clipped_flux),
                                            var=np.ma.std(clipped_flux)**2)
             else:
-                flux_prior = GaussianPrior(mean=np.nanmedian(self.flux_bkg),
-                                           var=np.nanstd(self.flux_bkg)**2)
+                flux_prior = GaussianPrior(mean=np.nanmedian(self.flux_bkg.value),
+                                           var=np.nanstd(self.flux_bkg.value)**2)
             kwargs['background_prior'] = BackgroundPrior(flux=flux_prior)
         return TPFModel(**kwargs)
 
@@ -1406,7 +1439,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'ra': self.ra,
                 'dec': self.dec,
                 'targetid': self.targetid}
-        return KeplerLightCurve(time=self.astropy_time,
+        return KeplerLightCurve(time=self.time,
                                 flux=lc.flux,
                                 **keys)
 
@@ -1677,8 +1710,8 @@ class KeplerTargetPixelFileFactory(object):
         hdu.header['TELESCOP'] = "Kepler"
         hdu.header['CREATOR'] = "lightkurve.KeplerTargetPixelFileFactory"
         hdu.header['OBJECT'] = self.target_id
-        hdu.header['KEPLERID'] = self.target_id
         # Empty a bunch of keywords rather than having incorrect info
+        hdu.header['KEPLERID'] = self.target_id
         for kw in ["PROCVER", "FILEVER", "CHANNEL", "MODULE", "OUTPUT",
                    "TIMVERSN", "CAMPAIGN", "DATA_REL", "TTABLEID",
                    "RA_OBJ", "DEC_OBJ"]:
@@ -1881,11 +1914,6 @@ class TessTargetPixelFile(TargetPixelFile):
     def mission(self):
         return 'TESS'
 
-    @property
-    def astropy_time(self):
-        """Returns an AstroPy Time object for all good-quality cadences."""
-        return btjd_to_astropy_time(btjd=self.time)
-
     def extract_aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
         """Returns a LightCurve obtained using aperture photometry.
 
@@ -1923,7 +1951,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_keyword('OBJECT'),
                 'targetid': self.targetid}
-        return TessLightCurve(time=self.astropy_time,
+        return TessLightCurve(time=self.time,
                               flux=flux,
                               flux_err=flux_err,
                               **keys)
@@ -1943,7 +1971,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
-        return TessLightCurve(time=self.astropy_time,
+        return TessLightCurve(time=self.time,
                               flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                               flux_err=flux_bkg_err,
                               **keys)

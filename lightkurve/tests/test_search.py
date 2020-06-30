@@ -19,7 +19,7 @@ import astropy.units as u
 from astropy.table import Table
 
 from ..utils import LightkurveWarning, LightkurveDeprecationWarning
-from ..search import search_lightcurvefile, search_targetpixelfile, \
+from ..search import search_lightcurve, search_targetpixelfile, \
                      search_tesscut, SearchResult, SearchError, log
 from ..io import read
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
@@ -62,30 +62,30 @@ def test_search_targetpixelfile():
 
 
 @pytest.mark.remote_data
-def test_search_lightcurvefile(caplog):
+def test_search_lightcurve(caplog):
     # We should also be able to resolve it by its name instead of KIC ID
-    assert(len(search_lightcurvefile('Kepler-10', mission='Kepler').table) == 15)
+    assert(len(search_lightcurve('Kepler-10', mission='Kepler').table) == 15)
     # An invalid KIC/EPIC ID or target name should be dealt with gracefully
-    search_lightcurvefile(-999)
+    search_lightcurve(-999)
     assert "Could not resolve" in caplog.text
-    search_lightcurvefile("DOES_NOT_EXIST (UNIT TEST)")
+    search_lightcurve("DOES_NOT_EXIST (UNIT TEST)")
     assert "Could not resolve" in caplog.text
     # If we ask for all cadence types, there should be four Kepler files given
-    assert(len(search_lightcurvefile('KIC 4914423', quarter=6, cadence='any').table) == 4)
+    assert(len(search_lightcurve('KIC 4914423', quarter=6, cadence='any').table) == 4)
     # ...and only one should have long cadence
-    assert(len(search_lightcurvefile('KIC 4914423', quarter=6, cadence='long').table) == 1)
+    assert(len(search_lightcurve('KIC 4914423', quarter=6, cadence='long').table) == 1)
     # Should be able to resolve an ra/dec
-    assert(len(search_lightcurvefile('297.5835, 40.98339', quarter=6).table) == 1)
+    assert(len(search_lightcurve('297.5835, 40.98339', quarter=6).table) == 1)
     # Should be able to resolve a SkyCoord
     c = SkyCoord('297.5835 40.98339', unit=(u.deg, u.deg))
-    assert(len(search_lightcurvefile(c, quarter=6).table) == 1)
-    search_lightcurvefile(c, quarter=6).download()
+    assert(len(search_lightcurve(c, quarter=6).table) == 1)
+    search_lightcurve(c, quarter=6).download()
     # with mission='TESS', it should return TESS observations
     tic = 'TIC 273985862'
-    assert(len(search_lightcurvefile(tic, mission='TESS').table) > 1)
-    assert(len(search_lightcurvefile(tic, mission='TESS', sector=1, radius=100).table) == 2)
-    search_lightcurvefile(tic, mission='TESS', sector=1).download()
-    assert(len(search_lightcurvefile("pi Mensae", sector=1).table) == 1)
+    assert(len(search_lightcurve(tic, mission='TESS').table) > 1)
+    assert(len(search_lightcurve(tic, mission='TESS', sector=1, radius=100).table) == 2)
+    search_lightcurve(tic, mission='TESS', sector=1).download()
+    assert(len(search_lightcurve("pi Mensae", sector=1).table) == 1)
 
 
 @pytest.mark.remote_data
@@ -169,7 +169,7 @@ def test_search_with_skycoord():
 
 @pytest.mark.remote_data
 def test_searchresult():
-    sr = search_lightcurvefile('Kepler-10', mission='Kepler')
+    sr = search_lightcurve('Kepler-10', mission='Kepler')
     assert len(sr) == len(sr.table)  # Tests SearchResult.__len__
     assert len(sr[2:7]) == 5  # Tests SearchResult.__get__
     assert len(sr[2]) == 1
@@ -191,7 +191,7 @@ def test_collections():
     # TargetPixelFileCollection class
     assert(len(search_targetpixelfile('EPIC 205998445', mission='K2',radius=900).table) == 4)
     # LightCurveFileCollection class with set targetlimit
-    assert(len(search_lightcurvefile('EPIC 205998445', mission='K2', radius=900, limit=3).download_all()) == 3)
+    assert(len(search_lightcurve('EPIC 205998445', mission='K2', radius=900, limit=3).download_all()) == 3)
     # if fewer targets are found than targetlimit, should still download all available
     assert(len(search_targetpixelfile('EPIC 205998445', mission='K2', radius=900, limit=6).table) == 4)
     # if download() is used when multiple files are available, should only download 1
@@ -300,7 +300,7 @@ def test_filenotfound():
 def test_indexerror_631():
     """Regression test for #631; avoid IndexError."""
     # This previously triggered an exception:
-    result = search_lightcurvefile("KIC 8462852", sector=15)
+    result = search_lightcurve("KIC 8462852", sector=15)
     assert len(result) == 1
 
 

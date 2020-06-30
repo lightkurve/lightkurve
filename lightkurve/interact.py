@@ -239,7 +239,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         raise no_targets_found_message
 
     # Apply correction for proper motion
-    year = ((tpf.astropy_time[0].jd - 2457206.375) * u.day).to(u.year)
+    year = ((tpf.time[0].jd - 2457206.375) * u.day).to(u.year)
     pmra = ((np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond/u.year) * year).to(u.deg).value
     pmdec = ((np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond/u.year) * year).to(u.deg).value
     result.RA_ICRS += pmra
@@ -319,7 +319,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     fig, stretch_slider : bokeh.plotting.figure.Figure, RangeSlider
     """
     if pedestal is None:
-        pedestal = -np.nanmin(tpf.flux) + 1
+        pedestal = -np.nanmin(tpf.flux.value) + 1
     if scale == 'linear':
         pedestal = 0
 
@@ -343,7 +343,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     fig.xaxis.axis_label = 'Pixel Column Number'
 
 
-    vlo, lo, hi, vhi = np.nanpercentile(tpf.flux + pedestal, [0.2, 1, 95, 99.8])
+    vlo, lo, hi, vhi = np.nanpercentile(tpf.flux.value + pedestal, [0.2, 1, 95, 99.8])
     if vmin is not None:
         vlo, lo = vmin, vmin
     if vmax is not None:
@@ -361,7 +361,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     else:
         raise ValueError('Please specify either `linear` or `log` scale for color.')
 
-    fig.image([tpf.flux[fiducial_frame, :, :] + pedestal],
+    fig.image([tpf.flux.value[fiducial_frame, :, :] + pedestal],
               x=tpf.column-0.5, y=tpf.row-0.5,
               dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
               color_mapper=color_mapper, name="tpfimg")
@@ -573,7 +573,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                                                             ylim_func=ylim_func)
 
         # Create the TPF figure and its stretch slider
-        pedestal = -np.nanmin(tpf.flux) + 1
+        pedestal = -np.nanmin(tpf.flux.value) + 1
         if scale == 'linear':
             pedestal = 0
         fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source,
@@ -648,11 +648,11 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
             if new in tpf.cadenceno:
                 frameno = tpf_index_lookup[new]
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
-                    [tpf.flux[frameno, :, :] + pedestal]
-                vertical_line.update(location=tpf.time[frameno])
+                    [tpf.flux.value[frameno, :, :] + pedestal]
+                vertical_line.update(location=tpf.time.value[frameno])
             else:
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
-                    [tpf.flux[0, :, :] * np.NaN]
+                    [tpf.flux.value[0, :, :] * np.NaN]
             lc_source.selected.indices = []
 
         def go_right_by_one():

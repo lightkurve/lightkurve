@@ -170,6 +170,10 @@ class LightCurve(TimeSeries):
             if not isinstance(self[col], (Quantity, Time)):
                 self.replace_column(col, Quantity(self[col], dtype=self[col].dtype))
 
+        # Ensure flux and flux_err have the same units
+        if self['flux'].unit != self['flux'].unit:
+            raise ValueError("flux and flux_err must have the same units")
+
         self._required_columns_relax = False
         self._check_required_columns()
 
