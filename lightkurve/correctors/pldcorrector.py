@@ -190,6 +190,7 @@ class PLDCorrector(RegressionCorrector):
             # Default to pixels <1-sigma above the background
             background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
         self.background_mask = background_mask
+        self.restore_trend = restore_trend
 
         if dm is None:
             dm = self.create_design_matrix(background_mask=background_mask,
@@ -203,7 +204,7 @@ class PLDCorrector(RegressionCorrector):
 
         clc = super(PLDCorrector, self).correct(dm, **kwargs)
         if restore_trend:
-            clc += self.diagnostic_lightcurves['spline']
+            clc += (self.diagnostic_lightcurves['spline'] - np.median(self.diagnostic_lightcurves['spline'].flux))
         self.dm = dm
         return clc
 
@@ -220,6 +221,12 @@ class PLDCorrector(RegressionCorrector):
 
         names = self.diagnostic_lightcurves.keys()
 
+        # plot the right version
+        if self.restore_trend:
+            clc = self.corrected_lc + self.diagnostic_lightcurves['spline'] - np.median(self.diagnostic_lightcurves['spline'].flux)
+        else:
+            clc = self.corrected_lc
+
         with plt.style.context(MPLSTYLE):
             _, axs = plt.subplots(3, figsize=(10, 9), sharex=True)
             ax = axs[0]
@@ -229,7 +236,7 @@ class PLDCorrector(RegressionCorrector):
             ax.set_xlabel('')
 
             ax = axs[1]
-            self.corrected_lc.plot(ax=ax, normalize=False, label='corrected', alpha=0.4)
+            clc.plot(ax=ax, normalize=False, label='corrected', alpha=0.4)
             for key in names:
                 if key in ['pixel_series', 'spline']:
                     (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
@@ -237,9 +244,9 @@ class PLDCorrector(RegressionCorrector):
 
             ax = axs[2]
             self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
-            self.corrected_lc[~self.cadence_mask].scatter(normalize=False, c='r', marker='x',
-                                      s=10, label='Outliers', ax=ax)
-            self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
+            clc[~self.cadence_mask].scatter(normalize=False, c='r', marker='x',
+                                            s=10, label='Outliers', ax=ax)
+            clc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
 
 
