@@ -139,7 +139,7 @@ class PLDCorrector(RegressionCorrector):
         simple_bkg -= np.percentile(simple_bkg, 5)
 
         # Flux-normalzied pixel time series
-        regressors = self.tpf.flux.reshape(len(self.tpf.flux), -1)
+        regressors = self.tpf.flux.reshape(len(self.tpf.flux), -1) - simple_bkg.reshape(-1,1)
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
         regressors = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
 
