@@ -1,6 +1,9 @@
 2.0.dev (unreleased)
 =====================
 
+- Modified the Seismology `estimate_radius`, `estimate_mass` and `estimate_logg`
+  functions to use observation meta data for effective temperature, when available. [#766]
+
 - Removed support for Python 2. [#733]
 
 - Added ``SparseDesignMatrix`` and modified ``RegressionCorrector`` to enable
