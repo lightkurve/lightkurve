@@ -1185,8 +1185,8 @@ class LightCurve(TimeSeries):
             return res, np.in1d(self.astropy_time.jd, res.epoch)
         return res
 
-    def _create_plot(self, method='plot', ax=None, normalize=False,
-                     xlabel=None, ylabel=None, column='flux', title='', style='lightkurve',
+    def _create_plot(self, column='flux', method='plot', ax=None, normalize=False,
+                     xlabel=None, ylabel=None, title='', style='lightkurve',
                      show_colorbar=True, colorbar_label='',
                      **kwargs):
         """Implements `plot()`, `scatter()`, and `errorbar()` to avoid code duplication.
@@ -1213,20 +1213,18 @@ class LightCurve(TimeSeries):
                 xlabel = 'Time'
         # Default ylabel
         if ylabel is None:
-            if column in ['flux','sap_flux','sap_bkg','pdscap_flux']:
-                if normalize or (self.flux.unit == u.dimensionless_unscaled):
-                    ylabel = 'Normalized Flux'
-                elif self.flux.unit is None:
-                    ylabel = 'Flux'
-                else:
-                    ylabel = 'Flux [{}]'.format(self.flux.unit.to_string("latex_inline"))
+            if "flux" in column:
+                    ylabel = "Flux"
             else:
-                if normalize:
-                    ylabel = 'Normalized {}'.format(column)
-                elif self[column].unit is None:
-                    ylabel = '{}'.format(column)
-                else:
-                    ylabel = '{} [{}]'.format(column, self[column].unit.to_string("latex_inline"))
+                    ylabel = f"{column}"
+                    
+            if normalize or self.meta.get("normalized"):
+                ylabel = "Normalized " + ylabel
+            elif self[column].unit:
+                ylabel += f" [{self[column].unit.to_string('latex_inline')}]"
+            else: 
+                pass
+
         # Default legend label
         if ('label' not in kwargs):
             kwargs['label'] = self.meta.get('label')
@@ -1284,6 +1282,8 @@ class LightCurve(TimeSeries):
 
         Parameters
         ----------
+        column : str
+            Name of data column to plot. Default `flux`.
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be created.
@@ -1293,8 +1293,6 @@ class LightCurve(TimeSeries):
             Plot x axis label
         ylabel : str
             Plot y axis label
-        column : str
-            Name of data column to plot. Default `flux`.
         title : str
             Plot set_title
         style : str
@@ -1316,6 +1314,8 @@ class LightCurve(TimeSeries):
 
         Parameters
         ----------
+        column : str
+            Name of data column to plot. Default `flux`.
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
@@ -1351,6 +1351,8 @@ class LightCurve(TimeSeries):
 
         Parameters
         ----------
+        column : str
+            Name of data column to plot. Default `flux`.
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
