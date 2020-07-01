@@ -323,7 +323,7 @@ class TargetPixelFile(object):
         return self.hdu[1].data['QUALITY'][self.quality_mask]
 
     @property
-    def wcs(self):
+    def wcs(self) -> WCS:
         """Returns an `astropy.wcs.WCS` object with the World Coordinate System
         solution for the target pixel file.
 

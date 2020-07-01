@@ -19,6 +19,8 @@ from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..utils import LightkurveWarning, LightkurveDeprecationWarning
+from ..search import search_lightcurve
+from ..collections import LightCurveCollection
 from .test_targetpixelfile import TABBY_TPF
 
 
@@ -994,3 +996,17 @@ def test_fold_v2():
     assert isinstance(fld.time, u.Quantity)
     fld.plot_river()
     plt.close()
+
+
+@pytest.mark.remote_data
+def test_combine_kepler_tess():
+    """Can we append or stitch a TESS light curve to a Kepler light curve?"""
+    lc_kplr = search_lightcurve("Kepler-10", mission='Kepler')[0].download()
+    lc_tess = search_lightcurve("Kepler-10", mission='TESS')[0].download()
+    # Can we use append()?
+    lc = lc_kplr.append(lc_tess)
+    assert(len(lc) == len(lc_kplr)+len(lc_tess))
+    # Can we use stitch()?
+    coll = LightCurveCollection((lc_kplr, lc_tess))
+    lc = coll.stitch()
+    assert(len(lc) == len(lc_kplr)+len(lc_tess))

@@ -447,7 +447,8 @@ class LightCurve(TimeSeries):
                              "as of Lightkurve v2.0")
         if not hasattr(others, '__iter__'):
             others = (others,)
-        return vstack((self, *others))
+        # Need `join_type='inner'` until AstroPy supports masked Quantities
+        return vstack((self, *others), join_type='inner', metadata_conflicts='silent')
 
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
                 break_tolerance=5, niters=3, sigma=3, mask=None, **kwargs):

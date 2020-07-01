@@ -119,17 +119,9 @@ class LightCurveCollection(Collection):
         """
         if corrector_func is None:
             corrector_func = lambda x: x
-
-        try:
-            targets = np.unique([lc.meta.get('label') for lc in self])
-        except TypeError:
-            targets = [None]
-
-        if len(targets) > 1:
-            raise ValueError('This collection contains more than one target, '
-                             'please reduce to a single target before calling `stitch()`.')
         lcs = [corrector_func(lc) for lc in self]
-        return vstack(lcs)
+        # Need `join_type='inner'` until AstroPy supports masked Quantities
+        return vstack(lcs, join_type='inner', metadata_conflicts='silent')
 
     def plot(self, ax=None, offset=0.1, **kwargs):
         """Plots all light curves in the collection on a single plot.
