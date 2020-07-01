@@ -1211,39 +1211,38 @@ class LightCurve(TimeSeries):
                 xlabel = 'Time [JD]'
             else:
                 xlabel = 'Time'
+
         # Default ylabel
         if ylabel is None:
             if "flux" in column:
-                    ylabel = "Flux"
+                ylabel = "Flux"
             else:
-                    ylabel = f"{column}"
+                ylabel = f"{column}"
             if normalize or self.meta.get("normalized"):
                 ylabel = "Normalized " + ylabel
             elif (self[column].unit) and (self[column].unit.to_string() != ''):
                 ylabel += f" [{self[column].unit.to_string('latex_inline')}]"
-            else: 
-                pass
+
         # Default legend label
         if ('label' not in kwargs):
             kwargs['label'] = self.meta.get('label')
-        # Create a copy with the appropriate flux and flux_err columns
-        lc_plot = self.copy()
-        lc_plot.flux = lc_plot[column]
-        # Check if column has associated uncertainties
-        if column in ['flux','sap_flux','sap_bkg','pdscap_flux',
-                        'psf_centr1','psf_centr2','mom_centr1','mom_centr2']:
-            lc_plot.flux_err = lc_plot['{}_err'.format(column)]
-            errors = True
-        else:
-            lc_plot.flux_err = np.full(len(lc_plot.flux), np.nan)
-            errors = False
+
+        flux = self[column]
+        try:
+            flux_err = self[f'{column}_err']
+        except KeyError:
+            flux_err = np.full(len(flux), np.nan)
 
         # Normalize the data if requested
         if normalize:
-            lc_normed = lc_plot.normalize()
+            if column == "flux":
+                lc_normed = self.normalize()
+            else:
+                lc_tmp = self.copy()
+                lc_tmp['flux'] = flux
+                lc_tmp['flux_err'] = flux_err
+                lc_normed = lc_tmp.normalize()
             flux, flux_err = lc_normed.flux, lc_normed.flux_err
-        else:
-            flux, flux_err = lc_plot.flux, lc_plot.flux_err
 
         # Make the plot
         with plt.style.context(style):
@@ -1260,10 +1259,10 @@ class LightCurve(TimeSeries):
                     cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
                     cbar.ax.minorticks_off()
             elif method == 'errorbar':
-                if errors:
+                if np.any(~np.isnan(flux_err)):
                     ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
-                elif errors == False:
-                    raise ValueError("The column `{}` has no associated errors.".format(column))
+                else:
+                    raise ValueError(f"Column `{column}` has no associated errors.")
             else:
                 ax.plot(self.time.value, flux.value, **kwargs)
             ax.set_xlabel(xlabel)
