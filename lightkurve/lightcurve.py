@@ -1217,14 +1217,12 @@ class LightCurve(TimeSeries):
                     ylabel = "Flux"
             else:
                     ylabel = f"{column}"
-                    
             if normalize or self.meta.get("normalized"):
                 ylabel = "Normalized " + ylabel
-            elif self[column].unit:
+            elif (self[column].unit) and (type(self[column].unit) is not u.CompositeUnit):
                 ylabel += f" [{self[column].unit.to_string('latex_inline')}]"
             else: 
                 pass
-
         # Default legend label
         if ('label' not in kwargs):
             kwargs['label'] = self.meta.get('label')
