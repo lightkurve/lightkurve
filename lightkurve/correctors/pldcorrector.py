@@ -14,6 +14,7 @@ from .designmatrix import DesignMatrix, DesignMatrixCollection, SparseDesignMatr
 from .regressioncorrector import RegressionCorrector
 from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
 from .. import MPLSTYLE
+from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 
 log = logging.getLogger(__name__)
 
@@ -80,7 +81,9 @@ class PLDCorrector(RegressionCorrector):
         (arXiv:1702.05488)
     .. [4] EVEREST pipeline webpage, https://rodluger.github.io/everest
     """
+
     def __init__(self, tpf, aperture_mask=None):
+
         self.tpf = tpf
         if aperture_mask is None:
             aperture_mask = tpf.create_threshold_mask(2)
@@ -170,8 +173,7 @@ class PLDCorrector(RegressionCorrector):
         return dm
 
     def correct(self, dm=None, pld_order=1, background_mask=None, pixel_components=3,
-                spline_n_knots=100, spline_degree=3,
-                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
+                spline_n_knots=100, spline_degree=3, n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
         Parameters
         ----------
@@ -250,55 +252,6 @@ class PLDCorrector(RegressionCorrector):
         return axs
 
 
-class TessPLDCorrector(PLDCorrector):
-    """Correct TESS light curves by detrending against local pixel time series.
-
-    Subclass of `.PLDCorrector`, a version of the `.RegressionCorrector` class
-    in which the `.DesignMatrix` is constructed from pixel time series.
-
-    Parameters
-    ----------
-    tpf : `.TargetPixelFile`
-        The target pixel from which a light curve and background model
-        will be extracted.
-    """
-
-    def __init__(self, tpf):
-        super(TessPLDCorrector, self).__init__(tpf)
-
-    def correct(self, dm=None, pld_order=1, background_mask=None, pixel_components=3,
-                spline_n_knots=100, spline_degree=3,
-                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
-        """Returns a systematics-corrected light curve.
-
-        Parameters
-        ----------
-        pixel_components : int
-            Number of principal components derived from the background pixel
-            time series to utilize.
-        background_mask : array-like or None
-            A boolean array flagging the background pixels such that `True` means
-            that the pixel will be used to generate the background systematics model.
-            If `None`, all pixels which are fainter than 1-sigma above the median
-            flux will be used.
-        restore_trend : bool
-            Whether to restore the long term spline trend to the light curve.
-        """
-
-        clc = super(TessPLDCorrector, self).correct(dm=dm,
-                                                    pld_order=pld_order,
-                                                    background_mask=background_mask,
-                                                    pixel_components=pixel_components,
-                                                    spline_n_knots=spline_n_knots,
-                                                    spline_degree=spline_degree,
-                                                    n_pca_terms=n_pca_terms,
-                                                    restore_trend=restore_trend,
-                                                    sparse=sparse,
-                                                    **kwargs)
-
-        return clc
-
-
 class KeplerPLDCorrector(PLDCorrector):
     """Correct Kepler light curves by detrending against local pixel time series.
 
@@ -312,12 +265,12 @@ class KeplerPLDCorrector(PLDCorrector):
         will be extracted.
     """
 
-    def __init__(self, tpf):
-        super(KeplerPLDCorrector, self).__init__(tpf)
+    def __repr__(self):
+        return 'KeplerPLDCorrector (LC: {})'.format(self.lc.label)
 
     def correct(self, dm=None, pld_order=2, background_mask=None, pixel_components=15,
-                spline_n_knots=100, spline_degree=3,
-                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
+                spline_n_knots=100, spline_degree=3, n_pca_terms=10, restore_trend=True,
+                sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -344,5 +297,54 @@ class KeplerPLDCorrector(PLDCorrector):
                                                       restore_trend=restore_trend,
                                                       sparse=sparse,
                                                       **kwargs)
+
+        return clc
+
+
+class TessPLDCorrector(PLDCorrector):
+    """Correct TESS light curves by detrending against local pixel time series.
+
+    Subclass of `.PLDCorrector`, a version of the `.RegressionCorrector` class
+    in which the `.DesignMatrix` is constructed from pixel time series.
+
+    Parameters
+    ----------
+    tpf : `.TargetPixelFile`
+        The target pixel from which a light curve and background model
+        will be extracted.
+    """
+
+    def __repr__(self):
+        return 'TessPLDCorrector (LC: {})'.format(self.lc.label)
+
+    def correct(self, dm=None, pld_order=1, background_mask=None, pixel_components=3,
+                spline_n_knots=100, spline_degree=3, n_pca_terms=10, restore_trend=True,
+                sparse=False, **kwargs):
+        """Returns a systematics-corrected light curve.
+
+        Parameters
+        ----------
+        pixel_components : int
+            Number of principal components derived from the background pixel
+            time series to utilize.
+        background_mask : array-like or None
+            A boolean array flagging the background pixels such that `True` means
+            that the pixel will be used to generate the background systematics model.
+            If `None`, all pixels which are fainter than 1-sigma above the median
+            flux will be used.
+        restore_trend : bool
+            Whether to restore the long term spline trend to the light curve.
+        """
+
+        clc = super(TessPLDCorrector, self).correct(dm=dm,
+                                                    pld_order=pld_order,
+                                                    background_mask=background_mask,
+                                                    pixel_components=pixel_components,
+                                                    spline_n_knots=spline_n_knots,
+                                                    spline_degree=spline_degree,
+                                                    n_pca_terms=n_pca_terms,
+                                                    restore_trend=restore_trend,
+                                                    sparse=sparse,
+                                                    **kwargs)
 
         return clc
