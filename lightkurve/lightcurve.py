@@ -1219,7 +1219,7 @@ class LightCurve(TimeSeries):
                     ylabel = f"{column}"
             if normalize or self.meta.get("normalized"):
                 ylabel = "Normalized " + ylabel
-            elif (self[column].unit) and (self[column].unit.to_string() is not ''):
+            elif (self[column].unit) and (self[column].unit.to_string() != ''):
                 ylabel += f" [{self[column].unit.to_string('latex_inline')}]"
             else: 
                 pass
