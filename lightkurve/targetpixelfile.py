@@ -266,7 +266,7 @@ class TargetPixelFile(object):
         elif bjdrefi == 2457000:
             time_format = 'btjd'
         else:
-            raise ValueError(f"Input file has unclear time format: {filename}")
+            time_format = 'jd'
 
         return Time(time_values,
                     scale=self.hdu[1].header.get('TIMESYS', 'tdb').lower(),
