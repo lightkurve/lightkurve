@@ -21,6 +21,7 @@ import astropy.units as u
 
 from matplotlib import patches
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import numpy as np
 from scipy.ndimage import label
 from tqdm import tqdm
@@ -1166,6 +1167,124 @@ class TargetPixelFile(object):
             warnings.simplefilter('ignore')
             newfits = fits.HDUList(hdus)
         return self.__class__(newfits)
+
+
+    def inspect_pixels(self, ax=None, normalized=False, periodogram=False, aperture_mask=None, style='lightkurve', title=None, **kwargs):
+        """ Plot the light curves or associated periodograms for each pixel in one quarter
+        Note that all values are autoscaled and axis labels are not provided.
+        This utility is designed for by-eye inspection of signal morphology.
+        
+        Parameters
+        ----------
+        ax : `~matplotlib.axes.Axes`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        normalized : bool
+            Default: False; if True, the normalized light curves will be plotted.
+        periodogram : bool
+            Default: False; if True, periodograms will be plotted, using normalized light curves.
+            Note that this keyword overrides normalized.
+        aperture_mask : ndarray or str
+            Highlight pixels selected by aperture_mask.
+            Only `pipeline`, `threshold`, or custom masks will be plotted.
+            `all` and None masks will be ignored.
+        style : str
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
+        kwargs : dict
+            e.g. `threshold` to be passed to create_threshold_mask
+        
+        """
+
+        if style == 'lightkurve' or style is None:
+            style = MPLSTYLE 
+        
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+
+            # get an aperture mask for each pixel
+            masks = np.zeros((self.shape[1]*self.shape[2], self.shape[1], self.shape[2]), dtype='bool')
+            for i in range(self.shape[1]*self.shape[2]):
+                masks[i][np.unravel_index(i, (self.shape[1], self.shape[2]))] = True
+            
+            pixel_list = []
+
+            for j in range(self.shape[1]*self.shape[2]):
+                lc = self.to_lightcurve(aperture_mask=masks[j])
+                lc_norm = lc.normalize().remove_outliers()  
+                if periodogram == True:
+                    try:
+                        pixel_list.append(lc_norm.to_periodogram())
+                    except IndexError:
+                        pixel_list.append(None)
+                else:
+                    if normalized == True:
+                        if len(lc_norm.remove_nans().flux) == 0:
+                            pixel_list.append(None)
+                        else:
+                            pixel_list.append(lc_norm)
+                    elif normalized == False:
+                        if len(lc.remove_nans().flux) == 0:
+                            pixel_list.append(None)
+                        else:
+                            pixel_list.append(lc)
+
+        if aperture_mask == 'pipeline':
+            mask = self.pipeline_mask
+        elif aperture_mask == 'threshold':
+            mask = self.create_threshold_mask(**kwargs)
+        elif aperture_mask == 'all' or aperture_mask == None:
+            mask = np.zeros((self.shape[1], self.shape[2]), dtype='bool')
+        else:
+            mask = aperture_mask
+
+        with plt.style.context(style):
+            if title is None:
+                title = 'Target ID: {}, Quarter: {}'.format(self.targetid, self.quarter)
+
+            fig = plt.figure()
+            if ax == None:
+                ax = plt.gca()
+                ax.get_xaxis().set_ticks([])
+                ax.get_yaxis().set_ticks([])
+
+                if periodogram == True:
+                    ax.set(title=title, xlabel='Frequency', ylabel='Power')
+                else:
+                    if normalized == True:
+                        ax.set(title=title, xlabel='Time', ylabel='Normalized Flux')
+                    else:
+                        ax.set(title=title, xlabel='Time', ylabel='Flux')
+
+            gs = gridspec.GridSpec(self.shape[1], self.shape[2], wspace=0, hspace=0)
+
+            for k in range(self.shape[1]*self.shape[2]):
+                if pixel_list[k]:
+                    x, y = np.unravel_index(k, (self.shape[1], self.shape[2]))
+                    gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
+
+                    if periodogram == True:
+                        x_vals = pixel_list[k].frequency.value
+                        y_vals = pixel_list[k].power.value
+                    elif periodogram == False:
+                        x_vals = pixel_list[k].time.value
+                        y_vals = pixel_list[k].flux.value
+
+                    if mask[x,y] == True:
+                        lower = np.zeros(len(x_vals)) + np.nanmin(y_vals)
+                        upper = np.zeros(len(x_vals)) + np.nanmax(y_vals)
+                        gax.fill_between(x_vals, lower, upper, facecolor='#ff99a3')
+
+                    gax.plot(x_vals, y_vals, lw=0.5, c='k')
+                    gax.set_xlim(np.nanmin(x_vals), np.nanmax(x_vals))
+                    gax.set_ylim(np.nanmin(y_vals), np.nanmax(y_vals))
+                    gax.set_xticklabels('')
+                    gax.set_yticklabels('')
+                    gax.set_xticks([])
+                    gax.set_yticks([])
+
+        return ax
 
 
 class KeplerTargetPixelFile(TargetPixelFile):
