@@ -6,7 +6,7 @@ import numpy as np
 from astropy.utils.data import get_pkg_data_filename
 from numpy.testing import assert_array_equal
 
-from ... import LightCurve, KeplerLightCurveFile, KeplerLightCurve, \
+from ... import LightCurve, KeplerLightCurve, \
                 TessLightCurve, LightkurveWarning
 from .. import SFFCorrector
 
@@ -19,8 +19,8 @@ K2_C08 = ("https://archive.stsci.edu/missions/k2/lightcurves/c8/"
 @pytest.mark.parametrize("path", [K2_C08])
 def test_remote_data(path):
     """Can we correct a simple K2 light curve?"""
-    lcf = KeplerLightCurveFile(path, quality_bitmask=None)
-    sff = SFFCorrector(lcf.PDCSAP_FLUX.remove_nans())
+    lc = KeplerLightCurve.read(path, quality_bitmask=None)
+    sff = SFFCorrector(lc.remove_nans())
     sff.correct(windows=10, bins=5, timescale=0.5)
     sff.correct(windows=10, bins=5, timescale=0.5, sparse=True)
 

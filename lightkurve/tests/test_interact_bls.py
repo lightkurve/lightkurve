@@ -1,13 +1,14 @@
 """Tests the features of the lightkurve.interact_bls module."""
 import pytest
 
-from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
+from astropy.timeseries import BoxLeastSquares
+
+from ..lightcurve import KeplerLightCurve, TessLightCurve
 from .test_lightcurve import KEPLER10, TESS_SIM
 
 bad_optional_imports = False
 try:
     import bokeh
-    from astropy.stats.bls import BoxLeastSquares
 except:
     bad_optional_imports = True
 
@@ -17,8 +18,8 @@ except:
                     reason="requires bokeh and astropy.stats.bls")
 def test_malformed_notebook_url():
     """Test if malformed notebook_urls raise proper exceptions."""
-    lcf = KeplerLightCurveFile(KEPLER10)
-    lc = lcf.PDCSAP_FLUX.normalize().remove_nans().flatten()
+    lc = KeplerLightCurve.read(KEPLER10)
+    lc = lc.normalize().remove_nans().flatten()
     with pytest.raises(ValueError) as exc:
         lc.interact_bls(notebook_url='')
     assert('Empty host value' in exc.value.args[0])
@@ -31,8 +32,8 @@ def test_malformed_notebook_url():
                     reason="requires bokeh and astropy.stats.bls")
 def test_graceful_exit_outside_notebook():
     """Test if running interact outside of a notebook does fails gracefully."""
-    lcf = KeplerLightCurveFile(KEPLER10)
-    lc = lcf.PDCSAP_FLUX.normalize().remove_nans().flatten()
+    lc = KeplerLightCurve.read(KEPLER10)
+    lc = lc.normalize().remove_nans().flatten()
     result = lc.interact_bls()
     assert(result is None)
 
@@ -49,8 +50,8 @@ def test_helper_functions():
     from ..interact_bls import (prepare_bls_help_source,
                                         prepare_f_help_source,
                                         prepare_lc_help_source)
-    lcf = KeplerLightCurveFile(KEPLER10)
-    lc = lcf.PDCSAP_FLUX.normalize().remove_nans().flatten()
+    lc = KeplerLightCurve.read(KEPLER10)
+    lc = lc.normalize().remove_nans().flatten()
     lc_source = prepare_lightcurve_datasource(lc)
     f_source = prepare_folded_datasource(lc.fold(1))
     model = BoxLeastSquares(lc.time, lc.flux)
@@ -65,25 +66,27 @@ def test_helper_functions():
     make_folded_figure_elements(lc.fold(1), lc.fold(1), f_source, f_source, f_help)
     make_bls_figure_elements(result, bls_source, bls_help)
 
+
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports,
                     reason="requires bokeh and astropy.stats.bls")
 def test_full_widget():
     '''Test if we can run the widget with the keywords'''
-    lcf = KeplerLightCurveFile(KEPLER10)
-    lc = lcf.PDCSAP_FLUX.normalize().remove_nans().flatten()
+    lc = KeplerLightCurve.read(KEPLER10)
+    lc = lc.normalize().remove_nans().flatten()
     lc.interact_bls()
     lc.interact_bls(minimum_period=4)
     lc.interact_bls(maximum_period=5)
     lc.interact_bls(resolution=1000)
+
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports,
                     reason="requires bokeh and astropy.stats.bls")
 def test_tess_widget():
     '''Test if we can run the widget with the keywords'''
-    lcf = TessLightCurveFile.read(TESS_SIM)
-    lc = lcf.PDCSAP_FLUX.normalize().remove_nans().flatten()
+    lc = TessLightCurve.read(TESS_SIM)
+    lc = lc.normalize().remove_nans().flatten()
     lc.interact_bls()
     lc.interact_bls(minimum_period=4)
     lc.interact_bls(maximum_period=5)
