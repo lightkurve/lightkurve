@@ -1262,7 +1262,7 @@ class LightCurve(TimeSeries):
                 if np.any(~np.isnan(flux_err)):
                     ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
                 else:
-                    raise ValueError(f"Column `{column}` has no associated errors.")
+                    log.warning(f"Column `{column}` has no associated errors.")
             else:
                 ax.plot(self.time.value, flux.value, **kwargs)
             ax.set_xlabel(xlabel)

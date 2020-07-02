@@ -347,8 +347,7 @@ def test_lightcurve_plots():
         lc.plot(column='sap_bkg', normalize=True)
         lc.plot(column='cadenceno')
         lc.errorbar(column='psf_centr1')
-        with pytest.raises(ValueError):
-            lc.errorbar(column='timecorr')      
+        lc.errorbar(column='timecorr')
         plt.close('all')
 
 
