@@ -1185,7 +1185,7 @@ class LightCurve(TimeSeries):
             return res, np.in1d(self.astropy_time.jd, res.epoch)
         return res
 
-    def _create_plot(self, method='plot', ax=None, normalize=False,
+    def _create_plot(self, column='flux', method='plot', ax=None, normalize=False,
                      xlabel=None, ylabel=None, title='', style='lightkurve',
                      show_colorbar=True, colorbar_label='',
                      **kwargs):
@@ -1211,24 +1211,38 @@ class LightCurve(TimeSeries):
                 xlabel = 'Time [JD]'
             else:
                 xlabel = 'Time'
+
         # Default ylabel
         if ylabel is None:
-            if normalize or (self.flux.unit == u.dimensionless_unscaled):
-                ylabel = 'Normalized Flux'
-            elif self.flux.unit is None:
-                ylabel = 'Flux'
+            if "flux" in column:
+                ylabel = "Flux"
             else:
-                ylabel = 'Flux [{}]'.format(self.flux.unit.to_string("latex_inline"))
+                ylabel = f"{column}"
+            if normalize or self.meta.get("normalized"):
+                ylabel = "Normalized " + ylabel
+            elif (self[column].unit) and (self[column].unit.to_string() != ''):
+                ylabel += f" [{self[column].unit.to_string('latex_inline')}]"
+
         # Default legend label
         if ('label' not in kwargs):
             kwargs['label'] = self.meta.get('label')
 
+        flux = self[column]
+        try:
+            flux_err = self[f'{column}_err']
+        except KeyError:
+            flux_err = np.full(len(flux), np.nan)
+
         # Normalize the data if requested
         if normalize:
-            lc_normed = self.normalize()
+            if column == "flux":
+                lc_normed = self.normalize()
+            else:
+                lc_tmp = self.copy()
+                lc_tmp['flux'] = flux
+                lc_tmp['flux_err'] = flux_err
+                lc_normed = lc_tmp.normalize()
             flux, flux_err = lc_normed.flux, lc_normed.flux_err
-        else:
-            flux, flux_err = self.flux, self.flux_err
 
         # Make the plot
         with plt.style.context(style):
@@ -1245,7 +1259,10 @@ class LightCurve(TimeSeries):
                     cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
                     cbar.ax.minorticks_off()
             elif method == 'errorbar':
-                ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
+                if np.any(~np.isnan(flux_err)):
+                    ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
+                else:
+                    log.warning(f"Column `{column}` has no associated errors.")
             else:
                 ax.plot(self.time.value, flux.value, **kwargs)
             ax.set_xlabel(xlabel)
@@ -1262,6 +1279,8 @@ class LightCurve(TimeSeries):
 
         Parameters
         ----------
+        column : str
+            Name of data column to plot. Default `flux`.
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be created.
@@ -1292,6 +1311,8 @@ class LightCurve(TimeSeries):
 
         Parameters
         ----------
+        column : str
+            Name of data column to plot. Default `flux`.
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
@@ -1327,6 +1348,8 @@ class LightCurve(TimeSeries):
 
         Parameters
         ----------
+        column : str
+            Name of data column to plot. Default `flux`.
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
