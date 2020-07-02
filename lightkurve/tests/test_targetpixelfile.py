@@ -61,6 +61,7 @@ def test_tpf_shapes():
         assert tpf.quality_mask.shape == tpf.hdu[1].data['TIME'].shape
         assert tpf.flux.shape == tpf.flux_err.shape
 
+
 def test_tpf_math():
     """Can you add, subtract, multiply and divide?"""
     with warnings.catch_warnings():
@@ -68,33 +69,34 @@ def test_tpf_math():
         warnings.simplefilter("ignore", LightkurveWarning)
         tpfs = [KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tpf_all_zeros)]
-    # These should work
-    for tpf in tpfs:
-        for other in [1, np.ones(tpf.flux.shape[1:]), np.ones(tpf.shape)]:
-            tpf + other
-            tpf - other
-            tpf * other
-            tpf / other
 
-
-            tpf += other
-            tpf -= other
-            tpf *= other
-            tpf /= other
-
-    # These should fail with a value error because their shape is wrong.
-    for tpf in tpfs:
-        for other in [np.asarray([1, 2]), np.arange(len(tpf.time) - 1), np.ones([100, 1]), np.ones([1, 2, 3])]:
-            with pytest.raises(ValueError):
+        # These should work
+        for tpf in tpfs:
+            for other in [1, np.ones(tpf.flux.shape[1:]), np.ones(tpf.shape)]:
                 tpf + other
+                tpf - other
+                tpf * other
+                tpf / other
 
-    # Check the values are correct
-    assert np.all(((tpf.flux.value + 2) == (tpf + 2).flux.value)[np.isfinite(tpf.flux)])
-    assert np.all(((tpf.flux.value - 2) == (tpf - 2).flux.value)[np.isfinite(tpf.flux)])
-    assert np.all(((tpf.flux.value * 2) == (tpf * 2).flux.value)[np.isfinite(tpf.flux)])
-    assert np.all(((tpf.flux.value / 2) == (tpf / 2).flux.value)[np.isfinite(tpf.flux)])
-    assert np.all(((tpf.flux_err.value * 2) == (tpf * 2).flux_err.value)[np.isfinite(tpf.flux)])
-    assert np.all(((tpf.flux_err.value / 2) == (tpf / 2).flux_err.value)[np.isfinite(tpf.flux)])
+                tpf += other
+                tpf -= other
+                tpf *= other
+                tpf /= other
+
+        # These should fail with a value error because their shape is wrong.
+        for tpf in tpfs:
+            for other in [np.asarray([1, 2]), np.arange(len(tpf.time) - 1),
+                          np.ones([100, 1]), np.ones([1, 2, 3])]:
+                with pytest.raises(ValueError):
+                    tpf + other
+
+        # Check the values are correct
+        assert np.all(((tpf.flux.value + 2) == (tpf + 2).flux.value)[np.isfinite(tpf.flux)])
+        assert np.all(((tpf.flux.value - 2) == (tpf - 2).flux.value)[np.isfinite(tpf.flux)])
+        assert np.all(((tpf.flux.value * 2) == (tpf * 2).flux.value)[np.isfinite(tpf.flux)])
+        assert np.all(((tpf.flux.value / 2) == (tpf / 2).flux.value)[np.isfinite(tpf.flux)])
+        assert np.all(((tpf.flux_err.value * 2) == (tpf * 2).flux_err.value)[np.isfinite(tpf.flux)])
+        assert np.all(((tpf.flux_err.value / 2) == (tpf / 2).flux_err.value)[np.isfinite(tpf.flux)])
 
 
 def test_tpf_plot():
