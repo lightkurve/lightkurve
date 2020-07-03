@@ -90,7 +90,7 @@ class PLDCorrector(Corrector):
 
         self.flux = tpf.flux
         self.flux_err = tpf.flux_err
-        self.time = tpf.time
+        self.time = tpf.time.value
 
     def correct(self, aperture_mask=None, cadence_mask=None, gp_timescale=30,
                 use_gp=True, pld_order=2, n_pca_terms=10, pld_aperture_mask=None):
@@ -278,5 +278,5 @@ class PLDCorrector(Corrector):
         # Create and return a new LightCurve object with the corrected flux
         corrected_lc = lc.copy()[nanmask]
         corrected_lc.flux = self.detrended_flux
-        corrected_lc.flux_err = flux_err
+        corrected_lc.flux_err = flux_err.value
         return corrected_lc

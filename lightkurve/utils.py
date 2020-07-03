@@ -330,7 +330,7 @@ def running_mean(data, window_size):
     return (cumsum[window_size:] - cumsum[:-window_size]) / float(window_size)
 
 
-def bkjd_to_astropy_time(bkjd):
+def bkjd_to_astropy_time(bkjd) -> Time:
     """Converts Kepler Barycentric Julian Day (BKJD) time values to an
     `astropy.time.Time` object.
 
@@ -359,7 +359,7 @@ def bkjd_to_astropy_time(bkjd):
     return Time(bkjd, format='bkjd', scale='tdb')
 
 
-def btjd_to_astropy_time(btjd):
+def btjd_to_astropy_time(btjd) -> Time:
     """Converts TESS Barycentric Julian Day (BTJD) values to an
     `astropy.time.Time` object.
 
@@ -420,6 +420,8 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     ax : `~matplotlib.axes.Axes`
         The matplotlib axes object.
     """
+    if isinstance(image, u.Quantity):
+        image = image.value
     if ax is None:
         _, ax = plt.subplots()
     with warnings.catch_warnings():
@@ -532,6 +534,8 @@ def centroid_quadratic(data, mask=None):
         The coordinates of the centroid in column and row.  If the fit failed,
         then (NaN, NaN) will be returned.
     """
+    if isinstance(data, u.Quantity):
+        data = data.value
     # Step 1: identify the patch of 3x3 pixels (z_)
     # that is centered on the brightest pixel (xx, yy)
     if mask is not None:
