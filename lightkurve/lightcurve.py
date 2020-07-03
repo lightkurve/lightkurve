@@ -1564,7 +1564,7 @@ class LightCurve(TimeSeries):
         return Seismology.from_lightcurve(self, **kwargs)
 
     def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX',
-                **extra_data) -> astropy.io.fits.HDUList:
+                **extra_data):
         """Converts the light curve to a FITS file in the Kepler/TESS file format.
 
         The FITS file will be returned as a `~astropy.io.fits.HDUList` object.
@@ -1675,7 +1675,7 @@ class LightCurve(TimeSeries):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
-    def to_corrector(self, method="sff") -> Corrector:
+    def to_corrector(self, method="sff"):
         """Returns a corrector object to remove instrument systematics.
 
         Parameters
