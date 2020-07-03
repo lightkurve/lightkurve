@@ -1504,7 +1504,7 @@ class LightCurve(TimeSeries):
             return path_or_buf.getvalue()
         return result
 
-    def to_periodogram(self, method="lombscargle", **kwargs) -> Periodogram:
+    def to_periodogram(self, method="lombscargle", **kwargs) -> 'Periodogram':
         """Converts the light curve to a `~lightkurve.periodogram.Periodogram`
         power spectrum object.
 
@@ -1549,7 +1549,7 @@ class LightCurve(TimeSeries):
             from . import LombScarglePeriodogram
             return LombScarglePeriodogram.from_lightcurve(lc=self, **kwargs)
 
-    def to_seismology(self, **kwargs) -> Seismology:
+    def to_seismology(self, **kwargs) -> 'Seismology':
         """Returns a `~lightkurve.seismology.Seismology` object for estimating
         quick-look asteroseismic quantities.
 
