@@ -1169,7 +1169,7 @@ class TargetPixelFile(object):
         return self.__class__(newfits)
 
 
-    def inspect_pixels(self, ax=None, normalize=False, periodogram=False, aperture_mask=None, style='lightkurve', title=None, **kwargs):
+    def inspect_pixels(self, ax=None, normalize=False, periodogram=False, aperture_mask=None, show_flux=False, style='lightkurve', title=None, **kwargs):
         """ Plot the light curves or associated periodograms for each pixel in one quarter
         Note that all values are autoscaled and axis labels are not provided.
         This utility is designed for by-eye inspection of signal morphology.
@@ -1188,6 +1188,9 @@ class TargetPixelFile(object):
             Highlight pixels selected by aperture_mask.
             Only `pipeline`, `threshold`, or custom masks will be plotted.
             `all` and None masks will be ignored.
+        show_flux : bool
+            Default: False; if True, shade pixels with frame 0 flux colour
+            Inspired by https://github.com/noraeisner/LATTE
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
@@ -1250,28 +1253,44 @@ class TargetPixelFile(object):
                     else:
                         ax.set(title=title, xlabel='Time', ylabel='Flux')
 
-            gs = gridspec.GridSpec(self.shape[1], self.shape[2], wspace=0, hspace=0)
+            gs = gridspec.GridSpec(self.shape[1], self.shape[2], wspace=0.01, hspace=0.01)
+            tpf_plot = plt.imshow(self.flux[0]) # only used if show_flux = True
 
             for k in range(self.shape[1]*self.shape[2]):
                 if pixel_list[k]:
                     x, y = np.unravel_index(k, (self.shape[1], self.shape[2]))
-                    gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
 
                     if periodogram == True:
                         x_vals = pixel_list[k].frequency.value
                         y_vals = pixel_list[k].power.value
+                        x_axis_min = 0
+                        x_axis_max = np.nanmax(x_vals)
+                        y_axis_min = 0
+                        y_axis_max = np.nanmax(y_vals)
                     elif periodogram == False:
                         x_vals = pixel_list[k].time.value
                         y_vals = pixel_list[k].flux.value
+                        y_val_range = np.nanmax(y_vals) - np.nanmin(y_vals)
+                        x_axis_min = np.nanmin(x_vals)
+                        x_axis_max = np.nanmax(x_vals)
+                        y_axis_min = np.nanmin(y_vals) - 0.05*y_val_range
+                        y_axis_max = np.nanmax(y_vals) + 0.05*y_val_range
 
                     if mask[x,y] == True:
-                        lower = np.zeros(len(x_vals)) + np.nanmin(y_vals)
-                        upper = np.zeros(len(x_vals)) + np.nanmax(y_vals)
-                        gax.fill_between(x_vals, lower, upper, facecolor='#ff99a3')
+                        with plt.rc_context(rc={"axes.linewidth":2, "axes.edgecolor":'red'}):
+                            gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
+                    else:
+                        with plt.rc_context(rc={"axes.linewidth":1}):
+                            gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
 
-                    gax.plot(x_vals, y_vals, lw=0.5, c='k')
-                    gax.set_xlim(np.nanmin(x_vals), np.nanmax(x_vals))
-                    gax.set_ylim(np.nanmin(y_vals), np.nanmax(y_vals))
+                    if show_flux == True:
+                        gax.set_facecolor(tpf_plot.cmap(tpf_plot.norm(self.flux[0,x,y])))
+                        gax.plot(x_vals, y_vals, 'w.', ms=0.5)
+                    else:
+                        gax.plot(x_vals, y_vals, 'k.', ms=0.5)
+                    
+                    gax.set_xlim(x_axis_min, x_axis_max)
+                    gax.set_ylim(y_axis_min, y_axis_max)
                     gax.set_xticklabels('')
                     gax.set_yticklabels('')
                     gax.set_xticks([])
