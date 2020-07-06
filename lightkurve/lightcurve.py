@@ -1,6 +1,4 @@
 """Defines LightCurve, KeplerLightCurve, and TessLightCurve."""
-from __future__ import annotations
-
 import os
 import datetime
 import logging
@@ -431,7 +429,7 @@ class LightCurve(TimeSeries):
                     idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
-    def append(self, others: Iterable[LightCurve], inplace=False) -> LightCurve:
+    def append(self, others, inplace=False):
         """Append one or more other `LightCurve` object(s) to this one.
 
         Parameters
@@ -456,7 +454,7 @@ class LightCurve(TimeSeries):
         return vstack((self, *others), join_type='inner', metadata_conflicts='silent')
 
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
-                break_tolerance=5, niters=3, sigma=3, mask=None, **kwargs) -> LightCurve:
+                break_tolerance=5, niters=3, sigma=3, mask=None, **kwargs):
         """Removes the low frequency trend using scipy's Savitzky-Golay filter.
 
         This method wraps `scipy.signal.savgol_filter`.
@@ -564,7 +562,7 @@ class LightCurve(TimeSeries):
     @deprecated_renamed_argument('t0', 'epoch_time', '2.0',
                                  warning_type=LightkurveDeprecationWarning)
     def fold(self, period=None, epoch_time=None, epoch_phase=0,
-             wrap_phase=None, normalize_phase=False) -> FoldedLightCurve:
+             wrap_phase=None, normalize_phase=False):
         """Returns a `FoldedLightCurve` object folded on a period and epoch.
 
         This method is identical to AstroPy's `~astropy.timeseries.TimeSeries.fold()`
@@ -655,7 +653,7 @@ class LightCurve(TimeSeries):
 
         return lc
 
-    def normalize(self, unit='unscaled') -> LightCurve:
+    def normalize(self, unit='unscaled'):
         """Returns a normalized version of the light curve.
 
         The normalized light curve is obtained by dividing the ``flux`` and
@@ -743,7 +741,7 @@ class LightCurve(TimeSeries):
         lc.meta['normalized'] = True
         return lc
 
-    def remove_nans(self) -> LightCurve:
+    def remove_nans(self):
         """Removes cadences where the flux is NaN.
 
         Returns
@@ -753,7 +751,7 @@ class LightCurve(TimeSeries):
         """
         return self[~np.isnan(self.flux)]  # This will return a sliced copy
 
-    def fill_gaps(self, method: str = 'gaussian_noise') -> LightCurve:
+    def fill_gaps(self, method: str = 'gaussian_noise'):
         """Fill in gaps in time.
 
         By default, the gaps will be filled with random white Gaussian noise
@@ -842,7 +840,7 @@ class LightCurve(TimeSeries):
         return LightCurve(data=newdata, meta=self.meta)
 
     def remove_outliers(self, sigma=5., sigma_lower=None, sigma_upper=None,
-                        return_mask=False, **kwargs) -> LightCurve:
+                        return_mask=False, **kwargs):
         """Removes outlier data points using sigma-clipping.
 
         This method returns a new `LightCurve` object from which data points
@@ -940,7 +938,7 @@ class LightCurve(TimeSeries):
                                  warning_type=LightkurveDeprecationWarning,
                                  alternative='time_bin_size')
     def bin(self, time_bin_size=None, time_bin_start=None, n_bins=None,
-            aggregate_func=None, binsize=None) -> LightCurve:
+            aggregate_func=None, binsize=None):
         """Bins a lightcurve in equally-spaced bins in time.
 
         If the original light curve contains flux uncertainties (``flux_err``),
