@@ -1230,7 +1230,7 @@ class TargetPixelFile(object):
                         else:
                             pixel_list.append(lc)
 
-mask = self._parse_aperture_mask(aperture_mask)
+        mask = self._parse_aperture_mask(aperture_mask)
 
         with plt.style.context(style):
             if title is None:
