@@ -1234,7 +1234,7 @@ mask = self._parse_aperture_mask(aperture_mask)
 
         with plt.style.context(style):
             if title is None:
-                title = 'Target ID: {}, Quarter: {}'.format(self.targetid, self.quarter)
+                title = f'Target ID: {self.targetid}'
 
             fig = plt.figure()
             if ax == None:
