@@ -1219,12 +1219,12 @@ class TargetPixelFile(object):
                     except IndexError:
                         pixel_list.append(None)
                 else:
-                    if normalized == True:
+                    if normalize == True:
                         if len(lc_norm.remove_nans().flux) == 0:
                             pixel_list.append(None)
                         else:
                             pixel_list.append(lc_norm)
-                    elif normalized == False:
+                    elif normalize == False:
                         if len(lc.remove_nans().flux) == 0:
                             pixel_list.append(None)
                         else:
@@ -1245,7 +1245,7 @@ class TargetPixelFile(object):
                 if periodogram == True:
                     ax.set(title=title, xlabel='Frequency', ylabel='Power')
                 else:
-                    if normalized == True:
+                    if normalize == True:
                         ax.set(title=title, xlabel='Time', ylabel='Normalized Flux')
                     else:
                         ax.set(title=title, xlabel='Time', ylabel='Flux')
