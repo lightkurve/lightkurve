@@ -1230,14 +1230,7 @@ class TargetPixelFile(object):
                         else:
                             pixel_list.append(lc)
 
-        if aperture_mask == 'pipeline':
-            mask = self.pipeline_mask
-        elif aperture_mask == 'threshold':
-            mask = self.create_threshold_mask(**kwargs)
-        elif aperture_mask == 'all' or aperture_mask == None:
-            mask = np.zeros((self.shape[1], self.shape[2]), dtype='bool')
-        else:
-            mask = aperture_mask
+mask = self._parse_aperture_mask(aperture_mask)
 
         with plt.style.context(style):
             if title is None:
