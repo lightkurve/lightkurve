@@ -1276,7 +1276,11 @@ class TargetPixelFile(object):
                         y_axis_min = np.nanmin(y_vals) - 0.05*y_val_range
                         y_axis_max = np.nanmax(y_vals) + 0.05*y_val_range
 
-                    if mask[x,y] == True:
+                    no_mask = False
+                    if aperture_mask == 'all' or aperture_mask == None:
+                        no_mask = True
+                        
+                    if mask[x,y] == True and no_mask == False:
                         with plt.rc_context(rc={"axes.linewidth":2, "axes.edgecolor":'red'}):
                             gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
                     else:
