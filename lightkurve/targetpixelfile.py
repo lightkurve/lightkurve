@@ -1234,6 +1234,8 @@ class TargetPixelFile(object):
                             pixel_list.append(lc)
 
         mask = self._parse_aperture_mask(aperture_mask)
+        tpf_plot = plt.imshow(self.flux[0])
+        plt.close()
 
         with plt.style.context(style):
             if title is None:
@@ -1254,7 +1256,6 @@ class TargetPixelFile(object):
                         ax.set(title=title, xlabel='Time', ylabel='Flux')
 
             gs = gridspec.GridSpec(self.shape[1], self.shape[2], wspace=0.01, hspace=0.01)
-            tpf_plot = plt.imshow(self.flux[0]) # only used if show_flux = True
 
             for k in range(self.shape[1]*self.shape[2]):
                 if pixel_list[k]:
@@ -1279,7 +1280,7 @@ class TargetPixelFile(object):
                     no_mask = False
                     if aperture_mask == 'all' or aperture_mask == None:
                         no_mask = True
-                        
+
                     if mask[x,y] == True and no_mask == False:
                         with plt.rc_context(rc={"axes.linewidth":2, "axes.edgecolor":'red'}):
                             gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
@@ -1299,6 +1300,8 @@ class TargetPixelFile(object):
                     gax.set_yticklabels('')
                     gax.set_xticks([])
                     gax.set_yticks([])
+
+            fig.set_size_inches((y*1.5,x*1.5))
 
         return ax
 
