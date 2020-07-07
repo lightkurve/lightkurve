@@ -1290,9 +1290,15 @@ class TargetPixelFile(object):
 
                     if show_flux == True:
                         gax.set_facecolor(tpf_plot.cmap(tpf_plot.norm(self.flux[0,x,y])))
-                        gax.plot(x_vals, y_vals, 'w.', ms=0.5)
+                        if periodogram == True:
+                            gax.plot(x_vals, y_vals, 'w-', lw=0.5)
+                        elif periodogram == False:
+                            gax.plot(x_vals, y_vals, 'w.', ms=0.5)
                     else:
-                        gax.plot(x_vals, y_vals, 'k.', ms=0.5)
+                        if periodogram == True:
+                            gax.plot(x_vals, y_vals, 'w-', lw=0.5)
+                        elif periodogram == False:
+                            gax.plot(x_vals, y_vals, 'w.', ms=0.5)
                     
                     gax.set_xlim(x_axis_min, x_axis_max)
                     gax.set_ylim(y_axis_min, y_axis_max)
