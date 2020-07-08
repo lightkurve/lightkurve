@@ -118,6 +118,7 @@ Science / Astrophysics
 Astronomical Spectroscopy / Radial Velocities
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+- `allesfitter <https://github.com/MNGuenther/allesfitter>`_ : Model exoplanets, binaries, and flares from photometry and RV.
 - `exoplanet <https://github.com/dfm/exoplanet>`_ : Fast and scalable MCMC for all your exoplanet needs
 - `exonailer <https://github.com/nespinoza/exonailer>`_ : Tools for fitting transiting exoplanet lightcurves and radial velocities
 - `pyaneti <https://github.com/oscaribv/pyaneti>`_ : A multi-planet Radial Velocity and Transit fit software

@@ -761,7 +761,7 @@ class LombScarglePeriodogram(Periodogram):
         time = lc.time.copy()
 
         # Approximate Nyquist Frequency and frequency bin width in terms of days
-        nyquist = 0.5 * (1./(np.median(np.diff(time))))
+        nyquist = 0.5 * (1./(np.median(np.diff(time.value)))) * (1/cds.d)
         fs = (1./(time[-1] - time[0])) / oversample_factor
 
         # Convert these values to requested frequency unit
@@ -850,7 +850,8 @@ class LombScarglePeriodogram(Periodogram):
                                       targetid=lc.meta.get('targetid'),
                                       label=lc.meta.get('label'),
                                       default_view=default_view, ls_obj=LS,
-                                      nterms=nterms, ls_method=ls_method)
+                                      nterms=nterms, ls_method=ls_method,
+                                      meta=lc.meta)
 
     def model(self, time, frequency=None):
         """Obtain the flux model for a given frequency and time

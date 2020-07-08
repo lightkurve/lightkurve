@@ -4,18 +4,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import unit_impulse as deltafn
 
-from ...search import search_lightcurvefile
+from ...search import search_lightcurve
 from ...periodogram import Periodogram
 from ...periodogram import SNRPeriodogram
 
 
 @pytest.mark.remote_data
 def test_asteroseismology():
-    datalist = search_lightcurvefile('KIC11615890')
+    datalist = search_lightcurve('KIC11615890')
     data = datalist.download_all()
-    lc = data[0].PDCSAP_FLUX.normalize().flatten()
+    lc = data[0].normalize().flatten()
     for nlc in data[0:5]:
-        lc = lc.append(nlc.PDCSAP_FLUX.normalize().flatten())
+        lc = lc.append(nlc.normalize().flatten())
     lc = lc.remove_nans()
     pg = lc.to_periodogram(normalization='psd')
     snr = pg.flatten()
@@ -236,6 +236,7 @@ def test_plot_deltanu_diagnostics():
     ax = butler.diagnose_deltanu()
     assert(np.isclose(deltanu.value, true_deltanu, atol=.25*true_deltanu))
     assert(deltanu.unit == u.microhertz)
+    plt.close('all')
 
     #Note: checks on the `numax` kwarg in `estimate_deltanu_kwargs` also apply
     #to this function, no need to check them twice.
@@ -248,6 +249,7 @@ def test_plot_deltanu_diagnostics():
     daynumax = u.Quantity(numax.value*u.microhertz, 1/u.day)
     deltanu = butler.estimate_deltanu(numax=daynumax)
     butler.diagnose_deltanu(deltanu)
+    plt.close('all')
 
     # Check plotting works when periodogram is sliced
     rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
@@ -255,6 +257,7 @@ def test_plot_deltanu_diagnostics():
     butler.estimate_numax()
     butler.estimate_deltanu()
     ax = butler.diagnose_deltanu()
+    plt.close('all')
 
     # Check it plots when frequency is in days
     fday = u.Quantity(f*u.microhertz, 1/u.day)
@@ -262,7 +265,36 @@ def test_plot_deltanu_diagnostics():
     butler = daysnr.to_seismology()
     butler.estimate_deltanu(numax=daynumax)
     butler.diagnose_deltanu()
+    plt.close('all')
 
+
+def test_stellar_estimator_calls():
+    f, p, _, true_deltanu = generate_test_spectrum()
+    snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
+    snr.meta = {'teff' : 3000}
+
+    butler = snr.to_seismology()
+    butler.estimate_numax()
+    deltanu = butler.estimate_deltanu()
+
+    # Calling teff from meta
+    mass = butler.estimate_mass()
+    rad = butler.estimate_radius()
+    log = butler.estimate_logg()
+
+    # Custom teff
+    mass = butler.estimate_mass(3100)
+    rad = butler.estimate_radius(3100)
+    log = butler.estimate_logg(3100)
+
+    # Raise error if no teff available
+    butler.periodogram.meta['teff'] = None
+    with pytest.raises(ValueError):
+        mass = butler.estimate_mass()
+    with pytest.raises(ValueError):  
+        rad = butler.estimate_radius()
+    with pytest.raises(ValueError):
+        log = butler.estimate_logg()
 
 def test_plot_echelle():
     f, p, numax, deltanu = generate_test_spectrum()
@@ -274,24 +306,31 @@ def test_plot_echelle():
 
     # Assert basic echelle works
     butler.plot_echelle(deltanu=deltanu, numax=numax)
+    plt.close('all')
     butler.plot_echelle(u.Quantity(deltanu, 1/u.day), numax)
     plt.close('all')
 
     # Assert accepts dimensionless input
     butler.plot_echelle(deltanu=deltanu.value*1.001, numax=numax)
+    plt.close('all')
     butler.plot_echelle(deltanu=deltanu, numax=numax.value/1.001)
     plt.close('all')
 
     # Assert echelle works with numax
     butler.plot_echelle(deltanu, numax)
+    plt.close('all')
     butler.plot_echelle(deltanu, u.Quantity(numax, 1/u.day))
     plt.close('all')
 
     # Assert echelle works with minimum limit
     butler.plot_echelle(deltanu, numax, minimum_frequency=numax)
+    plt.close('all')
     butler.plot_echelle(deltanu, numax, maximum_frequency=numax)
+    plt.close('all')
     butler.plot_echelle(deltanu, numax, minimum_frequency=u.Quantity(numax, 1/u.day))
+    plt.close('all')
     butler.plot_echelle(deltanu, numax, maximum_frequency=u.Quantity(numax, 1/u.day))
+    plt.close('all')
     butler.plot_echelle(deltanu, numax, minimum_frequency=u.Quantity(numax-deltanu, 1/u.day),
                         maximum_frequency=numax+deltanu)
     plt.close('all')
@@ -299,10 +338,13 @@ def test_plot_echelle():
     # Assert raises error if numax or either of the limits are too high
     with pytest.raises(ValueError):
         butler.plot_echelle(deltanu, numax, minimum_frequency=f[-1]+10)
+    plt.close('all')
     with pytest.raises(ValueError):
         butler.plot_echelle(deltanu, numax, maximum_frequency=f[-1]+10)
+    plt.close('all')
     with pytest.raises(ValueError):
         butler.plot_echelle(deltanu, numax=f[-1]+10)
+    plt.close('all')
 
     # Assert can pass colormap
     butler.plot_echelle(deltanu, numax, cmap='viridis')

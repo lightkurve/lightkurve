@@ -9,8 +9,14 @@
 - Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
   ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
 
-- Added the ``column`` parameter to ``TargetPixelFile.plot()`` to enable all
-  columns in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
+- Added a ``column`` parameter to ``TargetPixelFile.plot()`` to enable any
+  column in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
+
+- Added a ``column`` parameter to ``LightCurve``'s ``plot()``, ``scatter()``,
+  and ``errorbar()`` methods to enable any column to be plotted. [#765]
+
+- Modified the ``estimate_radius``, ``estimate_mass``, and ``estimate_logg``
+  methods to default to the ``teff`` value in the meta data. [#766]
 
 
 

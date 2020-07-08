@@ -1,9 +1,4 @@
-"""Adds the BKJD and BTJD time format for use by Astropy's `Time` object.
-
-TODO
-----
-We need to consider including these in Astropy Core
-"""
+"""Adds the BKJD and BTJD time format for use by Astropy's `Time` object."""
 from astropy.time.formats import TimeNumeric, day_frac
 
 

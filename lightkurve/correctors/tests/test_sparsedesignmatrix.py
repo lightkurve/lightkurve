@@ -120,19 +120,20 @@ def test_collection_basics():
     assert isinstance(dmc.to_designmatrix(), SparseDesignMatrix)
 
 
-
 def test_designmatrix_rank():
     """Does DesignMatrix issue a low-rank warning when justified?"""
     warnings.simplefilter("always")
 
     # Good rank
-    dm = DesignMatrix({'a': [1, 2, 3]})
+    dm = DesignMatrix({'a': [1, 2, 3]}).to_sparse()
     assert dm.rank == 1
     dm.validate(rank=True)  # Should not raise a warning
 
     # Bad rank
-    dm = DesignMatrix({'a': [1, 2, 3], 'b': [1, 1, 1], 'c': [1, 1, 1],
-                       'd': [1, 1, 1], 'e': [3, 4, 5]})
+    with pytest.warns(LightkurveWarning, match='rank'):
+        dm = DesignMatrix({'a': [1, 2, 3], 'b': [1, 1, 1], 'c': [1, 1, 1],
+                           'd': [1, 1, 1], 'e': [3, 4, 5]})
+    dm = dm.to_sparse()
     assert dm.rank == 2
     with pytest.warns(LightkurveWarning, match='rank'):
         dm.validate(rank=True)
@@ -143,7 +144,7 @@ def test_splines():
     # Dense and sparse splines should produce the same answer.
     x = np.linspace(0, 1, 100)
     spline_dense = create_spline_matrix(x, knots=[0.1, 0.3, 0.6, 0.9], degree=2)
-    spline_sparse =create_sparse_spline_matrix(x, knots=[0.1, 0.3, 0.6, 0.9], degree=2)
+    spline_sparse = create_sparse_spline_matrix(x, knots=[0.1, 0.3, 0.6, 0.9], degree=2)
     assert np.allclose(spline_dense.values, spline_sparse.values)
     assert isinstance(spline_dense, DesignMatrix)
     assert isinstance(spline_sparse, SparseDesignMatrix)
