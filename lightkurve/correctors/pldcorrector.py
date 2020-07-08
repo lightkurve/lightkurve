@@ -102,7 +102,8 @@ class PLDCorrector(RegressionCorrector):
         return self.dm
 
     def create_design_matrix(self, pld_order=1, pixel_components=3, background_mask=None,
-                             spline_n_knots=100, spline_degree=3, n_pca_terms=6, sparse=False):
+                             pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
+                             n_pca_terms=6, sparse=False):
         """
 
         Parameters
@@ -120,6 +121,14 @@ class PLDCorrector(RegressionCorrector):
             that the pixel will be used to generate the background systematics model.
             If `None`, all pixels which are fainter than 1-sigma above the median
             flux will be used.
+        pld_aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used when selecting the PLD basis vectors.
+            If `None` or `all` are passed in, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
         spline_n_knots : int
             Number of knots in spline.
         spline_degree : int
@@ -157,8 +166,12 @@ class PLDCorrector(RegressionCorrector):
         simple_bkg = np.nanmedian(simple_bkg[:, background_mask], axis=1)
         simple_bkg -= np.percentile(simple_bkg, 5)
 
+        # Parse PLD aperture mask
+        pld_pixel_mask = self.tpf._parse_aperture_mask(pld_aperture_mask)
+
         # Background-subtracted, flux-normalized pixel time series
-        regressors = self.tpf.flux.reshape(len(self.tpf.flux), -1) - simple_bkg.reshape(-1,1)
+        regressors = self.tpf.flux[:, pld_pixel_mask].reshape(len(self.tpf.flux), -1)
+        regressors = regressors - simple_bkg.reshape(-1,1)
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
         regressors = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
 
@@ -191,8 +204,8 @@ class PLDCorrector(RegressionCorrector):
         return dm
 
     def correct(self, dm=None, pld_order=1, pixel_components=3, background_mask=None,
-                spline_n_knots=100, spline_degree=3, n_pca_terms=10, restore_trend=True,
-                sparse=False, **kwargs):
+                pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
+                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -216,6 +229,14 @@ class PLDCorrector(RegressionCorrector):
             that the pixel will be used to generate the background systematics model.
             If `None`, all pixels which are fainter than 1-sigma above the median
             flux will be used.
+        pld_aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used when selecting the PLD basis vectors.
+            If `None` or `all` are passed in, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
         spline_n_knots : int
             Number of knots in spline.
         spline_degree : int
@@ -245,6 +266,7 @@ class PLDCorrector(RegressionCorrector):
 
         if dm is None:
             dm = self.create_design_matrix(background_mask=background_mask,
+                                           pld_aperture_mask=pld_aperture_mask,
                                            pld_order=pld_order,
                                            n_pca_terms=n_pca_terms,
                                            pixel_components=pixel_components,
@@ -335,6 +357,14 @@ class KeplerPLDCorrector(PLDCorrector):
         that the pixel will be used to generate the background systematics model.
         If `None`, all pixels which are fainter than 1-sigma above the median
         flux will be used.
+    pld_aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
+        A boolean array describing the aperture such that `True` means
+        that the pixel will be used when selecting the PLD basis vectors.
+        If `None` or `all` are passed in, all pixels will be used.
+        If 'pipeline' is passed, the mask suggested by the official pipeline
+        will be returned.
+        If 'threshold' is passed, all pixels brighter than 3-sigma above
+        the median flux will be used.
     spline_n_knots : int
         Number of knots in spline.
     spline_degree : int
@@ -361,8 +391,8 @@ class KeplerPLDCorrector(PLDCorrector):
         return 'KeplerPLDCorrector (LC: {})'.format(self.lc.label)
 
     def correct(self, dm=None, pld_order=2, pixel_components=15, background_mask=None,
-                spline_n_knots=100, spline_degree=3, n_pca_terms=10, restore_trend=True,
-                sparse=False, **kwargs):
+                pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
+                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -382,6 +412,7 @@ class KeplerPLDCorrector(PLDCorrector):
         clc = super(KeplerPLDCorrector, self).correct(dm=dm,
                                                       pld_order=pld_order,
                                                       background_mask=background_mask,
+                                                      pld_aperture_mask=pld_aperture_mask,
                                                       pixel_components=pixel_components,
                                                       spline_n_knots=spline_n_knots,
                                                       spline_degree=spline_degree,
@@ -422,6 +453,14 @@ class TessPLDCorrector(PLDCorrector):
         that the pixel will be used to generate the background systematics model.
         If `None`, all pixels which are fainter than 1-sigma above the median
         flux will be used.
+    pld_aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used when selecting the PLD basis vectors.
+            If `None` or `all` are passed in, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
     spline_n_knots : int
         Number of knots in spline.
     spline_degree : int
@@ -447,9 +486,9 @@ class TessPLDCorrector(PLDCorrector):
     def __repr__(self):
         return 'TessPLDCorrector (LC: {})'.format(self.lc.label)
 
-    def correct(self, dm=None, pld_order=1, pixel_components=15, background_mask=None,
-                spline_n_knots=100, spline_degree=3, n_pca_terms=10, restore_trend=True,
-                sparse=False, **kwargs):
+    def correct(self, dm=None, pld_order=1, pixel_components=3, background_mask=None,
+                pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
+                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -469,6 +508,7 @@ class TessPLDCorrector(PLDCorrector):
         clc = super(TessPLDCorrector, self).correct(dm=dm,
                                                     pld_order=pld_order,
                                                     background_mask=background_mask,
+                                                    pld_aperture_mask=pld_aperture_mask,
                                                     pixel_components=pixel_components,
                                                     spline_n_knots=spline_n_knots,
                                                     spline_degree=spline_degree,
