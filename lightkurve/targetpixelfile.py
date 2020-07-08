@@ -1218,7 +1218,7 @@ class TargetPixelFile(object):
                 lc_norm = lc.normalize().remove_outliers()  
                 if periodogram == True:
                     try:
-                        pixel_list.append(lc_norm.to_periodogram())
+                        pixel_list.append(lc_norm.to_periodogram(**kwargs))
                     except IndexError:
                         pixel_list.append(None)
                 else:
