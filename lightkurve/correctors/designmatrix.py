@@ -11,8 +11,6 @@ import matplotlib.pyplot as plt
 from numba import jit
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from itertools import combinations_with_replacement as multichoose
 from scipy.sparse import lil_matrix, csr_matrix, hstack, vstack, issparse, find
 
 from .. import MPLSTYLE
@@ -275,7 +273,19 @@ class DesignMatrix():
         return dm
 
     def mask(self, cadence_mask):
-        """ """
+        """Returns a masked version of the `.DesignMatrix`.
+
+        Parameters
+        ----------
+        cadence_mask : array
+            Array of length n_cadences with `True` for desired cadences and
+            `False` for rejected cadences.
+
+        Returns
+        -------
+        `.DesignMatrix`
+            New `.DesignMatrix` with `False` cadences removed.
+        """
         masked_X = self.X[cadence_mask]
         return DesignMatrix(masked_X, name=f'{self.name} (masked)')
 

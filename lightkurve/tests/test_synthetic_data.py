@@ -120,8 +120,8 @@ def test_sine_pld():
     true_amplitude = np.float(tpf.hdu[3].header['SINE_AMP'])
 
     # Run the PLD algorithm
-    corrector = PLDCorrector(tpf)
-    cor_lc = corrector.correct(use_gp=False)
+    corrector = tpf.to_corrector('pld')
+    cor_lc = corrector.correct()
 
     # Verify that we get the period within ~20%
     pg = cor_lc.to_periodogram(method='lombscargle', minimum_period=1,
@@ -171,8 +171,8 @@ def test_detrending_residuals():
     n_sigma = np.std(resid_n_sigmas)
     assert n_sigma < 2.0
 
-    corrector = PLDCorrector(tpf)
-    cor_lc = corrector.correct(use_gp=False)
+    corrector = tpf.to_corrector('pld')
+    cor_lc = corrector.correct()
 
     cdpp_improvement = lc.estimate_cdpp()/cor_lc.estimate_cdpp()
     assert cdpp_improvement > 10.0
