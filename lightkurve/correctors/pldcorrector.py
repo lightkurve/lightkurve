@@ -390,7 +390,7 @@ class KeplerPLDCorrector(PLDCorrector):
     def __repr__(self):
         return 'KeplerPLDCorrector (LC: {})'.format(self.lc.label)
 
-    def correct(self, dm=None, pld_order=2, pixel_components=15, background_mask=None,
+    def correct(self, dm=None, pld_order=3, pixel_components=15, background_mask=None,
                 pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
                 n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
@@ -518,4 +518,3 @@ class TessPLDCorrector(PLDCorrector):
                                                     **kwargs)
 
         return clc
-
