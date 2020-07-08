@@ -172,7 +172,7 @@ def test_detrending_residuals():
     assert n_sigma < 2.0
 
     corrector = tpf.to_corrector('pld')
-    cor_lc = corrector.correct()
+    cor_lc = corrector.correct(restore_trend=False)
 
     cdpp_improvement = lc.estimate_cdpp()/cor_lc.estimate_cdpp()
     assert cdpp_improvement > 10.0
