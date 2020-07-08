@@ -90,16 +90,7 @@ class PLDCorrector(RegressionCorrector):
         self.tpf = tpf
         if aperture_mask is None:
             aperture_mask = tpf.create_threshold_mask(2)
-
-        # create nan mask
-        lc = self.tpf.to_lightcurve(aperture_mask=aperture_mask)
-        self.nanmask = np.isfinite(lc.time)
-        self.nanmask &= np.isfinite(lc.flux.value)
-        self.nanmask &= np.isfinite(lc.flux_err.value)
-        self.nanmask &= np.abs(lc.flux_err.value) > 1e-12
-
-        # apply nan mask
-        self.lc = lc[self.nanmask]
+        self.lc = self.tpf.to_lightcurve(aperture_mask=aperture_mask)
 
         super(PLDCorrector, self).__init__(lc=self.lc)
 
@@ -110,9 +101,43 @@ class PLDCorrector(RegressionCorrector):
     def X(self):
         return self.dm
 
-    def create_design_matrix(self, background_mask=None, pld_order=1, n_pca_terms=6,
-                             pixel_components=3, spline_n_knots=100, spline_degree=3, sparse=False):
-        """Returns a `DesignMatrixCollection`."""
+    def create_design_matrix(self, pld_order=1, pixel_components=3, background_mask=None,
+                             spline_n_knots=100, spline_degree=3, n_pca_terms=6, sparse=False):
+        """
+
+        Parameters
+        ----------
+        pld_order : int
+            The order of Pixel Level De-correlation to be performed. First order
+            (`n=1`) uses only the pixel fluxes to construct the design matrix.
+            Higher order populates the design matrix with columns constructed
+            from the products of pixel fluxes.
+        pixel_components : int
+            Number of principal components derived from the background pixel
+            time series to utilize.
+        background_mask : array-like or None
+            A boolean array flagging the background pixels such that `True` means
+            that the pixel will be used to generate the background systematics model.
+            If `None`, all pixels which are fainter than 1-sigma above the median
+            flux will be used.
+        spline_n_knots : int
+            Number of knots in spline.
+        spline_degree : int
+            Polynomial degree of spline.
+        n_pca_terms : int
+            Number of terms added to the design matrix from each order of PLD
+            when performing Principal Component Analysis for models higher than
+            first order. Increasing this value may provide higher precision at
+            the expense of computational time.
+        sparse : bool
+            Whether to create `SparseDesignMatrix`.
+
+        Returns
+        -------
+        dm : `.DesignMatrixCollection`
+            `.DesignMatrixCollection` containing pixel, background, and spline
+            components.
+        """
 
         if background_mask is None:
             # Default to pixels <1-sigma above the background

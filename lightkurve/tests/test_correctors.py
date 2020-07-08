@@ -76,7 +76,7 @@ def test_pld_corrector():
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
 def test_to_corrector():
-    """Does the tpf.pld() convenience method work?"""
+    """Does the tpf.to_corrector('pld') convenience method work?"""
     from .. import KeplerTargetPixelFile
     from .test_targetpixelfile import TABBY_TPF
     tpf = KeplerTargetPixelFile(TABBY_TPF)
