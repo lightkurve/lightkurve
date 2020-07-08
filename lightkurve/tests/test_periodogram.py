@@ -218,7 +218,7 @@ def test_bls(caplog):
     ''' Test that BLS periodogram works and gives reasonable errors
     '''
     lc = LightCurve(time=np.linspace(0, 10, 1000), flux=np.random.normal(1, 0.1, 1000),
-                    flux_err=np.zeros(1000)+0.1)
+                    flux_err=np.zeros(1000)+0.1, time_format='jd')
 
     # should be able to make a periodogram
     p = lc.to_periodogram(method='bls')
