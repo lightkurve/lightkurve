@@ -1169,7 +1169,7 @@ class TargetPixelFile(object):
         return self.__class__(newfits)
 
 
-    def inspect_pixels(self, ax=None, normalize=False, periodogram=False, aperture_mask=None, show_flux=False, style='lightkurve', title=None, **kwargs):
+    def plot_pixels(self, ax=None, normalize=False, periodogram=False, aperture_mask=None, show_flux=False, style='lightkurve', title=None, **kwargs):
         """ Plot the light curves or associated periodograms for each pixel in one quarter
         Note that all values are autoscaled and axis labels are not provided.
         This utility is designed for by-eye inspection of signal morphology.
