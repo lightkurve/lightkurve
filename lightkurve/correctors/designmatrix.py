@@ -272,24 +272,6 @@ class DesignMatrix():
         dm.prior_sigma = np.append(self.prior_sigma, prior_sigma)
         return dm
 
-    def mask(self, cadence_mask):
-        """Returns a masked version of the `.DesignMatrix`.
-
-        Parameters
-        ----------
-        cadence_mask : array
-            Array of length n_cadences with `True` for desired cadences and
-            `False` for rejected cadences.
-
-        Returns
-        -------
-        `.DesignMatrix`
-            New `.DesignMatrix` with `False` cadences removed.
-        """
-        masked_X = self.X[cadence_mask]
-        return DesignMatrix(masked_X, name=f'{self.name} (masked)')
-
-
     def _validate(self, rank=True):
         """Helper function for validating."""
         # Matrix rank shouldn't be significantly smaller than the # of columns
