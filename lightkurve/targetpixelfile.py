@@ -1169,7 +1169,7 @@ class TargetPixelFile(object):
         return self.__class__(newfits)
 
 
-    def plot_pixels(self, ax=None, normalize=False, periodogram=False, aperture_mask=None, show_flux=False, style='lightkurve', title=None, **kwargs):
+    def plot_pixels(self, ax=None, normalize=False, periodogram=False, aperture_mask=None, show_flux=False, corrector_func=None, style='lightkurve', title=None, **kwargs):
         """ Plot the light curves or associated periodograms for each pixel in one quarter
         Note that all values are autoscaled and axis labels are not provided.
         This utility is designed for by-eye inspection of signal morphology.
@@ -1191,6 +1191,10 @@ class TargetPixelFile(object):
         show_flux : bool
             Default: False; if True, shade pixels with frame 0 flux colour
             Inspired by https://github.com/noraeisner/LATTE
+        corrector_func : function
+            Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.
+            This function is applied to each light curve in the collection
+            prior to stitching. The default is to normalize each light curve.            
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
@@ -1214,19 +1218,29 @@ class TargetPixelFile(object):
             pixel_list = []
 
             for j in range(self.shape[1]*self.shape[2]):
+
                 lc = self.to_lightcurve(aperture_mask=masks[j])
-                lc_norm = lc.normalize().remove_outliers()  
+
+                if normalize == True: # overrides corrector function
+                    corrector_func = lambda x:x.normalize().remove_outliers()
+                    lc_corr = corrector_func(lc)
+                elif corrector_func == None:
+                    corrector_func = lambda x:x.normalize().remove_outliers()
+                    lc_corr = corrector_func(lc)
+                else:
+                    lc_corr = corrector_func(lc)
+
                 if periodogram == True:
                     try:
-                        pixel_list.append(lc_norm.to_periodogram(**kwargs))
+                        pixel_list.append(lc_corr.to_periodogram(**kwargs))
                     except IndexError:
                         pixel_list.append(None)
                 else:
                     if normalize == True:
-                        if len(lc_norm.remove_nans().flux) == 0:
+                        if len(lc_corr.remove_nans().flux) == 0:
                             pixel_list.append(None)
                         else:
-                            pixel_list.append(lc_norm)
+                            pixel_list.append(lc_corr)
                     elif normalize == False:
                         if len(lc.remove_nans().flux) == 0:
                             pixel_list.append(None)
