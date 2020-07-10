@@ -1306,7 +1306,7 @@ class TargetPixelFile(object):
                         gax.set_facecolor(tpf_plot.cmap(tpf_plot.norm(self.flux[0,x,y])))
                         if periodogram:
                             gax.plot(x_vals, y_vals, 'w-', lw=0.5)
-                        elif not periodogram:
+                        else:
                             gax.plot(x_vals, y_vals, 'w.', ms=0.5)
                     else:
                         if periodogram:
