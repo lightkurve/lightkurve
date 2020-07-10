@@ -1208,13 +1208,18 @@ class TargetPixelFile(object):
             title = f'Target ID: {self.targetid}'
         if corrector_func is None:
             corrector_func = lambda x: x.remove_outliers()
+        if show_flux:
+            cmap = plt.get_cmap()
+            norm = plt.Normalize(vmin=np.nanmin(self.flux[0].value),
+                                 vmax=np.nanmax(self.flux[0].value))
         mask = self._parse_aperture_mask(aperture_mask)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=(RuntimeWarning, LightkurveWarning))
 
             # get an aperture mask for each pixel
-            masks = np.zeros((self.shape[1]*self.shape[2], self.shape[1], self.shape[2]), dtype='bool')
+            masks = np.zeros((self.shape[1]*self.shape[2], self.shape[1], self.shape[2]),
+                             dtype='bool')
             for i in range(self.shape[1]*self.shape[2]):
                 masks[i][np.unravel_index(i, (self.shape[1], self.shape[2]))] = True
             
@@ -1234,16 +1239,12 @@ class TargetPixelFile(object):
                     else:
                         pixel_list.append(lc)
 
-        tpf_plot = plt.imshow(self.flux[0])
-        plt.close()
-
         with plt.style.context(style):
             fig = plt.figure()
-            if ax is None:
+            if ax is None:  # Configure axes if none is given
                 ax = plt.gca()
                 ax.get_xaxis().set_ticks([])
                 ax.get_yaxis().set_ticks([])
-
                 if periodogram:
                     ax.set(title=title, xlabel='Frequency', ylabel='Power')
                 else:
@@ -1258,32 +1259,20 @@ class TargetPixelFile(object):
                     if periodogram:
                         x_vals = pixel_list[k].frequency.value
                         y_vals = pixel_list[k].power.value
-                        x_axis_min = 0
-                        x_axis_max = np.nanmax(x_vals)
-                        y_axis_min = 0
-                        y_axis_max = max(np.nanmax(y_vals), 1e-99)
                     else:
                         x_vals = pixel_list[k].time.value
                         y_vals = pixel_list[k].flux.value
-                        y_val_range = np.nanmax(y_vals) - np.nanmin(y_vals)
-                        x_axis_min = np.nanmin(x_vals)
-                        x_axis_max = np.nanmax(x_vals)
-                        y_axis_min = np.nanmin(y_vals) - 0.05*max(y_val_range, 0.1)
-                        y_axis_max = np.nanmax(y_vals) + 0.05*max(y_val_range, 0.1)
 
-                    no_mask = False
-                    if len(np.unique(mask)) == 1:
-                        no_mask = True
-
-                    if mask[x,y] and not no_mask:
-                        with plt.rc_context(rc={"axes.linewidth": 2, "axes.edgecolor": 'red'}):
-                            gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
+                    # Highlight aperture mask in red
+                    if aperture_mask is not None and mask[x,y]:
+                        rc = {"axes.linewidth": 2, "axes.edgecolor": 'red'}
                     else:
-                        with plt.rc_context(rc={"axes.linewidth": 1}):
-                            gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
+                        rc = {"axes.linewidth": 1}
+                    with plt.rc_context(rc=rc):
+                        gax = fig.add_subplot(gs[self.shape[1] - x - 1, y])
 
                     if show_flux:
-                        gax.set_facecolor(tpf_plot.cmap(tpf_plot.norm(self.flux.value[0,x,y])))
+                        gax.set_facecolor(cmap(norm(self.flux.value[0,x,y])))
                         if periodogram:
                             gax.plot(x_vals, y_vals, 'w-', lw=0.5)
                         else:
@@ -1294,8 +1283,7 @@ class TargetPixelFile(object):
                         else:
                             gax.plot(x_vals, y_vals, 'k.', ms=0.5)
                     
-                    gax.set_xlim(x_axis_min, x_axis_max)
-                    gax.set_ylim(y_axis_min, y_axis_max)
+                    gax.margins(y=.1, x=0)
                     gax.set_xticklabels('')
                     gax.set_yticklabels('')
                     gax.set_xticks([])
