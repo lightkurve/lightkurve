@@ -1168,19 +1168,19 @@ class TargetPixelFile(object):
             newfits = fits.HDUList(hdus)
         return self.__class__(newfits)
 
+    def plot_pixels(self, ax=None, periodogram=False, aperture_mask=None,
+                    show_flux=False, corrector_func=None, style='lightkurve',
+                    title=None, **kwargs):
+        """Show the light curve of each pixel in a single plot.
 
-    def plot_pixels(self, ax=None, normalize=False, periodogram=False, aperture_mask=None, show_flux=False, corrector_func=None, style='lightkurve', title=None, **kwargs):
-        """ Plot the light curves or associated periodograms for each pixel in one quarter
         Note that all values are autoscaled and axis labels are not provided.
         This utility is designed for by-eye inspection of signal morphology.
-        
+
         Parameters
         ----------
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
-        normalize : bool
-            Default: False; if True, the normalized light curves will be plotted.
         periodogram : bool
             Default: False; if True, periodograms will be plotted, using normalized light curves.
             Note that this keyword overrides normalized.
@@ -1200,13 +1200,16 @@ class TargetPixelFile(object):
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
         kwargs : dict
-            e.g. `threshold` to be passed to create_threshold_mask
-        
+            e.g. extra parameters to be passed to `lc.to_periodogram`.
         """
-
         if style == 'lightkurve' or style is None:
             style = MPLSTYLE 
-        
+        if title is None:
+            title = f'Target ID: {self.targetid}'
+        if corrector_func is None:
+            corrector_func = lambda x: x.remove_outliers()
+        mask = self._parse_aperture_mask(aperture_mask)
+
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=(RuntimeWarning, LightkurveWarning))
 
@@ -1216,44 +1219,27 @@ class TargetPixelFile(object):
                 masks[i][np.unravel_index(i, (self.shape[1], self.shape[2]))] = True
             
             pixel_list = []
-
             for j in range(self.shape[1]*self.shape[2]):
-
                 lc = self.to_lightcurve(aperture_mask=masks[j])
-
-                if normalize or corrector_func is None: # normalize overrides corrector function
-                    corrector_func = lambda x:x.normalize().remove_outliers()
-                    lc_corr = corrector_func(lc)
-                else:
-                    lc_corr = corrector_func(lc)
+                lc = corrector_func(lc)
 
                 if periodogram:
                     try:
-                        pixel_list.append(lc_corr.to_periodogram(**kwargs))
+                        pixel_list.append(lc.to_periodogram(**kwargs))
                     except IndexError:
                         pixel_list.append(None)
                 else:
-                    if normalize:
-                        if len(lc_corr.remove_nans().flux) == 0:
-                            pixel_list.append(None)
-                        else:
-                            pixel_list.append(lc_corr)
-                    elif not normalize:
-                        if len(lc.remove_nans().flux) == 0:
-                            pixel_list.append(None)
-                        else:
-                            pixel_list.append(lc)
+                    if len(lc.remove_nans().flux) == 0:
+                        pixel_list.append(None)
+                    else:
+                        pixel_list.append(lc)
 
-        mask = self._parse_aperture_mask(aperture_mask)
         tpf_plot = plt.imshow(self.flux[0])
         plt.close()
 
         with plt.style.context(style):
-            if title is None:
-                title = f'Target ID: {self.targetid}'
-
             fig = plt.figure()
-            if ax == None:
+            if ax is None:
                 ax = plt.gca()
                 ax.get_xaxis().set_ticks([])
                 ax.get_yaxis().set_ticks([])
@@ -1261,10 +1247,7 @@ class TargetPixelFile(object):
                 if periodogram:
                     ax.set(title=title, xlabel='Frequency', ylabel='Power')
                 else:
-                    if normalize:
-                        ax.set(title=title, xlabel='Time', ylabel='Normalized Flux')
-                    else:
-                        ax.set(title=title, xlabel='Time', ylabel='Flux')
+                    ax.set(title=title, xlabel='Time', ylabel='Flux')
 
             gs = gridspec.GridSpec(self.shape[1], self.shape[2], wspace=0.01, hspace=0.01)
 
@@ -1278,7 +1261,7 @@ class TargetPixelFile(object):
                         x_axis_min = 0
                         x_axis_max = np.nanmax(x_vals)
                         y_axis_min = 0
-                        y_axis_max = max(np.nanmax(y_vals),1e-99)
+                        y_axis_max = max(np.nanmax(y_vals), 1e-99)
                     else:
                         x_vals = pixel_list[k].time.value
                         y_vals = pixel_list[k].flux.value
@@ -1293,14 +1276,14 @@ class TargetPixelFile(object):
                         no_mask = True
 
                     if mask[x,y] and not no_mask:
-                        with plt.rc_context(rc={"axes.linewidth":2, "axes.edgecolor":'red'}):
+                        with plt.rc_context(rc={"axes.linewidth": 2, "axes.edgecolor": 'red'}):
                             gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
                     else:
-                        with plt.rc_context(rc={"axes.linewidth":1}):
+                        with plt.rc_context(rc={"axes.linewidth": 1}):
                             gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
 
                     if show_flux:
-                        gax.set_facecolor(tpf_plot.cmap(tpf_plot.norm(self.flux[0,x,y])))
+                        gax.set_facecolor(tpf_plot.cmap(tpf_plot.norm(self.flux.value[0,x,y])))
                         if periodogram:
                             gax.plot(x_vals, y_vals, 'w-', lw=0.5)
                         else:
@@ -1308,7 +1291,7 @@ class TargetPixelFile(object):
                     else:
                         if periodogram:
                             gax.plot(x_vals, y_vals, 'k-', lw=0.5)
-                        elif not periodogram:
+                        else:
                             gax.plot(x_vals, y_vals, 'k.', ms=0.5)
                     
                     gax.set_xlim(x_axis_min, x_axis_max)
@@ -1318,7 +1301,7 @@ class TargetPixelFile(object):
                     gax.set_xticks([])
                     gax.set_yticks([])
 
-            fig.set_size_inches((y*1.5,x*1.5))
+            fig.set_size_inches((y*1.5, x*1.5))
 
         return ax
 
