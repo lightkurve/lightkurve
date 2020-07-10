@@ -1179,7 +1179,7 @@ class TargetPixelFile(object):
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
-        normalized : bool
+        normalize : bool
             Default: False; if True, the normalized light curves will be plotted.
         periodogram : bool
             Default: False; if True, periodograms will be plotted, using normalized light curves.
