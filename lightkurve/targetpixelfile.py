@@ -1256,13 +1256,6 @@ class TargetPixelFile(object):
                 if pixel_list[k]:
                     x, y = np.unravel_index(k, (self.shape[1], self.shape[2]))
 
-                    if periodogram:
-                        x_vals = pixel_list[k].frequency.value
-                        y_vals = pixel_list[k].power.value
-                    else:
-                        x_vals = pixel_list[k].time.value
-                        y_vals = pixel_list[k].flux.value
-
                     # Highlight aperture mask in red
                     if aperture_mask is not None and mask[x,y]:
                         rc = {"axes.linewidth": 2, "axes.edgecolor": 'red'}
@@ -1271,18 +1264,23 @@ class TargetPixelFile(object):
                     with plt.rc_context(rc=rc):
                         gax = fig.add_subplot(gs[self.shape[1] - x - 1, y])
 
+                    # Determine background and foreground color
                     if show_flux:
                         gax.set_facecolor(cmap(norm(self.flux.value[0,x,y])))
-                        if periodogram:
-                            gax.plot(x_vals, y_vals, 'w-', lw=0.5)
-                        else:
-                            gax.plot(x_vals, y_vals, 'w.', ms=0.5)
+                        markercolor = "white"
                     else:
-                        if periodogram:
-                            gax.plot(x_vals, y_vals, 'k-', lw=0.5)
-                        else:
-                            gax.plot(x_vals, y_vals, 'k.', ms=0.5)
-                    
+                        markercolor = "black"
+
+                    # Plot flux or periodogram
+                    if periodogram:
+                        gax.plot(pixel_list[k].frequency.value,
+                                 pixel_list[k].power.value,
+                                 marker='None', color=markercolor, lw=0.5)
+                    else:
+                        gax.plot(pixel_list[k].time.value,
+                                 pixel_list[k].flux.value,
+                                 marker='.', color=markercolor, ms=0.5, lw=0)
+
                     gax.margins(y=.1, x=0)
                     gax.set_xticklabels('')
                     gax.set_yticklabels('')
