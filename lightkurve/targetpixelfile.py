@@ -1224,9 +1224,6 @@ class TargetPixelFile(object):
                 if normalize or corrector_func is None: # overrides corrector function
                     corrector_func = lambda x:x.normalize().remove_outliers()
                     lc_corr = corrector_func(lc)
-                elif corrector_func == None:
-                    corrector_func = lambda x:x.normalize().remove_outliers()
-                    lc_corr = corrector_func(lc)
                 else:
                     lc_corr = corrector_func(lc)
 
