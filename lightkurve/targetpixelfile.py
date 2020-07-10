@@ -1310,9 +1310,9 @@ class TargetPixelFile(object):
                             gax.plot(x_vals, y_vals, 'w.', ms=0.5)
                     else:
                         if periodogram:
-                            gax.plot(x_vals, y_vals, 'w-', lw=0.5)
+                            gax.plot(x_vals, y_vals, 'k-', lw=0.5)
                         elif not periodogram:
-                            gax.plot(x_vals, y_vals, 'w.', ms=0.5)
+                            gax.plot(x_vals, y_vals, 'k.', ms=0.5)
                     
                     gax.set_xlim(x_axis_min, x_axis_max)
                     gax.set_ylim(y_axis_min, y_axis_max)
