@@ -1288,8 +1288,8 @@ class TargetPixelFile(object):
                         y_val_range = np.nanmax(y_vals) - np.nanmin(y_vals)
                         x_axis_min = np.nanmin(x_vals)
                         x_axis_max = np.nanmax(x_vals)
-                        y_axis_min = np.nanmin(y_vals) - 0.05*y_val_range
-                        y_axis_max = np.nanmax(y_vals) + 0.05*y_val_range
+                        y_axis_min = np.nanmin(y_vals) - 0.05*max(y_val_range, 0.1)
+                        y_axis_max = np.nanmax(y_vals) + 0.05*max(y_val_range, 0.1)
 
                     no_mask = False
                     if aperture_mask == 'all' or aperture_mask == None:
