@@ -1208,7 +1208,7 @@ class TargetPixelFile(object):
             style = MPLSTYLE 
         
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+            warnings.simplefilter("ignore", category=(RuntimeWarning, LightkurveWarning))
 
             # get an aperture mask for each pixel
             masks = np.zeros((self.shape[1]*self.shape[2], self.shape[1], self.shape[2]), dtype='bool')
