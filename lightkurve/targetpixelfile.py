@@ -1221,7 +1221,7 @@ class TargetPixelFile(object):
 
                 lc = self.to_lightcurve(aperture_mask=masks[j])
 
-                if normalize: # overrides corrector function
+                if normalize or corrector_func is None: # overrides corrector function
                     corrector_func = lambda x:x.normalize().remove_outliers()
                     lc_corr = corrector_func(lc)
                 elif corrector_func == None:
