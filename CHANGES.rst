@@ -18,6 +18,9 @@
 - Modified the ``estimate_radius``, ``estimate_mass``, and ``estimate_logg``
   methods to default to the ``teff`` value in the meta data. [#766]
 
+- Added the ``TargetPixelFile.plot_pixels()`` method to plot light curves
+  and periodograms for each individual pixel in a TPF. [#771] 
+
 
 
 1.11.1 (2020-06-18)
