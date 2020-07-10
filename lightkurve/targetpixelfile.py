@@ -1221,7 +1221,7 @@ class TargetPixelFile(object):
 
                 lc = self.to_lightcurve(aperture_mask=masks[j])
 
-                if normalize == True: # overrides corrector function
+                if normalize: # overrides corrector function
                     corrector_func = lambda x:x.normalize().remove_outliers()
                     lc_corr = corrector_func(lc)
                 elif corrector_func == None:
@@ -1230,18 +1230,18 @@ class TargetPixelFile(object):
                 else:
                     lc_corr = corrector_func(lc)
 
-                if periodogram == True:
+                if periodogram:
                     try:
                         pixel_list.append(lc_corr.to_periodogram(**kwargs))
                     except IndexError:
                         pixel_list.append(None)
                 else:
-                    if normalize == True:
+                    if normalize:
                         if len(lc_corr.remove_nans().flux) == 0:
                             pixel_list.append(None)
                         else:
                             pixel_list.append(lc_corr)
-                    elif normalize == False:
+                    elif not normalize:
                         if len(lc.remove_nans().flux) == 0:
                             pixel_list.append(None)
                         else:
@@ -1261,10 +1261,10 @@ class TargetPixelFile(object):
                 ax.get_xaxis().set_ticks([])
                 ax.get_yaxis().set_ticks([])
 
-                if periodogram == True:
+                if periodogram:
                     ax.set(title=title, xlabel='Frequency', ylabel='Power')
                 else:
-                    if normalize == True:
+                    if normalize:
                         ax.set(title=title, xlabel='Time', ylabel='Normalized Flux')
                     else:
                         ax.set(title=title, xlabel='Time', ylabel='Flux')
@@ -1275,14 +1275,14 @@ class TargetPixelFile(object):
                 if pixel_list[k]:
                     x, y = np.unravel_index(k, (self.shape[1], self.shape[2]))
 
-                    if periodogram == True:
+                    if periodogram:
                         x_vals = pixel_list[k].frequency.value
                         y_vals = pixel_list[k].power.value
                         x_axis_min = 0
                         x_axis_max = np.nanmax(x_vals)
                         y_axis_min = 0
                         y_axis_max = max(np.nanmax(y_vals),1e-99)
-                    elif periodogram == False:
+                    elif not periodogram:
                         x_vals = pixel_list[k].time.value
                         y_vals = pixel_list[k].flux.value
                         y_val_range = np.nanmax(y_vals) - np.nanmin(y_vals)
@@ -1292,26 +1292,26 @@ class TargetPixelFile(object):
                         y_axis_max = np.nanmax(y_vals) + 0.05*max(y_val_range, 0.1)
 
                     no_mask = False
-                    if aperture_mask == 'all' or aperture_mask == None:
+                    if len(np.unique(mask)) == 1:
                         no_mask = True
 
-                    if mask[x,y] == True and no_mask == False:
+                    if mask[x,y] and not no_mask:
                         with plt.rc_context(rc={"axes.linewidth":2, "axes.edgecolor":'red'}):
                             gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
                     else:
                         with plt.rc_context(rc={"axes.linewidth":1}):
                             gax = fig.add_subplot(gs[self.shape[1] - x - 1,y])
 
-                    if show_flux == True:
+                    if show_flux:
                         gax.set_facecolor(tpf_plot.cmap(tpf_plot.norm(self.flux[0,x,y])))
-                        if periodogram == True:
+                        if periodogram:
                             gax.plot(x_vals, y_vals, 'w-', lw=0.5)
-                        elif periodogram == False:
+                        elif not periodogram:
                             gax.plot(x_vals, y_vals, 'w.', ms=0.5)
                     else:
-                        if periodogram == True:
+                        if periodogram:
                             gax.plot(x_vals, y_vals, 'w-', lw=0.5)
-                        elif periodogram == False:
+                        elif not periodogram:
                             gax.plot(x_vals, y_vals, 'w.', ms=0.5)
                     
                     gax.set_xlim(x_axis_min, x_axis_max)

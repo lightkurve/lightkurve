@@ -625,7 +625,7 @@ def test_plot_pixels():
     tpf.plot_pixels(periodogram=True)
     tpf.plot_pixels(periodogram=True, nyquist_factor=0.5)
     tpf.plot_pixels(aperture_mask='all')
-    # tpf.plot_pixels(aperture_mask=tpf.pipeline_mask) # fails - to look into
-    # tpf.plot_pixels(aperture_mask=tpf.create_threshold_mask()) # fails - to look into
+    tpf.plot_pixels(aperture_mask=tpf.pipeline_mask) # fails - to look into
+    tpf.plot_pixels(aperture_mask=tpf.create_threshold_mask()) # fails - to look into
     tpf.plot_pixels(show_flux=True)
     plt.close('all')
