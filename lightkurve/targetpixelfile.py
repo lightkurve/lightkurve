@@ -1281,7 +1281,7 @@ class TargetPixelFile(object):
                         x_axis_min = 0
                         x_axis_max = np.nanmax(x_vals)
                         y_axis_min = 0
-                        y_axis_max = np.nanmax(y_vals)
+                        y_axis_max = max(np.nanmax(y_vals),1e-99)
                     elif periodogram == False:
                         x_vals = pixel_list[k].time.value
                         y_vals = pixel_list[k].flux.value
