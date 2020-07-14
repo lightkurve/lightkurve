@@ -101,7 +101,7 @@ class PLDCorrector(RegressionCorrector):
     def X(self):
         return self.dm
 
-    def create_design_matrix(self, pld_order=1, pixel_components=3, background_mask=None,
+    def create_design_matrix(self, pld_order=None, pixel_components=None, background_mask=None,
                              pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
                              n_pca_terms=6, sparse=False):
         """
@@ -153,6 +153,18 @@ class PLDCorrector(RegressionCorrector):
             background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
         self.background_mask = background_mask
 
+        # Set mission-specific values for pld_order and pixel_components
+        if pld_order is None:
+            if isinstance(self.tpf, KeplerTargetPixelFile):
+                pld_order = 3
+            else:
+                pld_order = 1
+        if pixel_components is None:
+            if isinstance(self.tpf, KeplerTargetPixelFile):
+                n_pca_terms = 16
+            else:
+                n_pca_terms = 7
+
         DMC, spline = DesignMatrixCollection, create_spline_matrix
         if sparse:
             DMC, spline = SparseDesignMatrixCollection, create_sparse_spline_matrix
@@ -203,9 +215,9 @@ class PLDCorrector(RegressionCorrector):
         self.dm = dm
         return dm
 
-    def correct(self, dm=None, pld_order=1, pixel_components=3, background_mask=None,
-                pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
-                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
+    def correct(self, dm=None, pld_order=None, pixel_components=None, background_mask=None,
+                pld_aperture_mask=None, spline_n_knots=40, spline_degree=5,
+                n_pca_terms=8, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -220,10 +232,10 @@ class PLDCorrector(RegressionCorrector):
             The order of Pixel Level De-correlation to be performed. First order
             (`n=1`) uses only the pixel fluxes to construct the design matrix.
             Higher order populates the design matrix with columns constructed
-            from the products of pixel fluxes.
+            from the products of pixel fluxes. Default 3 for K2 and 1 for TESS.
         pixel_components : int
             Number of principal components derived from the background pixel
-            time series to utilize.
+            time series to utilize. Default 16 for K2 and 8 for TESS.
         background_mask : array-like or None
             A boolean array flagging the background pixels such that `True` means
             that the pixel will be used to generate the background systematics model.
@@ -273,7 +285,6 @@ class PLDCorrector(RegressionCorrector):
                                            spline_n_knots=spline_n_knots,
                                            spline_degree=spline_degree,
                                            sparse=sparse)
-
 
         clc = super(PLDCorrector, self).correct(dm, **kwargs)
         if restore_trend:
@@ -326,195 +337,3 @@ class PLDCorrector(RegressionCorrector):
                                             s=10, label='Outliers', ax=ax)
             clc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
-
-
-class KeplerPLDCorrector(PLDCorrector):
-    """Correct Kepler light curves by detrending against local pixel time series.
-
-    Subclass of `.PLDCorrector`, a version of the `.RegressionCorrector` class
-    in which the `.DesignMatrix` is constructed from pixel time series.
-
-    Returns a systematics-corrected light curve.
-
-    Parameters
-    ----------
-    dm : `.DesignMatrix` or `.DesignMatrixCollection` or `None`
-        One or more design matrices.  Each matrix must have a shape of
-        (time, regressors). The columns contained in each matrix must be
-        known to correlate with additive noise components we want to remove
-        from the light curve. If `None`, a `.DesignMatrix` will be generated
-        using the other keyword arguments.
-    pld_order : int
-        The order of Pixel Level De-correlation to be performed. First order
-        (`n=1`) uses only the pixel fluxes to construct the design matrix.
-        Higher order populates the design matrix with columns constructed
-        from the products of pixel fluxes.
-    pixel_components : int
-        Number of principal components derived from the background pixel
-        time series to utilize.
-    background_mask : array-like or None
-        A boolean array flagging the background pixels such that `True` means
-        that the pixel will be used to generate the background systematics model.
-        If `None`, all pixels which are fainter than 1-sigma above the median
-        flux will be used.
-    pld_aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
-        A boolean array describing the aperture such that `True` means
-        that the pixel will be used when selecting the PLD basis vectors.
-        If `None` or `all` are passed in, all pixels will be used.
-        If 'pipeline' is passed, the mask suggested by the official pipeline
-        will be returned.
-        If 'threshold' is passed, all pixels brighter than 3-sigma above
-        the median flux will be used.
-    spline_n_knots : int
-        Number of knots in spline.
-    spline_degree : int
-        Polynomial degree of spline.
-    n_pca_terms : int
-        Number of terms added to the design matrix from each order of PLD
-        when performing Principal Component Analysis for models higher than
-        first order. Increasing this value may provide higher precision at
-        the expense of computational time.
-    restore_trend : bool
-        Whether to restore the long term spline trend to the light curve.
-    sparse : bool
-        Whether to create `SparseDesignMatrix`.
-    **kwargs : dict
-        Extra parameters to be passed to `RegressionCorrector.correct`.
-
-    Returns
-    -------
-    clc : `.KeplerLightCurve`
-        Noise-corrected `.KeplerLightCurve`.
-    """
-
-    def __repr__(self):
-        return 'KeplerPLDCorrector (LC: {})'.format(self.lc.label)
-
-    def correct(self, dm=None, pld_order=3, pixel_components=15, background_mask=None,
-                pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
-                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
-        """Returns a systematics-corrected light curve.
-
-        Parameters
-        ----------
-        pixel_components : int
-            Number of principal components derived from the background pixel
-            time series to utilize.
-        background_mask : array-like or None
-            A boolean array flagging the background pixels such that `True` means
-            that the pixel will be used to generate the background systematics model.
-            If `None`, all pixels which are fainter than 1-sigma above the median
-            flux will be used.
-        restore_trend : bool
-            Whether to restore the long term spline trend to the light curve.
-        """
-
-        clc = super(KeplerPLDCorrector, self).correct(dm=dm,
-                                                      pld_order=pld_order,
-                                                      background_mask=background_mask,
-                                                      pld_aperture_mask=pld_aperture_mask,
-                                                      pixel_components=pixel_components,
-                                                      spline_n_knots=spline_n_knots,
-                                                      spline_degree=spline_degree,
-                                                      n_pca_terms=n_pca_terms,
-                                                      restore_trend=restore_trend,
-                                                      sparse=sparse,
-                                                      **kwargs)
-
-        return clc
-
-
-class TessPLDCorrector(PLDCorrector):
-    """Correct TESS light curves by detrending against local pixel time series.
-
-    Subclass of `.PLDCorrector`, a version of the `.RegressionCorrector` class
-    in which the `.DesignMatrix` is constructed from pixel time series.
-
-    Returns a systematics-corrected light curve.
-
-    Parameters
-    ----------
-    dm : `.DesignMatrix` or `.DesignMatrixCollection` or `None`
-        One or more design matrices.  Each matrix must have a shape of
-        (time, regressors). The columns contained in each matrix must be
-        known to correlate with additive noise components we want to remove
-        from the light curve. If `None`, a `.DesignMatrix` will be generated
-        using the other keyword arguments.
-    pld_order : int
-        The order of Pixel Level De-correlation to be performed. First order
-        (`n=1`) uses only the pixel fluxes to construct the design matrix.
-        Higher order populates the design matrix with columns constructed
-        from the products of pixel fluxes.
-    pixel_components : int
-        Number of principal components derived from the background pixel
-        time series to utilize.
-    background_mask : array-like or None
-        A boolean array flagging the background pixels such that `True` means
-        that the pixel will be used to generate the background systematics model.
-        If `None`, all pixels which are fainter than 1-sigma above the median
-        flux will be used.
-    pld_aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
-            A boolean array describing the aperture such that `True` means
-            that the pixel will be used when selecting the PLD basis vectors.
-            If `None` or `all` are passed in, all pixels will be used.
-            If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
-            If 'threshold' is passed, all pixels brighter than 3-sigma above
-            the median flux will be used.
-    spline_n_knots : int
-        Number of knots in spline.
-    spline_degree : int
-        Polynomial degree of spline.
-    n_pca_terms : int
-        Number of terms added to the design matrix from each order of PLD
-        when performing Principal Component Analysis for models higher than
-        first order. Increasing this value may provide higher precision at
-        the expense of computational time.
-    restore_trend : bool
-        Whether to restore the long term spline trend to the light curve.
-    sparse : bool
-        Whether to create `SparseDesignMatrix`.
-    **kwargs : dict
-        Extra parameters to be passed to `RegressionCorrector.correct`.
-
-    Returns
-    -------
-    clc : `.TessLightCurve`
-        Noise-corrected `.TessLightCurve`.
-    """
-
-    def __repr__(self):
-        return 'TessPLDCorrector (LC: {})'.format(self.lc.label)
-
-    def correct(self, dm=None, pld_order=1, pixel_components=3, background_mask=None,
-                pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
-                n_pca_terms=10, restore_trend=True, sparse=False, **kwargs):
-        """Returns a systematics-corrected light curve.
-
-        Parameters
-        ----------
-        pixel_components : int
-            Number of principal components derived from the background pixel
-            time series to utilize.
-        background_mask : array-like or None
-            A boolean array flagging the background pixels such that `True` means
-            that the pixel will be used to generate the background systematics model.
-            If `None`, all pixels which are fainter than 1-sigma above the median
-            flux will be used.
-        restore_trend : bool
-            Whether to restore the long term spline trend to the light curve.
-        """
-
-        clc = super(TessPLDCorrector, self).correct(dm=dm,
-                                                    pld_order=pld_order,
-                                                    background_mask=background_mask,
-                                                    pld_aperture_mask=pld_aperture_mask,
-                                                    pixel_components=pixel_components,
-                                                    spline_n_knots=spline_n_knots,
-                                                    spline_degree=spline_degree,
-                                                    n_pca_terms=n_pca_terms,
-                                                    restore_trend=restore_trend,
-                                                    sparse=sparse,
-                                                    **kwargs)
-
-        return clc

@@ -9,7 +9,7 @@ from .. import PLDCorrector, KeplerPLDCorrector, TessPLDCorrector
 @pytest.mark.remote_data
 def test_kepler_pld_corrector():
     tpf = search_targetpixelfile('K2-199')[0].download()
-    pld = KeplerPLDCorrector(tpf)
+    pld = PLDCorrector(tpf)
     # Is the correct filetype returned?
     clc = pld.correct()
     assert(isinstance(clc, KeplerLightCurve))
@@ -24,7 +24,7 @@ def test_kepler_pld_corrector():
 @pytest.mark.remote_data
 def test_tess_pld_corrector():
     tpf = search_targetpixelfile('TOI 700')[0].download()
-    pld = TessPLDCorrector(tpf)
+    pld = PLDCorrector(tpf)
     # Is the correct filetype returned?
     clc = pld.correct()
     assert(isinstance(clc, TessLightCurve))
