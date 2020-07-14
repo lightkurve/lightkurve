@@ -89,7 +89,8 @@ class PLDCorrector(RegressionCorrector):
 
         self.tpf = tpf
         if aperture_mask is None:
-            aperture_mask = tpf.create_threshold_mask(2)
+            aperture_mask = tpf.create_threshold_mask(3)
+        self.aperture_mask = aperture_mask
         self.lc = self.tpf.to_lightcurve(aperture_mask=aperture_mask)
 
         super(PLDCorrector, self).__init__(lc=self.lc)
@@ -181,10 +182,10 @@ class PLDCorrector(RegressionCorrector):
         simple_bkg -= np.percentile(simple_bkg, 5)
 
         # Parse PLD aperture mask
-        pld_pixel_mask = self.tpf._parse_aperture_mask(pld_aperture_mask)
+        self.pld_pixel_mask = self.tpf._parse_aperture_mask(pld_aperture_mask)
 
         # Background-subtracted, flux-normalized pixel time series
-        regressors = self.tpf.flux[:, pld_pixel_mask].reshape(len(self.tpf.flux), -1)
+        regressors = self.tpf.flux[:, self.pld_pixel_mask].reshape(len(self.tpf.flux), -1)
         regressors = regressors - simple_bkg.reshape(-1,1)
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
         regressors = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
@@ -341,7 +342,29 @@ class PLDCorrector(RegressionCorrector):
         return axs
 
     def diagnose_mask(self):
-        """ """
+        """Show different aperture masks used by PLD in the most recent call to
+        `correct()`. If `correct()` has not yet been called, a ``ValueError``
+        will be raised.
+
+        Returns
+        -------
+        `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
         if not hasattr(self, 'corrected_lc'):
             raise ValueError('Please call the `correct()` method before trying to diagnose.')
-        pass
+
+        # Use lightkurve plotting style
+        with plt.style.context(MPLSTYLE):
+            _, axs = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
+            # Show light curve aperture mask
+            ax = axs[0]
+            self.tpf.plot(ax=ax, show_colorbar=False, aperture_mask=self.aperture_mask, title='Light Curve Mask')
+            # Show background mask
+            ax = axs[1]
+            self.tpf.plot(ax=ax, show_colorbar=False, aperture_mask=self.background_mask, title='Background Mask')
+            # Show PLD pixel mask
+            ax = axs[2]
+            self.tpf.plot(ax=ax, show_colorbar=False, aperture_mask=self.pld_pixel_mask, title='PLD Mask')
+
+        return axs
