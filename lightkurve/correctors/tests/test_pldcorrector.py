@@ -39,10 +39,12 @@ def test_tess_pld_corrector():
 def test_pld_aperture_mask():
     """Test for #523: does PLDCorrector.correct() accept separate apertures for
     PLD pixels?"""
-    tpf = search_targetpixelfile('K2-199')[0].download()
+    tpf = search_targetpixelfile('K2-205')[0].download()
     # use only the pixels in the pipeline mask
-    lc_pipeline = tpf.to_corrector("pld").correct(pld_aperture_mask='pipeline')
+    lc_pipeline = tpf.to_corrector("pld").correct(pld_aperture_mask='pipeline',
+                                                  restore_trend=False)
     # use all pixels in the tpf
-    lc_all = tpf.to_corrector("pld").correct(pld_aperture_mask='all')
+    lc_all = tpf.to_corrector("pld").correct(pld_aperture_mask='all',
+                                             restore_trend=False)
     # does this improve the correction?
     assert(lc_all.estimate_cdpp() < lc_pipeline.estimate_cdpp())

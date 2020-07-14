@@ -150,7 +150,7 @@ class PLDCorrector(RegressionCorrector):
 
         if background_mask is None:
             # Default to pixels <1-sigma above the background
-            background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
+            background_mask = ~self.tpf.create_threshold_mask(3, reference_pixel=None)
         self.background_mask = background_mask
 
         # Set mission-specific values for pld_order and pixel_components
@@ -174,7 +174,9 @@ class PLDCorrector(RegressionCorrector):
         # (iii) assume that the 5%-percentile of those medians gives us the
         # exact background level. This assumption appears to work well for TESS
         # but it has not been validated in detail yet.
-        simple_bkg = (self.tpf.flux - np.nanmean(self.tpf.flux, axis=0))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            simple_bkg = (self.tpf.flux - np.nanmean(self.tpf.flux, axis=0))
         simple_bkg = np.nanmedian(simple_bkg[:, background_mask], axis=1)
         simple_bkg -= np.percentile(simple_bkg, 5)
 
@@ -272,7 +274,7 @@ class PLDCorrector(RegressionCorrector):
         """
         if background_mask is None:
             # Default to pixels <1-sigma above the background
-            background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
+            background_mask = ~self.tpf.create_threshold_mask(3, reference_pixel=None)
         self.background_mask = background_mask
         self.restore_trend = restore_trend
 
@@ -337,3 +339,9 @@ class PLDCorrector(RegressionCorrector):
                                             s=10, label='Outliers', ax=ax)
             clc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
+
+    def diagnose_mask(self):
+        """ """
+        if not hasattr(self, 'corrected_lc'):
+            raise ValueError('Please call the `correct()` method before trying to diagnose.')
+        pass
