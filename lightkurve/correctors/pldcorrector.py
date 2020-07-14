@@ -161,9 +161,9 @@ class PLDCorrector(RegressionCorrector):
                 pld_order = 1
         if pixel_components is None:
             if isinstance(self.tpf, KeplerTargetPixelFile):
-                n_pca_terms = 16
+                pixel_components = 16
             else:
-                n_pca_terms = 7
+                pixel_components = 7
 
         DMC, spline = DesignMatrixCollection, create_spline_matrix
         if sparse:
