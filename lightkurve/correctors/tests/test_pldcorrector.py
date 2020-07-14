@@ -13,8 +13,9 @@ def test_kepler_pld_corrector():
     # Is the correct filetype returned?
     clc = pld.correct()
     assert(isinstance(clc, KeplerLightCurve))
-    # Does the diagnostic plot run?
+    # Do the diagnostic plots run?
     pld.diagnose()
+    pld.diagnose_mask()
     # Does sparse correction work?
     pld.correct(sparse=True)
     # Did the correction with default values help?
@@ -28,8 +29,10 @@ def test_tess_pld_corrector():
     # Is the correct filetype returned?
     clc = pld.correct()
     assert(isinstance(clc, TessLightCurve))
-    # Does the diagnostic plot run?
+    # Do the diagnostic plots run?
     pld.diagnose()
+    pld.diagnose_mask()
+    # Does sparse correction work?
     pld.correct(sparse=True)
     # Did the correction with default values help?
     raw_lc = tpf.to_lightcurve(aperture_mask='threshold')
