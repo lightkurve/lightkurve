@@ -4,7 +4,7 @@ from astropy.utils.data import get_pkg_data_filename
 import numpy as np
 
 from ... import search_targetpixelfile, KeplerLightCurve, TessLightCurve
-from .. import PLDCorrector, KeplerPLDCorrector, TessPLDCorrector
+from .. import PLDCorrector
 
 @pytest.mark.remote_data
 def test_kepler_pld_corrector():

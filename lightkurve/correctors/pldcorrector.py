@@ -18,7 +18,7 @@ from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 
 log = logging.getLogger(__name__)
 
-__all__ = ['PLDCorrector', 'TessPLDCorrector', 'KeplerPLDCorrector']
+__all__ = ['PLDCorrector']
 
 
 class PLDCorrector(RegressionCorrector):
