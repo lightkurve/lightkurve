@@ -347,7 +347,7 @@ class PLDCorrector(RegressionCorrector):
             clc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
 
-    def diagnose_mask(self):
+    def diagnose_masks(self):
         """Show different aperture masks used by PLD in the most recent call to
         `correct()`. If `correct()` has not yet been called, a ``ValueError``
         will be raised.

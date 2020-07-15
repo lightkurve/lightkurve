@@ -1,10 +1,10 @@
 import pytest
 
-from astropy.utils.data import get_pkg_data_filename
-import numpy as np
+import matplotlib.pyplot as plt
 
 from ... import search_targetpixelfile, KeplerLightCurve, TessLightCurve
 from .. import PLDCorrector
+
 
 @pytest.mark.remote_data
 def test_kepler_pld_corrector():
@@ -15,12 +15,15 @@ def test_kepler_pld_corrector():
     assert(isinstance(clc, KeplerLightCurve))
     # Do the diagnostic plots run?
     pld.diagnose()
-    pld.diagnose_mask()
+    plt.close()
+    pld.diagnose_masks()
+    plt.close()
     # Does sparse correction work?
     pld.correct(sparse=True)
     # Did the correction with default values help?
     raw_lc = tpf.to_lightcurve(aperture_mask='threshold')
     assert(clc.estimate_cdpp() < raw_lc.estimate_cdpp())
+
 
 @pytest.mark.remote_data
 def test_tess_pld_corrector():
@@ -31,12 +34,15 @@ def test_tess_pld_corrector():
     assert(isinstance(clc, TessLightCurve))
     # Do the diagnostic plots run?
     pld.diagnose()
-    pld.diagnose_mask()
+    plt.close()
+    pld.diagnose_masks()
+    plt.close()
     # Does sparse correction work?
     pld.correct(sparse=True)
     # Did the correction with default values help?
     raw_lc = tpf.to_lightcurve(aperture_mask='threshold')
     assert(clc.estimate_cdpp() < raw_lc.estimate_cdpp())
+
 
 @pytest.mark.remote_data
 def test_pld_aperture_mask():
