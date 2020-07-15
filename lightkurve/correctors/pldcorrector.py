@@ -98,7 +98,7 @@ class PLDCorrector(RegressionCorrector):
     def __repr__(self):
         return 'PLDCorrector (LC: {})'.format(self.lc.label)
 
-    def create_design_matrix(self, pld_order=None, pixel_components=None, background_mask=None,
+    def create_design_matrix(self, pld_order=3, pixel_components=16, background_mask=None,
                              pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
                              n_pca_terms=6, sparse=False):
         """Returns a `.DesignMatrixCollection` containing a `DesignMatrix` object
@@ -156,18 +156,6 @@ class PLDCorrector(RegressionCorrector):
             # Default to pixels <1-sigma above the background
             background_mask = ~self.tpf.create_threshold_mask(3, reference_pixel=None)
         self.background_mask = background_mask
-
-        # Set mission-specific values for pld_order and pixel_components
-        if pld_order is None:
-            if isinstance(self.tpf, KeplerTargetPixelFile):
-                pld_order = 3
-            else:
-                pld_order = 1
-        if pixel_components is None:
-            if isinstance(self.tpf, KeplerTargetPixelFile):
-                pixel_components = 16
-            else:
-                pixel_components = 7
 
         DMC, spline = DesignMatrixCollection, create_spline_matrix
         if sparse:
@@ -287,6 +275,19 @@ class PLDCorrector(RegressionCorrector):
         self.restore_trend = restore_trend
 
         if dm is None:
+
+            # Set mission-specific values for pld_order and pixel_components
+            if pld_order is None:
+                if isinstance(self.tpf, KeplerTargetPixelFile):
+                    pld_order = 3
+                else:
+                    pld_order = 1
+            if pixel_components is None:
+                if isinstance(self.tpf, KeplerTargetPixelFile):
+                    pixel_components = 16
+                else:
+                    pixel_components = 7
+
             dm = self.create_design_matrix(background_mask=background_mask,
                                            pld_aperture_mask=pld_aperture_mask,
                                            pld_order=pld_order,
