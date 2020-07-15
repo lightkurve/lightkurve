@@ -93,19 +93,22 @@ class PLDCorrector(RegressionCorrector):
         self.aperture_mask = aperture_mask
         self.lc = self.tpf.to_lightcurve(aperture_mask=aperture_mask)
 
-        super(PLDCorrector, self).__init__(lc=self.lc)
+        super().__init__(lc=self.lc)
 
     def __repr__(self):
         return 'PLDCorrector (LC: {})'.format(self.lc.label)
 
-    @property
-    def X(self):
-        return self.dm
-
     def create_design_matrix(self, pld_order=None, pixel_components=None, background_mask=None,
                              pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
                              n_pca_terms=6, sparse=False):
-        """
+        """Returns a `.DesignMatrixCollection` containing a `DesignMatrix` object
+        for the background regressors, the PLD pixel component regressors, and
+        the spline regressors.
+
+        If the parameters `pld_order` and `pixel_components` are None, their
+        value will be assigned based on the mission. K2 and TESS experience
+        different dominant sources of noise, and require different defaults.
+        For information about how the defaults were chosen, see Pull Request #746.
 
         Parameters
         ----------
@@ -215,13 +218,17 @@ class PLDCorrector(RegressionCorrector):
             warnings.simplefilter('ignore')
             dm = DMC([dm_pixels, dm_bkg, dm_spline])
 
-        self.dm = dm
         return dm
 
     def correct(self, dm=None, pld_order=None, pixel_components=None, background_mask=None,
                 pld_aperture_mask=None, spline_n_knots=40, spline_degree=5,
                 n_pca_terms=8, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
+
+        If the parameters `pld_order` and `pixel_components` are None, their
+        value will be assigned based on the mission. K2 and TESS experience
+        different dominant sources of noise, and require different defaults.
+        For information about how the defaults were chosen, see Pull Request #746.
 
         Parameters
         ----------
@@ -292,7 +299,6 @@ class PLDCorrector(RegressionCorrector):
         clc = super(PLDCorrector, self).correct(dm, **kwargs)
         if restore_trend:
             clc += (self.diagnostic_lightcurves['spline'] - np.median(self.diagnostic_lightcurves['spline'].flux))
-        self.dm = dm
         return clc
 
     def diagnose(self):
