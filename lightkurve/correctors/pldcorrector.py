@@ -38,8 +38,10 @@ class PLDCorrector(RegressionCorrector):
     Our simple implementation of PLD is performed by first calculating the
     noise model for each cadence in time. This function goes up to arbitrary
     order, and is represented by
+
     .. math::
         m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...
+
     where
       - :math:`m_i` is the noise model at time :math:`t_i`
       - :math:`f_{il}` is the flux in the :math:`l^\text{th}` pixel at time :math:`t_i`
@@ -51,9 +53,12 @@ class PLDCorrector(RegressionCorrector):
     noise. With a PCA-reduced set of vectors, we can construct a design matrix
     containing fractional pixel fluxes.
     To solve for the PLD model, we need to minimize the difference squared
+
     .. math::
         \chi^2 = \sum_i \frac{(y_i - m_i)^2}{\sigma_i^2},
+
     where :math:`y_i` is the observed flux value at time :math:`t_i`, by solving
+
     .. math::
         \frac{\partial \chi^2}{\partial a_l} = 0.
 
@@ -63,11 +68,13 @@ class PLDCorrector(RegressionCorrector):
     Examples
     --------
     Download the pixel data for GJ 9827 and obtain a PLD-corrected light curve:
+
     >>> import lightkurve as lk
     >>> tpf = lk.search_targetpixelfile("GJ9827").download() # doctest: +SKIP
     >>> corrector = tpf.to_corrector('pld') # doctest: +SKIP
     >>> lc = corrector.correct() # doctest: +SKIP
     >>> lc.plot() # doctest: +SKIP
+
     However, the above example will over-fit the small transits!
     It is necessary to mask the transits using `corrector.correct(cadence_mask=...)`.
 
