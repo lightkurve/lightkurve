@@ -545,7 +545,7 @@ class Seismology(object):
             from .numax_estimators import estimate_numax_acf2d
 
             fs = np.mean(np.diff(self.periodogram.frequency))
-            if not np.isclose(np.median(np.diff(self.periodogram.append=frequency.value)), fs.value):
+            if not np.isclose(np.median(np.diff(self.periodogram.frequency.value)), fs.value):
                 raise ValueError("the ACF 2D method requires that the periodogram "
                                  "has a grid of uniformly spaced frequencies.")
 
