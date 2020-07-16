@@ -543,6 +543,12 @@ class Seismology(object):
         method = validate_method(method, supported_methods=["acf2d"])
         if method == "acf2d":
             from .numax_estimators import estimate_numax_acf2d
+
+            fs = np.mean(np.diff(self.periodogramfrequency))
+            if not np.isclose(np.median(np.diff(self.periodogramfrequency.value)), fs.value):
+                raise ValueError("the ACF 2D method requires that the periodogram "
+                                 "has a grid of uniformly spaced frequencies.")
+
             result = estimate_numax_acf2d(self.periodogram, **kwargs)
         self.numax = result
         return result
@@ -578,9 +584,15 @@ class Seismology(object):
 
         if method == "acf2d":
             from .deltanu_estimators import estimate_deltanu_acf2d
+
+            fs = np.mean(np.diff(self.periodogramfrequency))
+            if not np.isclose(np.median(np.diff(self.periodogramfrequency.value)), fs.value):
+                raise ValueError("the ACF 2D method requires that the periodogram "
+                                 "has a grid of uniformly spaced frequencies.")
+
             result = estimate_deltanu_acf2d(self.periodogram, numax=numax)
 
-        self.deltanu = result
+        self.deltanu = resultq
         return result
 
     def diagnose_deltanu(self, deltanu=None):
