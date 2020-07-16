@@ -544,8 +544,6 @@ class Seismology(object):
         if method == "acf2d":
             from .numax_estimators import estimate_numax_acf2d
 
-
-            print("CODE IS HERE")
             fs = np.mean(np.diff(self.periodogram.frequency))
             if not np.isclose(np.median(np.diff(self.periodogram.frequency.value)), fs.value):
                 raise ValueError("the ACF 2D method requires that the periodogram "

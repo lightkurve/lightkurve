@@ -211,7 +211,7 @@ def test_estimate_deltanu_basics():
     snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
 
     with pytest.raises(ValueError):
-        deltanu = snr.to_seismology().estimate_deltanu()
+        deltanu = snr.to_seismology().estimate_deltanu(numax=100)
 
 
 def test_estimate_deltanu_kwargs():
