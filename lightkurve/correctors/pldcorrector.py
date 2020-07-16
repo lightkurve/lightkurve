@@ -1,7 +1,5 @@
 """Defines PLDCorrector
 """
-from __future__ import division, print_function
-
 import logging
 import warnings
 from itertools import combinations_with_replacement as multichoose
@@ -9,12 +7,11 @@ from itertools import combinations_with_replacement as multichoose
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .corrector import Corrector
-from .designmatrix import DesignMatrix, DesignMatrixCollection, SparseDesignMatrix, SparseDesignMatrixCollection
+from .designmatrix import DesignMatrix, DesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
 from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
 from .. import MPLSTYLE
-from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
+from ..targetpixelfile import KeplerTargetPixelFile
 
 log = logging.getLogger(__name__)
 
@@ -84,19 +81,16 @@ class PLDCorrector(RegressionCorrector):
         (arXiv:1702.05488)
     .. [4] EVEREST pipeline webpage, https://rodluger.github.io/everest
     """
-
     def __init__(self, tpf, aperture_mask=None):
-
         self.tpf = tpf
         if aperture_mask is None:
             aperture_mask = tpf.create_threshold_mask(3)
         self.aperture_mask = aperture_mask
-        self.lc = self.tpf.to_lightcurve(aperture_mask=aperture_mask)
-
-        super().__init__(lc=self.lc)
+        lc = self.tpf.to_lightcurve(aperture_mask=aperture_mask)
+        super().__init__(lc=lc)
 
     def __repr__(self):
-        return 'PLDCorrector (LC: {})'.format(self.lc.label)
+        return 'PLDCorrector (ID: {})'.format(self.lc.label)
 
     def create_design_matrix(self, pld_order=3, pixel_components=16, background_mask=None,
                              pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
