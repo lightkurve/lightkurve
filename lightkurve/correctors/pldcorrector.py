@@ -211,7 +211,7 @@ class PLDCorrector(RegressionCorrector):
 
         return dm
 
-    def correct(self, dm=None, pld_order=None, pixel_components=None,
+    def correct(self, pld_order=None, pixel_components=None,
                 background_mask=None, pld_aperture_mask=None, spline_n_knots=40,
                 spline_degree=5, n_pca_terms=8, restore_trend=True, sparse=False,
                 **kwargs):
@@ -225,12 +225,6 @@ class PLDCorrector(RegressionCorrector):
 
         Parameters
         ----------
-        dm : `.DesignMatrix` or `.DesignMatrixCollection` or `None`
-            One or more design matrices.  Each matrix must have a shape of
-            (time, regressors). The columns contained in each matrix must be
-            known to correlate with additive noise components we want to remove
-            from the light curve. If `None`, a `.DesignMatrix` will be generated
-            using the other keyword arguments.
         pld_order : int
             The order of Pixel Level De-correlation to be performed. First order
             (`n=1`) uses only the pixel fluxes to construct the design matrix.
@@ -279,28 +273,26 @@ class PLDCorrector(RegressionCorrector):
         self.background_mask = background_mask
         self.restore_trend = restore_trend
 
-        if dm is None:
+        # Set mission-specific values for pld_order and pixel_components
+        if pld_order is None:
+            if isinstance(self.tpf, KeplerTargetPixelFile):
+                pld_order = 3
+            else:
+                pld_order = 1
+        if pixel_components is None:
+            if isinstance(self.tpf, KeplerTargetPixelFile):
+                pixel_components = 16
+            else:
+                pixel_components = 7
 
-            # Set mission-specific values for pld_order and pixel_components
-            if pld_order is None:
-                if isinstance(self.tpf, KeplerTargetPixelFile):
-                    pld_order = 3
-                else:
-                    pld_order = 1
-            if pixel_components is None:
-                if isinstance(self.tpf, KeplerTargetPixelFile):
-                    pixel_components = 16
-                else:
-                    pixel_components = 7
-
-            dm = self.create_design_matrix(background_mask=background_mask,
-                                           pld_aperture_mask=pld_aperture_mask,
-                                           pld_order=pld_order,
-                                           n_pca_terms=n_pca_terms,
-                                           pixel_components=pixel_components,
-                                           spline_n_knots=spline_n_knots,
-                                           spline_degree=spline_degree,
-                                           sparse=sparse)
+        dm = self.create_design_matrix(background_mask=background_mask,
+                                        pld_aperture_mask=pld_aperture_mask,
+                                        pld_order=pld_order,
+                                        n_pca_terms=n_pca_terms,
+                                        pixel_components=pixel_components,
+                                        spline_n_knots=spline_n_knots,
+                                        spline_degree=spline_degree,
+                                        sparse=sparse)
 
         clc = super(PLDCorrector, self).correct(dm, **kwargs)
         if restore_trend:
