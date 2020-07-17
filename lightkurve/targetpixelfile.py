@@ -404,7 +404,8 @@ class TargetPixelFile(object):
              np.atleast_3d(pos_corr2_pix).transpose([1, 2, 0]))
 
         # Pass through WCS
-        ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)
+        #ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1) # OLD (<2020JUL17)
+        ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 0) # NEW KJM astropy documentation says origin=0 when using NUMPY
         ra = ra.reshape((pos_corr1_pix.shape[0], self.shape[1], self.shape[2]))
         dec = dec.reshape((pos_corr2_pix.shape[0], self.shape[1], self.shape[2]))
         ra, dec = ra[self.quality_mask], dec[self.quality_mask]
