@@ -7,7 +7,8 @@ from itertools import combinations_with_replacement as multichoose
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .designmatrix import DesignMatrix, DesignMatrixCollection, SparseDesignMatrixCollection
+from .designmatrix import DesignMatrix, DesignMatrixCollection, \
+                          SparseDesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
 from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
 from .. import MPLSTYLE
@@ -99,8 +100,9 @@ class PLDCorrector(RegressionCorrector):
     def __repr__(self):
         return 'PLDCorrector (ID: {})'.format(self.lc.label)
 
-    def create_design_matrix(self, pld_order=3, pixel_components=16, background_mask=None,
-                             pld_aperture_mask=None, spline_n_knots=100, spline_degree=3,
+    def create_design_matrix(self, pld_order=3, pixel_components=16,
+                             background_mask=None, pld_aperture_mask=None,
+                             spline_n_knots=100, spline_degree=3,
                              n_pca_terms=6, sparse=False):
         """Returns a `.DesignMatrixCollection` containing a `DesignMatrix` object
         for the background regressors, the PLD pixel component regressors, and
@@ -189,7 +191,8 @@ class PLDCorrector(RegressionCorrector):
         # Create higher order matrix
         all_pld = [pld_1]
         for i in range(2, pld_order+1):
-            # This step creates higher order products of pixel components, from 2nd to nth order
+            # This step creates higher order products of pixel components,
+            # from 2nd to nth order
             reg_n = np.product(list(multichoose(pld_1.values.T, i)), axis=1).T
             # Apply PCA before merging into single PLD matrix
             with warnings.catch_warnings():
@@ -208,15 +211,17 @@ class PLDCorrector(RegressionCorrector):
 
         return dm
 
-    def correct(self, dm=None, pld_order=None, pixel_components=None, background_mask=None,
-                pld_aperture_mask=None, spline_n_knots=40, spline_degree=5,
-                n_pca_terms=8, restore_trend=True, sparse=False, **kwargs):
+    def correct(self, dm=None, pld_order=None, pixel_components=None,
+                background_mask=None, pld_aperture_mask=None, spline_n_knots=40,
+                spline_degree=5, n_pca_terms=8, restore_trend=True, sparse=False,
+                **kwargs):
         """Returns a systematics-corrected light curve.
 
         If the parameters `pld_order` and `pixel_components` are None, their
         value will be assigned based on the mission. K2 and TESS experience
         different dominant sources of noise, and require different defaults.
-        For information about how the defaults were chosen, see Pull Request #746.
+        For information about how the defaults were chosen, see PR #746 at
+        https://github.com/KeplerGO/lightkurve/pull/746#issuecomment-658458270
 
         Parameters
         ----------
@@ -299,7 +304,8 @@ class PLDCorrector(RegressionCorrector):
 
         clc = super(PLDCorrector, self).correct(dm, **kwargs)
         if restore_trend:
-            clc += (self.diagnostic_lightcurves['spline'] - np.median(self.diagnostic_lightcurves['spline'].flux))
+            clc += (self.diagnostic_lightcurves['spline']
+                    - np.median(self.diagnostic_lightcurves['spline'].flux))
         return clc
 
     def diagnose(self):
@@ -312,13 +318,15 @@ class PLDCorrector(RegressionCorrector):
             The matplotlib axes object.
         """
         if not hasattr(self, 'corrected_lc'):
-            raise ValueError('Please call the `correct()` method before trying to diagnose.')
-
+            raise ValueError('You need to call the `correct()` method '
+                             'before you can call `diagnose()`.')
         names = self.diagnostic_lightcurves.keys()
 
         # Plot the right version of corrected light curve
         if self.restore_trend:
-            clc = self.corrected_lc + self.diagnostic_lightcurves['spline'] - np.median(self.diagnostic_lightcurves['spline'].flux)
+            clc = self.corrected_lc \
+                  + self.diagnostic_lightcurves['spline'] \
+                  - np.median(self.diagnostic_lightcurves['spline'].flux)
         else:
             clc = self.corrected_lc
 
@@ -329,7 +337,10 @@ class PLDCorrector(RegressionCorrector):
             ax = axs[0]
             self.lc.plot(ax=ax, normalize=False, label='original', alpha=0.4)
             for key in ['background_model']:
-                (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
+                tmplc = self.diagnostic_lightcurves[key] \
+                        - np.median(self.diagnostic_lightcurves[key].flux) \
+                        + np.median(self.lc.flux)
+                tmplc.plot(ax=ax)
             ax.set_xlabel('')
 
             # Plot pixel and spline components
@@ -337,7 +348,10 @@ class PLDCorrector(RegressionCorrector):
             clc.plot(ax=ax, normalize=False, label='corrected', alpha=0.4)
             for key in names:
                 if key in ['pixel_series', 'spline']:
-                    (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
+                    tmplc = self.diagnostic_lightcurves[key] \
+                            - np.median(self.diagnostic_lightcurves[key].flux) \
+                            + np.median(self.lc.flux)
+                    tmplc.plot(ax=ax)
             ax.set_xlabel('')
 
             # Plot final corrected light curve with outliers marked
@@ -359,19 +373,25 @@ class PLDCorrector(RegressionCorrector):
             The matplotlib axes object.
         """
         if not hasattr(self, 'corrected_lc'):
-            raise ValueError('Please call the `correct()` method before trying to diagnose.')
+            raise ValueError('You need to call the `correct()` method '
+                             'before you can call `diagnose()`.')
 
         # Use lightkurve plotting style
         with plt.style.context(MPLSTYLE):
             _, axs = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
             # Show light curve aperture mask
             ax = axs[0]
-            self.tpf.plot(ax=ax, show_colorbar=False, aperture_mask=self.aperture_mask, title='Light Curve Mask')
+            self.tpf.plot(ax=ax, show_colorbar=False,
+                          aperture_mask=self.aperture_mask,
+                          title='Light Curve Mask')
             # Show background mask
             ax = axs[1]
-            self.tpf.plot(ax=ax, show_colorbar=False, aperture_mask=self.background_mask, title='Background Mask')
+            self.tpf.plot(ax=ax, show_colorbar=False,
+                          aperture_mask=self.background_mask,
+                          title='Background Mask')
             # Show PLD pixel mask
             ax = axs[2]
-            self.tpf.plot(ax=ax, show_colorbar=False, aperture_mask=self.pld_pixel_mask, title='PLD Mask')
-
+            self.tpf.plot(ax=ax, show_colorbar=False,
+                          aperture_mask=self.pld_pixel_mask,
+                          title='PLD Mask')
         return axs
