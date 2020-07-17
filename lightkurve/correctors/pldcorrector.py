@@ -7,7 +7,7 @@ from itertools import combinations_with_replacement as multichoose
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .designmatrix import DesignMatrix, DesignMatrixCollection
+from .designmatrix import DesignMatrix, DesignMatrixCollection, SparseDesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
 from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
 from .. import MPLSTYLE
@@ -152,10 +152,9 @@ class PLDCorrector(RegressionCorrector):
             `.DesignMatrixCollection` containing pixel, background, and spline
             components.
         """
-
         if background_mask is None:
-            # Default to pixels <1-sigma above the background
-            background_mask = ~self.tpf.create_threshold_mask(3, reference_pixel=None)
+            # Default to pixels less than 1-sigma above the background
+            background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
         self.background_mask = background_mask
 
         DMC, spline = DesignMatrixCollection, create_spline_matrix
@@ -271,7 +270,7 @@ class PLDCorrector(RegressionCorrector):
         """
         if background_mask is None:
             # Default to pixels <1-sigma above the background
-            background_mask = ~self.tpf.create_threshold_mask(3, reference_pixel=None)
+            background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
         self.background_mask = background_mask
         self.restore_trend = restore_trend
 
