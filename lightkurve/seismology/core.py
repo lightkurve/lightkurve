@@ -592,7 +592,7 @@ class Seismology(object):
 
             result = estimate_deltanu_acf2d(self.periodogram, numax=numax)
 
-        self.deltanu = resultq
+        self.deltanu = result
         return result
 
     def diagnose_deltanu(self, deltanu=None):
