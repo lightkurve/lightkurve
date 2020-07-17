@@ -286,15 +286,15 @@ class PLDCorrector(RegressionCorrector):
                 pixel_components = 7
 
         dm = self.create_design_matrix(background_mask=background_mask,
-                                        pld_aperture_mask=pld_aperture_mask,
-                                        pld_order=pld_order,
-                                        n_pca_terms=n_pca_terms,
-                                        pixel_components=pixel_components,
-                                        spline_n_knots=spline_n_knots,
-                                        spline_degree=spline_degree,
-                                        sparse=sparse)
+                                       pld_aperture_mask=pld_aperture_mask,
+                                       pld_order=pld_order,
+                                       n_pca_terms=n_pca_terms,
+                                       pixel_components=pixel_components,
+                                       spline_n_knots=spline_n_knots,
+                                       spline_degree=spline_degree,
+                                       sparse=sparse)
 
-        clc = super(PLDCorrector, self).correct(dm, **kwargs)
+        clc = super().correct(dm, **kwargs)
         if restore_trend:
             clc += (self.diagnostic_lightcurves['spline']
                     - np.median(self.diagnostic_lightcurves['spline'].flux))
