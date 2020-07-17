@@ -507,6 +507,8 @@ class TargetPixelFile(object):
             will be returned.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
+            If 'background' is passed, all pixels fainter than the median flux
+            will be used.
 
         Returns
         -------
@@ -529,6 +531,9 @@ class TargetPixelFile(object):
                 aperture_mask = self.pipeline_mask
             elif aperture_mask == 'threshold':
                 aperture_mask = self.create_threshold_mask()
+            elif aperture_mask == 'background':
+                aperture_mask = ~self.create_threshold_mask(threshold=0,
+                                                            reference_pixel=None)
             elif np.issubdtype(aperture_mask.dtype, np.integer) and \
                 ((aperture_mask & 2) == 2).any():
                 # Kepler and TESS pipeline style integer flags

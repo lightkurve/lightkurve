@@ -101,7 +101,7 @@ class PLDCorrector(RegressionCorrector):
         return 'PLDCorrector (ID: {})'.format(self.lc.label)
 
     def create_design_matrix(self, pld_order=3, pixel_components=16,
-                             background_mask=None, pld_aperture_mask=None,
+                             background_mask='background', pld_aperture_mask=None,
                              spline_n_knots=100, spline_degree=3,
                              n_pca_terms=6, sparse=False):
         """Returns a `.DesignMatrixCollection` containing a `DesignMatrix` object
@@ -154,9 +154,7 @@ class PLDCorrector(RegressionCorrector):
             `.DesignMatrixCollection` containing pixel, background, and spline
             components.
         """
-        if background_mask is None:
-            # Default to pixels less than 1-sigma above the background
-            background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
+        background_mask = self.tpf._parse_aperture_mask(background_mask)
         self.background_mask = background_mask
 
         DMC, spline = DesignMatrixCollection, create_spline_matrix
@@ -212,7 +210,7 @@ class PLDCorrector(RegressionCorrector):
         return dm
 
     def correct(self, pld_order=None, pixel_components=None,
-                background_mask=None, pld_aperture_mask=None, spline_n_knots=40,
+                background_mask='background', pld_aperture_mask=None, spline_n_knots=40,
                 spline_degree=5, n_pca_terms=8, restore_trend=True, sparse=False,
                 **kwargs):
         """Returns a systematics-corrected light curve.
@@ -267,10 +265,6 @@ class PLDCorrector(RegressionCorrector):
         clc : `.LightCurve`
             Noise-corrected `.LightCurve`.
         """
-        if background_mask is None:
-            # Default to pixels <1-sigma above the background
-            background_mask = ~self.tpf.create_threshold_mask(1, reference_pixel=None)
-        self.background_mask = background_mask
         self.restore_trend = restore_trend
 
         # Set mission-specific values for pld_order and pixel_components
