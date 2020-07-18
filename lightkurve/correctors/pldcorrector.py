@@ -174,7 +174,7 @@ class PLDCorrector(RegressionCorrector):
         self.pld_pixel_mask = self.tpf._parse_aperture_mask(pld_aperture_mask)
 
         # Background-subtracted, flux-normalized pixel time series
-        regressors = self.tpf.flux[:, self.pld_pixel_mask].reshape(len(self.tpf.flux), -1)
+        regressors = self.tpf.flux[:, self.pld_pixel_mask].reshape(len(self.tpf.flux),-1)
         regressors = regressors - simple_bkg.reshape(-1,1)
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
         regressors = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
