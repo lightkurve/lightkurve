@@ -102,8 +102,7 @@ class PLDCorrector(RegressionCorrector):
 
     def create_design_matrix(self, pld_order=3, pixel_components=16,
                              background_mask='background', pld_aperture_mask=None,
-                             spline_n_knots=100, spline_degree=3,
-                             n_pca_terms=6, sparse=False):
+                             spline_n_knots=100, spline_degree=3, sparse=False):
         """Returns a `.DesignMatrixCollection` containing a `DesignMatrix` object
         for the background regressors, the PLD pixel component regressors, and
         the spline regressors.
@@ -120,9 +119,13 @@ class PLDCorrector(RegressionCorrector):
             (`n=1`) uses only the pixel fluxes to construct the design matrix.
             Higher order populates the design matrix with columns constructed
             from the products of pixel fluxes.
-        pixel_components : int
+        pixel_components : int or tuple
             Number of principal components derived from the background pixel
-            time series to utilize.
+            time series to utilize. If performing PLD with `pld_order > 1`,
+            `pixel_components` can be passed as a tuple, with an int for the
+            number of terms for each order of PLD. If an int is passed for
+            `pld_order = 1`, the same number of terms will be used for each
+            order.
         background_mask : array-like or None
             A boolean array flagging the background pixels such that `True` means
             that the pixel will be used to generate the background systematics model.
@@ -140,11 +143,6 @@ class PLDCorrector(RegressionCorrector):
             Number of knots in spline.
         spline_degree : int
             Polynomial degree of spline.
-        n_pca_terms : int
-            Number of terms added to the design matrix from each order of PLD
-            when performing Principal Component Analysis for models higher than
-            first order. Increasing this value may provide higher precision at
-            the expense of computational time.
         sparse : bool
             Whether to create `SparseDesignMatrix`.
 
@@ -184,7 +182,10 @@ class PLDCorrector(RegressionCorrector):
         # Create first order design matrix
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
-            pld_1 = DesignMatrix(regressors).pca(pixel_components)
+            if isinstance(pixel_components, (tuple, list)):
+                pld_1 = DesignMatrix(regressors).pca(pixel_components[0])
+            else:
+                pld_1 = DesignMatrix(regressors).pca(pixel_components)
 
         # Create higher order matrix
         all_pld = [pld_1]
@@ -195,7 +196,12 @@ class PLDCorrector(RegressionCorrector):
             # Apply PCA before merging into single PLD matrix
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore')
-                pld_n = DesignMatrix(reg_n).pca(pixel_components)
+                # Check if pixel_components has an entry for each order,
+                # otherwise use pixel_components for PCA of higher order matrices
+                if isinstance(pixel_components, (tuple, list)):
+                    pld_n = DesignMatrix(reg_n).pca(pixel_components[i-1])
+                else:
+                    pld_n = DesignMatrix(reg_n).pca(pixel_components)
             all_pld.append(pld_n)
 
         # Collect each matrix
@@ -211,8 +217,7 @@ class PLDCorrector(RegressionCorrector):
 
     def correct(self, pld_order=None, pixel_components=None,
                 background_mask='background', pld_aperture_mask=None, spline_n_knots=40,
-                spline_degree=5, n_pca_terms=8, restore_trend=True, sparse=False,
-                **kwargs):
+                spline_degree=5, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         If the parameters `pld_order` and `pixel_components` are None, their
@@ -228,9 +233,13 @@ class PLDCorrector(RegressionCorrector):
             (`n=1`) uses only the pixel fluxes to construct the design matrix.
             Higher order populates the design matrix with columns constructed
             from the products of pixel fluxes. Default 3 for K2 and 1 for TESS.
-        pixel_components : int
+        pixel_components : int or tuple
             Number of principal components derived from the background pixel
-            time series to utilize. Default 16 for K2 and 8 for TESS.
+            time series to utilize. If performing PLD with `pld_order > 1`,
+            `pixel_components` can be passed as a tuple, with an int for the
+            number of terms for each order of PLD. If an int is passed for
+            `pld_order = 1`, the same number of terms will be used for each
+            order. Default 16 for K2 and 8 for TESS.
         background_mask : array-like or None
             A boolean array flagging the background pixels such that `True` means
             that the pixel will be used to generate the background systematics model.
@@ -248,11 +257,6 @@ class PLDCorrector(RegressionCorrector):
             Number of knots in spline.
         spline_degree : int
             Polynomial degree of spline.
-        n_pca_terms : int
-            Number of terms added to the design matrix from each order of PLD
-            when performing Principal Component Analysis for models higher than
-            first order. Increasing this value may provide higher precision at
-            the expense of computational time.
         restore_trend : bool
             Whether to restore the long term spline trend to the light curve.
         sparse : bool
@@ -282,7 +286,6 @@ class PLDCorrector(RegressionCorrector):
         dm = self.create_design_matrix(background_mask=background_mask,
                                        pld_aperture_mask=pld_aperture_mask,
                                        pld_order=pld_order,
-                                       n_pca_terms=n_pca_terms,
                                        pixel_components=pixel_components,
                                        spline_n_knots=spline_n_knots,
                                        spline_degree=spline_degree,
