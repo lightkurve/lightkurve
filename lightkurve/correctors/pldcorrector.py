@@ -100,14 +100,14 @@ class PLDCorrector(RegressionCorrector):
     def __repr__(self):
         return 'PLDCorrector (ID: {})'.format(self.lc.label)
 
-    def create_design_matrix(self, pld_order=3, pixel_components=16,
+    def create_design_matrix(self, pld_order=3, n_pca_terms=16,
                              background_mask='background', pld_aperture_mask=None,
                              spline_n_knots=100, spline_degree=3, sparse=False):
         """Returns a `.DesignMatrixCollection` containing a `DesignMatrix` object
         for the background regressors, the PLD pixel component regressors, and
         the spline regressors.
 
-        If the parameters `pld_order` and `pixel_components` are None, their
+        If the parameters `pld_order` and `n_pca_terms` are None, their
         value will be assigned based on the mission. K2 and TESS experience
         different dominant sources of noise, and require different defaults.
         For information about how the defaults were chosen, see Pull Request #746.
@@ -119,13 +119,14 @@ class PLDCorrector(RegressionCorrector):
             (`n=1`) uses only the pixel fluxes to construct the design matrix.
             Higher order populates the design matrix with columns constructed
             from the products of pixel fluxes.
-        pixel_components : int or tuple
-            Number of principal components derived from the background pixel
-            time series to utilize. If performing PLD with `pld_order > 1`,
-            `pixel_components` can be passed as a tuple, with an int for the
-            number of terms for each order of PLD. If an int is passed for
-            `pld_order = 1`, the same number of terms will be used for each
-            order.
+        n_pca_terms : int or tuple of int
+            Number of terms added to the design matrix for each order of PLD
+            pixel fluxes. Increasing this value may provide higher precision
+            at the expense of slower speed and/or overfitting.
+            If performing PLD with `pld_order > 1`, `n_pca_terms` can be
+            a tuple containing the number of terms for each order of PLD.
+            If a single int is passed, the same number of terms will be used
+            for each order. Defaults to 16 for K2 and 8 for TESS.
         background_mask : array-like or None
             A boolean array flagging the background pixels such that `True` means
             that the pixel will be used to generate the background systematics model.
@@ -182,10 +183,11 @@ class PLDCorrector(RegressionCorrector):
         # Create first order design matrix
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
-            if isinstance(pixel_components, (tuple, list)):
-                pld_1 = DesignMatrix(regressors).pca(pixel_components[0])
+            if isinstance(n_pca_terms, (tuple, list)):
+                n_terms = n_pca_terms[0]
             else:
-                pld_1 = DesignMatrix(regressors).pca(pixel_components)
+                n_terms = n_pca_terms
+            pld_1 = DesignMatrix(regressors).pca(n_terms)
 
         # Create higher order matrix
         all_pld = [pld_1]
@@ -196,12 +198,13 @@ class PLDCorrector(RegressionCorrector):
             # Apply PCA before merging into single PLD matrix
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore')
-                # Check if pixel_components has an entry for each order,
-                # otherwise use pixel_components for PCA of higher order matrices
-                if isinstance(pixel_components, (tuple, list)):
-                    pld_n = DesignMatrix(reg_n).pca(pixel_components[i-1])
+                # Check if n_pca_terms has an entry for each order,
+                # otherwise use n_pca_terms for PCA of higher order matrices
+                if isinstance(n_pca_terms, (tuple, list)):
+                    n_terms = n_pca_terms[i-1]
                 else:
-                    pld_n = DesignMatrix(reg_n).pca(pixel_components)
+                    n_terms = n_pca_terms
+            pld_n = DesignMatrix(reg_n).pca(n_terms)
             all_pld.append(pld_n)
 
         # Collect each matrix
@@ -215,12 +218,12 @@ class PLDCorrector(RegressionCorrector):
 
         return dm
 
-    def correct(self, pld_order=None, pixel_components=None,
+    def correct(self, pld_order=None, n_pca_terms=None,
                 background_mask='background', pld_aperture_mask=None, spline_n_knots=40,
                 spline_degree=5, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
-        If the parameters `pld_order` and `pixel_components` are None, their
+        If the parameters `pld_order` and `n_pca_terms` are None, their
         value will be assigned based on the mission. K2 and TESS experience
         different dominant sources of noise, and require different defaults.
         For information about how the defaults were chosen, see PR #746 at
@@ -233,13 +236,14 @@ class PLDCorrector(RegressionCorrector):
             (`n=1`) uses only the pixel fluxes to construct the design matrix.
             Higher order populates the design matrix with columns constructed
             from the products of pixel fluxes. Default 3 for K2 and 1 for TESS.
-        pixel_components : int or tuple
-            Number of principal components derived from the background pixel
-            time series to utilize. If performing PLD with `pld_order > 1`,
-            `pixel_components` can be passed as a tuple, with an int for the
-            number of terms for each order of PLD. If an int is passed for
-            `pld_order = 1`, the same number of terms will be used for each
-            order. Default 16 for K2 and 8 for TESS.
+        n_pca_terms : int or tuple of int
+            Number of terms added to the design matrix for each order of PLD
+            pixel fluxes. Increasing this value may provide higher precision
+            at the expense of slower speed and/or overfitting.
+            If performing PLD with `pld_order > 1`, `n_pca_terms` can be
+            a tuple containing the number of terms for each order of PLD.
+            If a single int is passed, the same number of terms will be used
+            for each order.
         background_mask : array-like or None
             A boolean array flagging the background pixels such that `True` means
             that the pixel will be used to generate the background systematics model.
@@ -271,22 +275,22 @@ class PLDCorrector(RegressionCorrector):
         """
         self.restore_trend = restore_trend
 
-        # Set mission-specific values for pld_order and pixel_components
+        # Set mission-specific values for pld_order and n_pca_terms
         if pld_order is None:
             if isinstance(self.tpf, KeplerTargetPixelFile):
                 pld_order = 3
             else:
                 pld_order = 1
-        if pixel_components is None:
+        if n_pca_terms is None:
             if isinstance(self.tpf, KeplerTargetPixelFile):
-                pixel_components = 16
+                n_pca_terms = 16
             else:
-                pixel_components = 7
+                n_pca_terms = 7
 
         dm = self.create_design_matrix(background_mask=background_mask,
                                        pld_aperture_mask=pld_aperture_mask,
                                        pld_order=pld_order,
-                                       pixel_components=pixel_components,
+                                       n_pca_terms=n_pca_terms,
                                        spline_n_knots=spline_n_knots,
                                        spline_degree=spline_degree,
                                        sparse=sparse)
