@@ -114,7 +114,7 @@ class PLDCorrector(RegressionCorrector):
         return 'PLDCorrector (ID: {})'.format(self.lc.label)
 
     def create_design_matrix(self, pld_order=3, n_pca_terms=16,
-                             background_mask='background', pld_aperture_mask=None,
+                             background_aperture_mask='background', pld_aperture_mask=None,
                              spline_n_knots=100, spline_degree=3, sparse=False):
         """Returns a `.DesignMatrixCollection` containing a `DesignMatrix` object
         for the background regressors, the PLD pixel component regressors, and
@@ -140,7 +140,7 @@ class PLDCorrector(RegressionCorrector):
             a tuple containing the number of terms for each order of PLD.
             If a single int is passed, the same number of terms will be used
             for each order. Defaults to 16 for K2 and 8 for TESS.
-        background_mask : array-like or None
+        background_aperture_mask : array-like or None
             A boolean array flagging the background pixels such that `True` means
             that the pixel will be used to generate the background systematics model.
             If `None`, all pixels which are fainter than 1-sigma above the median
@@ -166,12 +166,16 @@ class PLDCorrector(RegressionCorrector):
             `.DesignMatrixCollection` containing pixel, background, and spline
             components.
         """
-        background_mask = self.tpf._parse_aperture_mask(background_mask)
-        self.background_mask = background_mask
+        # Validate the inputs
+        pld_aperture_mask = self.tpf._parse_aperture_mask(pld_aperture_mask)
+        background_aperture_mask = self.tpf._parse_aperture_mask(background_aperture_mask)
+        self.pld_aperture_mask = pld_aperture_mask
+        self.background_aperture_mask = background_aperture_mask
 
         DMC, spline = DesignMatrixCollection, create_spline_matrix
         if sparse:
             DMC, spline = SparseDesignMatrixCollection, create_sparse_spline_matrix
+
         # First, we estimate the per-pixel background flux over time by
         # (i) subtracting a mean image from each cadence;
         # (ii) computing the median pixel value in the residual images;
@@ -181,14 +185,11 @@ class PLDCorrector(RegressionCorrector):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
             simple_bkg = (self.tpf.flux - np.nanmean(self.tpf.flux, axis=0))
-        simple_bkg = np.nanmedian(simple_bkg[:, background_mask], axis=1)
+        simple_bkg = np.nanmedian(simple_bkg[:, background_aperture_mask], axis=1)
         simple_bkg -= np.percentile(simple_bkg, 5)
 
-        # Parse PLD aperture mask
-        self.pld_pixel_mask = self.tpf._parse_aperture_mask(pld_aperture_mask)
-
         # Background-subtracted, flux-normalized pixel time series
-        regressors = self.tpf.flux[:, self.pld_pixel_mask].reshape(len(self.tpf.flux),-1)
+        regressors = self.tpf.flux[:, pld_aperture_mask].reshape(len(self.tpf.flux), -1)
         regressors = regressors - simple_bkg.reshape(-1,1)
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
         regressors = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
@@ -223,8 +224,9 @@ class PLDCorrector(RegressionCorrector):
         # Collect each matrix
         dm_pixels = DesignMatrixCollection(all_pld).to_designmatrix(name='pixel_series')
         dm_bkg = DesignMatrix(simple_bkg, name='background_model')
-        dm_spline = spline(self.lc.time.value, n_knots=spline_n_knots,
-                             degree=spline_degree).append_constant()
+        dm_spline = spline(self.lc.time.value,
+                           n_knots=spline_n_knots,
+                           degree=spline_degree).append_constant()
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             dm = DMC([dm_pixels, dm_bkg, dm_spline])
@@ -232,7 +234,7 @@ class PLDCorrector(RegressionCorrector):
         return dm
 
     def correct(self, pld_order=None, n_pca_terms=None,
-                background_mask='background', pld_aperture_mask=None, spline_n_knots=40,
+                background_aperture_mask='background', pld_aperture_mask=None, spline_n_knots=40,
                 spline_degree=5, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
@@ -257,7 +259,7 @@ class PLDCorrector(RegressionCorrector):
             a tuple containing the number of terms for each order of PLD.
             If a single int is passed, the same number of terms will be used
             for each order.
-        background_mask : array-like or None
+        background_aperture_mask : array-like or None
             A boolean array flagging the background pixels such that `True` means
             that the pixel will be used to generate the background systematics model.
             If `None`, all pixels which are fainter than 1-sigma above the median
@@ -300,7 +302,7 @@ class PLDCorrector(RegressionCorrector):
             else:
                 n_pca_terms = 7
 
-        dm = self.create_design_matrix(background_mask=background_mask,
+        dm = self.create_design_matrix(background_aperture_mask=background_aperture_mask,
                                        pld_aperture_mask=pld_aperture_mask,
                                        pld_order=pld_order,
                                        n_pca_terms=n_pca_terms,
@@ -393,12 +395,12 @@ class PLDCorrector(RegressionCorrector):
             # Show background mask
             ax = axs[1]
             self.tpf.plot(ax=ax, show_colorbar=False,
-                          aperture_mask=self.background_mask,
+                          aperture_mask=self.background_aperture_mask,
                           title='Background Mask')
             # Show PLD pixel mask
             ax = axs[2]
             self.tpf.plot(ax=ax, show_colorbar=False,
-                          aperture_mask=self.pld_pixel_mask,
+                          aperture_mask=self.pld_aperture_mask,
                           title='PLD Mask')
         return axs
 
