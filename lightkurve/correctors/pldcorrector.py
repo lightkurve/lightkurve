@@ -1,4 +1,12 @@
-"""Defines PLDCorrector
+"""Defines a `PLDCorrector` class which provides a simple way to correct a
+light curve by utilizing the pixel time series data contained within the
+target's own Target Pixel File.
+
+`PLDCorrector` builds upon `RegressionCorrector` by correlating the light curve
+against a design matrix composed of the following elements:
+* A background light curve to capture the dominant scattered light systematics.
+* Background-corrected pixel time series to capture any residual systematics.
+* Splines to capture the target's intrinsic variability.
 """
 import logging
 import warnings
@@ -7,16 +15,21 @@ from itertools import combinations_with_replacement as multichoose
 import numpy as np
 import matplotlib.pyplot as plt
 
+from astropy.utils.decorators import deprecated
+
 from .designmatrix import DesignMatrix, DesignMatrixCollection, \
                           SparseDesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
 from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
 from .. import MPLSTYLE
 from ..targetpixelfile import KeplerTargetPixelFile
+from ..utils import LightkurveDeprecationWarning
+
 
 log = logging.getLogger(__name__)
 
-__all__ = ['PLDCorrector']
+
+__all__ = ['PLDCorrector', 'TessPLDCorrector']
 
 
 class PLDCorrector(RegressionCorrector):
@@ -388,3 +401,11 @@ class PLDCorrector(RegressionCorrector):
                           aperture_mask=self.pld_pixel_mask,
                           title='PLD Mask')
         return axs
+
+
+# `TessPLDCorrector` was briefly introduced in Lightkurve v1.9
+# but was removed in v2.0 in favor of a single generic `PLDCorrector`.
+@deprecated("2.0", alternative="PLDCorrector",
+            warning_type=LightkurveDeprecationWarning)
+class TessPLDCorrector(PLDCorrector):
+    pass
