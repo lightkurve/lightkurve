@@ -77,8 +77,7 @@ def test_estimate_numax_basics():
 
     with pytest.raises(ValueError) as exc:
         numax = snr.to_seismology().estimate_numax()
-    assert "uniformly spaced" in str(exc)
-
+    assert "uniformly spaced" in str(exc.value)
 
 def test_estimate_numax_kwargs():
     """Test if we can estimate a numax using its various keyword arguments."""
@@ -213,8 +212,7 @@ def test_estimate_deltanu_basics():
 
     with pytest.raises(ValueError) as exc:
         deltanu = snr.to_seismology().estimate_deltanu(numax=100)
-    assert "uniformly spaced" in str(exc)
-
+    assert "uniformly spaced" in str(exc.value)
 
 def test_estimate_deltanu_kwargs():
     """Test if we can estimate a deltanu using its various keyword arguments
