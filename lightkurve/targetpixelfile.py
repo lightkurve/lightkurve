@@ -27,7 +27,7 @@ from tqdm import tqdm
 from copy import deepcopy
 
 from . import PACKAGEDIR, MPLSTYLE
-from .lightcurve import KeplerLightCurve, TessLightCurve
+from .lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, \
@@ -601,6 +601,53 @@ class TargetPixelFile(object):
             closest_arg = label_args[np.argmin(distances)]
             closest_label = labels[closest_arg[0], closest_arg[1]]
             return labels == closest_label
+
+    def estimate_background(self, aperture_mask='background'):
+        """Returns an estimate of the mean background level in the FLUX column.
+
+        In the case of official Kepler and TESS Target Pixel Files, the
+        background estimates should be close to zero because these products
+        have already been background-subtracted by the pipeline (i.e. the values
+        in the `FLUX_BKG` column have been subtracted from the values in `FLUX`).
+        Background subtraction is often imperfect however, and this method aims
+        to allow users to estimate residual background signals using different
+        methods.
+
+        Target Pixel Files created by the MAST TESSCut service have
+        not been background-subtracted. For such products, or other community-
+        generated pixel files, this method provides a first-order estimate of
+        the background levels.
+
+        This method estimates the per-pixel background flux over time by
+        (i) subtracting a mean image from each cadence;
+        (ii) computing the median pixel value in the residual images;
+        (iii) assume that the 5%-percentile of those medians gives us the
+        exact background level. This assumption appears to work well for TESS
+        but it has not been validated in detail yet.
+
+        Parameters
+        ----------
+        aperture_mask : 'background', 'all', or array-like
+            Which pixels should be used to estimate the background?
+            If None or 'all' are passed, all pixels in the pixel file will be
+            used.  If 'background' is passed, all pixels fainter than the
+            median flux will be used. Alternatively, users can pass a boolean
+            array describing the aperture mask such that `True` means that the
+            pixel will be used.
+
+        Returns
+        -------
+        lc : `LightCurve` object
+            Average background flux in units electron/second/pixel.
+        """
+        mask = self._parse_aperture_mask(aperture_mask)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            simple_bkg = (self.flux - np.nanmean(self.flux, axis=0))
+        simple_bkg = np.nanmedian(simple_bkg[:, mask], axis=1)
+        simple_bkg -= np.percentile(simple_bkg, 5)
+        n_pixels = mask.sum() * u.pixel
+        return LightCurve(time=self.time, flux=simple_bkg / n_pixels)
 
     def estimate_centroids(self, aperture_mask='pipeline', method='moments'):
         """Returns the flux center of an object inside ``aperture_mask``.
@@ -1332,10 +1379,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_header()['OBJECT'],
                 'targetid': self.targetid}
+        meta = {'aperture_mask': aperture_mask}
         return KeplerLightCurve(time=self.time,
                                 flux=flux,
                                 flux_err=flux_err,
-                                **keys)
+                                **keys,
+                                meta=meta)
 
 
     def get_bkg_lightcurve(self, aperture_mask=None):
@@ -1955,10 +2004,12 @@ class TessTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_keyword('OBJECT'),
                 'targetid': self.targetid}
+        meta = {'aperture_mask': aperture_mask}
         return TessLightCurve(time=self.time,
                               flux=flux,
                               flux_err=flux_err,
-                              **keys)
+                              **keys,
+                              meta=meta)
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)

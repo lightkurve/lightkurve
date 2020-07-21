@@ -67,8 +67,8 @@ class DesignMatrix():
             prior_mu = np.zeros(len(df.T))
         if prior_sigma is None:
             prior_sigma = np.ones(len(df.T)) * np.inf
-        self.prior_mu = prior_mu
-        self.prior_sigma = prior_sigma
+        self.prior_mu = np.atleast_1d(prior_mu)
+        self.prior_sigma = np.atleast_1d(prior_sigma)
         self.validate()
 
     @property

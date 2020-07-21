@@ -15,6 +15,7 @@ from itertools import combinations_with_replacement as multichoose
 import numpy as np
 import matplotlib.pyplot as plt
 
+import astropy.units as u
 from astropy.utils.decorators import deprecated
 
 from .designmatrix import DesignMatrix, DesignMatrixCollection, \
@@ -176,21 +177,13 @@ class PLDCorrector(RegressionCorrector):
         if sparse:
             DMC, spline = SparseDesignMatrixCollection, create_sparse_spline_matrix
 
-        # First, we estimate the per-pixel background flux over time by
-        # (i) subtracting a mean image from each cadence;
-        # (ii) computing the median pixel value in the residual images;
-        # (iii) assume that the 5%-percentile of those medians gives us the
-        # exact background level. This assumption appears to work well for TESS
-        # but it has not been validated in detail yet.
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RuntimeWarning)
-            simple_bkg = (self.tpf.flux - np.nanmean(self.tpf.flux, axis=0))
-        simple_bkg = np.nanmedian(simple_bkg[:, background_aperture_mask], axis=1)
-        simple_bkg -= np.percentile(simple_bkg, 5)
+        # First, we estimate the per-pixel background flux over time
+        bkg = self.tpf.estimate_background(aperture_mask=background_aperture_mask)
+        self.background_estimate = bkg
 
         # Background-subtracted, flux-normalized pixel time series
         regressors = self.tpf.flux[:, pld_aperture_mask].reshape(len(self.tpf.flux), -1)
-        regressors = regressors - simple_bkg.reshape(-1,1)
+        regressors = regressors - bkg.flux.reshape(-1,1) * pld_aperture_mask.sum() * u.pixel
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
         regressors = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
 
@@ -223,7 +216,9 @@ class PLDCorrector(RegressionCorrector):
 
         # Collect each matrix
         dm_pixels = DesignMatrixCollection(all_pld).to_designmatrix(name='pixel_series')
-        dm_bkg = DesignMatrix(simple_bkg, name='background_model')
+        bkg_prior_mu = self.tpf._parse_aperture_mask(self.lc.meta['aperture_mask']).sum()
+        dm_bkg = DesignMatrix(bkg.flux.value, name='background_model',
+                              prior_mu=bkg_prior_mu, prior_sigma=1)
         dm_spline = spline(self.lc.time.value,
                            n_knots=spline_n_knots,
                            degree=spline_degree).append_constant()
