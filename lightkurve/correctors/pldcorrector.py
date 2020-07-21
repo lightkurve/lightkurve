@@ -391,17 +391,17 @@ class PLDCorrector(RegressionCorrector):
             ax = axs[0]
             self.tpf.plot(ax=ax, show_colorbar=False,
                           aperture_mask=self.aperture_mask,
-                          title='Light Curve Mask')
+                          title='aperture_mask')
             # Show background mask
             ax = axs[1]
             self.tpf.plot(ax=ax, show_colorbar=False,
                           aperture_mask=self.background_aperture_mask,
-                          title='Background Mask')
+                          title='background_aperture_mask')
             # Show PLD pixel mask
             ax = axs[2]
             self.tpf.plot(ax=ax, show_colorbar=False,
                           aperture_mask=self.pld_aperture_mask,
-                          title='PLD Mask')
+                          title='pld_aperture_mask')
         return axs
 
 
