@@ -75,8 +75,9 @@ def test_estimate_numax_basics():
     f += np.random.uniform(size=len(f))
     snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as exc:
         numax = snr.to_seismology().estimate_numax()
+    assert "uniformly spaced" in str(exc)
 
 
 def test_estimate_numax_kwargs():
@@ -210,8 +211,9 @@ def test_estimate_deltanu_basics():
     f += np.random.uniform(size=len(f))
     snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as exc:
         deltanu = snr.to_seismology().estimate_deltanu(numax=100)
+    assert "uniformly spaced" in str(exc)
 
 
 def test_estimate_deltanu_kwargs():
