@@ -81,5 +81,7 @@ We are grateful to the following community members for sharing corrections & sug
 - `Attila Bódi <https://github.com/astrobatty>`_
 - Jennifer Burt
 - Joshua Pepper
+- `Joel Ong <https://github.com/darthoctopus>`_
+- `Ben Rackham <https://github.com/brackham>`_
 
 This list is incomplete. Please open an issue if your name is missing!
