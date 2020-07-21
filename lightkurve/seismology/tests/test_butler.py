@@ -70,6 +70,14 @@ def test_estimate_numax_basics():
     nmxday = u.Quantity(true_numax*u.microhertz, 1/u.day)
     assert(np.isclose(nmxday, numax, atol=.1*nmxday))
 
+    # Assert numax estimator fails when frequqencies are not uniform
+    f, p, true_numax, _ = generate_test_spectrum()
+    f += np.random.uniform(size=len(f))
+    snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
+
+    with pytest.raises(ValueError) as exc:
+        numax = snr.to_seismology().estimate_numax()
+    assert "uniformly spaced" in str(exc.value)
 
 def test_estimate_numax_kwargs():
     """Test if we can estimate a numax using its various keyword arguments."""
@@ -197,6 +205,14 @@ def test_estimate_deltanu_basics():
     deltanuday = u.Quantity(true_deltanu*u.microhertz, 1/u.day)
     assert(np.isclose(deltanuday.value, deltanu.value, atol=.25*deltanuday.value))
 
+    # Assert deltanu estimator fails when frequqencies are not uniform
+    f, p, true_numax, _ = generate_test_spectrum()
+    f += np.random.uniform(size=len(f))
+    snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
+
+    with pytest.raises(ValueError) as exc:
+        deltanu = snr.to_seismology().estimate_deltanu(numax=100)
+    assert "uniformly spaced" in str(exc.value)
 
 def test_estimate_deltanu_kwargs():
     """Test if we can estimate a deltanu using its various keyword arguments

@@ -575,11 +575,9 @@ class Seismology(object):
         """
         method = validate_method(method, supported_methods=["acf2d"])
         numax = self._validate_numax(numax)
-
         if method == "acf2d":
             from .deltanu_estimators import estimate_deltanu_acf2d
             result = estimate_deltanu_acf2d(self.periodogram, numax=numax)
-
         self.deltanu = result
         return result
 
