@@ -189,12 +189,15 @@ class PLDCorrector(RegressionCorrector):
 
         # Create first order design matrix
         with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            if isinstance(n_pca_terms, (tuple, list)):
-                n_terms = n_pca_terms[0]
-            else:
-                n_terms = n_pca_terms
-            pld_1 = DesignMatrix(regressors).pca(n_terms)
+            warnings.filterwarnings('ignore', message='.*low rank.*')
+            pld_1 = DesignMatrix(regressors)
+
+        # Apply PCA
+        if isinstance(n_pca_terms, (tuple, list)):
+            n_terms = n_pca_terms[0]
+        else:
+            n_terms = n_pca_terms
+        pld_1 = pld_1.pca(n_terms)
 
         # Create higher order matrix
         all_pld = [pld_1]
@@ -202,16 +205,17 @@ class PLDCorrector(RegressionCorrector):
             # This step creates higher order products of pixel components,
             # from 2nd to nth order
             reg_n = np.product(list(multichoose(pld_1.values.T, i)), axis=1).T
-            # Apply PCA before merging into single PLD matrix
             with warnings.catch_warnings():
-                warnings.simplefilter('ignore')
-                # Check if n_pca_terms has an entry for each order,
-                # otherwise use n_pca_terms for PCA of higher order matrices
-                if isinstance(n_pca_terms, (tuple, list)):
-                    n_terms = n_pca_terms[i-1]
-                else:
-                    n_terms = n_pca_terms
-            pld_n = DesignMatrix(reg_n).pca(n_terms)
+                warnings.filterwarnings('ignore', message='.*low rank.*')
+                pld_n = DesignMatrix(reg_n)
+            # Apply PCA before merging into single PLD matrix
+            # Check if n_pca_terms has an entry for each order,
+            # otherwise use n_pca_terms for PCA of higher order matrices
+            if isinstance(n_pca_terms, (tuple, list)):
+                n_terms = n_pca_terms[i-1]
+            else:
+                n_terms = n_pca_terms
+            pld_n = pld_n.pca(n_terms)
             all_pld.append(pld_n)
 
         # Collect each matrix
