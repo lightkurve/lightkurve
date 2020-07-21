@@ -547,7 +547,7 @@ class Seismology(object):
             # Detect whether the frequency grid is evenly-spaced
             # by verifying that the first differences are all equal
             freqdiff = np.diff(self.periodogram.frequency.value)
-            if not np.allclose(freqdiff[0], freqdiff)
+            if not np.allclose(freqdiff[0], freqdiff):
                 raise ValueError("the ACF 2D method requires that the periodogram "
                                  "has a grid of uniformly spaced frequencies.")
 
@@ -590,7 +590,7 @@ class Seismology(object):
             # Detect whether the frequency grid is evenly-spaced
             # by verifying that the first differences are all equal
             freqdiff = np.diff(self.periodogram.frequency.value)
-            if not np.allclose(freqdiff[0], freqdiff)
+            if not np.allclose(freqdiff[0], freqdiff):
                 raise ValueError("the ACF 2D method requires that the periodogram "
                                  "has a grid of uniformly spaced frequencies.")
 
