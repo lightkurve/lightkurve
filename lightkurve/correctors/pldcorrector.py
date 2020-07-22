@@ -140,7 +140,8 @@ class PLDCorrector(RegressionCorrector):
             If performing PLD with `pld_order > 1`, `n_pca_terms` can be
             a tuple containing the number of terms for each order of PLD.
             If a single int is passed, the same number of terms will be used
-            for each order. Defaults to 16 for K2 and 8 for TESS.
+            for each order. If zero is passed, PCA will not be performed.
+            Defaults to 16 for K2 and 8 for TESS.
         background_aperture_mask : array-like or None
             A boolean array flagging the background pixels such that `True` means
             that the pixel will be used to generate the background systematics model.
@@ -198,7 +199,10 @@ class PLDCorrector(RegressionCorrector):
             n_terms = n_pca_terms[0]
         else:
             n_terms = n_pca_terms
-        regressors_pld = regressors_dm.pca(n_terms).values
+        if n_pca_terms > 0:
+            regressors_dm = regressors_dm.pca(n_terms)
+        regressors_pld = regressors_dm.values
+
 
         # Create a DesignMatrix for each PLD order
         all_pld = []
@@ -213,7 +217,8 @@ class PLDCorrector(RegressionCorrector):
                 n_terms = n_pca_terms[order-1]
             else:
                 n_terms = n_pca_terms
-            pld_n = pld_n.pca(n_terms)
+            if n_pca_terms > 0:
+                pld_n = pld_n.pca(n_terms)
             all_pld.append(pld_n)
 
         # Create the collection of DesignMatrix objects.
@@ -260,7 +265,7 @@ class PLDCorrector(RegressionCorrector):
             If performing PLD with `pld_order > 1`, `n_pca_terms` can be
             a tuple containing the number of terms for each order of PLD.
             If a single int is passed, the same number of terms will be used
-            for each order.
+            for each order.  If zero is passed, PCA will not be performed.
         background_aperture_mask : array-like or None
             A boolean array flagging the background pixels such that `True` means
             that the pixel will be used to generate the background systematics model.
