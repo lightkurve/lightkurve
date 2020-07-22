@@ -3,8 +3,13 @@
 
 - Removed support for Python 2. [#733]
 
+- ``LightCurve`` is now a sub-class of ``astropy.time.TimeSeries``. [#744]
+
 - Added ``SparseDesignMatrix`` and modified ``RegressionCorrector`` to enable
   systematics removal methods to benefit from ``scipy.sparse`` speed-ups. [#732]
+
+- Modified ``PLDCorrector`` to make use of the new ``RegressionCorrector``
+  and ``DesignMatrix`` classes. [#746]
 
 - Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
   ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
@@ -24,8 +29,8 @@
 - Added an error message to ``estimate_numax()`` or ``estimate_deltanu()`` if
   the underlying periodogram does not have uniformly-spaced frequencies. [#780]
 
-- Modified ``PLDCorrector`` to make use of the new ``RegressionCorrector``
-  and ``DesignMatrix`` classes. [#746]
+- Added the ``estimate_background`` method to ``TargetPixelFile`` which returns
+  a 1D estimate of the residual background present in e.g. TESSCut data. [#746]
 
 
 
