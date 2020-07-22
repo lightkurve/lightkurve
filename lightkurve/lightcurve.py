@@ -345,6 +345,9 @@ class LightCurve(TimeSeries):
             # Applying standard uncertainty propagation, cf.
             # https://en.wikipedia.org/wiki/Propagation_of_uncertainty#Example_formulae
             newlc.flux_err = abs(newlc.flux) * np.hypot(self.flux_err / self.flux, other.flux_err / other.flux)
+        elif isinstance(other, (u.UnitBase, u.FunctionUnitBase)):  # cf. astropy/issues/6517
+            newlc.flux = other * self.flux
+            newlc.flux_err = other * self.flux_err
         else:
             newlc.flux = other * self.flux
             newlc.flux_err = abs(other) * self.flux_err

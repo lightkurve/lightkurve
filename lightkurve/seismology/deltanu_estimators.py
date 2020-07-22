@@ -77,6 +77,11 @@ def estimate_deltanu_acf2d(periodogram, numax):
         The average large frequency spacing of the seismic oscillation modes.
         In units of the periodogram frequency attribute.
     """
+    # The frequency grid must be evenly spaced
+    if not periodogram._is_evenly_spaced():
+        raise ValueError("the ACF 2D method requires that the periodogram "
+                         "has a grid of uniformly spaced frequencies.")
+
     # Run some checks on the passed in numaxs
     # Ensure input numax is in the correct units
     numax = u.Quantity(numax, periodogram.frequency.unit)
