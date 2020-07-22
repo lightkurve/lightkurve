@@ -24,7 +24,7 @@ def test_kepler_pld_corrector():
     raw_lc = tpf.to_lightcurve(aperture_mask='threshold')
     assert(clc.estimate_cdpp() < raw_lc.estimate_cdpp())
     # Can we pass a tuple in for higher order components?
-    clc = pld.correct(pld_order=2, n_pca_terms=(16, 5))
+    clc = pld.correct(pld_order=2, pca_components=(16, 5))
 
 
 @pytest.mark.remote_data

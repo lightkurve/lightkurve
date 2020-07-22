@@ -16,7 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import astropy.units as u
-from astropy.utils.decorators import deprecated
+from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 
 from .designmatrix import DesignMatrix, DesignMatrixCollection, \
                           SparseDesignMatrixCollection
@@ -114,14 +114,14 @@ class PLDCorrector(RegressionCorrector):
     def __repr__(self):
         return 'PLDCorrector (ID: {})'.format(self.lc.label)
 
-    def create_design_matrix(self, pld_order=3, n_pca_terms=16,
+    def create_design_matrix(self, pld_order=3, pca_components=16,
                              background_aperture_mask='background', pld_aperture_mask=None,
                              spline_n_knots=100, spline_degree=3, sparse=False):
         """Returns a `.DesignMatrixCollection` containing a `DesignMatrix` object
         for the background regressors, the PLD pixel component regressors, and
         the spline regressors.
 
-        If the parameters `pld_order` and `n_pca_terms` are None, their
+        If the parameters `pld_order` and `pca_components` are None, their
         value will be assigned based on the mission. K2 and TESS experience
         different dominant sources of noise, and require different defaults.
         For information about how the defaults were chosen, see Pull Request #746.
@@ -133,11 +133,11 @@ class PLDCorrector(RegressionCorrector):
             (`n=1`) uses only the pixel fluxes to construct the design matrix.
             Higher order populates the design matrix with columns constructed
             from the products of pixel fluxes.
-        n_pca_terms : int or tuple of int
+        pca_components : int or tuple of int
             Number of terms added to the design matrix for each order of PLD
             pixel fluxes. Increasing this value may provide higher precision
             at the expense of slower speed and/or overfitting.
-            If performing PLD with `pld_order > 1`, `n_pca_terms` can be
+            If performing PLD with `pld_order > 1`, `pca_components` can be
             a tuple containing the number of terms for each order of PLD.
             If a single int is passed, the same number of terms will be used
             for each order. If zero is passed, PCA will not be performed.
@@ -195,11 +195,11 @@ class PLDCorrector(RegressionCorrector):
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', message='.*low rank.*')
             regressors_dm = DesignMatrix(regressors)
-        if isinstance(n_pca_terms, (tuple, list)):
-            n_terms = n_pca_terms[0]
+        if isinstance(pca_components, (tuple, list)):
+            n_terms = pca_components[0]
         else:
-            n_terms = n_pca_terms
-        if n_pca_terms > 0:
+            n_terms = pca_components
+        if pca_components > 0:
             regressors_dm = regressors_dm.pca(n_terms)
         regressors_pld = regressors_dm.values
 
@@ -211,13 +211,13 @@ class PLDCorrector(RegressionCorrector):
             with warnings.catch_warnings():
                 warnings.filterwarnings('ignore', message='.*low rank.*')
                 pld_n = DesignMatrix(reg_n)
-            # Apply PCA. Check if n_pca_terms has an entry for each order,
-            # otherwise use n_pca_terms for PCA of higher order matrices.
-            if isinstance(n_pca_terms, (tuple, list)):
-                n_terms = n_pca_terms[order-1]
+            # Apply PCA. Check if pca_components has an entry for each order,
+            # otherwise use pca_components for PCA of higher order matrices.
+            if isinstance(pca_components, (tuple, list)):
+                n_terms = pca_components[order-1]
             else:
-                n_terms = n_pca_terms
-            if n_pca_terms > 0:
+                n_terms = pca_components
+            if pca_components > 0:
                 pld_n = pld_n.pca(n_terms)
             all_pld.append(pld_n)
 
@@ -240,12 +240,14 @@ class PLDCorrector(RegressionCorrector):
             dm_collection = DMC([dm_pixels, dm_bkg, dm_spline])
         return dm_collection
 
-    def correct(self, pld_order=None, n_pca_terms=None,
+    @deprecated_renamed_argument('n_pca_terms', 'pca_components', '2.0',
+                                 warning_type=LightkurveDeprecationWarning)
+    def correct(self, pld_order=None, pca_components=None,
                 background_aperture_mask='background', pld_aperture_mask=None, spline_n_knots=40,
                 spline_degree=5, restore_trend=True, sparse=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
-        If the parameters `pld_order` and `n_pca_terms` are None, their
+        If the parameters `pld_order` and `pca_components` are None, their
         value will be assigned based on the mission. K2 and TESS experience
         different dominant sources of noise, and require different defaults.
         For information about how the defaults were chosen, see PR #746 at
@@ -258,11 +260,11 @@ class PLDCorrector(RegressionCorrector):
             (`n=1`) uses only the pixel fluxes to construct the design matrix.
             Higher order populates the design matrix with columns constructed
             from the products of pixel fluxes. Default 3 for K2 and 1 for TESS.
-        n_pca_terms : int or tuple of int
+        pca_components : int or tuple of int
             Number of terms added to the design matrix for each order of PLD
             pixel fluxes. Increasing this value may provide higher precision
             at the expense of slower speed and/or overfitting.
-            If performing PLD with `pld_order > 1`, `n_pca_terms` can be
+            If performing PLD with `pld_order > 1`, `pca_components` can be
             a tuple containing the number of terms for each order of PLD.
             If a single int is passed, the same number of terms will be used
             for each order.  If zero is passed, PCA will not be performed.
@@ -297,22 +299,22 @@ class PLDCorrector(RegressionCorrector):
         """
         self.restore_trend = restore_trend
 
-        # Set mission-specific values for pld_order and n_pca_terms
+        # Set mission-specific values for pld_order and pca_components
         if pld_order is None:
             if isinstance(self.tpf, KeplerTargetPixelFile):
                 pld_order = 3
             else:
                 pld_order = 1
-        if n_pca_terms is None:
+        if pca_components is None:
             if isinstance(self.tpf, KeplerTargetPixelFile):
-                n_pca_terms = 16
+                pca_components = 16
             else:
-                n_pca_terms = 7
+                pca_components = 7
 
         dm = self.create_design_matrix(background_aperture_mask=background_aperture_mask,
                                        pld_aperture_mask=pld_aperture_mask,
                                        pld_order=pld_order,
-                                       n_pca_terms=n_pca_terms,
+                                       pca_components=pca_components,
                                        spline_n_knots=spline_n_knots,
                                        spline_degree=spline_degree,
                                        sparse=sparse)
