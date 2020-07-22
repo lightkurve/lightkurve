@@ -187,42 +187,42 @@ class PLDCorrector(RegressionCorrector):
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
         regressors = np.array([r / f for r,f in zip(regressors, self.lc.flux.value)])
 
-        # Create first order design matrix
+        # Use the DesignMatrix infrastructure to apply PCA to the regressors.
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', message='.*low rank.*')
-            pld_1 = DesignMatrix(regressors)
-
-        # Apply PCA
+            regressors_dm = DesignMatrix(regressors)
         if isinstance(n_pca_terms, (tuple, list)):
             n_terms = n_pca_terms[0]
         else:
             n_terms = n_pca_terms
-        pld_1 = pld_1.pca(n_terms)
+        regressors_pld = regressors_dm.pca(n_terms).values
 
-        # Create higher order matrix
-        all_pld = [pld_1]
-        for i in range(2, pld_order+1):
-            # This step creates higher order products of pixel components,
-            # from 2nd to nth order
-            reg_n = np.product(list(multichoose(pld_1.values.T, i)), axis=1).T
+        # Create a DesignMatrix for each PLD order
+        all_pld = []
+        for order in range(1, pld_order+1):
+            reg_n = np.product(list(multichoose(regressors_pld.T, order)), axis=1).T
             with warnings.catch_warnings():
                 warnings.filterwarnings('ignore', message='.*low rank.*')
                 pld_n = DesignMatrix(reg_n)
-            # Apply PCA before merging into single PLD matrix
-            # Check if n_pca_terms has an entry for each order,
-            # otherwise use n_pca_terms for PCA of higher order matrices
+            # Apply PCA. Check if n_pca_terms has an entry for each order,
+            # otherwise use n_pca_terms for PCA of higher order matrices.
             if isinstance(n_pca_terms, (tuple, list)):
-                n_terms = n_pca_terms[i-1]
+                n_terms = n_pca_terms[order-1]
             else:
                 n_terms = n_pca_terms
             pld_n = pld_n.pca(n_terms)
             all_pld.append(pld_n)
 
-        # Collect each matrix
+        # Create the collection of DesignMatrix objects.
+        # DesignMatrix 1 contains the PLD pixel series
         dm_pixels = DesignMatrixCollection(all_pld).to_designmatrix(name='pixel_series')
+        # DesignMatrix 2 contains the average per-pixel background flux
+        # The prior on the background flux is set equal to the number of pixels
+        # in the light curve aperture mask; this assumes the background is additive.
         bkg_prior_mu = self.tpf._parse_aperture_mask(self.lc.meta['aperture_mask']).sum()
         dm_bkg = DesignMatrix(bkg.flux.value, name='background_model',
                               prior_mu=bkg_prior_mu, prior_sigma=1)
+        # DesignMatrix 3 contains splines plus a constant
         dm_spline = spline(self.lc.time.value,
                            n_knots=spline_n_knots,
                            degree=spline_degree).append_constant()
