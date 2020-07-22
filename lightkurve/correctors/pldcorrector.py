@@ -353,7 +353,7 @@ class PLDCorrector(RegressionCorrector):
         `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        if not hasattr(self, 'corrected_lc'):
+        if not getattr(self, 'corrected_lc'):
             raise ValueError('You need to call the `correct()` method '
                              'before you can call `diagnose()`.')
         names = self.diagnostic_lightcurves.keys()
