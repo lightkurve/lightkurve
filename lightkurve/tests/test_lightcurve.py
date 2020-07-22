@@ -101,6 +101,16 @@ def test_rmath_operators():
     assert_array_equal(lc_div.flux, 2 / lc.flux)
 
 
+def test_math_operators_on_units():
+    lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
+    lc_mul = lc * u.pixel
+    lc_div = lc / u.pixel
+    assert lc_mul.flux.unit == 'pixel'
+    assert lc_mul.flux_err.unit == 'pixel'
+    assert lc_div.flux.unit == 1/u.pixel
+    assert lc_div.flux_err.unit == 1/u.pixel
+
+
 @pytest.mark.remote_data
 @pytest.mark.parametrize("path, mission", [(TABBY_Q8, "Kepler"), (K2_C08, "K2")])
 def test_KeplerLightCurveFile(path, mission):

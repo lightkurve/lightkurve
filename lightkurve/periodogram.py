@@ -96,6 +96,19 @@ class Periodogram(object):
             view = self.default_view
         return validate_method(view, ["frequency", "period"])
 
+    def _is_evenly_spaced(self):
+        """Returns true if the values in ``frequency`` are evenly spaced.
+
+        This helper method exists because some features, such as ``smooth()``,
+        ``estimate_numax()``, and ``estimate_deltanu()``, require a grid of
+        evenly-spaced frequencies.
+        """
+        # verify that the first differences are all equal
+        freqdiff = np.diff(self.frequency.value)
+        if np.allclose(freqdiff[0], freqdiff):
+            return True
+        return False
+
     @property
     def period(self):
         """Returns the array of periods, i.e. 1/frequency."""
@@ -219,11 +232,11 @@ class Periodogram(object):
                                  "frequency units.")
 
             # Check to see if we have a grid of evenly spaced periods instead.
-            fs = np.mean(np.diff(self.frequency))
-            if not np.isclose(np.median(np.diff(self.frequency.value)), fs.value):
+            if not self._is_evenly_spaced():
                 raise ValueError("the 'boxkernel' method requires the periodogram "
                                  "to have a grid of evenly spaced frequencies.")
 
+            fs = np.mean(np.diff(self.frequency))
             box_kernel = Box1DKernel(math.ceil((filter_width/fs).value))
             smooth_power = convolve(self.power.value, box_kernel)
             smooth_pg = self.copy()

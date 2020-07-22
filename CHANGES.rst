@@ -18,8 +18,15 @@
 - Modified the ``estimate_radius``, ``estimate_mass``, and ``estimate_logg``
   methods to default to the ``teff`` value in the meta data. [#766]
 
+- Added the ``TargetPixelFile.plot_pixels()`` method to plot light curves
+  and periodograms for each individual pixel in a TPF. [#771]
+
+- Added an error message to ``estimate_numax()`` or ``estimate_deltanu()`` if
+  the underlying periodogram does not have uniformly-spaced frequencies. [#780]
+
 - Modified ``PLDCorrector`` to make use of the new ``RegressionCorrector``
   and ``DesignMatrix`` classes. [#746]
+
 
 
 1.11.1 (2020-06-18)

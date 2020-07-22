@@ -616,3 +616,16 @@ def test_get_header():
     # ``tpf.header`` is deprecated
     with pytest.warns(LightkurveDeprecationWarning, match='deprecated'):
         tpf.header
+
+def test_plot_pixels():
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+    tpf.plot_pixels()
+    tpf.plot_pixels(normalize=True)
+    tpf.plot_pixels(periodogram=True)
+    tpf.plot_pixels(periodogram=True, nyquist_factor=0.5)
+    tpf.plot_pixels(aperture_mask='all')
+    tpf.plot_pixels(aperture_mask=tpf.pipeline_mask) 
+    tpf.plot_pixels(aperture_mask=tpf.create_threshold_mask()) 
+    tpf.plot_pixels(show_flux=True)
+    tpf.plot_pixels(corrector_func=lambda x:x)
+    plt.close('all')
