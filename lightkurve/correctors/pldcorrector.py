@@ -196,11 +196,11 @@ class PLDCorrector(RegressionCorrector):
             warnings.filterwarnings('ignore', message='.*low rank.*')
             regressors_dm = DesignMatrix(regressors)
         if isinstance(pca_components, (tuple, list)):
-            n_terms = pca_components[0]
+            ncomp = pca_components[0]
         else:
-            n_terms = pca_components
-        if pca_components > 0:
-            regressors_dm = regressors_dm.pca(n_terms)
+            ncomp = pca_components
+        if ncomp > 0:
+            regressors_dm = regressors_dm.pca(ncomp)
         regressors_pld = regressors_dm.values
 
 
@@ -214,11 +214,11 @@ class PLDCorrector(RegressionCorrector):
             # Apply PCA. Check if pca_components has an entry for each order,
             # otherwise use pca_components for PCA of higher order matrices.
             if isinstance(pca_components, (tuple, list)):
-                n_terms = pca_components[order-1]
+                ncomp = pca_components[order-1]
             else:
-                n_terms = pca_components
-            if pca_components > 0:
-                pld_n = pld_n.pca(n_terms)
+                ncomp = pca_components
+            if ncomp > 0:
+                pld_n = pld_n.pca(ncomp)
             all_pld.append(pld_n)
 
         # Create the collection of DesignMatrix objects.
@@ -240,11 +240,16 @@ class PLDCorrector(RegressionCorrector):
             dm_collection = DMC([dm_pixels, dm_bkg, dm_spline])
         return dm_collection
 
-    @deprecated_renamed_argument('n_pca_terms', 'pca_components', '2.0',
-                                 warning_type=LightkurveDeprecationWarning)
+    @deprecated_renamed_argument('n_pca_terms', 'pca_components', '2.0', warning_type=LightkurveDeprecationWarning)
+    @deprecated_renamed_argument('use_gp', None, '2.0', warning_type=LightkurveDeprecationWarning)
+    @deprecated_renamed_argument('gp_timescale', None, '2.0', warning_type=LightkurveDeprecationWarning)
+    @deprecated_renamed_argument('aperture_mask', None, '2.0', warning_type=LightkurveDeprecationWarning)
     def correct(self, pld_order=None, pca_components=None,
-                background_aperture_mask='background', pld_aperture_mask=None, spline_n_knots=40,
-                spline_degree=5, restore_trend=True, sparse=False, **kwargs):
+                background_aperture_mask='background', pld_aperture_mask=None,
+                spline_n_knots=40, spline_degree=5, restore_trend=True,
+                sparse=False, cadence_mask=None, sigma=5, niters=5,
+                propagate_errors=False, use_gp=None, gp_timescale=None,
+                aperture_mask=None):
         """Returns a systematics-corrected light curve.
 
         If the parameters `pld_order` and `pca_components` are None, their
@@ -289,8 +294,21 @@ class PLDCorrector(RegressionCorrector):
             Whether to restore the long term spline trend to the light curve.
         sparse : bool
             Whether to create `SparseDesignMatrix`.
-        **kwargs : dict
-            Extra parameters to be passed to `RegressionCorrector.correct`.
+        cadence_mask : np.ndarray of bools (optional)
+            Mask, where True indicates a cadence that should be used.
+        sigma : int (default 5)
+            Standard deviation at which to remove outliers from fitting
+        niters : int (default 5)
+            Number of iterations to fit and remove outliers
+        propagate_errors : bool (default False)
+            Whether to propagate the uncertainties from the regression. Default is False.
+            Setting to True will increase run time, but will sample from multivariate normal
+            distribution of weights.
+        use_gp, gp_timescale : DEPRECATED
+            As of Lightkurve v2.0 PLDCorrector uses splines instead of Gaussian Processes.
+        aperture_mask : DEPRECATED
+            As of Lightkurve v2.0 the `aperture_mask` parameter needs to be
+            passed to the class constructor.
 
         Returns
         -------
@@ -319,7 +337,8 @@ class PLDCorrector(RegressionCorrector):
                                        spline_degree=spline_degree,
                                        sparse=sparse)
 
-        clc = super().correct(dm, **kwargs)
+        clc = super().correct(dm, cadence_mask=cadence_mask, sigma=sigma,
+                              niters=niters, propagate_errors=propagate_errors)
         if restore_trend:
             clc += (self.diagnostic_lightcurves['spline']
                     - np.median(self.diagnostic_lightcurves['spline'].flux))
