@@ -101,7 +101,8 @@ class DesignMatrix():
         """
         with plt.style.context(MPLSTYLE):
             ax = plot_image(self.values, ax=ax, xlabel='Component', ylabel='X',
-                            clabel='Component Value', title=self.name, **kwargs)
+                            clabel='Component Value', title=self.name,
+                            interpolation='nearest', **kwargs)
             ax.set_aspect(self.shape[1]/(1.6*self.shape[0]))
             if self.shape[1] <= 40:
                 ax.set_xticks(np.arange(self.shape[1]))
