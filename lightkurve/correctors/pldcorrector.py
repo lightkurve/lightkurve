@@ -226,11 +226,9 @@ class PLDCorrector(RegressionCorrector):
         dm_spline = spline(self.lc.time.value,
                            n_knots=spline_n_knots,
                            degree=spline_degree).append_constant()
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            dm = DMC([dm_pixels, dm_bkg, dm_spline])
 
-        return dm
+        dm_collection = DMC([dm_pixels, dm_bkg, dm_spline])
+        return dm_collection
 
     def correct(self, pld_order=None, n_pca_terms=None,
                 background_aperture_mask='background', pld_aperture_mask=None, spline_n_knots=40,
