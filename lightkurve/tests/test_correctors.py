@@ -1,23 +1,15 @@
 from __future__ import division, print_function
 
-import sys
 import pytest
 
 from numpy.testing import assert_almost_equal
 
-from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile
 from ..correctors import KeplerCBVCorrector, PLDCorrector
 from ..search import search_targetpixelfile
 
 from .test_lightcurve import TABBY_Q8
 
-bad_optional_imports = False
-try:
-    import celerite
-    import fbpca
-except ImportError:
-    bad_optional_imports = True
 
 @pytest.mark.xfail  # Fit no longer matches exactly as of v2.0; ignoring for now due to new CBV corrector work
 @pytest.mark.remote_data
@@ -35,6 +27,7 @@ def test_kepler_cbv_fit():
     cbv = KeplerCBVCorrector(lc)
     cbv_lc_2 = cbv.correct()
     assert_almost_equal(cbv_lcf.flux, cbv_lc_2.flux)
+
 
 @pytest.mark.remote_data
 def test_to_corrector():
