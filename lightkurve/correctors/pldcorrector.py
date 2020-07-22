@@ -173,9 +173,12 @@ class PLDCorrector(RegressionCorrector):
         self.pld_aperture_mask = pld_aperture_mask
         self.background_aperture_mask = background_aperture_mask
 
-        DMC, spline = DesignMatrixCollection, create_spline_matrix
         if sparse:
-            DMC, spline = SparseDesignMatrixCollection, create_sparse_spline_matrix
+            DMC = SparseDesignMatrixCollection
+            spline = create_sparse_spline_matrix
+        else:
+            DMC = DesignMatrixCollection
+            spline = create_spline_matrix
 
         # First, we estimate the per-pixel background flux over time
         bkg = self.tpf.estimate_background(aperture_mask=background_aperture_mask)
@@ -227,7 +230,9 @@ class PLDCorrector(RegressionCorrector):
                            n_knots=spline_n_knots,
                            degree=spline_degree).append_constant()
 
-        dm_collection = DMC([dm_pixels, dm_bkg, dm_spline])
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', message='.*Not all matrices are `SparseDesignMatrix` objects..*')
+            dm_collection = DMC([dm_pixels, dm_bkg, dm_spline])
         return dm_collection
 
     def correct(self, pld_order=None, n_pca_terms=None,
