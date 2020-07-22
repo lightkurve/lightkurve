@@ -18,6 +18,8 @@
 - Modified the ``estimate_radius``, ``estimate_mass``, and ``estimate_logg``
   methods to default to the ``teff`` value in the meta data. [#766]
 
+- Modified ``PLDCorrector`` to make use of the new ``RegressionCorrector``
+  and ``DesignMatrix`` classes. [#746]
 
 
 1.11.1 (2020-06-18)
