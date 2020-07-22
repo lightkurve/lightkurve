@@ -67,8 +67,8 @@ class DesignMatrix():
             prior_mu = np.zeros(len(df.T))
         if prior_sigma is None:
             prior_sigma = np.ones(len(df.T)) * np.inf
-        self.prior_mu = prior_mu
-        self.prior_sigma = prior_sigma
+        self.prior_mu = np.atleast_1d(prior_mu)
+        self.prior_sigma = np.atleast_1d(prior_sigma)
         self.validate()
 
     @property
@@ -101,7 +101,8 @@ class DesignMatrix():
         """
         with plt.style.context(MPLSTYLE):
             ax = plot_image(self.values, ax=ax, xlabel='Component', ylabel='X',
-                            clabel='Component Value', title=self.name, **kwargs)
+                            clabel='Component Value', title=self.name,
+                            interpolation='nearest', **kwargs)
             ax.set_aspect(self.shape[1]/(1.6*self.shape[0]))
             if self.shape[1] <= 40:
                 ax.set_xticks(np.arange(self.shape[1]))

@@ -136,13 +136,13 @@ class RegressionCorrector(Corrector):
 
         # Default cadence mask
         if cadence_mask is None:
-            cadence_mask = np.ones(len(self.lc.flux), bool)
+            cadence_mask = np.ones(len(self.lc.flux.value), bool)
 
         # If flux errors are not all finite numbers, then default to array of ones
-        if np.all(~np.isfinite(self.lc.flux_err)):
+        if np.all(~np.isfinite(self.lc.flux_err.value)):
             flux_err = np.ones(cadence_mask.sum())
         else:
-            flux_err = self.lc.flux_err[cadence_mask]
+            flux_err = self.lc.flux_err.value[cadence_mask]
 
         # Retrieve the design matrix (X) as a numpy array
         X = self.dmc.X[cadence_mask]
@@ -150,7 +150,7 @@ class RegressionCorrector(Corrector):
             # Compute `X^T cov^-1 X + 1/prior_sigma^2`
             sigma_w_inv = X.T.dot(X / flux_err[:, None]**2)
             # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
-            B = np.dot(X.T, self.lc.flux[cadence_mask] / flux_err**2)
+            B = np.dot(X.T, self.lc.flux.value[cadence_mask] / flux_err**2)
 
         elif issparse(X):
             sigma_f_inv = csr_matrix(1/flux_err[:, None]**2)

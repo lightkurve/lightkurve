@@ -24,6 +24,9 @@
 - Added an error message to ``estimate_numax()`` or ``estimate_deltanu()`` if
   the underlying periodogram does not have uniformly-spaced frequencies. [#780]
 
+- Modified ``PLDCorrector`` to make use of the new ``RegressionCorrector``
+  and ``DesignMatrix`` classes. [#746]
+
 
 
 1.11.1 (2020-06-18)

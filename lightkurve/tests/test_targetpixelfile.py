@@ -270,9 +270,8 @@ def test_aperture_photometry():
     for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tess)]:
         tpf.extract_aperture_photometry()
-        tpf.extract_aperture_photometry(aperture_mask=None)
-        tpf.extract_aperture_photometry(aperture_mask='all')
-        tpf.extract_aperture_photometry(aperture_mask='pipeline')
+        for mask in [None, 'all', 'pipeline', 'threshold', 'background']:
+            tpf.extract_aperture_photometry(aperture_mask=mask)
 
 
 def test_tpf_to_fits():
