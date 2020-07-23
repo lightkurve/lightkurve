@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>FocusPrior &#8212; Lightkurve</title>
@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -91,7 +90,7 @@
     
   <div class="section" id="focusprior">
 <h1>FocusPrior<a class="headerlink" href="#focusprior" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="lightkurve.prf.FocusPrior">
 <em class="property">class </em><code class="sig-prename descclassname">lightkurve.prf.</code><code class="sig-name descname">FocusPrior</code><span class="sig-paren">(</span><em class="sig-param">scale_col=&lt;GaussianPrior(mean=[1], var=[0.0001])&gt;, scale_row=&lt;GaussianPrior(mean=[1], var=[0.0001])&gt;, rotation_angle=&lt;UniformPrior(lb=[-3.1415], ub=[3.1415])&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.FocusPrior" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.prf.tpfmodel.PriorContainer</span></code></p>
@@ -113,7 +112,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.prf.FocusPrior.__call__" title="lightkurve.prf.FocusPrior.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a>(self, \*params)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.prf.FocusPrior.__call__" title="lightkurve.prf.FocusPrior.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a>(self, *params)</p></td>
 <td><p>Calls <a class="reference internal" href="#lightkurve.prf.FocusPrior.evaluate" title="lightkurve.prf.FocusPrior.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.prf.FocusPrior.evaluate" title="lightkurve.prf.FocusPrior.evaluate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate</span></code></a>(self, scale_col, scale_row, …)</p></td>
@@ -122,15 +121,15 @@
 </tbody>
 </table>
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.prf.FocusPrior.__call__">
-<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*params</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.FocusPrior.__call__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.FocusPrior.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls <a class="reference internal" href="#lightkurve.prf.FocusPrior.evaluate" title="lightkurve.prf.FocusPrior.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a></p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.prf.FocusPrior.evaluate">
-<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">scale_col</em>, <em class="sig-param">scale_row</em>, <em class="sig-param">rotation_angle</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.FocusPrior.evaluate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">scale_col</span></em>, <em class="sig-param"><span class="n">scale_row</span></em>, <em class="sig-param"><span class="n">rotation_angle</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.FocusPrior.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the prior probability for a gien set of focus parameters.</p>
 </dd></dl>
 

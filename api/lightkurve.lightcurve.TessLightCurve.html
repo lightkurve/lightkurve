@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>TessLightCurve &#8212; Lightkurve</title>
@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -91,9 +90,9 @@
     
   <div class="section" id="tesslightcurve">
 <h1>TessLightCurve<a class="headerlink" href="#tesslightcurve" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="lightkurve.lightcurve.TessLightCurve">
-<em class="property">class </em><code class="sig-prename descclassname">lightkurve.lightcurve.</code><code class="sig-name descname">TessLightCurve</code><span class="sig-paren">(</span><em class="sig-param">time=None</em>, <em class="sig-param">flux=None</em>, <em class="sig-param">flux_err=None</em>, <em class="sig-param">flux_unit=Unit(&quot;electron / s&quot;)</em>, <em class="sig-param">time_format='btjd'</em>, <em class="sig-param">time_scale='tdb'</em>, <em class="sig-param">centroid_col=None</em>, <em class="sig-param">centroid_row=None</em>, <em class="sig-param">quality=None</em>, <em class="sig-param">quality_bitmask=None</em>, <em class="sig-param">cadenceno=None</em>, <em class="sig-param">sector=None</em>, <em class="sig-param">camera=None</em>, <em class="sig-param">ccd=None</em>, <em class="sig-param">targetid=None</em>, <em class="sig-param">ra=None</em>, <em class="sig-param">dec=None</em>, <em class="sig-param">label=None</em>, <em class="sig-param">meta=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.lightcurve.</code><code class="sig-name descname">TessLightCurve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flux</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flux_err</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flux_unit</span><span class="o">=</span><span class="default_value">Unit('electron / s')</span></em>, <em class="sig-param"><span class="n">time_format</span><span class="o">=</span><span class="default_value">'btjd'</span></em>, <em class="sig-param"><span class="n">time_scale</span><span class="o">=</span><span class="default_value">'tdb'</span></em>, <em class="sig-param"><span class="n">centroid_col</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">centroid_row</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">quality</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">quality_bitmask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cadenceno</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sector</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">camera</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ccd</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">targetid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ra</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dec</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">meta</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.lightcurve.LightCurve</span></code></a></p>
 <p>Subclass of <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a>
 which holds extra data specific to the TESS mission.</p>
@@ -166,7 +165,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td><p>Returns a copy of this <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.errorbar" title="lightkurve.lightcurve.TessLightCurve.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a>(self[, linestyle])</p></td>
-<td><p>Plots the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
+<td><p>Plots the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.estimate_cdpp" title="lightkurve.lightcurve.TessLightCurve.estimate_cdpp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_cdpp</span></code></a>(self[, transit_duration, …])</p></td>
 <td><p>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</p></td>
@@ -192,8 +191,8 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.normalize" title="lightkurve.lightcurve.TessLightCurve.normalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code></a>(self[, unit])</p></td>
 <td><p>Returns a normalized version of the light curve.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.plot" title="lightkurve.lightcurve.TessLightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self, \*\*kwargs)</p></td>
-<td><p>Plot the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.plot" title="lightkurve.lightcurve.TessLightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self, **kwargs)</p></td>
+<td><p>Plot the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.plot_river" title="lightkurve.lightcurve.TessLightCurve.plot_river"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_river</span></code></a>(self, period[, t0, ax, …])</p></td>
 <td><p>Plot the light curve as a river plot.</p></td>
@@ -208,7 +207,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td><p>Removes outlier data points using sigma-clipping.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.scatter" title="lightkurve.lightcurve.TessLightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(self[, colorbar_label, show_colorbar])</p></td>
-<td><p>Plots the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
+<td><p>Plots the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.show_properties" title="lightkurve.lightcurve.TessLightCurve.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>(self)</p></td>
 <td><p>Prints a description of all non-callable attributes.</p></td>
@@ -228,7 +227,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_periodogram" title="lightkurve.lightcurve.TessLightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodogram</span></code></a>(self[, method])</p></td>
 <td><p>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_seismology" title="lightkurve.lightcurve.TessLightCurve.to_seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_seismology</span></code></a>(self, \*\*kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_seismology" title="lightkurve.lightcurve.TessLightCurve.to_seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_seismology</span></code></a>(self, **kwargs)</p></td>
 <td><p>Returns a <a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object for estimating quick-look asteroseismic quantities.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_stingray" title="lightkurve.lightcurve.TessLightCurve.to_stingray"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_stingray</span></code></a>(self)</p></td>
@@ -243,7 +242,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.lightcurve.TessLightCurve.astropy_time">
 <code class="sig-name descname">astropy_time</code><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.astropy_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the time values as an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p>
@@ -301,26 +300,26 @@ that correspond to the raw time values:</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.lightcurve.TessLightCurve.extra_columns">
 <code class="sig-name descname">extra_columns</code><em class="property"> = ('quality', 'cadenceno', 'centroid_col', 'centroid_row')</em><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.extra_columns" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.lightcurve.TessLightCurve.flux_quantity">
 <code class="sig-name descname">flux_quantity</code><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.flux_quantity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the flux as an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.lightcurve.TessLightCurve.flux_unit">
 <code class="sig-name descname">flux_unit</code><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.flux_unit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.append">
-<code class="sig-name descname">append</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">others</em>, <em class="sig-param">inplace=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.append" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">append</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">others</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>Append one or more other <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object(s) to this one.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -341,9 +340,9 @@ of creating and returning a new one. Defaults to False.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.bin">
-<code class="sig-name descname">bin</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">binsize=None</em>, <em class="sig-param">bins=None</em>, <em class="sig-param">method='mean'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.bin" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">bin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">binsize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mean'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.bin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bins a lightcurve in chunks defined by <code class="docutils literal notranslate"><span class="pre">binsize</span></code> or <code class="docutils literal notranslate"><span class="pre">bins</span></code>.</p>
 <p>The flux value of the bins will be computed by taking the mean
 (<code class="docutils literal notranslate"><span class="pre">method='mean'</span></code>) or the median (<code class="docutils literal notranslate"><span class="pre">method='median'</span></code>) of the flux.
@@ -387,9 +386,9 @@ bitwise OR of the quality flags will be returned per bin.</p></li>
 </ul>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a copy of this <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object.</p>
 <p>This method uses Python’s <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy.deepcopy</span></code></a> function to ensure that all
 objects stored within the LightCurve instance are fully copied.</p>
@@ -403,14 +402,14 @@ objects stored within the LightCurve instance are fully copied.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.errorbar">
-<code class="sig-name descname">errorbar</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">linestyle=''</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.errorbar" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p>
+<code class="sig-name descname">errorbar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">linestyle</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.errorbar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
 a new one will be generated.</p>
 </dd>
 <dt><strong>normalize</strong><span class="classifier">bool</span></dt><dd><p>Normalize the lightcurve before plotting?</p>
@@ -427,22 +426,22 @@ Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
 <dt><strong>linestyle</strong><span class="classifier">str</span></dt><dd><p>Connect the error bars using a line?</p>
 </dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code></a>.</p>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.estimate_cdpp">
-<code class="sig-name descname">estimate_cdpp</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">transit_duration=13</em>, <em class="sig-param">savgol_window=101</em>, <em class="sig-param">savgol_polyorder=2</em>, <em class="sig-param">sigma=5.0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.estimate_cdpp" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">estimate_cdpp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">transit_duration</span><span class="o">=</span><span class="default_value">13</span></em>, <em class="sig-param"><span class="n">savgol_window</span><span class="o">=</span><span class="default_value">101</span></em>, <em class="sig-param"><span class="n">savgol_polyorder</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">sigma</span><span class="o">=</span><span class="default_value">5.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.estimate_cdpp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</p>
 <p>A common estimate of the noise in a lightcurve is the scatter that
 remains after all long term trends have been removed. This is the idea
@@ -499,9 +498,9 @@ Jeff van Cleve but lacks the normalization factor used there:
 svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.fill_gaps">
-<code class="sig-name descname">fill_gaps</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='gaussian_noise'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.fill_gaps" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fill_gaps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'gaussian_noise'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.fill_gaps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fill in gaps in time.</p>
 <p>By default, the gaps will be filled with random white Gaussian noise
 distributed according to
@@ -524,11 +523,11 @@ have been filled.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.flatten">
-<code class="sig-name descname">flatten</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">window_length=101</em>, <em class="sig-param">polyorder=2</em>, <em class="sig-param">return_trend=False</em>, <em class="sig-param">break_tolerance=5</em>, <em class="sig-param">niters=3</em>, <em class="sig-param">sigma=3</em>, <em class="sig-param">mask=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.flatten" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">flatten</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">window_length</span><span class="o">=</span><span class="default_value">101</span></em>, <em class="sig-param"><span class="n">polyorder</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">return_trend</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">break_tolerance</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">niters</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">sigma</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes the low frequency trend using scipy’s Savitzky-Golay filter.</p>
-<p>This method wraps <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.signal.savgol_filter</span></code></a>.</p>
+<p>This method wraps <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.signal.savgol_filter</span></code></a>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -557,7 +556,7 @@ mask is True will not be used to flatten the data. An interpolated
 result will be provided for these points. Use this mask to remove
 data you want to preserve, e.g. transits.</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.signal.savgol_filter</span></code></a>.</p>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.signal.savgol_filter</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -573,9 +572,9 @@ data you want to preserve, e.g. transits.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.fold">
-<code class="sig-name descname">fold</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">period</em>, <em class="sig-param">t0=None</em>, <em class="sig-param">transit_midpoint=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.fold" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fold</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">period</span></em>, <em class="sig-param"><span class="n">t0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">transit_midpoint</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.fold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Folds the lightcurve at a specified <code class="xref py py-obj docutils literal notranslate"><span class="pre">period</span></code> and reference time <code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code>.</p>
 <p>This method returns a <a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> object
 in which the time values range between -0.5 to +0.5 (i.e. the phase).
@@ -631,14 +630,14 @@ phase-folded fluxes:</p>
 <p>A <a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> inherits all the features
 of a standard <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object. For example, we can very quickly
 obtain a phase-folded plot using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">folded_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>    
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">folded_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>    
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.from_stingray">
-<em class="property">static </em><code class="sig-name descname">from_stingray</code><span class="sig-paren">(</span><em class="sig-param">lc</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.from_stingray" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">from_stingray</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.from_stingray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from a <code class="xref py py-obj docutils literal notranslate"><span class="pre">stingray.Lightcurve</span></code>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -650,9 +649,9 @@ obtain a phase-folded plot using:</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.from_timeseries">
-<em class="property">static </em><code class="sig-name descname">from_timeseries</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.from_timeseries" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">from_timeseries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.from_timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an AstroPy
 <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p>
 <dl class="field-list">
@@ -666,9 +665,9 @@ named ‘time’, ‘flux’, and ‘flux_err’.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.interact_bls">
-<code class="sig-name descname">interact_bls</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">minimum_period=None</em>, <em class="sig-param">maximum_period=None</em>, <em class="sig-param">resolution=2000</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.interact_bls" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interact_bls</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">notebook_url</span><span class="o">=</span><span class="default_value">'localhost:8888'</span></em>, <em class="sig-param"><span class="n">minimum_period</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maximum_period</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">resolution</span><span class="o">=</span><span class="default_value">2000</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.interact_bls" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display an interactive Jupyter Notebook widget to find planets.</p>
 <p>The Box Least Squares (BLS) periodogram is a statistical tool used
 for detecting transiting exoplanets and eclipsing binaries in
@@ -713,7 +712,7 @@ widget’s Resolution Slider.</p>
 <p class="rubric">Examples</p>
 <p>Load the light curve for Kepler-10, remove long-term trends, and
 display the BLS tool as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s1">&#39;kepler-10&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">interact_bls</span><span class="p">()</span>  
@@ -721,9 +720,9 @@ display the BLS tool as follows:</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.normalize">
-<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">unit='unscaled'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.normalize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">'unscaled'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a normalized version of the light curve.</p>
 <p>The normalized light curve is obtained by dividing the <code class="docutils literal notranslate"><span class="pre">flux</span></code> and
 <code class="docutils literal notranslate"><span class="pre">flux_err</span></code> object attributes by the by the median flux.
@@ -753,7 +752,7 @@ from zero.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">flux</span><span class="o">=</span><span class="p">[</span><span class="mf">25945.7</span><span class="p">,</span> <span class="mf">25901.5</span><span class="p">,</span> <span class="mf">25931.2</span><span class="p">],</span> <span class="n">flux_err</span><span class="o">=</span><span class="p">[</span><span class="mf">6.8</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">,</span> <span class="mf">6.2</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">normalized_lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">normalized_lc</span><span class="o">.</span><span class="n">flux</span>
@@ -764,14 +763,14 @@ from zero.</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.plot">
-<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p>
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
 a new one will be created.</p>
 </dd>
 <dt><strong>normalize</strong><span class="classifier">bool</span></dt><dd><p>Normalize the lightcurve before plotting?</p>
@@ -786,22 +785,22 @@ a new one will be created.</p>
 matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
 Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.plot_river">
-<code class="sig-name descname">plot_river</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">period</em>, <em class="sig-param">t0=0</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">bin_points=1</em>, <em class="sig-param">minimum_phase=-0.5</em>, <em class="sig-param">maximum_phase=0.5</em>, <em class="sig-param">method='mean'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.plot_river" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot_river</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">period</span></em>, <em class="sig-param"><span class="n">t0</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bin_points</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">minimum_phase</span><span class="o">=</span><span class="default_value">- 0.5</span></em>, <em class="sig-param"><span class="n">maximum_phase</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.plot_river" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the light curve as a river plot.</p>
 <p>A river plot uses colors to represent the light curve values in
 chronological order, relative to the period of an interesting signal.
@@ -809,11 +808,11 @@ Each row in the plot represents a full period cycle, and each column
 represents a fixed phase.  This type of plot is often used to visualize
 Transit Timing Variations (TTVs) in the light curves of exoplanets.</p>
 <p>All extra keywords supplied are passed on to Matplotlib’s
-<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.pcolormesh.html#matplotlib.pyplot.pcolormesh" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pcolormesh</span></code></a> function.</p>
+<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.pcolormesh.html#matplotlib.pyplot.pcolormesh" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pcolormesh</span></code></a> function.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 <dt><strong>period: float</strong></dt><dd><p>Period at which to fold the light curve</p>
 </dd>
@@ -832,22 +831,22 @@ the error in each bin, in order to show the data in terms of standard
 deviation.</p>
 </dd>
 <dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed on to Matplotlib’s
-<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.pcolormesh.html#matplotlib.pyplot.pcolormesh" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pcolormesh</span></code></a> function.</p>
+<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.pcolormesh.html#matplotlib.pyplot.pcolormesh" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pcolormesh</span></code></a> function.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.query_solar_system_objects">
-<code class="sig-name descname">query_solar_system_objects</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">cadence_mask='outliers'</em>, <em class="sig-param">radius=None</em>, <em class="sig-param">sigma=3</em>, <em class="sig-param">location=None</em>, <em class="sig-param">cache=True</em>, <em class="sig-param">return_mask=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.query_solar_system_objects" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">query_solar_system_objects</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">cadence_mask</span><span class="o">=</span><span class="default_value">'outliers'</span></em>, <em class="sig-param"><span class="n">radius</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sigma</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">location</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cache</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">return_mask</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.query_solar_system_objects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of asteroids or comets which affected the light curve.</p>
 <p>Light curves of stars or galaxies are frequently affected by solar
 system bodies (e.g. asteroids, comets, planets).  These objects can move
@@ -908,9 +907,9 @@ were found.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.remove_nans">
-<code class="sig-name descname">remove_nans</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.remove_nans" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_nans</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.remove_nans" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes cadences where the flux is NaN.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
@@ -922,9 +921,9 @@ were found.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.remove_outliers">
-<code class="sig-name descname">remove_outliers</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">sigma=5.0</em>, <em class="sig-param">sigma_lower=None</em>, <em class="sig-param">sigma_upper=None</em>, <em class="sig-param">return_mask=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.remove_outliers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_outliers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">sigma</span><span class="o">=</span><span class="default_value">5.0</span></em>, <em class="sig-param"><span class="n">sigma_lower</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sigma_upper</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_mask</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.remove_outliers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes outlier data points using sigma-clipping.</p>
 <p>This method returns a new <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object from which data points
 are removed if their flux values are greater or smaller than the median
@@ -1008,14 +1007,14 @@ array which flags the outliers identified by the method. For example:</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.scatter">
-<code class="sig-name descname">scatter</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">colorbar_label=''</em>, <em class="sig-param">show_colorbar=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.scatter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p>
+<code class="sig-name descname">scatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">colorbar_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">show_colorbar</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.scatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
 a new one will be generated.</p>
 </dd>
 <dt><strong>normalize</strong><span class="classifier">bool</span></dt><dd><p>Normalize the lightcurve before plotting?</p>
@@ -1034,29 +1033,29 @@ Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
 <dt><strong>show_colorbar</strong><span class="classifier">boolean</span></dt><dd><p>Show the colorbar if colors are given using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">c</span></code> argument?</p>
 </dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code></a>.</p>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.show_properties">
-<code class="sig-name descname">show_properties</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.show_properties" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">show_properties</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.show_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints a description of all non-callable attributes.</p>
 <p>Prints in order of type (ints, strings, lists, arrays, others).</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.to_corrector">
-<code class="sig-name descname">to_corrector</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='sff'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_corrector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_corrector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'sff'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_corrector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a corrector object to remove instrument systematics.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -1076,9 +1075,9 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.to_csv">
-<code class="sig-name descname">to_csv</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">path_or_buf=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_csv" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">path_or_buf</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the light curve to a CSV file.</p>
 <p>This method will convert the light curve into the Comma-Separated Values
 (CSV) text format. By default this method will return the result as a
@@ -1103,9 +1102,9 @@ Returns <a class="reference external" href="https://docs.python.org/3/library/co
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.to_fits">
-<code class="sig-name descname">to_fits</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">path=None</em>, <em class="sig-param">overwrite=False</em>, <em class="sig-param">flux_column_name='FLUX'</em>, <em class="sig-param">aperture_mask=None</em>, <em class="sig-param">**extra_data</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_fits" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_fits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">flux_column_name</span><span class="o">=</span><span class="default_value">'FLUX'</span></em>, <em class="sig-param"><span class="n">aperture_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">extra_data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_fits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the KeplerLightCurve to a FITS file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1138,9 +1137,9 @@ in the first extension.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.to_pandas">
-<code class="sig-name descname">to_pandas</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">columns=('time'</em>, <em class="sig-param">'flux'</em>, <em class="sig-param">'flux_err')</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_pandas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">columns</span><span class="o">=</span><span class="default_value">'time', 'flux', 'flux_err'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.0.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p>
 <p>By default, the object returned will contain the columns ‘time’, ‘flux’,
 and ‘flux_err’.  This can be changed using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">columns</span></code> parameter.</p>
@@ -1162,15 +1161,15 @@ and <code class="docutils literal notranslate"><span class="pre">flux_err</span>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.to_periodogram">
-<code class="sig-name descname">to_periodogram</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='lombscargle'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_periodogram" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_periodogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'lombscargle'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_periodogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a>
 power spectrum object.</p>
 <p>This method will call either
 <a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve()</span></code></a> or
 <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve()</span></code></a>,
-which in turn wrap <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.LombScargle.html#astropy.stats.LombScargle" title="(in Astropy v4.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.LombScargle</span></code></a> and <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.BoxLeastSquares.html#astropy.stats.BoxLeastSquares" title="(in Astropy v4.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.BoxLeastSquares</span></code></a>.</p>
+which in turn wrap <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.LombScargle</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.BoxLeastSquares</span></code>.</p>
 <p>Optional keywords accepted if <code class="docutils literal notranslate"><span class="pre">method='lombscargle'</span></code> are:
 <code class="docutils literal notranslate"><span class="pre">minimum_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">maximum_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">mininum_period</span></code>,
 <code class="docutils literal notranslate"><span class="pre">maximum_period</span></code>, <code class="docutils literal notranslate"><span class="pre">frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">period</span></code>, <code class="docutils literal notranslate"><span class="pre">nterms</span></code>,
@@ -1202,9 +1201,9 @@ and <code class="docutils literal notranslate"><span class="pre">'boxleastsquare
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.to_seismology">
-<code class="sig-name descname">to_seismology</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_seismology" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_seismology</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_seismology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object for estimating
 quick-look asteroseismic quantities.</p>
 <p>All <code class="xref py py-obj docutils literal notranslate"><span class="pre">**kwargs</span></code> will be passed to the <a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_periodogram" title="lightkurve.lightcurve.TessLightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodogram()</span></code></a> method.</p>
@@ -1218,9 +1217,9 @@ quick-look asteroseismic quantities.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.to_stingray">
-<code class="sig-name descname">to_stingray</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_stingray" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_stingray</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_stingray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">stingray.Lightcurve</span></code> object.</p>
 <p>This feature requires <a class="reference external" href="https://stingraysoftware.github.io/">Stingray</a>
 to be installed (e.g. <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">stingray</span></code>).  An <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImportError</span></code></a> will
@@ -1235,9 +1234,9 @@ be raised if this package is not available.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.to_table">
-<code class="sig-name descname">to_table</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_table" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the light curve to an Astropy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
@@ -1249,9 +1248,9 @@ be raised if this package is not available.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.lightcurve.TessLightCurve.to_timeseries">
-<code class="sig-name descname">to_timeseries</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_timeseries" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_timeseries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the light curve to an AstroPy
 <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p>
 <p>This feature requires AstroPy v3.2 or later (released in 2019).

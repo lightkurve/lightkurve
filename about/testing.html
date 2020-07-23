@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>Running the unit tests &#8212; Lightkurve</title>
@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -104,7 +103,7 @@
 <a class="reference internal image-reference" href="https://user-images.githubusercontent.com/14965634/53126462-01a9c780-3515-11e9-9031-1f7cd06fcfb3.png"><img alt="https://user-images.githubusercontent.com/14965634/53126462-01a9c780-3515-11e9-9031-1f7cd06fcfb3.png" src="https://user-images.githubusercontent.com/14965634/53126462-01a9c780-3515-11e9-9031-1f7cd06fcfb3.png" style="width: 500px;" /></a>
 <p>Note that here we’re using the master branch. If you want to run the tests on a branch you are developing, switch to that branch using <code class="xref py py-obj docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">branchname</span></code>. Once you’re in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve</span></code> directory, go to the tests directory in <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve/tests</span></code>.</p>
 <a class="reference internal image-reference" href="https://user-images.githubusercontent.com/14965634/53126884-ff943880-3515-11e9-9c1e-e4efc10b5bc2.png"><img alt="https://user-images.githubusercontent.com/14965634/53126884-ff943880-3515-11e9-9c1e-e4efc10b5bc2.png" src="https://user-images.githubusercontent.com/14965634/53126884-ff943880-3515-11e9-9c1e-e4efc10b5bc2.png" style="width: 500px;" /></a>
-<p>In this directory you should find several tests labeled <code class="xref py py-obj docutils literal notranslate"><span class="pre">test_xxx.py</span></code>. You can run a test using <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytest</span></code>. For example, to test the <a class="reference internal" href="../api/targetpixelfile.html#module-lightkurve.targetpixelfile" title="lightkurve.targetpixelfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.targetpixelfile</span></code></a> module you would execute:</p>
+<p>In this directory you should find several tests labeled <code class="xref py py-obj docutils literal notranslate"><span class="pre">test_xxx.py</span></code>. You can run a test using <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytest</span></code>. For example, to test the <a class="reference internal" href="../api/targetpixelfile.html#module-0" title="lightkurve.targetpixelfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.targetpixelfile</span></code></a> module you would execute:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">test_targetpixelfile</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>

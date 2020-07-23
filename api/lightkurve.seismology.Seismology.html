@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>Seismology &#8212; Lightkurve</title>
@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -91,9 +90,9 @@
     
   <div class="section" id="seismology">
 <h1>Seismology<a class="headerlink" href="#seismology" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="lightkurve.seismology.Seismology">
-<em class="property">class </em><code class="sig-prename descclassname">lightkurve.seismology.</code><code class="sig-name descname">Seismology</code><span class="sig-paren">(</span><em class="sig-param">periodogram</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.seismology.</code><code class="sig-name descname">Seismology</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">periodogram</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Enables astroseismic quantities to be estimated from periodograms.</p>
 <p>This class provides easy access to methods to estimate numax, deltanu, radius,
@@ -109,17 +108,17 @@ e.g. using <code class="xref py py-obj docutils literal notranslate"><span class
 </dl>
 <p class="rubric">Examples</p>
 <p>Download the TESS light curve for HIP 116158:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s2">&quot;HIP 116158&quot;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span>  
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>  
 </pre></div>
 </div>
 <p>Create a Lomb-Scargle periodogram:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">normalization</span><span class="o">=</span><span class="s1">&#39;psd&#39;</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>  
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">normalization</span><span class="o">=</span><span class="s1">&#39;psd&#39;</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>  
 </pre></div>
 </div>
 <p>Create a Seismology object and use it to estimate parameters:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seismology</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">to_seismology</span><span class="p">()</span>  
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seismology</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">to_seismology</span><span class="p">()</span>  
 <span class="gp">&gt;&gt;&gt; </span><span class="n">seismology</span><span class="o">.</span><span class="n">estimate_numax</span><span class="p">()</span>  
 <span class="go">numax: 415.00 uHz (method: ACF2D)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">seismology</span><span class="o">.</span><span class="n">estimate_deltanu</span><span class="p">()</span>  
@@ -156,7 +155,7 @@ e.g. using <code class="xref py py-obj docutils literal notranslate"><span class
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.seismology.Seismology.estimate_radius" title="lightkurve.seismology.Seismology.estimate_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_radius</span></code></a>(self, teff[, numax, deltanu])</p></td>
 <td><p>Returns a stellar radius estimate based on the scaling relations.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.seismology.Seismology.from_lightcurve" title="lightkurve.seismology.Seismology.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_lightcurve</span></code></a>(lc, \*\*kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.seismology.Seismology.from_lightcurve" title="lightkurve.seismology.Seismology.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_lightcurve</span></code></a>(lc, **kwargs)</p></td>
 <td><p>Returns a <a class="reference internal" href="#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object given a <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.seismology.Seismology.interact_echelle" title="lightkurve.seismology.Seismology.interact_echelle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_echelle</span></code></a>(self[, notebook_url])</p></td>
@@ -168,21 +167,21 @@ e.g. using <code class="xref py py-obj docutils literal notranslate"><span class
 </tbody>
 </table>
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.seismology.Seismology.diagnose_deltanu">
-<code class="sig-name descname">diagnose_deltanu</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">deltanu=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.diagnose_deltanu" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">diagnose_deltanu</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">deltanu</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.diagnose_deltanu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create diagnostic plots showing how numax was estimated.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.seismology.Seismology.diagnose_numax">
-<code class="sig-name descname">diagnose_numax</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">numax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.diagnose_numax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">diagnose_numax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">numax</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.diagnose_numax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create diagnostic plots showing how numax was estimated.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.seismology.Seismology.estimate_deltanu">
-<code class="sig-name descname">estimate_deltanu</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='acf2d'</em>, <em class="sig-param">numax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.estimate_deltanu" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">estimate_deltanu</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'acf2d'</span></em>, <em class="sig-param"><span class="n">numax</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.estimate_deltanu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the average value of the large frequency spacing, DeltaNu,
 of the seismic oscillations of the target.</p>
 <p>At present, the only method supported is based on using an
@@ -207,9 +206,9 @@ read the detailed docstring of this function by typing
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.seismology.Seismology.estimate_logg">
-<code class="sig-name descname">estimate_logg</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">teff</em>, <em class="sig-param">numax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.estimate_logg" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">estimate_logg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">teff</span></em>, <em class="sig-param"><span class="n">numax</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.estimate_logg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a surface gravity estimate based on the scaling relations.</p>
 <p>This method is implemented by the <a class="reference internal" href="lightkurve.seismology.estimate_logg.html#lightkurve.seismology.estimate_logg" title="lightkurve.seismology.estimate_logg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_logg</span></code></a> function.
 For details and literature references, please read the detailed
@@ -224,9 +223,9 @@ docstring of this function by typing <code class="docutils literal notranslate">
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.seismology.Seismology.estimate_mass">
-<code class="sig-name descname">estimate_mass</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">teff</em>, <em class="sig-param">numax=None</em>, <em class="sig-param">deltanu=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.estimate_mass" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">estimate_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">teff</span></em>, <em class="sig-param"><span class="n">numax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">deltanu</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.estimate_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a stellar mass estimate based on the scaling relations.</p>
 <p>This method is implemented by the <a class="reference internal" href="lightkurve.seismology.estimate_mass.html#lightkurve.seismology.estimate_mass" title="lightkurve.seismology.estimate_mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_mass</span></code></a> function.
 For details and literature references, please read the detailed
@@ -241,9 +240,9 @@ docstring of this function by typing <code class="docutils literal notranslate">
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.seismology.Seismology.estimate_numax">
-<code class="sig-name descname">estimate_numax</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='acf2d'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.estimate_numax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">estimate_numax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'acf2d'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.estimate_numax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the frequency of the peak of the seismic oscillation modes envelope.</p>
 <p>At present, the only method supported is based on using a
 2D autocorrelation function (ACF2D).  This method is implemented by the
@@ -268,9 +267,9 @@ in a Python terminal or notebook.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.seismology.Seismology.estimate_radius">
-<code class="sig-name descname">estimate_radius</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">teff</em>, <em class="sig-param">numax=None</em>, <em class="sig-param">deltanu=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.estimate_radius" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">estimate_radius</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">teff</span></em>, <em class="sig-param"><span class="n">numax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">deltanu</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.estimate_radius" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a stellar radius estimate based on the scaling relations.</p>
 <p>This method is implemented by the <a class="reference internal" href="lightkurve.seismology.estimate_radius.html#lightkurve.seismology.estimate_radius" title="lightkurve.seismology.estimate_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_radius</span></code></a> function.
 For details and literature references, please read the detailed
@@ -285,15 +284,15 @@ docstring of this function by typing <code class="docutils literal notranslate">
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.seismology.Seismology.from_lightcurve">
-<em class="property">static </em><code class="sig-name descname">from_lightcurve</code><span class="sig-paren">(</span><em class="sig-param">lc</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.from_lightcurve" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">from_lightcurve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lc</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.from_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <a class="reference internal" href="#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object given a <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.seismology.Seismology.interact_echelle">
-<code class="sig-name descname">interact_echelle</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.interact_echelle" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interact_echelle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">notebook_url</span><span class="o">=</span><span class="default_value">'localhost:8888'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.interact_echelle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display an interactive Jupyter notebook widget showing an Echelle diagram.</p>
 <p>This feature only works inside an active Jupyter Notebook, and
 requires an optional dependency, <code class="docutils literal notranslate"><span class="pre">bokeh</span></code> (v1.0 or later).
@@ -315,9 +314,9 @@ of the form “localhost:8888”, then “http” will be used.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.seismology.Seismology.plot_echelle">
-<code class="sig-name descname">plot_echelle</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">deltanu=None</em>, <em class="sig-param">numax=None</em>, <em class="sig-param">minimum_frequency=None</em>, <em class="sig-param">maximum_frequency=None</em>, <em class="sig-param">smooth_filter_width=0.1</em>, <em class="sig-param">scale='linear'</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">cmap='Blues'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.plot_echelle" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot_echelle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">deltanu</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">numax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">minimum_frequency</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maximum_frequency</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">smooth_filter_width</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">scale</span><span class="o">=</span><span class="default_value">'linear'</span></em>, <em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cmap</span><span class="o">=</span><span class="default_value">'Blues'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.Seismology.plot_echelle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots an echelle diagram of the periodogram by stacking the
 periodogram in slices of deltanu.</p>
 <p>Modes of equal radial degree should appear approximately vertically aligned.
@@ -357,7 +356,7 @@ periodogram frequency.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>

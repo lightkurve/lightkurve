@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>StarParameters &#8212; Lightkurve</title>
@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -91,9 +90,9 @@
     
   <div class="section" id="starparameters">
 <h1>StarParameters<a class="headerlink" href="#starparameters" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="lightkurve.prf.StarParameters">
-<em class="property">class </em><code class="sig-prename descclassname">lightkurve.prf.</code><code class="sig-name descname">StarParameters</code><span class="sig-paren">(</span><em class="sig-param">col</em>, <em class="sig-param">row</em>, <em class="sig-param">flux</em>, <em class="sig-param">err_col=None</em>, <em class="sig-param">err_row=None</em>, <em class="sig-param">err_flux=None</em>, <em class="sig-param">targetid=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.StarParameters" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.prf.</code><code class="sig-name descname">StarParameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">flux</span></em>, <em class="sig-param"><span class="n">err_col</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">err_row</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">err_flux</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">targetid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.StarParameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Container class to hold the parameters of a star in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p>
 </dd></dl>

@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>KeplerTargetPixelFile &#8212; Lightkurve</title>
@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -91,9 +90,9 @@
     
   <div class="section" id="keplertargetpixelfile">
 <h1>KeplerTargetPixelFile<a class="headerlink" href="#keplertargetpixelfile" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile">
-<em class="property">class </em><code class="sig-prename descclassname">lightkurve.targetpixelfile.</code><code class="sig-name descname">KeplerTargetPixelFile</code><span class="sig-paren">(</span><em class="sig-param">path</em>, <em class="sig-param">quality_bitmask='default'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.targetpixelfile.</code><code class="sig-name descname">KeplerTargetPixelFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">quality_bitmask</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.targetpixelfile.TargetPixelFile</span></code></p>
 <p>Class to read and interact with the pixel data products
 (“Target Pixel Files”) created by NASA’s Kepler pipeline.</p>
@@ -137,7 +136,7 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 </dl>
 <p class="rubric">References</p>
 <dl class="citation">
-<dt class="label" id="r59afa7b5afd4-1"><span class="brackets">R59afa7b5afd4-1</span></dt>
+<dt class="label" id="r59afa7b5afd4-1"><span class="brackets">1</span></dt>
 <dd><p>Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
 <a class="reference external" href="http://archive.stsci.edu/kepler/manuals/archive_manual.pdf">http://archive.stsci.edu/kepler/manuals/archive_manual.pdf</a></p>
 </dd>
@@ -284,7 +283,7 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, ax, frame, cadenceno, bkg, …])</p></td>
 <td><p>Plot the pixel data for a single frame (i.e.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_lightcurve</span></code></a>(self, \*\*kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_lightcurve</span></code></a>(self, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_solar_system_objects</span></code></a>(self[, …])</p></td>
@@ -305,161 +304,161 @@ See the <code class="xref py py-class docutils literal notranslate"><span class=
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.astropy_time">
 <code class="sig-name descname">astropy_time</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.astropy_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an AstroPy Time object for all good-quality cadences.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.cadenceno">
 <code class="sig-name descname">cadenceno</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.cadenceno" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the cadence number for all good-quality cadences.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.campaign">
 <code class="sig-name descname">campaign</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.campaign" title="Permalink to this definition">¶</a></dt>
 <dd><p>K2 Campaign number. (‘CAMPAIGN’ header keyword)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.channel">
 <code class="sig-name descname">channel</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kepler CCD channel number. (‘CHANNEL’ header keyword)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.column">
 <code class="sig-name descname">column</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.column" title="Permalink to this definition">¶</a></dt>
 <dd><p>CCD pixel column number (‘1CRV5P’ header keyword).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.dec">
 <code class="sig-name descname">dec</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.dec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Declination of target (‘DEC_OBJ’ header keyword).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.flux">
 <code class="sig-name descname">flux</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the flux for all good-quality cadences.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_bkg">
 <code class="sig-name descname">flux_bkg</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_bkg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the background flux for all good-quality cadences.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_bkg_err">
 <code class="sig-name descname">flux_bkg_err</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_bkg_err" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_err">
 <code class="sig-name descname">flux_err</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_err" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the flux uncertainty for all good-quality cadences.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.hdu">
 <code class="sig-name descname">hdu</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.hdu" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.header">
 <code class="sig-name descname">header</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.header" title="Permalink to this definition">¶</a></dt>
 <dd><p>DEPRECATED. Please use <code class="docutils literal notranslate"><span class="pre">get_header()</span></code> instead.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.mission">
 <code class="sig-name descname">mission</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.mission" title="Permalink to this definition">¶</a></dt>
 <dd><p>‘Kepler’ or ‘K2’. (‘MISSION’ header keyword)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.module">
 <code class="sig-name descname">module</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.module" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kepler CCD module number. (‘MODULE’ header keyword)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask">
 <code class="sig-name descname">nan_time_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a boolean mask flagging cadences whose time is <code class="xref py py-obj docutils literal notranslate"><span class="pre">nan</span></code>.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.obsmode">
 <code class="sig-name descname">obsmode</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.obsmode" title="Permalink to this definition">¶</a></dt>
 <dd><p>‘short cadence’ or ‘long cadence’. (‘OBSMODE’ header keyword)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.output">
 <code class="sig-name descname">output</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kepler CCD module output number. (‘OUTPUT’ header keyword)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.pipeline_mask">
 <code class="sig-name descname">pipeline_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.pipeline_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the optimal aperture mask used by the pipeline.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr1">
 <code class="sig-name descname">pos_corr1</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the column position correction.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr2">
 <code class="sig-name descname">pos_corr2</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the row position correction.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.quality">
 <code class="sig-name descname">quality</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.quality" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the quality flag integer of every good cadence.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.quarter">
 <code class="sig-name descname">quarter</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.quarter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kepler quarter number. (‘QUARTER’ header keyword)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.ra">
 <code class="sig-name descname">ra</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.ra" title="Permalink to this definition">¶</a></dt>
 <dd><p>Right Ascension of target (‘RA_OBJ’ header keyword).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.row">
 <code class="sig-name descname">row</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.row" title="Permalink to this definition">¶</a></dt>
 <dd><p>CCD pixel row number (‘2CRV5P’ header keyword).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.shape">
 <code class="sig-name descname">shape</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the cube dimension shape.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.time">
 <code class="sig-name descname">time</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the time for all good-quality cadences.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.wcs">
 <code class="sig-name descname">wcs</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.wcs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System
@@ -475,9 +474,9 @@ solution for the target pixel file.</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.create_threshold_mask">
-<code class="sig-name descname">create_threshold_mask</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">threshold=3</em>, <em class="sig-param">reference_pixel='center'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.create_threshold_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_threshold_mask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">threshold</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">reference_pixel</span><span class="o">=</span><span class="default_value">'center'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.create_threshold_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an aperture mask creating using the thresholding method.</p>
 <p>This method will identify the pixels in the TargetPixelFile which show
 a median flux that is brighter than <code class="xref py py-obj docutils literal notranslate"><span class="pre">threshold</span></code> times the standard
@@ -514,9 +513,9 @@ threshold.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.cutout">
-<code class="sig-name descname">cutout</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">center=None</em>, <em class="sig-param">size=5</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.cutout" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cutout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">center</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.cutout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cut a rectangle out of the Target Pixel File.</p>
 <p>This methods returns a new <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> object containing a
 rectangle of a given <code class="docutils literal notranslate"><span class="pre">size</span></code> cut out around a given <code class="docutils literal notranslate"><span class="pre">center</span></code>.</p>
@@ -545,9 +544,9 @@ cut out.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.estimate_centroids">
-<code class="sig-name descname">estimate_centroids</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">aperture_mask='pipeline'</em>, <em class="sig-param">method='moments'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.estimate_centroids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">estimate_centroids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">aperture_mask</span><span class="o">=</span><span class="default_value">'pipeline'</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'moments'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.estimate_centroids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the flux center of an object inside <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code>.</p>
 <p>Telescopes tend to smear out the light from a point-like star over
 multiple pixels.  For this reason, it is common to estimate the position
@@ -593,9 +592,9 @@ for each cadence, or NaN for cadences where the estimation failed.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.extract_aperture_photometry">
-<code class="sig-name descname">extract_aperture_photometry</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">aperture_mask='pipeline'</em>, <em class="sig-param">centroid_method='moments'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.extract_aperture_photometry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">extract_aperture_photometry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">aperture_mask</span><span class="o">=</span><span class="default_value">'pipeline'</span></em>, <em class="sig-param"><span class="n">centroid_method</span><span class="o">=</span><span class="default_value">'moments'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.extract_aperture_photometry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a LightCurve obtained using aperture photometry.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -623,9 +622,9 @@ cadence.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.extract_prf_photometry">
-<code class="sig-name descname">extract_prf_photometry</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">cadences=None</em>, <em class="sig-param">parallel=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.extract_prf_photometry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">extract_prf_photometry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">cadences</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.extract_prf_photometry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the results of PRF photometry applied to the pixel file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -650,9 +649,9 @@ various diagnostics.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images">
-<em class="property">static </em><code class="sig-name descname">from_fits_images</code><span class="sig-paren">(</span><em class="sig-param">images</em>, <em class="sig-param">position</em>, <em class="sig-param">size=(11</em>, <em class="sig-param">11)</em>, <em class="sig-param">extension=1</em>, <em class="sig-param">target_id='unnamed-target'</em>, <em class="sig-param">hdu0_keywords=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">from_fits_images</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">images</span></em>, <em class="sig-param"><span class="n">position</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">11, 11</span></em>, <em class="sig-param"><span class="n">extension</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">target_id</span><span class="o">=</span><span class="default_value">'unnamed-target'</span></em>, <em class="sig-param"><span class="n">hdu0_keywords</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new Target Pixel File from a set of images.</p>
 <p>This method is intended to make it easy to cut out targets from
 Kepler/K2 “superstamp” regions or TESS FFI images.</p>
@@ -686,14 +685,14 @@ or name to use. Default: 0.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve">
-<code class="sig-name descname">get_bkg_lightcurve</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">aperture_mask=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_bkg_lightcurve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">aperture_mask</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_coordinates">
-<code class="sig-name descname">get_coordinates</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">cadence='all'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_coordinates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_coordinates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">cadence</span><span class="o">=</span><span class="default_value">'all'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_coordinates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns two 3D arrays of RA and Dec values in decimal degrees.</p>
 <p>If cadence number is given, returns 2D arrays for that cadence. If
 cadence is ‘all’ returns one RA, Dec value for each pixel in every cadence.
@@ -716,9 +715,9 @@ Uses the WCS solution and the POS_CORR data from TPF header.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_header">
-<code class="sig-name descname">get_header</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ext=0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_header" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_header</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the metadata embedded in the file.</p>
 <p>Target Pixel Files contain embedded metadata headers spread across three
 different FITS extensions:</p>
@@ -746,17 +745,17 @@ aperture pixel mask and the expected coordinate system (WCS).</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_keyword">
-<code class="sig-name descname">get_keyword</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">keyword</em>, <em class="sig-param">hdu=0</em>, <em class="sig-param">default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_keyword" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_keyword</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">keyword</span></em>, <em class="sig-param"><span class="n">hdu</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_keyword" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a header keyword value.</p>
 <p>If the keyword is Undefined or does not exist,
 then return <code class="docutils literal notranslate"><span class="pre">default</span></code> instead.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model">
-<code class="sig-name descname">get_model</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">star_priors=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">star_priors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a default <code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModel</span></code> object for PRF fitting.</p>
 <p>The default model only includes one star and only allows its flux
 and position to change.  A different set of stars can be added using
@@ -778,9 +777,9 @@ the <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model">
-<code class="sig-name descname">get_prf_model</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_prf_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an object of KeplerPRF initialized using the
 necessary metadata in the tpf object.</p>
 <dl class="field-list simple">
@@ -792,9 +791,9 @@ necessary metadata in the tpf object.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact">
-<code class="sig-name descname">interact</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">max_cadences=30000</em>, <em class="sig-param">aperture_mask='pipeline'</em>, <em class="sig-param">exported_filename=None</em>, <em class="sig-param">transform_func=None</em>, <em class="sig-param">ylim_func=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interact</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">notebook_url</span><span class="o">=</span><span class="default_value">'localhost:8888'</span></em>, <em class="sig-param"><span class="n">max_cadences</span><span class="o">=</span><span class="default_value">30000</span></em>, <em class="sig-param"><span class="n">aperture_mask</span><span class="o">=</span><span class="default_value">'pipeline'</span></em>, <em class="sig-param"><span class="n">exported_filename</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">transform_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ylim_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
 the lightcurve shown is obtained by calling the <a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve()</span></code></a> method,
@@ -862,9 +861,9 @@ the lightcurve after each pixel selection:</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact_sky">
-<code class="sig-name descname">interact_sky</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">magnitude_limit=18</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact_sky" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interact_sky</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">notebook_url</span><span class="o">=</span><span class="default_value">'localhost:8888'</span></em>, <em class="sig-param"><span class="n">magnitude_limit</span><span class="o">=</span><span class="default_value">18</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact_sky" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -885,16 +884,16 @@ of the form “localhost:8888”, then “http” will be used.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot">
-<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">frame=0</em>, <em class="sig-param">cadenceno=None</em>, <em class="sig-param">bkg=False</em>, <em class="sig-param">aperture_mask=None</em>, <em class="sig-param">show_colorbar=True</em>, <em class="sig-param">mask_color='pink'</em>, <em class="sig-param">title=None</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">frame</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">cadenceno</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bkg</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">aperture_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show_colorbar</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">mask_color</span><span class="o">=</span><span class="default_value">'pink'</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">style</span><span class="o">=</span><span class="default_value">'lightkurve'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the pixel data for a single frame (i.e. at a single time).</p>
 <p>The time can be specified by frame index number (<code class="xref py py-obj docutils literal notranslate"><span class="pre">frame=0</span></code> will show the
 first frame) or absolute cadence number (<a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.cadenceno" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.cadenceno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadenceno</span></code></a>).</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
 a new one will be generated.</p>
 </dd>
 <dt><strong>frame</strong><span class="classifier">int</span></dt><dd><p>Frame number. The default is 0, i.e. the first frame.</p>
@@ -920,21 +919,21 @@ Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve">
-<code class="sig-name descname">prf_lightcurve</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">prf_lightcurve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.prf_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects">
-<code class="sig-name descname">query_solar_system_objects</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">cadence_mask='outliers'</em>, <em class="sig-param">radius=None</em>, <em class="sig-param">sigma=3</em>, <em class="sig-param">cache=True</em>, <em class="sig-param">return_mask=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">query_solar_system_objects</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">cadence_mask</span><span class="o">=</span><span class="default_value">'outliers'</span></em>, <em class="sig-param"><span class="n">radius</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sigma</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">cache</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">return_mask</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.query_solar_system_objects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of asteroids or comets which affected the target pixel files.</p>
 <p>Light curves of stars or galaxies are frequently affected by solar
 system bodies (e.g. asteroids, comets, planets).  These objects can move
@@ -994,16 +993,16 @@ SSOs.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties">
-<code class="sig-name descname">show_properties</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">show_properties</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints a description of all non-callable attributes.</p>
 <p>Prints in order of type (ints, strings, lists, arrays, others).</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector">
-<code class="sig-name descname">to_corrector</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='pld'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_corrector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'pld'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_corrector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> instance to remove systematics.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -1023,15 +1022,15 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits">
-<code class="sig-name descname">to_fits</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">output_fn=None</em>, <em class="sig-param">overwrite=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_fits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">output_fn</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the TPF to a FITS file on disk.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve">
-<code class="sig-name descname">to_lightcurve</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='aperture'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_lightcurve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'aperture'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs photometry on the pixel data and returns a LightCurve object.</p>
 <p>See the docstring of <code class="xref py py-obj docutils literal notranslate"><span class="pre">aperture_photometry()</span></code> for valid
 arguments if the method is ‘aperture’.  Otherwise, see the docstring

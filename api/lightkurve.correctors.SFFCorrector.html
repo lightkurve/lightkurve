@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>SFFCorrector &#8212; Lightkurve</title>
@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -91,9 +90,9 @@
     
   <div class="section" id="sffcorrector">
 <h1>SFFCorrector<a class="headerlink" href="#sffcorrector" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="lightkurve.correctors.SFFCorrector">
-<em class="property">class </em><code class="sig-prename descclassname">lightkurve.correctors.</code><code class="sig-name descname">SFFCorrector</code><span class="sig-paren">(</span><em class="sig-param">lc</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.correctors.</code><code class="sig-name descname">SFFCorrector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.correctors.regressioncorrector.RegressionCorrector</span></code></p>
 <p>Special case of <a class="reference internal" href="lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector" title="lightkurve.correctors.RegressionCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionCorrector</span></code></a> where the <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> includes
 the target’s centroid positions.</p>
@@ -141,16 +140,16 @@ design to capture the intrinsic, long-term variability of the target.</p>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.correctors.SFFCorrector.X">
 <code class="sig-name descname">X</code><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.X" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shorthand for self.design_matrix_collection.</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.correctors.SFFCorrector.correct">
-<code class="sig-name descname">correct</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">centroid_col=None</em>, <em class="sig-param">centroid_row=None</em>, <em class="sig-param">windows=20</em>, <em class="sig-param">bins=5</em>, <em class="sig-param">timescale=1.5</em>, <em class="sig-param">breakindex=None</em>, <em class="sig-param">degree=3</em>, <em class="sig-param">restore_trend=False</em>, <em class="sig-param">additional_design_matrix=None</em>, <em class="sig-param">polyorder=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.correct" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">correct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">centroid_col</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">centroid_row</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">windows</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">bins</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">timescale</span><span class="o">=</span><span class="default_value">1.5</span></em>, <em class="sig-param"><span class="n">breakindex</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">degree</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">restore_trend</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">additional_design_matrix</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">polyorder</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.correct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the best fit correction for the light curve.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -204,23 +203,23 @@ distribution of weights.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.correctors.SFFCorrector.diagnose">
-<code class="sig-name descname">diagnose</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.diagnose" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">diagnose</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.diagnose" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a diagnostic plot which visualizes what happened during the
 most recent call to <a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code></a>.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.correctors.SFFCorrector.diagnose_arclength">
-<code class="sig-name descname">diagnose_arclength</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.diagnose_arclength" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">diagnose_arclength</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.diagnose_arclength" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a diagnostic plot which visualizes arclength vs flux
 from most recent call to <a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct()</span></code></a>.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.correctors.SFFCorrector.diagnose_priors">
-<code class="sig-name descname">diagnose_priors</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.diagnose_priors" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">diagnose_priors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.diagnose_priors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a diagnostic plot visualizing how the best-fit coefficients
 compare against the priors.</p>
 <p>The method will show the results obtained during the most recent call
@@ -229,7 +228,7 @@ to <a class="reference internal" href="#lightkurve.correctors.SFFCorrector.corre
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></dt><dd><p>The matplotlib axes object.</p>
+<dt><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>

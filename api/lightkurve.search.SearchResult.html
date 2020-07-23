@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>SearchResult &#8212; Lightkurve</title>
@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -91,9 +90,9 @@
     
   <div class="section" id="searchresult">
 <h1>SearchResult<a class="headerlink" href="#searchresult" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="lightkurve.search.SearchResult">
-<em class="property">class </em><code class="sig-prename descclassname">lightkurve.search.</code><code class="sig-name descname">SearchResult</code><span class="sig-paren">(</span><em class="sig-param">table=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.search.</code><code class="sig-name descname">SearchResult</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Container for the results returned by <a class="reference internal" href="lightkurve.search.search_targetpixelfile.html#lightkurve.search.search_targetpixelfile" title="lightkurve.search.search_targetpixelfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code></a>,
 <a class="reference internal" href="lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile" title="lightkurve.search.search_lightcurvefile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code></a>, or <a class="reference internal" href="lightkurve.search.search_tesscut.html#lightkurve.search.search_tesscut" title="lightkurve.search.search_tesscut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_tesscut</span></code></a>.</p>
@@ -149,40 +148,40 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.search.SearchResult.dec">
 <code class="sig-name descname">dec</code><a class="headerlink" href="#lightkurve.search.SearchResult.dec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of dec values for targets in search</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.search.SearchResult.obsid">
 <code class="sig-name descname">obsid</code><a class="headerlink" href="#lightkurve.search.SearchResult.obsid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of MAST observation IDs</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.search.SearchResult.ra">
 <code class="sig-name descname">ra</code><a class="headerlink" href="#lightkurve.search.SearchResult.ra" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of RA values for targets in search</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.search.SearchResult.target_name">
 <code class="sig-name descname">target_name</code><a class="headerlink" href="#lightkurve.search.SearchResult.target_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of target names</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="lightkurve.search.SearchResult.unique_targets">
 <code class="sig-name descname">unique_targets</code><a class="headerlink" href="#lightkurve.search.SearchResult.unique_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a table of targets and their RA &amp; dec values produced by search</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.search.SearchResult.download">
-<code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">quality_bitmask='default'</em>, <em class="sig-param">download_dir=None</em>, <em class="sig-param">cutout_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult.download" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">quality_bitmask</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">download_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cutout_size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult.download" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a single <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code> object.</p>
 <p>If multiple files are present in <code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult.table</span></code>, only the first
 will be downloaded.</p>
@@ -230,9 +229,9 @@ Default size is (5, 5)</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.search.SearchResult.download_all">
-<code class="sig-name descname">download_all</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">quality_bitmask='default'</em>, <em class="sig-param">download_dir=None</em>, <em class="sig-param">cutout_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult.download_all" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">download_all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">quality_bitmask</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">download_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cutout_size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult.download_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <a class="reference internal" href="lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection" title="lightkurve.collections.TargetPixelFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code></a> or
 <a class="reference internal" href="lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection" title="lightkurve.collections.LightCurveFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFileCollection</span></code></a>.</p>
 <dl class="field-list">

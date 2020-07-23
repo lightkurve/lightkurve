@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>TPFModel &#8212; Lightkurve</title>
@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -91,7 +90,7 @@
     
   <div class="section" id="tpfmodel">
 <h1>TPFModel<a class="headerlink" href="#tpfmodel" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="lightkurve.prf.TPFModel">
 <em class="property">class </em><code class="sig-prename descclassname">lightkurve.prf.</code><code class="sig-name descname">TPFModel</code><span class="sig-paren">(</span><em class="sig-param">star_priors=None, background_prior=&lt;BackgroundPrior(   flux=&lt;FixedValuePrior(value=[0])&gt;)&gt;, focus_prior=&lt;FocusPrior(   scale_col=&lt;GaussianPrior(mean=[1], var=[0.0001])&gt;   scale_row=&lt;GaussianPrior(mean=[1], var=[0.0001])&gt;   rotation_angle=&lt;UniformPrior(lb=[-3.1415], ub=[3.1415])&gt;)&gt;, motion_prior=&lt;MotionPrior(   shift_col=&lt;GaussianPrior(mean=[0], var=[1.])&gt;   shift_row=&lt;GaussianPrior(mean=[0], var=[1.])&gt;)&gt;, prfmodel=None, fit_background=True, fit_focus=False, fit_motion=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
@@ -125,7 +124,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.prf.TPFModel.__call__" title="lightkurve.prf.TPFModel.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a>(self, \*params_array)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.prf.TPFModel.__call__" title="lightkurve.prf.TPFModel.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a>(self, *params_array)</p></td>
 <td><p>Call self as a function.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.prf.TPFModel.fit" title="lightkurve.prf.TPFModel.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(self, data[, loss_function, method, …])</p></td>
@@ -134,13 +133,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.prf.TPFModel.get_initial_guesses" title="lightkurve.prf.TPFModel.get_initial_guesses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_initial_guesses</span></code></a>(self)</p></td>
 <td><p>Returns the prior means which can be used to initialize the model.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.prf.TPFModel.gradient" title="lightkurve.prf.TPFModel.gradient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient</span></code></a>(self, \*params_array)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.prf.TPFModel.gradient" title="lightkurve.prf.TPFModel.gradient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient</span></code></a>(self, *params_array)</p></td>
 <td><p>UNFINISHED WORK!</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.prf.TPFModel.logp_prior" title="lightkurve.prf.TPFModel.logp_prior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logp_prior</span></code></a>(self, params)</p></td>
 <td><p>Evaluates the prior at a point in the parameter space.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.prf.TPFModel.plot" title="lightkurve.prf.TPFModel.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self, \*params, \*\*kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.prf.TPFModel.plot" title="lightkurve.prf.TPFModel.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self, *params, **kwargs)</p></td>
 <td><p>Plots an image of the model for a given point in the parameter space.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.prf.TPFModel.plot_diagnostics" title="lightkurve.prf.TPFModel.plot_diagnostics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_diagnostics</span></code></a>(self, data[, figsize])</p></td>
@@ -152,13 +151,13 @@
 </tbody>
 </table>
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.prf.TPFModel.__call__">
-<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*params_array</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.__call__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params_array</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call self as a function.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.prf.TPFModel.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">data</em>, <em class="sig-param">loss_function=&lt;class 'oktopus.posterior.PoissonPosterior'&gt;</em>, <em class="sig-param">method='powell'</em>, <em class="sig-param">pos_corr1=None</em>, <em class="sig-param">pos_corr2=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fits the model to the data.</p>
@@ -171,7 +170,7 @@
 <dt><strong>loss_function</strong><span class="classifier">subclass of oktopus.LossFunction</span></dt><dd><p>Noise distribution associated with each random measurement</p>
 </dd>
 <dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of additional parameters to be passed to
-<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.optimize.minimize</span></code></a>.</p>
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.optimize.minimize</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -184,22 +183,22 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.prf.TPFModel.get_initial_guesses">
-<code class="sig-name descname">get_initial_guesses</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.get_initial_guesses" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_initial_guesses</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.get_initial_guesses" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the prior means which can be used to initialize the model.</p>
 <p>The guesses are obtained by taking the means of the priors.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.prf.TPFModel.gradient">
-<code class="sig-name descname">gradient</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*params_array</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.gradient" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gradient</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params_array</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.gradient" title="Permalink to this definition">¶</a></dt>
 <dd><p>UNFINISHED WORK!</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.prf.TPFModel.logp_prior">
-<code class="sig-name descname">logp_prior</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.logp_prior" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">logp_prior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.logp_prior" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluates the prior at a point in the parameter space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes</dt>
@@ -210,21 +209,21 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.prf.TPFModel.plot">
-<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*params</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots an image of the model for a given point in the parameter space.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.prf.TPFModel.plot_diagnostics">
-<code class="sig-name descname">plot_diagnostics</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">data</em>, <em class="sig-param">figsize=(12</em>, <em class="sig-param">4)</em>, <em class="sig-param">*params</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.plot_diagnostics" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot_diagnostics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">12, 4</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">params</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.plot_diagnostics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots an image of the model for a given point in the parameter space.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="lightkurve.prf.TPFModel.predict">
-<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">params=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.TPFModel.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a synthetic Kepler image given a set of model parameters.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>

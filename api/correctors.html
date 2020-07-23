@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>Correcting systematics &#8212; Lightkurve</title>
@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -91,7 +90,7 @@
     
   <div class="section" id="module-lightkurve.correctors">
 <span id="correcting-systematics"></span><h1>Correcting systematics<a class="headerlink" href="#module-lightkurve.correctors" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-lightkurve.correctors"></span><p>This sub-package defines classes which help remove instrument systematics
+<span class="target" id="module-0"></span><p>This sub-package defines classes which help remove instrument systematics
 or variability from time series photometry data.</p>
 <p>Classes provided by this package should inherit from an abstract <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code>
 class, which provides three key methods:</p>
@@ -137,7 +136,7 @@ class, which provides three key methods:</p>
 </div>
 <div class="section" id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<div class="graphviz"><img src="../_images/inheritance-998f45f5626bff84c4004ab80ba08272a2c8bd18.png" alt="Inheritance diagram of lightkurve.correctors.designmatrix.DesignMatrix, lightkurve.correctors.designmatrix.DesignMatrixCollection, lightkurve.correctors.cbvcorrector.KeplerCBVCorrector, lightkurve.correctors.pldcorrector.PLDCorrector, lightkurve.correctors.regressioncorrector.RegressionCorrector, lightkurve.correctors.sffcorrector.SFFCorrector, lightkurve.correctors.tesspldcorrector.TessPLDCorrector" class="inheritance graphviz" /></div>
+<div class="graphviz"><img src="../_images/inheritance-cba56aba25a119eaf5773ce40a4db970c7aaba6e.png" alt="Inheritance diagram of lightkurve.correctors.designmatrix.DesignMatrix, lightkurve.correctors.designmatrix.DesignMatrixCollection, lightkurve.correctors.cbvcorrector.KeplerCBVCorrector, lightkurve.correctors.pldcorrector.PLDCorrector, lightkurve.correctors.regressioncorrector.RegressionCorrector, lightkurve.correctors.sffcorrector.SFFCorrector, lightkurve.correctors.tesspldcorrector.TessPLDCorrector" class="inheritance graphviz" /></div>
 </div>
 </div>
 
