@@ -23,6 +23,12 @@ extensions = [
     'sphinx_automodapi.automodapi',
     'sphinxcontrib.rawfiles']
 
+# Disable RequireJS because it creates a conflict with bootstrap.js.
+# This conflict breaks the navigation toggle button.
+# The exact consequence of disabling RequireJS is not understood
+# -- likely it means that notebook widgets may not work?
+nbsphinx_requirejs_path = ""
+
 numpydoc_show_class_members = False
 
 
