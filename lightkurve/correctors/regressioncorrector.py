@@ -210,29 +210,26 @@ class RegressionCorrector(Corrector):
         self.design_matrix_collection = design_matrix_collection
 
         if cadence_mask is None:
-            cadence_mask = np.ones(len(self.lc.time), bool)
-            self.user_mask = None
+            self.cadence_mask = np.ones(len(self.lc.time), bool)
         else:
-            cadence_mask = np.copy(cadence_mask)
-            self.user_mask = cadence_mask
+            self.cadence_mask = cadence_mask
 
-        # Prepare for iterative masking of residuals
-        clean_cadences = np.ones_like(cadence_mask)
-        # Iterative sigma clipping
+        # Create an outlier mask using iterative sigma clipping
+        self.outlier_mask = np.zeros_like(self.cadence_mask)
         for count in range(niters):
+            tmp_cadence_mask = self.cadence_mask & ~self.outlier_mask
             coefficients, coefficients_err = \
-                self._fit_coefficients(cadence_mask=cadence_mask & clean_cadences,
+                self._fit_coefficients(cadence_mask=tmp_cadence_mask,
                                        prior_mu=self.dmc.prior_mu,
                                        prior_sigma=self.dmc.prior_sigma,
                                        propagate_errors=propagate_errors)
             model = np.ma.masked_array(data=self.dmc.X.dot(coefficients),
-                                       mask=~(cadence_mask & clean_cadences))
+                                       mask=~tmp_cadence_mask)
             model = u.Quantity(model, unit=self.lc.flux.unit)
             residuals = self.lc.flux - model
-            clean_cadences = ~sigma_clip(residuals, sigma=sigma).mask
+            self.outlier_mask |= sigma_clip(residuals, sigma=sigma).mask
             log.debug("correct(): iteration {}: clipped {} cadences"
-                      "".format(count, (~clean_cadences).sum()))
-        self.cadence_mask = cadence_mask & clean_cadences
+                      "".format(count, self.outlier_mask.sum()))
 
         self.coefficients = coefficients
         self.coefficients_err = coefficients_err
@@ -298,14 +295,13 @@ class RegressionCorrector(Corrector):
             ax.set_xlabel('')
             ax = axs[1]
             self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
-            self.corrected_lc[~self.cadence_mask].scatter(
+            self.corrected_lc[self.outlier_mask].scatter(
                                             normalize=False, c='r', marker='x',
-                                            s=10, label='Outliers', ax=ax)
-            if self.user_mask is not None:
-                self.corrected_lc[~self.user_mask].scatter(
-                                             normalize=False, c='dodgerblue',
-                                             marker='x', s=10, label='Masked',
-                                             ax=ax)
+                                            s=10, label='outlier_mask', ax=ax)
+            self.corrected_lc[~self.cadence_mask].scatter(
+                                            normalize=False, c='dodgerblue',
+                                            marker='x', s=10, label='~cadence_mask',
+                                            ax=ax)
             self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
 
