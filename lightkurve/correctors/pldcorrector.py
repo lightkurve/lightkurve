@@ -397,8 +397,8 @@ class PLDCorrector(RegressionCorrector):
                                             s=10, label='Outliers', ax=ax)
             if self.user_mask is not None:
                 clc[~self.user_mask].scatter(normalize=False, c='dodgerblue',
-                                                marker='x', s=10, label='Masked',
-                                                ax=ax)
+                                             marker='x', s=10, label='Masked',
+                                             ax=ax)
             clc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
 
