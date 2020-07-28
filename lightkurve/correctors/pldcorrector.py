@@ -392,10 +392,13 @@ class PLDCorrector(RegressionCorrector):
 
             # Plot final corrected light curve with outliers marked
             ax = axs[2]
-            self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
-            clc[~self.cadence_mask].scatter(normalize=False, c='r', marker='x',
-                                            s=10, label='Outliers', ax=ax)
-            clc.plot(normalize=False, label='Corrected', ax=ax, c='k')
+            self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='original')
+            clc[self.outlier_mask].scatter(normalize=False, c='r', marker='x',
+                                            s=10, label='outlier_mask', ax=ax)
+            clc[~self.cadence_mask].scatter(normalize=False, c='dodgerblue',
+                                            marker='x', s=10, label='~cadence_mask',
+                                            ax=ax)
+            clc.plot(normalize=False, label='corrected', ax=ax, c='k')
         return axs
 
     def diagnose_masks(self):
