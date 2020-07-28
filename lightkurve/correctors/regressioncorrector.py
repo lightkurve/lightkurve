@@ -301,6 +301,11 @@ class RegressionCorrector(Corrector):
             self.corrected_lc[~self.cadence_mask].scatter(
                                             normalize=False, c='r', marker='x',
                                             s=10, label='Outliers', ax=ax)
+            if self.user_mask is not None:
+                self.corrected_lc[~self.user_mask].scatter(
+                                             normalize=False, c='dodgerblue',
+                                             marker='x', s=10, label='Masked',
+                                             ax=ax)
             self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
 
