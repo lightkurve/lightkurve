@@ -211,8 +211,10 @@ class RegressionCorrector(Corrector):
 
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.lc.time), bool)
+            self.user_mask = None
         else:
             cadence_mask = np.copy(cadence_mask)
+            self.user_mask = cadence_mask
 
         # Prepare for iterative masking of residuals
         clean_cadences = np.ones_like(cadence_mask)

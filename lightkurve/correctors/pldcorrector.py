@@ -395,6 +395,10 @@ class PLDCorrector(RegressionCorrector):
             self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
             clc[~self.cadence_mask].scatter(normalize=False, c='r', marker='x',
                                             s=10, label='Outliers', ax=ax)
+            if self.user_mask is not None:
+                clc[~self.user_mask].scatter(normalize=False, c='dodgerblue',
+                                                marker='x', s=10, label='Masked',
+                                                ax=ax)
             clc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
 
