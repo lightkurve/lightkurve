@@ -294,7 +294,7 @@ class RegressionCorrector(Corrector):
                 (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
             ax.set_xlabel('')
             ax = axs[1]
-            self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
+            self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='original')
             self.corrected_lc[self.outlier_mask].scatter(
                                             normalize=False, c='r', marker='x',
                                             s=10, label='outlier_mask', ax=ax)
@@ -302,7 +302,7 @@ class RegressionCorrector(Corrector):
                                             normalize=False, c='dodgerblue',
                                             marker='x', s=10, label='~cadence_mask',
                                             ax=ax)
-            self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
+            self.corrected_lc.plot(normalize=False, label='corrected', ax=ax, c='k')
         return axs
 
     def diagnose(self):
