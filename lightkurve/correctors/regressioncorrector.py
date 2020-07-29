@@ -70,7 +70,7 @@ class RegressionCorrector(Corrector):
 
     .. math::
 
-        \covw = (X^\\top \cov^{-1} X + \\boldsymbol\sigma^{-2}_\w I)^{-1}
+        \covw^{-1} = (X^\\top \cov^{-1} X + \\boldsymbol\sigma^{-2}_\w I)
 
 
     Parameters
