@@ -32,6 +32,9 @@
 - Added the ``estimate_background`` method to ``TargetPixelFile`` which returns
   a 1D estimate of the residual background present in e.g. TESSCut data. [#746]
 
+- Added support for reading K2SFF and EVEREST community light curves via the
+  `LightCurve.read()` and `search_lightcurve()` functions.
+
 
 
 1.11.1 (2020-06-18)

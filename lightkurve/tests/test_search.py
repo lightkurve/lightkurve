@@ -7,7 +7,6 @@ if no internet connection is available.
 """
 import os
 import pytest
-import warnings
 
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
@@ -35,7 +34,27 @@ def test_search_targetpixelfile():
     # ...including quarter 11 but not 12:
     assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler', quarter=11).unique_targets) == 1)
     assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler', quarter=12).table) == 0)
-    # should work for all split campaigns
+    search_targetpixelfile('KIC 11904151', quarter=11).download()
+    # with mission='TESS', it should return TESS observations
+    tic = 'TIC 273985862'  # Has been observed in multiple sectors including 1
+    assert(len(search_targetpixelfile(tic, mission='TESS').table) > 1)
+    assert(len(search_targetpixelfile(tic, mission='TESS', sector=1, radius=100).table) == 2)
+    search_targetpixelfile(tic, mission='TESS', sector=1).download()
+    assert(len(search_targetpixelfile("pi Mensae", sector=1).table) == 1)
+    # Issue #445: indexing with -1 should return the last index of the search result
+    assert(len(search_targetpixelfile("pi Men")[-1]) == 1)
+
+
+# The test below currently fail because the MAST portal does not consistently
+# assign `sequence_number` at the time of writing, i.e.
+# * C91 and C91 appear bundled into one observation with sequence number "91" (example: EPIC 228162462)
+# * C101 and C102 appear bundled together with sequence number "10" (example: EPIC 228726301)
+# * C111 and C112 appear as *separate* observations with sequence numbers "111" and "112" (example: EPIC 202975993)
+# This issue is expected to be resolved by September 2020, at which point
+# we should try and revive this test.
+@pytest.mark.xfail
+def test_search_split_campaigns():
+    """Searches should should work for split campaigns."""
     campaigns = [[91, 92, 9], [101, 102, 10], [111, 112, 11]]
     ids = ['EPIC 228162462', 'EPIC 228726301', 'EPIC 202975993']
     for c, idx in zip(campaigns, ids):
@@ -47,15 +66,6 @@ def test_search_targetpixelfile():
         # If you specify the whole campaign, both split parts must be returned.
         cc = search_targetpixelfile(idx, campaign=c[2]).table
         assert(len(cc) == 2)
-    search_targetpixelfile('KIC 11904151', quarter=11).download()
-    # with mission='TESS', it should return TESS observations
-    tic = 'TIC 273985862'  # Has been observed in multiple sectors including 1
-    assert(len(search_targetpixelfile(tic, mission='TESS').table) > 1)
-    assert(len(search_targetpixelfile(tic, mission='TESS', sector=1, radius=100).table) == 2)
-    search_targetpixelfile(tic, mission='TESS', sector=1).download()
-    assert(len(search_targetpixelfile("pi Mensae", sector=1).table) == 1)
-    # Issue #445: indexing with -1 should return the last index of the search result
-    assert(len(search_targetpixelfile("pi Men")[-1]) == 1)
 
 
 @pytest.mark.remote_data
@@ -248,7 +258,6 @@ def test_corrupt_download_handling():
 
     This is a regression test for #511.
     """
-    from builtins import open  # Because open is imported as lightkurve.open at the top
     with tempfile.TemporaryDirectory() as tmpdirname:
         # Pretend a corrupt file exists at the expected cache location
         expected_dir = os.path.join(tmpdirname,

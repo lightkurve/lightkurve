@@ -31,7 +31,7 @@ def read(path_or_url, **kwargs):
 
     This function will use the `detect_filetype()` function to
     automatically detect the type of the data product, and return the
-    appropriate object. File types currently supported are::
+    appropriate object. File types currently supported include::
 
         * `KeplerTargetPixelFile` (typical suffix "-targ.fits.gz");
         * `KeplerLightCurve` (typical suffix "llc.fits");
@@ -71,11 +71,14 @@ def read(path_or_url, **kwargs):
         if 'No such file' in str(e):
             raise e
 
-    # Community-provided science products
     if filetype == "KeplerLightCurve":
         return KeplerLightCurve.read(path_or_url, format='kepler', **kwargs)
     elif filetype == "TessLightCurve":
         return TessLightCurve.read(path_or_url, format='tess', **kwargs)
+    elif filetype == "K2SFF":
+        return KeplerLightCurve.read(path_or_url, format='k2sff', **kwargs)
+    elif filetype == "EVEREST":
+        return KeplerLightCurve.read(path_or_url, format='everest', **kwargs)
 
     # Official data products;
     # if the filetype is recognized, instantiate a class of that name
