@@ -16,8 +16,8 @@ def detect_filetype(hdulist):
         * `'TessTargetPixelFile'`
         * `'KeplerLightCurve'`
         * `'TessLightCurve'`
-
-    In addition, community-provided data products such as K2SFF are supported.
+        * `'K2SFF'`
+        * `'EVEREST'`
 
     If the data product cannot be detected, `None` will be returned.
 

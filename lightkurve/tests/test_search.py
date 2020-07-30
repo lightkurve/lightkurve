@@ -18,13 +18,10 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astropy.table import Table
 
-from ..utils import LightkurveWarning, LightkurveDeprecationWarning
+from ..utils import LightkurveWarning
 from ..search import search_lightcurve, search_targetpixelfile, \
                      search_tesscut, SearchResult, SearchError, log
-from ..io import read
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
-
-from .. import PACKAGEDIR
 
 
 @pytest.mark.remote_data
@@ -231,30 +228,6 @@ def test_empty_searchresult():
         sr.download_all()
 
 
-def test_open():
-    from ..io import open
-    with warnings.catch_warnings():  # lk.open is deprecated
-        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
-        # define paths to k2 and tess data
-        k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
-        tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
-        # Ensure files are read in as the correct object
-        k2tpf = open(k2_path)
-        assert(isinstance(k2tpf, KeplerTargetPixelFile))
-        tesstpf = open(tess_path)
-        assert(isinstance(tesstpf, TessTargetPixelFile))
-        # Open should fail if the filetype is not recognized
-        try:
-            open(os.path.join(PACKAGEDIR, "data", "lightkurve.mplstyle"))
-        except (ValueError, IOError):
-            pass
-        # Can you instantiate with a path?
-        assert(isinstance(KeplerTargetPixelFile(k2_path), KeplerTargetPixelFile))
-        assert(isinstance(TessTargetPixelFile(tess_path), TessTargetPixelFile))
-        # Can open take a quality_bitmask argument?
-        assert(open(k2_path, quality_bitmask='hard').quality_bitmask == 'hard')
-
-
 @pytest.mark.remote_data
 def test_issue_472():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/472"""
@@ -288,12 +261,6 @@ def test_corrupt_download_handling():
         with pytest.raises(SearchError) as err:
             search_targetpixelfile("Kepler-10", quarter=4).download(download_dir=tmpdirname)
         assert "The file was likely only partially downloaded." in err.value.args[0]
-
-
-def test_filenotfound():
-    """Regression test for #540; ensure lk.read() yields `FileNotFoundError`."""
-    with pytest.raises(FileNotFoundError):
-        read("DOESNOTEXIST")
 
 
 @pytest.mark.remote_data

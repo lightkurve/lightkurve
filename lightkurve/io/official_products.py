@@ -3,7 +3,7 @@ import logging
 
 import numpy as np
 
-from astropy.io import registry, fits
+from astropy.io import fits
 from astropy.table import Table
 from astropy.time import Time
 
@@ -183,11 +183,3 @@ def read_tess_lightcurve(filename,
     lc.meta['quality_bitmask'] = quality_bitmask
     lc.meta['quality_mask'] = quality_mask
     return TessLightCurve(data=lc)
-
-
-"""ADD READERS TO THE REGISTRY"""
-try:
-    registry.register_reader('kepler', LightCurve, read_kepler_lightcurve)
-    registry.register_reader('tess', LightCurve, read_tess_lightcurve)
-except registry.IORegistryError:
-    pass  # necessary to enable autoreload during debugging
