@@ -6,6 +6,7 @@ from astropy.table import Table
 from astropy.time import Time
 import numpy as np
 
+from ..utils import validate_method
 from ..lightcurve import LightCurve
 
 
@@ -17,7 +18,8 @@ def read_generic_lightcurve(filename, flux_column,
                             cadenceno_column='cadenceno',
                             centroid_col_column='mom_centr1',
                             centroid_row_column='mom_centr2',
-                            time_format=None):
+                            time_format=None,
+                            ext=1):
     """Generic helper function to convert a Kepler ot TESS light curve file
     into a generic `LightCurve` object.
     """
@@ -25,7 +27,11 @@ def read_generic_lightcurve(filename, flux_column,
         hdulist = filename  # Allow HDUList to be passed
     else:
         hdulist = fits.open(filename)
-    hdu = hdulist[1]
+
+    # Raise an exception if the requested extension is invalid
+    if isinstance(ext, str):
+        validate_method(ext, supported_methods=[hdu.name.lower() for hdu in hdulist])
+    hdu = hdulist[ext]
     tab = Table.read(hdu, format='fits')
 
     # Make sure the meta data also includes header fields from extension #0
@@ -73,6 +79,7 @@ def read_generic_lightcurve(filename, flux_column,
     # we make sure standard columns and attributes exist.
     if 'flux' not in tab.columns:
         tab.add_column(tab[flux_column], name="flux", index=0)
+    if 'flux_err' not in tab.columns and f"{flux_column}_err" in tab.columns:
         tab.add_column(tab[f"{flux_column}_err"], name="flux_err", index=1)
     if 'quality' not in tab.columns and quality_column in tab.columns:
         tab.add_column(tab[quality_column], name="quality", index=2)
