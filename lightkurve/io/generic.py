@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 
 def read_generic_lightcurve(filename, flux_column,
                             quality_column='quality',
+                            cadenceno_column='cadenceno',
                             centroid_col_column='mom_centr1',
                             centroid_row_column='mom_centr2',
                             time_format=None):
@@ -75,10 +76,12 @@ def read_generic_lightcurve(filename, flux_column,
         tab.add_column(tab[f"{flux_column}_err"], name="flux_err", index=1)
     if 'quality' not in tab.columns and quality_column in tab.columns:
         tab.add_column(tab[quality_column], name="quality", index=2)
+    if 'cadenceno' not in tab.columns and cadenceno_column in tab.columns:
+        tab.add_column(tab[cadenceno_column], name="cadenceno", index=3)
     if 'centroid_col' not in tab.columns and centroid_col_column in tab.columns:
-        tab.add_column(tab[centroid_col_column], name="centroid_col", index=3)
+        tab.add_column(tab[centroid_col_column], name="centroid_col", index=4)
     if 'centroid_row' not in tab.columns and centroid_row_column in tab.columns:
-        tab.add_column(tab[centroid_row_column], name="centroid_row", index=4)
+        tab.add_column(tab[centroid_row_column], name="centroid_row", index=5)
 
     tab.meta['label'] = hdulist[0].header.get('OBJECT')
     tab.meta['mission'] = hdulist[0].header.get('MISSION', hdulist[0].header.get('TELESCOP'))

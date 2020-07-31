@@ -179,7 +179,7 @@ class LightCurve(TimeSeries):
             flux_err = np.empty(len(flux))
             flux_err[:] = np.nan
         if not isinstance(flux_err, Quantity):
-            flux_err = Quantity(flux_err, deprecated_kws.get("flux_unit"))
+            flux_err = Quantity(flux_err, flux.unit)
 
         # Backwards compatibility with Lightkurve v1.x
         # Ensure attributes are set if passed via deprecated kwargs
