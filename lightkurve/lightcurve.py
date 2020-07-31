@@ -118,20 +118,30 @@ class LightCurve(TimeSeries):
             if kw in kwargs:
                 deprecated_column_kws[kw] = kwargs.pop(kw)
 
+        # If `time` is passed as keyword argument, we populate it with integer numbers
+        if data is None or 'time' not in data.keys():
+            if time is None and flux is not None:
+                time = np.arange(len(flux))
+            # We are tolerant of missing time format
+            if time is not None and not isinstance(time, Time):
+                # Lightkurve v1.x supported specifying the time_format
+                # as a constructor kwarg
+                time = Time(time,
+                            format=deprecated_kws.get("time_format", self._default_time_format),
+                            scale=deprecated_kws.get("time_scale", self._default_time_scale))
+
+        # Also be tolerant of missing time format if time is passed via `data`
+        if data and 'time' in data.keys():
+            if not isinstance(data['time'], Time):
+                data['time'] = Time(data['time'],
+                            format=deprecated_kws.get("time_format", self._default_time_format),
+                            scale=deprecated_kws.get("time_scale", self._default_time_scale))
+
+        # Allow overriding the required columns
         self._required_columns = kwargs.pop("_required_columns",
                                             self._required_columns)
 
-        # We are tolerant of missing time if flux is given
-        if time is None and flux is not None:
-            time = np.arange(len(flux))
-        # We are tolerant of missing time format
-        if time is not None and not isinstance(time, Time):
-            # Lightkurve v1.x supported specifying the time_format
-            # as a constructor kwarg
-            time = Time(time,
-                        format=deprecated_kws.get("time_format", self._default_time_format),
-                        scale=deprecated_kws.get("time_scale", self._default_time_scale))
-
+        # Call the SampledTimeSeries constructor!
         super().__init__(data=data, time=time, **kwargs)
 
         # For some operations, an empty time series needs to be created, then
@@ -141,28 +151,45 @@ class LightCurve(TimeSeries):
             self._required_columns_relax = True
             return
 
-        # Ensure the required columns are available
-        if flux is None:
-            flux = np.empty(len(self))
+        # Load `time`, `flux`, and `flux_err` from the table as local variable names
+        time = self.columns['time']  # super().__init__() guarantees this is a column
+        if 'flux' in self.colnames:
+            if flux is None:
+                flux = self.columns['flux']
+            else:
+                raise TypeError(f"'flux' has been given both in the `data` table and as a keyword argument")
+        if 'flux_err' in self.colnames:
+            if flux_err is None:
+                flux_err = self.columns['flux_err']
+            else:
+                raise TypeError(f"'flux_err' has been given both in the `data` table and as a keyword argument")
+
+        # Ensure `flux` and `flux_err` are populated with NaNs if missing
+        if flux is None and time is not None:
+            flux = np.empty(len(time))
             flux[:] = np.nan
         if not isinstance(flux, Quantity):
             flux = Quantity(flux, deprecated_kws.get("flux_unit"))
-        if "flux" not in self.columns:
-            self.add_column(flux, name="flux", index=1)
 
         if flux_err is None:
-            flux_err = np.empty(len(self))
+            flux_err = np.empty(len(flux))
             flux_err[:] = np.nan
         if not isinstance(flux_err, Quantity):
             flux_err = Quantity(flux_err, deprecated_kws.get("flux_unit"))
-        if "flux_err" not in self.columns:
-            self.add_column(flux_err, name="flux_err", index=2)
 
         # Backwards compatibility with Lightkurve v1.x
         # Ensure attributes are set if passed via deprecated kwargs
         for kw in deprecated_kws:
             if kw not in self.meta:
                 self.meta[kw] = deprecated_kws[kw]
+
+        # Ensure all required columns are in the right order
+        with self._delay_required_column_checks():
+            for idx, col in enumerate(self._required_columns):
+                if col in self.colnames:
+                    self.remove_column(col)
+                self.add_column(locals()[col], index=idx, name=col)
+
         # Ensure columns are set if passed via deprecated kwargs
         for kw in deprecated_column_kws:
             if kw not in self.meta and kw not in self.columns:

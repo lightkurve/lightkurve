@@ -4,6 +4,7 @@ from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
 from astropy import units as u
 from astropy.time import Time, TimeDelta
+from astropy.table import Table
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -1024,3 +1025,15 @@ def test_combine_kepler_tess():
     coll = LightCurveCollection((lc_kplr, lc_tess))
     lc = coll.stitch()
     assert(len(lc) == len(lc_kplr)+len(lc_tess))
+
+
+def test_mixed_instantiation():
+    """Can a LightCurve be instantianted using a mix of keywords and colums?"""
+    LightCurve(flux=[4,5,6], flux_err=[7,8,9], data={'time': [1,2,3]})
+    LightCurve(flux=[4,5,6], flux_err=[7,8,9], data=Table({'time': [1,2,3]}))
+
+    LightCurve(time=[1,2,3], flux_err=[7,8,9], data={'flux': [4,5,6]})
+    LightCurve(time=[1,2,3], flux_err=[7,8,9], data=Table({'flux': [4,5,6]}))
+
+    LightCurve(data=Table({'time': [1,2,3]}), flux=[4,5,6])
+    LightCurve(data={'time': [1,2,3]}, flux=[4,5,6])
