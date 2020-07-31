@@ -141,8 +141,12 @@ class LightCurve(TimeSeries):
         self._required_columns = kwargs.pop("_required_columns",
                                             self._required_columns)
 
-        # Call the SampledTimeSeries constructor!
+        # Call the SampledTimeSeries constructor.
+        # Disable required columns for now; we'll check those later.
+        tmp = self._required_columns
+        self._required_columns = []
         super().__init__(data=data, time=time, **kwargs)
+        self._required_columns = tmp
 
         # For some operations, an empty time series needs to be created, then
         # columns added one by one. We should check that when columns are added

@@ -1037,3 +1037,6 @@ def test_mixed_instantiation():
 
     LightCurve(data=Table({'time': [1,2,3]}), flux=[4,5,6])
     LightCurve(data={'time': [1,2,3]}, flux=[4,5,6])
+
+    LightCurve(time=[1,2,3], flux=[1,2,3], data=Table({'flux_err': [3,4,5]}))
+    LightCurve(time=[1,2,3], flux=[1,2,3], data={'flux_err': [3,4,5]})
