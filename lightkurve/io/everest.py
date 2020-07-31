@@ -62,4 +62,14 @@ def read_everest_lightcurve(filename, **kwargs):
     tab.meta['dec'] = tab.meta.get('dec_obj')
     tab.meta['filename'] = filename
 
+    """
+    # Filter out poor-quality data
+    # NOTE: Unfortunately Astropy Table masking does not yet work for columns
+    # that are Quantity objects, so for now we remove poor-quality data instead
+    # of masking. Details: https://github.com/astropy/astropy/issues/10119
+    quality_mask = KeplerQualityFlags.create_quality_mask(
+                                quality_array=lc['sap_quality'],
+                                bitmask=quality_bitmask)
+    """
+
     return KeplerLightCurve(time=time, data=tab, **kwargs)
