@@ -1,3 +1,4 @@
+"""The .io sub-package provides functions for reading data."""
 from .detect import *
 from .read import *
 
@@ -6,7 +7,12 @@ from .. import LightCurve
 
 from astropy.io import registry
 
-"""ADD READERS TO THE REGISTRY"""
+
+__all__ = ['read', 'open']
+
+
+# We intend the reader functions to be accessed via `LightCurve.read()`,
+# so we add them to the `astropy.io.registry`.
 try:
     registry.register_reader('kepler', LightCurve, kepler.read_kepler_lightcurve)
     registry.register_reader('tess', LightCurve, tess.read_tess_lightcurve)
