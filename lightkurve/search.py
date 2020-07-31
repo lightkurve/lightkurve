@@ -1068,10 +1068,11 @@ def _open_downloaded_file(path, **kwargs):
     download having been interrupted."""
     try:
         return read(path, **kwargs)
-    except ValueError:
+    except ValueError as exc:
         raise SearchError("Failed to open the downloaded file ({}). "
                           "The file was likely only partially downloaded. "
-                          "Please remove it from your disk and try again.".format(path))
+                          "Please remove it from your disk and try again.".format(path)) \
+              from exc
 
 
 def _resolve_object(target):

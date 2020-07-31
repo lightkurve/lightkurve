@@ -33,7 +33,7 @@
   a 1D estimate of the residual background present in e.g. TESSCut data. [#746]
 
 - Added support for reading K2SFF and EVEREST community light curves via the
-  `LightCurve.read()` and `search_lightcurve()` functions.
+  `LightCurve.read()` and `search_lightcurve()` functions. [#739]
 
 
 
