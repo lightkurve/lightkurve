@@ -59,10 +59,10 @@ def read_k2sff_lightcurve(filename, ext="BESTAPER", **kwargs):
                 format='bkjd')
     tab.remove_column('t')
 
-    tab.meta['label'] = tab.meta.get('object')
+    tab.meta['label'] = '{} (K2SFF)'.format(tab.meta.get("object"))
     tab.meta['targetid'] = tab.meta.get('keplerid')
     tab.meta['ra'] = tab.meta.get('ra_obj')
     tab.meta['dec'] = tab.meta.get('dec_obj')
     tab.meta['filename'] = filename
 
-    return KeplerLightCurve(time=time, data=tab)
+    return KeplerLightCurve(time=time, data=tab, **kwargs)
