@@ -150,9 +150,9 @@ class SearchResult(object):
                                     'coordinates may be too near the edge of the FFI.'
                                     'Error: {}'.format(exc))
 
-            return _open_downloaded_file(path,
-                                         quality_bitmask=quality_bitmask,
-                                         targetid=table[0]['targetid'])
+            return read(path,
+                        quality_bitmask=quality_bitmask,
+                        targetid=table[0]['targetid'])
 
         else:
             if cutout_size is not None:
@@ -163,8 +163,7 @@ class SearchResult(object):
             path = Observations.download_products(table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
             log.debug("Finished downloading.")
-            # _open_downloaded_file() will determine filetype and return
-            return _open_downloaded_file(path, quality_bitmask=quality_bitmask)
+            return read(path, quality_bitmask=quality_bitmask)
 
     @suppress_stdout
     def download(self, quality_bitmask='default', download_dir=None, cutout_size=None):
@@ -1060,19 +1059,6 @@ def _mask_spoc_products(products, sector=None, filetype='Target Pixel'):
     mask &= np.array([description_string in desc for desc in products['description']])
 
     return mask
-
-
-def _open_downloaded_file(path, **kwargs):
-    """Wrapper around `read()` which yields a more clear error message when
-    the file was downloaded from MAST but corrupted, e.g. due to the
-    download having been interrupted."""
-    try:
-        return read(path, **kwargs)
-    except ValueError as exc:
-        raise SearchError("Failed to open the downloaded file ({}). "
-                          "The file was likely only partially downloaded. "
-                          "Please remove it from your disk and try again.".format(path)) \
-              from exc
 
 
 def _resolve_object(target):

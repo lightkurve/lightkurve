@@ -17,7 +17,7 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astropy.table import Table
 
-from ..utils import LightkurveWarning
+from ..utils import LightkurveWarning, LightkurveError
 from ..search import search_lightcurve, search_targetpixelfile, \
                      search_tesscut, SearchResult, SearchError, log
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
@@ -267,9 +267,9 @@ def test_corrupt_download_handling():
         expected_fn = os.path.join(expected_dir, "kplr011904151-2010009091648_lpd-targ.fits.gz")
         os.makedirs(expected_dir)
         open(expected_fn, 'w').close()  # create "corrupt" i.e. empty file
-        with pytest.raises(SearchError) as err:
+        with pytest.raises(LightkurveError) as err:
             search_targetpixelfile("Kepler-10", quarter=4).download(download_dir=tmpdirname)
-        assert "The file was likely only partially downloaded." in err.value.args[0]
+        assert "may be corrupt" in err.value.args[0]
 
 
 @pytest.mark.remote_data

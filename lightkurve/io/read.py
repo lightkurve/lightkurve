@@ -90,5 +90,7 @@ def read(path_or_url, **kwargs):
                                    "in this version of Lightkurve.") from exc
     else:
         # if these keywords don't exist, raise `ValueError`
-        raise LightkurveError("Not recognized as a supported data product: "
-                              "{}".format(path_or_url))
+        raise LightkurveError("Not recognized as a supported data product:\n"
+                              f"{path_or_url}\n"
+                              "This file may be corrupt due to an interrupted download. "
+                              "Please remove it from your disk and try again.")
