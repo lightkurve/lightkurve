@@ -18,6 +18,8 @@ def detect_filetype(hdulist):
         * `'TessLightCurve'`
         * `'K2SFF'`
         * `'EVEREST'`
+        * `'K2SC'`
+        * `'K2VARCAT'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -32,18 +34,27 @@ def detect_filetype(hdulist):
         A string describing the detected filetype. If the filetype is not
         recognized, `None` will be returned.
     """
+    # Is it a K2VARCAT file?
+    # There are no self-identifying keywords in the header, so go by filename.
+    if "hlsp_k2varcat" in hdulist.filename():
+        return "K2VARCAT"
+
+    # Is it a K2SC file?
+    if "k2sc" in hdulist[0].header.get('creator', '').lower():
+        return "K2SC"
+
     # Is it a K2SFF file?
     try:
         # There are no metadata keywords identifying K2SFF FITS files,
         # so we go by structure.
-        if hdulist[1].header['EXTNAME'] == "BESTAPER" and hdulist[1].header["TTYPE4"] == "ARCLENGTH":
+        if hdulist[1].header.get('EXTNAME') == "BESTAPER" and hdulist[1].header.get("TTYPE4") == "ARCLENGTH":
             return "K2SFF"
     except Exception:
         pass
 
     # Is it an EVEREST file?
     try:
-        if "EVEREST" in str(hdulist[0].header['COMMENT']):
+        if "EVEREST" in str(hdulist[0].header.get('COMMENT')):
             return "EVEREST"
     except Exception:
         pass

@@ -3,7 +3,7 @@ import warnings
 
 import pytest
 
-from ...utils import LightkurveDeprecationWarning
+from ...utils import LightkurveDeprecationWarning, LightkurveError
 from ... import PACKAGEDIR, KeplerTargetPixelFile, TessTargetPixelFile
 from .. import read
 
@@ -20,7 +20,7 @@ def test_read():
     # Open should fail if the filetype is not recognized
     try:
         read(os.path.join(PACKAGEDIR, "data", "lightkurve.mplstyle"))
-    except (ValueError, IOError):
+    except LightkurveError:
         pass
     # Can you instantiate with a path?
     assert(isinstance(KeplerTargetPixelFile(k2_path), KeplerTargetPixelFile))
@@ -45,7 +45,7 @@ def test_open():
         # Open should fail if the filetype is not recognized
         try:
             open(os.path.join(PACKAGEDIR, "data", "lightkurve.mplstyle"))
-        except (ValueError, IOError):
+        except LightkurveError:
             pass
         # Can you instantiate with a path?
         assert(isinstance(KeplerTargetPixelFile(k2_path), KeplerTargetPixelFile))

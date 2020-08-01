@@ -6,7 +6,7 @@ from astropy.utils import deprecated
 
 from .detect import detect_filetype
 from ..lightcurve import KeplerLightCurve, TessLightCurve
-from ..utils import validate_method, LightkurveWarning, LightkurveDeprecationWarning
+from ..utils import LightkurveDeprecationWarning, LightkurveError
 
 log = logging.getLogger(__name__)
 
@@ -83,8 +83,12 @@ def read(path_or_url, **kwargs):
     # Official data products;
     # if the filetype is recognized, instantiate a class of that name
     if filetype is not None:
-        return getattr(__import__('lightkurve'), filetype)(path_or_url, **kwargs)
+        try:
+            return getattr(__import__('lightkurve'), filetype)(path_or_url, **kwargs)
+        except AttributeError as exc:
+            raise LightkurveError(f"{filetype} files are not supported "
+                                   "in this version of Lightkurve.") from exc
     else:
         # if these keywords don't exist, raise `ValueError`
-        raise ValueError("Not recognized as a Kepler or TESS data product: "
-                         "{}".format(path_or_url))
+        raise LightkurveError("Not recognized as a supported data product: "
+                              "{}".format(path_or_url))
