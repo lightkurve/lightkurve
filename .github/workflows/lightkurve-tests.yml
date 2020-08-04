@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: [3.6, 3.7, 3.8-remote-data, 3.8-no-optional-dependencies]
+        name: [3.6, 3.7, 3.8-remote-data, 3.8-no-optional-dependencies, 3.9]
         include:
           - name: 3.6
             python-version: 3.6
@@ -27,7 +27,7 @@ jobs:
             pytest-command: pytest
           - name: 3.7
             python-version: 3.7
-            pip-command: pip install -e .[all,test]
+            pip-command: python setup.py install  # also try setup.py for coverage
             pytest-command: pytest
           - name: 3.8-remote-data
             python-version: 3.8
@@ -36,6 +36,10 @@ jobs:
           - name: 3.8-no-optional-dependencies
             python-version: 3.8
             pip-command: pip install -e .[test]
+            pytest-command: pytest
+          - name: 3.9
+            python-version: 3.9
+            pip-command: pip install -e .[all,test]
             pytest-command: pytest
     steps:
     - uses: actions/checkout@v1
