@@ -21,7 +21,7 @@ from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
-__all__ = ['LightkurveWarning',
+__all__ = ['LightkurveError', 'LightkurveWarning',
            'KeplerQualityFlags', 'TessQualityFlags',
            'bkjd_to_astropy_time', 'btjd_to_astropy_time']
 
@@ -454,6 +454,11 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
         cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
         cbar.ax.minorticks_off()
     return ax
+
+
+class LightkurveError(Exception):
+    """Class for Lightkurve exceptions."""
+    pass
 
 
 class LightkurveWarning(Warning):
