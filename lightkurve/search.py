@@ -868,7 +868,8 @@ def _query_mast(target, radius=None,
                                            **query_criteria)
         # astroquery does not return distance if target_name is given;
         # we add it here so that the table returned always has this column.
-        obs['distance'] = 0.
+        if len(obs) > 0:
+            obs['distance'] = 0.
         return obs
 
     # Else, do a cone search using the MAST name resolver

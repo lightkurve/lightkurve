@@ -222,9 +222,9 @@ def test_source_confusion():
     # When obtaining the TPF for target 6507433, @benmontet noticed that
     # a target 4 arcsec away was returned instead.
     # See https://github.com/KeplerGO/lightkurve/issues/148
-    desired_target = 6507433
+    desired_target = "KIC 6507433"
     tpf = search_targetpixelfile(desired_target, quarter=8).download()
-    assert tpf.targetid == desired_target
+    assert tpf.targetid == 6507433
 
 
 def test_empty_searchresult():
@@ -276,7 +276,7 @@ def test_corrupt_download_handling():
 def test_indexerror_631():
     """Regression test for #631; avoid IndexError."""
     # This previously triggered an exception:
-    result = search_lightcurve("KIC 8462852", sector=15)
+    result = search_lightcurve("KIC 8462852", sector=15, radius=1)
     assert len(result) == 1
 
 
