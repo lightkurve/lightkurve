@@ -814,22 +814,18 @@ def _query_mast(target, radius=None,
     obs : astropy.Table
         Table detailing the available observations on MAST.
     """
+    # Local astroquery import because the package is not used elsewhere
+    from astroquery.mast import Observations
+    from astroquery.exceptions import ResolverError
+
     # If passed a SkyCoord, convert it to an "ra, dec" string for MAST
     if isinstance(target, SkyCoord):
         target = '{}, {}'.format(target.ra.deg, target.dec.deg)
 
-    # `radius` defaults to 0.0001 and unit arcsecond
-    if radius is None:
-        radius = .0001 * u.arcsec
-    elif not isinstance(radius, u.quantity.Quantity):
-        radius = radius * u.arcsec
-
     # We pass the following `query_criteria` to MAST regardless of whether
     # we search by position or target name:
     query_criteria = {
-        'radius': str(radius.to(u.deg)),
         'project': project,
-        'productType': 'SCIENCE',
         **extra_query_criteria
         }
     if provenance_name is not None:
@@ -841,19 +837,28 @@ def _query_mast(target, radius=None,
 
     # If an exact KIC ID is passed, we will search by the exact `target_name`
     # under which MAST will know the object to prevent source confusion.
-    # For discussion, see GitHub issues #148, #718.
+    # For discussion, see e.g. GitHub issues #148, #718.
     exact_target_name = None
     target_lower = str(target).lower()
-    kplr_match = re.match("(kplr|kic)? ?(\d+)", target_lower)
+    # Was a Kepler target ID passed?
+    kplr_match = re.match("^(kplr|kic) ?(\d+)$", target_lower)
     if kplr_match:
         exact_target_name = f"kplr{kplr_match.group(2).zfill(9)}"
+    # Was a K2 target ID passed?
+    ktwo_match = re.match("^(ktwo|epic) ?(\d+)$", target_lower)
+    if ktwo_match:
+        exact_target_name = f"ktwo{ktwo_match.group(2).zfill(9)}"
+    # Was a TESS target ID passed?
+    tess_match = re.match("^(tess|tic) ?(\d+)$", target_lower)
+    if tess_match:
+        exact_target_name = f"{tess_match.group(2).zfill(9)}"
 
-    if exact_target_name:
+    if exact_target_name and radius is None:
         #with warnings.catch_warnings():
         # suppress misleading AstropyWarning
         #warnings.simplefilter('ignore', AstropyWarning)
-        from astroquery.mast import Observations
-        log.debug(f"Started querying MAST for observations with target_name='{exact_target_name}'.")
+        log.debug("Started querying MAST for observations with the exact "
+                  f"target_name='{exact_target_name}'.")
         obs = Observations.query_criteria(target_name=exact_target_name,
                                            **query_criteria)
         # astroquery does not return distance if target_name is given;
@@ -861,22 +866,28 @@ def _query_mast(target, radius=None,
         obs['distance'] = 0.
         return obs
 
-    # If `target` did not look like a KIC or EPIC ID, then we let MAST
-    # resolve the target name to a sky position.
-    from astroquery.exceptions import ResolverError
-    try:
-        with warnings.catch_warnings():
-            # suppress misleading AstropyWarning
-            warnings.simplefilter('ignore', AstropyWarning)
-            from astroquery.mast import Observations
-            log.debug("Started querying MAST for observations within {} of objectname='{}'."
-                      "".format(radius.to(u.arcsec), target))
-            obs = Observations.query_criteria(objectname=target,
-                                              **query_criteria)
-        obs.sort('distance')
-        return obs
-    except ResolverError as exc:
-        raise SearchError(exc)
+    # Else, do a cone search using the MAST name resolver
+    else:
+        # `radius` defaults to 0.0001 and unit arcsecond
+        if radius is None:
+            radius = .0001 * u.arcsec
+        elif not isinstance(radius, u.quantity.Quantity):
+            radius = radius * u.arcsec
+        query_criteria['radius'] = str(radius.to(u.deg))
+
+        try:
+            with warnings.catch_warnings():
+                # suppress misleading AstropyWarning
+                warnings.simplefilter('ignore', AstropyWarning)
+                log.debug("Started querying MAST for observations within {} of objectname='{}'."
+                        "".format(radius.to(u.arcsec), target))
+                obs = Observations.query_criteria(objectname=target,
+                                                **query_criteria)
+            obs.sort('distance')
+            return obs
+        except ResolverError as exc:
+            # MAST failed to resolve the object name to sky coordinates
+            raise SearchError(exc) from exc
 
 
 def _filter_products(products, campaign=None, quarter=None, month=None,

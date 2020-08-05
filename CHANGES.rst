@@ -35,6 +35,10 @@
 - Added support for reading K2SFF and EVEREST community light curves via the
   `LightCurve.read()` and `search_lightcurve()` functions. [#739]
 
+- Modified the search functions such that exact mission target identifiers,
+  such as 'KIC 5112705' or 'TIC 261136679', only return products known under
+  those names, unless a search radius is specified. [#TBD]
+
 
 
 1.11.1 (2020-06-18)
