@@ -310,5 +310,6 @@ def test_overlapping_targets_718():
 
 @pytest.mark.remote_data
 def test_tesscut_795():
-    """Regression test for #795."""
-    str(search_tesscut('KIC 8462852'))
+    """Regression test for #795: make sure the __repr__.of a TESSCut
+    SearchResult works."""
+    str(search_tesscut('KIC 8462852'))  # This raised a KeyError
