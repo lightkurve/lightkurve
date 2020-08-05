@@ -21,9 +21,7 @@ with open('requirements.txt') as f:
 # 2. What dependencies required to run the unit tests? (i.e. `pytest --remote-data`)
 tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata', 'codecov', 'pytest-doctestplus', 'codacy-coverage']
 # 3. What dependencies are required for optional features?
-# `BoxLeastSquaresPeriodogram` requires astropy>=3.1.
 # `interact()` requires bokeh>=1.0, ipython.
-# `PLDCorrector` requires pybind11, celerite.
 extras_require = {"all":  ["bokeh>=1.0", "ipython"],
                   "test": tests_require}
 
