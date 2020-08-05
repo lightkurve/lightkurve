@@ -290,3 +290,25 @@ def test_name_resolving_regression_764():
     c1 = MastClass().resolve_object(objectname="EPIC250105131")
     c2 = MastClass().resolve_object(objectname="EPIC 250105131")
     assert c1.separation(c2).to("arcsec").value < 0.1
+
+
+@pytest.mark.remote_data
+def test_overlapping_targets_718():
+    """Regression test for #718."""
+    # Searching for the following targets without radius should only return
+    # the requested targets, not their overlapping neighbors.
+    targets = ['KIC 5112705', 'KIC 10058374', 'KIC 5385723']
+    for target in targets:
+        search = search_lightcurve(target, quarter=11)
+        assert len(search) == 1
+        assert search.target_name[0] == f'kplr{target[4:].zfill(9)}'
+
+    # When using `radius=1` we should also retrieve the overlapping targets
+    search = search_lightcurve('KIC 5112705', quarter=11, radius=1*u.arcsec)
+    assert len(search) > 1
+
+
+@pytest.mark.remote_data
+def test_tesscut_795():
+    """Regression test for #795."""
+    str(search_tesscut('KIC 8462852'))
