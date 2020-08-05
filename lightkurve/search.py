@@ -55,7 +55,7 @@ class SearchResult(object):
                 self._add_columns()
 
     def _add_columns(self):
-        """Adds user-friendly ``idx`` and ``observation`` columns.
+        """Adds user-friendly index (``#``) column.
 
         These columns are not part of the MAST Portal API, but they make the
         display of search results much nicer in Lightkurve.
@@ -697,6 +697,10 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
         # At MAST, non-FFI Kepler pipeline products are known as "cube" products,
         # and non-FFI TESS pipeline products are listed as "timeseries".
         extra_query_criteria['dataproduct_type'] = ['cube', 'timeseries']
+    # Make sure `search_tesscut` always performs a cone search (i.e. always
+    # passed a radius value), because strict target name search does not apply.
+    if filetype.lower() == 'ffi' and radius is None:
+        radius = .0001 * u.arcsec
     observations = _query_mast(target, radius=radius,
                                project=mission,
                                provenance_name=provenance_name,
@@ -755,7 +759,8 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
             s = observations['sequence_number'][idx]
             # if the desired sector is available, add a row
             if s in np.atleast_1d(sector) or sector is None:
-                cutouts.append({'description': 'TESS FFI Cutout (sector {})'.format(s),
+                cutouts.append({'description': f'TESS FFI Cutout (sector {s})',
+                                'observation': f'TESS Sector {s}',
                                 'target_name': str(target),
                                 'targetid': str(target),
                                 'productFilename': 'TESSCut',
