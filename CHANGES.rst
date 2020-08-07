@@ -1,9 +1,52 @@
-2.0.dev (unreleased)
-=====================
+2.0.0 (unreleased)
+==================
+
+
+Major changes
+-------------
 
 - Removed support for Python 2. [#733]
 
-- ``LightCurve`` is now a sub-class of ``astropy.time.TimeSeries``. [#744]
+- ``LightCurve`` is now a sub-class of ``astropy.time.TimeSeries`` to enable it
+  to have arbitrary columns and to enable closer integration with AstroPy. [#744]
+
+
+Other changes
+-------------
+
+lightkurve.lightcurve
+^^^^^^^^^^^^^^^^^^^^^
+
+- Added a ``column`` parameter to ``LightCurve``'s ``plot()``, ``scatter()``,
+  and ``errorbar()`` methods to enable any column to be plotted. [#765]
+
+lightkurve.targetpixelfile
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
+  ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
+
+- Added the ``TargetPixelFile.plot_pixels()`` method to plot light curves
+  and periodograms for each individual pixel in a TPF. [#771]
+
+- Added the ``estimate_background`` method to ``TargetPixelFile`` which returns
+  a 1D estimate of the residual background present in e.g. TESSCut data. [#746]
+
+- Added a ``column`` parameter to ``TargetPixelFile.plot()`` to enable any
+  column in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
+
+lightkurve.search
+^^^^^^^^^^^^^^^^^
+
+- Added support for reading K2SFF and EVEREST community light curves via the
+  `LightCurve.read()` and `search_lightcurve()` functions. [#739]
+
+- Modified the search functions such that exact mission target identifiers,
+  such as 'KIC 5112705' or 'TIC 261136679', only return products known under
+  those names, unless a search radius is specified. [#796]
+
+lightkurve.correctors
+^^^^^^^^^^^^^^^^^^^^^
 
 - Added ``SparseDesignMatrix`` and modified ``RegressionCorrector`` to enable
   systematics removal methods to benefit from ``scipy.sparse`` speed-ups. [#732]
@@ -11,33 +54,14 @@
 - Modified ``PLDCorrector`` to make use of the new ``RegressionCorrector``
   and ``DesignMatrix`` classes. [#746]
 
-- Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
-  ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
-
-- Added a ``column`` parameter to ``TargetPixelFile.plot()`` to enable any
-  column in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
-
-- Added a ``column`` parameter to ``LightCurve``'s ``plot()``, ``scatter()``,
-  and ``errorbar()`` methods to enable any column to be plotted. [#765]
+lightkurve.seismology
+^^^^^^^^^^^^^^^^^^^^^
 
 - Modified the ``estimate_radius``, ``estimate_mass``, and ``estimate_logg``
   methods to default to the ``teff`` value in the meta data. [#766]
 
-- Added the ``TargetPixelFile.plot_pixels()`` method to plot light curves
-  and periodograms for each individual pixel in a TPF. [#771]
-
 - Added an error message to ``estimate_numax()`` or ``estimate_deltanu()`` if
   the underlying periodogram does not have uniformly-spaced frequencies. [#780]
-
-- Added the ``estimate_background`` method to ``TargetPixelFile`` which returns
-  a 1D estimate of the residual background present in e.g. TESSCut data. [#746]
-
-- Added support for reading K2SFF and EVEREST community light curves via the
-  `LightCurve.read()` and `search_lightcurve()` functions. [#739]
-
-- Modified the search functions such that exact mission target identifiers,
-  such as 'KIC 5112705' or 'TIC 261136679', only return products known under
-  those names, unless a search radius is specified. [#TBD]
 
 
 
