@@ -1602,7 +1602,13 @@ class LightCurve(TimeSeries):
             return BoxLeastSquaresPeriodogram.from_lightcurve(lc=self, **kwargs)
         else:
             from . import LombScarglePeriodogram
-            return LombScarglePeriodogram.from_lightcurve(lc=self, **kwargs)
+
+            if (~np.isfinite(self.flux)).any():
+                log.warning('Lightcurve contains NaN values.'
+                            'These are removed before creating the periodogram.')
+                return LombScarglePeriodogram.from_lightcurve(lc=self.remove_nans(), **kwargs)
+            else:
+                return LombScarglePeriodogram.from_lightcurve(lc=self, **kwargs)
 
     def to_seismology(self, **kwargs):
         """Returns a `~lightkurve.seismology.Seismology` object for estimating

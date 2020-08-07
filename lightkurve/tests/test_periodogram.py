@@ -330,13 +330,6 @@ def test_error_messages():
     with pytest.raises(ValueError) as err:
         lc.to_periodogram(frequency=np.arange(10), period=np.arange(10))
 
-    # Don't accept NaNs
-    with pytest.raises(ValueError) as err:
-        lc_with_nans = lc.copy()
-        lc_with_nans.flux[0] = np.nan
-        lc_with_nans.to_periodogram()
-    assert('Lightcurve contains NaN values.' in err.value.args[0])
-
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0], [1])

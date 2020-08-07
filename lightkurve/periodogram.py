@@ -767,10 +767,6 @@ class LombScarglePeriodogram(Periodogram):
             raise ValueError('You have input keyword arguments for both frequency and period. '
                              'Please only use one.')
 
-        if (~np.isfinite(lc.flux)).any():
-            raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
-                             ' to remove NaN values from a LightCurve.')
-
         time = lc.time.copy()
 
         # Approximate Nyquist Frequency and frequency bin width in terms of days
