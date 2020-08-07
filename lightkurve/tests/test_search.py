@@ -307,6 +307,11 @@ def test_overlapping_targets_718():
     search = search_lightcurve('KIC 5112705', quarter=11, radius=1*u.arcsec)
     assert len(search) > 1
 
+    # Searching by `target_name` should not preven a KIC identifier to work
+    # in a TESS data search
+    search = search_targetpixelfile('KIC 8462852', mission='TESS', sector=15)
+    assert len(search) == 1
+
 
 @pytest.mark.remote_data
 def test_tesscut_795():

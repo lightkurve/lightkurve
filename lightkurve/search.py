@@ -821,7 +821,7 @@ def _query_mast(target, radius=None,
     """
     # Local astroquery import because the package is not used elsewhere
     from astroquery.mast import Observations
-    from astroquery.exceptions import ResolverError
+    from astroquery.exceptions import ResolverError, NoResultsWarning
 
     # If passed a SkyCoord, convert it to an "ra, dec" string for MAST
     if isinstance(target, SkyCoord):
@@ -859,41 +859,40 @@ def _query_mast(target, radius=None,
         exact_target_name = f"{tess_match.group(2).zfill(9)}"
 
     if exact_target_name and radius is None:
-        #with warnings.catch_warnings():
-        # suppress misleading AstropyWarning
-        #warnings.simplefilter('ignore', AstropyWarning)
         log.debug("Started querying MAST for observations with the exact "
                   f"target_name='{exact_target_name}'.")
-        obs = Observations.query_criteria(target_name=exact_target_name,
-                                           **query_criteria)
-        # astroquery does not return distance if target_name is given;
-        # we add it here so that the table returned always has this column.
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=NoResultsWarning)
+            obs = Observations.query_criteria(target_name=exact_target_name,
+                                              **query_criteria)
         if len(obs) > 0:
+            # astroquery does not report distance when querying by `target_name`;
+            # we add it here so that the table returned always has this column.
             obs['distance'] = 0.
-        return obs
-
-    # Else, do a cone search using the MAST name resolver
-    else:
-        # `radius` defaults to 0.0001 and unit arcsecond
-        if radius is None:
-            radius = .0001 * u.arcsec
-        elif not isinstance(radius, u.quantity.Quantity):
-            radius = radius * u.arcsec
-        query_criteria['radius'] = str(radius.to(u.deg))
-
-        try:
-            with warnings.catch_warnings():
-                # suppress misleading AstropyWarning
-                warnings.simplefilter('ignore', AstropyWarning)
-                log.debug("Started querying MAST for observations within {} of objectname='{}'."
-                        "".format(radius.to(u.arcsec), target))
-                obs = Observations.query_criteria(objectname=target,
-                                                **query_criteria)
-            obs.sort('distance')
             return obs
-        except ResolverError as exc:
-            # MAST failed to resolve the object name to sky coordinates
-            raise SearchError(exc) from exc
+        else:
+            log.debug(f"No observations found. Now performing a cone search instead.")
+
+    # If the above did not return a result, then do a cone search using the MAST name resolver
+    # `radius` defaults to 0.0001 and unit arcsecond
+    if radius is None:
+        radius = .0001 * u.arcsec
+    elif not isinstance(radius, u.quantity.Quantity):
+        radius = radius * u.arcsec
+    query_criteria['radius'] = str(radius.to(u.deg))
+
+    try:
+        log.debug("Started querying MAST for observations within "
+                  f"{radius.to(u.arcsec)} arcsec of objectname='{target}'.")
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=NoResultsWarning)
+            obs = Observations.query_criteria(objectname=target,
+                                              **query_criteria)
+        obs.sort('distance')
+        return obs
+    except ResolverError as exc:
+        # MAST failed to resolve the object name to sky coordinates
+        raise SearchError(exc) from exc
 
 
 def _filter_products(products, campaign=None, quarter=None, month=None,
