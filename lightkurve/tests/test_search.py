@@ -222,9 +222,9 @@ def test_source_confusion():
     # When obtaining the TPF for target 6507433, @benmontet noticed that
     # a target 4 arcsec away was returned instead.
     # See https://github.com/KeplerGO/lightkurve/issues/148
-    desired_target = 6507433
+    desired_target = "KIC 6507433"
     tpf = search_targetpixelfile(desired_target, quarter=8).download()
-    assert tpf.targetid == desired_target
+    assert tpf.targetid == 6507433
 
 
 def test_empty_searchresult():
@@ -276,7 +276,7 @@ def test_corrupt_download_handling():
 def test_indexerror_631():
     """Regression test for #631; avoid IndexError."""
     # This previously triggered an exception:
-    result = search_lightcurve("KIC 8462852", sector=15)
+    result = search_lightcurve("KIC 8462852", sector=15, radius=1)
     assert len(result) == 1
 
 
@@ -290,3 +290,26 @@ def test_name_resolving_regression_764():
     c1 = MastClass().resolve_object(objectname="EPIC250105131")
     c2 = MastClass().resolve_object(objectname="EPIC 250105131")
     assert c1.separation(c2).to("arcsec").value < 0.1
+
+
+@pytest.mark.remote_data
+def test_overlapping_targets_718():
+    """Regression test for #718."""
+    # Searching for the following targets without radius should only return
+    # the requested targets, not their overlapping neighbors.
+    targets = ['KIC 5112705', 'KIC 10058374', 'KIC 5385723']
+    for target in targets:
+        search = search_lightcurve(target, quarter=11)
+        assert len(search) == 1
+        assert search.target_name[0] == f'kplr{target[4:].zfill(9)}'
+
+    # When using `radius=1` we should also retrieve the overlapping targets
+    search = search_lightcurve('KIC 5112705', quarter=11, radius=1*u.arcsec)
+    assert len(search) > 1
+
+
+@pytest.mark.remote_data
+def test_tesscut_795():
+    """Regression test for #795: make sure the __repr__.of a TESSCut
+    SearchResult works."""
+    str(search_tesscut('KIC 8462852'))  # This raised a KeyError
