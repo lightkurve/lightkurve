@@ -209,6 +209,9 @@ class RegressionCorrector(Corrector):
         design_matrix_collection.validate()
         self.design_matrix_collection = design_matrix_collection
 
+        # Validate the design matrix. Emits a warning if the matrix has low rank.
+        self.design_matrix_collection.validate()
+
         if cadence_mask is None:
             self.cadence_mask = np.ones(len(self.lc.time), bool)
         else:
