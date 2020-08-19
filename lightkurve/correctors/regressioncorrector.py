@@ -206,11 +206,10 @@ class RegressionCorrector(Corrector):
                 design_matrix_collection = SparseDesignMatrixCollection([design_matrix_collection])
             elif isinstance(design_matrix_collection, DesignMatrix):
                 design_matrix_collection = DesignMatrixCollection([design_matrix_collection])
-        design_matrix_collection.validate()
-        self.design_matrix_collection = design_matrix_collection
 
         # Validate the design matrix. Emits a warning if the matrix has low rank.
-        self.design_matrix_collection.validate()
+        design_matrix_collection.validate()
+        self.design_matrix_collection = design_matrix_collection
 
         if cadence_mask is None:
             self.cadence_mask = np.ones(len(self.lc.time), bool)
