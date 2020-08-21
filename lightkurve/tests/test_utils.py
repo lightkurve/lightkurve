@@ -66,6 +66,20 @@ def test_quality_flag_decoding_tess():
         == [flags[3][1], flags[4][1], flags[5][1]]
 
 
+def test_quality_flag_deconding_quantity_object():
+    """Can a QUALITY flag that is a astropy quantity object be parsed correctly"""
+    from astropy.units.quantity import Quantity
+    flags = list(TessQualityFlags.STRINGS.items())
+    for key, value in flags:
+        assert TessQualityFlags.decode(Quantity(key, dtype='int32'))[0] == value
+    # Can we recover combinations of flags?
+    assert TessQualityFlags.decode(Quantity(flags[5][0], dtype='int32') + \
+        Quantity(flags[7][0], dtype='int32')) == [flags[5][1], flags[7][1]]
+    assert TessQualityFlags.decode(Quantity(flags[3][0], dtype='int32') + \
+        Quantity(flags[4][0], dtype='int32') + Quantity(flags[5][0], dtype='int32')) \
+        == [flags[3][1], flags[4][1], flags[5][1]]
+
+
 def test_quality_mask():
     """Can we create a quality mask using KeplerQualityFlags?"""
     quality = np.array([0, 0, 1])
