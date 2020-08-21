@@ -9,6 +9,7 @@ import pandas as pd
 
 from astropy.utils.data import download_file
 from astropy.coordinates import SkyCoord
+from astropy.units.quantity import Quantity
 import astropy.units as u
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LinearStretch)
@@ -34,16 +35,16 @@ class QualityFlags(object):
 
     @classmethod
     def decode(cls, quality):
-        """Converts a Kepler QUALITY value into a list of human-readable strings.
+        """Converts a QUALITY value into a list of human-readable strings.
 
         This function takes the QUALITY bitstring that can be found for each
-        cadence in Kepler/K2's pixel and light curve files and converts into
+        cadence in Kepler/K2/TESS' pixel and light curve files and converts into
         a list of human-readable strings explaining the flags raised (if any).
 
         Parameters
         ----------
         quality : int
-            Value from the 'QUALITY' column of a Kepler/K2 pixel or lightcurve file.
+            Value from the 'QUALITY' column of a Kepler/K2/TESS pixel or lightcurve file.
 
         Returns
         -------
@@ -51,6 +52,9 @@ class QualityFlags(object):
             List of human-readable strings giving a short description of the
             quality flags raised.  Returns an empty list if no flags raised.
         """
+        # If passed an astropy quantity object, get the value
+        if isinstance(quality, Quantity):
+            quality = quality.value
         result = []
         for flag in cls.STRINGS.keys():
             if quality & flag > 0:
