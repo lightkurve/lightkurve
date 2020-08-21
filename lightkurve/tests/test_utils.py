@@ -66,7 +66,7 @@ def test_quality_flag_decoding_tess():
         == [flags[3][1], flags[4][1], flags[5][1]]
 
 
-def test_quality_flag_deconding_quantity_object():
+def test_quality_flag_decoding_quantity_object():
     """Can a QUALITY flag that is a astropy quantity object be parsed correctly"""
     from astropy.units.quantity import Quantity
     flags = list(TessQualityFlags.STRINGS.items())
