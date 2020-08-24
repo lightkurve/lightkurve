@@ -20,7 +20,7 @@ from ..lightcurve import LightCurve, KeplerLightCurve
 from ..search import search_lightcurvefile
 from ..lightcurvefile import KeplerLightCurveFile
 from .corrector import Corrector
-from ..utils import channel_to_module_output, validate_method
+from ..utils import channel_to_module_output, validate_method, print_dictionary
 from .designmatrix import DesignMatrix, DesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
 from ..collections import LightCurveCollection
@@ -620,7 +620,7 @@ class CBVCorrector(RegressionCorrector):
             Using too few can cause unreliable results. Default = 30
         max_targets : float
             Maximum number of targets to use in correlation metric
-            Using too many can low down the metric due to large data
+            Using too many can slow down the metric due to large data
             download. Default = 50
         clear_cache : bool
             If true then force the method to re-find the neighboring targets.
@@ -658,7 +658,7 @@ class CBVCorrector(RegressionCorrector):
             # One Kepler CCD spans 4,096 arcseconds
             max_search_radius = np.sqrt(2) * 4096
 
-        # Retrieve PDC light curves in a neighborhood around the target
+        # Retrieve SAP light curves in a neighborhood around the target
         # Only do this once, check if lc set is already cached
         if (self.lc_neighborhood is None or clear_cache):
             continue_searching = True
@@ -709,12 +709,11 @@ class CBVCorrector(RegressionCorrector):
             print('Neighboring targets ready for use')
 
 
-        # Create fluxMatrix Last entry is target under study
+        # Create fluxMatrix. The last entry is the target under study
         fluxMatrix = np.zeros((len(self.lc_neighborhood[0].flux),
             len(self.lc_neighborhood)+1))
         for idx in np.arange(len(fluxMatrix[0,:])-1):
             fluxMatrix[:,idx] = self.lc_neighborhood[idx].flux
-
         # Add in target under study
         fluxMatrix[:,-1] = self.corrected_lc.flux
 
@@ -989,18 +988,18 @@ class CBVCorrector(RegressionCorrector):
         return axs
 
     def goodness_metric_scan_plot(self, cbv_type=['SingleScale'],
-            cbv_indices=[np.arange(1,9)], 
+            cbv_indices=[np.arange(1,9)], alpha_range_log10=[-4, 4],
             ext_dm=None, cadence_mask=None):
         """ Returns a diagnostic plot of the over and under goodness metrics as a
-        function of the L2-norm regularization term alpha.
+        function of the L2-Norm regularization term, alpha.
 
         alpha is scanned by default to the range 10^-4 : 10^4 in logspace
 
         cbvCorrector.correct_gaussian_prior is used to make the correction for
         each alpha. Then the over and under goodness metric are computed.
 
-        If a corrction has already been performed (via one of the correct_*
-        methods) then then used alpha value is also plotted here for reference.
+        If a correction has already been performed (via one of the correct_*
+        methods) then the used alpha value is also plotted for reference.
 
         Parameters
         ----------
@@ -1009,6 +1008,8 @@ class CBVCorrector(RegressionCorrector):
         cbv_indices : list of lists
             List of CBV vectors to use in each of cbv_type passed. {'ALL' => Use all}
             NOTE: 1-Based indexing!
+        alpha_range_log10 : [list of two] The start and end exponent for the logspace scan.
+            Default = [-4, 4]
         ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
             Optionally pass an extra design matrix to also be used in the fit
         cadence_mask : np.ndarray of bools (optional)
@@ -1020,7 +1021,7 @@ class CBVCorrector(RegressionCorrector):
             The matplotlib axes object.
         """
 
-        alphaArray = np.logspace(-4, 4, num=100)
+        alphaArray = np.logspace(alpha_range_log10[0], alpha_range_log10[1], num=100)
 
         # We need to make a copy of self so that the scan's final fit parameters
         # do not over-write any stored fit parameters
@@ -1069,7 +1070,8 @@ class CBVCorrector(RegressionCorrector):
         return copy.deepcopy(self)
 
     def __repr__(self):
-        return 'cbvCorrector (ID: {})'.format(self.lc.targetid)
+       #return 'cbvCorrector (ID: {})'.format(self.lc.targetid)
+        return print_dictionary(self)
 
 #*******************************************************************************
 # Cotrending Basis Vectors Classes and Functions 
@@ -1371,10 +1373,10 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
     def __repr__(self):
 
         if self.mission == 'Kepler':
-            repr_string = 'Kepler CBVs (Quarter.Module.Output : {}.{}.{})'\
+            repr_string = 'Kepler CBVs, Quarter.Module.Output : {}.{}.{}, nCBVs : {}'\
                 ''.format(self.quarter, self.module, self.output)
         elif self.mission == 'K2':
-            repr_string = 'K2 CBVs (Campaign.Module.Output : {}.{}.{})'\
+            repr_string = 'K2 CBVs, Campaign.Module.Output : {}.{}.{}, nCBVs : {}'\
                 ''.format( self.campaign, self.module, self.output)
 
         return repr_string
@@ -1456,12 +1458,12 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
     def __repr__(self):
 
         if (self.cbv_type == 'MultiScale'):
-            repr_string = 'TESS CBVs Sector.Camera.CCD : {}.{}.{}, CBVType.Band: {}.{}' \
+            repr_string = 'TESS CBVs, Sector.Camera.CCD : {}.{}.{}, CBVType.Band: {}.{}, nCBVs : {}' \
                 ''.format(self.sector, self.camera, self.ccd, self.cbv_type, 
-                    self.band)
+                    self.band, len(self.cbv_indices))
         else:
-            repr_string = 'TESS CBVs Sector.Camera.CCD : {}.{}.{}, CBVType : {}'\
-                ''.format(self.sector, self.camera, self.ccd, self.cbv_type)
+            repr_string = 'TESS CBVs, Sector.Camera.CCD : {}.{}.{}, CBVType : {}, nCBVS : {}'\
+                ''.format(self.sector, self.camera, self.ccd, self.cbv_type, len(self.cbv_indices))
 
         return repr_string
 
