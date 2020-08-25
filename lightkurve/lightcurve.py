@@ -1197,19 +1197,13 @@ class LightCurve(TimeSeries):
             if not hasattr(self, '{}'.format(attr)):
                 raise ValueError('Input does not have a `{}` attribute.'.format(attr))
 
-        sequence_type = None
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            # use the deprecated collections.Sequence to be compatible with python 2.7
-            sequence_type = collections.Sequence
-
         # Validate `cadence_mask`
         if isinstance(cadence_mask, str):
             if cadence_mask == 'outliers':
                 cadence_mask = self.remove_outliers(sigma=sigma, return_mask=True)[1]
             elif cadence_mask == 'all':
                 cadence_mask = np.ones(len(self.time)).astype(bool)
-        elif isinstance(cadence_mask, sequence_type):
+        elif isinstance(cadence_mask, collections.abc.Sequence):
             cadence_mask = np.array(cadence_mask)
         elif isinstance(cadence_mask, (bool)):
             # for boundary case of a single element tuple, e.g., (True)
