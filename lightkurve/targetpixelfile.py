@@ -792,7 +792,7 @@ class TargetPixelFile(object):
         Notes:
         * This method will use the `ra` and `dec` properties of the `LightCurve`
           object to determine the position of the search cone.
-        * The size of the search cone is 5 spacecraft pixels by default. You
+        * The size of the search cone is 5 spacecraft pixels + TPF dimension by default. You
           can change this by passing the `radius` parameter (unit: degrees).
         * By default, this method will only search points in time during which the light
           curve showed 3-sigma outliers in flux. You can override this behavior
