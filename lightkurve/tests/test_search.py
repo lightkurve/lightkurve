@@ -318,3 +318,10 @@ def test_tesscut_795():
     """Regression test for #795: make sure the __repr__.of a TESSCut
     SearchResult works."""
     str(search_tesscut('KIC 8462852'))  # This raised a KeyError
+
+
+@pytest.mark.remote_data
+def test_download_flux_column():
+    """Can we pass reader keyword arguments to the download method?"""
+    lc = search_lightcurve("Pi Men", sector=12).download(flux_column='sap_flux')
+    assert_array_equal(lc.flux, lc.sap_flux)

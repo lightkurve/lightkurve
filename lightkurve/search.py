@@ -116,7 +116,7 @@ class SearchResult(object):
         """Returns an array of dec values for targets in search"""
         return self.table['s_dec'].data.data
 
-    def _download_one(self, table, quality_bitmask, download_dir, cutout_size):
+    def _download_one(self, table, quality_bitmask, download_dir, cutout_size, **kwargs):
         """Private method used by `download()` and `download_all()` to download
         exactly one file from the MAST archive.
 
@@ -163,10 +163,10 @@ class SearchResult(object):
             path = Observations.download_products(table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
             log.debug("Finished downloading.")
-            return read(path, quality_bitmask=quality_bitmask)
+            return read(path, quality_bitmask=quality_bitmask, **kwargs)
 
     @suppress_stdout
-    def download(self, quality_bitmask='default', download_dir=None, cutout_size=None):
+    def download(self, quality_bitmask='default', download_dir=None, cutout_size=None, **kwargs):
         """Returns a single `LightCurve` or `TargetPixelFile` object.
 
         If multiple files are present in `SearchResult.table`, only the first
@@ -194,6 +194,8 @@ class SearchResult(object):
         cutout_size : int, float or tuple
             Side length of cutout in pixels. Tuples should have dimensions (y, x).
             Default size is (5, 5)
+        kwargs : dict
+            Extra keyword arguments passed on to the file format reader function.
 
         Returns
         -------
@@ -222,10 +224,11 @@ class SearchResult(object):
         return self._download_one(table=self.table[:1],
                                   quality_bitmask=quality_bitmask,
                                   download_dir=download_dir,
-                                  cutout_size=cutout_size)
+                                  cutout_size=cutout_size,
+                                  **kwargs)
 
     @suppress_stdout
-    def download_all(self, quality_bitmask='default', download_dir=None, cutout_size=None):
+    def download_all(self, quality_bitmask='default', download_dir=None, cutout_size=None, **kwargs):
         """Returns a `~lightkurve.collections.TargetPixelFileCollection` or
         `~lightkurve.collections.LightCurveCollection`.
 
@@ -251,6 +254,8 @@ class SearchResult(object):
         cutout_size : int, float or tuple
             Side length of cutout in pixels. Tuples should have dimensions (y, x).
             Default size is (5, 5)
+        kwargs : dict
+            Extra keyword arguments passed on to the file format reader function.
 
         Returns
         -------
@@ -277,7 +282,8 @@ class SearchResult(object):
             products.append(self._download_one(table=self.table[idx:idx+1],
                                                quality_bitmask=quality_bitmask,
                                                download_dir=download_dir,
-                                               cutout_size=cutout_size))
+                                               cutout_size=cutout_size,
+                                               **kwargs))
         if isinstance(products[0], TargetPixelFile):
             return TargetPixelFileCollection(products)
         else:
