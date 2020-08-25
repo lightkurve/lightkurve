@@ -126,10 +126,10 @@ class CBVCorrector(RegressionCorrector):
         # This class wants zero-centered median normalized flux
         # Store the median value so we can denormalize
         assert  lc.flux.unit==u.Unit('electron / second'), \
-            'cbvCorrector expects light curve to be passed in e/s units.'        
+            'cbvCorrector expects light curve to be passed in e-/s units.'        
         self._lc_median = np.nanmedian(lc.flux)
         lc = lc.remove_nans().normalize()
-        lc.flux -= 1.0
+        lc.flux -= 1.0 
 
         # Call the RegresssionCorrector Constructor
         super(CBVCorrector, self).__init__(lc)
@@ -207,7 +207,8 @@ class CBVCorrector(RegressionCorrector):
         lc = self.lc.copy()
         lc.flux = (lc.flux+1.0) * self._lc_median
         lc.flux_err = lc.flux_err * self._lc_median
-        lc.flux_unit = u.Unit('electron / second')
+        assert  lc.flux.unit==u.Unit('electron / second'), \
+            'Bookkeeping Error, flux should be in units of e-/s.'        
 
         return lc 
 
@@ -225,7 +226,8 @@ class CBVCorrector(RegressionCorrector):
         lc = self.corrected_lc.copy()
         lc.flux = (lc.flux+1.0) * self._lc_median
         lc.flux_err = lc.flux_err * self._lc_median
-        lc.flux_unit = u.Unit('electron / second')
+        assert  lc.flux.unit==u.Unit('electron / second'), \
+            'Bookkeeping Error, flux should be in units of e-/s.'        
 
         return lc 
 
@@ -381,7 +383,7 @@ class CBVCorrector(RegressionCorrector):
         
         self.coefficients = self.regressor.coef_
         
-        self.model_lc = LightCurve(self.lc.time, model_flux, model_err)
+        self.model_lc = LightCurve(time=self.lc.time, flux=model_flux, flux_err=model_err)
         self.corrected_lc = self.lc.copy()
         self.corrected_lc.flux = self.lc.flux - self.model_lc.flux
         self.corrected_lc.flux_err = (self.lc.flux_err**2 + model_err**2)**0.5
@@ -550,7 +552,7 @@ class CBVCorrector(RegressionCorrector):
             WGNCorrectedUncert = (np.random.randn(nNonGappedCadences,1) * 
                     meanCorrectedUncertainties).T[0]
             model_err   = np.zeros(nNonGappedCadences)
-            noise_lc = LightCurve(orig_lc.time, WGNCorrectedUncert, model_err)
+            noise_lc = LightCurve(time=orig_lc.time, flux=WGNCorrectedUncert, flux_err=model_err)
             pgCorrectedUncert = noise_lc.to_periodogram()
             meanCorrectedUncertPower = np.nanmean(np.array(pgCorrectedUncert.power))
             
@@ -687,13 +689,13 @@ class CBVCorrector(RegressionCorrector):
             print('Found {} neighboring targets for under-fitting '
                     'metric'.format(len(search_result)))
             print('Downloading... this might take a while')
-            lcfCol = search_result.download_all()
+            lcfCol = search_result.download_all(flux_column='sap_flux')
 
             lc_neighborhood = []
             # Extract SAP light curves
             # We want zero-centered median normalized light curves
             for lc in lcfCol:
-                lcSAP = lc.SAP_FLUX.remove_nans().normalize()
+                lcSAP = lc.remove_nans().normalize()
                 lcSAP.flux -= 1.0
                 lc_neighborhood.append(lcSAP)
                 # Align the neighboring target with the target under study

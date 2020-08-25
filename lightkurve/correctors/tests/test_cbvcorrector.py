@@ -85,7 +85,7 @@ def test_CotrendingBasisVectors_nonretrieval():
     #***
     # align
     # Set up some cadenceno such that both the CBV and the LC are trimmed
-    sample_lc = TessLightCurve([1,2,3,4], [1,2,3,4], [0.1, 0.1, 0.1, 0.1],
+    sample_lc = TessLightCurve(time=[1,2,3,4], flux=[1,2,3,4], flux_err=[0.1, 0.1, 0.1, 0.1],
             cadenceno=[1,3,4,5])
     trimmed_lc = cbvs.align(sample_lc, trim_lc=True)
     assert np.all(trimmed_lc.cadenceno == cbvs.cadenceno)
@@ -143,14 +143,14 @@ def test_compute_correlation():
 def test_CBVCorrector():
 
     # Create a CBVCorrector without reading CBVs from MAST
-    sample_lc = TessLightCurve([1,2,3,4,5], [1,2,np.nan,4,5], [0.1, 0.1, 0.1, 0.1, 0.1],
+    sample_lc = TessLightCurve(time=[1,2,3,4,5], flux=[1,2,np.nan,4,5], flux_err=[0.1, 0.1, 0.1, 0.1, 0.1],
             cadenceno=[1,2,3,4,5], flux_unit=u.Unit('electron / second'))
 
     cbvCorrector =  CBVCorrector(sample_lc, do_not_load_cbvs=True)
     # Check that Nan was removed
     assert len(cbvCorrector.lc.flux) == 4
     # Check that zero-centered median normalization occured
-    assert_allclose(cbvCorrector._lc_median, 3.0)
+    assert_allclose(np.array(cbvCorrector._lc_median), 3.0)
     assert_allclose(np.mean(cbvCorrector.lc.flux), 0.0)
 
     dm = DesignMatrix(pd.DataFrame({'a':np.ones(4), 'b':[1,2,4,5]}))
@@ -160,7 +160,7 @@ def test_CBVCorrector():
         alpha=1e-9, ext_dm=dm)
     assert isinstance(lc, TessLightCurve)
     # Check that returned lc is in absolute flux units
-    assert lc.flux_unit == u.Unit("electron / second")
+    assert lc.flux.unit == u.Unit("electron / second")
     # The design matrix should have completely zeroed the flux around the median
     assert_allclose(lc.flux, cbvCorrector._lc_median)
     ax = cbvCorrector.diagnose()
@@ -183,7 +183,7 @@ def test_CBVCorrector():
     lc = cbvCorrector.correct_ElasticNet(cbv_type=None, cbv_indices=None,
         alpha=1e-20, l1_ratio=0.5, ext_dm=dm)
     assert isinstance(lc, TessLightCurve) 
-    assert lc.flux_unit == u.Unit("electron / second")
+    assert lc.flux.unit == u.Unit("electron / second")
     # The design matrix should have completely zeroed the flux around the median
     assert_allclose(lc.flux, cbvCorrector._lc_median, rtol=1e-3)
     ax = cbvCorrector.diagnose()
@@ -215,9 +215,8 @@ def test_CBVCorrector_retrieval():
     #***
     # A good TESS example of both over- and under-fitting
     # The "over-fitted" curve looks better to the eye, but eyes can be deceiving!
-    lcf = search_lightcurve('TIC 357126143', mission='tess', sector=10).download()
-    target = 'TIC 99180739'
-    cbvCorrector =  CBVCorrector(lcf.SAP_FLUX)
+    lc = search_lightcurve('TIC 357126143', mission='tess', sector=10).download(flux_column='sap_flux')
+    cbvCorrector =  CBVCorrector(lc)
     assert isinstance(cbvCorrector, CBVCorrector)
 
     cbv_type = ['SingleScale', 'Spike']
@@ -228,7 +227,7 @@ def test_CBVCorrector_retrieval():
         alpha=1e-2)
     assert isinstance(lc, TessLightCurve) 
     # Check that returned lightcurve is in flux units
-    assert lc.flux_unit == u.Unit("electron / second")
+    assert lc.flux.unit == u.Unit("electron / second")
     ax = cbvCorrector.diagnose()
     assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
 
@@ -236,7 +235,7 @@ def test_CBVCorrector_retrieval():
     lc = cbvCorrector.correct_ElasticNet(cbv_type=cbv_type, cbv_indices=cbv_indices,
         alpha=1e1, l1_ratio=0.5)
     assert isinstance(lc, TessLightCurve) 
-    assert lc.flux_unit == u.Unit("electron / second")
+    assert lc.flux.unit == u.Unit("electron / second")
     ax = cbvCorrector.diagnose()
     assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
 
@@ -245,7 +244,7 @@ def test_CBVCorrector_retrieval():
         alpha_bounds=[1e-4, 1e4],
         target_over_score=0.5, target_under_score=0.8)
     assert isinstance(lc, TessLightCurve) 
-    assert lc.flux_unit == u.Unit("electron / second")
+    assert lc.flux.unit == u.Unit("electron / second")
     ax = cbvCorrector.diagnose()
     assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
 
@@ -262,17 +261,17 @@ def test_CBVCorrector_retrieval():
     
     #***
     # A Kepler and K2 example
-    lcf = search_lightcurve('KIC 6508221', mission='kepler', quarter=5).download()
-    cbvCorrector =  CBVCorrector(lcf.SAP_FLUX)
+    lc = search_lightcurve('KIC 6508221', mission='kepler', quarter=5).download(flux_column='sap_flux')
+    cbvCorrector =  CBVCorrector(lc)
     lc = cbvCorrector.correct_gaussian_prior(alpha=1.0)
     assert isinstance(lc, KeplerLightCurve) 
-    assert lc.flux_unit == u.Unit("electron / second")
+    assert lc.flux.unit == u.Unit("electron / second")
 
-    lcf = search_lightcurve('EPIC 247887989', mission='K2').download()
-    cbvCorrector =  CBVCorrector(lcf.SAP_FLUX)
+    lc = search_lightcurve('EPIC 247887989', mission='K2').download(flux_column='sap_flux')
+    cbvCorrector =  CBVCorrector(lc)
     lc = cbvCorrector.correct_gaussian_prior(alpha=1.0)
     assert isinstance(lc, KeplerLightCurve) 
-    assert lc.flux_unit == u.Unit("electron / second")
+    assert lc.flux.unit == u.Unit("electron / second")
 
     #***
     # Try some expected failures
