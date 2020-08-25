@@ -4,18 +4,25 @@ import logging
 import sys
 import os
 import warnings
+import numpy as np
+import pandas as pd
 
+from astropy.utils.data import download_file
+from astropy.coordinates import SkyCoord
+from astropy.units.quantity import Quantity
+import astropy.units as u
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LinearStretch)
 from astropy.time import Time
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-import numpy as np
 from functools import wraps
+
+from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
-__all__ = ['LightkurveWarning',
+__all__ = ['LightkurveError', 'LightkurveWarning',
            'KeplerQualityFlags', 'TessQualityFlags',
            'bkjd_to_astropy_time', 'btjd_to_astropy_time']
 
@@ -28,16 +35,16 @@ class QualityFlags(object):
 
     @classmethod
     def decode(cls, quality):
-        """Converts a Kepler QUALITY value into a list of human-readable strings.
+        """Converts a QUALITY value into a list of human-readable strings.
 
         This function takes the QUALITY bitstring that can be found for each
-        cadence in Kepler/K2's pixel and light curve files and converts into
+        cadence in Kepler/K2/TESS' pixel and light curve files and converts into
         a list of human-readable strings explaining the flags raised (if any).
 
         Parameters
         ----------
         quality : int
-            Value from the 'QUALITY' column of a Kepler/K2 pixel or lightcurve file.
+            Value from the 'QUALITY' column of a Kepler/K2/TESS pixel or lightcurve file.
 
         Returns
         -------
@@ -45,6 +52,9 @@ class QualityFlags(object):
             List of human-readable strings giving a short description of the
             quality flags raised.  Returns an empty list if no flags raised.
         """
+        # If passed an astropy quantity object, get the value
+        if isinstance(quality, Quantity):
+            quality = quality.value
         result = []
         for flag in cls.STRINGS.keys():
             if quality & flag > 0:
@@ -55,8 +65,8 @@ class QualityFlags(object):
     def create_quality_mask(cls, quality_array, bitmask=None):
         """Returns a boolean array which flags good cadences given a bitmask.
 
-        This method is used by the constructors of :class:`KeplerTargetPixelFile`
-        and :class:`KeplerLightCurveFile` to initialize their `quality_mask`
+        This method is used by the readers of :class:`KeplerTargetPixelFile`
+        and :class:`KeplerLightCurve` to initialize their `quality_mask`
         class attribute which is used to ignore bad-quality data.
 
         Parameters
@@ -74,6 +84,8 @@ class QualityFlags(object):
         # Return an array filled with `True` by default (i.e. ignore nothing)
         if bitmask is None:
             return np.ones(len(quality_array), dtype=bool)
+        if isinstance(quality_array, u.Quantity):
+            quality_array = quality_array.value
         # A few pre-defined bitmasks can be specified as strings
         if isinstance(bitmask, str):
             try:
@@ -322,7 +334,7 @@ def running_mean(data, window_size):
     return (cumsum[window_size:] - cumsum[:-window_size]) / float(window_size)
 
 
-def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
+def bkjd_to_astropy_time(bkjd) -> Time:
     """Converts Kepler Barycentric Julian Day (BKJD) time values to an
     `astropy.time.Time` object.
 
@@ -338,8 +350,6 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
     ----------
     bkjd : float or array of floats
         Barycentric Kepler Julian Day.
-    bjdref : float
-        BJD reference date, for Kepler this is 2454833.
 
     Returns
     -------
@@ -347,16 +357,13 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
         Resulting time object.
     """
     bkjd = np.atleast_1d(bkjd)
-    jd = bkjd + bjdref
     # Some data products have missing time values;
     # we need to set these to zero or `Time` cannot be instantiated.
-    jd[~np.isfinite(jd)] = 0
-    if isinstance(bkjd, float):  # If user entered a float, return a float
-        jd = jd[0]
-    return Time(jd, format='jd', scale='tdb')
+    bkjd[~np.isfinite(bkjd)] = 0
+    return Time(bkjd, format='bkjd', scale='tdb')
 
 
-def btjd_to_astropy_time(btjd, bjdref=2457000.):
+def btjd_to_astropy_time(btjd) -> Time:
     """Converts TESS Barycentric Julian Day (BTJD) values to an
     `astropy.time.Time` object.
 
@@ -370,8 +377,6 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
     ----------
     btjd : float or array of floats
         Barycentric TESS Julian Day
-    bjdref : float
-        BJD reference date.
 
     Returns
     -------
@@ -379,11 +384,8 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
         Resulting time object.
     """
     btjd = np.atleast_1d(btjd)
-    jd = btjd + bjdref
-    jd[~np.isfinite(jd)] = 0
-    if isinstance(btjd, float):  # If user entered a float, return a float
-        jd = jd[0]
-    return Time(jd, format='jd', scale='tdb')
+    btjd[~np.isfinite(btjd)] = 0
+    return Time(btjd, format='btjd', scale='tdb')
 
 
 def plot_image(image, ax=None, scale='linear', origin='lower',
@@ -422,6 +424,8 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     ax : `~matplotlib.axes.Axes`
         The matplotlib axes object.
     """
+    if isinstance(image, u.Quantity):
+        image = image.value
     if ax is None:
         _, ax = plt.subplots()
     with warnings.catch_warnings():
@@ -456,8 +460,18 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     return ax
 
 
+class LightkurveError(Exception):
+    """Class for Lightkurve exceptions."""
+    pass
+
+
 class LightkurveWarning(Warning):
     """Class for all Lightkurve warnings."""
+    pass
+
+
+class LightkurveDeprecationWarning(LightkurveWarning):
+    """Class for all Lightkurve deprecation warnings."""
     pass
 
 
@@ -475,67 +489,6 @@ def suppress_stdout(f, *args, **kwargs):
             finally:
                 sys.stdout = old_out
     return wrapper
-
-
-def detect_filetype(header):
-    """Returns Kepler and TESS file types given their primary header.
-
-    This function will detect the file type by looking at both the TELESCOP and
-    CREATOR keywords in the first extension of the FITS header. If the file is
-    recognized as a Kepler or TESS data product, one of the following strings
-    will be returned:
-
-        * `'KeplerTargetPixelFile'`
-        * `'TessTargetPixelFile'`
-        * `'KeplerLightCurveFile'`
-        * `'TessLightCurveFile'`
-
-    If the file is not recognized as a Kepler or TESS data product, then
-    `None` will be returned.
-
-    Parameters
-    ----------
-    header : astropy.io.fits.Header object
-        The primary header of a FITS file.
-
-    Returns
-    -------
-    filetype : str or None
-        A string describing the detected filetype. If the filetype is not
-        recognized, `None` will be returned.
-    """
-    try:
-        # use `telescop` keyword to determine mission
-        # and `creator` to determine tpf or lc
-        if 'TELESCOP' in header.keys():
-            telescop = header['telescop'].lower()
-        else:
-            # Some old custom TESS data did not define the `TELESCOP` card
-            telescop = header['mission'].lower()
-        creator = header['creator'].lower()
-        origin = header['origin'].lower()
-        if telescop == 'kepler':
-            # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
-            if 'targetpixel' in creator:
-                return 'KeplerTargetPixelFile'
-            # Kepler LCFs will contain "FluxExporter2PipelineModule"
-            elif ('fluxexporter' in creator or 'lightcurve' in creator
-                or 'lightcurve' in creator):
-                return 'KeplerLightCurveFile'
-        elif telescop == 'tess':
-            # TESS TPFs will contain "TargetPixelExporterPipelineModule"
-            if 'targetpixel' in creator:
-                return 'TessTargetPixelFile'
-            # TESS LCFs will contain "LightCurveExporterPipelineModule"
-            elif 'lightcurve' in creator:
-                return 'TessLightCurveFile'
-            # Early versions of TESScut did not set a good CREATOR keyword
-            elif 'stsci' in origin:
-                return 'TessTargetPixelFile'
-    # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
-    # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
-    except (KeyError, AttributeError):
-        return None
 
 
 def validate_method(method, supported_methods):
@@ -612,6 +565,8 @@ def centroid_quadratic(data, mask=None):
         The coordinates of the centroid in column and row.  If the fit failed,
         then (NaN, NaN) will be returned.
     """
+    if isinstance(data, u.Quantity):
+        data = data.value
     # Step 1: identify the patch of 3x3 pixels (z_)
     # that is centered on the brightest pixel (xx, yy)
     if mask is not None:
@@ -661,6 +616,68 @@ def centroid_quadratic(data, mask=None):
     xm = - (2 * f * b - c * e) / det
     ym = - (2 * d * c - b * e) / det
     return xx + xm, yy + ym
+
+def _query_solar_system_objects(ra, dec, times, radius=0.1, location='kepler',
+                                cache=True):
+    """Returns a list of asteroids/comets given a position and time.
+
+    This function relies on The Virtual Observatory Sky Body Tracker (SkyBot)
+    service which can be found at http://vo.imcce.fr/webservices/skybot/
+
+    Parameters
+    ----------
+    ra : float
+        Right Ascension in degrees.
+    dec : float
+        Declination in degrees.
+    times : array of float
+        Times in Julian Date.
+    radius : float
+        Search radius in degrees.
+    location : str
+        Spacecraft location. Options include `'kepler'` and `'tess'`.
+    cache : bool
+        Whether to cache the search result. Default is True.
+
+    Returns
+    -------
+    result : `pandas.DataFrame`
+        DataFrame containing the list of known solar system objects at the
+        requested time and location.
+    """
+    if (location.lower() == 'kepler') or (location.lower() == 'k2'):
+        location = 'C55'
+    elif location.lower() == 'tess':
+        location = 'C57'
+
+    url = 'http://vo.imcce.fr/webservices/skybot/skybotconesearch_query.php?'
+    url += '-mime=text&'
+    url += '-ra={}&'.format(ra)
+    url += '-dec={}&'.format(dec)
+    url += '-bd={}&'.format(radius)
+    url += '-loc={}&'.format(location)
+
+    df = None
+    times = np.atleast_1d(times)
+    for time in tqdm(times, desc='Querying for SSOs'):
+        url_queried = url + 'EPOCH={}'.format(time)
+        response = download_file(url_queried, cache=cache)
+        if open(response).read(10) == '# Flag: -1':  # error code detected?
+            raise IOError("SkyBot Solar System query failed.\n"
+                          "URL used:\n" + url_queried + "\n"
+                          "Response received:\n" + open(response).read())
+        res = pd.read_csv(response, delimiter='|', skiprows=2)
+        if len(res) > 0:
+            res['epoch'] = time
+            res.rename({'# Num ':'Num', ' Name ':'Name', ' Class ':'Class', ' Mv ':'Mv'}, inplace=True, axis='columns')
+            res = res[['Num', 'Name', 'Class', 'Mv', 'epoch']].reset_index(drop=True)
+            if df is None:
+                df = res
+            else:
+                df = df.append(res)
+    if df is not None:
+        df.reset_index(drop=True)
+    return df
 
 def print_dictionary(dictionary, verbosity=False):
     """ Print dictionary name-value pairs to the standard output.

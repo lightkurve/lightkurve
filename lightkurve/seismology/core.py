@@ -43,7 +43,7 @@ class Seismology(object):
     Download the TESS light curve for HIP 116158:
 
         >>> import lightkurve as lk
-        >>> lc = lk.search_lightcurvefile("HIP 116158", sector=2).download().PDCSAP_FLUX  # doctest: +SKIP
+        >>> lc = lk.search_lightcurve("HIP 116158", sector=2).download()  # doctest: +SKIP
         >>> lc = lc.normalize().remove_nans().remove_outliers()  # doctest: +SKIP
 
     Create a Lomb-Scargle periodogram:
@@ -575,11 +575,9 @@ class Seismology(object):
         """
         method = validate_method(method, supported_methods=["acf2d"])
         numax = self._validate_numax(numax)
-
         if method == "acf2d":
             from .deltanu_estimators import estimate_deltanu_acf2d
             result = estimate_deltanu_acf2d(self.periodogram, numax=numax)
-
         self.deltanu = result
         return result
 
@@ -588,12 +586,53 @@ class Seismology(object):
         deltanu = self._validate_deltanu(deltanu)
         return deltanu.diagnostics_plot_method(deltanu, self.periodogram)
 
-    def estimate_radius(self, teff, numax=None, deltanu=None):
+    def estimate_radius(self, teff=None, numax=None, deltanu=None):
         """Returns a stellar radius estimate based on the scaling relations.
 
-        This method is implemented by the `~lightkurve.seismology.estimate_radius` function.
-        For details and literature references, please read the detailed
-        docstring of this function by typing ``lightkurve.seismology.estimate_radius?``.
+        The two global observable seismic parameters, numax and deltanu, along with
+        temperature, scale with fundamental stellar properties (Brown et al. 1991;
+        Kjeldsen & Bedding 1995). These scaling relations can be rearranged to
+        calculate a stellar radius as
+
+        R = Rsol * (numax/numax_sol)(deltanu/deltanusol)^-2(Teff/Teffsol)^0.5
+
+        where R is the radius and Teff is the effective temperature, and the suffix
+        'sol' indicates a solar value. In this method we use the solar values for
+        numax and deltanu as given in Huber et al. (2011) and for Teff as given in
+        Prsa et al. (2016).
+
+        This code structure borrows from work done in Bellinger et al. (2019), which
+        also functions as an accessible explanation of seismic scaling relations.
+
+        If no value of effective temperature is given, this function will check the 
+        meta data of the `Periodogram` object used to create the `Seismology` object.
+        These data will often contain an effective tempearture from the Kepler Input 
+        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+        or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
+        catalogues are estimated using photometry, and so have large associated uncertainties
+        (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
+        temperature are often more precise.
+
+        NOTE: These scaling relations are scaled to the Sun, and therefore do not
+        always produce an entirely accurate result for more evolved stars.
+
+        Parameters
+        ----------
+        numax : float
+            The frequency of maximum power of the seismic mode envelope. If not
+            given an astropy unit, assumed to be in units of microhertz.
+        deltanu : float
+            The frequency spacing between two consecutive overtones of equal radial
+            degree. If not given an astropy unit, assumed to be in units of
+            microhertz.
+        teff : float
+            The effective temperature of the star. In units of Kelvin.
+        numax_err : float
+            Error on numax. Assumed to be same units as numax
+        deltanu_err : float
+            Error on deltanu. Assumed to be same units as deltanu
+        teff_err : float
+            Error on Teff. Assumed to be same units as Teff.
 
         Returns
         -------
@@ -602,16 +641,69 @@ class Seismology(object):
         """
         numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
+        if teff is None:
+            teff = self.periodogram.meta.get('teff')
+            if teff is None:
+                raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
+                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
+            else:
+                log.info("Using value for effective temperature from the Kepler Input Catalogue."
+                        "These temperatue values may sometimes differ significantly from modern estimates.")
+                pass
+        else:
+            pass
+
         result = stellar_estimators.estimate_radius(numax, deltanu, teff)
         self.radius = result
         return result
 
-    def estimate_mass(self, teff, numax=None, deltanu=None):
-        """Returns a stellar mass estimate based on the scaling relations.
+    def estimate_mass(self, teff=None, numax=None, deltanu=None):
+        """Calculates mass using the asteroseismic scaling relations.
 
-        This method is implemented by the `~lightkurve.seismology.estimate_mass` function.
-        For details and literature references, please read the detailed
-        docstring of this function by typing ``lightkurve.seismology.estimate_mass?``.
+        The two global observable seismic parameters, numax and deltanu, along with
+        temperature, scale with fundamental stellar properties (Brown et al. 1991;
+        Kjeldsen & Bedding 1995). These scaling relations can be rearranged to
+        calculate a stellar mass as
+
+        M = Msol * (numax/numax_sol)^3(deltanu/deltanusol)^-4(Teff/Teffsol)^1.5
+
+        where M is the mass and Teff is the effective temperature, and the suffix
+        'sol' indicates a solar value. In this method we use the solar values for
+        numax and deltanu as given in Huber et al. (2011) and for Teff as given in
+        Prsa et al. (2016).
+
+        This code structure borrows from work done in Bellinger et al. (2019), which
+        also functions as an accessible explanation of seismic scaling relations.
+
+        If no value of effective temperature is given, this function will check the 
+        meta data of the `Periodogram` object used to create the `Seismology` object.
+        These data will often contain an effective tempearture from the Kepler Input 
+        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+        or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
+        catalogues are estimated using photometry, and so have large associated uncertainties
+        (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
+        temperature are often more precise.
+
+        NOTE: These scaling relations are scaled to the Sun, and therefore do not
+        always produce an entirely accurate result for more evolved stars.
+
+        Parameters
+        ----------
+        numax : float
+            The frequency of maximum power of the seismic mode envelope. If not
+            given an astropy unit, assumed to be in units of microhertz.
+        deltanu : float
+            The frequency spacing between two consecutive overtones of equal radial
+            degree. If not given an astropy unit, assumed to be in units of
+            microhertz.
+        teff : float
+            The effective temperature of the star. In units of Kelvin. 
+        numax_err : float
+            Error on numax. Assumed to be same units as numax
+        deltanu_err : float
+            Error on deltanu. Assumed to be same units as deltanu
+        teff_err : float
+            Error on Teff. Assumed to be same units as Teff.
 
         Returns
         -------
@@ -620,16 +712,68 @@ class Seismology(object):
         """
         numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
+        if teff is None:
+            teff = self.periodogram.meta.get('teff')
+            if teff is None:
+                raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
+                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
+            else:
+                log.info("Using value for effective temperature from the Kepler Input Catalogue."
+                        "These temperatue values may sometimes differ significantly from modern estimates.")
+                pass
+        else:
+            pass
+
         result = stellar_estimators.estimate_mass(numax, deltanu, teff)
         self.mass = result
         return result
 
-    def estimate_logg(self, teff, numax=None):
-        """Returns a surface gravity estimate based on the scaling relations.
+    def estimate_logg(self, teff=None, numax=None):
+        """Calculates the log of the surface gravity using the asteroseismic scaling
+        relations.
 
-        This method is implemented by the `~lightkurve.seismology.estimate_logg` function.
-        For details and literature references, please read the detailed
-        docstring of this function by typing ``lightkurve.seismology.estimate_logg?``.
+        The two global observable seismic parameters, numax and deltanu, along with
+        temperature, scale with fundamental stellar properties (Brown et al. 1991;
+        Kjeldsen & Bedding 1995). These scaling relations can be rearranged to
+        calculate a stellar surface gravity as
+
+            g = gsol * (numax/numax_sol)(Teff/Teffsol)^0.5
+
+        where g is the surface gravity and Teff is the effective temperature,
+        and the suffix 'sol' indicates a solar value. In this method we use the
+        solar values for numax as given in Huber et al. (2011) and for Teff as given
+        in Prsa et al. (2016). The solar surface gravity is calcluated from the
+        astropy constants for solar mass and radius and does not have an error.
+
+        The solar surface gravity is returned as log10(g) with units in dex, as is
+        common in the astrophysics literature.
+
+        This code structure borrows from work done in Bellinger et al. (2019), which
+        also functions as an accessible explanation of seismic scaling relations.
+
+        If no value of effective temperature is given, this function will check the 
+        meta data of the `Periodogram` object used to create the `Seismology` object.
+        These data will often contain an effective tempearture from the Kepler Input 
+        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+        or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
+        catalogues are estimated using photometry, and so have large associated uncertainties
+        (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
+        temperature are often more precise.
+
+        NOTE: These scaling relations are scaled to the Sun, and therefore do not
+        always produce an entirely accurate result for more evolved stars.
+
+        Parameters
+        ----------
+        numax : float
+            The frequency of maximum power of the seismic mode envelope. If not
+            given an astropy unit, assumed to be in units of microhertz.
+        teff : float
+            The effective temperature of the star. In units of Kelvin.
+        numax_err : float
+            Error on numax. Assumed to be same units as numax
+        teff_err : float
+            Error on teff. Assumed to be same units as teff.
 
         Returns
         -------
@@ -637,6 +781,17 @@ class Seismology(object):
             Stellar surface gravity estimate.
         """
         numax = self._validate_numax(numax)
+        if teff is None:
+            teff = self.periodogram.meta.get('teff')
+            if teff is None:
+                raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
+                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
+            else:
+                log.info("Using value for effective temperature from the Kepler Input Catalogue."
+                        "These temperatue values may sometimes differ significantly from modern estimates.")
+                pass
+        else:
+            pass
         result = stellar_estimators.estimate_logg(numax, teff)
         self.logg = result
         return result

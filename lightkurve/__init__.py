@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
 
 from .version import __version__
+from .time import *
 from .prf import *
 from .lightcurve import *
 from .lightcurvefile import *
@@ -29,4 +30,5 @@ from .convenience import *
 from .periodogram import *
 from .seismology import *
 from .collections import *
+from .io import *
 from .search import *

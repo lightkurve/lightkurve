@@ -3,6 +3,8 @@
 from __future__ import division, print_function
 
 from astropy.utils.data import get_pkg_data_filename
+from astropy.stats.bls import BoxLeastSquares
+
 import numpy as np
 import pytest
 from scipy import stats
@@ -14,14 +16,6 @@ from ..correctors import SFFCorrector, PLDCorrector
 filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sinusoid.targ.fits.gz")
 filename_synthetic_transit = get_pkg_data_filename("data/synthetic/synthetic-k2-planet.targ.fits.gz")
 filename_synthetic_flat = get_pkg_data_filename("data/synthetic/synthetic-k2-flat.targ.fits.gz")
-
-# BLS is only available in Python 3 versions of AstroPy;
-# so we will need to skip BLS-based tests below when in Python 2.
-lacks_bls = False
-try:
-    from astropy.stats.bls import BoxLeastSquares
-except ImportError:
-    lacks_bls = True
 
 
 def test_sine_sff():
@@ -48,8 +42,8 @@ def test_sine_sff():
     # Verify that we get the amplitude to within 10%
     n_cad = len(tpf.time)
     design_matrix = np.vstack([np.ones(n_cad),
-                              np.sin(2.0*np.pi*cor_lc.time/ret_period),
-                              np.cos(2.0*np.pi*cor_lc.time/ret_period)]).T
+                              np.sin(2.0*np.pi*cor_lc.time.value/ret_period),
+                              np.cos(2.0*np.pi*cor_lc.time.value/ret_period)]).T
     ATA = np.dot(design_matrix.T,  design_matrix / cor_lc.flux_err[:, None]**2)
     least_squares_coeffs = np.linalg.solve(ATA, np.dot(design_matrix.T, cor_lc.flux/cor_lc.flux_err**2 ))
     const, sin_weight, cos_weight = least_squares_coeffs
@@ -59,7 +53,6 @@ def test_sine_sff():
             (fractional_amplitude < true_amplitude*1.1) )
 
 
-@pytest.mark.skipif(lacks_bls, reason="Astropy BLS requires Python 3")
 def test_transit_sff():
     """Can we recover a synthetic exoplanet signal using SFF and BLS?"""
     # Retrieve the custom, known signal properties
@@ -88,7 +81,6 @@ def test_transit_sff():
             (pg.depth_at_max_power < max_depth))
 
 
-@pytest.mark.skipif(lacks_bls, reason="Astropy BLS requires Python 3")
 def test_transit_pld():
     """Can we recover a synthetic exoplanet signal using PLD and BLS?"""
     # Retrieve the custom, known signal properties
@@ -100,12 +92,12 @@ def test_transit_pld():
 
     # Run the PLD algorithm on a first pass
     corrector = PLDCorrector(tpf)
-    cor_lc = corrector.correct(use_gp=False)
+    cor_lc = corrector.correct()
     pg = cor_lc.to_periodogram(method='bls', minimum_period=1, maximum_period=9,
                                frequency_factor=0.05, duration=np.arange(0.1, 0.6, 0.1))
 
     # Re-do PLD with the suspected transits masked
-    cor_lc = corrector.correct(use_gp=False, cadence_mask=pg.get_transit_mask()).normalize()
+    cor_lc = corrector.correct(cadence_mask=pg.get_transit_mask()).normalize()
     pg = cor_lc.to_periodogram(method='bls', minimum_period=1, maximum_period=9,
                                frequency_factor=0.05, duration=np.arange(0.1, 0.6, 0.1))
 
@@ -128,8 +120,8 @@ def test_sine_pld():
     true_amplitude = np.float(tpf.hdu[3].header['SINE_AMP'])
 
     # Run the PLD algorithm
-    corrector = PLDCorrector(tpf)
-    cor_lc = corrector.correct(use_gp=False)
+    corrector = tpf.to_corrector('pld')
+    cor_lc = corrector.correct()
 
     # Verify that we get the period within ~20%
     pg = cor_lc.to_periodogram(method='lombscargle', minimum_period=1,
@@ -142,8 +134,8 @@ def test_sine_pld():
     # Verify that we get the amplitude to within 20%
     n_cad = len(tpf.time)
     design_matrix = np.vstack([np.ones(n_cad),
-                              np.sin(2.0*np.pi*cor_lc.time/ret_period),
-                              np.cos(2.0*np.pi*cor_lc.time/ret_period)]).T
+                              np.sin(2.0*np.pi*cor_lc.time.value/ret_period),
+                              np.cos(2.0*np.pi*cor_lc.time.value/ret_period)]).T
     ATA = np.dot(design_matrix.T,  design_matrix / cor_lc.flux_err[:, None]**2)
     least_squares_coeffs = np.linalg.solve(ATA, np.dot(design_matrix.T, cor_lc.flux/cor_lc.flux_err**2 ))
     const, sin_weight, cos_weight = least_squares_coeffs
@@ -179,8 +171,8 @@ def test_detrending_residuals():
     n_sigma = np.std(resid_n_sigmas)
     assert n_sigma < 2.0
 
-    corrector = PLDCorrector(tpf)
-    cor_lc = corrector.correct(use_gp=False)
+    corrector = tpf.to_corrector('pld')
+    cor_lc = corrector.correct(restore_trend=False)
 
     cdpp_improvement = lc.estimate_cdpp()/cor_lc.estimate_cdpp()
     assert cdpp_improvement > 10.0
@@ -203,6 +195,6 @@ def test_centroids():
         ynorm = yraw - np.median(yraw)
         xposc = tpf.pos_corr2 - np.median(tpf.pos_corr2)
         yposc = tpf.pos_corr1 - np.median(tpf.pos_corr1)
-        rmax = np.max(np.sqrt((xnorm-xposc)**2 + (ynorm-yposc)**2))
+        rmax = np.max(np.sqrt((xnorm.value-xposc)**2 + (ynorm.value-yposc)**2))
         # The centroids should agree to within a hundredth of a pixel.
         assert rmax < 0.01

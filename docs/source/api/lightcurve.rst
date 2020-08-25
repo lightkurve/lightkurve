@@ -5,5 +5,3 @@ LightCurve classes
 
 .. automodapi:: lightkurve.lightcurve
 	:no-heading:
-	:inherited-members:
-    :include-all-objects:

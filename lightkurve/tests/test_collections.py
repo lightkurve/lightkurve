@@ -51,8 +51,8 @@ def test_collection_getitem():
                      flux_err=np.arange(10, 15), targetid=120334)
     lcc = LightCurveCollection([lc])
     lcc.append(lc2)
-    assert(lcc[0] == lc)
-    assert(lcc[1] == lc2)
+    assert((lcc[0] == lc).all())
+    assert((lcc[1] == lc2).all())
     with pytest.raises(IndexError):
         lcc[50]
 
@@ -65,11 +65,11 @@ def test_collection_setitem():
                      flux_err=np.arange(10, 15), targetid=120334)
     lcc = LightCurveCollection([lc])
     lcc.append(lc2)
-    lc3 = LightCurve([1], targetid=55)
+    lc3 = LightCurve(time=[1], targetid=55)
     lcc[1] = lc3
-    assert(lcc[1] == lc3)
+    assert(lcc[1].time == lc3.time)
     lcc.append(lc2)
-    assert(lcc[2] == lc2)
+    assert((lcc[2].time == lc2.time).all())
     with pytest.raises(IndexError):
         lcc[51] = 10
 

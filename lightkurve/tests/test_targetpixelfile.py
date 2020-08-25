@@ -21,8 +21,8 @@ from astropy.utils.exceptions import AstropyWarning
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
 from ..lightcurve import TessLightCurve
-from ..utils import LightkurveWarning
-from ..search import open as lkopen
+from ..utils import LightkurveWarning, LightkurveDeprecationWarning
+from ..io import read as lkopen
 
 from .test_synthetic_data import filename_synthetic_flat
 
@@ -36,6 +36,7 @@ TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
              "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000"
             "/004/176/tess2019128220341-0000000417699452-0016-s_tp.fits")
+asteroid_TPF = get_pkg_data_filename("data/asteroid_test.fits")
 
 
 @pytest.mark.remote_data
@@ -61,6 +62,43 @@ def test_tpf_shapes():
         assert tpf.flux.shape == tpf.flux_err.shape
 
 
+def test_tpf_math():
+    """Can you add, subtract, multiply and divide?"""
+    with warnings.catch_warnings():
+        # Ignore the "TELESCOP is not equal to TESS" warning
+        warnings.simplefilter("ignore", LightkurveWarning)
+        tpfs = [KeplerTargetPixelFile(filename_tpf_all_zeros),
+                TessTargetPixelFile(filename_tpf_all_zeros)]
+
+        # These should work
+        for tpf in tpfs:
+            for other in [1, np.ones(tpf.flux.shape[1:]), np.ones(tpf.shape)]:
+                tpf + other
+                tpf - other
+                tpf * other
+                tpf / other
+
+                tpf += other
+                tpf -= other
+                tpf *= other
+                tpf /= other
+
+        # These should fail with a value error because their shape is wrong.
+        for tpf in tpfs:
+            for other in [np.asarray([1, 2]), np.arange(len(tpf.time) - 1),
+                          np.ones([100, 1]), np.ones([1, 2, 3])]:
+                with pytest.raises(ValueError):
+                    tpf + other
+
+        # Check the values are correct
+        assert np.all(((tpf.flux.value + 2) == (tpf + 2).flux.value)[np.isfinite(tpf.flux)])
+        assert np.all(((tpf.flux.value - 2) == (tpf - 2).flux.value)[np.isfinite(tpf.flux)])
+        assert np.all(((tpf.flux.value * 2) == (tpf * 2).flux.value)[np.isfinite(tpf.flux)])
+        assert np.all(((tpf.flux.value / 2) == (tpf / 2).flux.value)[np.isfinite(tpf.flux)])
+        assert np.all(((tpf.flux_err.value * 2) == (tpf * 2).flux_err.value)[np.isfinite(tpf.flux)])
+        assert np.all(((tpf.flux_err.value / 2) == (tpf / 2).flux_err.value)[np.isfinite(tpf.flux)])
+
+
 def test_tpf_plot():
     """Sanity check to verify that tpf plotting works"""
     with warnings.catch_warnings():
@@ -83,6 +121,15 @@ def test_tpf_plot():
         tpf.plot(scale="log")
         with pytest.raises(ValueError):
             tpf.plot(scale="blabla")
+        tpf.plot(column='FLUX')
+        tpf.plot(column='FLUX_ERR') 
+        tpf.plot(column='FLUX_BKG') 
+        tpf.plot(column='FLUX_BKG_ERR') 
+        tpf.plot(column='RAW_CNTS') 
+        tpf.plot(column='COSMIC_RAYS') 
+        with pytest.raises(ValueError):
+            tpf.plot(column='not a column')
+
         plt.close('all')
 
 
@@ -94,16 +141,16 @@ def test_tpf_zeros():
         warnings.simplefilter("ignore", LightkurveWarning)
         lc = tpf.to_lightcurve()
     # If you don't mask out bad data, time contains NaNs
-    assert np.any(lc.time != tpf.time)  # Using the property that NaN does not equal NaN
+    assert np.any(lc.time.value != tpf.time)  # Using the property that NaN does not equal NaN
     # When you do mask out bad data everything should work.
-    assert (tpf.astropy_time.jd == 0).any()
+    assert (tpf.time.value == 0).any()
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask='hard')
     lc = tpf.to_lightcurve(aperture_mask="all")
     assert len(lc.time) == len(lc.flux)
     assert np.all(lc.time == tpf.time)
     assert np.all(lc.flux == 0)
     # The default QUALITY bitmask should have removed all NaNs in the TIME
-    assert ~np.any(np.isnan(tpf.time))
+    #assert ~np.any(np.isnan(tpf.time))
 
 @pytest.mark.parametrize("centroid_method", [("moments"), ("quadratic")])
 def test_tpf_ones(centroid_method):
@@ -115,11 +162,11 @@ def test_tpf_ones(centroid_method):
                 TessTargetPixelFile(filename_tpf_one_center)]
     for tpf in tpfs:
         lc = tpf.to_lightcurve(aperture_mask='all', centroid_method=centroid_method)
-        assert np.all(lc.flux == 1)
-        assert np.all((lc.centroid_col < tpf.column+tpf.shape[1]).all()
-                      * (lc.centroid_col > tpf.column).all())
-        assert np.all((lc.centroid_row < tpf.row+tpf.shape[2]).all()
-                      * (lc.centroid_row > tpf.row).all())
+        assert np.all(lc.flux.value == 1)
+        assert np.all((lc.centroid_col.value < tpf.column+tpf.shape[1]).all()
+                      * (lc.centroid_col.value > tpf.column).all())
+        assert np.all((lc.centroid_row.value < tpf.row+tpf.shape[2]).all()
+                      * (lc.centroid_row.value > tpf.row).all())
 
 
 @pytest.mark.parametrize("quality_bitmask,answer", [(None, 1290), ('none', 1290),
@@ -154,8 +201,8 @@ def test_wcs_tabby(method):
     tpf.wcs
     ra, dec = tpf.get_coordinates(0)
     col, row = tpf.estimate_centroids(method=method)
-    col -= tpf.column
-    row -= tpf.row
+    col = col.value - tpf.column
+    row = row.value - tpf.row
     y, x = int(np.round(col[0])), int(np.round(row[1]))
     # Compare with RA and Dec from Simbad
     assert np.isclose(ra[x, y], 301.5643971, 1e-4)
@@ -172,15 +219,6 @@ def test_centroid_methods_consistency():
     assert np.max(np.abs(centr_moments[1] - centr_quadratic[1]) / centr_moments[1]) < 1e-2
 
 
-def test_astropy_time():
-    '''Test the lc.date() function'''
-    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
-                TessTargetPixelFile(filename_tess)]:
-        astropy_time = tpf.astropy_time
-        assert astropy_time.scale == 'tdb'
-        assert len(astropy_time.iso) == len(tpf.time)
-
-
 def test_properties():
     """Test the short-hand properties."""
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
@@ -189,10 +227,10 @@ def test_properties():
     assert(tpf.output == tpf.hdu[0].header['OUTPUT'])
     assert(tpf.ra == tpf.hdu[0].header['RA_OBJ'])
     assert(tpf.dec == tpf.hdu[0].header['DEC_OBJ'])
-    assert_array_equal(tpf.flux, tpf.hdu[1].data['FLUX'][tpf.quality_mask])
-    assert_array_equal(tpf.flux_err, tpf.hdu[1].data['FLUX_ERR'][tpf.quality_mask])
-    assert_array_equal(tpf.flux_bkg, tpf.hdu[1].data['FLUX_BKG'][tpf.quality_mask])
-    assert_array_equal(tpf.flux_bkg_err, tpf.hdu[1].data['FLUX_BKG_ERR'][tpf.quality_mask])
+    assert_array_equal(tpf.flux.value, tpf.hdu[1].data['FLUX'][tpf.quality_mask])
+    assert_array_equal(tpf.flux_err.value, tpf.hdu[1].data['FLUX_ERR'][tpf.quality_mask])
+    assert_array_equal(tpf.flux_bkg.value, tpf.hdu[1].data['FLUX_BKG'][tpf.quality_mask])
+    assert_array_equal(tpf.flux_bkg_err.value, tpf.hdu[1].data['FLUX_BKG_ERR'][tpf.quality_mask])
     assert_array_equal(tpf.quality, tpf.hdu[1].data['QUALITY'][tpf.quality_mask])
     assert(tpf.campaign == tpf.hdu[0].header['CAMPAIGN'])
     assert(tpf.quarter is None)
@@ -213,7 +251,7 @@ def test_to_lightcurve():
         tpf.to_lightcurve(aperture_mask=None)
         tpf.to_lightcurve(aperture_mask='all')
         lc = tpf.to_lightcurve(aperture_mask='pipeline')
-        assert lc.astropy_time.scale == 'tdb'
+        assert lc.time.scale == 'tdb'
         assert lc.label == tpf.hdu[0].header['OBJECT']
 
 
@@ -223,7 +261,7 @@ def test_bkg_lightcurve():
         lc = tpf.get_bkg_lightcurve()
         lc = tpf.get_bkg_lightcurve(aperture_mask=None)
         lc = tpf.get_bkg_lightcurve(aperture_mask='all')
-        assert lc.astropy_time.scale == 'tdb'
+        assert lc.time.scale == 'tdb'
         assert lc.flux.shape == lc.flux_err.shape
         assert len(lc.time) == len(lc.flux)
 
@@ -232,9 +270,8 @@ def test_aperture_photometry():
     for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tess)]:
         tpf.extract_aperture_photometry()
-        tpf.extract_aperture_photometry(aperture_mask=None)
-        tpf.extract_aperture_photometry(aperture_mask='all')
-        tpf.extract_aperture_photometry(aperture_mask='pipeline')
+        for mask in [None, 'all', 'pipeline', 'threshold', 'background']:
+            tpf.extract_aperture_photometry(aperture_mask=mask)
 
 
 def test_tpf_to_fits():
@@ -283,10 +320,10 @@ def test_tpf_factory():
     # This should pass
     tpf = factory.get_tpf()
 
-    assert_array_equal(tpf.flux[0], flux_0)
-    assert_array_equal(tpf.flux[9], flux_9)
-    assert(tpf.time[0] == 5)
-    assert(tpf.time[9] == 95)
+    assert_array_equal(tpf.flux[0].value, flux_0)
+    assert_array_equal(tpf.flux[9].value, flux_9)
+    assert(tpf.time[0].value == 5)
+    assert(tpf.time[9].value == 95)
 
     # Can you add the WRONG sized frame?
     flux_wrong = 3 * np.ones((6, 9))
@@ -302,7 +339,7 @@ def test_tpf_factory():
 
     # Can we add our own keywords?
     tpf = factory.get_tpf(hdu0_keywords={'creator': 'Christina TargetPixelFileWriter'})
-    assert tpf.header['CREATOR'] == 'Christina TargetPixelFileWriter'
+    assert tpf.get_keyword('CREATOR') == 'Christina TargetPixelFileWriter'
 
 
 def _create_image_array(header=None, shape=(5, 5)):
@@ -457,12 +494,12 @@ def test_tess_simulation():
     """Can we read simulated TESS data?"""
     tpf = TessTargetPixelFile(TESS_SIM)
     assert tpf.mission == 'TESS'
-    assert tpf.astropy_time.scale == 'tdb'
+    assert tpf.time.scale == 'tdb'
     assert tpf.flux.shape == tpf.flux_err.shape
     tpf.wcs
     col, row = tpf.estimate_centroids()
     # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
-    assert np.isnan(tpf.time).sum() == 0
+    assert (tpf.time.value == 0).sum() == 0
 
 
 def test_threshold_aperture_mask():
@@ -470,7 +507,7 @@ def test_threshold_aperture_mask():
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.plot(aperture_mask='threshold')
     lc = tpf.to_lightcurve(aperture_mask=tpf.create_threshold_mask(threshold=1))
-    assert (lc.flux == 1).all()
+    assert (lc.flux.value == 1).all()
     # The TESS file shows three pixel regions above a 2-sigma threshold;
     # let's make sure the `reference_pixel` argument allows them to be selected.
     tpf = TessTargetPixelFile(filename_tess)
@@ -496,7 +533,7 @@ def test_tpf_tess():
     lc = tpf.to_lightcurve()
     assert isinstance(lc, TessLightCurve)
     assert_array_equal(lc.time, tpf.time)
-    assert tpf.astropy_time.scale == 'tdb'
+    assert tpf.time.scale == 'tdb'
     assert tpf.flux.shape == tpf.flux_err.shape
     tpf.wcs
     col, row = tpf.estimate_centroids()
@@ -555,3 +592,40 @@ def test_aperture_photometry_nan():
     assert ~np.isnan(lc.flux_err[1])
     assert np.isnan(lc.flux[2])
     assert np.isnan(lc.flux_err[2])
+
+
+@pytest.mark.xfail  # As of June 2020 the SkyBot service is returning MySQL errors
+@pytest.mark.remote_data
+def test_SSOs():
+    # TESS test
+    tpf = TessTargetPixelFile(asteroid_TPF)
+    result = tpf.query_solar_system_objects(cadence_mask='all', cache=False)
+    assert(len(result) == 1)
+    result = tpf.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=False)
+    assert(len(result) == 1)
+    result, mask = tpf.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=True, return_mask=True)
+    assert(len(mask) == len(tpf.flux))
+
+
+def test_get_header():
+    """Test the basic functionality of ``tpf.get_header()``"""
+    tpf = lkopen(filename_tpf_one_center)
+    assert tpf.get_header()['CHANNEL'] == tpf.get_keyword("CHANNEL")
+    assert tpf.get_header(0)['MISSION'] == tpf.get_keyword("MISSION")
+    assert tpf.get_header(ext=2)['EXTNAME'] == "APERTURE"
+    # ``tpf.header`` is deprecated
+    with pytest.warns(LightkurveDeprecationWarning, match='deprecated'):
+        tpf.header
+
+def test_plot_pixels():
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+    tpf.plot_pixels()
+    tpf.plot_pixels(normalize=True)
+    tpf.plot_pixels(periodogram=True)
+    tpf.plot_pixels(periodogram=True, nyquist_factor=0.5)
+    tpf.plot_pixels(aperture_mask='all')
+    tpf.plot_pixels(aperture_mask=tpf.pipeline_mask) 
+    tpf.plot_pixels(aperture_mask=tpf.create_threshold_mask()) 
+    tpf.plot_pixels(show_flux=True)
+    tpf.plot_pixels(corrector_func=lambda x:x)
+    plt.close('all')

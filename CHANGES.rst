@@ -1,7 +1,111 @@
-1.10.dev (unreleased)
+2.0.0 (unreleased)
 ==================
 
+
+Major changes
+-------------
+
+- Removed support for Python 2. [#733]
+
+- ``LightCurve`` is now a sub-class of ``astropy.time.TimeSeries`` to enable it
+  to have arbitrary columns and to enable closer integration with AstroPy. [#744]
+
+
+Other changes
+-------------
+
+lightkurve.lightcurve
+^^^^^^^^^^^^^^^^^^^^^
+
+- Added a ``column`` parameter to ``LightCurve``'s ``plot()``, ``scatter()``,
+  and ``errorbar()`` methods to enable any column to be plotted. [#765]
+
+lightkurve.targetpixelfile
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
+  ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
+
+- Added the ``TargetPixelFile.plot_pixels()`` method to plot light curves
+  and periodograms for each individual pixel in a TPF. [#771]
+
+- Added the ``estimate_background`` method to ``TargetPixelFile`` which returns
+  a 1D estimate of the residual background present in e.g. TESSCut data. [#746]
+
+- Added a ``column`` parameter to ``TargetPixelFile.plot()`` to enable any
+  column in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
+
+lightkurve.search
+^^^^^^^^^^^^^^^^^
+
+- Added support for reading K2SFF and EVEREST community light curves via the
+  `LightCurve.read()` and `search_lightcurve()` functions. [#739]
+
+- Modified the search functions such that exact mission target identifiers,
+  such as 'KIC 5112705' or 'TIC 261136679', only return products known under
+  those names, unless a search radius is specified. [#796]
+
+lightkurve.correctors
+^^^^^^^^^^^^^^^^^^^^^
+
+- Added ``SparseDesignMatrix`` and modified ``RegressionCorrector`` to enable
+  systematics removal methods to benefit from ``scipy.sparse`` speed-ups. [#732]
+
+- Modified ``PLDCorrector`` to make use of the new ``RegressionCorrector``
+  and ``DesignMatrix`` classes. [#746]
+
+lightkurve.seismology
+^^^^^^^^^^^^^^^^^^^^^
+
+- Modified the ``estimate_radius``, ``estimate_mass``, and ``estimate_logg``
+  methods to default to the ``teff`` value in the meta data. [#766]
+
+- Added an error message to ``estimate_numax()`` or ``estimate_deltanu()`` if
+  the underlying periodogram does not have uniformly-spaced frequencies. [#780]
+
+
+
+1.11.1 (2020-06-18)
+===================
+
+- Fixed a bug in ``TargetPixelFile.cutout()`` which prevented image edges from
+  being included in cut-outs. [#749]
+
+- Fixed a bug in ``tpf.interact()`` which caused the pixel selection to be off
+  by half a pixel. The bug was introduced in v1.11.0. [#754]
+
+- Fixed ``tpf.plot()`` and ``tpf.interact_sky()`` to reflect that Kepler and
+  TESS pixel coordinates refer to pixel centers. [#755]
+
+- Fixed broken links in tutorials. [#756]
+
+
+
+1.11.0 (2020-05-20)
+===================
+
+- Deprecated the ``TargetPixelFile.header`` property and ``LightCurveFile.header()``
+  method in favor of a consistent ``get_header()`` method. [#736]
+
+- Fixed a bug in ``tpf.interact_sky()`` which caused star positions to be off
+  by half a pixel. [#734]
+
+
+
+1.10.0 (2020-05-14)
+===================
+
+- Added the ``query_solar_system_objects()`` method to search for solar system
+  objects in ``TargetPixelFile`` and ``LightCurve`` objects. [#714]
+
 - Added the ``extra_columns`` attribute to ``LightCurve`` objects. [#724]
+
+- Fixed the URL to the Point Response Function (PRF) files in ``KeplerPRF``. [#727]
+
+- Fixed a bug which caused searches to fail with Astroquery v0.4.1 and later. [#728]
+
+- Fixed a bug in ``TargetPixelFile.interact_sky()`` which caused high proper
+  motion stars to be shown at incorrect locations. [#730]
 
 
 

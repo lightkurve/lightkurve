@@ -59,13 +59,15 @@ def prepare_lightcurve_datasource(lc):
     # Convert time into human readable strings, breaks with NaN time
     # See https://github.com/KeplerGO/lightkurve/issues/116
     if (lc.time == lc.time).all():
-        human_time = lc.astropy_time.isot
+        human_time = lc.time.isot
     else:
         human_time = [' '] * len(lc.flux)
 
     # Convert binary quality numbers into human readable strings
     qual_strings = []
     for bitmask in lc.quality:
+        if isinstance(bitmask, u.Quantity):
+            bitmask = bitmask.value
         flag_str_list = KeplerQualityFlags.decode(bitmask)
         if len(flag_str_list) == 0:
             qual_strings.append(' ')
@@ -75,11 +77,11 @@ def prepare_lightcurve_datasource(lc):
             qual_strings.append("; ".join(flag_str_list))
 
     lc_source = ColumnDataSource(data=dict(
-                                 time=lc.time,
+                                 time=lc.time.value,
                                  time_iso=human_time,
-                                 flux=lc.flux,
-                                 cadence=lc.cadenceno,
-                                 quality_code=lc.quality,
+                                 flux=lc.flux.value,
+                                 cadence=lc.cadenceno.value,
+                                 quality_code=lc.quality.value,
                                  quality=np.array(qual_strings)))
     return lc_source
 
@@ -104,7 +106,7 @@ def prepare_tpf_datasource(tpf, aperture_mask):
     xx = tpf.column + np.arange(tpf.shape[2])
     yy = tpf.row + np.arange(tpf.shape[1])
     xa, ya = np.meshgrid(xx, yy)
-    tpf_source = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5))
+    tpf_source = ColumnDataSource(data=dict(xx=xa.astype(float), yy=ya.astype(float)))
     tpf_source.selected.indices = pixel_index_array[aperture_mask].reshape(-1).tolist()
     return tpf_source
 
@@ -146,13 +148,14 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     step_renderer : GlyphRenderer
     vertical_line : Span
     """
-    if lc.mission == 'K2':
+    mission = lc.meta.get('mission')
+    if mission == 'K2':
         title = "Lightcurve for {} (K2 C{})".format(
             lc.label, lc.campaign)
-    elif lc.mission == 'Kepler':
+    elif mission == 'Kepler':
         title = "Lightcurve for {} (Kepler Q{})".format(
             lc.label, lc.quarter)
-    elif lc.mission == 'TESS':
+    elif mission == 'TESS':
         title = "Lightcurve for {} (TESS Sec. {})".format(
             lc.label, lc.sector)
     else:
@@ -193,7 +196,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
                       fill_color=None, hover_fill_color="firebrick",
                       hover_alpha=0.9, hover_line_color="white")
     tooltips = [("Cadence", "@cadence"),
-                ("Time ({})".format(lc.time_format.upper()),
+                ("Time ({})".format(lc.time.format.upper()),
                  "@time{0,0.000}"),
                 ("Time (ISO)", "@time_iso"),
                 ("Flux", "@flux"),
@@ -203,7 +206,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
                             mode='mouse', point_policy="snap_to_data"))
 
     # Vertical line to indicate the cadence
-    vertical_line = Span(location=lc.time[0], dimension='height',
+    vertical_line = Span(location=lc.time[0].value, dimension='height',
                          line_color='firebrick', line_width=4, line_alpha=0.5)
     fig.add_layout(vertical_line)
 
@@ -234,25 +237,31 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     result = result[result.Gmag < magnitude_limit]
     if len(result) == 0:
         raise no_targets_found_message
-    radecs = np.vstack([result['RA_ICRS'], result['DE_ICRS']]).T
-    coords = tpf.wcs.all_world2pix(radecs, 0)
-    year = ((tpf.astropy_time[0].jd - 2457206.375) * u.day).to(u.year)
-    pmra = ((np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
-    pmdec = ((np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
+
+    # Apply correction for proper motion
+    year = ((tpf.time[0].jd - 2457206.375) * u.day).to(u.year)
+    pmra = ((np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond/u.year) * year).to(u.deg).value
+    pmdec = ((np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond/u.year) * year).to(u.deg).value
     result.RA_ICRS += pmra
     result.DE_ICRS += pmdec
+
+    # Convert to pixel coordinates
+    radecs = np.vstack([result['RA_ICRS'], result['DE_ICRS']]).T
+    coords = tpf.wcs.all_world2pix(radecs, 0)
 
     # Gently size the points by their Gaia magnitude
     sizes = 64.0 / 2**(result['Gmag']/5.0)
     one_over_parallax = 1.0 / (result['Plx']/1000.)
     source = ColumnDataSource(data=dict(ra=result['RA_ICRS'],
                                         dec=result['DE_ICRS'],
+                                        pmra=result['pmRA'],
+                                        pmde=result['pmDE'],
                                         source=result['Source'].astype(str),
                                         Gmag=result['Gmag'],
                                         plx=result['Plx'],
                                         one_over_plx=one_over_parallax,
-                                        x=coords[:, 0]+tpf.column,
-                                        y=coords[:, 1]+tpf.row,
+                                        x=coords[:, 0] + tpf.column,
+                                        y=coords[:, 1] + tpf.row,
                                         size=sizes))
 
     r = fig.circle('x', 'y', source=source, fill_alpha=0.3, size='size',
@@ -267,6 +276,8 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
                                       ("Parallax (mas)", "@plx (~@one_over_plx{0,0} pc)"),
                                       ("RA", "@ra{0,0.00000000}"),
                                       ("DEC", "@dec{0,0.00000000}"),
+                                      ("pmRA", "@pmra{0,0.000} mas/yr"),
+                                      ("pmDE", "@pmde{0,0.000} mas/yr"),
                                       ("x", "@x"),
                                       ("y", "@y")],
                             renderers=[r],
@@ -308,7 +319,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     fig, stretch_slider : bokeh.plotting.figure.Figure, RangeSlider
     """
     if pedestal is None:
-        pedestal = -np.nanmin(tpf.flux) + 1
+        pedestal = -np.nanmin(tpf.flux.value) + 1
     if scale == 'linear':
         pedestal = 0
 
@@ -319,9 +330,11 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     else:
         title = "Pixel data"
 
+    # We subtract 0.5 from the range below because pixel coordinates refer to
+    # the middle of a pixel, e.g. (col, row) = (10.0, 20.0) is a pixel center.
     fig = figure(plot_width=plot_width, plot_height=plot_height,
-                 x_range=(tpf.column, tpf.column+tpf.shape[2]),
-                 y_range=(tpf.row, tpf.row+tpf.shape[1]),
+                 x_range=(tpf.column-0.5, tpf.column+tpf.shape[2]-0.5),
+                 y_range=(tpf.row-0.5, tpf.row+tpf.shape[1]-0.5),
                  title=title, tools=tools,
                  toolbar_location="below",
                  border_fill_color="whitesmoke")
@@ -330,7 +343,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     fig.xaxis.axis_label = 'Pixel Column Number'
 
 
-    vlo, lo, hi, vhi = np.nanpercentile(tpf.flux + pedestal, [0.2, 1, 95, 99.8])
+    vlo, lo, hi, vhi = np.nanpercentile(tpf.flux.value + pedestal, [0.2, 1, 95, 99.8])
     if vmin is not None:
         vlo, lo = vmin, vmin
     if vmax is not None:
@@ -348,7 +361,8 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
     else:
         raise ValueError('Please specify either `linear` or `log` scale for color.')
 
-    fig.image([tpf.flux[fiducial_frame, :, :] + pedestal], x=tpf.column, y=tpf.row,
+    fig.image([tpf.flux.value[fiducial_frame, :, :] + pedestal],
+              x=tpf.column-0.5, y=tpf.row-0.5,
               dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
               color_mapper=color_mapper, name="tpfimg")
 
@@ -559,7 +573,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                                                             ylim_func=ylim_func)
 
         # Create the TPF figure and its stretch slider
-        pedestal = -np.nanmin(tpf.flux) + 1
+        pedestal = -np.nanmin(tpf.flux.value) + 1
         if scale == 'linear':
             pedestal = 0
         fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source,
@@ -613,7 +627,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
             if new != []:
                 lc_new = _create_lightcurve_from_pixels(tpf, new, transform_func=transform_func)
-                lc_source.data['flux'] = lc_new.flux
+                lc_source.data['flux'] = lc_new.flux.value
 
                 if ylim_func is None:
                     ylims = get_lightcurve_y_limits(lc_source)
@@ -622,7 +636,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 fig_lc.y_range.start = ylims[0]
                 fig_lc.y_range.end = ylims[1]
             else:
-                lc_source.data['flux'] = lc.flux * 0.0
+                lc_source.data['flux'] = lc.flux.value * 0.0
                 fig_lc.y_range.start = -1
                 fig_lc.y_range.end = 1
 
@@ -634,11 +648,11 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
             if new in tpf.cadenceno:
                 frameno = tpf_index_lookup[new]
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
-                    [tpf.flux[frameno, :, :] + pedestal]
-                vertical_line.update(location=tpf.time[frameno])
+                    [tpf.flux.value[frameno, :, :] + pedestal]
+                vertical_line.update(location=tpf.time.value[frameno])
             else:
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
-                    [tpf.flux[0, :, :] * np.NaN]
+                    [tpf.flux.value[0, :, :] * np.NaN]
             lc_source.selected.indices = []
 
         def go_right_by_one():

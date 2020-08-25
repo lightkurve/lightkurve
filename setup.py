@@ -21,12 +21,8 @@ with open('requirements.txt') as f:
 # 2. What dependencies required to run the unit tests? (i.e. `pytest --remote-data`)
 tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata', 'codecov', 'pytest-doctestplus', 'codacy-coverage']
 # 3. What dependencies are required for optional features?
-# `BoxLeastSquaresPeriodogram` requires astropy>=3.1.
 # `interact()` requires bokeh>=1.0, ipython.
-# `PLDCorrector` requires pybind11, celerite.
-extras_require = {"all":  ["astropy>=3.1",
-                           "bokeh>=1.0", "ipython",
-                           "pybind11", "celerite"],
+extras_require = {"all":  ["bokeh>=1.0", "ipython"],
                   "test": tests_require}
 
 setup(name='lightkurve',
@@ -40,10 +36,11 @@ setup(name='lightkurve',
       license='MIT',
       package_dir={
             'lightkurve': 'lightkurve',
+            'lightkurve.io': 'lightkurve/io',
             'lightkurve.correctors': 'lightkurve/correctors',
             'lightkurve.seismology': 'lightkurve/seismology',
             'lightkurve.prf': 'lightkurve/prf'},
-      packages=['lightkurve', 'lightkurve.correctors',
+      packages=['lightkurve', 'lightkurve.io', 'lightkurve.correctors',
                 'lightkurve.seismology', 'lightkurve.prf'],
       install_requires=install_requires,
       extras_require=extras_require,

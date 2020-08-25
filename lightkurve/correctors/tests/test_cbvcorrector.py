@@ -12,7 +12,7 @@ import astropy.units as u
 import pandas as pd
 
 from ... import TessLightCurve, KeplerLightCurve
-from ... import search_lightcurvefile
+from ... import search_lightcurve
 from ..designmatrix import DesignMatrix
 from ..cbvcorrector import MAX_NUMBER_CBVS
 from ..cbvcorrector import get_kepler_cbvs, get_tess_cbvs, \
@@ -215,7 +215,7 @@ def test_CBVCorrector_retrieval():
     #***
     # A good TESS example of both over- and under-fitting
     # The "over-fitted" curve looks better to the eye, but eyes can be deceiving!
-    lcf = search_lightcurvefile('TIC 357126143', mission='tess', sector=10).download()
+    lcf = search_lightcurve('TIC 357126143', mission='tess', sector=10).download()
     target = 'TIC 99180739'
     cbvCorrector =  CBVCorrector(lcf.SAP_FLUX)
     assert isinstance(cbvCorrector, CBVCorrector)
@@ -262,13 +262,13 @@ def test_CBVCorrector_retrieval():
     
     #***
     # A Kepler and K2 example
-    lcf = search_lightcurvefile('KIC 6508221', mission='kepler', quarter=5).download()
+    lcf = search_lightcurve('KIC 6508221', mission='kepler', quarter=5).download()
     cbvCorrector =  CBVCorrector(lcf.SAP_FLUX)
     lc = cbvCorrector.correct_gaussian_prior(alpha=1.0)
     assert isinstance(lc, KeplerLightCurve) 
     assert lc.flux_unit == u.Unit("electron / second")
 
-    lcf = search_lightcurvefile('EPIC 247887989', mission='K2').download()
+    lcf = search_lightcurve('EPIC 247887989', mission='K2').download()
     cbvCorrector =  CBVCorrector(lcf.SAP_FLUX)
     lc = cbvCorrector.correct_gaussian_prior(alpha=1.0)
     assert isinstance(lc, KeplerLightCurve) 

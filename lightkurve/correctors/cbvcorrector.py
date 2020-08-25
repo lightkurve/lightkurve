@@ -15,9 +15,8 @@ import urllib.request
 import astropy.units as u
 
 from .. import MPLSTYLE
-
 from ..lightcurve import LightCurve, KeplerLightCurve
-from ..search import search_lightcurvefile
+from ..search import search_lightcurve
 from ..lightcurvefile import KeplerLightCurveFile
 from .corrector import Corrector
 from ..utils import channel_to_module_output, validate_method, print_dictionary
@@ -126,8 +125,8 @@ class CBVCorrector(RegressionCorrector):
 
         # This class wants zero-centered median normalized flux
         # Store the median value so we can denormalize
-        assert  lc.flux_unit==u.Unit('electron / second'), \
-            'cbvCorrector expects light curve to be in e/s units.'        
+        assert  lc.flux.unit==u.Unit('electron / second'), \
+            'cbvCorrector expects light curve to be passed in e/s units.'        
         self._lc_median = np.nanmedian(lc.flux)
         lc = lc.remove_nans().normalize()
         lc.flux -= 1.0
@@ -451,7 +450,6 @@ class CBVCorrector(RegressionCorrector):
             >>> alpha_bounds=[1.0,1e3],  # doctest: +SKIP
             >>> target_over_score=0.5, target_under_score=0.5) # doctest: +SKIP
             >>> cbvCorrector.diagnose() # doctest: +SKIP
-
         """
 
         # Perform all the preparatory stuff common to all correct methods
@@ -664,15 +662,15 @@ class CBVCorrector(RegressionCorrector):
             continue_searching = True
             while continue_searching:
                 if (self.lc.mission == 'TESS'):
-                    search_result = search_lightcurvefile(self.lc.label,
+                    search_result = search_lightcurve(self.lc.label,
                         mission=self.lc.mission, sector=self.lc.sector,
                         radius=dynamic_search_radius, limit=max_targets)
                 elif (self.lc.mission == 'Kepler'):
-                    search_result = search_lightcurvefile(self.lc.label,
+                    search_result = search_lightcurve(self.lc.label,
                         mission=self.lc.mission, quarter=self.lc.quarter,
                         radius=dynamic_search_radius, limit=max_targets)
                 elif (self.lc.mission == 'K2'):
-                    search_result = search_lightcurvefile(self.lc.label,
+                    search_result = search_lightcurve(self.lc.label,
                         mission=self.lc.mission, campaign=self.lc.campaign,
                         radius=dynamic_search_radius, limit=max_targets)
                 # Check if too few found
@@ -882,7 +880,7 @@ class CBVCorrector(RegressionCorrector):
             flattened_dm_list = [self.extra_design_matrix]
 
         self.design_matrix_collection = DesignMatrixCollection(flattened_dm_list)
-        self.design_matrix_collection._validate()
+        self.design_matrix_collection.validate()
 
 
     def _set_prior_width(self, sigma):

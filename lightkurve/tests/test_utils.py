@@ -10,7 +10,7 @@ import os
 from ..utils import KeplerQualityFlags, TessQualityFlags
 from ..utils import module_output_to_channel, channel_to_module_output
 from ..utils import LightkurveWarning
-from ..utils import running_mean, detect_filetype, validate_method
+from ..utils import running_mean, validate_method
 from ..utils import bkjd_to_astropy_time, btjd_to_astropy_time
 from ..utils import centroid_quadratic
 from ..lightcurve import LightCurve
@@ -66,6 +66,23 @@ def test_quality_flag_decoding_tess():
         == [flags[3][1], flags[4][1], flags[5][1]]
 
 
+def test_quality_flag_decoding_quantity_object():
+    """Can a QUALITY flag that is a astropy quantity object be parsed correctly?
+
+    This is a regression test for https://github.com/KeplerGO/lightkurve/issues/804
+    """
+    from astropy.units.quantity import Quantity
+    flags = list(TessQualityFlags.STRINGS.items())
+    for key, value in flags:
+        assert TessQualityFlags.decode(Quantity(key, dtype='int32'))[0] == value
+    # Can we recover combinations of flags?
+    assert TessQualityFlags.decode(Quantity(flags[5][0], dtype='int32') + \
+        Quantity(flags[7][0], dtype='int32')) == [flags[5][1], flags[7][1]]
+    assert TessQualityFlags.decode(Quantity(flags[3][0], dtype='int32') + \
+        Quantity(flags[4][0], dtype='int32') + Quantity(flags[5][0], dtype='int32')) \
+        == [flags[3][1], flags[4][1], flags[5][1]]
+
+
 def test_quality_mask():
     """Can we create a quality mask using KeplerQualityFlags?"""
     quality = np.array([0, 0, 1])
@@ -80,6 +97,7 @@ def test_quality_mask():
     assert "not supported" in err.value.args[0]
 
 
+@pytest.mark.xfail  # Lightkurve v2.x no longer support NaNs in time values
 def test_lightkurve_warning():
     """Can we ignore Lightkurve warnings?"""
     with warnings.catch_warnings(record=True) as warns:
@@ -88,14 +106,6 @@ def test_lightkurve_warning():
         flux = np.array([1, 2, 3, 4])
         lc = LightCurve(time=time, flux=flux)
         assert len(warns) == 0
-
-
-def test_detect_filetype():
-    """Can we detect the correct filetype?"""
-    k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
-    tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
-    assert detect_filetype(fits.open(k2_path)[0].header) == 'KeplerTargetPixelFile'
-    assert detect_filetype(fits.open(tess_path)[0].header) == 'TessTargetPixelFile'
 
 
 def test_validate_method():
@@ -114,13 +124,13 @@ def test_import():
 def test_btjd_bkjd_input():
     """Regression test for #607: are the bkjd/btjd functions tolerant?"""
     # Kepler
-    assert bkjd_to_astropy_time(0).value == 2454833.
+    assert bkjd_to_astropy_time(0).jd[0] == 2454833.
     for user_input in [[0], np.array([0])]:
-        assert_array_equal(bkjd_to_astropy_time(user_input).value, np.array([2454833.]))
+        assert_array_equal(bkjd_to_astropy_time(user_input).jd, np.array([2454833.]))
     # TESS
-    assert btjd_to_astropy_time(0).value == 2457000.
+    assert btjd_to_astropy_time(0).jd[0] == 2457000.
     for user_input in [[0], np.array([0])]:
-        assert_array_equal(btjd_to_astropy_time(user_input).value, np.array([2457000.]))
+        assert_array_equal(btjd_to_astropy_time(user_input).jd, np.array([2457000.]))
 
 
 def test_centroid_quadratic():

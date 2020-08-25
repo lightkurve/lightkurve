@@ -2,23 +2,14 @@
 import logging
 import warnings
 import numpy as np
+
 from astropy.convolution import convolve, Box1DKernel
+from astropy.timeseries import BoxLeastSquares
 
 from .utils import LightkurveWarning
 
 log = logging.getLogger(__name__)
 
-# Import the optional AstroPy dependency, or print a friendly error otherwise.
-# BoxLeastSquares was added to `astropy.stats` in AstroPy v3.1 and then
-# moved to `astropy.timeseries` in v3.2, which makes the import below
-# somewhat complicated.
-try:
-    from astropy.timeseries import BoxLeastSquares
-except ImportError:
-    try:
-        from astropy.stats import BoxLeastSquares
-    except ImportError:
-        pass  # we will print an error message in `show_interact_widget` instead
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
@@ -231,13 +222,13 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
                  border_fill_color="#FFFFFF", active_drag="box_zoom")
     fig.title.offset = -10
     fig.yaxis.axis_label = 'Flux (e/s)'
-    if lc.time_format == 'bkjd':
+    if lc.time.format == 'bkjd':
         fig.xaxis.axis_label = 'Time - 2454833 (days)'
-    elif lc.time_format == 'btjd':
+    elif lc.time.format == 'btjd':
         fig.xaxis.axis_label = 'Time - 2457000 (days)'
     else:
         fig.xaxis.axis_label = 'Time (days)'
-    ylims = [np.nanmin(lc.flux), np.nanmax(lc.flux)]
+    ylims = [np.nanmin(lc.flux.value), np.nanmax(lc.flux.value)]
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
 
     # Add light curve
@@ -347,8 +338,8 @@ def make_bls_figure_elements(result, bls_source, help_source):
     fig.title.offset = -10
     fig.yaxis.axis_label = 'Power'
     fig.xaxis.axis_label = 'Period [days]'
-    fig.y_range = Range1d(start=result.power.min() * 0.95, end=result.power.max() * 1.05)
-    fig.x_range = Range1d(start=result.period.min(), end=result.period.max())
+    fig.y_range = Range1d(start=result.power.min().value * 0.95, end=result.power.max().value * 1.05)
+    fig.x_range = Range1d(start=result.period.min().value, end=result.period.max().value)
 
     # Add circles for the selection of new period. These are always hidden
     fig.circle('period', 'power',
@@ -426,14 +417,6 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                   "you can install bokeh using e.g. `conda install bokeh`.")
         return None
 
-    try:
-        from astropy.timeseries import BoxLeastSquares
-    except ImportError:
-        try:
-            from astropy.stats import BoxLeastSquares
-        except ImportError:
-            log.error("The `interact_bls()` tool requires AstroPy v3.1 or later.")
-
     def _create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
         """Create BLS interact user interface."""
         if minp is None:
@@ -442,9 +425,9 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             maxp = (lc.time[-1] - lc.time[0])/2
 
         time_format = ''
-        if lc.time_format == 'bkjd':
+        if lc.time.format == 'bkjd':
             time_format = ' - 2454833 days'
-        if lc.time_format == 'btjd':
+        if lc.time.format == 'btjd':
             time_format = ' - 2457000 days'
 
         # Some sliders

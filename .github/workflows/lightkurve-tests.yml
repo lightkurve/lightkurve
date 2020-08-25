@@ -1,13 +1,12 @@
 # GitHub Actions workflow for Lightkurve's continuous integration.
 #
-# This file configures seven different jobs:
-# 1) pytest on Linux, Python 2.7.
-# 2) pytest on Linux, Python 3.7.
-# 3) pytest on Linux, Python 3.8, with --remote-data enabled (i.e. get data from MAST).
-# 4) pytest on Linux, Python 3.8, without installing optional dependencies.
-# 5) pytest on Windows, Python 3.8, with --remote-data enabled.
-# 6) pytest on OSX, Python 3.8.
-# 7) flake8 syntax check.
+# This file configures six different jobs:
+# 1) pytest on Linux, Python 3.7.
+# 2) pytest on Linux, Python 3.8, with --remote-data enabled (i.e. get data from MAST).
+# 3) pytest on Linux, Python 3.8, without installing optional dependencies.
+# 4) pytest on Windows, Python 3.8, with --remote-data enabled.
+# 5) pytest on OSX, Python 3.8.
+# 6) flake8 syntax check.
 
 name: Lightkurve-tests
 
@@ -20,23 +19,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: [2.7, 3.7, 3.8-remote-data, 3.8-no-optional-dependencies]
+        name: [3.6, 3.7, 3.8-remote-data, 3.8-no-optional-dependencies]
         include:
-          - name: 2.7
-            python-version: 2.7
-            pip-command: pip install -e .[test]
+          - name: 3.6
+            python-version: 3.6
+            pip-command: pip install .[all,test]
             pytest-command: pytest
           - name: 3.7
             python-version: 3.7
-            pip-command: pip install -e .[all,test]
+            pip-command: pip install .[all,test]
             pytest-command: pytest
           - name: 3.8-remote-data
             python-version: 3.8
-            pip-command: pip install -e .[all,test]
+            pip-command: pip install .[all,test]
             pytest-command: pytest --remote-data --doctest-modules
           - name: 3.8-no-optional-dependencies
             python-version: 3.8
-            pip-command: pip install -e .[test]
+            pip-command: pip install .[test]
             pytest-command: pytest
     steps:
     - uses: actions/checkout@v1
@@ -58,8 +57,8 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        name: [3.7-remote-data]
-        python-version: [3.7]
+        name: [3.8-remote-data]
+        python-version: [3.8]
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
@@ -69,7 +68,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        pip install -e .[test]
+        pip install .[test]
     - name: Test with pytest --remote-data
       run: |
         pytest --remote-data
@@ -79,7 +78,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: [3.8]
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
@@ -89,7 +88,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        pip install -e .[all,test]
+        pip install .[all,test]
     - name: Test with pytest
       run: |
         pytest
@@ -99,7 +98,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: [3.8]
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}

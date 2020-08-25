@@ -9,11 +9,13 @@ import warnings
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from astropy.modeling import models, fitting
 
-from . import DesignMatrix, DesignMatrixCollection
+from astropy.modeling import models, fitting
+from astropy.units import Quantity
+
+from . import DesignMatrix, DesignMatrixCollection, SparseDesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
-from .designmatrix import create_spline_matrix
+from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
 
 from .. import MPLSTYLE
 from ..utils import LightkurveWarning
@@ -43,13 +45,8 @@ class SFFCorrector(RegressionCorrector):
                           LightkurveWarning)
 
         self.raw_lc = lc
-        if hasattr(lc, 'flux_unit'):
-            if lc.flux_unit is None:
-                lc = lc.copy()
-            elif lc.flux_unit.to_string() == '':
-                lc = lc.copy()
-            else:
-                lc = lc.copy().normalize()
+        if lc.flux.unit.to_string() == '':
+            lc = lc.copy()
         else:
             lc = lc.copy().normalize()
 
@@ -69,7 +66,7 @@ class SFFCorrector(RegressionCorrector):
 
     def correct(self, centroid_col=None, centroid_row=None, windows=20, bins=5,
                 timescale=1.5, breakindex=None, degree=3, restore_trend=False,
-                additional_design_matrix=None, polyorder=None, **kwargs):
+                additional_design_matrix=None, polyorder=None, sparse=False, **kwargs):
         """Find the best fit correction for the light curve.
 
         Parameters
@@ -118,9 +115,11 @@ class SFFCorrector(RegressionCorrector):
         corrected_lc : `~lightkurve.lightcurve.LightCurve`
             Corrected light curve, with noise removed.
         """
-        from patsy import dmatrix  # local import because it's rarely-used
+        DMC, spline = DesignMatrixCollection, create_spline_matrix
+        if sparse:
+            DMC, spline = SparseDesignMatrixCollection, create_sparse_spline_matrix
 
-        if polyorder is not None: 
+        if polyorder is not None:
             warnings.warn("`polyorder` is deprecated and no longer used, "
                           "please use the `degree` keyword instead.",
                           LightkurveWarning)
@@ -144,35 +143,35 @@ class SFFCorrector(RegressionCorrector):
         lower_idx = np.asarray(np.append(0, self.window_points), int)
         upper_idx = np.asarray(np.append(self.window_points, len(self.lc.time)), int)
 
-        stack = []
-        columns = []
-        prior_sigmas = []
+        dms = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
-            knots = list(np.percentile(self.arclength[a:b], np.linspace(0, 100, bins+1)[1:-1]))
-            ar = np.copy(self.arclength)
+            if isinstance(self.arclength, Quantity):
+                ar = np.copy(self.arclength.value)
+            else:
+                ar = np.copy(self.arclength)
+            knots = list(np.percentile(ar[a:b], np.linspace(0, 100, bins+1)[1:-1]))
             ar[~np.in1d(ar, ar[a:b])] = 0
-            dm = np.asarray(dmatrix("bs(x, knots={}, degree={}, include_intercept={}) - 1"
-                                    "".format(knots, degree, True), {"x": ar}))
-            stack.append(dm)
-            columns.append(['window{}_bin{}'.format(idx+1, jdx+1)
-                            for jdx in range(len(dm.T))])
+
+            dm = spline(ar, knots=knots, degree=degree).copy()
+            dm.columns = ['window{}_bin{}'.format(idx+1, jdx+1)
+                                        for jdx in range(dm.shape[1])]
 
             # I'm putting VERY weak priors on the SFF motion vectors
             # (1e-6 is being added to prevent sigma from being zero)
-            ps = np.ones(len(dm.T)) * 10000 * self.lc[a:b].flux.std() + 1e-6
-            prior_sigmas.append(ps)
+            ps = np.ones(dm.shape[1]) * 10000 * self.lc[a:b].flux.std() + 1e-6
+            dm.prior_sigma = ps
+            dms.append(dm)
 
-        sff_dm = DesignMatrix(pd.DataFrame(np.hstack(stack)),
-                              columns=np.hstack(columns),
-                              name='sff',
-                              prior_sigma=np.hstack(prior_sigmas))
+        sff_dm = DMC(dms).to_designmatrix(name='sff')#.standardize()
+
 
 
         # long term
-        n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
-        s_dm = create_spline_matrix(self.lc.time, n_knots=n_knots, include_intercept=True)
+        n_knots = int((self.lc.time.value[-1] - self.lc.time.value[0])/timescale)
 
-        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
+        s_dm = spline(self.lc.time.value, n_knots=n_knots, name='spline')
+        means = [np.average(chunk) for chunk in np.array_split(self.lc.flux, n_knots)]
+#        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
         s_dm.prior_mu = np.asarray(means)
 
         # I'm putting WEAK priors on the spline that it must be around 1
@@ -183,11 +182,11 @@ class SFFCorrector(RegressionCorrector):
             if not isinstance(additional_design_matrix, DesignMatrix):
                 raise ValueError('`additional_design_matrix` must be a DesignMatrix object.')
             self.additional_design_matrix = additional_design_matrix
-            dm = DesignMatrixCollection([s_dm,
+            dm = DMC([s_dm,
                                          sff_dm,
                                          additional_design_matrix])
         else:
-            dm = DesignMatrixCollection([s_dm, sff_dm])
+            dm = DMC([s_dm, sff_dm])
 
         # correct
         clc = super(SFFCorrector, self).correct(dm, **kwargs)
@@ -205,7 +204,7 @@ class SFFCorrector(RegressionCorrector):
         most recent call to `correct()`."""
         axs = self._diagnostic_plot()
         for t in self.window_points:
-            axs[0].axvline(self.lc.time[t], color='r', ls='--', alpha=0.3)
+            axs[0].axvline(self.lc.time.value[t], color='r', ls='--', alpha=0.3)
 
     def diagnose_arclength(self):
         """Returns a diagnostic plot which visualizes arclength vs flux
@@ -305,7 +304,10 @@ def _get_thruster_firings(arclength):
     thrusters: np.ndarray of bools
         True at times where thrusters were fired.
     """
-    arc = np.copy(arclength)
+    if isinstance(arclength, Quantity):
+        arc = np.copy(arclength.value)
+    else:
+        arc = np.copy(arclength)
     # Rate of change of rate of change of arclength wrt time
     d2adt2 = (np.gradient(np.gradient(arc)))
     # Fit a Gaussian, most points lie in a tight region, thruster firings are outliers
@@ -426,6 +428,6 @@ def _estimate_arclength(centroid_col, centroid_row):
     col = centroid_col - np.nanmin(centroid_col)
     row = centroid_row  - np.nanmin(centroid_row)
     # Force c to be correlated not anticorrelated
-    if np.polyfit(col, row, 1)[0] < 0:
+    if np.polyfit(col.data, row.data, 1)[0] < 0:
         col = np.nanmax(col) - col
     return (col**2 + row**2)**0.5
