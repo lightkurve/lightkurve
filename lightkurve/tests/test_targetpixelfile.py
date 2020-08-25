@@ -23,6 +23,7 @@ from ..targetpixelfile import TessTargetPixelFile
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning, LightkurveDeprecationWarning
 from ..io import read as lkopen
+from ..search import search_tesscut
 
 from .test_synthetic_data import filename_synthetic_flat
 
@@ -515,9 +516,9 @@ def test_threshold_aperture_mask():
     assert tpf.create_threshold_mask(threshold=2., reference_pixel='center').sum() == 25
     assert tpf.create_threshold_mask(threshold=2., reference_pixel=None).sum() == 28
     assert tpf.create_threshold_mask(threshold=2., reference_pixel=(5, 0)).sum() == 2
-    # A mask which contains zero pixels should work without crashing
+    # A mask which contains zero-flux pixels should work without crashing
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    assert tpf.create_threshold_mask().sum() == 0
+    assert tpf.create_threshold_mask().sum() == 9
 
 
 def test_tpf_tess():
@@ -617,6 +618,7 @@ def test_get_header():
     with pytest.warns(LightkurveDeprecationWarning, match='deprecated'):
         tpf.header
 
+
 def test_plot_pixels():
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.plot_pixels()
@@ -629,3 +631,16 @@ def test_plot_pixels():
     tpf.plot_pixels(show_flux=True)
     tpf.plot_pixels(corrector_func=lambda x:x)
     plt.close('all')
+
+
+def test_missing_pipeline_mask():
+    """Regression test for #791.
+
+    TPFs produced by TESSCut contain an empty pipeline mask.  When the pipeline
+    mask is missing or empty, we want `to_lightcurve()` to fall back on the
+    'threshold' mask, to avoid creating a light curve based on zero pixels."""
+    tpf = search_tesscut("Proxima Cen", sector=12).download(cutout_size=1)
+    lc = tpf.to_lightcurve()
+    assert np.isfinite(lc.flux).any()
+    lc = tpf.to_lightcurve(aperture_mask='pipeline')
+    assert np.isfinite(lc.flux).any()
