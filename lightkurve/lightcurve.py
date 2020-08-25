@@ -1187,7 +1187,7 @@ class LightCurve(TimeSeries):
         --------
         Find if there are SSOs affecting the lightcurve for the given time frame:
 
-            >>> df_sso = lc.query_solar_system_objects(cadence_mask=np.logical_and(lc.time >= 2014.1, lc.time <= 2014.9))
+            >>> df_sso = lc.query_solar_system_objects(cadence_mask=(lc.time.value >= 2014.1) & (lc.time.value <= 2014.9))  # doctest: +SKIP
         """
         for attr in ['ra', 'dec']:
             if not hasattr(self, '{}'.format(attr)):
