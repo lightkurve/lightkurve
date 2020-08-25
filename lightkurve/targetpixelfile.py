@@ -505,7 +505,8 @@ class TargetPixelFile(object):
             that the pixel will be used.
             If None or 'all' are passed, all pixels will be used.
             If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
+            will be returned.  If the pipeline mask is missing or empty, we
+            automatically fall back on the 'threshold' mask instead.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
             If 'background' is passed, all pixels fainter than the median flux
@@ -516,6 +517,13 @@ class TargetPixelFile(object):
         aperture_mask : ndarray
             2D boolean numpy array containing `True` for selected pixels.
         """
+        # If 'pipeline' mask is requested but missing, fall back to 'threshold'
+        if isinstance(aperture_mask, str) and (aperture_mask == 'pipeline') \
+           and ~np.any(self.pipeline_mask):
+            log.debug("_parse_aperture_mask: 'pipeline' mask is missing or "
+                      "empty, falling back on 'threshold' mask instead.")
+            aperture_mask = 'threshold'
+
         # Input validation
         if hasattr(aperture_mask, 'shape') and (aperture_mask.shape != self.flux[0].shape):
             raise ValueError("`aperture_mask` has shape {}, "
@@ -674,8 +682,10 @@ class TargetPixelFile(object):
         aperture_mask : 'pipeline', 'threshold', 'all', or array-like
             Which pixels contain the object to be measured, i.e. which pixels
             should be used in the estimation?  If None or 'all' are passed,
-            all pixels in the pixel file will be used.  If 'pipeline' is passed,
-            the mask suggested by the official pipeline will be used.
+            all pixels in the pixel file will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.  If the pipeline mask is missing or empty, we
+            automatically fall back on the 'threshold' mask instead.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
             Alternatively, users can pass a boolean array describing the
@@ -991,12 +1001,13 @@ class TargetPixelFile(object):
         max_cadences : int
             Raise a RuntimeError if the number of cadences shown is larger than
             this value. This limit helps keep browsers from becoming unresponsive.
-        aperture_mask : array-like, 'pipeline', 'threshold' or 'all'
+        aperture_mask : array-like, 'pipeline', 'threshold', or 'all'
             A boolean array describing the aperture such that `True` means
             that the pixel will be used.
             If None or 'all' are passed, all pixels will be used.
             If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
+            will be returned.  If the pipeline mask is missing or empty, we
+            automatically fall back on the 'threshold' mask instead.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
         exported_filename: str
@@ -1475,7 +1486,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             that the pixel will be used.
             If None or 'all' are passed, all pixels will be used.
             If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
+            will be returned.  If the pipeline mask is missing or empty, we
+            automatically fall back on the 'threshold' mask instead.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
         centroid_method : str, 'moments' or 'quadratic'
@@ -2101,7 +2113,8 @@ class TessTargetPixelFile(TargetPixelFile):
             that the pixel will be used.
             If None or 'all' are passed, all pixels will be used.
             If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
+            will be returned.  If the pipeline mask is missing or empty, we
+            automatically fall back on the 'threshold' mask instead.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
             The default behaviour is to use the TESS pipeline mask.
