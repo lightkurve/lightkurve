@@ -1150,10 +1150,9 @@ class LightCurve(TimeSeries):
           object to determine the position of the search cone.
         * The size of the search cone is 15 spacecraft pixels by default. You
           can change this by passing the `radius` parameter (unit: degrees).
-        * This method will only search points in time during which he light
+        * By default, this method will only search points in time during which the light
           curve showed 3-sigma outliers in flux. You can override this behavior
-          and search all times by passing the `cadence_mask='all'` argument,
-          but this will be much slower.
+          and search for specific times by passing `cadence_mask`. See examples for details.
 
         Parameters
         ----------
@@ -1188,6 +1187,11 @@ class LightCurve(TimeSeries):
         Find if there are SSOs affecting the lightcurve for the given time frame:
 
             >>> df_sso = lc.query_solar_system_objects(cadence_mask=(lc.time.value >= 2014.1) & (lc.time.value <= 2014.9))  # doctest: +SKIP
+
+        Find if there are SSOs affecting the lightcurve for all times, but it will be much slower:
+
+            >>> df_sso = lc.query_solar_system_objects(cadence_mask='all')  # doctest: +SKIP
+
         """
         for attr in ['ra', 'dec']:
             if not hasattr(self, '{}'.format(attr)):
