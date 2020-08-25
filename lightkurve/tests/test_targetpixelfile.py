@@ -516,9 +516,9 @@ def test_threshold_aperture_mask():
     assert tpf.create_threshold_mask(threshold=2., reference_pixel='center').sum() == 25
     assert tpf.create_threshold_mask(threshold=2., reference_pixel=None).sum() == 28
     assert tpf.create_threshold_mask(threshold=2., reference_pixel=(5, 0)).sum() == 2
-    # A mask which contains zero pixels should work without crashing
+    # A mask which contains zero-flux pixels should work without crashing
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    assert tpf.create_threshold_mask().sum() == 0
+    assert tpf.create_threshold_mask().sum() == 9
 
 
 def test_tpf_tess():
