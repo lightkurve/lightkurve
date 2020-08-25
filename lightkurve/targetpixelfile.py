@@ -6,6 +6,8 @@ import os
 import warnings
 import logging
 
+import collections
+
 from astropy.io import fits
 from astropy.io.fits import Undefined
 from astropy.nddata import Cutout2D
@@ -792,18 +794,16 @@ class TargetPixelFile(object):
           object to determine the position of the search cone.
         * The size of the search cone is 15 spacecraft pixels by default. You
           can change this by passing the `radius` parameter (unit: degrees).
-        * This method will only search points in time during which he light
+        * By default, this method will only search points in time during which the light
           curve showed 3-sigma outliers in flux. You can override this behavior
-          and search all times by passing the `cadence_mask='all'` argument,
-          but this will be much slower.
-
+          and search for specific times by passing `cadence_mask`. See examples for details.
 
         Parameters
         ----------
-        cadence_mask : str or bool
+        cadence_mask : str, or boolean array with length of self.time
             mask in time to select which frames or points should be searched for SSOs.
             Default "outliers" will search for SSOs at points that are `sigma` from the mean.
-            "all" will search all cadences. Pass a boolean array with values of "True"
+            "all" will search all cadences. Alternatively, pass a boolean array with values of "True"
             for times to search for SSOs.
         radius : optional, float
             Radius to search for bodies. If None, will search for SSOs within 5 pixels of
@@ -814,7 +814,7 @@ class TargetPixelFile(object):
         cache : optional, bool
             If True will cache the search result in the astropy cache. Set to False
             to request the search again.
-        return_mask: bool
+        return_mask: optional, bool
             If True will return a boolean mask in time alongside the result
 
         Returns
@@ -822,6 +822,17 @@ class TargetPixelFile(object):
         result : pandas.DataFrame
             DataFrame containing the list objects in frames that were identified to contain
             SSOs.
+
+        Examples
+        --------
+        Find if there are SSOs affecting the target pixel file for the given time frame:
+
+            >>> df_sso = tpf.query_solar_system_objects(cadence_mask=(tpf.time.value >= 2014.1) & (tpf.time.value <= 2014.9))  # doctest: +SKIP
+
+        Find if there are SSOs affecting the target pixel file for all times, but it will be much slower:
+
+            >>> df_sso = tpf.query_solar_system_objects(cadence_mask='all')  # doctest: +SKIP
+
         """
 
         for attr in ['mission', 'ra', 'dec']:
@@ -840,7 +851,11 @@ class TargetPixelFile(object):
 
             if cadence_mask == 'all':
                 cadence_mask = np.ones(len(self.time)).astype(bool)
-
+        elif isinstance(cadence_mask, collections.abc.Sequence):
+            cadence_mask = np.array(cadence_mask)
+        elif isinstance(cadence_mask, (bool)):
+            # for boundary case of a single element tuple, e.g., (True)
+            cadence_mask = np.array([cadence_mask])
         elif not isinstance(cadence_mask, np.ndarray):
             raise ValueError('Pass a cadence_mask method or a cadence_mask')
 
@@ -1246,7 +1261,7 @@ class TargetPixelFile(object):
         corrector_func : function
             Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.
             This function is applied to each light curve in the collection
-            prior to stitching. The default is to normalize each light curve.            
+            prior to stitching. The default is to normalize each light curve.
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
@@ -1255,7 +1270,7 @@ class TargetPixelFile(object):
             e.g. extra parameters to be passed to `lc.to_periodogram`.
         """
         if style == 'lightkurve' or style is None:
-            style = MPLSTYLE 
+            style = MPLSTYLE
         if title is None:
             title = f'Target ID: {self.targetid}'
         if corrector_func is None:
@@ -1274,7 +1289,7 @@ class TargetPixelFile(object):
                              dtype='bool')
             for i in range(self.shape[1]*self.shape[2]):
                 masks[i][np.unravel_index(i, (self.shape[1], self.shape[2]))] = True
-            
+
             pixel_list = []
             for j in range(self.shape[1]*self.shape[2]):
                 lc = self.to_lightcurve(aperture_mask=masks[j])
