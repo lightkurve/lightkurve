@@ -608,6 +608,11 @@ def test_SSOs():
     assert(len(result) == 1)
     result, mask = tpf.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=True, return_mask=True)
     assert(len(mask) == len(tpf.flux))
+    try:
+        result = tpf.query_solar_system_objects(cadence_mask='str-not-supported', cache=False)
+        pytest.fail("Unsupported cadence_mask should have thrown Error")
+    except ValueError:
+        pass
 
 
 def test_get_header():
