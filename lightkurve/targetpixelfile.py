@@ -594,7 +594,7 @@ class TargetPixelFile(object):
         # Calculate the theshold value in flux units
         mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
         # Create a mask containing the pixels above the threshold flux
-        threshold_mask = np.nan_to_num(median_image) > mad_cut
+        threshold_mask = np.nan_to_num(median_image) >= mad_cut
         if (reference_pixel is None) or (not threshold_mask.any()):
             # return all regions above threshold
             return threshold_mask
