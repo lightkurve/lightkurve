@@ -167,13 +167,7 @@ class TargetPixelFile(object):
         If the keyword is Undefined or does not exist,
         then return ``default`` instead.
         """
-        try:
-            kw = self.hdu[hdu].header[keyword]
-        except KeyError:
-            return default
-        if isinstance(kw, Undefined):
-            return default
-        return kw
+        return self.hdu[hdu].header.get(keyword, default)
 
     @property
     @deprecated("2.0", alternative="get_header()",
@@ -1162,8 +1156,8 @@ class TargetPixelFile(object):
         hdu.header['DEC_OBJ'] = np.nanmean(d[row_edges[0]:row_edges[1], col_edges[0]:col_edges[1]])
 
         # Remove any KIC labels
-        labels = ['*MAG', 'PM*', 'GL*', 'OBJECT', 'PARALLAX', '*COLOR', 'TEFF',
-                  'LOGG', 'FEH', 'EBMINUSV', 'AV', "RADIUS", "TMINDEX", "OBJECT"]
+        labels = ['*MAG', 'PM*', 'GL*', 'PARALLAX', '*COLOR', 'TEFF',
+                  'LOGG', 'FEH', 'EBMINUSV', 'AV', "RADIUS", "TMINDEX"]
         for label in labels:
             if label in hdu.header:
                 hdu.header[label] = fits.card.Undefined()
@@ -1513,7 +1507,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.get_header()['OBJECT'],
+                'label': self.get_keyword('OBJECT', default=self.targetid),
                 'targetid': self.targetid}
         meta = {'aperture_mask': aperture_mask}
         return KeplerLightCurve(time=self.time,
@@ -1537,7 +1531,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.get_header()['OBJECT'],
+                'label': self.get_keyword('OBJECT', default=self.targetid),
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
@@ -2139,7 +2133,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.get_keyword('OBJECT'),
+                'label': self.get_keyword('OBJECT', default=self.targetid),
                 'targetid': self.targetid}
         meta = {'aperture_mask': aperture_mask}
         return TessLightCurve(time=self.time,
@@ -2161,7 +2155,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.get_header()['OBJECT'],
+                'label': self.get_keyword('OBJECT', default=self.targetid),
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
