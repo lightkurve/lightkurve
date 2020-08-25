@@ -22,7 +22,7 @@ from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactor
 from ..targetpixelfile import TessTargetPixelFile
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning, LightkurveDeprecationWarning
-from ..io import read as lkopen
+from ..io import read
 from ..search import search_tesscut
 
 from .test_synthetic_data import filename_synthetic_flat
@@ -212,7 +212,7 @@ def test_wcs_tabby(method):
 
 def test_centroid_methods_consistency():
     """Are the centroid methods consistent for a well behaved target?"""
-    pixels = lkopen(filename_synthetic_flat)
+    pixels = read(filename_synthetic_flat)
     centr_moments = pixels.estimate_centroids(method='moments')
     centr_quadratic = pixels.estimate_centroids(method='quadratic')
     # check that the maximum relative difference doesnt exceed 1%
@@ -585,7 +585,7 @@ def test_aperture_photometry_nan():
 
     When FLUX or FLUX_ERR is entirely NaN in a TPF, the resulting light curve
     should report NaNs in that cadence rather than zero."""
-    tpf = lkopen(filename_tpf_one_center)
+    tpf = read(filename_tpf_one_center)
     tpf.hdu[1].data['FLUX'][2] = np.nan
     tpf.hdu[1].data['FLUX_ERR'][2] = np.nan
     lc = tpf.to_lightcurve(aperture_mask='all')
@@ -610,7 +610,7 @@ def test_SSOs():
 
 def test_get_header():
     """Test the basic functionality of ``tpf.get_header()``"""
-    tpf = lkopen(filename_tpf_one_center)
+    tpf = read(filename_tpf_one_center)
     assert tpf.get_header()['CHANNEL'] == tpf.get_keyword("CHANNEL")
     assert tpf.get_header(0)['MISSION'] == tpf.get_keyword("MISSION")
     assert tpf.get_header(ext=2)['EXTNAME'] == "APERTURE"
@@ -644,3 +644,10 @@ def test_missing_pipeline_mask():
     assert np.isfinite(lc.flux).any()
     lc = tpf.to_lightcurve(aperture_mask='pipeline')
     assert np.isfinite(lc.flux).any()
+
+
+def test_cutout_quality_masking():
+    """Regression test for #813: Does tpf.cutout() maintain the quality mask?"""
+    tpf = read(filename_tpf_one_center, quality_bitmask=8192)
+    tpfcut = tpf.cutout()
+    assert(len(tpf) == len(tpfcut))

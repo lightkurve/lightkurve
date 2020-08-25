@@ -1223,7 +1223,8 @@ class TargetPixelFile(object):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             newfits = fits.HDUList(hdus)
-        return self.__class__(newfits)
+        return self.__class__(newfits, quality_bitmask=self.quality_bitmask)
+
 
     def plot_pixels(self, ax=None, periodogram=False, aperture_mask=None,
                     show_flux=False, corrector_func=None, style='lightkurve',
