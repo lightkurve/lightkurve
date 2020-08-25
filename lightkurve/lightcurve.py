@@ -1203,6 +1203,8 @@ class LightCurve(TimeSeries):
                 cadence_mask = self.remove_outliers(sigma=sigma, return_mask=True)[1]
             elif cadence_mask == 'all':
                 cadence_mask = np.ones(len(self.time)).astype(bool)
+            else:
+                raise ValueError('invalid `cadence_mask` string argument')
         elif isinstance(cadence_mask, collections.abc.Sequence):
             cadence_mask = np.array(cadence_mask)
         elif isinstance(cadence_mask, (bool)):

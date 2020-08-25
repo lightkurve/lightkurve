@@ -984,6 +984,11 @@ def test_SSOs():
     assert(len(result) == 1)
     result, mask = lc.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=True, return_mask=True)
     assert(len(mask) == len(lc.flux))
+    try:
+        result = lc.query_solar_system_objects(cadence_mask='str-not-supported', cache=False)
+        pytest.fail("Unsupported cadence_mask should have thrown Error")
+    except ValueError:
+        pass
 
 
 @pytest.mark.xfail  # LightCurveFile was removed in Lightkurve v2.x
