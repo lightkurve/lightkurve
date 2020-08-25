@@ -1156,7 +1156,7 @@ class LightCurve(TimeSeries):
 
         Parameters
         ----------
-        cadence_mask : str, or boolean ndarray with length of self.time
+        cadence_mask : str, or boolean array with length of self.time
             mask in time to select which frames or points should be searched for SSOs.
             Default "outliers" will search for SSOs at points that are `sigma` from the mean.
             "all" will search all cadences. Alternatively, pass a boolean array with values of "True"
