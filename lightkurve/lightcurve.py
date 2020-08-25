@@ -834,7 +834,7 @@ class LightCurve(TimeSeries):
                 ntime.append(t)
             ntime = np.asarray(ntime, float)
             in_original = np.in1d(ntime, lc.time.value)
-        
+
         # Fill in time points
         newdata['time'] = Time(ntime, format=lc.time.format, scale=lc.time.scale)
         f = np.zeros(len(ntime))
@@ -1156,10 +1156,10 @@ class LightCurve(TimeSeries):
 
         Parameters
         ----------
-        cadence_mask : str or bool
+        cadence_mask : str, or boolean ndarray with length of self.time
             mask in time to select which frames or points should be searched for SSOs.
             Default "outliers" will search for SSOs at points that are `sigma` from the mean.
-            "all" will search all cadences. Pass a boolean array with values of "True"
+            "all" will search all cadences. Alternatively, pass a boolean ndarray with values of "True"
             for times to search for SSOs.
         radius : optional, float
             Radius in degrees to search for bodies. If None, will search for
@@ -1181,6 +1181,12 @@ class LightCurve(TimeSeries):
             DataFrame object which lists the Solar System objects in frames
             that were identified to contain SSOs.  Returns `None` if no objects
             were found.
+
+        Examples
+        --------
+        Find if there are SSOs affecting the lightcurve for the given time frame:
+
+            >>> df_sso = lc.query_solar_system_objects(cadence_mask=np.logical_and(lc.time >= 2014.1, lc.time <= 2014.9))
         """
         for attr in ['ra', 'dec']:
             if not hasattr(self, '{}'.format(attr)):
