@@ -1922,7 +1922,7 @@ class LightCurve(TimeSeries):
     def create_transit_mask(self, period, transit_time, duration):
         """Returns a np.array that is False during transits and True everywhere else.
 
-        This function creates a `lightkurve.BLSPeriodogram` for the lightcurve,
+        This function creates a `lightkurve.BLSPeriodogram` for the light curve,
         and utilizes its `get_transit_mask` method. It is flexible to multi-planet
         systems, allowing users to pass in transit parameters as arrays or lists.
 
@@ -1940,11 +1940,14 @@ class LightCurve(TimeSeries):
         mask : np.array of Bool
             Mask that removes transits. Mask is True where there are no transits.
         """
-        # Instantiate the BLSPeriodogram
+        # It's necessary to replace NaN values with a small float to ensure that
+        # the output mask has the same dimensions as the input light curve
         temp_lc = self.copy()
         nanmask = np.where(np.isnan(temp_lc.flux_err.value))
         temp_lc.flux.value[nanmask] = 1e-10 * self.flux.unit
         temp_lc.flux_err.value[nanmask] = 1e-10 * self.flux_err.unit
+
+        # Instantiate the BLSPeriodogram
         bls = temp_lc.to_periodogram('bls')
 
         # Create a transit mask for a single planet
