@@ -834,7 +834,7 @@ class LightCurve(TimeSeries):
                 ntime.append(t)
             ntime = np.asarray(ntime, float)
             in_original = np.in1d(ntime, lc.time.value)
-        
+
         # Fill in time points
         newdata['time'] = Time(ntime, format=lc.time.format, scale=lc.time.scale)
         f = np.zeros(len(ntime))
@@ -1919,6 +1919,62 @@ class LightCurve(TimeSeries):
             ax.set_aspect(a/b)
         return ax
 
+    def create_transit_mask(self, period, transit_time, duration):
+        """Returns a np.array that is False during transits and True everywhere else.
+
+        This function creates a `lightkurve.BLSPeriodogram` for the lightcurve,
+        and utilizes its `get_transit_mask` method. It is flexible to multi-planet
+        systems, allowing users to pass in transit parameters as arrays or lists.
+
+        Parameters
+        ----------
+        period : float, Quantity, or array-like
+            Period of the transits.
+        duration : float, Quantity, or array-like
+            Duration of the transits.
+        transit_time : float, Quantity, or array-like
+            Transit midpoint of the transits.
+
+        Returns
+        -------
+        mask : np.array of Bool
+            Mask that removes transits. Mask is True where there are no transits.
+        """
+        # Instantiate the BLSPeriodogram
+        temp_lc = self.copy()
+        nanmask = np.where(np.isnan(temp_lc.flux_err.value))
+        temp_lc.flux.value[nanmask] = 1e-10 * self.flux.unit
+        temp_lc.flux_err.value[nanmask] = 1e-10 * self.flux_err.unit
+        bls = temp_lc.to_periodogram('bls')
+
+        # Create a transit mask for a single planet
+        if isinstance(period, (float, int)):
+            mask = bls.get_transit_mask(period=period, transit_time=transit_time,
+                                        duration=duration)
+
+        # Create a multi-planet transit mask
+        elif isinstance(period, (list, np.ndarray)):
+            # Make sure all params have the same number of entries
+            n_planets = len(period)
+            if any(len(lst) != n_planets for lst in [np.atleast_1d(transit_time),
+                                                     np.atleast_1d(duration)]):
+                raise ValueError("period, duration, and transit_time must have "
+                                 "the same number of values.")
+
+            # Create mask for first planet
+            mask = bls.get_transit_mask(period=period[0], duration=duration[0],
+                                        transit_time=transit_time[0])
+            # Iterate through other planets
+            for i,p in enumerate(period[1:]):
+                n = i+1
+                new_mask = bls.get_transit_mask(period=p, duration=duration[n],
+                                                transit_time=transit_time[n])
+                mask = mask & new_mask
+        else:
+            raise TypeError("period, duration, and transit_time must be type "
+                            "`float`, `Quantity` or `array-like`.")
+
+        return mask
 
 class FoldedLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
