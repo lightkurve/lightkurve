@@ -36,7 +36,7 @@ lightkurve.targetpixelfile
   column in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
 
 - Modified ``to_lightcurve()`` to default to using ``aperture_mask='threshold'``
-  if the 'pipeline' mask is missing or empty, e.g. for TESSCut files.
+  if the 'pipeline' mask is missing or empty, e.g. for TESSCut files. [#812]
 
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
