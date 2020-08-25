@@ -1167,12 +1167,12 @@ class LightCurve(TimeSeries):
         sigma : optional, float
             If `cadence_mask` is set to `"outlier"`, `sigma` will be used to identify
             outliers.
-        location : str
-            Spacecraft location. Options include `'kepler'` and `'tess'`.
+        location : optional, str
+            Spacecraft location. Options include `'kepler'` and `'tess'`. Default: `self.mission`
         cache : optional, bool
             If True will cache the search result in the astropy cache. Set to False
             to request the search again.
-        return_mask: bool
+        return_mask: optional, bool
             If True will return a boolean mask in time alongside the result
 
         Returns
