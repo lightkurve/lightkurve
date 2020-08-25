@@ -28,13 +28,26 @@ class Collection(object):
         List of data objects.
     """
     def __init__(self, data):
-        self.data = data
+        if data is not None:
+            # ensure we have our own container
+            self.data = [item for item in data]
+        else:
+            self.data = []
 
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, index):
-        return self.data[index]
+    def __getitem__(self, indexOrMask):
+        if (isinstance(indexOrMask, (int, slice))):
+            return self.data[indexOrMask]
+        else:
+            # assume indexOrMask is array like, e.g., np.ndarray, collections.abc.Sequence, etc.
+
+            # note: filter using nd.array is very slow
+            #   np.array(self.data)[np.nonzero(indexOrMask)]
+            # specifically, nd.array(self.data) is very slow, it probably deep copies the data
+            # so we create the filtered list on our own
+            return type(self)([self.data[i] for i in np.nonzero(indexOrMask)[0]])
 
     def __setitem__(self, index, obj):
         self.data[index] = obj
@@ -87,6 +100,12 @@ class Collection(object):
                 result += ','.join(['{}'.format(i) for i in np.arange(len(jdxs))])
             result += '\n'
         return result
+
+    @property
+    def sector(self):
+        """(TESS-specific) the sectors of the lightcurves / target pixel files
+        """
+        return np.array([lc.sector for lc in self.data])
 
 
 class LightCurveCollection(Collection):
