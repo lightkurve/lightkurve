@@ -866,7 +866,7 @@ class TargetPixelFile(object):
             pixel_scale = 27
 
         if radius == None:
-            radius = (2**0.5*(pixel_scale * np.max(self.shape[1:])) + 5)*u.arcsecond.to(u.deg)
+            radius = (2**0.5*(pixel_scale * (np.max(self.shape[1:]) + 5)))*u.arcsecond.to(u.deg)
 
         res = _query_solar_system_objects(ra=self.ra, dec=self.dec, times=self.time.jd[cadence_mask],
                                       location=location, radius=radius, cache=cache)
