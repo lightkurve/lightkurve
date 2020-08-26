@@ -956,7 +956,7 @@ class TargetPixelFile(object):
                         rect = patches.Rectangle(
                                         xy=(j+self.column-0.5, i+self.row-0.5),
                                         width=1, height=1, color=mask_color,
-                                        fill=False, hatch='..')
+                                        fill=False, hatch='//')
                         ax.add_patch(rect)
         return ax
 
