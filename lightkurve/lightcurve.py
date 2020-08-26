@@ -4,6 +4,7 @@ import datetime
 import logging
 import warnings
 
+import collections
 from typing import Iterable
 
 import numpy as np
@@ -834,7 +835,7 @@ class LightCurve(TimeSeries):
                 ntime.append(t)
             ntime = np.asarray(ntime, float)
             in_original = np.in1d(ntime, lc.time.value)
-        
+
         # Fill in time points
         newdata['time'] = Time(ntime, format=lc.time.format, scale=lc.time.scale)
         f = np.zeros(len(ntime))
@@ -1149,17 +1150,16 @@ class LightCurve(TimeSeries):
           object to determine the position of the search cone.
         * The size of the search cone is 15 spacecraft pixels by default. You
           can change this by passing the `radius` parameter (unit: degrees).
-        * This method will only search points in time during which he light
+        * By default, this method will only search points in time during which the light
           curve showed 3-sigma outliers in flux. You can override this behavior
-          and search all times by passing the `cadence_mask='all'` argument,
-          but this will be much slower.
+          and search for specific times by passing `cadence_mask`. See examples for details.
 
         Parameters
         ----------
-        cadence_mask : str or bool
+        cadence_mask : str, or boolean array with length of self.time
             mask in time to select which frames or points should be searched for SSOs.
             Default "outliers" will search for SSOs at points that are `sigma` from the mean.
-            "all" will search all cadences. Pass a boolean array with values of "True"
+            "all" will search all cadences. Alternatively, pass a boolean array with values of "True"
             for times to search for SSOs.
         radius : optional, float
             Radius in degrees to search for bodies. If None, will search for
@@ -1167,12 +1167,12 @@ class LightCurve(TimeSeries):
         sigma : optional, float
             If `cadence_mask` is set to `"outlier"`, `sigma` will be used to identify
             outliers.
-        location : str
-            Spacecraft location. Options include `'kepler'` and `'tess'`.
+        location : optional, str
+            Spacecraft location. Options include `'kepler'` and `'tess'`. Default: `self.mission`
         cache : optional, bool
             If True will cache the search result in the astropy cache. Set to False
             to request the search again.
-        return_mask: bool
+        return_mask: optional, bool
             If True will return a boolean mask in time alongside the result
 
         Returns
@@ -1181,6 +1181,17 @@ class LightCurve(TimeSeries):
             DataFrame object which lists the Solar System objects in frames
             that were identified to contain SSOs.  Returns `None` if no objects
             were found.
+
+        Examples
+        --------
+        Find if there are SSOs affecting the lightcurve for the given time frame:
+
+            >>> df_sso = lc.query_solar_system_objects(cadence_mask=(lc.time.value >= 2014.1) & (lc.time.value <= 2014.9))  # doctest: +SKIP
+
+        Find if there are SSOs affecting the lightcurve for all times, but it will be much slower:
+
+            >>> df_sso = lc.query_solar_system_objects(cadence_mask='all')  # doctest: +SKIP
+
         """
         for attr in ['ra', 'dec']:
             if not hasattr(self, '{}'.format(attr)):
@@ -1192,6 +1203,13 @@ class LightCurve(TimeSeries):
                 cadence_mask = self.remove_outliers(sigma=sigma, return_mask=True)[1]
             elif cadence_mask == 'all':
                 cadence_mask = np.ones(len(self.time)).astype(bool)
+            else:
+                raise ValueError('invalid `cadence_mask` string argument')
+        elif isinstance(cadence_mask, collections.abc.Sequence):
+            cadence_mask = np.array(cadence_mask)
+        elif isinstance(cadence_mask, (bool)):
+            # for boundary case of a single element tuple, e.g., (True)
+            cadence_mask = np.array([cadence_mask])
         elif not isinstance(cadence_mask, np.ndarray):
             raise ValueError('the `cadence_mask` argument is missing or invalid')
         # Avoid searching times with NaN flux; this is necessary because e.g.

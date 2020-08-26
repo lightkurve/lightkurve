@@ -123,11 +123,11 @@ def test_tpf_plot():
         with pytest.raises(ValueError):
             tpf.plot(scale="blabla")
         tpf.plot(column='FLUX')
-        tpf.plot(column='FLUX_ERR') 
-        tpf.plot(column='FLUX_BKG') 
-        tpf.plot(column='FLUX_BKG_ERR') 
-        tpf.plot(column='RAW_CNTS') 
-        tpf.plot(column='COSMIC_RAYS') 
+        tpf.plot(column='FLUX_ERR')
+        tpf.plot(column='FLUX_BKG')
+        tpf.plot(column='FLUX_BKG_ERR')
+        tpf.plot(column='RAW_CNTS')
+        tpf.plot(column='COSMIC_RAYS')
         with pytest.raises(ValueError):
             tpf.plot(column='not a column')
 
@@ -595,17 +595,27 @@ def test_aperture_photometry_nan():
     assert np.isnan(lc.flux_err[2])
 
 
-@pytest.mark.xfail  # As of June 2020 the SkyBot service is returning MySQL errors
 @pytest.mark.remote_data
 def test_SSOs():
     # TESS test
     tpf = TessTargetPixelFile(asteroid_TPF)
+    result = tpf.query_solar_system_objects() # default cadence_mask = 'outliers'
+    assert(result is None) # the TPF has only data for 1 epoch. The lone time is removed as outlier
     result = tpf.query_solar_system_objects(cadence_mask='all', cache=False)
     assert(len(result) == 1)
     result = tpf.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=False)
     assert(len(result) == 1)
+    result = tpf.query_solar_system_objects(cadence_mask=[True], cache=False)
+    assert(len(result) == 1)
+    result = tpf.query_solar_system_objects(cadence_mask=(True), cache=False)
+    assert(len(result) == 1)
     result, mask = tpf.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=True, return_mask=True)
     assert(len(mask) == len(tpf.flux))
+    try:
+        result = tpf.query_solar_system_objects(cadence_mask='str-not-supported', cache=False)
+        pytest.fail("Unsupported cadence_mask should have thrown Error")
+    except ValueError:
+        pass
 
 
 def test_get_header():
@@ -626,8 +636,8 @@ def test_plot_pixels():
     tpf.plot_pixels(periodogram=True)
     tpf.plot_pixels(periodogram=True, nyquist_factor=0.5)
     tpf.plot_pixels(aperture_mask='all')
-    tpf.plot_pixels(aperture_mask=tpf.pipeline_mask) 
-    tpf.plot_pixels(aperture_mask=tpf.create_threshold_mask()) 
+    tpf.plot_pixels(aperture_mask=tpf.pipeline_mask)
+    tpf.plot_pixels(aperture_mask=tpf.create_threshold_mask())
     tpf.plot_pixels(show_flux=True)
     tpf.plot_pixels(corrector_func=lambda x:x)
     plt.close('all')

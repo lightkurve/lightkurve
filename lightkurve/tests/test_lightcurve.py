@@ -969,17 +969,26 @@ def test_bin_issue705():
         lc.bin(binsize=15)
 
 
-@pytest.mark.xfail  # As of June 2020 the SkyBot service is returning MySQL errors
 @pytest.mark.remote_data
 def test_SSOs():
     # TESS test
     lc = TessTargetPixelFile(asteroid_TPF).to_lightcurve(aperture_mask='all')
+    lc.mission = 'TESS' # needed to resolve default value for location argument
     result = lc.query_solar_system_objects(cadence_mask='all', cache=False)
     assert(len(result) == 1)
     result = lc.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=False)
     assert(len(result) == 1)
+    result = lc.query_solar_system_objects(cadence_mask=[True], cache=False)
+    assert(len(result) == 1)
+    result = lc.query_solar_system_objects(cadence_mask=(True), cache=False)
+    assert(len(result) == 1)
     result, mask = lc.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=True, return_mask=True)
     assert(len(mask) == len(lc.flux))
+    try:
+        result = lc.query_solar_system_objects(cadence_mask='str-not-supported', cache=False)
+        pytest.fail("Unsupported cadence_mask should have thrown Error")
+    except ValueError:
+        pass
 
 
 @pytest.mark.xfail  # LightCurveFile was removed in Lightkurve v2.x
