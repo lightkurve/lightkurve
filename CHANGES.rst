@@ -38,6 +38,9 @@ lightkurve.targetpixelfile
 - Modified ``to_lightcurve()`` to default to using ``aperture_mask='threshold'``
   if the 'pipeline' mask is missing or empty, e.g. for TESSCut files. [#812]
 
+- Modified `plot()` to use a more clear hatched style when visualizing the
+  aperture mask on top of pixel data. [#814]
+
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
 
