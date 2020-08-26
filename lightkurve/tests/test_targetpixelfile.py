@@ -598,6 +598,8 @@ def test_aperture_photometry_nan():
 def test_SSOs():
     # TESS test
     tpf = TessTargetPixelFile(asteroid_TPF)
+    result = tpf.query_solar_system_objects() # default cadence_mask = 'outliers'
+    assert(result is None) # the TPF has only data for 1 epoch. The lone time is removed as outlier
     result = tpf.query_solar_system_objects(cadence_mask='all', cache=False)
     assert(len(result) == 1)
     result = tpf.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=False)

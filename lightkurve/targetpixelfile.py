@@ -848,6 +848,9 @@ class TargetPixelFile(object):
                     aper = 'all'
                 lc = self.to_lightcurve(aperture_mask=aper)
                 cadence_mask = lc.remove_outliers(sigma=sigma, return_mask=True)[1]
+                # Avoid searching times with NaN flux; this is necessary because e.g.
+                # `remove_outliers` includes NaNs in its mask.
+                cadence_mask &= ~np.isnan(lc.flux)
             elif cadence_mask == 'all':
                 cadence_mask = np.ones(len(self.time)).astype(bool)
             else:
