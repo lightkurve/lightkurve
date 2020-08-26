@@ -1922,17 +1922,16 @@ class LightCurve(TimeSeries):
     def create_transit_mask(self, period, transit_time, duration):
         """Returns a np.array that is False during transits and True everywhere else.
 
-        This function creates a `lightkurve.BLSPeriodogram` for the light curve,
-        and utilizes its `get_transit_mask` method. It is flexible to multi-planet
-        systems, allowing users to pass in transit parameters as arrays or lists.
+        This function is flexible to multi-planet systems, allowing users to pass
+        in transit parameters as arrays or lists.
 
         Parameters
         ----------
-        period : float, Quantity, or array-like
+        period : float, or array-like
             Period of the transits.
-        duration : float, Quantity, or array-like
+        duration : float, or array-like
             Duration of the transits.
-        transit_time : float, Quantity, or array-like
+        transit_time : float, or array-like
             Transit midpoint of the transits.
 
         Returns
