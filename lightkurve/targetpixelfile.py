@@ -882,7 +882,7 @@ class TargetPixelFile(object):
         return res
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, column='FLUX', aperture_mask=None,
-             show_colorbar=True, mask_color='pink', title=None, style='lightkurve',
+             show_colorbar=True, mask_color='red', title=None, style='lightkurve',
              **kwargs):
         """Plot the pixel data for a single frame (i.e. at a single time).
 
@@ -975,7 +975,7 @@ class TargetPixelFile(object):
                         rect = patches.Rectangle(
                                         xy=(j+self.column-0.5, i+self.row-0.5),
                                         width=1, height=1, color=mask_color,
-                                        fill=True, alpha=.6)
+                                        fill=False, hatch='//')
                         ax.add_patch(rect)
         return ax
 
