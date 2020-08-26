@@ -1937,47 +1937,49 @@ class LightCurve(TimeSeries):
 
         Returns
         -------
-        mask : np.array of Bool
+        transit_mask : np.array of Bool
             Mask that removes transits. Mask is True where there are no transits.
         """
-        # It's necessary to replace NaN values with a small float to ensure that
-        # the output mask has the same dimensions as the input light curve
-        temp_lc = self.copy()
-        nanmask = np.where(np.isnan(temp_lc.flux_err.value))
-        temp_lc.flux.value[nanmask] = 1e-10 * self.flux.unit
-        temp_lc.flux_err.value[nanmask] = 1e-10 * self.flux_err.unit
 
-        # Instantiate the BLSPeriodogram
-        bls = temp_lc.to_periodogram('bls')
+        # Make sure all params have the same number of entries
+        n_planets = len(np.atleast_1d(period))
+        if any(len(param) != n_planets for param in [np.atleast_1d(transit_time),
+                                                     np.atleast_1d(duration)]):
+            raise ValueError("period, duration, and transit_time must have "
+                             "the same number of values.")
+
+        # Create empty cadence mask
+        transit_mask = np.empty(len(self), dtype=bool)
+        transit_mask[:] = True
 
         # Create a transit mask for a single planet
         if isinstance(period, (float, int)):
-            mask = bls.get_transit_mask(period=period, transit_time=transit_time,
-                                        duration=duration)
+            in_transit = self._get_masked_cadences(period, duration, transit_time)
 
         # Create a multi-planet transit mask
         elif isinstance(period, (list, np.ndarray)):
-            # Make sure all params have the same number of entries
-            n_planets = len(period)
-            if any(len(lst) != n_planets for lst in [np.atleast_1d(transit_time),
-                                                     np.atleast_1d(duration)]):
-                raise ValueError("period, duration, and transit_time must have "
-                                 "the same number of values.")
-
             # Create mask for first planet
-            mask = bls.get_transit_mask(period=period[0], duration=duration[0],
-                                        transit_time=transit_time[0])
+            in_transit = self._get_masked_cadences(period[0], duration[0],
+                                                   transit_time[0])
             # Iterate through other planets
             for i,p in enumerate(period[1:]):
                 n = i+1
-                new_mask = bls.get_transit_mask(period=p, duration=duration[n],
-                                                transit_time=transit_time[n])
-                mask = mask & new_mask
+                new_in_transit = self._get_masked_cadences(p, duration[n],
+                                                           transit_time[n])
+                in_transit = np.logical_or(in_transit, new_in_transit)
+
         else:
             raise TypeError("period, duration, and transit_time must be type "
                             "`float`, `Quantity` or `array-like`.")
 
-        return mask
+        transit_mask[in_transit] = False
+        return transit_mask
+
+    def _get_masked_cadences(self, period, duration, transit_time):
+        """Helper function to identify masked cadences."""
+        hp = period / 2.
+        in_transit = np.abs((self.time.value - transit_time + hp) % period - hp) < 0.5*duration
+        return in_transit
 
 class FoldedLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
