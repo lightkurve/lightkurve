@@ -45,27 +45,18 @@ def test_search_targetpixelfile():
     assert(len(search_targetpixelfile("pi Men")[-1]) == 1)
 
 
-# The test below currently fail because the MAST portal does not consistently
-# assign `sequence_number` at the time of writing, i.e.
-# * C91 and C91 appear bundled into one observation with sequence number "91" (example: EPIC 228162462)
-# * C101 and C102 appear bundled together with sequence number "10" (example: EPIC 228726301)
-# * C111 and C112 appear as *separate* observations with sequence numbers "111" and "112" (example: EPIC 202975993)
-# This issue is expected to be resolved by September 2020, at which point
-# we should try and revive this test.
-@pytest.mark.xfail
 def test_search_split_campaigns():
-    """Searches should should work for split campaigns."""
-    campaigns = [[91, 92, 9], [101, 102, 10], [111, 112, 11]]
+    """Searches should should work for split campaigns.
+
+    K2 Campaigns 9, 10, and 11 were split into two halves for various technical
+    reasons (C91=C9a, C92=C9b, C101=C10a, C102=C10b, C111=C11a, C112=C11b).
+    We expect most targets from those campaigns to return two TPFs.
+    """
+    campaigns = [9, 10, 11]
     ids = ['EPIC 228162462', 'EPIC 228726301', 'EPIC 202975993']
     for c, idx in zip(campaigns, ids):
-        ca = search_targetpixelfile(idx, campaign=c[0]).table
-        cb = search_targetpixelfile(idx, campaign=c[1]).table
-        assert(len(ca) == 1)
-        assert(len(ca) == len(cb))
-        assert(~np.any(ca['description'] == cb['description']))
-        # If you specify the whole campaign, both split parts must be returned.
-        cc = search_targetpixelfile(idx, campaign=c[2]).table
-        assert(len(cc) == 2)
+        search = search_targetpixelfile(idx, campaign=c).table
+        assert(len(search) == 2)
 
 
 @pytest.mark.remote_data
