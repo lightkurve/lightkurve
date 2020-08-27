@@ -752,6 +752,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                                          provenance_name=provenance_name,
                                          month=month, sector=sector, limit=limit)
         log.debug("MAST found {} matching data products.".format(len(masked_result)))
+        masked_result['distance'].info.format = '.1f'  # display <0.1 arcsec
         return SearchResult(masked_result)
 
     # Full Frame Images
