@@ -5,7 +5,6 @@ import logging
 import warnings
 
 import collections
-from typing import Iterable
 
 import numpy as np
 from scipy import signal
@@ -1241,11 +1240,44 @@ class LightCurve(TimeSeries):
             return res, np.in1d(self.astropy_time.jd, res.epoch)
         return res
 
-    def _create_plot(self, column='flux', method='plot', ax=None, normalize=False,
+    def _create_plot(self, method='plot', column='flux', ax=None, normalize=False,
                      xlabel=None, ylabel=None, title='', style='lightkurve',
-                     show_colorbar=True, colorbar_label='',
+                     show_colorbar=True, colorbar_label='', offset=None,
                      **kwargs) -> matplotlib.axes.Axes:
         """Implements `plot()`, `scatter()`, and `errorbar()` to avoid code duplication.
+
+        Parameters
+        ----------
+        method : str
+            One of 'plot', 'scatter', or 'errorbar'.
+        column : str
+            Name of data column to plot. Default `flux`.
+        ax : `~matplotlib.axes.Axes`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        normalize : bool
+            Normalize the lightcurve before plotting?
+        xlabel : str
+            X axis label.
+        ylabel : str
+            Y axis label.
+        title : str
+            Title shown at the top using matplotlib `set_title`.
+        style : str
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
+        show_colorbar : boolean
+            Show the colorbar if colors are given using the `c` argument?
+        colorbar_label : str
+            Label to show next to the colorbar (if `c` is given).
+        offset : float
+            Offset value to apply to the Y axis values before plotting. Use this
+            to avoid light curves from overlapping on the same plot. By default,
+            no offset is applies.
+        kwargs : dict
+            Dictionary of arguments to be passed to Matplotlib's `plot`,
+            `scatter`, or `errorbar` methods.
 
         Returns
         -------
@@ -1300,6 +1332,10 @@ class LightCurve(TimeSeries):
                 lc_normed = lc_tmp.normalize()
             flux, flux_err = lc_normed.flux, lc_normed.flux_err
 
+        # Apply offset if requested
+        if offset:
+            flux += offset*flux.unit
+
         # Make the plot
         with plt.style.context(style):
             if ax is None:
@@ -1339,19 +1375,27 @@ class LightCurve(TimeSeries):
             Name of data column to plot. Default `flux`.
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be created.
+            a new one will be generated.
         normalize : bool
             Normalize the lightcurve before plotting?
         xlabel : str
-            Plot x axis label
+            X axis label.
         ylabel : str
-            Plot y axis label
+            Y axis label.
         title : str
-            Plot set_title
+            Title shown at the top using matplotlib `set_title`.
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
+        show_colorbar : boolean
+            Show the colorbar if colors are given using the `c` argument?
+        colorbar_label : str
+            Label to show next to the colorbar (if `c` is given).
+        offset : float
+            Offset value to apply to the Y axis values before plotting. Use this
+            to avoid light curves from overlapping on the same plot. By default,
+            no offset is applies.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
@@ -1375,19 +1419,23 @@ class LightCurve(TimeSeries):
         normalize : bool
             Normalize the lightcurve before plotting?
         xlabel : str
-            Plot x axis label
+            X axis label.
         ylabel : str
-            Plot y axis label
+            Y axis label.
         title : str
-            Plot set_title
+            Title shown at the top using matplotlib `set_title`.
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
-        colorbar_label : str
-            Label to show next to the colorbar (if `c` is given).
         show_colorbar : boolean
             Show the colorbar if colors are given using the `c` argument?
+        colorbar_label : str
+            Label to show next to the colorbar (if `c` is given).
+        offset : float
+            Offset value to apply to the Y axis values before plotting. Use this
+            to avoid light curves from overlapping on the same plot. By default,
+            no offset is applies.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.scatter`.
 
@@ -1404,6 +1452,8 @@ class LightCurve(TimeSeries):
 
         Parameters
         ----------
+        linestyle : str
+            Connect the error bars using a line?
         column : str
             Name of data column to plot. Default `flux`.
         ax : `~matplotlib.axes.Axes`
@@ -1412,19 +1462,25 @@ class LightCurve(TimeSeries):
         normalize : bool
             Normalize the lightcurve before plotting?
         xlabel : str
-            Plot x axis label
+            X axis label.
         ylabel : str
-            Plot y axis label
+            Y axis label.
         title : str
-            Plot set_title
+            Title shown at the top using matplotlib `set_title`.
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
-        linestyle : str
-            Connect the error bars using a line?
+        show_colorbar : boolean
+            Show the colorbar if colors are given using the `c` argument?
+        colorbar_label : str
+            Label to show next to the colorbar (if `c` is given).
+        offset : float
+            Offset value to apply to the Y axis values before plotting. Use this
+            to avoid light curves from overlapping on the same plot. By default,
+            no offset is applies.
         kwargs : dict
-            Dictionary of arguments to be passed to `matplotlib.pyplot.scatter`.
+            Dictionary of arguments to be passed to `matplotlib.pyplot.errorbar`.
 
         Returns
         -------

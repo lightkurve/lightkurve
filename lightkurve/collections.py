@@ -2,13 +2,13 @@
 import logging
 import warnings
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
 from astropy.table import vstack
 
 from . import MPLSTYLE
-from .utils import LightkurveWarning
 from .targetpixelfile import TargetPixelFile
 
 log = logging.getLogger(__name__)
@@ -123,7 +123,7 @@ class LightCurveCollection(Collection):
         # Need `join_type='inner'` until AstroPy supports masked Quantities
         return vstack(lcs, join_type='inner', metadata_conflicts='silent')
 
-    def plot(self, ax=None, offset=0.1, **kwargs):
+    def plot(self, ax=None, offset=0., **kwargs) -> matplotlib.axes.Axes:
         """Plots all light curves in the collection on a single plot.
 
         Parameters
@@ -131,9 +131,15 @@ class LightCurveCollection(Collection):
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be created.
-
+        offset : float
+            Offset to add to targets with different labels, to prevent light
+            curves from being plotted on top of each other.  For example, if
+            the collection contains light curves with unique labels "A", "B",
+            and "C", light curves "A" will have `0*offset` added to their flux,
+            light curves "B" will have `1*offset` offset added, and "C" will
+            have `2*offset` added.
         **kwargs : dict
-            Dictionary of arguments to be passed to matplotlib's `~matplotlib.pyplot.plot`.
+            Dictionary of arguments to be passed to `LightCurve.plot`.
 
         Returns
         -------
@@ -143,24 +149,22 @@ class LightCurveCollection(Collection):
         with plt.style.context(MPLSTYLE):
             if ax is None:
                 _, ax = plt.subplots()
-            for kwarg in ['c', 'color', 'label', 'normalize']:
+            for kwarg in ['c', 'color', 'label']:
                 if kwarg in kwargs:
                     kwargs.pop(kwarg)
 
             labels = np.asarray([lc.meta.get('label') for lc in self])
             try:
                 unique_labels = np.sort(np.unique(labels))
-            except TypeError:
+            except TypeError:  # sorting will fail if labels includes None
                 unique_labels = [None]
+
             for idx, targetid in enumerate(unique_labels):
                 jdxs = np.where(labels == targetid)[0]
-                if not hasattr(jdxs, '__iter__'):
-                    jdxs = [jdxs]
-                for jdx in jdxs:
-                    if jdx == jdxs[0]:
-                        (self[jdx].normalize() + idx*offset).plot(ax=ax, c='C{}'.format(idx), normalize=False, **kwargs)
-                    else:
-                        (self[jdx].normalize() + idx*offset).plot(ax=ax, c='C{}'.format(idx), normalize=False, label='', **kwargs)
+                for jdx in np.atleast_1d(jdxs):
+                    if jdx != jdxs[0]:  # Avoid multiple labels for same object
+                        kwargs['label'] = ''
+                    self[jdx].plot(ax=ax, c=f'C{idx}', offset=idx*offset, **kwargs)
         return ax
 
 
