@@ -12,7 +12,6 @@ from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii
 from astropy import units as u
-from astropy.utils.exceptions import AstropyWarning
 from astropy.utils import deprecated
 
 from .targetpixelfile import TargetPixelFile
@@ -683,19 +682,6 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
         provenance_name = None
     else:
         provenance_name = np.atleast_1d(provenance_name).tolist()
-
-    # Temporary bug workaround: MAST assigned `sequence_number=92` to both
-    # C91 and C92 observations at the time of writing.
-    if (9 in np.atleast_1d(campaign)) or (91 in np.atleast_1d(campaign)):
-        campaign = np.atleast_1d(campaign).tolist()
-        campaign.append(91)
-        campaign.append(92)
-    # Temporary bug workaround: MAST assigned sequence_number 111 or 112
-    # to C11 observations; this code below makes `campaign=11` work regardless.
-    if 11 in np.atleast_1d(campaign):
-        campaign = np.atleast_1d(campaign).tolist()
-        campaign.append(111)
-        campaign.append(112)
 
     # Speed up by restricting the MAST query if we don't want FFI image data
     extra_query_criteria = {}
