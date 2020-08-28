@@ -36,16 +36,16 @@ lightkurve.targetpixelfile
   column in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
 
 - Modified ``to_lightcurve()`` to default to using ``aperture_mask='threshold'``
-  if the 'pipeline' mask is missing or empty, e.g. for TESSCut files. [#812]
+  if the ``'pipeline'`` mask is missing or empty, e.g. for TESSCut files. [#812]
 
-- Modified `plot()` to use a more clear hatched style when visualizing the
+- Modified ``plot()`` to use a more clear hatched style when visualizing the
   aperture mask on top of pixel data. [#814]
 
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
 
 - Added support for reading K2SFF and EVEREST community light curves via the
-  `LightCurve.read()` and `search_lightcurve()` functions. [#739]
+  ``LightCurve.read()`` and ``search_lightcurve()`` functions. [#739]
 
 - Modified the search functions such that exact mission target identifiers,
   such as 'KIC 5112705' or 'TIC 261136679', only return products known under
@@ -68,6 +68,14 @@ lightkurve.seismology
 
 - Added an error message to ``estimate_numax()`` or ``estimate_deltanu()`` if
   the underlying periodogram does not have uniformly-spaced frequencies. [#780]
+
+
+
+1.11.2 (2020-08-28)
+===================
+
+- Fixed a warning being issued (``"LightCurveFile.header is deprecated"``)
+  when downloading light curve files from MAST. [#819]
 
 
 
