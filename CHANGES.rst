@@ -41,6 +41,9 @@ lightkurve.targetpixelfile
 - Modified ``plot()`` to use a more clear hatched style when visualizing the
   aperture mask on top of pixel data. [#814]
 
+- Modified ``_parse_aperture_mask()`` to ensure that masks composed of integer
+  or floats are always converted to booleans. [#694]
+
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
 
