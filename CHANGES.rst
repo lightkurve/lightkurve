@@ -2,7 +2,7 @@
 ===================
 
 - Fixed a warning being issued (``"LightCurveFile.header is deprecated"``)
-  when downloading light curve files from MAST.
+  when downloading light curve files from MAST. [#819]
 
 
 1.11.1 (2020-06-18)
