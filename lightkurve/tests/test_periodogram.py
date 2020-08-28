@@ -26,6 +26,8 @@ def test_periodogram_basics():
     pg.show_properties()
     pg.to_table()
     str(pg)
+    lc[400:500] = np.nan
+    pg = lc.to_periodogram()
 
 
 def test_periodogram_normalization():
@@ -329,6 +331,7 @@ def test_error_messages():
     # Can't specify periods and frequencies
     with pytest.raises(ValueError) as err:
         lc.to_periodogram(frequency=np.arange(10), period=np.arange(10))
+
 
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
