@@ -1940,45 +1940,33 @@ class LightCurve(TimeSeries):
             Mask that removes transits. Mask is True where there are no transits.
         """
 
+        # Make all parameters arrays
+        period = np.atleast_1d(period)
+        duration = np.atleast_1d(duration)
+        transit_time = np.atleast_1d(transit_time)
+
         # Make sure all params have the same number of entries
-        n_planets = len(np.atleast_1d(period))
-        if any(len(param) != n_planets for param in [np.atleast_1d(transit_time),
-                                                     np.atleast_1d(duration)]):
+        n_planets = len(period)
+        if any(len(param) != n_planets for param in [duration, transit_time]):
             raise ValueError("period, duration, and transit_time must have "
                              "the same number of values.")
 
         # Create empty cadence mask
-        transit_mask = np.empty(len(self), dtype=bool)
-        transit_mask[:] = True
+        in_transit = np.empty(len(self), dtype=bool)
+        in_transit[:] = False
 
-        # Create a transit mask for a single planet
-        if isinstance(period, (float, int)):
-            in_transit = self._get_masked_cadences(period, duration, transit_time)
+        # Create a transit mask
+        for per, dur, tt in zip(period, duration, transit_time):
+            in_transit |= self._get_masked_cadences(per, dur, tt)
 
-        # Create a multi-planet transit mask
-        elif isinstance(period, (list, np.ndarray)):
-            # Create mask for first planet
-            in_transit = self._get_masked_cadences(period[0], duration[0],
-                                                   transit_time[0])
-            # Iterate through other planets
-            for i,p in enumerate(period[1:]):
-                n = i+1
-                new_in_transit = self._get_masked_cadences(p, duration[n],
-                                                           transit_time[n])
-                in_transit = np.logical_or(in_transit, new_in_transit)
-
-        else:
-            raise TypeError("period, duration, and transit_time must be type "
-                            "`float`, `Quantity` or `array-like`.")
-
-        transit_mask[in_transit] = False
-        return transit_mask
+        return ~in_transit
 
     def _get_masked_cadences(self, period, duration, transit_time):
         """Helper function to identify masked cadences."""
         hp = period / 2.
         in_transit = np.abs((self.time.value - transit_time + hp) % period - hp) < 0.5*duration
         return in_transit
+
 
 class FoldedLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
