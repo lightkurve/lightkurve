@@ -308,7 +308,7 @@ class KeplerLightCurveFile(LightCurveFile):
         super(KeplerLightCurveFile, self).__init__(path, **kwargs)
 
         # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.header())
+        filetype = detect_filetype(self.get_header())
         if filetype == 'TessLightCurveFile':
             warnings.warn("A TESS data product is being opened using the "
                           "`KeplerLightCurveFile` class. "
@@ -466,7 +466,7 @@ class TessLightCurveFile(LightCurveFile):
         super(TessLightCurveFile, self).__init__(path, **kwargs)
 
         # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.header())
+        filetype = detect_filetype(self.get_header())
         if filetype == 'KeplerLightCurveFile':
             warnings.warn("A Kepler data product is being opened using the "
                           "`TessLightCurveFile` class. "
