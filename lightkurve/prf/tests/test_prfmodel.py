@@ -1,5 +1,4 @@
 """Test the features of the lightkurve.prf.prfmodels module."""
-from __future__ import division, print_function
 from collections import OrderedDict
 
 from astropy.io import fits
