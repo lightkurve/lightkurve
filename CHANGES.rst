@@ -20,6 +20,9 @@ lightkurve.lightcurve
 - Added a ``column`` parameter to ``LightCurve``'s ``plot()``, ``scatter()``,
   and ``errorbar()`` methods to enable any column to be plotted. [#765]
 
+- Added the ``LightCurve.create_transit_mask(period, transit_time, duration)``
+  method to conveniently mask planet or eclipsing binary transits. [#808]
+
 lightkurve.targetpixelfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

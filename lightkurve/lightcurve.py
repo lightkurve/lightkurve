@@ -1920,27 +1920,41 @@ class LightCurve(TimeSeries):
         return ax
 
     def create_transit_mask(self, period, transit_time, duration):
-        """Returns a np.array that is False during transits and True everywhere else.
+        """Returns a boolean array that is ``True`` during transits and
+        ``False`` elsewhere.
 
-        This function is flexible to multi-planet systems, allowing users to pass
-        in transit parameters as arrays or lists.
+        This method supports multi-planet systems by allowing ``period``,
+        ``transit_time``, and ``duration`` to be array-like lists of parameters.
 
         Parameters
         ----------
         period : float, or array-like
-            Period of the transits.
+            Period(s) of the transits.
         duration : float, or array-like
-            Duration of the transits.
-        transit_time : float, or array-like
-            Transit midpoint of the transits.
+            Duration(s) of the transits.
+        transit_time : `~astropy.time.Time`, float, or array-like
+            Transit midpoint(s) of the transits.
 
         Returns
         -------
-        transit_mask : np.array of Bool
-            Mask that removes transits. Mask is True where there are no transits.
-        """
+        transit_mask : np.array of bool
+            Mask that flags transits. Mask is ``True`` where there are transits.
 
-        # Make all parameters arrays
+        Examples
+        --------
+        You can create a transit mask for a single-planet system as follows::
+
+            >>> import lightkurve as lk
+            >>> lc = lk.LightCurve({'time': [1, 2, 3, 4, 5], 'flux': [1, 1, 1, 1, 1]})
+            >>> lc.create_transit_mask(transit_time=2., period=2., duration=0.1)
+            array([False,  True, False,  True, False])
+
+        The method accepts lists of parameters to support multi-planet systems::
+
+            >>> lc.create_transit_mask(transit_time=[2., 3.], period=[2., 10.], duration=[0.1, 0.1])
+            array([False,  True,  True,  True, False])
+        """
+        # Ensure all parameters are 1D-arrays
         period = np.atleast_1d(period)
         duration = np.atleast_1d(duration)
         transit_time = np.atleast_1d(transit_time)
@@ -1951,20 +1965,18 @@ class LightCurve(TimeSeries):
             raise ValueError("period, duration, and transit_time must have "
                              "the same number of values.")
 
-        # Create empty cadence mask
+        # Initialize an empty cadence mask
         in_transit = np.empty(len(self), dtype=bool)
         in_transit[:] = False
 
-        # Create a transit mask
+        # Create the transit mask
         for per, dur, tt in zip(period, duration, transit_time):
-            in_transit |= self._get_masked_cadences(per, dur, tt)
+            if isinstance(tt, Time):
+                # If a `Time` is passed, ensure it has the right format & scale
+                tt = Time(tt, format=self.time.format, scale=self.time.scale).value
+            hp = per / 2.
+            in_transit |= np.abs((self.time.value - tt + hp) % per - hp) < 0.5*dur
 
-        return ~in_transit
-
-    def _get_masked_cadences(self, period, duration, transit_time):
-        """Helper function to identify masked cadences."""
-        hp = period / 2.
-        in_transit = np.abs((self.time.value - transit_time + hp) % period - hp) < 0.5*duration
         return in_transit
 
 
