@@ -671,3 +671,10 @@ def test_parse_numeric_aperture_masks():
     assert(mask.dtype == bool)
     mask = tpf._parse_aperture_mask(np.zeros(tpf.shape[1:], dtype=int))
     assert(mask.dtype == bool)
+
+
+def test_tpf_meta():
+    """Can we access meta data using tpf.meta?"""
+    tpf = read(filename_tpf_one_center)
+    assert tpf.meta.get('mission') == 'K2'
+    assert tpf.meta.get('channel') == 45

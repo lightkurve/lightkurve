@@ -62,6 +62,11 @@ class TargetPixelFile(object):
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
 
+        # For consistency with `LightCurve`, provide a `meta` dictionary
+        self.meta = {}
+        self.meta.update(self.get_header(0))
+        self.meta = {k.lower(): v for k, v in self.meta.items()}
+
     def __getitem__(self, key):
         """Implements indexing and slicing.
 
