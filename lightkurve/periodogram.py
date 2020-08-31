@@ -725,6 +725,10 @@ class LombScarglePeriodogram(Periodogram):
         """
         # Input validation
         normalization = validate_method(normalization, ['psd', 'amplitude'])
+        if np.isnan(lc.flux).any():
+            lc = lc.remove_nans()
+            log.debug('Lightcurve contains NaN values.'
+                      'These are removed before creating the periodogram.')
 
         # Setting default frequency units
         if freq_unit is None:
@@ -766,10 +770,6 @@ class LombScarglePeriodogram(Periodogram):
            (not all(b is None for b in [frequency, minimum_frequency, maximum_frequency])):
             raise ValueError('You have input keyword arguments for both frequency and period. '
                              'Please only use one.')
-
-        if (~np.isfinite(lc.flux)).any():
-            raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
-                             ' to remove NaN values from a LightCurve.')
 
         time = lc.time.copy()
 
