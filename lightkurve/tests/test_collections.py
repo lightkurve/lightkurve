@@ -4,9 +4,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
 
+<<<<<<< HEAD
 from ..lightcurve import LightCurve
 from ..search import search_lightcurve
 from ..targetpixelfile import KeplerTargetPixelFile
+=======
+from ..lightcurve import LightCurve, TessLightCurve
+from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
+>>>>>>> 1608e57... Collection.sector - test; handle boundary cases
 from ..collections import LightCurveCollection, TargetPixelFileCollection
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
@@ -154,3 +159,31 @@ def test_stitch_repr():
     # The line below used to raise `ValueError: Unable to parse format string
     # "{:10d}" for entry "70445.0" in column "cadenceno"`
     LightCurveCollection((lc,lc)).stitch().__repr__()
+
+
+def test_accessor_tess_sector():
+    lc0 = TessLightCurve(time=np.arange(1, 5), flux=np.arange(1, 5),
+                         flux_err=np.arange(1, 5), targetid=50000)
+    lc0.sector = 14
+    lc1 = TessLightCurve(time=np.arange(10, 15), flux=np.arange(10, 15),
+                         flux_err=np.arange(10, 15), targetid=120334)
+    lc1.sector = 26
+    lcc = LightCurveCollection([lc0, lc1])
+    assert(lcc.sector == [14, 26])
+
+    # boundary condition: some lightcurve objects do not have sector
+    lc2 = LightCurve(time=np.arange(15, 20), flux=np.arange(15, 20),
+                     flux_err=np.arange(15, 20), targetid=23456)
+    lcc.append(lc2)
+    assert(lcc.sector == [14, 26, None])
+
+    # ensure it works for TPFs too.
+    tpf = TessTargetPixelFile(filename_tpf_all_zeros)
+    tpf.hdu[0].header['SECTOR'] = 23
+    tpf2 = TessTargetPixelFile(filename_tpf_one_center)
+    # tpf2 has no sector defined
+    tpf3 = TessTargetPixelFile(filename_tpf_one_center)
+    tpf3.hdu[0].header['SECTOR'] = 1
+    tpfc = TargetPixelFileCollection([tpf, tpf2, tpf3])
+    assert(tpfc.sector == [23, None, 1])
+

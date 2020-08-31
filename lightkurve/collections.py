@@ -18,6 +18,11 @@ log = logging.getLogger(__name__)
 
 __all__ = ['LightCurveCollection', 'TargetPixelFileCollection']
 
+def _safe_sector(lcOrTpf):
+    try:
+        return lcOrTpf.sector
+    except AttributeError:
+        return None
 
 class Collection(object):
     """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
@@ -107,7 +112,7 @@ class Collection(object):
     def sector(self):
         """(TESS-specific) the sectors of the lightcurves / target pixel files
         """
-        return np.array([lc.sector for lc in self.data])
+        return [_safe_sector(lc) for lc in self.data]
 
 
 class LightCurveCollection(Collection):
