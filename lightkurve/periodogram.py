@@ -728,7 +728,7 @@ class LombScarglePeriodogram(Periodogram):
         if np.isnan(lc.flux).any():
             lc = lc.remove_nans()
             log.debug('Lightcurve contains NaN values.'
-            'These are removed before creating the periodogram.')
+                      'These are removed before creating the periodogram.')
 
         # Setting default frequency units
         if freq_unit is None:
