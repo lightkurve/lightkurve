@@ -97,6 +97,33 @@ def test_collection_getitem_by_boolean_array():
     with pytest.raises(IndexError):
         lcc[[True, False, True, True]]
 
+def test_collection_getitem_by_other_array():
+    """Tests Collection.__getitem__ , case the argument an non-boolean array"""
+    lc0 = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5),
+                    flux_err=np.arange(1, 5), targetid=50000)
+    lc1 = LightCurve(time=np.arange(10, 15), flux=np.arange(10, 15),
+                     flux_err=np.arange(10, 15), targetid=120334)
+    lc2 = LightCurve(time=np.arange(15, 20), flux=np.arange(15, 20),
+                     flux_err=np.arange(15, 20), targetid=23456)
+    lcc = LightCurveCollection([lc0, lc1, lc2])
+
+    # case: an int array-like, follow ndarray behavior
+    lcc_f = lcc[[2, 0]]
+    assert(lcc_f.data == [lc2, lc0])
+    lcc_f = lcc[np.array([2, 0])]
+    assert(lcc_f.data == [lc2, lc0])
+    # boundary condition: True / False is interpreted as 1/0 in an bool/int mixed array-like
+    lcc_f = lcc[[True, False, 2]]
+    assert(lcc_f.data == [lc1, lc0, lc2])
+    # boundary condition: some index is out of bound
+    with pytest.raises(IndexError):
+        lcc[[2, 99]]
+    # boundary conditions: array-like of neither bool or int, follow ndarray behavior
+    with pytest.raises(IndexError):
+        lcc[['abc', 'def']]
+    with pytest.raises(IndexError):
+        lcc[[True, 'def']]
+
 def test_collection_setitem():
     """Tests Collection. __setitem__"""
     lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5),

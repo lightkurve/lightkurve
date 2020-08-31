@@ -45,16 +45,21 @@ class Collection(object):
     def __getitem__(self, indexOrMask):
         if (isinstance(indexOrMask, (int, np.integer, slice))):
             return self.data[indexOrMask]
-        else:
-            # assume indexOrMask is array like, e.g., np.ndarray, collections.abc.Sequence, etc.
+        elif (all([isinstance(i, (bool, np.bool_)) for i in indexOrMask])):
+            # case indexOrMask is bool array like, e.g., np.ndarray, collections.abc.Sequence, etc.
 
             # note: filter using nd.array is very slow
             #   np.array(self.data)[np.nonzero(indexOrMask)]
-            # specifically, nd.array(self.data) is very slow, it probably deep copies the data
+            # specifically, nd.array(self.data) is very slow, as it deep copies the data
             # so we create the filtered list on our own
             if (len(indexOrMask) != len(self.data)):
                 raise IndexError(f'boolean index did not match indexed array; dimension is {len(self.data)} but corresponding boolean dimension is {len(indexOrMask)}')
             return type(self)([self.data[i] for i in np.nonzero(indexOrMask)[0]])
+        elif (all([isinstance(i, (int, np.integer)) for i in indexOrMask])):
+            # case int array like, follow ndarray behavior
+            return type(self)([self.data[i] for i in indexOrMask])
+        else:
+            raise IndexError('only integers, slices (`:`) and integer or boolean arrays are valid indices')
 
     def __setitem__(self, index, obj):
         self.data[index] = obj
