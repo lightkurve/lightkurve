@@ -57,6 +57,40 @@ def test_collection_getitem():
     with pytest.raises(IndexError):
         lcc[50]
 
+def test_collection_getitem_by_boolean_array():
+    """Tests Collection.__getitem__ , case the argument is a mask, i.e, indexed by boolean array"""
+    lc0 = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5),
+                    flux_err=np.arange(1, 5), targetid=50000)
+    lc1 = LightCurve(time=np.arange(10, 15), flux=np.arange(10, 15),
+                     flux_err=np.arange(10, 15), targetid=120334)
+    lc2 = LightCurve(time=np.arange(15, 20), flux=np.arange(15, 20),
+                     flux_err=np.arange(15, 20), targetid=23456)
+    lcc = LightCurveCollection([lc0, lc1, lc2])
+
+    lcc_f = lcc[[True, False, True]]
+    assert(lcc_f.data == [lc0, lc2])
+    assert(type(lcc_f), LightCurveCollection)
+
+    # boundary case: 1 element
+    lcc_f = lcc[[False, True, False]]
+    assert(lcc_f.data == [lc1])
+    # boundary case: no element
+    lcc_f = lcc[[False, False, False]]
+    assert(lcc_f.data == [])
+    # other array-like input: tuple
+    lcc_f = lcc[(True, False, True)]
+    assert(lcc_f.data == [lc0, lc2])
+    # other array-like input: ndarray
+    lcc_f = lcc[np.array([True, False, True])]
+    assert(lcc_f.data == [lc0, lc2])
+
+    # boundary case: mask length not matching - shorter
+    with pytest.raises(IndexError):
+        lcc[[True, False]]
+
+    # boundary case: mask length not matching - longer
+    with pytest.raises(IndexError):
+        lcc[[True, False, True, True]]
 
 def test_collection_setitem():
     """Tests Collection. __setitem__"""
@@ -88,6 +122,10 @@ def test_tpfcollection():
     assert(tpfc[2] == tpf2)
     with pytest.raises(IndexError):
         tpfc[51]
+    # ensure index by boolean array also works for TPFs
+    tpfc_f = tpfc[[False, True, True]]
+    assert(tpfc_f.data == [tpf2, tpf2])
+    assert(type(tpfc_f), TargetPixelFileCollection)
     # Test __setitem__
     tpf3 = KeplerTargetPixelFile(filename_tpf_one_center, targetid=55)
     tpfc[1] = tpf3

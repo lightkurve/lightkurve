@@ -47,6 +47,8 @@ class Collection(object):
             #   np.array(self.data)[np.nonzero(indexOrMask)]
             # specifically, nd.array(self.data) is very slow, it probably deep copies the data
             # so we create the filtered list on our own
+            if (len(indexOrMask) != len(self.data)):
+                raise IndexError(f'boolean index did not match indexed array; dimension is {len(self.data)} but corresponding boolean dimension is {len(indexOrMask)}')
             return type(self)([self.data[i] for i in np.nonzero(indexOrMask)[0]])
 
     def __setitem__(self, index, obj):
