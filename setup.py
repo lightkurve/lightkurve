@@ -20,10 +20,7 @@ with open('requirements.txt') as f:
     install_requires = f.read().splitlines()
 # 2. What dependencies required to run the unit tests? (i.e. `pytest --remote-data`)
 tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata', 'codecov', 'pytest-doctestplus', 'codacy-coverage']
-# 3. What dependencies are required for optional features?
-# `interact()` requires bokeh>=1.0, ipython.
-extras_require = {"all":  ["bokeh>=1.0", "ipython"],
-                  "test": tests_require}
+extras_require = {"test": tests_require}
 
 setup(name='lightkurve',
       version=__version__,
