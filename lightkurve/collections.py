@@ -38,7 +38,7 @@ class Collection(object):
         return len(self.data)
 
     def __getitem__(self, indexOrMask):
-        if (isinstance(indexOrMask, (int, slice))):
+        if (isinstance(indexOrMask, (int, np.integer, slice))):
             return self.data[indexOrMask]
         else:
             # assume indexOrMask is array like, e.g., np.ndarray, collections.abc.Sequence, etc.
