@@ -112,6 +112,9 @@ def test_collection_getitem_by_other_array():
     assert(lcc_f.data == [lc2, lc0])
     lcc_f = lcc[np.array([2, 0])]
     assert(lcc_f.data == [lc2, lc0])
+    # support other int types in np too
+    lcc_f = lcc[np.array([np.int64(2), np.uint8(0)])]
+    assert(lcc_f.data == [lc2, lc0])
     # boundary condition: True / False is interpreted as 1/0 in an bool/int mixed array-like
     lcc_f = lcc[[True, False, 2]]
     assert(lcc_f.data == [lc1, lc0, lc2])
