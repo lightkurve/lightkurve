@@ -209,12 +209,13 @@ def test_accessor_tess_sector():
     lc2 = LightCurve(time=np.arange(15, 20), flux=np.arange(15, 20),
                      flux_err=np.arange(15, 20), targetid=23456)
     lcc.append(lc2)
-    assert((lcc.sector == [14, 26, None]).all())
+    # expecting [14, 26, np.nan], need 2 asserts to do it.
+    assert((lcc.sector[:-1] == [14, 26]).all())
+    assert(np.isnan(lcc.sector[-1]))
     # The sector accessor can be used to generate boolean array
     # to support filter collection by sector
     assert(((lcc.sector == 26) == [False, True, False]).all())
-    # OPEN: does not work yet. as None < 20 yields type error
-    # assert(((lcc.sector < 20) == [True, False, False]).all())
+    assert(((lcc.sector < 20) == [True, False, False]).all())
 
     # ensure it works for TPFs too.
     tpf = TessTargetPixelFile(filename_tpf_all_zeros)

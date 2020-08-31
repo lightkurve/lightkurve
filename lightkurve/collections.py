@@ -22,7 +22,9 @@ def _safe_sector(lcOrTpf):
     try:
         return lcOrTpf.sector
     except AttributeError:
-        return None
+        # return np.nan instead of None, so that the returned value can be used in a comparison
+        # e.g., lcc[lcc.sector < 25]
+        return np.nan
 
 class Collection(object):
     """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
@@ -115,7 +117,7 @@ class Collection(object):
 
     @property
     def sector(self):
-        """(TESS-specific) the sectors of the lightcurves / target pixel files
+        """(TESS-specific) the sectors of the lightcurves / target pixel files; np.nan for objects with no sector.
         """
         return np.array([_safe_sector(lc) for lc in self.data])
 
