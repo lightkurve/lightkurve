@@ -199,13 +199,22 @@ def test_accessor_tess_sector():
                          flux_err=np.arange(10, 15), targetid=120334)
     lc1.sector = 26
     lcc = LightCurveCollection([lc0, lc1])
-    assert(lcc.sector == [14, 26])
+    assert((lcc.sector == [14, 26]).all())
+    # The sector accessor can be used to generate boolean array
+    # to support filter collection by sector
+    assert(((lcc.sector == 26) == [False, True]).all())
+    assert(((lcc.sector < 20) == [True, False]).all())
 
     # boundary condition: some lightcurve objects do not have sector
     lc2 = LightCurve(time=np.arange(15, 20), flux=np.arange(15, 20),
                      flux_err=np.arange(15, 20), targetid=23456)
     lcc.append(lc2)
-    assert(lcc.sector == [14, 26, None])
+    assert((lcc.sector == [14, 26, None]).all())
+    # The sector accessor can be used to generate boolean array
+    # to support filter collection by sector
+    assert(((lcc.sector == 26) == [False, True, False]).all())
+    # OPEN: does not work yet. as None < 20 yields type error
+    # assert(((lcc.sector < 20) == [True, False, False]).all())
 
     # ensure it works for TPFs too.
     tpf = TessTargetPixelFile(filename_tpf_all_zeros)
@@ -215,5 +224,5 @@ def test_accessor_tess_sector():
     tpf3 = TessTargetPixelFile(filename_tpf_one_center)
     tpf3.hdu[0].header['SECTOR'] = 1
     tpfc = TargetPixelFileCollection([tpf, tpf2, tpf3])
-    assert(tpfc.sector == [23, None, 1])
+    assert((tpfc.sector == [23, None, 1]).all())
 

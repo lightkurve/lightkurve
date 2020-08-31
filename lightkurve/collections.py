@@ -117,7 +117,7 @@ class Collection(object):
     def sector(self):
         """(TESS-specific) the sectors of the lightcurves / target pixel files
         """
-        return [_safe_sector(lc) for lc in self.data]
+        return np.array([_safe_sector(lc) for lc in self.data])
 
 
 class LightCurveCollection(Collection):
