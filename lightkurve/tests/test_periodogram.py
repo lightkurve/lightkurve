@@ -267,7 +267,7 @@ def test_bls(caplog):
     mask = p.get_transit_mask(1, 0.1, 0)
     assert isinstance(mask, np.ndarray)
     assert isinstance(mask[0], np.bool_)
-    assert mask.sum() > (~mask).sum()
+    assert mask.sum() < (~mask).sum()
 
     assert isinstance(p.period_at_max_power, u.Quantity)
     assert isinstance(p.duration_at_max_power, u.Quantity)
