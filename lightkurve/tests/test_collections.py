@@ -1,3 +1,5 @@
+import warnings
+
 import pytest
 from astropy.utils.data import get_pkg_data_filename
 import matplotlib.pyplot as plt
@@ -8,6 +10,7 @@ from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..search import search_lightcurve
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..collections import LightCurveCollection, TargetPixelFileCollection
+from ..utils import LightkurveWarning
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
@@ -213,12 +216,16 @@ def test_accessor_tess_sector():
     assert(((lcc.sector < 20) == [True, False, False]).all())
 
     # ensure it works for TPFs too.
-    tpf = TessTargetPixelFile(filename_tpf_all_zeros)
-    tpf.hdu[0].header['SECTOR'] = 23
-    tpf2 = TessTargetPixelFile(filename_tpf_one_center)
-    # tpf2 has no sector defined
-    tpf3 = TessTargetPixelFile(filename_tpf_one_center)
-    tpf3.hdu[0].header['SECTOR'] = 1
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", LightkurveWarning)
+        # Ignore "A Kepler data product is being opened using the `TessTargetPixelFile` class"
+        # the test only cares about the SECTOR header that it sets.
+        tpf = TessTargetPixelFile(filename_tpf_all_zeros)
+        tpf.hdu[0].header['SECTOR'] = 23
+        tpf2 = TessTargetPixelFile(filename_tpf_one_center)
+        # tpf2 has no sector defined
+        tpf3 = TessTargetPixelFile(filename_tpf_one_center)
+        tpf3.hdu[0].header['SECTOR'] = 1
     tpfc = TargetPixelFileCollection([tpf, tpf2, tpf3])
     assert((tpfc.sector == [23, None, 1]).all())
 
