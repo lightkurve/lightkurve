@@ -29,10 +29,24 @@ def _safe_sector(lcOrTpf):
 class Collection(object):
     """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
 
+    A collection can be indexed by standard Python list syntax.
+    Additionally, it can be indexed by a subset of `numpy.ndarray` syntax: boolean array indexing and integer array indexing.
+
     Attributes
     ----------
     data: array-like
         List of data objects.
+
+    Examples
+    --------
+    Filter a collection by boolean array indexing.
+
+        >>> lcc_filtered = lcc[(lcc.sector == 13) & (lcc.sector <= 19)]  # doctest: +SKIP
+        >>> lc22 = lcc[lcc.sector == 22][0]  # doctest: +SKIP
+
+    Filter a collection by integer array indexing to get the object at index 0 and 2.
+
+        >>>  lcc_filtered = lcc[0, 2]  # doctest: +SKIP
     """
     def __init__(self, data):
         if data is not None:
@@ -117,7 +131,21 @@ class Collection(object):
 
     @property
     def sector(self):
-        """(TESS-specific) the sectors of the lightcurves / target pixel files; np.nan for objects with no sector.
+        """(TESS-specific) the sectors of the lightcurves / target pixel files.
+
+        The TESS sectors of the lightcurves / target pixel files; `numpy.nan` for those with no sector.
+        The attribute is useful for filtering a collection by sector.
+
+        Examples
+        --------
+        Plot two lightcurves, one from TESS sectors 13 to 19, and one for sector 22
+
+            >>> import lightkurve as lk
+            >>> lcc = lk.search_lightcurve('TIC286923464', mission='TESS').download_all()  # doctest: +SKIP
+            >>> lcc_filtered = lcc[(lcc.sector >= 13) & (lcc.sector <= 19)]  # doctest: +SKIP
+            >>> lcc_filtered.plot()  # doctest: +SKIP
+            >>> lcc[lcc.sector == 22][0].plot()  # doctest: +SKIP
+
         """
         return np.array([_safe_sector(lc) for lc in self.data])
 
