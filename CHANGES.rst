@@ -66,6 +66,12 @@ lightkurve.seismology
 - Added an error message to ``estimate_numax()`` or ``estimate_deltanu()`` if
   the underlying periodogram does not have uniformly-spaced frequencies. [#780]
 
+lightkurve.periodogram
+^^^^^^^^^^^^^^^^^^^^^^
+
+- Modified ``create_transit_mask`` method to return ``True`` during transits and
+  ``False`` elsewhere for consistent mask syntax. [#808]
+
 
 
 1.11.1 (2020-06-18)
