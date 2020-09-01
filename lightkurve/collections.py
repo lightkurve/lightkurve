@@ -1,6 +1,5 @@
 """Defines collections of data products."""
 import logging
-import warnings
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -17,6 +16,7 @@ from .utils import LightkurveDeprecationWarning
 log = logging.getLogger(__name__)
 
 __all__ = ['LightCurveCollection', 'TargetPixelFileCollection']
+
 
 class Collection(object):
     """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
@@ -61,7 +61,8 @@ class Collection(object):
             # specifically, nd.array(self.data) is very slow, as it deep copies the data
             # so we create the filtered list on our own
             if (len(indexOrMask) != len(self.data)):
-                raise IndexError(f'boolean index did not match indexed array; dimension is {len(self.data)} but corresponding boolean dimension is {len(indexOrMask)}')
+                raise IndexError(f'boolean index did not match indexed array; dimension is {len(self.data)} '
+                                 f'but corresponding boolean dimension is {len(indexOrMask)}')
             return type(self)([self.data[i] for i in np.nonzero(indexOrMask)[0]])
         elif (all([isinstance(i, (int, np.integer)) for i in indexOrMask])):
             # case int array like, follow ndarray behavior
@@ -162,6 +163,7 @@ class Collection(object):
         """
         return self._safeGetScalarAttr('campaign')
 
+
 class LightCurveCollection(Collection):
     """Class to hold a collection of LightCurve objects.
 
@@ -209,7 +211,7 @@ class LightCurveCollection(Collection):
             Stitched light curve.
         """
         if corrector_func is None:
-            corrector_func = lambda x: x
+            corrector_func = lambda x: x  # noqa: E731
         lcs = [corrector_func(lc) for lc in self]
         # Need `join_type='inner'` until AstroPy supports masked Quantities
         return vstack(lcs, join_type='inner', metadata_conflicts='silent')
