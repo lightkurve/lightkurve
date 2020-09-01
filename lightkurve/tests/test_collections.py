@@ -4,14 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
 
-<<<<<<< HEAD
-from ..lightcurve import LightCurve
+from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..search import search_lightcurve
-from ..targetpixelfile import KeplerTargetPixelFile
-=======
-from ..lightcurve import LightCurve, TessLightCurve
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
->>>>>>> 1608e57... Collection.sector - test; handle boundary cases
 from ..collections import LightCurveCollection, TargetPixelFileCollection
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
@@ -227,3 +222,40 @@ def test_accessor_tess_sector():
     tpfc = TargetPixelFileCollection([tpf, tpf2, tpf3])
     assert((tpfc.sector == [23, None, 1]).all())
 
+def test_accessor_kepler_quarter():
+    # scaled down version of tess sector test, as they share the same codepath
+    lc0 = KeplerLightCurve(time=np.arange(1, 5), flux=np.arange(1, 5),
+                    flux_err=np.arange(1, 5), targetid=50000)
+    lc0.quarter = 2
+    lc1 = KeplerLightCurve(time=np.arange(10, 15), flux=np.arange(10, 15),
+                     flux_err=np.arange(10, 15), targetid=120334)
+    lc1.quarter = 1
+    lcc = LightCurveCollection([lc0, lc1])
+    assert((lcc.quarter == [2, 1]).all())
+
+    # ensure it works for TPFs too.
+    tpf0 = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    tpf0.hdu[0].header['QUARTER'] = 2
+    tpf1 = KeplerTargetPixelFile(filename_tpf_one_center)
+    tpf1.hdu[0].header['QUARTER'] = 1
+    tpfc = TargetPixelFileCollection([tpf0, tpf1])
+    assert((tpfc.quarter == [2, 1]).all())
+
+def test_accessor_k2_campaign():
+    # scaled down version of tess sector test, as they share the same codepath
+    lc0 = KeplerLightCurve(time=np.arange(1, 5), flux=np.arange(1, 5),
+                    flux_err=np.arange(1, 5), targetid=50000)
+    lc0.campaign = 2
+    lc1 = KeplerLightCurve(time=np.arange(10, 15), flux=np.arange(10, 15),
+                     flux_err=np.arange(10, 15), targetid=120334)
+    lc1.campaign = 1
+    lcc = LightCurveCollection([lc0, lc1])
+    assert((lcc.campaign == [2, 1]).all())
+
+    # ensure it works for TPFs too.
+    tpf0 = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    tpf0.hdu[0].header['CAMPAIGN'] = 2
+    tpf1 = KeplerTargetPixelFile(filename_tpf_one_center)
+    tpf1.hdu[0].header['CAMPAIGN'] = 1
+    tpfc = TargetPixelFileCollection([tpf0, tpf1])
+    assert((tpfc.campaign == [2, 1]).all())

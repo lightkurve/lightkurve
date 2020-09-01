@@ -18,14 +18,6 @@ log = logging.getLogger(__name__)
 
 __all__ = ['LightCurveCollection', 'TargetPixelFileCollection']
 
-def _safe_sector(lcOrTpf):
-    try:
-        return lcOrTpf.sector
-    except AttributeError:
-        # return np.nan instead of None, so that the returned value can be used in a comparison
-        # e.g., lcc[lcc.sector < 25]
-        return np.nan
-
 class Collection(object):
     """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
 
@@ -129,6 +121,11 @@ class Collection(object):
             result += '\n'
         return result
 
+    def _safeGetScalarAttr(self, attrName):
+        # return np.nan when the attribute is missing, so that the returned value can be used in a comparison
+        # e.g., lcc[lcc.sector < 25]
+        return np.array([getattr(lcOrTpf, attrName, np.nan) for lcOrTpf in self.data])
+
     @property
     def sector(self):
         """(TESS-specific) the sectors of the lightcurves / target pixel files.
@@ -147,8 +144,23 @@ class Collection(object):
             >>> lcc[lcc.sector == 22][0].plot()  # doctest: +SKIP
 
         """
-        return np.array([_safe_sector(lc) for lc in self.data])
+        return self._safeGetScalarAttr('sector')
 
+    @property
+    def quarter(self):
+        """(Kepler-specific) the quarters of the lightcurves / target pixel files.
+
+        The Kepler quarters of the lightcurves / target pixel files; `numpy.nan` for those with none.
+        """
+        return self._safeGetScalarAttr('quarter')
+
+    @property
+    def campaign(self):
+        """(K2-specific) the campaigns of the lightcurves / target pixel files.
+
+        The K2 campaigns of the lightcurves / target pixel files; `numpy.nan` for those with none.
+        """
+        return self._safeGetScalarAttr('campaign')
 
 class LightCurveCollection(Collection):
     """Class to hold a collection of LightCurve objects.
