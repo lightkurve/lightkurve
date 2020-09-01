@@ -1049,3 +1049,48 @@ def test_mixed_instantiation():
 
     LightCurve(time=[1,2,3], flux=[1,2,3], data=Table({'flux_err': [3,4,5]}))
     LightCurve(time=[1,2,3], flux=[1,2,3], data={'flux_err': [3,4,5]})
+
+
+def test_create_transit_mask():
+    """Test for `LightCurve.create_transit_mask()`."""
+    # Set planet parameters
+    period = 2.0
+    transit_time = Time(2450000., format='jd')
+    duration = 0.1
+    depth = 0.2
+    flux_err = 0.01
+
+    # Create the synthetic light curve
+    time = np.arange(0, 100, 0.1)
+    flux = np.ones_like(time)
+    transit_mask = np.abs((time-transit_time.value+0.5*period) % period-0.5*period) < 0.5*duration
+    flux[transit_mask] = 1.0 - depth
+    flux += flux_err * np.random.randn(len(time))
+    synthetic_lc = LightCurve(time=time, flux=flux)
+
+    # Create planet mask
+    mask = synthetic_lc.create_transit_mask(period=period, duration=duration,
+                                            transit_time=transit_time)
+
+    # Are all masked values out of transit?
+    assert(all(f > 0.9 for f in synthetic_lc[~mask].flux.value))
+    # Are all unmasked values in transit?
+    assert(all(f < 0.9 for f in synthetic_lc[mask].flux.value))
+
+    # Can it handle multi-planet masks?
+    period_2 = 3.0
+    transit_time_2 = 0.75
+    duration_2 = 0.1
+    transit_mask_2 = np.abs((time-transit_time_2+0.5*period_2) % period_2-0.5*period_2) < 0.5*duration_2
+    flux[transit_mask_2] = 1.0 - depth
+    synthetic_lc = LightCurve(time=time, flux=flux)
+
+    # Create multi-planet planet mask
+    mask = synthetic_lc.create_transit_mask(period=[period, period_2],
+                                            duration=[duration, duration_2],
+                                            transit_time=[transit_time, transit_time_2])
+
+    # Are all masked values out of transit?
+    assert(all(f > 0.9 for f in synthetic_lc[~mask].flux.value))
+    # Are all unmasked values in transit?
+    assert(all(f < 0.9 for f in synthetic_lc[mask].flux.value))

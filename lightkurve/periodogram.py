@@ -1080,9 +1080,8 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         return model
 
     def get_transit_mask(self, period=None, duration=None, transit_time=None):
-        """Computes the transit mask using the BLS, returns a lightkurve.LightCurve
-
-        True where there are no transits.
+        """Returns a boolean array that is ``True`` during transits and
+        ``False`` elsewhere.
 
         Parameters
         ----------
@@ -1095,11 +1094,11 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
         Returns
         -------
-        mask : np.array of Bool
-            Mask that removes transits. Mask is True where there are no transits.
+        transit_mask : np.array of bool
+            Mask that flags transits. Mask is ``True`` where there are transits.
         """
         model = self.get_transit_model(period=period, duration=duration, transit_time=transit_time)
-        return model.flux == np.median(model.flux)
+        return model.flux != np.median(model.flux)
 
     @property
     def transit_time_at_max_power(self):
