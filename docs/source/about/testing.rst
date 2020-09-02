@@ -105,3 +105,20 @@ We run our unit tests using `pytest <https://docs.pytest.org/en/stable/>`_. This
 or equivalently if you are managing your Python environment using `conda`::
 
     conda install --file=requirements-test.txt
+
+
+How to generate HTML report?
+----------------------------
+
+Use `pytest-html` extension. Install it by::
+
+    pip install pytest-html
+
+or in `conda`::
+
+    conda install pytest-html
+
+Then you can generate an HTML report. For example::
+
+    pytest --html=build/report.html test_targetpixelfile.py
+
