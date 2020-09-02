@@ -20,6 +20,9 @@ lightkurve.lightcurve
 - Added a ``column`` parameter to ``LightCurve``'s ``plot()``, ``scatter()``,
   and ``errorbar()`` methods to enable any column to be plotted. [#765]
 
+- Added the ``LightCurve.create_transit_mask(period, transit_time, duration)``
+  method to conveniently mask planet or eclipsing binary transits. [#808]
+
 lightkurve.targetpixelfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -40,6 +43,9 @@ lightkurve.targetpixelfile
 
 - Modified ``plot()`` to use a more clear hatched style when visualizing the
   aperture mask on top of pixel data. [#814]
+
+- Modified ``_parse_aperture_mask()`` to ensure that masks composed of integer
+  or floats are always converted to booleans. [#694]
 
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
@@ -68,6 +74,12 @@ lightkurve.seismology
 
 - Added an error message to ``estimate_numax()`` or ``estimate_deltanu()`` if
   the underlying periodogram does not have uniformly-spaced frequencies. [#780]
+
+lightkurve.periodogram
+^^^^^^^^^^^^^^^^^^^^^^
+
+- Modified ``create_transit_mask`` method to return ``True`` during transits and
+  ``False`` elsewhere for consistent mask syntax. [#808]
 
 
 

@@ -661,3 +661,20 @@ def test_cutout_quality_masking():
     tpf = read(filename_tpf_one_center, quality_bitmask=8192)
     tpfcut = tpf.cutout()
     assert(len(tpf) == len(tpfcut))
+
+
+def test_parse_numeric_aperture_masks():
+    """Regression test for #694: float or int aperture masks should be
+    interpreted as boolean masks."""
+    tpf = read(filename_tpf_one_center)
+    mask = tpf._parse_aperture_mask(np.zeros(tpf.shape[1:], dtype=float))
+    assert(mask.dtype == bool)
+    mask = tpf._parse_aperture_mask(np.zeros(tpf.shape[1:], dtype=int))
+    assert(mask.dtype == bool)
+
+
+def test_tpf_meta():
+    """Can we access meta data using tpf.meta?"""
+    tpf = read(filename_tpf_one_center)
+    assert tpf.meta.get('mission') == 'K2'
+    assert tpf.meta.get('channel') == 45

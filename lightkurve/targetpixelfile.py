@@ -62,6 +62,11 @@ class TargetPixelFile(object):
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
 
+        # For consistency with `LightCurve`, provide a `meta` dictionary
+        self.meta = {}
+        self.meta.update(self.get_header(0))
+        self.meta = {k.lower(): v for k, v in self.meta.items()}
+
     def __getitem__(self, key):
         """Implements indexing and slicing.
 
@@ -543,6 +548,8 @@ class TargetPixelFile(object):
                 ((aperture_mask & 2) == 2).any():
                 # Kepler and TESS pipeline style integer flags
                 aperture_mask = (aperture_mask & 2) == 2
+            elif isinstance(aperture_mask.flat[0], (np.integer, np.float)):
+                aperture_mask = aperture_mask.astype(bool)
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 

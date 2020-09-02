@@ -97,7 +97,7 @@ def test_transit_pld():
                                frequency_factor=0.05, duration=np.arange(0.1, 0.6, 0.1))
 
     # Re-do PLD with the suspected transits masked
-    cor_lc = corrector.correct(cadence_mask=pg.get_transit_mask()).normalize()
+    cor_lc = corrector.correct(cadence_mask=~pg.get_transit_mask()).normalize()
     pg = cor_lc.to_periodogram(method='bls', minimum_period=1, maximum_period=9,
                                frequency_factor=0.05, duration=np.arange(0.1, 0.6, 0.1))
 

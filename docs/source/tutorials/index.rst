@@ -17,7 +17,6 @@ all classes and methods, please consult the `API docs <../api/index.html>`_.
 
     01-target-pixel-files.ipynb
     01-what-are-lightcurves.ipynb
-    01-lightcurve-files.ipynb
     01-using-the-periodogram-class.ipynb
 
 
