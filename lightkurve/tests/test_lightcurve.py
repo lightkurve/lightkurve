@@ -143,7 +143,7 @@ def test_KeplerLightCurveFile(path, mission):
                          ['hardest', 'hard', 'default', None,
                           1, 100, 2096639])
 def test_TessLightCurveFile(quality_bitmask):
-    lc = TessLightCurveFile.read(TESS_SIM, quality_bitmask=quality_bitmask, flux_column="sap_flux")
+    lc = TessLightCurveFile(TESS_SIM, quality_bitmask=quality_bitmask, flux_column="sap_flux")
     hdu = pyfits.open(TESS_SIM)
 
     assert lc.mission == 'TESS'
