@@ -47,6 +47,26 @@ __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
 
 
+class HduToMetaMapping(collections.abc.Mapping):
+    """Provides a read-only view of HDU header in `astropy.timeseries.TimeSeries.meta` format,
+       with keys lowercased."""
+
+    def __init__(self, hdu):
+        self._hdu = hdu
+
+    def __getitem__(self, key):
+        # HDU header's keys are all in uppercase; while meta's keys are all in lowercase
+        if key.lower() != key:
+            raise KeyError(f"'{key}'")
+        return self._hdu.header[key.upper()]
+
+    def __len__(self):
+        return len(self._hdu.header)
+
+    def __iter__(self):
+        return iter(self._hdu.header)
+
+
 class TargetPixelFile(object):
     """Abstract class representing FITS files which contain time series imaging data.
 
@@ -63,9 +83,7 @@ class TargetPixelFile(object):
         self.targetid = targetid
 
         # For consistency with `LightCurve`, provide a `meta` dictionary
-        self.meta = {}
-        self.meta.update(self.get_header(0))
-        self.meta = {k.lower(): v for k, v in self.meta.items()}
+        self.meta = HduToMetaMapping(self.hdu[0])
 
     def __getitem__(self, key):
         """Implements indexing and slicing.

@@ -677,4 +677,15 @@ def test_tpf_meta():
     """Can we access meta data using tpf.meta?"""
     tpf = read(filename_tpf_one_center)
     assert tpf.meta.get('mission') == 'K2'
+    assert tpf.meta['mission'] == 'K2'
     assert tpf.meta.get('channel') == 45
+    # the meta cannot be accessed with uppercase key (as seen in the original HDU)
+    assert tpf.meta.get('MISSION') is None
+    with pytest.raises(KeyError):
+        tpf.meta['MISSION']
+    # ensure meta is read-only view of the underlying self.hdu[0].header
+    with pytest.raises(TypeError):
+        tpf.meta['channel'] = 44
+    tpf.hdu[0].header['CHANNEL'] = 44
+    assert tpf.meta['channel'] == 44
+
