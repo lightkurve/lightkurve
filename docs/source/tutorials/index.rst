@@ -55,17 +55,15 @@ can be extracted from the pixel data, and on the removal of instrument noise
     04-identify-rolling-band.ipynb
 
 
-2.3. Removing instrument noise
+2.3. Removing instrumental noise
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
     :maxdepth: 1
 
+    04-how-to-use-cbvs.ipynb
     04-how-to-remove-tess-scattered-light-using-regressioncorrector.ipynb
     04-how-to-detrend.ipynb
-    04-removing-cbvs.ipynb
-
-
 
 
 3. Science examples
