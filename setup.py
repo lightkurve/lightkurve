@@ -19,7 +19,8 @@ exec(open('lightkurve/version.py').read())
 with open('requirements.txt') as f:
     install_requires = f.read().splitlines()
 # 2. What dependencies required to run the unit tests? (i.e. `pytest --remote-data`)
-tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata', 'codecov', 'pytest-doctestplus', 'codacy-coverage']
+with open('requirements-test.txt') as f:
+    tests_require = f.read().splitlines()
 extras_require = {"test": tests_require}
 
 setup(name='lightkurve',
