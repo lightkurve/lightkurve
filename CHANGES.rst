@@ -23,6 +23,9 @@ lightkurve.lightcurve
 - Added the ``LightCurve.create_transit_mask(period, transit_time, duration)``
   method to conveniently mask planet or eclipsing binary transits. [#808]
 
+- Added a ``column`` parameter to ``LightCurve.remove_nans()`` to enable
+  cadences to be removed which contain NaN values in a specific column. [#828]
+
 lightkurve.targetpixelfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

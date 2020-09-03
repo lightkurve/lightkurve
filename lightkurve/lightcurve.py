@@ -775,15 +775,34 @@ class LightCurve(TimeSeries):
         lc.meta['normalized'] = True
         return lc
 
-    def remove_nans(self):
-        """Removes cadences where the flux is NaN.
+    def remove_nans(self, column: str = 'flux'):
+        """Removes cadences where ``column`` is a NaN.
+
+        Parameters
+        ----------
+        column : str
+            Column to check for NaNs.  Defaults to ``'flux'``.
 
         Returns
         -------
         clean_lightcurve : `LightCurve`
             A new light curve object from which NaNs fluxes have been removed.
+
+        Examples
+        --------
+            >>> import lightkurve as lk
+            >>> import numpy as np
+            >>> lc = lk.LightCurve({'time': [1, 2, 3], 'flux': [1., np.nan, 1.]})
+            >>> lc.remove_nans()
+            <LightCurve length=2>
+            time    flux  flux_err
+            <BLANKLINE>
+            object float64 float64
+            ------ ------- --------
+            1.0     1.0      nan
+            3.0     1.0      nan
         """
-        return self[~np.isnan(self.flux)]  # This will return a sliced copy
+        return self[~np.isnan(self[column])]  # This will return a sliced copy
 
     def fill_gaps(self, method: str = 'gaussian_noise'):
         """Fill in gaps in time.
