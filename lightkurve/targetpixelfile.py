@@ -92,8 +92,8 @@ class TargetPixelFile(object):
         with warnings.catch_warnings():
             # Ignore warnings about empty fields
             warnings.simplefilter('ignore', UserWarning)
-            # AstroPy added `HDUList.copy()` in v3.1, but we don't want to make
-            # v3.1 a minimum requirement yet, so we copy in a funny way.
+            # AstroPy added `HDUList.copy()` in v3.1, allowing us to avoid manually
+            # copying the HDUs, which brought along unexpected memory leaks.
             copy = self.hdu.copy()
             copy[1] = BinTableHDU(data=self.hdu[1].data[selected_idx], header=self.hdu[1].header)
         return self.__class__(copy, quality_bitmask=self.quality_bitmask, targetid=self.targetid)

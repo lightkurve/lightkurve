@@ -540,13 +540,31 @@ def test_tpf_tess():
     col, row = tpf.estimate_centroids()
 
 
-def test_tpf_slicing():
-    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+@pytest.mark.parametrize("tpf_type", [KeplerTargetPixelFile, TessTargetPixelFile])
+def test_tpf_slicing(tpf_type):
+    """Test indexing and slicing of TargetPixelFile objects."""
+    with warnings.catch_warnings():
+        # Ignore the "TELESCOP is not equal to TESS" warning
+        warnings.simplefilter("ignore", LightkurveWarning)
+        tpf = tpf_type(filename_tpf_one_center)
+
     assert tpf[0].time == tpf.time[0]
     assert tpf[-1].time == tpf.time[-1]
     assert tpf[5:10].shape == tpf.flux[5:10].shape
     assert tpf[0].targetid == tpf.targetid
     assert_array_equal(tpf[tpf.time < tpf.time[5]].time, tpf.time[0:5])
+
+    frame = tpf[5]
+    assert frame.shape[0] == 1
+    assert frame.shape[1:] == tpf.shape[1:]
+    assert_array_equal(frame.time[0], tpf.time[5])
+    assert_array_equal(frame.flux[0], tpf.flux[5])
+
+    frames = tpf[100:200]
+    assert frames.shape[0] == 100
+    assert frames.shape[1:] == tpf.shape[1:]
+    assert_array_equal(frames.time, tpf.time[100:200])
+    assert_array_equal(frames.flux, tpf.flux[100:200])
 
 
 def test_endianness():
@@ -678,22 +696,3 @@ def test_tpf_meta():
     tpf = read(filename_tpf_one_center)
     assert tpf.meta.get('mission') == 'K2'
     assert tpf.meta.get('channel') == 45
-
-
-@pytest.mark.parametrize("tpf_type", [KeplerTargetPixelFile, TessTargetPixelFile])
-def test_tpf_slice(tpf_type):
-    """Test indexing and slicing of TargetPixelFile object."""
-    with warnings.catch_warnings():
-        # Ignore the "TELESCOP is not equal to TESS" warning
-        warnings.simplefilter("ignore", LightkurveWarning)
-        tpf = tpf_type(filename_tpf_all_zeros)
-
-    frame = tpf[5]
-    assert frame.shape[0] == 1
-    assert frame.shape[1:] == tpf.shape[1:]
-    assert_array_equal(frame.time[0], tpf.time[5])
-
-    frames = tpf[100:200]
-    assert frames.shape[0] == 100
-    assert frames.shape[1:] == tpf.shape[1:]
-    assert_array_equal(frames.time, tpf.time[100:200])
