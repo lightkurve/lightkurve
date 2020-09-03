@@ -125,7 +125,7 @@ class SFFCorrector(RegressionCorrector):
                           LightkurveWarning)
 
         if centroid_col is None:
-            self.lc = self.lc[~np.isnan(self.lc.centroid_col)]
+            self.lc = self.lc.remove_nans(column='centroid_col')
             centroid_col = self.lc.centroid_col
         if centroid_row is None:
             self.lc = self.lc[~np.isnan(self.lc.centroid_row)]
