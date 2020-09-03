@@ -7,7 +7,8 @@ from astropy.utils.data import get_pkg_data_filename
 from numpy.testing import assert_array_equal
 
 from ... import LightCurve, KeplerLightCurve, \
-                TessLightCurve, LightkurveWarning
+                TessLightCurve, LightkurveWarning, \
+                search_lightcurve
 from .. import SFFCorrector
 
 
@@ -181,3 +182,12 @@ def test_sff_tess_warning():
     lc = TessLightCurve(flux=[1, 2, 3], meta={'mission': 'TESS'})
     with pytest.warns(LightkurveWarning, match='not suitable'):
         corr = SFFCorrector(lc)
+
+
+@pytest.mark.remote_data
+def test_sff_nan_centroids():
+    """Regression test for #827: SFF failed if light curve contained
+    NaNs in its `centroid_col` or `centroid_row` columns."""
+    lc = search_lightcurve("EPIC 211083408").download()
+    # This previously raised a ValueError:
+    lc[200:500].remove_nans().to_corrector("sff").correct()
