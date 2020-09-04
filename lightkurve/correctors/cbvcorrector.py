@@ -409,7 +409,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
                 time=time, **kwargs)
 
     @classmethod
-    def from_HDU(self, HDU=None, module=None, output=None,
+    def from_hdu(self, hdu=None, module=None, output=None,
             **kwargs):
         """ Class method to instantiate a KeplerCotrendingBasisVectors object
         from a CBV FITS HDU.
