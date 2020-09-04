@@ -50,6 +50,9 @@ lightkurve.targetpixelfile
 - Modified ``_parse_aperture_mask()`` to ensure that masks composed of integer
   or floats are always converted to booleans. [#694]
 
+- Fixed a bug in ``TargetPixelFile.__getitem__()`` which caused a substantial
+  memory leak on indexing or slicing a tpf. [#829]
+
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
 
