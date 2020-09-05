@@ -1100,7 +1100,7 @@ def test_create_transit_mask():
 
 
 def test_row_repr():
-    """Ensure the repr works for a single row."""
+    """Regression test for #830: ensure the repr works for a single row."""
     lc = LightCurve({'time': [1,2,3], 'flux':[1.,1.,1.]})
     lc[0].__repr__()
     lc[0]._repr_html_()
