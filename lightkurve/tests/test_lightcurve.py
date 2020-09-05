@@ -1097,3 +1097,10 @@ def test_create_transit_mask():
     assert(all(f > 0.9 for f in synthetic_lc[~mask].flux.value))
     # Are all unmasked values in transit?
     assert(all(f < 0.9 for f in synthetic_lc[mask].flux.value))
+
+
+def test_row_repr():
+    """Regression test for #830: ensure the repr works for a single row."""
+    lc = LightCurve({'time': [1,2,3], 'flux':[1.,1.,1.]})
+    lc[0].__repr__()
+    lc[0]._repr_html_()

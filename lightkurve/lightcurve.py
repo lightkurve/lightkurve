@@ -234,7 +234,7 @@ class LightCurve(TimeSeries):
         else:
             super().__setattr__(name, value, **kwargs)
 
-    def _base_repr_(self, descr_vals=None, **kwargs):
+    def _base_repr_(self, html=False, descr_vals=None, **kwargs):
         """Defines the description shown by `__repr__` and `_html_repr_`."""
         if descr_vals is None:
             descr_vals = [self.__class__.__name__]
@@ -243,7 +243,7 @@ class LightCurve(TimeSeries):
             if hasattr(self, "targetid"):
                 descr_vals.append(f'targetid={self.targetid}')
             descr_vals.append('length={}'.format(len(self)))
-        return super()._base_repr_(descr_vals=descr_vals, **kwargs)
+        return super()._base_repr_(html=html, descr_vals=descr_vals, **kwargs)
 
     # Define `time`, `flux`, `flux_err` as class attributes to enable IDE
     # of these required columns auto-completion.
