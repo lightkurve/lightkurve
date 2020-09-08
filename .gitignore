@@ -74,7 +74,10 @@ pyraf
 .*.swp
 .*.swo
 
+# Visual Studio Code
+.vscode
+*.code-workspace
+
 sandbox
 mastDownload
 .pytest_cache
-.vscode
