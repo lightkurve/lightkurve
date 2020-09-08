@@ -33,7 +33,7 @@ class Collection(object):
     --------
     Filter a collection by boolean array indexing.
 
-        >>> lcc_filtered = lcc[(lcc.sector == 13) & (lcc.sector <= 19)]  # doctest: +SKIP
+        >>> lcc_filtered = lcc[(lcc.sector >= 13) & (lcc.sector <= 19)]  # doctest: +SKIP
         >>> lc22 = lcc[lcc.sector == 22][0]  # doctest: +SKIP
 
     Filter a collection by integer array indexing to get the object at index 0 and 2.
@@ -50,23 +50,23 @@ class Collection(object):
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, indexOrMask):
-        if (isinstance(indexOrMask, (int, np.integer, slice))):
-            return self.data[indexOrMask]
-        elif (all([isinstance(i, (bool, np.bool_)) for i in indexOrMask])):
+    def __getitem__(self, index_or_mask):
+        if (isinstance(index_or_mask, (int, np.integer, slice))):
+            return self.data[index_or_mask]
+        elif (all([isinstance(i, (bool, np.bool_)) for i in index_or_mask])):
             # case indexOrMask is bool array like, e.g., np.ndarray, collections.abc.Sequence, etc.
 
             # note: filter using nd.array is very slow
             #   np.array(self.data)[np.nonzero(indexOrMask)]
             # specifically, nd.array(self.data) is very slow, as it deep copies the data
             # so we create the filtered list on our own
-            if (len(indexOrMask) != len(self.data)):
+            if (len(index_or_mask) != len(self.data)):
                 raise IndexError(f'boolean index did not match indexed array; dimension is {len(self.data)} '
-                                 f'but corresponding boolean dimension is {len(indexOrMask)}')
-            return type(self)([self.data[i] for i in np.nonzero(indexOrMask)[0]])
-        elif (all([isinstance(i, (int, np.integer)) for i in indexOrMask])):
+                                 f'but corresponding boolean dimension is {len(index_or_mask)}')
+            return type(self)([self.data[i] for i in np.nonzero(index_or_mask)[0]])
+        elif (all([isinstance(i, (int, np.integer)) for i in index_or_mask])):
             # case int array like, follow ndarray behavior
-            return type(self)([self.data[i] for i in indexOrMask])
+            return type(self)([self.data[i] for i in index_or_mask])
         else:
             raise IndexError('only integers, slices (`:`) and integer or boolean arrays are valid indices')
 
