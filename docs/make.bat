@@ -9,6 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=source
 set BUILDDIR=..\..\lightkurve-docs
+set SPHINXOPTS=-j auto
 set SPHINXPROJ=lightkurve
 
 if "%1" == "" goto help
