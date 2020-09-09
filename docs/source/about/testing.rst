@@ -10,6 +10,8 @@ However, running these tests online can take a long time. Running the tests loca
 How do I run tests locally?
 ---------------------------
 
+*Lightkurve* uses `pytest <https://docs.pytest.org/en/stable/>`_ for testing.
+
 First off, you need to find the directory that your *Lightkurve* installation is in. You can check this by looking at the *Lightkurve* path::
 
     import lightkurve as lk
@@ -96,10 +98,27 @@ Ideally, any PR opened to *Lightkurve* with new functionality should include som
 I can't run any tests.
 ----------------------
 
-We run our unit tests using `pytest`. This should have been installed when you installed *Lightkurve*. However, if your tests don't run, you may want to check all the test dependencies are installed by running (with `pip`)::
+We run our unit tests using `pytest <https://docs.pytest.org/en/stable/>`_. This should have been installed when you installed *Lightkurve*. However, if your tests don't run, you may want to check all the test dependencies are installed by running (with `pip`)::
 
-    pip install pytest pytest-cov pytest-remotedata
+    pip install -r requirements-test.txt
 
 or equivalently if you are managing your Python environment using `conda`::
 
-    conda install pytest pytest-cov pytest-remotedata
+    conda install --file=requirements-test.txt
+
+
+How to generate HTML report?
+----------------------------
+
+Use `pytest-html` extension. Install it by::
+
+    pip install pytest-html
+
+or in `conda`::
+
+    conda install pytest-html
+
+Then you can generate an HTML report. For example::
+
+    pytest --html=build/report.html test_targetpixelfile.py
+

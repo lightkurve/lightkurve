@@ -143,7 +143,7 @@ def test_KeplerLightCurveFile(path, mission):
                          ['hardest', 'hard', 'default', None,
                           1, 100, 2096639])
 def test_TessLightCurveFile(quality_bitmask):
-    lc = TessLightCurveFile.read(TESS_SIM, quality_bitmask=quality_bitmask, flux_column="sap_flux")
+    lc = TessLightCurveFile(TESS_SIM, quality_bitmask=quality_bitmask, flux_column="sap_flux")
     hdu = pyfits.open(TESS_SIM)
 
     assert lc.mission == 'TESS'
@@ -718,9 +718,12 @@ def test_boolean_masking():
 def test_remove_nans():
     """Does LightCurve.__getitem__() allow slicing?"""
     time, flux = [1, 2, 3, 4], [100, np.nan, 102, np.nan]
-    lc_clean = LightCurve(time=time, flux=flux).remove_nans()
+    lc = LightCurve(time=time, flux=flux)
+    lc_clean = lc.remove_nans()
     assert_array_equal(lc_clean.time.value, [1, 3])
     assert_array_equal(lc_clean.flux, [100, 102])
+    lc_clean = lc.remove_nans('flux_err')
+    assert_array_equal(lc_clean.flux, [])
 
 
 def test_remove_outliers():
@@ -1094,3 +1097,10 @@ def test_create_transit_mask():
     assert(all(f > 0.9 for f in synthetic_lc[~mask].flux.value))
     # Are all unmasked values in transit?
     assert(all(f < 0.9 for f in synthetic_lc[mask].flux.value))
+
+
+def test_row_repr():
+    """Regression test for #830: ensure the repr works for a single row."""
+    lc = LightCurve({'time': [1,2,3], 'flux':[1.,1.,1.]})
+    lc[0].__repr__()
+    lc[0]._repr_html_()

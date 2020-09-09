@@ -886,8 +886,12 @@ class LombScarglePeriodogram(Periodogram):
         if frequency is None:
             frequency = self.frequency_at_max_power
         f = self._LS_object.model(time, frequency)
-        return LightCurve(time, f, label='LS Model', meta={'frequency':frequency},
-                            targetid='{} LS Model'.format(self.targetid)).normalize()
+        lc = LightCurve(time=time,
+                        flux=f,
+                        meta={'frequency':frequency},
+                        label='LS Model',
+                        targetid='{} LS Model'.format(self.targetid))
+        return lc.normalize()
 
 
 class BoxLeastSquaresPeriodogram(Periodogram):

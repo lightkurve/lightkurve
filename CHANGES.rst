@@ -23,6 +23,9 @@ lightkurve.lightcurve
 - Added the ``LightCurve.create_transit_mask(period, transit_time, duration)``
   method to conveniently mask planet or eclipsing binary transits. [#808]
 
+- Added a ``column`` parameter to ``LightCurve.remove_nans()`` to enable
+  cadences to be removed which contain NaN values in a specific column. [#828]
+
 lightkurve.targetpixelfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -47,6 +50,9 @@ lightkurve.targetpixelfile
 - Modified ``_parse_aperture_mask()`` to ensure that masks composed of integer
   or floats are always converted to booleans. [#694]
 
+- Fixed a bug in ``TargetPixelFile.__getitem__()`` which caused a substantial
+  memory leak on indexing or slicing a tpf. [#829]
+
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
 
@@ -65,6 +71,9 @@ lightkurve.correctors
 
 - Modified ``PLDCorrector`` to make use of the new ``RegressionCorrector``
   and ``DesignMatrix`` classes. [#746]
+
+- Fixed a bug in ``SFFCorrector`` which caused correction to fail if a light
+  curve's ``centroid_col`` or ``centroid_row`` columns contained NaNs. [#827]
 
 lightkurve.seismology
 ^^^^^^^^^^^^^^^^^^^^^

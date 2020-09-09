@@ -7,4 +7,4 @@ from . import LightCurve, KeplerLightCurve, TessLightCurve
 
 LightCurveFile = LightCurve
 KeplerLightCurveFile = KeplerLightCurve.read
-TessLightCurveFile = TessLightCurve
+TessLightCurveFile = TessLightCurve.read

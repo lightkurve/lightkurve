@@ -234,7 +234,7 @@ class LightCurve(TimeSeries):
         else:
             super().__setattr__(name, value, **kwargs)
 
-    def _base_repr_(self, descr_vals=None, **kwargs):
+    def _base_repr_(self, html=False, descr_vals=None, **kwargs):
         """Defines the description shown by `__repr__` and `_html_repr_`."""
         if descr_vals is None:
             descr_vals = [self.__class__.__name__]
@@ -243,7 +243,7 @@ class LightCurve(TimeSeries):
             if hasattr(self, "targetid"):
                 descr_vals.append(f'targetid={self.targetid}')
             descr_vals.append('length={}'.format(len(self)))
-        return super()._base_repr_(descr_vals=descr_vals, **kwargs)
+        return super()._base_repr_(html=html, descr_vals=descr_vals, **kwargs)
 
     # Define `time`, `flux`, `flux_err` as class attributes to enable IDE
     # of these required columns auto-completion.
@@ -775,15 +775,34 @@ class LightCurve(TimeSeries):
         lc.meta['normalized'] = True
         return lc
 
-    def remove_nans(self):
-        """Removes cadences where the flux is NaN.
+    def remove_nans(self, column: str = 'flux'):
+        """Removes cadences where ``column`` is a NaN.
+
+        Parameters
+        ----------
+        column : str
+            Column to check for NaNs.  Defaults to ``'flux'``.
 
         Returns
         -------
         clean_lightcurve : `LightCurve`
             A new light curve object from which NaNs fluxes have been removed.
+
+        Examples
+        --------
+            >>> import lightkurve as lk
+            >>> import numpy as np
+            >>> lc = lk.LightCurve({'time': [1, 2, 3], 'flux': [1., np.nan, 1.]})
+            >>> lc.remove_nans()
+            <LightCurve length=2>
+            time    flux  flux_err
+            <BLANKLINE>
+            object float64 float64
+            ------ ------- --------
+            1.0     1.0      nan
+            3.0     1.0      nan
         """
-        return self[~np.isnan(self.flux)]  # This will return a sliced copy
+        return self[~np.isnan(self[column])]  # This will return a sliced copy
 
     def fill_gaps(self, method: str = 'gaussian_noise'):
         """Fill in gaps in time.
