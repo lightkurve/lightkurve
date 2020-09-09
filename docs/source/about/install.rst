@@ -8,7 +8,7 @@ Using conda
 ===========
 
 The easiest way to install *Lightkurve* and all of its dependencies is to use
-the ``conda`` package manager, which is part of the 
+the ``conda`` package manager, which is part of the
 `Anaconda Python <https://www.continuum.io/downloads>`_ distribution.
 With ``conda`` installed, simply run the following command in a terminal window::
 
@@ -35,6 +35,9 @@ To install *Lightkurve*, run the following command in a terminal window::
 
 The ``--upgrade`` flag is optional, but recommended if you already
 have *Lightkurve* installed and want to upgrade to the latest version.
+
+Depending on the specific Python environment, you may need to replace ``python``
+with the correct Python interpreter, e.g., ``python3``.
 
 If you encounter any compilation errors using this command, then we recommend
 that you use the ``conda`` package manager instead.
@@ -78,7 +81,7 @@ If you want to experiment with the latest development version of
 
     $ git clone https://github.com/KeplerGO/lightkurve.git
     $ cd lightkurve
-    $ pip install -e .
+    $ python -m pip install -e .
 
 This is recommended for anyone who wants to edit the source code.
 Please see our guide on :ref:`contributing to lightkurve<contributing>`
