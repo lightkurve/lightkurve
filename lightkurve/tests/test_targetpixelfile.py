@@ -251,9 +251,14 @@ def test_to_lightcurve():
         tpf.to_lightcurve()
         tpf.to_lightcurve(aperture_mask=None)
         tpf.to_lightcurve(aperture_mask='all')
-        lc = tpf.to_lightcurve(aperture_mask='pipeline')
+        lc = tpf.to_lightcurve(aperture_mask='threshold')
         assert lc.time.scale == 'tdb'
         assert lc.label == tpf.hdu[0].header['OBJECT']
+        if np.any(tpf.pipeline_mask):
+            tpf.to_lightcurve(aperture_mask='pipeline')
+        else:
+            with pytest.raises(ValueError):
+                tpf.to_lightcurve(aperture_mask='pipeline')
 
 
 def test_bkg_lightcurve():
@@ -271,8 +276,13 @@ def test_aperture_photometry():
     for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tess)]:
         tpf.extract_aperture_photometry()
-        for mask in [None, 'all', 'pipeline', 'threshold', 'background']:
+        for mask in [None, 'all', 'default', 'threshold', 'background']:
             tpf.extract_aperture_photometry(aperture_mask=mask)
+        if np.any(tpf.pipeline_mask):
+            tpf.extract_aperture_photometry(aperture_mask='pipeline')
+        else:
+            with pytest.raises(ValueError):
+                tpf.extract_aperture_photometry(aperture_mask='pipeline')
 
 
 def test_tpf_to_fits():
@@ -666,12 +676,16 @@ def test_missing_pipeline_mask():
 
     TPFs produced by TESSCut contain an empty pipeline mask.  When the pipeline
     mask is missing or empty, we want `to_lightcurve()` to fall back on the
-    'threshold' mask, to avoid creating a light curve based on zero pixels."""
+    'threshold' mask by default, to avoid creating a light curve based on zero pixels."""
     tpf = search_tesscut("Proxima Cen", sector=12).download(cutout_size=1)
     lc = tpf.to_lightcurve()
     assert np.isfinite(lc.flux).any()
-    lc = tpf.to_lightcurve(aperture_mask='pipeline')
-    assert np.isfinite(lc.flux).any()
+    assert lc.meta.get('aperture_mask', None) == 'threshold'
+
+    with pytest.raises(ValueError):
+        # if aperture_mask is explicitly set as pipeline,
+        # the logic will throw an error as it is missing in the TPF
+        lc = tpf.to_lightcurve(aperture_mask='pipeline')
 
 
 def test_cutout_quality_masking():

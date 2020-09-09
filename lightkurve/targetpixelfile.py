@@ -493,6 +493,13 @@ class TargetPixelFile(object):
         else:
             raise ValueError("Photometry method must be 'aperture' or 'prf'.")
 
+    def _resolve_default_aperture_mask(self, aperture_mask):
+        if isinstance(aperture_mask, str) and (aperture_mask == 'default'):
+            # returns 'pipeline', unless it is missing. Falls back to 'threshold'
+            return 'pipeline' if np.any(self.pipeline_mask) else 'threshold'
+        else:
+            return aperture_mask
+
     def _parse_aperture_mask(self, aperture_mask):
         """Parse the `aperture_mask` parameter as given by a user.
 
@@ -518,12 +525,12 @@ class TargetPixelFile(object):
         aperture_mask : ndarray
             2D boolean numpy array containing `True` for selected pixels.
         """
+        aperture_mask = self._resolve_default_aperture_mask(aperture_mask)
+
         # If 'pipeline' mask is requested but missing, fall back to 'threshold'
         if isinstance(aperture_mask, str) and (aperture_mask == 'pipeline') \
            and ~np.any(self.pipeline_mask):
-            log.debug("_parse_aperture_mask: 'pipeline' mask is missing or "
-                      "empty, falling back on 'threshold' mask instead.")
-            aperture_mask = 'threshold'
+           raise ValueError("_parse_aperture_mask: 'pipeline' is requested, but it is missing or empty.")
 
         # Input validation
         if hasattr(aperture_mask, 'shape') and (aperture_mask.shape != self.flux[0].shape):
@@ -661,7 +668,7 @@ class TargetPixelFile(object):
         n_pixels = mask.sum() * u.pixel
         return LightCurve(time=self.time, flux=simple_bkg / n_pixels)
 
-    def estimate_centroids(self, aperture_mask='pipeline', method='moments'):
+    def estimate_centroids(self, aperture_mask='default', method='moments'):
         """Returns the flux center of an object inside ``aperture_mask``.
 
         Telescopes tend to smear out the light from a point-like star over
@@ -743,7 +750,7 @@ class TargetPixelFile(object):
         row_centr = Quantity(row_centr, unit='pixel')
         return col_centr, row_centr
 
-    def _aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
+    def _aperture_photometry(self, aperture_mask, centroid_method='moments'):
         """Helper method for ``extract_aperture photometry``.
 
         Returns
@@ -993,7 +1000,7 @@ class TargetPixelFile(object):
         self.hdu.writeto(output_fn, overwrite=overwrite, checksum=True)
 
     def interact(self, notebook_url='localhost:8888', max_cadences=30000,
-                 aperture_mask='pipeline', exported_filename=None,
+                 aperture_mask='default', exported_filename=None,
                  transform_func=None, ylim_func=None, **kwargs):
         """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
@@ -1497,7 +1504,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """'Kepler' or 'K2'. ('MISSION' header keyword)"""
         return self.get_keyword('MISSION')
 
-    def extract_aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
+    def extract_aperture_photometry(self, aperture_mask='default', centroid_method='moments'):
         """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
@@ -1521,6 +1528,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Array containing the summed flux within the aperture for each
             cadence.
         """
+        # explicitly resolve default, so that the aperture_mask set in meta
+        # later will be the resolved one
+        aperture_mask = self._resolve_default_aperture_mask(aperture_mask)
+
         flux, flux_err, centroid_col, centroid_row = \
             self._aperture_photometry(aperture_mask=aperture_mask,
                                       centroid_method=centroid_method)
@@ -2124,7 +2135,7 @@ class TessTargetPixelFile(TargetPixelFile):
     def mission(self):
         return 'TESS'
 
-    def extract_aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
+    def extract_aperture_photometry(self, aperture_mask='default', centroid_method='moments'):
         """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
@@ -2148,6 +2159,10 @@ class TessTargetPixelFile(TargetPixelFile):
         lc : TessLightCurve object
             Contains the summed flux within the aperture for each cadence.
         """
+        # explicitly resolve default, so that the aperture_mask set in meta
+        # later will be the resolved one
+        aperture_mask = self._resolve_default_aperture_mask(aperture_mask)
+
         flux, flux_err, centroid_col, centroid_row = \
             self._aperture_photometry(aperture_mask=aperture_mask,
                                       centroid_method=centroid_method)
