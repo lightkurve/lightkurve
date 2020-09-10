@@ -100,7 +100,7 @@ I can't run any tests.
 
 We run our unit tests using `pytest <https://docs.pytest.org/en/stable/>`_. This should have been installed when you installed *Lightkurve*. However, if your tests don't run, you may want to check all the test dependencies are installed by running (with `pip`)::
 
-    pip install -r requirements-test.txt
+    python -m pip install -r requirements-test.txt
 
 or equivalently if you are managing your Python environment using `conda`::
 
@@ -112,7 +112,7 @@ How to generate HTML report?
 
 Use `pytest-html` extension. Install it by::
 
-    pip install pytest-html
+    python -m pip install pytest-html
 
 or in `conda`::
 
