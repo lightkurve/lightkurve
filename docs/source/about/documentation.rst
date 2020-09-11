@@ -20,18 +20,14 @@ Building documentation
     latest version of the documentation is available online at
     `docs.lightkurve.org <https://docs.lightkurve.org/>`_ .
 
-Building the *lightkurve* documentation requires a few extra packages:
+Building the *lightkurve* documentation requires `sphinx` and a few extra packages. To install them::
 
-- amunra-sphinx-theme
-- sphinx
-- sphinx-automodapi
-- sphinxcontrib-rawfiles
-- nbsphinx
-- ghp-import
-- graphviz
-- `numpydoc <https://github.com/numpy/numpydoc>`_
+    $ cd docs
+    $ pip install -r requirements.txt
 
-These packages can be installed using `conda` or `pip`.
+If you encounter the error ``Pandoc wasn't found``, install `pandoc` as well. Follow its `installation instruction <https://pandoc.org/installing.html>`_  , or use `conda`::
+
+    $ conda install --channel=conda-forge pandoc
 
 To build the documentation in HTML format, execute::
 
