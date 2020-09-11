@@ -1,29 +1,30 @@
 """Defines Corrector classes that utilize Kepler/K2/TESS Cotrending Basis Vectors.
 """
 import logging
-
 import copy
-import numpy as np
-import matplotlib.pyplot as plt
 import requests
-from astropy.io import fits as pyfits
-from bs4 import BeautifulSoup
 import urllib.request
-from .. import MPLSTYLE
+
+from astropy.io import fits as pyfits
 from astropy.table import Table
 from astropy.time import Time
 from astropy.timeseries import TimeSeries
 from astropy.units import Quantity
-from scipy.interpolate import PchipInterpolator
-from .designmatrix import DesignMatrix, DesignMatrixCollection
 
+from bs4 import BeautifulSoup
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.interpolate import PchipInterpolator
+
+from .designmatrix import DesignMatrix, DesignMatrixCollection
+from .. import MPLSTYLE
 from ..lightcurve import LightCurve
 from ..utils import channel_to_module_output, validate_method
 
 log = logging.getLogger(__name__)
 
 __all__ = ['CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
-        'TessCotrendingBasisVectors', 'download_kepler_cbvs', 'download_tess_cbvs']
+           'TessCotrendingBasisVectors', 'download_kepler_cbvs', 'download_tess_cbvs']
 
 #*******************************************************************************
 # Cotrending Basis Vectors Classes and Functions 
@@ -128,9 +129,8 @@ class CotrendingBasisVectors(TimeSeries):
     def cadenceno(self, cadenceno):
         self['CADENCENO'] = cadenceno
 
-
     def to_designmatrix(self, cbv_indices='all', name='CBVs'):
-        """ Returns a designmatrix.DesignMatrix where the columns are the
+        """Returns a `DesignMatrix` where the columns are the
         requested CBVs.
 
         Parameters
@@ -138,7 +138,7 @@ class CotrendingBasisVectors(TimeSeries):
         cbv_indices : list of ints
             List of CBV vectors to use. 1-based indexing! 
             {'all' => Use all}
-        name        : str
+        name : str
             A Name for the DesignMatrix
 
         Returns
@@ -172,23 +172,23 @@ class CotrendingBasisVectors(TimeSeries):
     def plot(self, cbv_indices='all', ax=None, **kwargs):
         """Plots the requested CBVs evenly spaced out vertically for legibility.
 
-            Does not plot gapped cadences
+        Does not plot gapped cadences
 
         Parameters
         ----------
         cbv_indices : list of ints
-                        The list of cotrending basis vectors to plot. For example:
-                            [1, 2] will fit the first two basis vectors. 'all' => plot all
-                            NOTE: 1-based indexing
-        ax          : matplotlib.pyplot.Axes.AxesSubplot
-                        Matplotlib axis object. If `None`, one will be generated.
-        kwargs      : dict
-                        Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+            The list of cotrending basis vectors to plot. For example:
+            [1, 2] will fit the first two basis vectors. 'all' => plot all
+            NOTE: 1-based indexing
+        ax : matplotlib.pyplot.Axes.AxesSubplot
+            Matplotlib axis object. If `None`, one will be generated.
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
         Returns
         -------
-        ax      : matplotlib.pyplot.Axes.AxesSubplot
-                    Matplotlib axis object
+        ax : matplotlib.pyplot.Axes.AxesSubplot
+            Matplotlib axis object
         """
 
         if isinstance(cbv_indices, str) and not cbv_indices == 'all':
@@ -251,7 +251,7 @@ class CotrendingBasisVectors(TimeSeries):
         return ax
 
     def align(self, lc):
-        """ Aligns the CBVs to a light curve. The lightCurve object might not 
+        """Aligns the CBVs to a light curve. The lightCurve object might not
         have the same cadences as the CBVs. This will trim the CBVs to be
         aligned with the light curve. 
 
@@ -269,14 +269,13 @@ class CotrendingBasisVectors(TimeSeries):
 
         Parameters
         ----------
-            lc : LightCurve object
-                The reference light curve to align to
+        lc : LightCurve object
+            The reference light curve to align to
 
         Returns
         -------
-            cbvs : CotrendingBasisVectors object 
-                Aligned to the light curve
-
+        cbvs : CotrendingBasisVectors object
+            Aligned to the light curve
         """
 
         if not isinstance(lc, LightCurve):
@@ -305,13 +304,11 @@ class CotrendingBasisVectors(TimeSeries):
                     dict_to_add['GAP'] = True
                     for cbvIdx in cbvs.cbv_indices:
                         dict_to_add['VECTOR_{}'.format(cbvIdx)] = np.nan
-
                 
                     cbvs.add_row(dict_to_add)
 
             # Now sort the CBVs by cadenceno
             cbvs.sort('CADENCENO')
-
 
         else:
             raise Exception('align requires cadence numbers for the ' + \
@@ -320,7 +317,7 @@ class CotrendingBasisVectors(TimeSeries):
         return cbvs
 
     def interpolate(self, lc, extrapolate=False):
-        """ Interpolates the CBV to the cadence times in the given light curve 
+        """Interpolates the CBV to the cadence times in the given light curve
         using Piecewise Cubic Hermite Interpolating Polynomial (PCHIP). 
 
         Uses scipy.interpolate.PchipInterpolator
@@ -330,16 +327,16 @@ class CotrendingBasisVectors(TimeSeries):
         
         Parameters
         ----------
-            lc : LightCurve object
-                The reference light curve cadence times to interpolate to
-            extrapolate : bool, optional
-                Whether to extrapolate to out-of-bounds points based on first 
-                and last intervals, or to return NaNs.
+        lc : LightCurve object
+            The reference light curve cadence times to interpolate to
+        extrapolate : bool, optional
+            Whether to extrapolate to out-of-bounds points based on first 
+            and last intervals, or to return NaNs.
 
         Returns
         -------
-            cbvs_interpolated: CotrendingBasisVectors object 
-                interpolated to the light curve cadence times
+        cbvs_interpolated: CotrendingBasisVectors object
+            interpolated to the light curve cadence times
         """
 
         if not isinstance(lc, LightCurve):
@@ -368,9 +365,9 @@ class CotrendingBasisVectors(TimeSeries):
         else:
             return CotrendingBasisVectors(data=dataTbl, time=cbvNewTime)
 
-#***
+
 class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
-    """ Sub-class for Kepler/K2 cotrending basis vectors
+    """Sub-class for Kepler/K2 cotrending basis vectors
 
     See CotrendingBasisVectors for class details
 
@@ -394,7 +391,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
     #***
 
     def __init__(self, data=None, time=None, **kwargs):
-        """ Initiatates a KeplerCotrendingBasisVectors object.
+        """Initiates a KeplerCotrendingBasisVectors object.
         Normally one would use KeplerCotrendingBasisVectors.from_hdu to
         automatically set up the object. However, for certain functionality
         one must instantiate the object directly.
@@ -407,7 +404,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
     @classmethod
     def from_hdu(self, hdu=None, module=None, output=None,
             **kwargs):
-        """ Class method to instantiate a KeplerCotrendingBasisVectors object
+        """Class method to instantiate a KeplerCotrendingBasisVectors object
         from a CBV FITS HDU.
 
         Kepler/K2 CBVs are all in the same FITS file for each quarter/campaign,
@@ -423,7 +420,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
         output : int
             Kepler CCD output 1 - 4
         **kwargs : Optional arguments
-                    Passed to the TimeSeries superclass
+            Passed to the TimeSeries superclass
         """
 
         assert module > 1 and module < 85, 'Invalid module number'
@@ -437,7 +434,6 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
             mission = 'K2'
         else:
             raise Exception('This does not appear to be a Kepler or K2 FITS HDU')
-
 
         extName = 'MODOUT_{0}_{1}'.format(module, output)
 
@@ -469,7 +465,6 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
 
         # Here we instantiate the actual object
         return self(data=dataTbl, time=cbvTime, **kwargs)
-
 
     @property
     def mission(self):
@@ -535,7 +530,8 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
                 ''.format( self.campaign, self.module, self.output, len(self.cbv_indices))
 
         return repr_string
-#***
+
+
 class TessCotrendingBasisVectors(CotrendingBasisVectors):
     """ Sub-class for TESS cotrending basis vectors
 
@@ -554,15 +550,12 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
 
     """
 
-
-    #***
     validMissionOptions = ('TESS')
     validCBVTypes = ('SingleScale', 'MultiScale', 'Spike')
 
-    #***
-
     def __init__(self, data=None, time=None, **kwargs):
-        """ Initiatates a TessCotrendingBasisVectors object.
+        """Initiates a TessCotrendingBasisVectors object.
+
         Normally one would use TessCotrendingBasisVectors.from_hdu to
         automatically set up the object. However, for certain functionaility
         one must instantiate the object directly.
@@ -574,7 +567,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
 
     @classmethod
     def from_hdu(self, hdu=None, cbv_type=None, band=None, **kwargs):
-        """ Class method to instantiate a TessCotrendingBasisVectors object
+        """Class method to instantiate a TessCotrendingBasisVectors object
         from a CBV FITS HDU.
 
         TESS CBVs are in seperate FITS files for each camera.CCD, so camera.CCD
@@ -594,12 +587,11 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
             Band number for 'MultiScale' CBVs 
             Ignored for 'SingleScale' or 'Spike'
         **kwargs : Optional arguments
-                    Passed to the TimeSeries superclass
+            Passed to the TimeSeries superclass
         """
 
         mission = hdu['PRIMARY'].header['TELESCOP']
         assert mission == 'TESS', 'This does not appear to be a TESS FITS HDU'
-
 
         # Check if a valid cbv_type and band was passed
         if not cbv_type in self.validCBVTypes:
@@ -712,9 +704,9 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
 #*******************************************************************************
 # Functions
 
-def download_kepler_cbvs (mission=None, quarter=None, campaign=None,
+def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
         channel=None, module=None, output=None):
-    """ Searches the public data archive at MAST <https://archive.stsci.edu>
+    """Searches the public data archive at MAST <https://archive.stsci.edu>
     for Kepler or K2 cotrending basis vectors.
 
     This function fetches the Cotrending Basis Vectors FITS HDU for the desired
@@ -729,14 +721,14 @@ def download_kepler_cbvs (mission=None, quarter=None, campaign=None,
 
     Parameters
     ----------
-    mission     : str, list of str
-                    'Kepler' or 'K2'
+    mission : str, list of str
+        'Kepler' or 'K2'
     quarter or campaign : int
-                    Kepler Quarter or K2 Campaign.
+        Kepler Quarter or K2 Campaign.
     channel or (module and output) : int
-                    Kepler/K2  requested channel or module and output
-                    Must provide either channel, or module and outout, 
-                    but not both
+        Kepler/K2 requested channel or module and output.
+        Must provide either channel, or module and output,
+        but not both.
 
     Returns
     -------
@@ -802,10 +794,10 @@ def download_kepler_cbvs (mission=None, quarter=None, campaign=None,
     except:
         raise Exception('CBVS were not found')
 
-def download_tess_cbvs (sector=None, camera=None,
-        ccd=None, cbv_type='SingleScale', band=None):
 
-    """ Searches the `public data archive at MAST <https://archive.stsci.edu>`
+def download_tess_cbvs(sector=None, camera=None,
+        ccd=None, cbv_type='SingleScale', band=None):
+    """Searches the `public data archive at MAST <https://archive.stsci.edu>`
     for TESS cotrending basis vectors.
 
     This function fetches the Cotrending Basis Vectors FITS HDU for the desired
@@ -820,13 +812,13 @@ def download_tess_cbvs (sector=None, camera=None,
     Parameters
     ----------
     sector : int, list of ints
-                    TESS Sector number.
+        TESS Sector number.
     camera and ccd : int
-                    TESS camera and CCD
-    cbv_type    : str
-                    'SingleScale' or 'MultiScale' or 'Spike'
-    band        : int
-                    Multi-scale band number
+        TESS camera and CCD
+    cbv_type : str
+        'SingleScale' or 'MultiScale' or 'Spike'
+    band : int
+        Multi-scale band number
 
     Returns
     -------
@@ -918,5 +910,3 @@ def download_tess_cbvs (sector=None, camera=None,
 
     except:
         raise Exception('CBVS were not found')
-
-        

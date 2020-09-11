@@ -66,6 +66,9 @@ lightkurve.search
 lightkurve.correctors
 ^^^^^^^^^^^^^^^^^^^^^
 
+- Added the ``CotrendingBasisVectors`` class to provide a convenient interface
+  to work with TESS and Kepler basis vector data products. [#826]
+
 - Added ``SparseDesignMatrix`` and modified ``RegressionCorrector`` to enable
   systematics removal methods to benefit from ``scipy.sparse`` speed-ups. [#732]
 
