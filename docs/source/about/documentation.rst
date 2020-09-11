@@ -20,7 +20,7 @@ Building documentation
     latest version of the documentation is available online at
     `docs.lightkurve.org <https://docs.lightkurve.org/>`_ .
 
-Building the *lightkurve* documentation requires a `sphinx` and few extra packages. To install them::
+Building the *lightkurve* documentation requires `sphinx` and a few extra packages. To install them::
 
     $ cd docs
     $ pip install -r requirements.txt
