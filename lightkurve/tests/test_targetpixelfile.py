@@ -195,6 +195,7 @@ def test_wcs():
         assert type(w).__name__ == 'WCS'
 
 
+@pytest.mark.remote_data
 @pytest.mark.parametrize("method", [("moments"), ("quadratic")])
 def test_wcs_tabby(method):
     '''Test the centroids from Tabby's star against simbad values'''
@@ -671,6 +672,7 @@ def test_plot_pixels():
     plt.close('all')
 
 
+@pytest.mark.remote_data
 def test_missing_pipeline_mask():
     """Regression test for #791.
 
