@@ -663,14 +663,45 @@ def _query_solar_system_objects(ra, dec, times, radius=0.1, location='kepler',
 
 def show_citation_instructions():
     """Show citation instructions."""
-    from pathlib import Path
-    from IPython.display import HTML
     from . import PACKAGEDIR, __citation__
-    import astroquery
+    if not is_notebook():
+        print(__citation__)
+    else:
+        from pathlib import Path
+        from IPython.display import HTML
+        import astroquery
+        templatefile = Path(PACKAGEDIR, 'data', 'show_citation_instructions.html')
+        template = open(templatefile, 'r').read()
+        template = template.replace("LIGHTKURVE_CITATION", __citation__)
+        template = template.replace("ASTROPY_CITATION", astropy.__citation__)
+        template = template.replace("ASTROQUERY_CITATION", astroquery.__citation__)
+        return HTML(template)
 
-    templatefile = Path(PACKAGEDIR, 'data', 'show_citation_instructions.html')
-    template = open(templatefile, 'r').read()
-    template = template.replace("LIGHTKURVE_CITATION", __citation__)
-    template = template.replace("ASTROPY_CITATION", astropy.__citation__)
-    template = template.replace("ASTROQUERY_CITATION", astroquery.__citation__)
-    return HTML(template)
+
+def _get_notebook_environment():
+    """Returns 'jupyter', 'colab', or 'terminal'.
+
+    One can detect whether or not a piece of Python is running by executing
+    `get_ipython().__class__`, which returns the following result:
+
+        * Jupyter notebook: `ipykernel.zmqshell.ZMQInteractiveShell`
+        * Google colab: `google.colab._shell.Shell`
+        * IPython terminal: `IPython.terminal.interactiveshell.TerminalInteractiveShell`
+        * Python terminal: `NameError: name 'get_ipython' is not defined`
+    """
+    try:
+        ipy = str(type(get_ipython())).lower()
+        if 'zmqshell' in ipy:
+            return 'jupyter'
+        if 'colab' in ipy:
+            return 'colab'
+    except NameError:
+        pass  # get_ipython() is not a builtin
+    return 'terminal'
+
+
+def is_notebook():
+    """Returns `True` if we are running in a notebook."""
+    if _get_notebook_environment() in ['jupyter', 'colab']:
+        return True
+    return False

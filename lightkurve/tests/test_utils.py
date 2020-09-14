@@ -1,11 +1,8 @@
-from __future__ import division, print_function
+import pytest
+import warnings
 
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
-from astropy.io import fits
-import pytest
-import warnings
-import os
 
 from ..utils import KeplerQualityFlags, TessQualityFlags
 from ..utils import module_output_to_channel, channel_to_module_output
@@ -13,9 +10,9 @@ from ..utils import LightkurveWarning
 from ..utils import running_mean, validate_method
 from ..utils import bkjd_to_astropy_time, btjd_to_astropy_time
 from ..utils import centroid_quadratic
+from ..utils import show_citation_instructions
 from ..lightcurve import LightCurve
 
-from .. import PACKAGEDIR
 
 def test_channel_to_module_output():
     assert channel_to_module_output(1) == (2, 1)
@@ -167,3 +164,7 @@ def test_centroid_quadratic_robustness():
     data[-1, -1] = 10
     col, row = centroid_quadratic(data)
     assert np.isfinite(col) & np.isfinite(row)
+
+
+def test_show_citation_instructions():
+    show_citation_instructions()
