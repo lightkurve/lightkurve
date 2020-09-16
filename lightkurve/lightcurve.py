@@ -576,15 +576,15 @@ class LightCurve(TimeSeries):
             mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
                     (np.nanstd(self.flux[mask] - trend_signal) * sigma + Quantity(1e-14, self.flux.unit))
             f = interp1d(self.time.value[mask][mask1], trend_signal[mask1], fill_value='extrapolate')
-            trend_signal = f(self.time.value)
+            trend_signal = Quantity(f(self.time.value), self.flux.unit)
             mask[mask] &= mask1
 
         flatten_lc = self.copy()
         with warnings.catch_warnings():
             # ignore invalid division warnings
             warnings.simplefilter("ignore", RuntimeWarning)
-            flatten_lc.flux = flatten_lc.flux / trend_signal
-            flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
+            flatten_lc.flux = flatten_lc.flux / trend_signal.value
+            flatten_lc.flux_err = flatten_lc.flux_err / trend_signal.value
         if return_trend:
             trend_lc = self.copy()
             trend_lc.flux = trend_signal
