@@ -1087,10 +1087,9 @@ def test_assignment_time():
     lc.time = time_adjusted_raw
     assert_array_equal(lc.time, Time(time_adjusted_raw, scale='tdb', format='bkjd'))
 
-    # case the input is scalar
-    time_adjusted_raw_singular = 21
-    lc.time = time_adjusted_raw_singular
-    assert_array_equal(lc.time, Time(time_adjusted_raw_singular, scale='tdb', format='bkjd'))
+    # case the input is scalar, it'd be broadcasted to the existing time's length
+    lc.time = 21
+    assert_array_equal(lc.time, Time([21, 21, 21], scale='tdb', format='bkjd'))
 
 
 def test_create_transit_mask():
