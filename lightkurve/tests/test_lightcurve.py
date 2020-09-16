@@ -1075,6 +1075,24 @@ def test_mixed_instantiation():
     LightCurve(time=[1,2,3], flux=[1,2,3], data={'flux_err': [3,4,5]})
 
 
+def test_assignment_time():
+    """Ensure time property can be reassigned"""
+    lc = KeplerLightCurve(time=Time([1,2,3], scale='tdb', format='bkjd'), flux=[4,5,6], flux_err=[7,8,9])
+    time_adjusted = lc.time - 0.5
+    lc.time = time_adjusted
+    assert_array_equal(lc.time, time_adjusted)
+
+    # case the input is not given format / scale, ensure default format / scale is applied
+    time_adjusted_raw = [11., 12., 13.]
+    lc.time = time_adjusted_raw
+    assert_array_equal(lc.time, Time(time_adjusted_raw, scale='tdb', format='bkjd'))
+
+    # case the input is scalar
+    time_adjusted_raw_singular = 21
+    lc.time = time_adjusted_raw_singular
+    assert_array_equal(lc.time, Time(time_adjusted_raw_singular, scale='tdb', format='bkjd'))
+
+
 def test_create_transit_mask():
     """Test for `LightCurve.create_transit_mask()`."""
     # Set planet parameters
