@@ -787,6 +787,27 @@ def test_flatten_robustness():
     assert_allclose(lc.flux, flat_lc.flux * trend_lc.flux)
 
 
+def test_flatten_returns_normalized():
+    """Ensure returned lightcurves from flatten() can be normalized"""
+    # Test for https://github.com/KeplerGO/lightkurve/issues/838
+    lc_flux_unit = u.Unit("electron/second")
+    lc = LightCurve(time=[1, 2, 3, 4, 5, 6],
+                    flux=[10.1, 20.2, 30.3, 40.4, 50.5, 60.6] * lc_flux_unit,
+                    flux_err=[0.01, 0.02, 0.03, 0.04, 0.05, 0.06] * lc_flux_unit
+                    )
+    flat_lc, trend_lc = lc.flatten(window_length=3, polyorder=1, return_trend=True)
+
+    assert(flat_lc.flux.unit is lc_flux_unit)
+    assert(flat_lc.flux_err.unit is lc_flux_unit)
+    assert(trend_lc.flux.unit is lc_flux_unit)
+    assert(trend_lc.flux_err.unit is lc_flux_unit)
+
+    # once the above assertions pass, the normalize() should work
+    # but we test it anyway just in case something else goes wrong
+    flat_lc.normalize(unit='percent')
+    trend_lc.normalize(unit='percent')
+
+
 def test_iterative_flatten():
     '''Test the iterative sigma clipping in flatten '''
     # Test a light curve with a single, buried outlier.
