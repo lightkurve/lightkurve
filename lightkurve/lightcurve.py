@@ -1264,7 +1264,7 @@ class LightCurve(TimeSeries):
     def _create_plot(self, method='plot', column='flux', ax=None, normalize=False,
                      xlabel=None, ylabel=None, title='', style='lightkurve',
                      show_colorbar=True, colorbar_label='', offset=None,
-                     **kwargs) -> matplotlib.axes.Axes:
+                     clip_outliers=False, **kwargs) -> matplotlib.axes.Axes:
         """Implements `plot()`, `scatter()`, and `errorbar()` to avoid code duplication.
 
         Parameters
@@ -1296,6 +1296,8 @@ class LightCurve(TimeSeries):
             Offset value to apply to the Y axis values before plotting. Use this
             to avoid light curves from overlapping on the same plot. By default,
             no offset is applies.
+        clip_outliers : bool
+            If ``True``, clip the y axis limit to the 95%-percentile range.
         kwargs : dict
             Dictionary of arguments to be passed to Matplotlib's `plot`,
             `scatter`, or `errorbar` methods.
@@ -1384,6 +1386,11 @@ class LightCurve(TimeSeries):
             legend_labels = ax.get_legend_handles_labels()
             if (np.sum([len(a) for a in legend_labels]) != 0):
                 ax.legend(loc='best')
+
+            if clip_outliers and len(flux) > 0:
+                ymin, ymax = np.percentile(flux.value, [2.5, 97.5])
+                margin = 0.05 * (ymax - ymin)
+                ax.set_ylim(ymin - margin, ymax + margin)
 
         return ax
 

@@ -712,3 +712,13 @@ def test_tpf_meta():
     tpf = read(filename_tpf_one_center)
     assert tpf.meta.get('mission') == 'K2'
     assert tpf.meta.get('channel') == 45
+
+
+def test_estimate_background():
+    """Verifies tpf.estimate_background()."""
+    # Create a TPF with 100 electron/second in every pixel
+    tpf = read(filename_tpf_all_zeros) + 100.
+    # The resulting background should be 100 e/s/pixel
+    bg = tpf.estimate_background(aperture_mask='all')
+    assert_array_equal(bg.flux.value, 100)
+    assert bg.flux.unit == tpf.flux.unit / u.pixel

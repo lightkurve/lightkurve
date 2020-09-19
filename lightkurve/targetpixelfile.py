@@ -624,7 +624,7 @@ class TargetPixelFile(object):
             return labels == closest_label
 
     def estimate_background(self, aperture_mask='background'):
-        """Returns an estimate of the mean background level in the FLUX column.
+        """Returns an estimate of the median background level in the FLUX column.
 
         In the case of official Kepler and TESS Target Pixel Files, the
         background estimates should be close to zero because these products
@@ -640,11 +640,7 @@ class TargetPixelFile(object):
         the background levels.
 
         This method estimates the per-pixel background flux over time by
-        (i) subtracting a mean image from each cadence;
-        (ii) computing the median pixel value in the residual images;
-        (iii) assume that the 5%-percentile of those medians gives us the
-        exact background level. This assumption appears to work well for TESS
-        but it has not been validated in detail yet.
+        computing the median pixel value across the `aperture mask`.
 
         Parameters
         ----------
@@ -659,16 +655,12 @@ class TargetPixelFile(object):
         Returns
         -------
         lc : `LightCurve` object
-            Average background flux in units electron/second/pixel.
+            Median background flux in units electron/second/pixel.
         """
         mask = self._parse_aperture_mask(aperture_mask)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RuntimeWarning)
-            simple_bkg = (self.flux - np.nanmean(self.flux, axis=0))
-        simple_bkg = np.nanmedian(simple_bkg[:, mask], axis=1)
-        simple_bkg -= np.percentile(simple_bkg, 5)
-        n_pixels = mask.sum() * u.pixel
-        return LightCurve(time=self.time, flux=simple_bkg / n_pixels)
+        # For each cadence, compute the median pixel flux across the background
+        simple_bkg = np.nanmedian(self.flux[:, mask], axis=1) / u.pixel
+        return LightCurve(time=self.time, flux=simple_bkg)
 
     def estimate_centroids(self, aperture_mask='default', method='moments'):
         """Returns the flux center of an object inside ``aperture_mask``.
