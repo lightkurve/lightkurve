@@ -2240,6 +2240,8 @@ class KeplerLightCurve(LightCurve):
                   This mask is not recommended.
 
             See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` class for details on the bitmasks.
+        format : str, optional
+            The format of the Kepler FITS file. Should be one of 'kepler', 'k2sff', 'everest'. Defaults to 'kepler'.
         """
         # Default to Kepler file format
         if kwargs.get("format") is None:
