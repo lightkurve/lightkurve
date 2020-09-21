@@ -393,7 +393,7 @@ def btjd_to_astropy_time(btjd) -> Time:
 def plot_image(image, ax=None, scale='linear', origin='lower',
                xlabel='Pixel Column Number', ylabel='Pixel Row Number',
                clabel='Flux ($e^{-}s^{-1}$)', title=None, show_colorbar=True,
-               **kwargs):
+               vmin=None, vmax=None, **kwargs):
     """Utility function to plot a 2D image
 
     Parameters
@@ -418,6 +418,10 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
         Title for the plot.
     show_colorbar : bool
         Whether or not to show the colorbar
+    vmin : float
+        Minimum colorbar value. By default, the 2.5%-percentile is used.
+    vmax : float
+        Maximum colorbar value. By default, the 97.5%-percentile is used.
     kwargs : dict
         Keyword arguments to be passed to `matplotlib.pyplot.imshow`.
 
@@ -430,13 +434,19 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
         image = image.value
     if ax is None:
         _, ax = plt.subplots()
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", RuntimeWarning)  # ignore image NaN values
-        mask = np.nan_to_num(image) > 0
-        if mask.any() > 0:
-            vmin, vmax = PercentileInterval(95.).get_limits(image[mask])
-        else:
-            vmin, vmax = 0, 0
+
+    if vmin is None or vmax is None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)  # ignore image NaN values
+            mask = np.nan_to_num(image) > 0
+            if mask.any() > 0:
+                vmin_default, vmax_default = PercentileInterval(95.).get_limits(image[mask])
+            else:
+                vmin_default, vmax_default = 0, 0
+            if vmin is None:
+                vmin = vmin_default
+            if vmax is None:
+                vmax = vmax_default
 
     norm = None
     if scale is not None:
