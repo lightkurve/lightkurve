@@ -173,27 +173,29 @@ class SearchResult(object):
 
         Parameters
         ----------
-        quality_bitmask : str or int
+        quality_bitmask : str or int, optional
             Bitmask (integer) which identifies the quality flag bitmask that should
             be used to mask out bad cadences. If a string is passed, it has the
             following meaning:
 
-                * "none": no cadences will be ignored (`quality_bitmask=0`).
+                * "none": no cadences will be ignored
                 * "default": cadences with severe quality issues will be ignored
-                  (`quality_bitmask=1130799`).
                 * "hard": more conservative choice of flags to ignore
-                  (`quality_bitmask=1664431`). This is known to remove good data.
+                  This is known to remove good data.
                 * "hardest": removes all data that has been flagged
-                  (`quality_bitmask=2096639`). This mask is not recommended.
+                  This mask is not recommended.
 
-            See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-        download_dir : str
+            See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` or :class:`TessQualityFlags <lightkurve.utils.TessQualityFlags>` class for details on the bitmasks.
+        download_dir : str, optional
             Location where the data files will be stored.
             Defaults to "~/.lightkurve-cache" if `None` is passed.
-        cutout_size : int, float or tuple
+        cutout_size : int, float or tuple, optional
             Side length of cutout in pixels. Tuples should have dimensions (y, x).
             Default size is (5, 5)
-        kwargs : dict
+        flux_column : str, optional
+            The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
+            Typically 'pdcsap_flux' or 'sap_flux'.
+        kwargs : dict, optional
             Extra keyword arguments passed on to the file format reader function.
 
         Returns
@@ -233,27 +235,29 @@ class SearchResult(object):
 
          Parameters
          ----------
-         quality_bitmask : str or int
-             Bitmask (integer) which identifies the quality flag bitmask that should
-             be used to mask out bad cadences. If a string is passed, it has the
-             following meaning:
+        quality_bitmask : str or int, optional
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
 
-                 * "none": no cadences will be ignored (`quality_bitmask=0`).
-                 * "default": cadences with severe quality issues will be ignored
-                   (`quality_bitmask=1130799`).
-                 * "hard": more conservative choice of flags to ignore
-                   (`quality_bitmask=1664431`). This is known to remove good data.
-                 * "hardest": removes all data that has been flagged
-                   (`quality_bitmask=2096639`). This mask is not recommended.
+                * "none": no cadences will be ignored
+                * "default": cadences with severe quality issues will be ignored
+                * "hard": more conservative choice of flags to ignore
+                  This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  This mask is not recommended.
 
-             See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-        download_dir : str
+            See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` or :class:`TessQualityFlags <lightkurve.utils.TessQualityFlags>` class for details on the bitmasks.
+        download_dir : str, optional
             Location where the data files will be stored.
             Defaults to "~/.lightkurve-cache" if `None` is passed.
-        cutout_size : int, float or tuple
+        cutout_size : int, float or tuple, optional
             Side length of cutout in pixels. Tuples should have dimensions (y, x).
             Default size is (5, 5)
-        kwargs : dict
+        flux_column : str, optional
+            The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
+            Typically 'pdcsap_flux' or 'sap_flux'.
+        kwargs : dict, optional
             Extra keyword arguments passed on to the file format reader function.
 
         Returns

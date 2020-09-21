@@ -2218,6 +2218,29 @@ class KeplerLightCurve(LightCurve):
 
     @classmethod
     def read(cls, *args, **kwargs):
+        """Returns a `KeplerLightCurve` by reading the given file.
+
+        Parameters
+        ----------
+        filename : str
+            Local path or remote url of a Kepler light curve FITS file.
+        flux_column : str, optional
+            The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
+            Typically 'pdcsap_flux' or 'sap_flux'.
+        quality_bitmask : str or int, optional
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored
+                * "default": cadences with severe quality issues will be ignored
+                * "hard": more conservative choice of flags to ignore
+                  This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` class for details on the bitmasks.
+        """
         # Default to Kepler file format
         if kwargs.get("format") is None:
             kwargs['format'] = "kepler"
@@ -2297,6 +2320,29 @@ class TessLightCurve(LightCurve):
 
     @classmethod
     def read(cls, *args, **kwargs):
+        """Returns a `TessLightCurve` by reading the given file.
+
+        Parameters
+        ----------
+        filename : str
+            Local path or remote url of a TESS light curve FITS file.
+        flux_column : str, optional
+            The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
+            Typically 'pdcsap_flux' or 'sap_flux'.
+        quality_bitmask : str or int, optional
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored
+                * "default": cadences with severe quality issues will be ignored
+                * "hard": more conservative choice of flags to ignore
+                  This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  This mask is not recommended.
+
+            See the :class:`TessQualityFlags <lightkurve.utils.TessQualityFlags>` class for details on the bitmasks.
+        """
         # Default to TESS file format
         if kwargs.get("format") is None:
             kwargs['format'] = "tess"
