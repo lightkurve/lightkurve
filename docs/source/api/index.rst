@@ -30,6 +30,10 @@ The :class:`lightkurve.search` module provides functions which make it easy to l
 .. automodsumm:: lightkurve.search
     :skip: SearchResult, search_lightcurvefile
 
+The :class:`lightkurve.io` module provides functions to load data files produced by the Kepler and TESS missions.
+
+.. automodsumm:: lightkurve.io
+    :skip: open
 
 Data product objects
 --------------------
@@ -46,7 +50,7 @@ extract custom light curves.
 Correcting systematics
 ----------------------
 
-Telescope data is always affected by systematic noise contributed by the detector. 
+Telescope data is always affected by systematic noise contributed by the detector.
 The :class:`lightkurve.correctors` sub-package provides classes which offer
 different strategies to remove such noise.
 At the core of the package lies the generic `.RegressionCorrector` class.
