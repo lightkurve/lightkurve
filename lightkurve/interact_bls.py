@@ -4,6 +4,7 @@ import warnings
 import numpy as np
 
 from astropy.convolution import convolve, Box1DKernel
+from astropy.time import TimeDelta
 from astropy.timeseries import BoxLeastSquares
 
 from .utils import LightkurveWarning
@@ -417,12 +418,20 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                   "you can install bokeh using e.g. `conda install bokeh`.")
         return None
 
+    def _to_timeDelta(val, time_reference):
+        """Convert the raw value as TimeDelta using the format / scale of the given reference Time object"""
+        return TimeDelta(val, format=time_reference.format, scale=time_reference.scale)
+
+    def _round_time(time, decimals):
+        return np.round(time.value, decimals)
+
     def _create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
         """Create BLS interact user interface."""
         if minp is None:
             minp = 0.3
         if maxp is None:
-            maxp = (lc.time[-1] - lc.time[0])/2
+            maxp = ((lc.time[-1].value - lc.time[0].value)/2)
+        # TODO: consider to accept Time as minp / maxp, and convert it to unitless days
 
         time_format = ''
         if lc.time.format == 'bkjd':
@@ -460,7 +469,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         half_button = Button(label="Half Period", button_type="danger", width=100)
         text_output = Paragraph(text="Period: {} days, T0: {}{}".format(
                                                     np.round(best_period, 7),
-                                                    np.round(best_t0, 7), time_format),
+                                                    _round_time(best_t0, 7), time_format),
                                 width=350, height=40)
 
         # Set up BLS source
@@ -472,8 +481,9 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         mf /= np.median(mf)
         mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
         model_lc = LightCurve(lc.time[mask], mf[mask])
-        model_lc = model_lc.append(LightCurve([(lc.time[0] - best_t0) + best_period/2], [1]))
-        model_lc = model_lc.append(LightCurve([(lc.time[0] - best_t0) + 3*best_period/2], [1]))
+        # Need to use raw value for best_t0 and best_period so that the result is of type Time, rather than TimeDelta
+        model_lc = model_lc.append(LightCurve([(lc.time[0].value - best_t0.value) + best_period.value/2], [1]))
+        model_lc = model_lc.append(LightCurve([(lc.time[0].value - best_t0.value) + 3*best_period.value/2], [1]))
 
         model_lc_source = ColumnDataSource(data=dict(
                                      time=np.sort(model_lc.time),
@@ -491,8 +501,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         f_help_source = prepare_f_help_source(f)
 
         f_model_lc = model_lc.fold(best_period, best_t0)
-        f_model_lc = LightCurve([-0.5], [1]).append(f_model_lc)
-        f_model_lc = f_model_lc.append(LightCurve([0.5], [1]))
+        f_model_lc = LightCurve(_to_timeDelta([-0.5], f_model_lc.time), [1]).append(f_model_lc)
+        f_model_lc = f_model_lc.append(LightCurve(_to_timeDelta([0.5], f_model_lc.time), [1]))
 
         f_model_lc_source = ColumnDataSource(data=dict(
                                  phase=f_model_lc.time,
@@ -568,13 +578,13 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             f_model_lc_source.data = {'phase': f_model_lc.time,
                                       'flux': f_model_lc.flux}
 
-            vertical_line.update(location=best_period)
+            vertical_line.update(location=best_period.value)
             fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(
                                         np.round(best_period, 7),
-                                        np.round(best_t0, 7), time_format)
+                                        _round_time(best_t0, 7), time_format)
             text_output.text = "Period: {} days, \t T0: {}{}".format(
                                         np.round(best_period, 7),
-                                        np.round(best_t0, 7), time_format)
+                                        _round_time(best_t0, 7), time_format)
 
         # Callbacks
         def _update_upon_period_selection(attr, old, new):
@@ -635,7 +645,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         # Create all the figures.
         fig_folded = make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, f_help_source)
-        fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(np.round(best_period, 7), np.round(best_t0, 5), time_format)
+        fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(np.round(best_period, 7), _round_time(best_t0, 5), time_format)
         fig_bls, vertical_line = make_bls_figure_elements(result, bls_source, bls_help_source)
         fig_lc = make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, lc_help_source)
 
@@ -652,7 +662,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         npoints_slider.on_change('value', _update_model_slider)
 
         # Make sure the vertical line always goes to the best period.
-        vertical_line.update(location=best_period)
+        vertical_line.update(location=best_period.value)
 
         # If we pan in the BLS panel, update everything
         fig_bls.on_event(PanEnd, _update_model_slider_EVENT)
