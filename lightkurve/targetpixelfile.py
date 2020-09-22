@@ -62,10 +62,6 @@ class TargetPixelFile(object):
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
         
-        self.quality_mask = QualityFlags.create_quality_mask(
-                                quality_array=self.hdu[1].data['QUALITY'],
-                                bitmask=None)
-
         # For consistency with `LightCurve`, provide a `meta` dictionary
         self.meta = {}
         self.meta.update(self.get_header(0))
@@ -1922,6 +1918,8 @@ class TargetPixelFileFactory(object):
         elif filetype == 'KeplerTargetPixelFile':
             tpf = KeplerTargetPixelFile(hdulist, **kwargs)
         else:
+            warnings.warn('Could not detect filetype as TESSTargetPixelFile or KeplerTargetPixelFile, '
+                          'returning generic TargetPixelFile instead.', LightkurveWarning)
             tpf = TargetPixelFile(hdulist, **kwargs)
         return tpf
     
