@@ -19,7 +19,7 @@ import astropy.units as u
 from astropy.utils.exceptions import AstropyWarning
 
 from ..targetpixelfile import KeplerTargetPixelFile, TargetPixelFileFactory
-from ..targetpixelfile import TessTargetPixelFile
+from ..targetpixelfile import TessTargetPixelFile, TargetPixelFile
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning, LightkurveDeprecationWarning
 from ..io import read
