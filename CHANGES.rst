@@ -1,16 +1,105 @@
-2.0.dev (unreleased)
-=====================
+2.0.0 (unreleased)
+==================
+
+
+Major changes
+-------------
 
 - Removed support for Python 2. [#733]
 
-- Added ``SparseDesignMatrix`` and modified ``RegressionCorrector`` to enable
-  systematics removal methods to benefit from ``scipy.sparse`` speed-ups. [#732]
+- ``LightCurve`` is now a sub-class of ``astropy.time.TimeSeries`` to enable it
+  to have arbitrary columns and to enable closer integration with AstroPy. [#744]
+
+
+Other changes
+-------------
+
+lightkurve.lightcurve
+^^^^^^^^^^^^^^^^^^^^^
+
+- Added a ``column`` parameter to ``LightCurve``'s ``plot()``, ``scatter()``,
+  and ``errorbar()`` methods to enable any column to be plotted. [#765]
+
+- Added the ``LightCurve.create_transit_mask(period, transit_time, duration)``
+  method to conveniently mask planet or eclipsing binary transits. [#808]
+
+- Added a ``column`` parameter to ``LightCurve.remove_nans()`` to enable
+  cadences to be removed which contain NaN values in a specific column. [#828]
+
+lightkurve.targetpixelfile
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
   ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
 
-- Added the ``column`` parameter to ``TargetPixelFile.plot()`` to enable all
-  columns in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
+- Added the ``TargetPixelFile.plot_pixels()`` method to plot light curves
+  and periodograms for each individual pixel in a TPF. [#771]
+
+- Added the ``estimate_background`` method to ``TargetPixelFile`` which returns
+  a 1D estimate of the residual background present in e.g. TESSCut data. [#746]
+
+- Added a ``column`` parameter to ``TargetPixelFile.plot()`` to enable any
+  column in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
+
+- Modified ``to_lightcurve()`` to default to using ``aperture_mask='threshold'``
+  if the ``'pipeline'`` mask is missing or empty, e.g. for TESSCut files. [#833]
+
+- Modified ``plot()`` to use a more clear hatched style when visualizing the
+  aperture mask on top of pixel data. [#814]
+
+- Modified ``_parse_aperture_mask()`` to ensure that masks composed of integer
+  or floats are always converted to booleans. [#694]
+
+- Fixed a bug in ``TargetPixelFile.__getitem__()`` which caused a substantial
+  memory leak on indexing or slicing a tpf. [#829]
+
+lightkurve.search
+^^^^^^^^^^^^^^^^^
+
+- Added support for reading K2SFF and EVEREST community light curves via the
+  ``LightCurve.read()`` and ``search_lightcurve()`` functions. [#739]
+
+- Modified the search functions such that exact mission target identifiers,
+  such as 'KIC 5112705' or 'TIC 261136679', only return products known under
+  those names, unless a search radius is specified. [#796]
+
+lightkurve.correctors
+^^^^^^^^^^^^^^^^^^^^^
+
+- Added the ``CotrendingBasisVectors`` class to provide a convenient interface
+  to work with TESS and Kepler basis vector data products. [#826]
+
+- Added ``SparseDesignMatrix`` and modified ``RegressionCorrector`` to enable
+  systematics removal methods to benefit from ``scipy.sparse`` speed-ups. [#732]
+
+- Modified ``PLDCorrector`` to make use of the new ``RegressionCorrector``
+  and ``DesignMatrix`` classes. [#746]
+
+- Fixed a bug in ``SFFCorrector`` which caused correction to fail if a light
+  curve's ``centroid_col`` or ``centroid_row`` columns contained NaNs. [#827]
+
+lightkurve.seismology
+^^^^^^^^^^^^^^^^^^^^^
+
+- Modified the ``estimate_radius``, ``estimate_mass``, and ``estimate_logg``
+  methods to default to the ``teff`` value in the meta data. [#766]
+
+- Added an error message to ``estimate_numax()`` or ``estimate_deltanu()`` if
+  the underlying periodogram does not have uniformly-spaced frequencies. [#780]
+
+lightkurve.periodogram
+^^^^^^^^^^^^^^^^^^^^^^
+
+- Modified ``create_transit_mask`` method to return ``True`` during transits and
+  ``False`` elsewhere for consistent mask syntax. [#808]
+
+
+
+1.11.2 (2020-08-28)
+===================
+
+- Fixed a warning being issued (``"LightCurveFile.header is deprecated"``)
+  when downloading light curve files from MAST. [#819]
 
 
 

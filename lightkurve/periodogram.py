@@ -96,6 +96,19 @@ class Periodogram(object):
             view = self.default_view
         return validate_method(view, ["frequency", "period"])
 
+    def _is_evenly_spaced(self):
+        """Returns true if the values in ``frequency`` are evenly spaced.
+
+        This helper method exists because some features, such as ``smooth()``,
+        ``estimate_numax()``, and ``estimate_deltanu()``, require a grid of
+        evenly-spaced frequencies.
+        """
+        # verify that the first differences are all equal
+        freqdiff = np.diff(self.frequency.value)
+        if np.allclose(freqdiff[0], freqdiff):
+            return True
+        return False
+
     @property
     def period(self):
         """Returns the array of periods, i.e. 1/frequency."""
@@ -219,11 +232,11 @@ class Periodogram(object):
                                  "frequency units.")
 
             # Check to see if we have a grid of evenly spaced periods instead.
-            fs = np.mean(np.diff(self.frequency))
-            if not np.isclose(np.median(np.diff(self.frequency.value)), fs.value):
+            if not self._is_evenly_spaced():
                 raise ValueError("the 'boxkernel' method requires the periodogram "
                                  "to have a grid of evenly spaced frequencies.")
 
+            fs = np.mean(np.diff(self.frequency))
             box_kernel = Box1DKernel(math.ceil((filter_width/fs).value))
             smooth_power = convolve(self.power.value, box_kernel)
             smooth_pg = self.copy()
@@ -712,6 +725,10 @@ class LombScarglePeriodogram(Periodogram):
         """
         # Input validation
         normalization = validate_method(normalization, ['psd', 'amplitude'])
+        if np.isnan(lc.flux).any():
+            lc = lc.remove_nans()
+            log.debug('Lightcurve contains NaN values.'
+                      'These are removed before creating the periodogram.')
 
         # Setting default frequency units
         if freq_unit is None:
@@ -754,14 +771,10 @@ class LombScarglePeriodogram(Periodogram):
             raise ValueError('You have input keyword arguments for both frequency and period. '
                              'Please only use one.')
 
-        if (~np.isfinite(lc.flux)).any():
-            raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
-                             ' to remove NaN values from a LightCurve.')
-
         time = lc.time.copy()
 
         # Approximate Nyquist Frequency and frequency bin width in terms of days
-        nyquist = 0.5 * (1./(np.median(np.diff(time))))
+        nyquist = 0.5 * (1./(np.median(np.diff(time.value)))) * (1/cds.d)
         fs = (1./(time[-1] - time[0])) / oversample_factor
 
         # Convert these values to requested frequency unit
@@ -850,7 +863,8 @@ class LombScarglePeriodogram(Periodogram):
                                       targetid=lc.meta.get('targetid'),
                                       label=lc.meta.get('label'),
                                       default_view=default_view, ls_obj=LS,
-                                      nterms=nterms, ls_method=ls_method)
+                                      nterms=nterms, ls_method=ls_method,
+                                      meta=lc.meta)
 
     def model(self, time, frequency=None):
         """Obtain the flux model for a given frequency and time
@@ -872,8 +886,12 @@ class LombScarglePeriodogram(Periodogram):
         if frequency is None:
             frequency = self.frequency_at_max_power
         f = self._LS_object.model(time, frequency)
-        return LightCurve(time, f, label='LS Model', meta={'frequency':frequency},
-                            targetid='{} LS Model'.format(self.targetid)).normalize()
+        lc = LightCurve(time=time,
+                        flux=f,
+                        meta={'frequency':frequency},
+                        label='LS Model',
+                        targetid='{} LS Model'.format(self.targetid))
+        return lc.normalize()
 
 
 class BoxLeastSquaresPeriodogram(Periodogram):
@@ -1066,9 +1084,8 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         return model
 
     def get_transit_mask(self, period=None, duration=None, transit_time=None):
-        """Computes the transit mask using the BLS, returns a lightkurve.LightCurve
-
-        True where there are no transits.
+        """Returns a boolean array that is ``True`` during transits and
+        ``False`` elsewhere.
 
         Parameters
         ----------
@@ -1081,11 +1098,11 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
         Returns
         -------
-        mask : np.array of Bool
-            Mask that removes transits. Mask is True where there are no transits.
+        transit_mask : np.array of bool
+            Mask that flags transits. Mask is ``True`` where there are transits.
         """
         model = self.get_transit_model(period=period, duration=duration, transit_time=transit_time)
-        return model.flux == np.median(model.flux)
+        return model.flux != np.median(model.flux)
 
     @property
     def transit_time_at_max_power(self):

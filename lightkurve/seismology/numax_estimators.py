@@ -89,6 +89,11 @@ def estimate_numax_acf2d(periodogram, numaxs=None, window_width=None, spacing=No
         The numax of the periodogram. In the units of the periodogram object
         frequency.
     """
+    # Detect whether the frequency grid is evenly-spaced
+    if not periodogram._is_evenly_spaced():
+        raise ValueError("the ACF 2D method requires that the periodogram "
+                         "has a grid of uniformly spaced frequencies.")
+
     # Calculate the window_width size
 
     #C: What is this doing? Why have these values been picked? This function is slow.

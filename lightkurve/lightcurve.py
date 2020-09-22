@@ -4,9 +4,12 @@ import datetime
 import logging
 import warnings
 
+import collections
+
 import numpy as np
 from scipy import signal
 from scipy.interpolate import interp1d
+import matplotlib
 from matplotlib import pyplot as plt
 from copy import deepcopy
 
@@ -77,8 +80,8 @@ class LightCurve(TimeSeries):
 
     # The following keywords were removed in Lightkurve v2.0.
     # Their use will trigger a warning.
-    _deprecated_keywords = ['targetid', 'label', 'time_format', 'time_scale',
-                            'flux_unit']
+    _deprecated_keywords = ('targetid', 'label', 'time_format', 'time_scale',
+                            'flux_unit')
     _deprecated_column_keywords = ['centroid_col', 'centroid_row',
                                    'cadenceno', 'quality']
 
@@ -115,21 +118,35 @@ class LightCurve(TimeSeries):
             if kw in kwargs:
                 deprecated_column_kws[kw] = kwargs.pop(kw)
 
+        # If `time` is passed as keyword argument, we populate it with integer numbers
+        if data is None or 'time' not in data.keys():
+            if time is None and flux is not None:
+                time = np.arange(len(flux))
+            # We are tolerant of missing time format
+            if time is not None and not isinstance(time, Time):
+                # Lightkurve v1.x supported specifying the time_format
+                # as a constructor kwarg
+                time = Time(time,
+                            format=deprecated_kws.get("time_format", self._default_time_format),
+                            scale=deprecated_kws.get("time_scale", self._default_time_scale))
+
+        # Also be tolerant of missing time format if time is passed via `data`
+        if data and 'time' in data.keys():
+            if not isinstance(data['time'], Time):
+                data['time'] = Time(data['time'],
+                            format=deprecated_kws.get("time_format", self._default_time_format),
+                            scale=deprecated_kws.get("time_scale", self._default_time_scale))
+
+        # Allow overriding the required columns
         self._required_columns = kwargs.pop("_required_columns",
                                             self._required_columns)
 
-        # We are tolerant of missing time if flux is given
-        if time is None and flux is not None:
-            time = np.arange(len(flux))
-        # We are tolerant of missing time format
-        if time is not None and not isinstance(time, Time):
-            # Lightkurve v1.x supported specifying the time_format
-            # as a constructor kwarg
-            time = Time(time,
-                        format=deprecated_kws.get("time_format", self._default_time_format),
-                        scale=deprecated_kws.get("time_scale", self._default_time_scale))
-
+        # Call the SampledTimeSeries constructor.
+        # Disable required columns for now; we'll check those later.
+        tmp = self._required_columns
+        self._required_columns = []
         super().__init__(data=data, time=time, **kwargs)
+        self._required_columns = tmp
 
         # For some operations, an empty time series needs to be created, then
         # columns added one by one. We should check that when columns are added
@@ -138,28 +155,45 @@ class LightCurve(TimeSeries):
             self._required_columns_relax = True
             return
 
-        # Ensure the required columns are available
-        if flux is None:
-            flux = np.empty(len(self))
+        # Load `time`, `flux`, and `flux_err` from the table as local variable names
+        time = self.columns['time']  # super().__init__() guarantees this is a column
+        if 'flux' in self.colnames:
+            if flux is None:
+                flux = self.columns['flux']
+            else:
+                raise TypeError(f"'flux' has been given both in the `data` table and as a keyword argument")
+        if 'flux_err' in self.colnames:
+            if flux_err is None:
+                flux_err = self.columns['flux_err']
+            else:
+                raise TypeError(f"'flux_err' has been given both in the `data` table and as a keyword argument")
+
+        # Ensure `flux` and `flux_err` are populated with NaNs if missing
+        if flux is None and time is not None:
+            flux = np.empty(len(time))
             flux[:] = np.nan
         if not isinstance(flux, Quantity):
             flux = Quantity(flux, deprecated_kws.get("flux_unit"))
-        if "flux" not in self.columns:
-            self.add_column(flux, name="flux", index=1)
 
         if flux_err is None:
-            flux_err = np.empty(len(self))
+            flux_err = np.empty(len(flux))
             flux_err[:] = np.nan
         if not isinstance(flux_err, Quantity):
-            flux_err = Quantity(flux_err, deprecated_kws.get("flux_unit"))
-        if "flux_err" not in self.columns:
-            self.add_column(flux_err, name="flux_err", index=2)
+            flux_err = Quantity(flux_err, flux.unit)
 
         # Backwards compatibility with Lightkurve v1.x
         # Ensure attributes are set if passed via deprecated kwargs
         for kw in deprecated_kws:
             if kw not in self.meta:
                 self.meta[kw] = deprecated_kws[kw]
+
+        # Ensure all required columns are in the right order
+        with self._delay_required_column_checks():
+            for idx, col in enumerate(self._required_columns):
+                if col in self.colnames:
+                    self.remove_column(col)
+                self.add_column(locals()[col], index=idx, name=col)
+
         # Ensure columns are set if passed via deprecated kwargs
         for kw in deprecated_column_kws:
             if kw not in self.meta and kw not in self.columns:
@@ -169,6 +203,10 @@ class LightCurve(TimeSeries):
         for col in self.columns:
             if not isinstance(self[col], (Quantity, Time)):
                 self.replace_column(col, Quantity(self[col], dtype=self[col].dtype))
+
+        # Ensure flux and flux_err have the same units
+        if self['flux'].unit != self['flux'].unit:
+            raise ValueError("flux and flux_err must have the same units")
 
         self._required_columns_relax = False
         self._check_required_columns()
@@ -187,7 +225,9 @@ class LightCurve(TimeSeries):
 
     def __setattr__(self, name, value, **kwargs):
         """To get copied, attributes have to be stored in the meta dictionary!"""
-        if ('columns' in self.__dict__) and (name in self.__dict__['columns']):
+        if (name == 'time'):
+            self['time'] = value # astropy will convert value to Time if needed
+        elif ('columns' in self.__dict__) and (name in self.__dict__['columns']):
             if not isinstance(value, Quantity):
                 value = Quantity(value, dtype=value.dtype)
             self.replace_column(name, value)
@@ -196,7 +236,7 @@ class LightCurve(TimeSeries):
         else:
             super().__setattr__(name, value, **kwargs)
 
-    def _base_repr_(self, descr_vals=None, **kwargs):
+    def _base_repr_(self, html=False, descr_vals=None, **kwargs):
         """Defines the description shown by `__repr__` and `_html_repr_`."""
         if descr_vals is None:
             descr_vals = [self.__class__.__name__]
@@ -205,7 +245,7 @@ class LightCurve(TimeSeries):
             if hasattr(self, "targetid"):
                 descr_vals.append(f'targetid={self.targetid}')
             descr_vals.append('length={}'.format(len(self)))
-        return super()._base_repr_(descr_vals=descr_vals, **kwargs)
+        return super()._base_repr_(html=html, descr_vals=descr_vals, **kwargs)
 
     # Define `time`, `flux`, `flux_err` as class attributes to enable IDE
     # of these required columns auto-completion.
@@ -338,6 +378,9 @@ class LightCurve(TimeSeries):
             # Applying standard uncertainty propagation, cf.
             # https://en.wikipedia.org/wiki/Propagation_of_uncertainty#Example_formulae
             newlc.flux_err = abs(newlc.flux) * np.hypot(self.flux_err / self.flux, other.flux_err / other.flux)
+        elif isinstance(other, (u.UnitBase, u.FunctionUnitBase)):  # cf. astropy/issues/6517
+            newlc.flux = other * self.flux
+            newlc.flux_err = other * self.flux_err
         else:
             newlc.flux = other * self.flux
             newlc.flux_err = abs(other) * self.flux_err
@@ -379,25 +422,18 @@ class LightCurve(TimeSeries):
         Prints in order of type (ints, strings, lists, arrays, others).
         """
         attrs = {}
+        deprecated_properties = list(self._deprecated_keywords)
+        deprecated_properties += ['flux_quantity', 'SAP_FLUX', 'PDCSAP_FLUX',
+                                  'astropy_time', 'hdu']
         for attr in dir(self):
-            if not attr.startswith('_'):
+            if not attr.startswith('_') and attr not in deprecated_properties:
                 try:
                     res = getattr(self, attr)
                 except Exception:
                     continue
                 if callable(res):
                     continue
-                if attr == 'hdu':
-                    attrs[attr] = {'res': res, 'type': 'list'}
-                    for idx, r in enumerate(res):
-                        if idx == 0:
-                            attrs[attr]['print'] = '{}'.format(r.header['EXTNAME'])
-                        else:
-                            attrs[attr]['print'] = '{}, {}'.format(
-                                attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
-                    continue
-                else:
-                    attrs[attr] = {'res': res}
+                attrs[attr] = {'res': res}
                 if isinstance(res, int):
                     attrs[attr]['print'] = '{}'.format(res)
                     attrs[attr]['type'] = 'int'
@@ -429,7 +465,7 @@ class LightCurve(TimeSeries):
                     idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
-    def append(self, others, inplace=None):
+    def append(self, others, inplace=False):
         """Append one or more other `LightCurve` object(s) to this one.
 
         Parameters
@@ -450,7 +486,8 @@ class LightCurve(TimeSeries):
                              "as of Lightkurve v2.0")
         if not hasattr(others, '__iter__'):
             others = (others,)
-        return vstack((self, *others))
+        # Need `join_type='inner'` until AstroPy supports masked Quantities
+        return vstack((self, *others), join_type='inner', metadata_conflicts='silent')
 
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
                 break_tolerance=5, niters=3, sigma=3, mask=None, **kwargs):
@@ -541,15 +578,15 @@ class LightCurve(TimeSeries):
             mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
                     (np.nanstd(self.flux[mask] - trend_signal) * sigma + Quantity(1e-14, self.flux.unit))
             f = interp1d(self.time.value[mask][mask1], trend_signal[mask1], fill_value='extrapolate')
-            trend_signal = f(self.time.value)
+            trend_signal = Quantity(f(self.time.value), self.flux.unit)
             mask[mask] &= mask1
 
         flatten_lc = self.copy()
         with warnings.catch_warnings():
             # ignore invalid division warnings
             warnings.simplefilter("ignore", RuntimeWarning)
-            flatten_lc.flux = flatten_lc.flux / trend_signal
-            flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
+            flatten_lc.flux = flatten_lc.flux / trend_signal.value
+            flatten_lc.flux_err = flatten_lc.flux_err / trend_signal.value
         if return_trend:
             trend_lc = self.copy()
             trend_lc.flux = trend_signal
@@ -740,17 +777,36 @@ class LightCurve(TimeSeries):
         lc.meta['normalized'] = True
         return lc
 
-    def remove_nans(self):
-        """Removes cadences where the flux is NaN.
+    def remove_nans(self, column: str = 'flux'):
+        """Removes cadences where ``column`` is a NaN.
+
+        Parameters
+        ----------
+        column : str
+            Column to check for NaNs.  Defaults to ``'flux'``.
 
         Returns
         -------
         clean_lightcurve : `LightCurve`
             A new light curve object from which NaNs fluxes have been removed.
-        """
-        return self[~np.isnan(self.flux)]  # This will return a sliced copy
 
-    def fill_gaps(self, method='gaussian_noise'):
+        Examples
+        --------
+            >>> import lightkurve as lk
+            >>> import numpy as np
+            >>> lc = lk.LightCurve({'time': [1, 2, 3], 'flux': [1., np.nan, 1.]})
+            >>> lc.remove_nans()
+            <LightCurve length=2>
+            time    flux  flux_err
+            <BLANKLINE>
+            object float64 float64
+            ------ ------- --------
+            1.0     1.0      nan
+            3.0     1.0      nan
+        """
+        return self[~np.isnan(self[column])]  # This will return a sliced copy
+
+    def fill_gaps(self, method: str = 'gaussian_noise'):
         """Fill in gaps in time.
 
         By default, the gaps will be filled with random white Gaussian noise
@@ -799,7 +855,7 @@ class LightCurve(TimeSeries):
                 ntime.append(t)
             ntime = np.asarray(ntime, float)
             in_original = np.in1d(ntime, lc.time.value)
-        
+
         # Fill in time points
         newdata['time'] = Time(ntime, format=lc.time.format, scale=lc.time.scale)
         f = np.zeros(len(ntime))
@@ -1022,7 +1078,7 @@ class LightCurve(TimeSeries):
         return self.__class__(ts)
 
     def estimate_cdpp(self, transit_duration=13, savgol_window=101,
-                      savgol_polyorder=2, sigma=5.):
+                      savgol_polyorder=2, sigma=5.) -> float:
         """Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.
 
         A common estimate of the noise in a lightcurve is the scatter that
@@ -1081,8 +1137,11 @@ class LightCurve(TimeSeries):
 
         detrended_lc = self.flatten(window_length=savgol_window,
                                     polyorder=savgol_polyorder)
-        cleaned_lc = detrended_lc.remove_outliers(sigma=sigma).normalize("ppm")
-        mean = running_mean(data=cleaned_lc.flux, window_size=transit_duration)
+        cleaned_lc = detrended_lc.remove_outliers(sigma=sigma)
+        with warnings.catch_warnings():  # ignore "already normalized" message
+            warnings.filterwarnings("ignore", message=".*already.*")
+            normalized_lc = cleaned_lc.normalize("ppm")
+        mean = running_mean(data=normalized_lc.flux, window_size=transit_duration)
         return np.std(mean)
 
     def query_solar_system_objects(self, cadence_mask='outliers', radius=None,
@@ -1111,17 +1170,16 @@ class LightCurve(TimeSeries):
           object to determine the position of the search cone.
         * The size of the search cone is 15 spacecraft pixels by default. You
           can change this by passing the `radius` parameter (unit: degrees).
-        * This method will only search points in time during which he light
+        * By default, this method will only search points in time during which the light
           curve showed 3-sigma outliers in flux. You can override this behavior
-          and search all times by passing the `cadence_mask='all'` argument,
-          but this will be much slower.
+          and search for specific times by passing `cadence_mask`. See examples for details.
 
         Parameters
         ----------
-        cadence_mask : str or bool
+        cadence_mask : str, or boolean array with length of self.time
             mask in time to select which frames or points should be searched for SSOs.
             Default "outliers" will search for SSOs at points that are `sigma` from the mean.
-            "all" will search all cadences. Pass a boolean array with values of "True"
+            "all" will search all cadences. Alternatively, pass a boolean array with values of "True"
             for times to search for SSOs.
         radius : optional, float
             Radius in degrees to search for bodies. If None, will search for
@@ -1129,12 +1187,12 @@ class LightCurve(TimeSeries):
         sigma : optional, float
             If `cadence_mask` is set to `"outlier"`, `sigma` will be used to identify
             outliers.
-        location : str
-            Spacecraft location. Options include `'kepler'` and `'tess'`.
+        location : optional, str
+            Spacecraft location. Options include `'kepler'` and `'tess'`. Default: `self.mission`
         cache : optional, bool
             If True will cache the search result in the astropy cache. Set to False
             to request the search again.
-        return_mask: bool
+        return_mask: optional, bool
             If True will return a boolean mask in time alongside the result
 
         Returns
@@ -1143,6 +1201,17 @@ class LightCurve(TimeSeries):
             DataFrame object which lists the Solar System objects in frames
             that were identified to contain SSOs.  Returns `None` if no objects
             were found.
+
+        Examples
+        --------
+        Find if there are SSOs affecting the lightcurve for the given time frame:
+
+            >>> df_sso = lc.query_solar_system_objects(cadence_mask=(lc.time.value >= 2014.1) & (lc.time.value <= 2014.9))  # doctest: +SKIP
+
+        Find if there are SSOs affecting the lightcurve for all times, but it will be much slower:
+
+            >>> df_sso = lc.query_solar_system_objects(cadence_mask='all')  # doctest: +SKIP
+
         """
         for attr in ['ra', 'dec']:
             if not hasattr(self, '{}'.format(attr)):
@@ -1154,6 +1223,13 @@ class LightCurve(TimeSeries):
                 cadence_mask = self.remove_outliers(sigma=sigma, return_mask=True)[1]
             elif cadence_mask == 'all':
                 cadence_mask = np.ones(len(self.time)).astype(bool)
+            else:
+                raise ValueError('invalid `cadence_mask` string argument')
+        elif isinstance(cadence_mask, collections.abc.Sequence):
+            cadence_mask = np.array(cadence_mask)
+        elif isinstance(cadence_mask, (bool)):
+            # for boundary case of a single element tuple, e.g., (True)
+            cadence_mask = np.array([cadence_mask])
         elif not isinstance(cadence_mask, np.ndarray):
             raise ValueError('the `cadence_mask` argument is missing or invalid')
         # Avoid searching times with NaN flux; this is necessary because e.g.
@@ -1185,11 +1261,44 @@ class LightCurve(TimeSeries):
             return res, np.in1d(self.astropy_time.jd, res.epoch)
         return res
 
-    def _create_plot(self, method='plot', ax=None, normalize=False,
+    def _create_plot(self, method='plot', column='flux', ax=None, normalize=False,
                      xlabel=None, ylabel=None, title='', style='lightkurve',
-                     show_colorbar=True, colorbar_label='',
-                     **kwargs):
+                     show_colorbar=True, colorbar_label='', offset=None,
+                     **kwargs) -> matplotlib.axes.Axes:
         """Implements `plot()`, `scatter()`, and `errorbar()` to avoid code duplication.
+
+        Parameters
+        ----------
+        method : str
+            One of 'plot', 'scatter', or 'errorbar'.
+        column : str
+            Name of data column to plot. Default `flux`.
+        ax : `~matplotlib.axes.Axes`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        normalize : bool
+            Normalize the lightcurve before plotting?
+        xlabel : str
+            X axis label.
+        ylabel : str
+            Y axis label.
+        title : str
+            Title shown at the top using matplotlib `set_title`.
+        style : str
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
+        show_colorbar : boolean
+            Show the colorbar if colors are given using the `c` argument?
+        colorbar_label : str
+            Label to show next to the colorbar (if `c` is given).
+        offset : float
+            Offset value to apply to the Y axis values before plotting. Use this
+            to avoid light curves from overlapping on the same plot. By default,
+            no offset is applies.
+        kwargs : dict
+            Dictionary of arguments to be passed to Matplotlib's `plot`,
+            `scatter`, or `errorbar` methods.
 
         Returns
         -------
@@ -1211,24 +1320,42 @@ class LightCurve(TimeSeries):
                 xlabel = 'Time [JD]'
             else:
                 xlabel = 'Time'
+
         # Default ylabel
         if ylabel is None:
-            if normalize or (self.flux.unit == u.dimensionless_unscaled):
-                ylabel = 'Normalized Flux'
-            elif self.flux.unit is None:
-                ylabel = 'Flux'
+            if "flux" in column:
+                ylabel = "Flux"
             else:
-                ylabel = 'Flux [{}]'.format(self.flux.unit.to_string("latex_inline"))
+                ylabel = f"{column}"
+            if normalize or self.meta.get("normalized"):
+                ylabel = "Normalized " + ylabel
+            elif (self[column].unit) and (self[column].unit.to_string() != ''):
+                ylabel += f" [{self[column].unit.to_string('latex_inline')}]"
+
         # Default legend label
         if ('label' not in kwargs):
             kwargs['label'] = self.meta.get('label')
 
+        flux = self[column]
+        try:
+            flux_err = self[f'{column}_err']
+        except KeyError:
+            flux_err = np.full(len(flux), np.nan)
+
         # Normalize the data if requested
         if normalize:
-            lc_normed = self.normalize()
+            if column == "flux":
+                lc_normed = self.normalize()
+            else:
+                lc_tmp = self.copy()
+                lc_tmp['flux'] = flux
+                lc_tmp['flux_err'] = flux_err
+                lc_normed = lc_tmp.normalize()
             flux, flux_err = lc_normed.flux, lc_normed.flux_err
-        else:
-            flux, flux_err = self.flux, self.flux_err
+
+        # Apply offset if requested
+        if offset:
+            flux += offset*flux.unit
 
         # Make the plot
         with plt.style.context(style):
@@ -1245,7 +1372,10 @@ class LightCurve(TimeSeries):
                     cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
                     cbar.ax.minorticks_off()
             elif method == 'errorbar':
-                ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
+                if np.any(~np.isnan(flux_err)):
+                    ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
+                else:
+                    log.warning(f"Column `{column}` has no associated errors.")
             else:
                 ax.plot(self.time.value, flux.value, **kwargs)
             ax.set_xlabel(xlabel)
@@ -1257,26 +1387,36 @@ class LightCurve(TimeSeries):
 
         return ax
 
-    def plot(self, **kwargs):
+    def plot(self, **kwargs) -> matplotlib.axes.Axes:
         """Plot the light curve using Matplotlib's `~matplotlib.pyplot.plot` method.
 
         Parameters
         ----------
+        column : str
+            Name of data column to plot. Default `flux`.
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be created.
+            a new one will be generated.
         normalize : bool
             Normalize the lightcurve before plotting?
         xlabel : str
-            Plot x axis label
+            X axis label.
         ylabel : str
-            Plot y axis label
+            Y axis label.
         title : str
-            Plot set_title
+            Title shown at the top using matplotlib `set_title`.
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
+        show_colorbar : boolean
+            Show the colorbar if colors are given using the `c` argument?
+        colorbar_label : str
+            Label to show next to the colorbar (if `c` is given).
+        offset : float
+            Offset value to apply to the Y axis values before plotting. Use this
+            to avoid light curves from overlapping on the same plot. By default,
+            no offset is applies.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
@@ -1287,30 +1427,36 @@ class LightCurve(TimeSeries):
         """
         return self._create_plot(method='plot', **kwargs)
 
-    def scatter(self, colorbar_label='', show_colorbar=True, **kwargs):
+    def scatter(self, colorbar_label='', show_colorbar=True, **kwargs) -> matplotlib.axes.Axes:
         """Plots the light curve using Matplotlib's `~matplotlib.pyplot.scatter` method.
 
         Parameters
         ----------
+        column : str
+            Name of data column to plot. Default `flux`.
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
         normalize : bool
             Normalize the lightcurve before plotting?
         xlabel : str
-            Plot x axis label
+            X axis label.
         ylabel : str
-            Plot y axis label
+            Y axis label.
         title : str
-            Plot set_title
+            Title shown at the top using matplotlib `set_title`.
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
-        colorbar_label : str
-            Label to show next to the colorbar (if `c` is given).
         show_colorbar : boolean
             Show the colorbar if colors are given using the `c` argument?
+        colorbar_label : str
+            Label to show next to the colorbar (if `c` is given).
+        offset : float
+            Offset value to apply to the Y axis values before plotting. Use this
+            to avoid light curves from overlapping on the same plot. By default,
+            no offset is applies.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.scatter`.
 
@@ -1322,30 +1468,40 @@ class LightCurve(TimeSeries):
         return self._create_plot(method='scatter', colorbar_label=colorbar_label,
                                  show_colorbar=show_colorbar, **kwargs)
 
-    def errorbar(self, linestyle='', **kwargs):
+    def errorbar(self, linestyle='', **kwargs) -> matplotlib.axes.Axes:
         """Plots the light curve using Matplotlib's `~matplotlib.pyplot.errorbar` method.
 
         Parameters
         ----------
+        linestyle : str
+            Connect the error bars using a line?
+        column : str
+            Name of data column to plot. Default `flux`.
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
         normalize : bool
             Normalize the lightcurve before plotting?
         xlabel : str
-            Plot x axis label
+            X axis label.
         ylabel : str
-            Plot y axis label
+            Y axis label.
         title : str
-            Plot set_title
+            Title shown at the top using matplotlib `set_title`.
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
-        linestyle : str
-            Connect the error bars using a line?
+        show_colorbar : boolean
+            Show the colorbar if colors are given using the `c` argument?
+        colorbar_label : str
+            Label to show next to the colorbar (if `c` is given).
+        offset : float
+            Offset value to apply to the Y axis values before plotting. Use this
+            to avoid light curves from overlapping on the same plot. By default,
+            no offset is applies.
         kwargs : dict
-            Dictionary of arguments to be passed to `matplotlib.pyplot.scatter`.
+            Dictionary of arguments to be passed to `matplotlib.pyplot.errorbar`.
 
         Returns
         -------
@@ -1412,7 +1568,7 @@ class LightCurve(TimeSeries):
         return show_interact_widget(clean, notebook_url=notebook_url, minimum_period=minimum_period,
                                     maximum_period=maximum_period, resolution=resolution)
 
-    def to_table(self):
+    def to_table(self) -> Table:
         return Table(self)
 
     @deprecated("2.0",
@@ -1557,7 +1713,8 @@ class LightCurve(TimeSeries):
         from .seismology import Seismology
         return Seismology.from_lightcurve(self, **kwargs)
 
-    def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX', **extra_data):
+    def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX',
+                **extra_data):
         """Converts the light curve to a FITS file in the Kepler/TESS file format.
 
         The FITS file will be returned as a `~astropy.io.fits.HDUList` object.
@@ -1629,7 +1786,7 @@ class LightCurve(TimeSeries):
                 extra_data = {}
             cols = []
             if ~np.asarray(['TIME' in k.upper() for k in extra_data.keys()]).any():
-                cols.append(fits.Column(name='TIME', format='D', unit=self.time_format,
+                cols.append(fits.Column(name='TIME', format='D', unit=self.time.format,
                                         array=self.time.value))
             if ~np.asarray([flux_column_name in k.upper() for k in extra_data.keys()]).any():
                 cols.append(fits.Column(name=flux_column_name, format='E',
@@ -1699,7 +1856,7 @@ class LightCurve(TimeSeries):
                                  warning_type=LightkurveDeprecationWarning)
     def plot_river(self, period, epoch_time=None, ax=None, bin_points=1,
                    minimum_phase=-0.5, maximum_phase=0.5, method='mean',
-                   **kwargs):
+                   **kwargs) -> matplotlib.axes.Axes:
         """Plot the light curve as a river plot.
 
         A river plot uses colors to represent the light curve values in
@@ -1857,6 +2014,66 @@ class LightCurve(TimeSeries):
             ax.set_aspect(a/b)
         return ax
 
+    def create_transit_mask(self, period, transit_time, duration):
+        """Returns a boolean array that is ``True`` during transits and
+        ``False`` elsewhere.
+
+        This method supports multi-planet systems by allowing ``period``,
+        ``transit_time``, and ``duration`` to be array-like lists of parameters.
+
+        Parameters
+        ----------
+        period : float, or array-like
+            Period(s) of the transits.
+        duration : float, or array-like
+            Duration(s) of the transits.
+        transit_time : `~astropy.time.Time`, float, or array-like
+            Transit midpoint(s) of the transits.
+
+        Returns
+        -------
+        transit_mask : np.array of bool
+            Mask that flags transits. Mask is ``True`` where there are transits.
+
+        Examples
+        --------
+        You can create a transit mask for a single-planet system as follows::
+
+            >>> import lightkurve as lk
+            >>> lc = lk.LightCurve({'time': [1, 2, 3, 4, 5], 'flux': [1, 1, 1, 1, 1]})
+            >>> lc.create_transit_mask(transit_time=2., period=2., duration=0.1)
+            array([False,  True, False,  True, False])
+
+        The method accepts lists of parameters to support multi-planet systems::
+
+            >>> lc.create_transit_mask(transit_time=[2., 3.], period=[2., 10.], duration=[0.1, 0.1])
+            array([False,  True,  True,  True, False])
+        """
+        # Ensure all parameters are 1D-arrays
+        period = np.atleast_1d(period)
+        duration = np.atleast_1d(duration)
+        transit_time = np.atleast_1d(transit_time)
+
+        # Make sure all params have the same number of entries
+        n_planets = len(period)
+        if any(len(param) != n_planets for param in [duration, transit_time]):
+            raise ValueError("period, duration, and transit_time must have "
+                             "the same number of values.")
+
+        # Initialize an empty cadence mask
+        in_transit = np.empty(len(self), dtype=bool)
+        in_transit[:] = False
+
+        # Create the transit mask
+        for per, dur, tt in zip(period, duration, transit_time):
+            if isinstance(tt, Time):
+                # If a `Time` is passed, ensure it has the right format & scale
+                tt = Time(tt, format=self.time.format, scale=self.time.scale).value
+            hp = per / 2.
+            in_transit |= np.abs((self.time.value - tt + hp) % per - hp) < 0.5*dur
+
+        return in_transit
+
 
 class FoldedLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
@@ -1993,13 +2210,39 @@ class KeplerLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
     to represent data from NASA's Kepler and K2 mission."""
 
-    _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'channel',
+    _deprecated_keywords = ('targetid', 'label',  'time_format', 'time_scale',
+                            'flux_unit', 'quality_bitmask', 'channel',
                             'campaign', 'quarter', 'mission', 'ra', 'dec')
 
     _default_time_format = 'bkjd'
 
     @classmethod
     def read(cls, *args, **kwargs):
+        """Returns a `KeplerLightCurve` by reading the given file.
+
+        Parameters
+        ----------
+        filename : str
+            Local path or remote url of a Kepler light curve FITS file.
+        flux_column : str, optional
+            The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
+            Typically 'pdcsap_flux' or 'sap_flux'.
+        quality_bitmask : str or int, optional
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored
+                * "default": cadences with severe quality issues will be ignored
+                * "hard": more conservative choice of flags to ignore
+                  This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` class for details on the bitmasks.
+        format : str, optional
+            The format of the Kepler FITS file. Should be one of 'kepler', 'k2sff', 'everest'. Defaults to 'kepler'.
+        """
         # Default to Kepler file format
         if kwargs.get("format") is None:
             kwargs['format'] = "kepler"
@@ -2056,12 +2299,8 @@ class KeplerLightCurve(LightCurve):
                                                     overwrite=overwrite,
                                                     **extra_data)
 
-        if ('quarter' in dir(self)) and (self.quarter is not None):
-            hdu[0].header['QUARTER'] = self.quarter
-        elif ('campaign' in dir(self)) and self.campaign is not None:
-            hdu[0].header['CAMPAIGN'] = self.campaign
-        else:
-            log.warning('Cannot find Campaign or Quarter number.')
+        hdu[0].header['QUARTER'] = self.meta.get('quarter')
+        hdu[0].header['CAMPAIGN'] = self.meta.get('campaign')
 
         hdu = _make_aperture_extension(hdu, aperture_mask)
 
@@ -2075,13 +2314,37 @@ class TessLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
     to represent data from NASA's TESS mission."""
 
-    _deprecated_keywords = ('targetid', 'label', 'quality_bitmask', 'sector',
+    _deprecated_keywords = ('targetid', 'label',  'time_format', 'time_scale',
+                            'flux_unit', 'quality_bitmask', 'sector',
                             'camera', 'ccd', 'mission', 'ra', 'dec')
 
     _default_time_format = 'btjd'
 
     @classmethod
     def read(cls, *args, **kwargs):
+        """Returns a `TessLightCurve` by reading the given file.
+
+        Parameters
+        ----------
+        filename : str
+            Local path or remote url of a TESS light curve FITS file.
+        flux_column : str, optional
+            The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
+            Typically 'pdcsap_flux' or 'sap_flux'.
+        quality_bitmask : str or int, optional
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored
+                * "default": cadences with severe quality issues will be ignored
+                * "hard": more conservative choice of flags to ignore
+                  This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  This mask is not recommended.
+
+            See the :class:`TessQualityFlags <lightkurve.utils.TessQualityFlags>` class for details on the bitmasks.
+        """
         # Default to TESS file format
         if kwargs.get("format") is None:
             kwargs['format'] = "tess"

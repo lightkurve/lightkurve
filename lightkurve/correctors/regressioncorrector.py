@@ -70,7 +70,7 @@ class RegressionCorrector(Corrector):
 
     .. math::
 
-        \covw = (X^\\top \cov^{-1} X + \\boldsymbol\sigma^{-2}_\w I)^{-1}
+        \covw^{-1} = (X^\\top \cov^{-1} X + \\boldsymbol\sigma^{-2}_\w I)
 
 
     Parameters
@@ -136,13 +136,13 @@ class RegressionCorrector(Corrector):
 
         # Default cadence mask
         if cadence_mask is None:
-            cadence_mask = np.ones(len(self.lc.flux), bool)
+            cadence_mask = np.ones(len(self.lc.flux.value), bool)
 
         # If flux errors are not all finite numbers, then default to array of ones
-        if np.all(~np.isfinite(self.lc.flux_err)):
+        if np.all(~np.isfinite(self.lc.flux_err.value)):
             flux_err = np.ones(cadence_mask.sum())
         else:
-            flux_err = self.lc.flux_err[cadence_mask]
+            flux_err = self.lc.flux_err.value[cadence_mask]
 
         # Retrieve the design matrix (X) as a numpy array
         X = self.dmc.X[cadence_mask]
@@ -150,7 +150,7 @@ class RegressionCorrector(Corrector):
             # Compute `X^T cov^-1 X + 1/prior_sigma^2`
             sigma_w_inv = X.T.dot(X / flux_err[:, None]**2)
             # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
-            B = np.dot(X.T, self.lc.flux[cadence_mask] / flux_err**2)
+            B = np.dot(X.T, self.lc.flux.value[cadence_mask] / flux_err**2)
 
         elif issparse(X):
             sigma_f_inv = csr_matrix(1/flux_err[:, None]**2)
@@ -210,27 +210,26 @@ class RegressionCorrector(Corrector):
         self.design_matrix_collection = design_matrix_collection
 
         if cadence_mask is None:
-            cadence_mask = np.ones(len(self.lc.time), bool)
+            self.cadence_mask = np.ones(len(self.lc.time), bool)
         else:
-            cadence_mask = np.copy(cadence_mask)
+            self.cadence_mask = cadence_mask
 
-        # Prepare for iterative masking of residuals
-        clean_cadences = np.ones_like(cadence_mask)
-        # Iterative sigma clipping
+        # Create an outlier mask using iterative sigma clipping
+        self.outlier_mask = np.zeros_like(self.cadence_mask)
         for count in range(niters):
+            tmp_cadence_mask = self.cadence_mask & ~self.outlier_mask
             coefficients, coefficients_err = \
-                self._fit_coefficients(cadence_mask=cadence_mask & clean_cadences,
+                self._fit_coefficients(cadence_mask=tmp_cadence_mask,
                                        prior_mu=self.dmc.prior_mu,
                                        prior_sigma=self.dmc.prior_sigma,
                                        propagate_errors=propagate_errors)
             model = np.ma.masked_array(data=self.dmc.X.dot(coefficients),
-                                       mask=~(cadence_mask & clean_cadences))
+                                       mask=~tmp_cadence_mask)
             model = u.Quantity(model, unit=self.lc.flux.unit)
             residuals = self.lc.flux - model
-            clean_cadences = ~sigma_clip(residuals, sigma=sigma).mask
+            self.outlier_mask |= sigma_clip(residuals, sigma=sigma).mask
             log.debug("correct(): iteration {}: clipped {} cadences"
-                      "".format(count, (~clean_cadences).sum()))
-        self.cadence_mask = cadence_mask & clean_cadences
+                      "".format(count, self.outlier_mask.sum()))
 
         self.coefficients = coefficients
         self.coefficients_err = coefficients_err
@@ -295,11 +294,15 @@ class RegressionCorrector(Corrector):
                 (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
             ax.set_xlabel('')
             ax = axs[1]
-            self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
-            self.corrected_lc[~self.cadence_mask].scatter(
+            self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='original')
+            self.corrected_lc[self.outlier_mask].scatter(
                                             normalize=False, c='r', marker='x',
-                                            s=10, label='Outliers', ax=ax)
-            self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
+                                            s=10, label='outlier_mask', ax=ax)
+            self.corrected_lc[~self.cadence_mask].scatter(
+                                            normalize=False, c='dodgerblue',
+                                            marker='x', s=10, label='~cadence_mask',
+                                            ax=ax)
+            self.corrected_lc.plot(normalize=False, label='corrected', ax=ax, c='k')
         return axs
 
     def diagnose(self):

@@ -6,8 +6,10 @@ import os
 import warnings
 import logging
 
+import collections
+
 from astropy.io import fits
-from astropy.io.fits import Undefined
+from astropy.io.fits import Undefined, BinTableHDU
 from astropy.nddata import Cutout2D
 from astropy.table import Table
 from astropy.wcs import WCS
@@ -15,20 +17,23 @@ from astropy.utils.exceptions import AstropyWarning
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
 from astropy.utils.decorators import deprecated
+from astropy.time import Time
+from astropy.units import Quantity
 import astropy.units as u
 
 from matplotlib import patches
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import numpy as np
 from scipy.ndimage import label
 from tqdm import tqdm
 from copy import deepcopy
 
 from . import PACKAGEDIR, MPLSTYLE
-from .lightcurve import KeplerLightCurve, TessLightCurve
+from .lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
-from .utils import QualityFlags, KeplerQualityFlags, TessQualityFlags, \
-                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
+from .utils import KeplerQualityFlags, TessQualityFlags, \
+                   plot_image, \
                    LightkurveWarning, LightkurveDeprecationWarning, \
                    validate_method, centroid_quadratic, \
                    _query_solar_system_objects
@@ -61,6 +66,11 @@ class TargetPixelFile(object):
                                 quality_array=self.hdu[1].data['QUALITY'],
                                 bitmask=None)
 
+        # For consistency with `LightCurve`, provide a `meta` dictionary
+        self.meta = {}
+        self.meta.update(self.get_header(0))
+        self.meta = {k.lower(): v for k, v in self.meta.items()}
+
     def __getitem__(self, key):
         """Implements indexing and slicing.
 
@@ -86,27 +96,33 @@ class TargetPixelFile(object):
         with warnings.catch_warnings():
             # Ignore warnings about empty fields
             warnings.simplefilter('ignore', UserWarning)
-            # AstroPy added `HDUList.copy()` in v3.1, but we don't want to make
-            # v3.1 a minimum requirement yet, so we copy in a funny way.
-            copy = fits.HDUList([myhdu.copy() for myhdu in self.hdu])
-            copy[1].data = copy[1].data[selected_idx]
+            # AstroPy added `HDUList.copy()` in v3.1, allowing us to avoid manually
+            # copying the HDUs, which brought along unexpected memory leaks.
+            copy = self.hdu.copy()
+            copy[1] = BinTableHDU(data=self.hdu[1].data[selected_idx], header=self.hdu[1].header)
         return self.__class__(copy, quality_bitmask=self.quality_bitmask, targetid=self.targetid)
 
     def __len__(self):
         return len(self.time)
 
     def __add__(self, other):
+        if isinstance(other, Quantity):
+            other = other.value
         hdu = deepcopy(self.hdu)
         hdu[1].data['FLUX'][self.quality_mask] += other
         return type(self)(hdu, quality_bitmask=self.quality_bitmask)
 
     def __mul__(self, other):
+        if isinstance(other, Quantity):
+            other = other.value
         hdu = deepcopy(self.hdu)
         hdu[1].data['FLUX'][self.quality_mask] *= other
         hdu[1].data['FLUX_ERR'][self.quality_mask] *= other
         return type(self)(hdu, quality_bitmask=self.quality_bitmask)
 
     def __rtruediv__(self, other):
+        if isinstance(other, Quantity):
+            other = other.value
         hdu = deepcopy(self.hdu)
         hdu[1].data['FLUX'][self.quality_mask] /= other
         hdu[1].data['FLUX_ERR'][self.quality_mask] /= other
@@ -134,6 +150,12 @@ class TargetPixelFile(object):
         return self.__rtruediv__(other)
 
     @property
+    @deprecated("2.0", alternative="time", warning_type=LightkurveDeprecationWarning)
+    def astropy_time(self):
+        """Returns an AstroPy Time object for all good-quality cadences."""
+        return self.time
+
+    @property
     def hdu(self):
         return self._hdu
 
@@ -156,13 +178,7 @@ class TargetPixelFile(object):
         If the keyword is Undefined or does not exist,
         then return ``default`` instead.
         """
-        try:
-            kw = self.hdu[hdu].header[keyword]
-        except KeyError:
-            return default
-        if isinstance(kw, Undefined):
-            return default
-        return kw
+        return self.hdu[hdu].header.get(keyword, default)
 
     @property
     @deprecated("2.0", alternative="get_header()",
@@ -243,9 +259,24 @@ class TargetPixelFile(object):
         return self.flux.shape
 
     @property
-    def time(self):
+    def time(self) -> Time:
         """Returns the time for all good-quality cadences."""
-        return self.hdu[1].data['TIME'][self.quality_mask]
+        time_values = self.hdu[1].data['TIME'][self.quality_mask]
+        # Some data products have missing time values;
+        # we need to set these to zero or `Time` cannot be instantiated.
+        time_values[~np.isfinite(time_values)] = 0
+
+        bjdrefi = self.hdu[1].header.get('BJDREFI')
+        if bjdrefi == 2454833:
+            time_format = 'bkjd'
+        elif bjdrefi == 2457000:
+            time_format = 'btjd'
+        else:
+            time_format = 'jd'
+
+        return Time(time_values,
+                    scale=self.hdu[1].header.get('TIMESYS', 'tdb').lower(),
+                    format=time_format)
 
     @property
     def cadenceno(self):
@@ -260,26 +291,37 @@ class TargetPixelFile(object):
     @property
     def nan_time_mask(self):
         """Returns a boolean mask flagging cadences whose time is `nan`."""
-        return ~np.isfinite(self.time)
+        return self.time.value == 0
 
     @property
-    def flux(self):
+    def flux(self) -> Quantity:
         """Returns the flux for all good-quality cadences."""
-        return self.hdu[1].data['FLUX'][self.quality_mask]
+        if self.get_header(1)['TUNIT5'] == 'e-/s':
+            unit = 'electron/s'
+        else:
+            unit = 'dimensionless'
+        return Quantity(self.hdu[1].data['FLUX'][self.quality_mask], unit=unit)
 
     @property
-    def flux_err(self):
+    def flux_err(self) -> Quantity:
         """Returns the flux uncertainty for all good-quality cadences."""
-        return self.hdu[1].data['FLUX_ERR'][self.quality_mask]
+        if self.get_header(1)['TUNIT6'] == 'e-/s':
+            unit = 'electron/s'
+        else:
+            unit = 'dimensionless'
+        return Quantity(self.hdu[1].data['FLUX_ERR'][self.quality_mask], unit=unit)
 
     @property
-    def flux_bkg(self):
+    def flux_bkg(self) -> Quantity:
         """Returns the background flux for all good-quality cadences."""
-        return self.hdu[1].data['FLUX_BKG'][self.quality_mask]
+        return Quantity(self.hdu[1].data['FLUX_BKG'][self.quality_mask],
+                        unit='electron/s')
 
     @property
-    def flux_bkg_err(self):
-        return self.hdu[1].data['FLUX_BKG_ERR'][self.quality_mask]
+    def flux_bkg_err(self) -> Quantity:
+        return Quantity(self.hdu[1].data['FLUX_BKG_ERR'][self.quality_mask],
+                        unit='electron/s')
+
 
     @property
     def quality(self):
@@ -287,7 +329,7 @@ class TargetPixelFile(object):
         return self.hdu[1].data['QUALITY'][self.quality_mask]
 
     @property
-    def wcs(self):
+    def wcs(self) -> WCS:
         """Returns an `astropy.wcs.WCS` object with the World Coordinate System
         solution for the target pixel file.
 
@@ -382,7 +424,7 @@ class TargetPixelFile(object):
         """
         attrs = {}
         for attr in dir(self):
-            if not attr.startswith('_') and attr != "header":
+            if not attr.startswith('_') and attr != "header" and attr != "astropy_time":
                 res = getattr(self, attr)
                 if callable(res):
                     continue
@@ -455,6 +497,13 @@ class TargetPixelFile(object):
         else:
             raise ValueError("Photometry method must be 'aperture' or 'prf'.")
 
+    def _resolve_default_aperture_mask(self, aperture_mask):
+        if isinstance(aperture_mask, str) and (aperture_mask == 'default'):
+            # returns 'pipeline', unless it is missing. Falls back to 'threshold'
+            return 'pipeline' if np.any(self.pipeline_mask) else 'threshold'
+        else:
+            return aperture_mask
+
     def _parse_aperture_mask(self, aperture_mask):
         """Parse the `aperture_mask` parameter as given by a user.
 
@@ -463,7 +512,8 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
+        aperture_mask : array-like, 'pipeline', 'all', 'threshold', 'default',
+        'background', or None
             A boolean array describing the aperture such that `True` means
             that the pixel will be used.
             If None or 'all' are passed, all pixels will be used.
@@ -471,12 +521,23 @@ class TargetPixelFile(object):
             will be returned.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
+            If 'default' is passed, 'pipeline' mask will be used when available,
+            with 'threshold' as the fallback.
+            If 'background' is passed, all pixels fainter than the median flux
+            will be used.
 
         Returns
         -------
         aperture_mask : ndarray
             2D boolean numpy array containing `True` for selected pixels.
         """
+        aperture_mask = self._resolve_default_aperture_mask(aperture_mask)
+
+        # If 'pipeline' mask is requested but missing, fall back to 'threshold'
+        if isinstance(aperture_mask, str) and (aperture_mask == 'pipeline') \
+           and ~np.any(self.pipeline_mask):
+           raise ValueError("_parse_aperture_mask: 'pipeline' is requested, but it is missing or empty.")
+
         # Input validation
         if hasattr(aperture_mask, 'shape') and (aperture_mask.shape != self.flux[0].shape):
             raise ValueError("`aperture_mask` has shape {}, "
@@ -493,10 +554,15 @@ class TargetPixelFile(object):
                 aperture_mask = self.pipeline_mask
             elif aperture_mask == 'threshold':
                 aperture_mask = self.create_threshold_mask()
+            elif aperture_mask == 'background':
+                aperture_mask = ~self.create_threshold_mask(threshold=0,
+                                                            reference_pixel=None)
             elif np.issubdtype(aperture_mask.dtype, np.integer) and \
                 ((aperture_mask & 2) == 2).any():
                 # Kepler and TESS pipeline style integer flags
                 aperture_mask = (aperture_mask & 2) == 2
+            elif isinstance(aperture_mask.flat[0], (np.integer, np.float)):
+                aperture_mask = aperture_mask.astype(bool)
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
@@ -544,7 +610,7 @@ class TargetPixelFile(object):
         # Calculate the theshold value in flux units
         mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
         # Create a mask containing the pixels above the threshold flux
-        threshold_mask = np.nan_to_num(median_image) > mad_cut
+        threshold_mask = np.nan_to_num(median_image) >= mad_cut
         if (reference_pixel is None) or (not threshold_mask.any()):
             # return all regions above threshold
             return threshold_mask
@@ -561,7 +627,54 @@ class TargetPixelFile(object):
             closest_label = labels[closest_arg[0], closest_arg[1]]
             return labels == closest_label
 
-    def estimate_centroids(self, aperture_mask='pipeline', method='moments'):
+    def estimate_background(self, aperture_mask='background'):
+        """Returns an estimate of the mean background level in the FLUX column.
+
+        In the case of official Kepler and TESS Target Pixel Files, the
+        background estimates should be close to zero because these products
+        have already been background-subtracted by the pipeline (i.e. the values
+        in the `FLUX_BKG` column have been subtracted from the values in `FLUX`).
+        Background subtraction is often imperfect however, and this method aims
+        to allow users to estimate residual background signals using different
+        methods.
+
+        Target Pixel Files created by the MAST TESSCut service have
+        not been background-subtracted. For such products, or other community-
+        generated pixel files, this method provides a first-order estimate of
+        the background levels.
+
+        This method estimates the per-pixel background flux over time by
+        (i) subtracting a mean image from each cadence;
+        (ii) computing the median pixel value in the residual images;
+        (iii) assume that the 5%-percentile of those medians gives us the
+        exact background level. This assumption appears to work well for TESS
+        but it has not been validated in detail yet.
+
+        Parameters
+        ----------
+        aperture_mask : 'background', 'all', or array-like
+            Which pixels should be used to estimate the background?
+            If None or 'all' are passed, all pixels in the pixel file will be
+            used.  If 'background' is passed, all pixels fainter than the
+            median flux will be used. Alternatively, users can pass a boolean
+            array describing the aperture mask such that `True` means that the
+            pixel will be used.
+
+        Returns
+        -------
+        lc : `LightCurve` object
+            Average background flux in units electron/second/pixel.
+        """
+        mask = self._parse_aperture_mask(aperture_mask)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            simple_bkg = (self.flux - np.nanmean(self.flux, axis=0))
+        simple_bkg = np.nanmedian(simple_bkg[:, mask], axis=1)
+        simple_bkg -= np.percentile(simple_bkg, 5)
+        n_pixels = mask.sum() * u.pixel
+        return LightCurve(time=self.time, flux=simple_bkg / n_pixels)
+
+    def estimate_centroids(self, aperture_mask='default', method='moments'):
         """Returns the flux center of an object inside ``aperture_mask``.
 
         Telescopes tend to smear out the light from a point-like star over
@@ -582,13 +695,16 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        aperture_mask : 'pipeline', 'threshold', 'all', or array-like
+        aperture_mask : 'pipeline', 'threshold', 'all', 'default', or array-like
             Which pixels contain the object to be measured, i.e. which pixels
             should be used in the estimation?  If None or 'all' are passed,
-            all pixels in the pixel file will be used.  If 'pipeline' is passed,
-            the mask suggested by the official pipeline will be used.
+            all pixels in the pixel file will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
+            If 'default' is passed, 'pipeline' mask will be used when available,
+            with 'threshold' as the fallback.
             Alternatively, users can pass a boolean array describing the
             aperture mask such that `True` means that the pixel will be used.
         method : 'moments' or 'quadratic'
@@ -622,9 +738,7 @@ class TargetPixelFile(object):
             warnings.simplefilter("ignore", RuntimeWarning)
             col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
             row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
-        col_centr = u.Quantity(col_centr, unit='pixel')
-        row_centr = u.Quantity(row_centr, unit='pixel')
-        return col_centr, row_centr
+        return col_centr*u.pixel, row_centr*u.pixel
 
     def _estimate_centroids_via_quadratic(self, aperture_mask):
         """Estimate centroids by fitting a 2D quadratic to the brightest pixels;
@@ -639,11 +753,11 @@ class TargetPixelFile(object):
         # pixels are centered at .5, 1.5, 2.5, ...
         col_centr = np.asfarray(col_centr) + self.column + .5
         row_centr = np.asfarray(row_centr) + self.row + .5
-        col_centr = u.Quantity(col_centr, unit='pixel')
-        row_centr = u.Quantity(row_centr, unit='pixel')
+        col_centr = Quantity(col_centr, unit='pixel')
+        row_centr = Quantity(row_centr, unit='pixel')
         return col_centr, row_centr
 
-    def _aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
+    def _aperture_photometry(self, aperture_mask, centroid_method='moments'):
         """Helper method for ``extract_aperture photometry``.
 
         Returns
@@ -674,8 +788,8 @@ class TargetPixelFile(object):
             flux_err[is_allnan] = np.nan
 
         if self.get_header(1)['TUNIT5'] == 'e-/s':
-            flux = u.Quantity(flux, unit='electron/s')
-            flux_err = u.Quantity(flux_err, unit='electron/s')
+            flux = Quantity(flux, unit='electron/s')
+            flux_err = Quantity(flux_err, unit='electron/s')
 
         return flux, flux_err, centroid_col, centroid_row
 
@@ -703,20 +817,18 @@ class TargetPixelFile(object):
         Notes:
         * This method will use the `ra` and `dec` properties of the `LightCurve`
           object to determine the position of the search cone.
-        * The size of the search cone is 15 spacecraft pixels by default. You
+        * The size of the search cone is 5 spacecraft pixels + TPF dimension by default. You
           can change this by passing the `radius` parameter (unit: degrees).
-        * This method will only search points in time during which he light
+        * By default, this method will only search points in time during which the light
           curve showed 3-sigma outliers in flux. You can override this behavior
-          and search all times by passing the `cadence_mask='all'` argument,
-          but this will be much slower.
-
+          and search for specific times by passing `cadence_mask`. See examples for details.
 
         Parameters
         ----------
-        cadence_mask : str or bool
+        cadence_mask : str, or boolean array with length of self.time
             mask in time to select which frames or points should be searched for SSOs.
             Default "outliers" will search for SSOs at points that are `sigma` from the mean.
-            "all" will search all cadences. Pass a boolean array with values of "True"
+            "all" will search all cadences. Alternatively, pass a boolean array with values of "True"
             for times to search for SSOs.
         radius : optional, float
             Radius to search for bodies. If None, will search for SSOs within 5 pixels of
@@ -727,7 +839,7 @@ class TargetPixelFile(object):
         cache : optional, bool
             If True will cache the search result in the astropy cache. Set to False
             to request the search again.
-        return_mask: bool
+        return_mask: optional, bool
             If True will return a boolean mask in time alongside the result
 
         Returns
@@ -735,6 +847,17 @@ class TargetPixelFile(object):
         result : pandas.DataFrame
             DataFrame containing the list objects in frames that were identified to contain
             SSOs.
+
+        Examples
+        --------
+        Find if there are SSOs affecting the target pixel file for the given time frame:
+
+            >>> df_sso = tpf.query_solar_system_objects(cadence_mask=(tpf.time.value >= 2014.1) & (tpf.time.value <= 2014.9))  # doctest: +SKIP
+
+        Find if there are SSOs affecting the target pixel file for all times, but it will be much slower:
+
+            >>> df_sso = tpf.query_solar_system_objects(cadence_mask='all')  # doctest: +SKIP
+
         """
 
         for attr in ['mission', 'ra', 'dec']:
@@ -750,10 +873,18 @@ class TargetPixelFile(object):
                     aper = 'all'
                 lc = self.to_lightcurve(aperture_mask=aper)
                 cadence_mask = lc.remove_outliers(sigma=sigma, return_mask=True)[1]
-
-            if cadence_mask == 'all':
+                # Avoid searching times with NaN flux; this is necessary because e.g.
+                # `remove_outliers` includes NaNs in its mask.
+                cadence_mask &= ~np.isnan(lc.flux)
+            elif cadence_mask == 'all':
                 cadence_mask = np.ones(len(self.time)).astype(bool)
-
+            else:
+                raise ValueError('invalid `cadence_mask` string argument')
+        elif isinstance(cadence_mask, collections.abc.Sequence):
+            cadence_mask = np.array(cadence_mask)
+        elif isinstance(cadence_mask, (bool)):
+            # for boundary case of a single element tuple, e.g., (True)
+            cadence_mask = np.array([cadence_mask])
         elif not isinstance(cadence_mask, np.ndarray):
             raise ValueError('Pass a cadence_mask method or a cadence_mask')
 
@@ -763,16 +894,16 @@ class TargetPixelFile(object):
             pixel_scale = 27
 
         if radius == None:
-            radius = (2**0.5*(pixel_scale * np.max(self.shape[1:])) + 5)*u.arcsecond.to(u.deg)
+            radius = (2**0.5*(pixel_scale * (np.max(self.shape[1:]) + 5)))*u.arcsecond.to(u.deg)
 
-        res = _query_solar_system_objects(ra=self.ra, dec=self.dec, times=self.astropy_time.jd[cadence_mask],
+        res = _query_solar_system_objects(ra=self.ra, dec=self.dec, times=self.time.jd[cadence_mask],
                                       location=location, radius=radius, cache=cache)
         if return_mask:
-            return res, np.in1d(self.astropy_time.jd, res.epoch)
+            return res, np.in1d(self.time.jd, res.epoch)
         return res
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, column='FLUX', aperture_mask=None,
-             show_colorbar=True, mask_color='pink', title=None, style='lightkurve',
+             show_colorbar=True, mask_color='red', title=None, style='lightkurve',
              **kwargs):
         """Plot the pixel data for a single frame (i.e. at a single time).
 
@@ -865,7 +996,7 @@ class TargetPixelFile(object):
                         rect = patches.Rectangle(
                                         xy=(j+self.column-0.5, i+self.row-0.5),
                                         width=1, height=1, color=mask_color,
-                                        fill=True, alpha=.6)
+                                        fill=False, hatch='//')
                         ax.add_patch(rect)
         return ax
 
@@ -876,7 +1007,7 @@ class TargetPixelFile(object):
         self.hdu.writeto(output_fn, overwrite=overwrite, checksum=True)
 
     def interact(self, notebook_url='localhost:8888', max_cadences=30000,
-                 aperture_mask='pipeline', exported_filename=None,
+                 aperture_mask='default', exported_filename=None,
                  transform_func=None, ylim_func=None, **kwargs):
         """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
@@ -904,7 +1035,7 @@ class TargetPixelFile(object):
         max_cadences : int
             Raise a RuntimeError if the number of cadences shown is larger than
             this value. This limit helps keep browsers from becoming unresponsive.
-        aperture_mask : array-like, 'pipeline', 'threshold' or 'all'
+        aperture_mask : array-like, 'pipeline', 'threshold', 'default', or 'all'
             A boolean array describing the aperture such that `True` means
             that the pixel will be used.
             If None or 'all' are passed, all pixels will be used.
@@ -912,6 +1043,8 @@ class TargetPixelFile(object):
             will be returned.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
+            If 'default' is passed, 'pipeline' mask will be used when available,
+            with 'threshold' as the fallback.
         exported_filename: str
             An optional filename to assign to exported fits files containing
             the custom aperture mask generated by clicking on pixels in interact.
@@ -1064,8 +1197,8 @@ class TargetPixelFile(object):
         hdu.header['DEC_OBJ'] = np.nanmean(d[row_edges[0]:row_edges[1], col_edges[0]:col_edges[1]])
 
         # Remove any KIC labels
-        labels = ['*MAG', 'PM*', 'GL*', 'OBJECT', 'PARALLAX', '*COLOR', 'TEFF',
-                  'LOGG', 'FEH', 'EBMINUSV', 'AV', "RADIUS", "TMINDEX", "OBJECT"]
+        labels = ['*MAG', 'PM*', 'GL*', 'PARALLAX', '*COLOR', 'TEFF',
+                  'LOGG', 'FEH', 'EBMINUSV', 'AV', "RADIUS", "TMINDEX"]
         for label in labels:
             if label in hdu.header:
                 hdu.header[label] = fits.card.Undefined()
@@ -1131,7 +1264,8 @@ class TargetPixelFile(object):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             newfits = fits.HDUList(hdus)
-        return self.__class__(newfits)
+        return self.__class__(newfits, quality_bitmask=self.quality_bitmask)
+    
     
     @staticmethod
     def from_fits_images(images, position, size=(11, 11), extension=1,
@@ -1277,6 +1411,130 @@ class TargetPixelFile(object):
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
 
+    def plot_pixels(self, ax=None, periodogram=False, aperture_mask=None,
+                    show_flux=False, corrector_func=None, style='lightkurve',
+                    title=None, **kwargs):
+        """Show the light curve of each pixel in a single plot.
+
+        Note that all values are autoscaled and axis labels are not provided.
+        This utility is designed for by-eye inspection of signal morphology.
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes.Axes`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        periodogram : bool
+            Default: False; if True, periodograms will be plotted, using normalized light curves.
+            Note that this keyword overrides normalized.
+        aperture_mask : ndarray or str
+            Highlight pixels selected by aperture_mask.
+            Only `pipeline`, `threshold`, or custom masks will be plotted.
+            `all` and None masks will be ignored.
+        show_flux : bool
+            Default: False; if True, shade pixels with frame 0 flux colour
+            Inspired by https://github.com/noraeisner/LATTE
+        corrector_func : function
+            Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.
+            This function is applied to each light curve in the collection
+            prior to stitching. The default is to normalize each light curve.
+        style : str
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
+        kwargs : dict
+            e.g. extra parameters to be passed to `lc.to_periodogram`.
+        """
+        if style == 'lightkurve' or style is None:
+            style = MPLSTYLE
+        if title is None:
+            title = f'Target ID: {self.targetid}'
+        if corrector_func is None:
+            corrector_func = lambda x: x.remove_outliers()
+        if show_flux:
+            cmap = plt.get_cmap()
+            norm = plt.Normalize(vmin=np.nanmin(self.flux[0].value),
+                                 vmax=np.nanmax(self.flux[0].value))
+        mask = self._parse_aperture_mask(aperture_mask)
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=(RuntimeWarning, LightkurveWarning))
+
+            # get an aperture mask for each pixel
+            masks = np.zeros((self.shape[1]*self.shape[2], self.shape[1], self.shape[2]),
+                             dtype='bool')
+            for i in range(self.shape[1]*self.shape[2]):
+                masks[i][np.unravel_index(i, (self.shape[1], self.shape[2]))] = True
+
+            pixel_list = []
+            for j in range(self.shape[1]*self.shape[2]):
+                lc = self.to_lightcurve(aperture_mask=masks[j])
+                lc = corrector_func(lc)
+
+                if periodogram:
+                    try:
+                        pixel_list.append(lc.to_periodogram(**kwargs))
+                    except IndexError:
+                        pixel_list.append(None)
+                else:
+                    if len(lc.remove_nans().flux) == 0:
+                        pixel_list.append(None)
+                    else:
+                        pixel_list.append(lc)
+
+        with plt.style.context(style):
+            fig = plt.figure()
+            if ax is None:  # Configure axes if none is given
+                ax = plt.gca()
+                ax.get_xaxis().set_ticks([])
+                ax.get_yaxis().set_ticks([])
+                if periodogram:
+                    ax.set(title=title, xlabel='Frequency', ylabel='Power')
+                else:
+                    ax.set(title=title, xlabel='Time', ylabel='Flux')
+
+            gs = gridspec.GridSpec(self.shape[1], self.shape[2], wspace=0.01, hspace=0.01)
+
+            for k in range(self.shape[1]*self.shape[2]):
+                if pixel_list[k]:
+                    x, y = np.unravel_index(k, (self.shape[1], self.shape[2]))
+
+                    # Highlight aperture mask in red
+                    if aperture_mask is not None and mask[x,y]:
+                        rc = {"axes.linewidth": 2, "axes.edgecolor": 'red'}
+                    else:
+                        rc = {"axes.linewidth": 1}
+                    with plt.rc_context(rc=rc):
+                        gax = fig.add_subplot(gs[self.shape[1] - x - 1, y])
+
+                    # Determine background and foreground color
+                    if show_flux:
+                        gax.set_facecolor(cmap(norm(self.flux.value[0,x,y])))
+                        markercolor = "white"
+                    else:
+                        markercolor = "black"
+
+                    # Plot flux or periodogram
+                    if periodogram:
+                        gax.plot(pixel_list[k].frequency.value,
+                                 pixel_list[k].power.value,
+                                 marker='None', color=markercolor, lw=0.5)
+                    else:
+                        gax.plot(pixel_list[k].time.value,
+                                 pixel_list[k].flux.value,
+                                 marker='.', color=markercolor, ms=0.5, lw=0)
+
+                    gax.margins(y=.1, x=0)
+                    gax.set_xticklabels('')
+                    gax.set_yticklabels('')
+                    gax.set_xticks([])
+                    gax.set_yticks([])
+
+            fig.set_size_inches((y*1.5, x*1.5))
+
+        return ax
+
+
 class KeplerTargetPixelFile(TargetPixelFile):
     """Class to read and interact with the pixel data products
     ("Target Pixel Files") created by NASA's Kepler pipeline.
@@ -1384,11 +1642,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return self.get_keyword('CHANNEL')
 
     @property
-    def astropy_time(self):
-        """Returns an AstroPy Time object for all good-quality cadences."""
-        return bkjd_to_astropy_time(bkjd=self.time)
-
-    @property
     def quarter(self):
         """Kepler quarter number. ('QUARTER' header keyword)"""
         return self.get_keyword('QUARTER')
@@ -1403,12 +1656,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """'Kepler' or 'K2'. ('MISSION' header keyword)"""
         return self.get_keyword('MISSION')
 
-    def extract_aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
+    def extract_aperture_photometry(self, aperture_mask='default', centroid_method='moments'):
         """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', 'threshold' or 'all'
+        aperture_mask : array-like, 'pipeline', 'threshold', 'default', or 'all'
             A boolean array describing the aperture such that `True` means
             that the pixel will be used.
             If None or 'all' are passed, all pixels will be used.
@@ -1416,6 +1669,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             will be returned.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
+            If 'default' is passed, 'pipeline' mask will be used when available,
+            with 'threshold' as the fallback.
         centroid_method : str, 'moments' or 'quadratic'
             For the details on this arguments, please refer to the documentation
             for `TargetPixelFile.estimate_centroids`.
@@ -1426,6 +1681,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Array containing the summed flux within the aperture for each
             cadence.
         """
+        # explicitly resolve default, so that the aperture_mask set in meta
+        # later will be the resolved one
+        aperture_mask = self._resolve_default_aperture_mask(aperture_mask)
+
         flux, flux_err, centroid_col, centroid_row = \
             self._aperture_photometry(aperture_mask=aperture_mask,
                                       centroid_method=centroid_method)
@@ -1439,12 +1698,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.get_header()['OBJECT'],
+                'label': self.get_keyword('OBJECT', default=self.targetid),
                 'targetid': self.targetid}
-        return KeplerLightCurve(time=self.astropy_time,
+        meta = {'aperture_mask': aperture_mask}
+        return KeplerLightCurve(time=self.time,
                                 flux=flux,
                                 flux_err=flux_err,
-                                **keys)
+                                **keys,
+                                meta=meta)
 
 
     def get_bkg_lightcurve(self, aperture_mask=None):
@@ -1461,9 +1722,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.get_header()['OBJECT'],
+                'label': self.get_keyword('OBJECT', default=self.targetid),
                 'targetid': self.targetid}
-        return KeplerLightCurve(time=self.astropy_time,
+        return KeplerLightCurve(time=self.time,
                                 flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                                 flux_err=flux_bkg_err,
                                 **keys)
@@ -1495,8 +1756,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                        var=np.nanstd(centr_col.value)**2),
                                      row=GaussianPrior(mean=np.nanmedian(centr_row.value),
                                                        var=np.nanstd(centr_row.value)**2),
-                                     flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0]),
-                                                       ub=2*np.nansum(self.flux[0]) + 1e-10),
+                                     flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0].value),
+                                                       ub=2*np.nansum(self.flux[0].value) + 1e-10),
                                      targetid=self.targetid)]
             kwargs['star_priors'] = star_priors
         if 'prfmodel' not in kwargs:
@@ -1504,13 +1765,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if 'background_prior' not in kwargs:
             if np.all(np.isnan(self.flux_bkg)):  # If TargetPixelFile has no background flux data
                 # Use the median of the lower half of flux as an estimate for flux_bkg
-                clipped_flux = np.ma.masked_where(self.flux > np.percentile(self.flux, 50),
-                                                  self.flux)
+                clipped_flux = np.ma.masked_where(self.flux.value > np.percentile(self.flux.value, 50),
+                                                  self.flux.value)
                 flux_prior = GaussianPrior(mean=np.ma.median(clipped_flux),
                                            var=np.ma.std(clipped_flux)**2)
             else:
-                flux_prior = GaussianPrior(mean=np.nanmedian(self.flux_bkg),
-                                           var=np.nanstd(self.flux_bkg)**2)
+                flux_prior = GaussianPrior(mean=np.nanmedian(self.flux_bkg.value),
+                                           var=np.nanstd(self.flux_bkg.value)**2)
             kwargs['background_prior'] = BackgroundPrior(flux=flux_prior)
         return TPFModel(**kwargs)
 
@@ -1553,7 +1814,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'ra': self.ra,
                 'dec': self.dec,
                 'targetid': self.targetid}
-        return KeplerLightCurve(time=self.astropy_time,
+        return KeplerLightCurve(time=self.time,
                                 flux=lc.flux,
                                 **keys)
 
@@ -1893,17 +2154,12 @@ class TessTargetPixelFile(TargetPixelFile):
     def mission(self):
         return 'TESS'
 
-    @property
-    def astropy_time(self):
-        """Returns an AstroPy Time object for all good-quality cadences."""
-        return btjd_to_astropy_time(btjd=self.time)
-
-    def extract_aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
+    def extract_aperture_photometry(self, aperture_mask='default', centroid_method='moments'):
         """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', 'threshold' or 'all'
+        aperture_mask : array-like, 'pipeline', 'threshold', 'default', or 'all'
             A boolean array describing the aperture such that `True` means
             that the pixel will be used.
             If None or 'all' are passed, all pixels will be used.
@@ -1911,7 +2167,8 @@ class TessTargetPixelFile(TargetPixelFile):
             will be returned.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
-            The default behaviour is to use the TESS pipeline mask.
+            If 'default' is passed, 'pipeline' mask will be used when available,
+            with 'threshold' as the fallback.
         centroid_method : str, 'moments' or 'quadratic'
             For the details on this arguments, please refer to the documentation
             for `TargetPixelFile.estimate_centroids`.
@@ -1921,6 +2178,10 @@ class TessTargetPixelFile(TargetPixelFile):
         lc : TessLightCurve object
             Contains the summed flux within the aperture for each cadence.
         """
+        # explicitly resolve default, so that the aperture_mask set in meta
+        # later will be the resolved one
+        aperture_mask = self._resolve_default_aperture_mask(aperture_mask)
+
         flux, flux_err, centroid_col, centroid_row = \
             self._aperture_photometry(aperture_mask=aperture_mask,
                                       centroid_method=centroid_method)
@@ -1933,12 +2194,14 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.get_keyword('OBJECT'),
+                'label': self.get_keyword('OBJECT', default=self.targetid),
                 'targetid': self.targetid}
-        return TessLightCurve(time=self.astropy_time,
+        meta = {'aperture_mask': aperture_mask}
+        return TessLightCurve(time=self.time,
                               flux=flux,
                               flux_err=flux_err,
-                              **keys)
+                              **keys,
+                              meta=meta)
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -1953,9 +2216,9 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.get_header()['OBJECT'],
+                'label': self.get_keyword('OBJECT', default=self.targetid),
                 'targetid': self.targetid}
-        return TessLightCurve(time=self.astropy_time,
+        return TessLightCurve(time=self.time,
                               flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                               flux_err=flux_bkg_err,
                               **keys)

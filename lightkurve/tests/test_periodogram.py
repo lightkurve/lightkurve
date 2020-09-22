@@ -26,6 +26,8 @@ def test_periodogram_basics():
     pg.show_properties()
     pg.to_table()
     str(pg)
+    lc[400:500] = np.nan
+    pg = lc.to_periodogram()
 
 
 def test_periodogram_normalization():
@@ -217,8 +219,8 @@ def test_index():
 def test_bls(caplog):
     ''' Test that BLS periodogram works and gives reasonable errors
     '''
-    lc = LightCurve(time=np.linspace(0, 10, 1000), flux=np.random.normal(1, 0.1, 1000),
-                    flux_err=np.zeros(1000)+0.1)
+    lc = LightCurve(time=np.linspace(0, 10, 200), flux=np.random.normal(100, 0.1, 200),
+                    flux_err=np.zeros(200)+0.1)
 
     # should be able to make a periodogram
     p = lc.to_periodogram(method='bls')
@@ -267,7 +269,7 @@ def test_bls(caplog):
     mask = p.get_transit_mask(1, 0.1, 0)
     assert isinstance(mask, np.ndarray)
     assert isinstance(mask[0], np.bool_)
-    assert mask.sum() > (~mask).sum()
+    assert mask.sum() < (~mask).sum()
 
     assert isinstance(p.period_at_max_power, u.Quantity)
     assert isinstance(p.duration_at_max_power, u.Quantity)
@@ -330,12 +332,6 @@ def test_error_messages():
     with pytest.raises(ValueError) as err:
         lc.to_periodogram(frequency=np.arange(10), period=np.arange(10))
 
-    # Don't accept NaNs
-    with pytest.raises(ValueError) as err:
-        lc_with_nans = lc.copy()
-        lc_with_nans.flux[0] = np.nan
-        lc_with_nans.to_periodogram()
-    assert('Lightcurve contains NaN values.' in err.value.args[0])
 
     # No unitless periodograms
     with pytest.raises(ValueError) as err:

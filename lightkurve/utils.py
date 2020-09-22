@@ -1,29 +1,32 @@
 """This module provides various helper functions."""
-from __future__ import division, print_function
 import logging
 import sys
 import os
 import warnings
+from functools import wraps
+
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
+import astropy
 from astropy.utils.data import download_file
-from astropy.coordinates import SkyCoord
+from astropy.units.quantity import Quantity
 import astropy.units as u
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LinearStretch)
 from astropy.time import Time
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-from functools import wraps
 
-from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
-__all__ = ['LightkurveWarning',
+
+__all__ = ['LightkurveError', 'LightkurveWarning',
            'KeplerQualityFlags', 'TessQualityFlags',
-           'bkjd_to_astropy_time', 'btjd_to_astropy_time']
+           'bkjd_to_astropy_time', 'btjd_to_astropy_time',
+           'show_citation_instructions']
 
 
 class QualityFlags(object):
@@ -34,16 +37,16 @@ class QualityFlags(object):
 
     @classmethod
     def decode(cls, quality):
-        """Converts a Kepler QUALITY value into a list of human-readable strings.
+        """Converts a QUALITY value into a list of human-readable strings.
 
         This function takes the QUALITY bitstring that can be found for each
-        cadence in Kepler/K2's pixel and light curve files and converts into
+        cadence in Kepler/K2/TESS' pixel and light curve files and converts into
         a list of human-readable strings explaining the flags raised (if any).
 
         Parameters
         ----------
         quality : int
-            Value from the 'QUALITY' column of a Kepler/K2 pixel or lightcurve file.
+            Value from the 'QUALITY' column of a Kepler/K2/TESS pixel or lightcurve file.
 
         Returns
         -------
@@ -51,6 +54,9 @@ class QualityFlags(object):
             List of human-readable strings giving a short description of the
             quality flags raised.  Returns an empty list if no flags raised.
         """
+        # If passed an astropy quantity object, get the value
+        if isinstance(quality, Quantity):
+            quality = quality.value
         result = []
         for flag in cls.STRINGS.keys():
             if quality & flag > 0:
@@ -330,7 +336,7 @@ def running_mean(data, window_size):
     return (cumsum[window_size:] - cumsum[:-window_size]) / float(window_size)
 
 
-def bkjd_to_astropy_time(bkjd):
+def bkjd_to_astropy_time(bkjd) -> Time:
     """Converts Kepler Barycentric Julian Day (BKJD) time values to an
     `astropy.time.Time` object.
 
@@ -359,7 +365,7 @@ def bkjd_to_astropy_time(bkjd):
     return Time(bkjd, format='bkjd', scale='tdb')
 
 
-def btjd_to_astropy_time(btjd):
+def btjd_to_astropy_time(btjd) -> Time:
     """Converts TESS Barycentric Julian Day (BTJD) values to an
     `astropy.time.Time` object.
 
@@ -387,7 +393,7 @@ def btjd_to_astropy_time(btjd):
 def plot_image(image, ax=None, scale='linear', origin='lower',
                xlabel='Pixel Column Number', ylabel='Pixel Row Number',
                clabel='Flux ($e^{-}s^{-1}$)', title=None, show_colorbar=True,
-               **kwargs):
+               vmin=None, vmax=None, **kwargs):
     """Utility function to plot a 2D image
 
     Parameters
@@ -412,6 +418,10 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
         Title for the plot.
     show_colorbar : bool
         Whether or not to show the colorbar
+    vmin : float
+        Minimum colorbar value. By default, the 2.5%-percentile is used.
+    vmax : float
+        Maximum colorbar value. By default, the 97.5%-percentile is used.
     kwargs : dict
         Keyword arguments to be passed to `matplotlib.pyplot.imshow`.
 
@@ -420,15 +430,23 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     ax : `~matplotlib.axes.Axes`
         The matplotlib axes object.
     """
+    if isinstance(image, u.Quantity):
+        image = image.value
     if ax is None:
         _, ax = plt.subplots()
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", RuntimeWarning)  # ignore image NaN values
-        mask = np.nan_to_num(image) > 0
-        if mask.any() > 0:
-            vmin, vmax = PercentileInterval(95.).get_limits(image[mask])
-        else:
-            vmin, vmax = 0, 0
+
+    if vmin is None or vmax is None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)  # ignore image NaN values
+            mask = np.nan_to_num(image) > 0
+            if mask.any() > 0:
+                vmin_default, vmax_default = PercentileInterval(95.).get_limits(image[mask])
+            else:
+                vmin_default, vmax_default = 0, 0
+            if vmin is None:
+                vmin = vmin_default
+            if vmax is None:
+                vmax = vmax_default
 
     norm = None
     if scale is not None:
@@ -448,10 +466,15 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     if show_colorbar:
-        cbar = plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
+        cbar = plt.colorbar(cax, ax=ax, label=clabel)
         cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
         cbar.ax.minorticks_off()
     return ax
+
+
+class LightkurveError(Exception):
+    """Class for Lightkurve exceptions."""
+    pass
 
 
 class LightkurveWarning(Warning):
@@ -532,6 +555,8 @@ def centroid_quadratic(data, mask=None):
         The coordinates of the centroid in column and row.  If the fit failed,
         then (NaN, NaN) will be returned.
     """
+    if isinstance(data, u.Quantity):
+        data = data.value
     # Step 1: identify the patch of 3x3 pixels (z_)
     # that is centered on the brightest pixel (xx, yy)
     if mask is not None:
@@ -644,3 +669,49 @@ def _query_solar_system_objects(ra, dec, times, radius=0.1, location='kepler',
     if df is not None:
         df.reset_index(drop=True)
     return df
+
+
+def show_citation_instructions():
+    """Show citation instructions."""
+    from . import PACKAGEDIR, __citation__
+    if not is_notebook():
+        print(__citation__)
+    else:
+        from pathlib import Path
+        from IPython.display import HTML
+        import astroquery
+        templatefile = Path(PACKAGEDIR, 'data', 'show_citation_instructions.html')
+        template = open(templatefile, 'r').read()
+        template = template.replace("LIGHTKURVE_CITATION", __citation__)
+        template = template.replace("ASTROPY_CITATION", astropy.__citation__)
+        template = template.replace("ASTROQUERY_CITATION", astroquery.__citation__)
+        return HTML(template)
+
+
+def _get_notebook_environment():
+    """Returns 'jupyter', 'colab', or 'terminal'.
+
+    One can detect whether or not a piece of Python is running by executing
+    `get_ipython().__class__`, which returns the following result:
+
+        * Jupyter notebook: `ipykernel.zmqshell.ZMQInteractiveShell`
+        * Google colab: `google.colab._shell.Shell`
+        * IPython terminal: `IPython.terminal.interactiveshell.TerminalInteractiveShell`
+        * Python terminal: `NameError: name 'get_ipython' is not defined`
+    """
+    try:
+        ipy = str(type(get_ipython())).lower()
+        if 'zmqshell' in ipy:
+            return 'jupyter'
+        if 'colab' in ipy:
+            return 'colab'
+    except NameError:
+        pass  # get_ipython() is not a builtin
+    return 'terminal'
+
+
+def is_notebook():
+    """Returns `True` if we are running in a notebook."""
+    if _get_notebook_environment() in ['jupyter', 'colab']:
+        return True
+    return False

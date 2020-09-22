@@ -36,6 +36,15 @@ def estimate_radius(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff
     This code structure borrows from work done in Bellinger et al. (2019), which
     also functions as an accessible explanation of seismic scaling relations.
 
+    If no value of effective temperature is given, this function will check the 
+    meta data of the `Periodogram` object used to create the `Seismology` object.
+    These data will often contain an effective tempearture from the Kepler Input 
+    Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+    or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
+    catalogues are estimated using photometry, and so have large associated uncertainties
+    (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
+    temperature are often more precise.
+
     NOTE: These scaling relations are scaled to the Sun, and therefore do not
     always produce an entirely accurate result for more evolved stars.
 
@@ -104,6 +113,15 @@ def estimate_mass(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_e
     This code structure borrows from work done in Bellinger et al. (2019), which
     also functions as an accessible explanation of seismic scaling relations.
 
+    If no value of effective temperature is given, this function will check the 
+    meta data of the `Periodogram` object used to create the `Seismology` object.
+    These data will often contain an effective tempearture from the Kepler Input 
+    Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+    or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
+    catalogues are estimated using photometry, and so have large associated uncertainties
+    (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
+    temperature are often more precise.
+
     NOTE: These scaling relations are scaled to the Sun, and therefore do not
     always produce an entirely accurate result for more evolved stars.
 
@@ -117,7 +135,7 @@ def estimate_mass(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_e
         degree. If not given an astropy unit, assumed to be in units of
         microhertz.
     teff : float
-        The effective temperature of the star. In units of Kelvin.
+        The effective temperature of the star. In units of Kelvin. 
     numax_err : float
         Error on numax. Assumed to be same units as numax
     deltanu_err : float
@@ -177,6 +195,15 @@ def estimate_logg(numax, teff, numax_err=None, teff_err=None):
 
     This code structure borrows from work done in Bellinger et al. (2019), which
     also functions as an accessible explanation of seismic scaling relations.
+
+    If no value of effective temperature is given, this function will check the 
+    meta data of the `Periodogram` object used to create the `Seismology` object.
+    These data will often contain an effective tempearture from the Kepler Input 
+    Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+    or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
+    catalogues are estimated using photometry, and so have large associated uncertainties
+    (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
+    temperature are often more precise.
 
     NOTE: These scaling relations are scaled to the Sun, and therefore do not
     always produce an entirely accurate result for more evolved stars.
