@@ -374,7 +374,7 @@ def test_tpf_from_images():
     """Basic tests of tpf.from_fits_images()"""
     # Not without a wcs...
     with pytest.raises(Exception):
-        KeplerTargetPixelFile.from_fits_images(_create_image_array(), size=(3, 3),
+        TargetPixelFile.from_fits_images(_create_image_array(), size=(3, 3),
                                                position=SkyCoord(-234.75, 8.3393, unit='deg'))
 
     # Make a fake WCS based on astropy.docs...
@@ -392,9 +392,9 @@ def test_tpf_from_images():
 
     # Now this should work.
     images = _create_image_array(header=header)
-    tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+    tpf = TargetPixelFile.from_fits_images(images, size=(3, 3),
                                                  position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
-    assert isinstance(tpf, KeplerTargetPixelFile)
+    assert isinstance(tpf, TargetPixelFile)
 
 
     with warnings.catch_warnings():
@@ -421,12 +421,12 @@ def test_tpf_from_images():
             hdus.append(hdu)
 
         # Should be able to run with a list of file names
-        tpf_tmpfiles = KeplerTargetPixelFile.from_fits_images(tmpfile_names,
+        tpf_tmpfiles = TargetPixelFile.from_fits_images(tmpfile_names,
                             size=(3, 3),
                             position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
         # Should be able to run with a list of HDUlists
-        tpf_hdus = KeplerTargetPixelFile.from_fits_images(hdus,
+        tpf_hdus = TargetPixelFile.from_fits_images(hdus,
                             size=(3, 3),
                             position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
@@ -442,7 +442,7 @@ def test_tpf_wcs_from_images():
     """Test to see if tpf.from_fits_images() output a tpf with WCS in the header"""
     # Not without a wcs...
     with pytest.raises(Exception):
-        KeplerTargetPixelFile.from_fits_images(_create_image_array(), size=(3, 3),
+        TargetPixelFile.from_fits_images(_create_image_array(), size=(3, 3),
                                                position=SkyCoord(-234.75, 8.3393, unit='deg'))
 
     # Make a fake WCS based on astropy.docs...
@@ -457,7 +457,7 @@ def test_tpf_wcs_from_images():
     ra, dec = 23.2336, 45.235
 
     # Now this should work.
-    tpf = KeplerTargetPixelFile.from_fits_images(_create_image_array(header=header), size=(3, 3),
+    tpf = TargetPixelFile.from_fits_images(_create_image_array(header=header), size=(3, 3),
                                                  position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
     assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
     assert tpf.hdu[1].header['1CTYP5'] == 'RA---TAN'
