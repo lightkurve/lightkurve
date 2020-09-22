@@ -61,7 +61,7 @@ class TargetPixelFile(object):
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
-        
+
         # For consistency with `LightCurve`, provide a `meta` dictionary
         self.meta = {}
         self.meta.update(self.get_header(0))
@@ -1947,7 +1947,7 @@ class TargetPixelFileFactory(object):
         hdu.header['DATE'] = datetime.datetime.now().strftime("%Y-%m-%d")
         hdu.header['CREATOR'] = "lightkurve.TargetPixelFileFactory"
         hdu.header['OBJECT'] = self.target_id
-        if hdu.header['TELESCOP'] is not None and hdu.header['TELESCOP'] == "kepler":
+        if hdu.header['TELESCOP'] is not None and hdu.header['TELESCOP'] == "Kepler":
             hdu.header['KEPLERID'] = self.target_id
         # Empty a bunch of keywords rather than having incorrect info
         for kw in ["PROCVER", "FILEVER", "CHANNEL", "MODULE", "OUTPUT",
