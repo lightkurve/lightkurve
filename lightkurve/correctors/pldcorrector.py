@@ -179,12 +179,28 @@ class PLDCorrector(RegressionCorrector):
 
         # We set the width of all coefficient priors to median flux divided
         # by 3 to prevent the fit from going crazy.
-        prior_sigma = np.nanmedian(self.lc.flux.value)
+        prior_sigma = np.nanstd(self.lc.flux.value) * 10
 
-        # Flux-normalized pixel time series
-        regressors = self.tpf.flux[:, pld_aperture_mask].reshape(len(self.tpf.flux), -1)
+        # Separate on-target and off-target pixels, which should be normalized
+        # separately to avoid introducing stellar signals to background pixels
+        on_target_mask = pld_aperture_mask & self.aperture_mask
+        off_target_mask = pld_aperture_mask & ~self.aperture_mask
+
+        # Flux normalize on-target regressors
+        on_target_pix = self.tpf.flux[:, on_target_mask].reshape(len(self.tpf.flux), -1)
+        on_target_pix = np.array([r / f for r, f in zip(on_target_pix, self.lc.flux.value)])
+
+        # Flux normalize off-target pixels for K2, and not for TESS
+        off_target_pix = self.tpf.flux[:, off_target_mask].reshape(len(self.tpf.flux), -1)
+        if self.tpf.meta.get('mission') == 'K2':
+            background_flux = np.sum(self.tpf.flux[:, off_target_mask], -1)
+            off_target_pix = np.array([r / f for r, f in zip(off_target_pix, background_flux)])
+        else:
+            off_target_pix = off_target_pix.value
+
+        # Combine and remove NaNs
+        regressors = np.hstack((on_target_pix, off_target_pix))
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
-        #regressors = np.array([r / f for r, f in zip(regressors, self.lc.flux.value)])
 
         # Use the DesignMatrix infrastructure to apply PCA to the regressors.
         with warnings.catch_warnings():
@@ -377,12 +393,12 @@ class PLDCorrector(RegressionCorrector):
             ax = axs[1]
             clc.plot(ax=ax, normalize=False, alpha=0.4,
                      label=f'corrected ({corr_cdpp:.0f})')
-            for key in names:
+            for key, color in zip(names, ['dodgerblue', 'r']):
                 if key in ['pixel_series', 'spline']:
                     tmplc = self.diagnostic_lightcurves[key] \
                             - np.median(self.diagnostic_lightcurves[key].flux) \
                             + np.median(self.lc.flux)
-                    tmplc.plot(ax=ax)
+                    tmplc.plot(ax=ax, c=color)
             ax.set_xlabel('')
             ax.set_ylim(ylim)
 
