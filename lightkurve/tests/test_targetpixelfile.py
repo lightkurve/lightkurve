@@ -330,7 +330,12 @@ def test_tpf_factory():
      for i in np.arange(1, 9)]
 
     # This should pass
-    tpf = factory.get_tpf()
+    tpf = factory.get_tpf(hdu0_keywords={'TELESCOP':'TESS'})
+
+    assert_array_equal(tpf.flux[0].value, flux_0)
+    assert_array_equal(tpf.flux[9].value, flux_9)
+
+    tpf = factory.get_tpf(hdu0_keywords={'TELESCOP':'Kepler'})
 
     assert_array_equal(tpf.flux[0].value, flux_0)
     assert_array_equal(tpf.flux[9].value, flux_9)
@@ -350,7 +355,7 @@ def test_tpf_factory():
                             header={'TSTART': 90, 'TSTOP': 100})
 
     # Can we add our own keywords?
-    tpf = factory.get_tpf(hdu0_keywords={'creator': 'Christina TargetPixelFileWriter'})
+    tpf = factory.get_tpf(hdu0_keywords={'creator': 'Christina TargetPixelFileWriter', 'TELESCOP':'TESS'})
     assert tpf.get_keyword('CREATOR') == 'Christina TargetPixelFileWriter'
 
 
