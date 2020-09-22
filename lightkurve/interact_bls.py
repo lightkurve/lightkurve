@@ -32,6 +32,26 @@ from .lightcurve import LightCurve
 
 __all__ = ['show_interact_widget']
 
+#
+# Convert Time / Quantity to unitless ones for the use with bokeh
+# Otherwise, Bokeh will complain:
+# - NotImplementedError('cannot make a list of Quantities.  Get list of values with q.value.tolist()')
+# - TypeError('Object of type Time is not JSON serializable')
+# - TypeError('Object of type TimeDelta is not JSON serializable')
+#
+
+def _to_unitless(data):
+    """Convet the values in the data dict to unitless one"""
+    return { key: getattr(val, 'value', val) for key, val in data.items() }
+
+def _to_ColumnDataSource(data):
+    """Convet the values in the data dict to unitless one for use with ColumnDataSource"""
+    return ColumnDataSource(data=_to_unitless(data))
+
+def _update_source(source, data):
+    """Convet the values in the data dict to unitless one and use it to update the given DataSource"""
+    source.data = _to_unitless(data)
+    return source
 
 def prepare_bls_datasource(result, loc):
     """Prepare a bls result for bokeh plotting
@@ -48,7 +68,7 @@ def prepare_bls_datasource(result, loc):
     bls_source : Bokeh.plotting.ColumnDataSource
         Bokeh style source for plotting
     """
-    bls_source = ColumnDataSource(data=dict(
+    bls_source = _to_ColumnDataSource(data=dict(
                                         period=result['period'],
                                         power=result['power'],
                                         depth=result['depth'],
@@ -71,8 +91,8 @@ def prepare_folded_datasource(folded_lc):
     folded_source : Bokeh.plotting.ColumnDataSource
         Bokeh style source for plotting
     """
-    folded_src = ColumnDataSource(data=dict(
-                                  phase=np.sort(folded_lc.time),
+    folded_src = _to_ColumnDataSource(data=dict(
+                                  phase=folded_lc.time.sort(),
                                   flux=folded_lc.flux[np.argsort(folded_lc.time)]))
     return folded_src
 
@@ -80,8 +100,8 @@ def prepare_folded_datasource(folded_lc):
 # Helper functions for help text...
 
 def prepare_lc_help_source(lc):
-    data = dict(time=[(np.max(lc.time) - np.min(lc.time)) * 0.98 + np.min(lc.time)],
-                flux=[(np.max(lc.flux) - np.min(lc.flux)) * 0.9 + np.min(lc.flux)],
+    data = dict(time=[((np.max(lc.time) - np.min(lc.time)) * 0.98 + np.min(lc.time)).value],
+                flux=[((np.max(lc.flux) - np.min(lc.flux)) * 0.9 + np.min(lc.flux)).value],
                 boxicon=['https://bokeh.pydata.org/en/latest/_images/BoxZoom.png'],
                 panicon=['https://bokeh.pydata.org/en/latest/_images/Pan.png'],
                 reseticon=['https://bokeh.pydata.org/en/latest/_images/Reset.png'],
@@ -129,7 +149,7 @@ def prepare_lc_help_source(lc):
                                  </div>
                              </div>
                          """])
-    return ColumnDataSource(data=data)
+    return _to_ColumnDataSource(data=data)
 
 
 def prepare_bls_help_source(bls_source, slider_value):
@@ -162,12 +182,12 @@ def prepare_bls_help_source(bls_source, slider_value):
                                  </div>
                              </div>
                          """])
-    return ColumnDataSource(data=data)
+    return _to_ColumnDataSource(data=data)
 
 
 def prepare_f_help_source(f):
-    data = dict(phase=[(np.max(f.time) - np.min(f.time)) * 0.98 + np.min(f.time)],
-                flux=[(np.max(f.flux) - np.min(f.flux)) * 0.98 + np.min(f.flux)],
+    data = dict(phase=[((np.max(f.time) - np.min(f.time)) * 0.98 + np.min(f.time)).value],
+                flux=[((np.max(f.flux) - np.min(f.flux)) * 0.98 + np.min(f.flux)).value],
                 helpme=['?'],
                 help=["""
                         <div style="width: 375px;">
@@ -192,7 +212,7 @@ def prepare_f_help_source(f):
                             </div>
                         </div>
                 """])
-    return ColumnDataSource(data=data)
+    return _to_ColumnDataSource(data=data)
 
 
 def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, help_source):
@@ -482,11 +502,12 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
         model_lc = LightCurve(lc.time[mask], mf[mask])
         # Need to use raw value for best_t0 and best_period so that the result is of type Time, rather than TimeDelta
-        model_lc = model_lc.append(LightCurve([(lc.time[0].value - best_t0.value) + best_period.value/2], [1]))
-        model_lc = model_lc.append(LightCurve([(lc.time[0].value - best_t0.value) + 3*best_period.value/2], [1]))
+        # TODO: the time is not quite right, which messes up the lightcurve display (the time-axis is zoomed way out)
+        # model_lc = model_lc.append(LightCurve([(lc.time[0].value - best_t0.value) + best_period.value/2], [1]))
+        # model_lc = model_lc.append(LightCurve([(lc.time[0].value - best_t0.value) + 3*best_period.value/2], [1]))
 
-        model_lc_source = ColumnDataSource(data=dict(
-                                     time=np.sort(model_lc.time),
+        model_lc_source = _to_ColumnDataSource(data=dict(
+                                     time=model_lc.time.sort(),
                                      flux=model_lc.flux[np.argsort(model_lc.time)]))
 
         # Set up the LC
@@ -504,7 +525,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         f_model_lc = LightCurve(_to_timeDelta([-0.5], f_model_lc.time), [1]).append(f_model_lc)
         f_model_lc = f_model_lc.append(LightCurve(_to_timeDelta([0.5], f_model_lc.time), [1]))
 
-        f_model_lc_source = ColumnDataSource(data=dict(
+        f_model_lc_source = _to_ColumnDataSource(data=dict(
                                  phase=f_model_lc.time,
                                  flux=f_model_lc.flux))
 
@@ -514,8 +535,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             inwindow = (lc.time > mint) & (lc.time < maxt)
             nb = int(np.ceil(inwindow.sum()/5000))
             temp_lc = lc[inwindow]
-            lc_source.data = {'time': temp_lc.time[::nb],
-                              'flux': temp_lc.flux[::nb]}
+            _update_source(lc_source, {'time': temp_lc.time[::nb],
+                                       'flux': temp_lc.flux[::nb]})
 
         def _update_folded_plot(event):
             loc = np.argmax(bls_source.data['power'])
@@ -526,8 +547,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             f = lc.fold(best_period, best_t0)
             inwindow = (f.time > minphase) & (f.time < maxphase)
             nb = int(np.ceil(inwindow.sum()/10000))
-            f_source.data = {'phase': f[inwindow].time[::nb],
-                             'flux': f[inwindow].flux[::nb]}
+            _update_source(f_source, {'phase': f[inwindow].time[::nb],
+                                      'flux': f[inwindow].flux[::nb]})
 
         # Function to update the widget
         def _update_params(all=False, best_period=None, best_t0=None):
@@ -542,11 +563,11 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                 result = model.power(period_values, duration_slider.value)
                 ok = np.isfinite(result['power']) & np.isfinite(result['duration']) &\
                          np.isfinite(result['transit_time']) & np.isfinite(result['period'])
-                bls_source.data = dict(
-                                     period=result['period'][ok],
-                                     power=result['power'][ok],
-                                     duration=result['duration'][ok],
-                                     transit_time=result['transit_time'][ok])
+                _update_source(bls_source, dict(
+                                                period=result['period'][ok],
+                                                power=result['power'][ok],
+                                                duration=result['duration'][ok],
+                                                transit_time=result['transit_time'][ok]))
                 loc = np.nanargmax(bls_source.data['power'])
                 best_period = bls_source.data['period'][loc]
                 best_t0 = bls_source.data['transit_time'][loc]
@@ -560,23 +581,23 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             f = lc.fold(best_period, best_t0)
             inwindow = (f.time > minphase) & (f.time < maxphase)
             nb = int(np.ceil(inwindow.sum()/10000))
-            f_source.data = {'phase': f[inwindow].time[::nb],
-                             'flux': f[inwindow].flux[::nb]}
+            _update_source(f_source, {'phase': f[inwindow].time[::nb],
+                                      'flux': f[inwindow].flux[::nb]})
 
             mf = model.model(lc.time, best_period, duration_slider.value, best_t0)
             mf /= np.median(mf)
             mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
             model_lc = LightCurve(lc.time[mask], mf[mask])
 
-            model_lc_source.data = {'time': np.sort(model_lc.time),
-                                    'flux': model_lc.flux[np.argsort(model_lc.time)]}
+            _update_source(model_lc_source, {'time': model_lc.time.sort(),
+                                             'flux': model_lc.flux[np.argsort(model_lc.time)]})
 
             f_model_lc = model_lc.fold(best_period, best_t0)
             f_model_lc = LightCurve([-0.5], [1]).append(f_model_lc)
             f_model_lc = f_model_lc.append(LightCurve([0.5], [1]))
 
-            f_model_lc_source.data = {'phase': f_model_lc.time,
-                                      'flux': f_model_lc.flux}
+            _update_source(f_model_lc_source, {'phase': f_model_lc.time,
+                                               'flux': f_model_lc.flux})
 
             vertical_line.update(location=best_period.value)
             fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(
