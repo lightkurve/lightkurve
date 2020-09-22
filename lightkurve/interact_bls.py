@@ -446,8 +446,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         """Convert the raw value as TimeDelta using the format / scale of the given reference Time object"""
         return TimeDelta(val, format=time_reference.format, scale=time_reference.scale)
 
-    def _round_time(time, decimals):
-        return np.round(time.value, decimals)
+    def _round_strip_unit(val, decimals):
+        return np.round(getattr(val, 'value', val), decimals)
 
     def _create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
         """Create BLS interact user interface."""
@@ -492,8 +492,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         double_button = Button(label="Double Period", button_type="danger", width=100)
         half_button = Button(label="Half Period", button_type="danger", width=100)
         text_output = Paragraph(text="Period: {} days, T0: {}{}".format(
-                                                    np.round(best_period, 7),
-                                                    _round_time(best_t0, 7), time_format),
+                                                    _round_strip_unit(best_period, 7),
+                                                    _round_strip_unit(best_t0, 7), time_format),
                                 width=350, height=40)
 
         # Set up BLS source
@@ -605,11 +605,11 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
             vertical_line.update(location=best_period.value)
             fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(
-                                        np.round(best_period, 7),
-                                        _round_time(best_t0, 7), time_format)
+                                        _round_strip_unit(best_period, 7),
+                                        _round_strip_unit(best_t0, 7), time_format)
             text_output.text = "Period: {} days, \t T0: {}{}".format(
-                                        np.round(best_period, 7),
-                                        _round_time(best_t0, 7), time_format)
+                                        _round_strip_unit(best_period, 7),
+                                        _round_strip_unit(best_t0, 7), time_format)
 
         # Callbacks
         def _update_upon_period_selection(attr, old, new):
@@ -670,7 +670,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         # Create all the figures.
         fig_folded = make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, f_help_source)
-        fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(np.round(best_period, 7), _round_time(best_t0, 5), time_format)
+        fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(_round_strip_unit(best_period, 7), _round_strip_unit(best_t0, 5), time_format)
         fig_bls, vertical_line = make_bls_figure_elements(result, bls_source, bls_help_source)
         fig_lc = make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, lc_help_source)
 
