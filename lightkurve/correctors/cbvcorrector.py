@@ -9,25 +9,1169 @@ from astropy.io import fits as pyfits
 from astropy.table import Table
 from astropy.time import Time
 from astropy.timeseries import TimeSeries
-from astropy.units import Quantity
+from astropy.units import Quantity, Unit
 
 from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import PchipInterpolator
+from sklearn import linear_model
+from scipy.optimize import minimize_scalar
 
 from .designmatrix import DesignMatrix, DesignMatrixCollection
 from .. import MPLSTYLE
 from ..lightcurve import LightCurve
 from ..utils import channel_to_module_output, validate_method
+from ..search import search_lightcurve
+from .regressioncorrector import RegressionCorrector
+from ..collections import LightCurveCollection
 
 log = logging.getLogger(__name__)
 
-__all__ = ['CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
-           'TessCotrendingBasisVectors', 'download_kepler_cbvs', 'download_tess_cbvs']
+__all__ = ['CBVCorrector', 'CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
+        'TessCotrendingBasisVectors', 'download_kepler_cbvs',
+        'download_tess_cbvs', 'compute_correlation']
 
 #*******************************************************************************
+# CBV Corrector Class
+
+class CBVCorrector(RegressionCorrector):
+    """ Class for removing systematics using CBV correctors for Kepler/K2/TESS
+
+    On construction of this object, the relevent CBVs will be downloaded from
+    MAST appropriate for the lightcurve object passed to the constructor.
+
+    For TESS there are multiple CBV types. All are loaded and the user must specify
+    which to use in the correction.
+
+    Attributes
+    ----------
+    lc  : LightCurve
+        The light curve to correct, stored zero-centered median normalized
+    denormalized_lc  : LightCurve
+        The light curve in electrons / second
+    cbvs    : CetrendingBasisVectors list
+        The retrieved CBVs, can contain multiple types
+    interpolated_cbvs : bool
+        If true then the CBVs have been interpolated to the lightkurve
+    cbv_design_matrix : DesignMatrix
+        The retrieved CBVs ported into a DesignMatrix object
+    extra_design_matrix : DesignMatrix
+        An extra design matrix to include in the fit with the CBVs
+    design_matrix_collection   : DesignMatrixCollection
+        The design matrix collection composed of cbv_design_matrix and extra_design_matrix
+    corrected_lc : LightCurve
+        The returned light curve from regression_corrector.correct
+        stored zero-centered median normalized
+        TODO: Switch this to denormalized LC
+    denormalized_corrected_lc  : LightCurve
+        The light curve in electrons / second
+    coefficients : float ndarray
+        The fit coefficients corresponding to the design_matric_collection
+        As computed by regressioncorrection.correct
+    coefficients_err : float ndarray
+        The error estimates for the coefficients, see regressioncorrection
+    model_lc : LightCurve
+        The model fit to the lightcurve 'lc'
+    diagnostic_lightcurves : dict
+        Model fits for each of the sub design matrices fit in model_lc
+    lc_neighborhood : LightCurveCollection
+        SAP light curves of all targets within the defined neighborhood of the
+        target under study for use with the under-fitting metric
+    lc_neighborhood_flux : list of arrays
+        Neighboring target flux aligned or interpoalted to the target under
+        study cadence
+    cadence_mask : np.ndarray of bool
+        Mask, where True indicates a cadence that was used in
+        regressioncorrector.correct.
+        Note: The saved cadence_mask is overwritten for each call to correct.
+    over_fitting_score : float
+        Over-fitting score from the most recent run of correct_optimizer
+    under_fitting_score : float
+        Under-fitting score from the most recent run of correct_optimizer
+    alpha : float
+        L2-norm regularization term used in most recent fit
+        equal to:
+            designmatrix prior sigma = np.median(self.lc.flux_err) / np.sqrt(alpha)
+
+
+    """
+
+    def __init__(self, lc, interpolate_cbvs=False, do_not_load_cbvs=False):
+        """ Constructor for CBVClass objects
+
+        This constructor will retrieve all relevant CBVs from MAST and then
+        align them with the passed-in light curve.
+
+        Parameters
+        ----------
+        lc  : LightCurve
+            The light curve to correct
+        interpolate_cbvs : bool
+            By default, the cbvs will be 'aligned' to the lightcurve. If you
+            wish to interpolate the cbvs instead then set this to True.
+        do_not_load_cbvs : bool
+            If True then the CBVs will NOT be loaded from MAST. 
+            Use this option if you wish to use the CBV corrector methods with only a 
+            custom design matrix (via the ext_dm argument in the corrector methods)
+
+        Examples
+        --------
+        """
+
+        if not isinstance(lc, LightCurve):
+            raise Exception('<lc> must be a LightCurve class')
+
+        # This class wants zero-centered median normalized flux
+        # Store the median value so we can denormalize
+        assert  lc.flux.unit==Unit('electron / second'), \
+            'cbvCorrector expects light curve to be passed in e-/s units.'        
+        self._lc_median = np.nanmedian(lc.flux)
+        lc = lc.remove_nans().normalize()
+        lc.flux -= 1.0 
+
+        # Call the RegresssionCorrector Constructor
+        super(CBVCorrector, self).__init__(lc)
+
+        #***
+        # Retrieve all relevant CBVs from MAST
+        cbvs = []
+
+        if (not do_not_load_cbvs):
+            if self.lc.mission == 'Kepler':
+                cbvs.append(download_kepler_cbvs(mission=self.lc.mission, quarter=self.lc.quarter,
+                        channel=self.lc.channel))
+            elif self.lc.mission == 'K2':
+                cbvs.append(download_kepler_cbvs(mission=self.lc.mission, campaign=self.lc.campaign,
+                        channel=self.lc.channel))
+            elif self.lc.mission == 'TESS':
+                # For TESS we load multiple CBV types
+            
+                cbvs.append(download_tess_cbvs(sector=self.lc.sector,
+                    camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='SingleScale'))
+            
+                # Although there has always been 3 bands, there could be more,
+                # continue to load more bands until no more are left to load
+                iBand = int(0)
+                moreData = True
+                while moreData:
+                    iBand += 1
+                    cbvObj = download_tess_cbvs(sector=self.lc.sector,
+                        camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='MultiScale',
+                        band=iBand)
+                    if (cbvObj.band == iBand):
+                        cbvs.append(cbvObj)
+                    else:
+                        moreData = False
+            
+                cbvs.append(download_tess_cbvs(sector=self.lc.sector,
+                    camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='Spike'))
+            
+            else:
+                raise ValueError('Unknown mission type')
+            
+            for idx in np.arange(len(cbvs)):
+                if (not isinstance(cbvs[idx], CotrendingBasisVectors)):
+                    raise Exception('CBVs could not be loaded. CBVCorrector must exit')
+            
+            # Align or interpolate the CBVs with the lightcurve flux using the cadence numbers
+            for idx in np.arange(len(cbvs)):
+                if interpolate_cbvs:
+                    cbvs[idx] = cbvs[idx].interpolate(self.lc)
+                else:
+                    cbvs[idx] = cbvs[idx].align(self.lc)
+
+        self.cbvs = cbvs
+        self.interpolated_cbvs = interpolate_cbvs
+
+        # Initiate all extra attributes to None
+        self.cbv_design_matrix = None
+        self.extra_design_matrix = None
+        self.design_matrix_collection = None
+        self.corrected_lc = None
+        self.coefficients = None
+        self.coefficients_err = None
+        self.model_lc = None
+        self.diagnostic_lightcurves = None
+        self.lc_neighborhood = None
+        self.lc_neighborhood_flux = None
+        self.cadence_mask = None
+        self.over_fitting_score = None
+        self.under_fitting_score = None
+        self.alpha = None
+
+    @property 
+    def denormalized_lc(self): 
+        """ The light curve is stored internally as zero-centered median 
+        normalized. This getter returns the denormalized light curve in
+        absolute flux units.
+        """
+        
+        lc = self.lc.copy()
+        lc.flux = (lc.flux+1.0) * self._lc_median
+        lc.flux_err = lc.flux_err * self._lc_median
+        assert  lc.flux.unit==Unit('electron / second'), \
+            'Bookkeeping Error, flux should be in units of e-/s.'        
+
+        return lc 
+
+    @property 
+    def denormalized_corrected_lc(self): 
+        """ The light curve is stored internally as zero-centered median 
+        normalized. This getter returns the denormalized light curve.
+        """
+
+        if (self.corrected_lc is None):
+            log.warning('A corrected light curve does not exist, please run '
+                    'correct first')
+            return None
+        
+        lc = self.corrected_lc.copy()
+        lc.flux = (lc.flux+1.0) * self._lc_median
+        lc.flux_err = lc.flux_err * self._lc_median
+        assert  lc.flux.unit==Unit('electron / second'), \
+            'Bookkeeping Error, flux should be in units of e-/s.'        
+
+        return lc 
+
+    def correct_gaussian_prior(self, cbv_type=['SingleScale'],
+            cbv_indices=[np.arange(1,9)], 
+            alpha=1e-20, ext_dm=None, cadence_mask=None):
+        """ Performs the correction using RegressionCorrector methods.
+
+        This method will assemble the full design matrix collection composed of
+        cbv_design_matrix and extra_design_matrix (ext_dm). It then uses the
+        alpha L2-Norm (Ridge Regression) penalty term to set the width on the
+        design matrix priors.  Then uses the super-class
+        RegressionCorrector.correct to perform the correction.
+
+        The relation between the L2-Norm alpha term and the Gaussian prior sigma
+        is: 
+        alpha = flux_sigma^2 / sigma^2
+
+        By default this method will use the first 8 "SingleScale" basis vectors.
+
+        Parameters
+        ----------
+        cbv_type : str list
+            List of CBV types to use
+        cbv_indices : list of lists
+            List of CBV vectors to use in each passed cbv_type. {'ALL' => Use all}
+            NOTE: 1-Based indexing!
+        alpha : float
+            L2-norm regularization penatly term. Default = 1e-20
+            {0 => no regularization}
+        ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
+            Optionally pass an extra design matrix to also be used in the fit
+        cadence_mask : np.ndarray of bools (optional)
+            Mask, where True indicates a cadence that should be used.
+
+        Returns
+        -------
+        `.LightCurve`
+            Corrected light curve, with noise removed. In units of electrons / second
+
+        Examples
+        --------
+        The following example will perform the correction using the
+        SingleScale and Spike basis vectors with a weak regularization alpha
+        term of 0.1. It also adds in an external design matrix to perfomr a
+        joint fit.
+            >>> cbv_type = ['SingleScale', 'Spike']
+            >>> cbv_indices = [np.arange(1,9), 'ALL']
+            >>> corrected_lc = cbvCorrector.correct_gaussian_prior(cbv_type=cbv_type, # doctest: +SKIP
+            >>>     cbv_indices=cbv_indices, alpha=0.1, # doctest: +SKIP
+            >>>     ext_dm=design_matrix ) # doctest: +SKIP
+        """
+        
+        # Perform all the preparatory stuff common to all correct methods
+        self._correct_initialization(cbv_type=cbv_type,
+                cbv_indices=cbv_indices, ext_dm=ext_dm)
+
+        # Add in a width to the Gaussian priors
+        # alpha = flux_sigma^2 / sigma^2
+        if (alpha == 0.0):
+            sigma = None
+        else:
+            sigma = np.median(self.lc.flux_err) / np.sqrt(np.abs(alpha))
+        self._set_prior_width(sigma)
+            
+        # Use RegressionCorrector.correct for the actual fitting
+        super(CBVCorrector, self).correct(self.design_matrix_collection, 
+                cadence_mask=cadence_mask)
+
+        self.alpha = alpha
+
+        return self.denormalized_corrected_lc
+
+    def correct_ElasticNet(self, cbv_type='SingleScale', cbv_indices=np.arange(1,9), 
+            alpha=1e-20, l1_ratio=0.01, ext_dm=None, cadence_mask=None):
+        """ Performs the correction using scikit-learn's ElasticNet which
+        utilizes combined L1- and L2-Norm priors as a regularizer.
+
+        This method will assemble the full design matrix collection composed of
+        cbv_design_matrix and extra_design_matrix (ext_dm). Then uses
+        scikit-learn.linear_model.ElasticNet to perform the correction.
+
+        By default this method will use the first 8 "SingleScale" basis vectors.
+
+        Note that the alpha term in scikit-learn's ElasticNet does not have the
+        same scaling as when used in CBVCorrector.correct_gaussian_prior or 
+        CBVCorrector.correct_optimizer. Do not assume similar results with a
+        similar alpha value.
+
+        Parameters
+        ----------
+        cbv_type : str list
+            List of CBV types to use
+        cbv_indices : list of lists
+            List of CBV vectors to use in each passed cbv_type. {'ALL' => Use all}
+            NOTE: 1-Based indexing!
+        alpha : float
+            L2-norm regularization pentaly term.
+            {0 => no regularization}
+        l1_ratio : float
+            Elastic-Net mixing parameter
+            l1_ratio = 0 => L2 penalty (Ridge). l1_ratio = 1 => L1 penalty (Lasso).
+        ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
+            Optionally pass an extra design matrix to also be used in the fit
+        cadence_mask : np.ndarray of bools (optional)
+            Mask, where True indicates a cadence that should be used.
+
+        Returns
+        -------
+        `.LightCurve`
+            Corrected light curve, with noise removed. In units of electrons / second
+
+        Examples
+        --------
+        The following example will perform the ElasticNet correction using the
+        SingleScale and Spike basis vectors with a strong regualrization alpha
+        term of 1.0 and an L1 ratio of 0.9 which means predominantly a Lasso
+        regularization but a slight amount of Ridge Regression.
+            >>> cbv_type = ['SingleScale', 'Spike']
+            >>> cbv_indices = [np.arange(1,9), 'ALL']
+            >>> corrected_lc = cbvCorrector.correct_ElasticNet(cbv_type=cbv_type, # doctest: +SKIP
+            >>>     cbv_indices=cbv_indices, alpha=1.0, l1_ratio=0.9) # doctest: +SKIP
+        """
+        
+        # Perform all the preparatory stuff common to all correct methods
+        self._correct_initialization(cbv_type=cbv_type,
+                cbv_indices=cbv_indices, ext_dm=ext_dm)
+
+        # Default cadence mask
+        if cadence_mask is None:
+            cadence_mask = np.ones(len(self.lc.flux), bool)
+
+        # Use Scikit-learn ElasticNet
+        self.regressor = linear_model.ElasticNet(alpha=alpha, l1_ratio=l1_ratio,
+                fit_intercept=False)
+
+        X = self.design_matrix_collection.values
+        y = self.lc.flux
+
+        # Set mask
+        # note: ElasticNet has no internal way to do this so we have to just
+        # remove the cadences from X and y
+        X = X[cadence_mask,:]
+        y = y[cadence_mask]
+
+        self.regressor.fit(X, y)
+
+        # Finishing work
+        model_flux  = np.dot(X, self.regressor.coef_)
+        model_err   = np.zeros(len(model_flux))
+        
+        self.coefficients = self.regressor.coef_
+        
+        self.model_lc = LightCurve(time=self.lc.time, flux=model_flux, flux_err=model_err)
+        self.corrected_lc = self.lc.copy()
+        self.corrected_lc.flux = self.lc.flux - self.model_lc.flux
+        self.corrected_lc.flux_err = (self.lc.flux_err**2 + model_err**2)**0.5
+        self.diagnostic_lightcurves = self._create_diagnostic_lightcurves()
+        self.cadence_mask = cadence_mask
+        self.alpha = alpha
+            
+        return self.denormalized_corrected_lc
+
+    def correct_optimizer(self, cbv_type=['SingleScale'],
+            cbv_indices=[np.arange(1,9)], 
+            ext_dm=None, cadence_mask=None, alpha_bounds=[1e-4,1e4], 
+            target_over_score=0.5, target_under_score=0.5, max_iter=100):
+        """ Optimizes the correction by adjusting the L2-Norm (Ridge Regression)
+        regularization penalty term, alpha, based on the introduced noise
+        (over-fitting) and residual correlation (under-fitting) goodness
+        metrics. The optmization is performed using the
+        scipy.optimize.minimize_scalar Brent's method.
+
+        The optimizer attempts to maximize the over- and under-fitting goodness
+        metrics.  However, once the target_over_score or target_under_score is
+        reached, a "Leaky ReLU" is used so that the optimization "pressure"
+        concentrates on ther other metric so that both metrics rise above their
+        respective target scores, instead of driving a single metric to near
+        1.0.
+
+        The optimization parameters used are stored in self.optimization_params
+        as a record of how the optimization was performed.
+
+        The optimized correction is performed using LightKurve's 
+        RegressionCorrector methods. See correct_gaussian_prior for details.
+
+        Parameters
+        ----------
+        cbv_type : str list
+            List of CBV types to use in correction {'ALL' => Use all}
+        cbv_indices : list of lists
+            List of CBV vectors to use in each of cbv_type passed. {'ALL' => Use all}
+            NOTE: 1-Based indexing!
+        ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
+            Optionally pass an extra design matrix to also be used in the fit
+        cadence_mask : np.ndarray of bools (optional)
+            Mask, where True indicates a cadence that should be used.
+        alpha_bounds : float list(len=2)
+            upper anbd lowe bounds for alpha
+        target_over_score : float
+            Target Over-fitting metric score
+        target_under_score : float
+            Target under-fitting metric score
+        max_iter : int
+            Maximum number of iterations to optimize goodness metrics
+
+        Returns
+        -------
+        `.LightCurve`
+            Corrected light curve, with noise removed. In units of electrons / second
+
+        Examples
+        --------
+        The following example will perform the correction using the
+        SingleScale and Spike basis vectors. It will use an initial alpha value
+        of 1.0. The target over-fitting score is 0.5 and the target
+        under-fitting score is 0.8. 
+            >>> cbv_type = ['SingleScale', 'Spike']
+            >>> cbv_indices = [np.arange(1,9), 'ALL']
+            >>> cbvCorrector.correct_optimizer(cbv_type=cbv_type, cbv_indices=cbv_indices,  # doctest: +SKIP
+            >>> alpha_bounds=[1.0,1e3],  # doctest: +SKIP
+            >>> target_over_score=0.5, target_under_score=0.5) # doctest: +SKIP
+            >>> cbvCorrector.diagnose() # doctest: +SKIP
+        """
+
+        # Perform all the preparatory stuff common to all correct methods
+        self._correct_initialization(cbv_type=cbv_type,
+                cbv_indices=cbv_indices, ext_dm=ext_dm)
+
+        # Create a dictionary for optimization parameters to easily pass to the
+        # objective function, and also to save for posterity
+        self.optimization_params = {'alpha_bounds': alpha_bounds,
+                                    'target_over_score': target_over_score,
+                                    'target_under_score': target_under_score,
+                                    'max_iter': max_iter,
+                                    'cadence_mask': cadence_mask,
+                                    'over_metric_nSamples': 1}
+
+        #***
+        # Use scipy.optimize.minimize_scalar
+        # Minimize the introduced metric
+        minimize_result = minimize_scalar(self._goodness_metric_obj_fun, method='Bounded',
+                bounds=alpha_bounds,
+                options={'maxiter':max_iter, 'disp': False})
+
+        # Re-fit with final alpha value
+        # (scipy.optimize.minimize_scalar does not exit with the final fit!)
+        self._goodness_metric_obj_fun(minimize_result.x)
+
+        # Only display over- or under-fitting scores if requested to optimize
+        # for each
+        if (self.optimization_params['target_over_score'] > 0):
+            self.over_fitting_score = self.over_fitting_metric(nSamples=10)
+            print('Optimized Over-fitting metric: {}'.format(self.over_fitting_score))
+        else:
+            self.over_fitting_score = -1.0
+
+        if (self.optimization_params['target_under_score'] > 0):
+            self.under_fitting_score = self.under_fitting_metric()
+            print('Optimized Under-fitting metric: {}'.format(self.under_fitting_score))
+        else:
+            self.under_fitting_score = -1.0
+
+        self.alpha = minimize_result.x
+
+        print('Optimized Alpha: {0:2.3e}'.format(self.alpha))
+
+        return self.denormalized_corrected_lc
+
+
+    def over_fitting_metric(self, nSamples=10):
+        """ Uses a LombScarglePeriodogram to assess the change in broad-band
+        power in a corrected light curve (in self.corrected_lc) to measure 
+        degree of over-fitting.
+
+        This function expects a zero-centered median normalized light curve.
+
+        The to_periodogram Lomb-Scargle method is used and the sampling band is
+        from one frequency separation to the Nyquist frequency
+
+        This over-fitting goodness metric is callibrated such that a metric
+        value of 0.5 means the introduced noise due to over-fitting is at the
+        same power level as the uncertainties in the light curve.
+
+        Parameters
+        ----------
+        nSamples : int
+            The number of times to compute and average the metric
+            This can stabalize the value, defaut = 10
+
+        Returns
+        -------
+        over-fitting_metric : float
+            A float in the range [0,1] where 0 => Bad, 1 => Good
+        """
+
+        # Check if corrected_lc is present
+        if (self.corrected_lc is None):
+            log.warning('A corrected light curve does not exist, please run '
+                    'correct first')
+            return None
+
+        # The fit can sometimes result in NaNs
+        # Also ignore masked cadences
+        orig_lc         = self.lc.copy()
+        orig_lc         = orig_lc[self.cadence_mask]
+        orig_lc         = orig_lc.remove_nans()
+        corrected_lc    = self.corrected_lc.copy()
+        corrected_lc    = corrected_lc[self.cadence_mask]
+        corrected_lc    = corrected_lc.remove_nans()
+        if (len(corrected_lc.flux) == 0):
+            return 1.0
+
+        # Perform the measurement multiple times and averge to stabalize the metric
+
+        metric_per_iter = np.full_like(np.arange(nSamples), np.nan, dtype=np.double)
+        for idx in np.arange(nSamples):
+
+            pgOrig = orig_lc.to_periodogram()
+            # Use the same periods in the corrected flux as just used in the
+            # original flux
+            pgCorrected = corrected_lc.to_periodogram(frequency=pgOrig.frequency)
+            
+            # Get an estimate of the PSD at the uncertainties limit
+            # The raw and corrected uncertainties should be essentially identical so 
+            # use the corrected
+            # TODO: the periodogram of WGN should be analytical to compute!
+            nNonGappedCadences = len(orig_lc.flux)
+            meanCorrectedUncertainties = np.nanmean(corrected_lc.flux_err)
+            WGNCorrectedUncert = (np.random.randn(nNonGappedCadences,1) * 
+                    meanCorrectedUncertainties).T[0]
+            model_err   = np.zeros(nNonGappedCadences)
+            noise_lc = LightCurve(time=orig_lc.time, flux=WGNCorrectedUncert, flux_err=model_err)
+            pgCorrectedUncert = noise_lc.to_periodogram()
+            meanCorrectedUncertPower = np.nanmean(np.array(pgCorrectedUncert.power))
+            
+            # Compute the change in power
+            pgChange = np.array(pgCorrected.power) - np.array(pgOrig.power)
+
+            # ignore nans
+            pgChange = pgChange[~np.isnan(pgChange)]
+            
+            # If no increase in power in ANY bands then return a perfect loss
+            # function
+            if (len(np.nonzero(pgChange>0.0)[0]) == 0):
+                metric_per_iter[idx] = 0.0
+                continue
+            
+            # We are only concerned with bands where the power increased so
+            # when(pgCorrected - pgOrig) > 0 
+            # Normalize by the noise in the uncertainty
+            # We want the goodness to begin to degrade when the introduced 
+            # noise is greater than the uncertainties.
+            # So, when Sigmoid > 0.5 (given twiceSigmoidInv defn.)
+            metric_per_iter[idx] = (np.sum(pgChange[pgChange>0.0]) / 
+                    ((len(np.nonzero(pgChange>0.0)[0]))*meanCorrectedUncertPower))
+
+        metric = np.mean(metric_per_iter)
+
+        
+        # We want the goodness to span (0,1]
+        # Use twice a reversed sigmoid to get a [0,1] range from a [0,inf) range
+        # We also want a goodness of 0.8 to mean the introduced noise is just
+        # begining to increase beyond the noise of WGN of the mean of the uncertainties
+        # 0.8 = sigmoidInv(0.4)
+        # So, subtract 0.6 from the metric so that a metric value of 1.0 returns
+        # a goodness of 0.8
+        def sigmoidInv(x): return 2.0 / (1 + np.exp(x))
+        # Make sure maximum score is 1.0
+        metric = sigmoidInv(np.max([metric, 0.0]))
+
+        return metric
+    
+    def under_fitting_metric(self, search_radius=None, min_targets=30,
+            max_targets=50, clear_cache=False):
+        """ This goodness metric measures the degree of under-fitting of the
+        CBVs to the light curve. It does so by measuring the mean residual target to
+        target Pearson correlation between the target under study and a selection of
+        neighboring targets.
+
+        This function will begin with the given search_radius in arcseconds and
+        finds all neighboring targets. If not enough were found (< min_targets)
+        the search_radius is increased until a minimum number are found.
+
+        For TESS, the default search_radius is 5000 arcseconds.
+        For Kepler/K2, the default search_radius is 1000 arcseconds
+
+        The downloaded neighboring targets will normally be "aligned" to the
+        corrected_lc meaning the cadence numbers are used to align the targets
+        to the corrected_lc. However, if the CBVCorrector object was
+        instantiated with interpolated_cbvs=True then the targets will be
+        interpolated to the corrected_lc cadence times.
+
+        The returned under-fitting goodness metric is callibrated such that a
+        value of 0.95 means the residual correlations in the target is
+        equivalent to chance correlations of White Gaussian Noise.
+
+        Parameters
+        ----------
+        search_radius : float
+            Search Radius to find neighboring targets in arcseconds
+        min_targets : float
+            Minimum number of targets to use in correlation metric
+            Using too few can cause unreliable results. Default = 30
+        max_targets : float
+            Maximum number of targets to use in correlation metric
+            Using too many can slow down the metric due to large data
+            download. Default = 50
+        clear_cache : bool
+            If true then force the method to re-find the neighboring targets.
+            Otherwise, the neighboring targets are only found once the first
+            time this function is called within the object.
+
+        Returns
+        -------
+        under-fitting_metric : float
+            A float in the range [0,1] where 0 => Bad, 1 => Good
+        """
+
+        # Check if corrected_lc is present
+        if (self.corrected_lc is None):
+            raise Exception('A corrected light curve does not exist, please run '
+                    'correct first')
+            return None
+
+        # Set default search_radius if one is not provided.
+        if (search_radius is None):
+            if (self.lc.mission == 'TESS'):
+                search_radius = 5000
+            else:
+                search_radius = 1000
+
+        # Make a copy of search_radius because it changes locally
+        dynamic_search_radius = search_radius
+        # Max search radius is the diagonal distance along a CCD in arcseconds
+        # 1 pixel in TESS is 21.09 arcseconds
+        # 1 pixel in Kepler/K2 is 3.98 arcseconds
+        if (self.lc.mission == 'TESS'):
+            # 24 degrees of a TESS CCD array (2 CCD's wide) is 86,400 arcseconds
+            max_search_radius = np.sqrt(2) * (86400/2.0)
+        else:
+            # One Kepler CCD spans 4,096 arcseconds
+            max_search_radius = np.sqrt(2) * 4096
+
+        coord_str = '{} {}'.format(self.lc.meta['ra'], self.lc.meta['dec'])
+
+        # Retrieve SAP light curves in a neighborhood around the target
+        # Only do this once, check if lc set is already cached
+        if (self.lc_neighborhood is None or clear_cache):
+            continue_searching = True
+            while continue_searching:
+                if (self.lc.mission == 'TESS'):
+                    search_result = search_lightcurve(coord_str,
+                        mission=self.lc.mission, sector=self.lc.sector,
+                        radius=dynamic_search_radius, limit=max_targets)
+                elif (self.lc.mission == 'Kepler'):
+                    search_result = search_lightcurve(coord_str,
+                        mission=self.lc.mission, quarter=self.lc.quarter,
+                        radius=dynamic_search_radius, limit=max_targets)
+                elif (self.lc.mission == 'K2'):
+                    search_result = search_lightcurve(coord_str,
+                        mission=self.lc.mission, campaign=self.lc.campaign,
+                        radius=dynamic_search_radius, limit=max_targets)
+                # Check if too few found
+                if (len(search_result) < min_targets):
+                    if (dynamic_search_radius > max_search_radius):
+                        # hit the edge fo the CCD, we have to give up
+                        raise Exception('Not enough neighboring targets were '
+                            'found. under_fitting_metric failed')
+                    # Too few found, increase search radius
+                    dynamic_search_radius *= 1.5
+                else:
+                    continue_searching = False
+                
+            print('Found {} neighboring targets for under-fitting '
+                    'metric'.format(len(search_result)))
+            print('Downloading... this might take a while')
+            lcfCol = search_result.download_all(flux_column='sap_flux')
+
+            lc_neighborhood = []
+            lc_neighborhood_flux = []
+            # Extract SAP light curves
+            # We want zero-centered median normalized light curves
+            for lc in lcfCol:
+                lcSAP = lc.remove_nans().normalize()
+                lcSAP.flux -= 1.0
+                lc_neighborhood.append(lcSAP)
+                # Align or interpolate the neighboring target with the target under study
+                if self.interpolated_cbvs:
+                    # Interpolate to corrected_lc cadence times
+                    fInterp = PchipInterpolator(lc_neighborhood[-1].time.value,
+                            lc_neighborhood[-1].flux.value, extrapolate=False)
+                   #lc_neighborhood[-1].flux.value = fInterp(self.corrected_lc.time.value)
+                    lc_neighborhood_flux.append(fInterp(self.corrected_lc.time.value))
+                else:
+                    # The CBVs were aligned so also align the neighboring
+                    # lightcurves
+                    lc_trim_mask = np.in1d(lc_neighborhood[-1].cadenceno, 
+                            self.corrected_lc.cadenceno)
+                   #lc_neighborhood[-1] = lc_neighborhood[-1][lc_trim_mask]
+                    lc_neighborhood_flux.append(lc_neighborhood[-1][lc_trim_mask].flux.value)
+
+            # store the unmolested lightcurve neighborhood but also save the
+            # aligned or interpolated neighborhood flux
+            self.lc_neighborhood = LightCurveCollection(lc_neighborhood)
+            self.lc_neighborhood_flux = lc_neighborhood_flux 
+
+            
+            print('Neighboring targets ready for use')
+
+        
+        # If there happens to be any cadences in the corrected_lc
+        # that are not in the neighboring targets then those need to
+        # be NaNed.
+        # If we interpolated the CBVs then this should not occur
+        corrected_lc = self.corrected_lc.copy()
+        if not self.interpolated_cbvs:
+            corrected_lc_trim_mask = np.logical_not(np.in1d(self.corrected_lc.cadenceno,
+                    self.lc_neighborhood[0].cadenceno))
+            corrected_lc.flux.value[corrected_lc_trim_mask] = np.nan
+
+
+        # Create fluxMatrix. The last entry is the target under study
+        fluxMatrix = np.zeros((len(self.lc_neighborhood_flux[0]),
+            len(self.lc_neighborhood_flux)+1))
+        for idx in np.arange(len(fluxMatrix[0,:])-1):
+            fluxMatrix[:,idx] = self.lc_neighborhood_flux[idx]
+        # Add in target under study
+        fluxMatrix[:,-1] = corrected_lc.flux
+
+        # Ignore masked cadences and NaNs
+        mask = np.logical_and(self.cadence_mask,
+                ~np.isnan(corrected_lc.flux))
+        fluxMatrix = fluxMatrix[mask,:]
+
+        # Determine the target-target correlation between target and
+        # neighborhood
+        correlationMatrix = compute_correlation(fluxMatrix)
+
+        # The selection basis for targets used for the PDC-MAP SVD  uses median
+        # absolute correlation per star.  However, here we wish to overemphasize
+        # any residual correlation between a handfull of targets and not the
+        # overall correlation (which should almost always be low).
+
+        # We want a residual correlation larger than random correlations of WGN
+        # to mean a meaningful correlation. The median Pearson correlation of
+        # WGN of nCadences is approximated by the equation: 
+        # 0.0010288 + 0.80304 nCadences^ -0.50128
+        nCadences = len(fluxMatrix[:,0])
+        beta = [0.0007, 0.8083, -0.5023]
+        WGNCorrelation = (beta[0]+beta[1]*(nCadences**(beta[2])))
+
+        # badLimit is the goodness value for WGN correlations
+        # I.e. anything above this goodness value is equivalent to random correlations
+        # I.e. 0.95 = sigmoidInv(WGNCorr * correlationScale)
+        badLimit = 0.95
+        correlationScale = 1 / (WGNCorrelation) * np.log((2.0 / badLimit) - 1.0)
+
+        # Over-emphasize any individual correlation groups. Note the power of 
+        # three after taking the absolute value
+        # of the correlation. Also, the mean is used so that outliers are *not* ignored. 
+        # Zero diagonal elements
+        correlationMatrix = (np.tril(correlationMatrix, k=-1) + 
+                                np.triu(correlationMatrix, k=+1))
+
+
+        # Add up the correlation over all targets ignoring NaNs (no corrected fit)
+        correlation = correlationScale*np.nanmean(np.abs(correlationMatrix)**3, axis=0)
+
+        # We only want the last entry, which is for the target under study
+        correlation = correlation[-1]
+
+        def sigmoidInv(x): return 2.0 / (1 + np.exp(x))
+        metric = sigmoidInv(correlation)
+
+        return metric
+
+
+    def _correct_initialization(self, cbv_type='SingleScale', cbv_indices='ALL',
+            ext_dm=None):
+        """ Performs all the preparatory work needed before applying a 'correct' method.
+
+        This helper function is used so that multiple correct methods can be used
+        without the need to repeat preparatory code.
+
+        The main thing this method does is set up the design matrix, given the
+        requested CBVs and external design matrix.
+
+        Parameters
+        ----------
+        cbv_type : str list
+            List of CBV types to use
+            Can be None if only ext_dm is used
+        cbv_indices : list of lists
+            List of CBV vectors to use in each passed cbv_type. {'ALL' => Use all}
+            Can be None if only ext_dm is used
+        ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
+            Optionally pass an extra design matrix to additionally be used in the fit
+
+        """
+
+        assert not ((cbv_type is None) ^ (cbv_indices is None)), \
+                'Both cbv_type and cbv_indices must be None, or neither'
+
+        if (cbv_type is None and cbv_indices is None):
+            use_cbvs = False
+        else:
+            use_cbvs = True
+
+        # If any DesignMatrix was passed then store it
+        self.extra_design_matrix = ext_dm
+        # Check that extra design matrix is aligned with lc flux
+        if ext_dm is not None:
+            assert isinstance(ext_dm, DesignMatrix), \
+                'ext_dm must be a DesignMatrix'
+            if (ext_dm.df.shape[0] != len(self.lc.flux)):
+                    raise ValueError(
+                        'ext_dm must contain the same number of cadences as lc.flux')
+            
+
+        # Create a CBV design matrix for each CBV set requested
+        self.cbv_design_matrix = []
+
+        if use_cbvs:
+            assert (not isinstance(cbv_type, str) and 
+                    not isinstance(cbv_indices[0], int)), \
+                    'cbv_type and cbv_indices must be lists of strings'
+            
+            if (self.lc.mission in ['Kepler', 'K2']):
+                assert len(cbv_type) == 1 , \
+                    'cbv_type must be only Single-Scale for Kepler and K2 missions'
+                assert cbv_type == ['SingleScale'], \
+                    'cbv_type must be Single-Scale for Kepler and K2 missions'
+            
+            if (isinstance(cbv_type, list) and len(cbv_type) != 1):
+                assert (self.lc.mission == 'TESS'), \
+                    'Multiple CBV types are only allowed for TESS'
+            
+            assert (len(cbv_type) == len(cbv_indices)), \
+                'cbv_type and cbv_indices must be the same list length'
+
+
+            # Loop through all the stored CBVs and find the ones matching the
+            # requested cbv_type list
+            for idx in np.arange(len(cbv_type)): 
+                for cbvs in self.cbvs:
+            
+                    # Temporarily copy the cbv_indices requested
+                    cbv_idx_loop = cbv_indices[idx]
+            
+                    # If requesting 'ALL' CBVs then set to max default number
+                    # Remember, cbv indices is 1-based!
+                    if (isinstance(cbv_idx_loop, str) and (cbv_idx_loop == 'ALL')):
+                        cbv_idx_loop = cbvs.cbv_indices
+                    # Trim to nCBVs in cbvs
+                    cbv_idx_loop = np.array([idx for idx in cbv_idx_loop if
+                        bool(np.in1d(idx, cbvs.cbv_indices))])
+            
+                    if cbv_type[idx].find('MultiScale') >= 0:
+                        # Find the correct band if this is a multi-scale CBV set
+                        band = int(cbv_type[idx][-1])
+                        if (cbvs.cbv_type in cbv_type[idx] and cbvs.band == band):
+                            self.cbv_design_matrix.append(cbvs.to_designmatrix(
+                                cbv_indices=cbv_idx_loop, name=cbv_type[idx]))
+
+                    else:
+                        if (cbvs.cbv_type in cbv_type[idx]):
+                            self.cbv_design_matrix.append(cbvs.to_designmatrix(
+                                cbv_indices=cbv_idx_loop, name=cbv_type[idx]))
+
+        #***
+        # Create the design matrix collection with CBVs, plus extra passed basis vectors
+
+        # Create the full design matrix collection from all the sub-design
+        # matrices (I.e 'flatten' the design matrix collection)
+        if self.extra_design_matrix is not None and \
+            self.cbv_design_matrix != []:
+            # Combine cbv_design_matrix and extra_design_matrix 
+            dm_to_flatten = [[cbv_dm for cbv_dm in self.cbv_design_matrix], 
+                                [self.extra_design_matrix]]
+            flattened_dm_list = [item for sublist in dm_to_flatten for item in sublist]
+        elif self.cbv_design_matrix != []:
+            # Just use cbv_design_matrix 
+            dm_to_flatten = [[cbv_dm for cbv_dm in self.cbv_design_matrix]]
+            flattened_dm_list = [item for sublist in dm_to_flatten for item in sublist]
+        else:
+            # Just use extra_design_matrix
+            flattened_dm_list = [self.extra_design_matrix]
+
+        self.design_matrix_collection = DesignMatrixCollection(flattened_dm_list)
+        self.design_matrix_collection.validate()
+
+
+    def _set_prior_width(self, sigma):
+        """ Sets the Gaussian prior in the design_matrix_collection widths to sigma
+
+        Parameters
+        ----------
+        sigma : scalar float 
+            all widths are set to the same value
+            If sigma = None then uniform sigma is set
+        """
+
+        if (isinstance(sigma, list)):
+            raise Exception("Seperate widths is not yet implemented")
+
+        for dm in self.design_matrix_collection:
+            nCBVs = len(dm.prior_sigma)
+
+            if sigma is None:
+                dm.prior_sigma = np.ones(nCBVs) * np.inf
+            else:
+                dm.prior_sigma = np.ones(nCBVs) * sigma
+
+
+    def _goodness_metric_obj_fun(self, alpha):
+        """ The objective function to minimize with
+        scipy.optimize.minimize_scalar
+
+        First sets the alpha regularization penalty then runs
+        RegressionCorrector.correct and then computes the over- and
+        under-fitting goodness metrics to return a scalar penalty term to
+        minimize.
+
+        Uses the paramaters in self.optimization_params.
+
+        Parameters
+        ----------
+        alpha : float
+            regualrization penalty term value to set
+        cadence_mask : np.ndarray of bools (optional)
+            Mask, where True indicates a cadence that should be used.
+        target_over_score : float
+            Target Over-fitting metric score
+            If <=0 then ignore over-fitting metric
+        target_under_score : float
+            Target under-fitting metric score
+            If <=0 then ignore under-fitting metric
+
+        Returns
+        -------
+        penalty : float
+            Penalty term for minimizer, based on goodness metrics
+
+        """
+
+        # Add in a width to the Gaussian priors
+        # alpha = flux_sigma^2 / sigma^2
+        sigma = np.median(self.lc.flux_err.value) / np.sqrt(np.abs(alpha))
+        self._set_prior_width(sigma)                
+        # Use RegressionCorrector.correct for the actual fitting
+        super(CBVCorrector, self).correct(self.design_matrix_collection, 
+            cadence_mask=self.optimization_params['cadence_mask'])
+
+        # Do not compute and ignore if target score < 0
+        if (self.optimization_params['target_over_score'] > 0):
+            overMetric = self.over_fitting_metric(
+                nSamples=self.optimization_params['over_metric_nSamples'])
+        else: 
+            overMetric = 1.0
+
+        # Do not compute and ignore if target score < 0
+        if (self.optimization_params['target_under_score'] > 0):
+            underMetric = self.under_fitting_metric()
+        else: 
+            underMetric = 1.0
+
+        # Once we hit the target we want to ease-back on increasing the metric
+        # However, we don't want to ease-back to zero pressure, that will
+        # unconstrain the penalty term and cause the optmizer to run wild.
+        # So, use a "Leaky ReLU"
+        # metric' = threshold + (metric - threshold) * leakFactor
+        leakFactor = 0.01
+        if (self.optimization_params['target_over_score'] > 0 and
+                overMetric >= self.optimization_params['target_over_score']):
+            overMetric = (self.optimization_params['target_over_score'] +
+                leakFactor * 
+                    (overMetric -
+                        self.optimization_params['target_over_score']))
+
+        if (self.optimization_params['target_under_score'] > 0 and
+                underMetric >= self.optimization_params['target_under_score']):
+            underMetric = (self.optimization_params['target_under_score'] +
+                leakFactor * 
+                    (underMetric -
+                        self.optimization_params['target_under_score']))
+
+        penalty = -(overMetric + underMetric)
+
+        return penalty
+
+    def diagnose(self):
+        """ Returns diagnostic plots to assess the most recent correction.
+
+        If a correction has not yet been fitted, a ``ValueError`` will be raised.
+
+        Returns
+        -------
+        `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+
+        axs = self._diagnostic_plot()
+
+        plt.title('Alpha = {0:2.3e}'.format(self.alpha))
+        
+        return axs
+
+    def goodness_metric_scan_plot(self, cbv_type=['SingleScale'],
+            cbv_indices=[np.arange(1,9)], alpha_range_log10=[-4, 4],
+            ext_dm=None, cadence_mask=None):
+        """ Returns a diagnostic plot of the over and under goodness metrics as a
+        function of the L2-Norm regularization term, alpha.
+
+        alpha is scanned by default to the range 10^-4 : 10^4 in logspace
+
+        cbvCorrector.correct_gaussian_prior is used to make the correction for
+        each alpha. Then the over and under goodness metric are computed.
+
+        If a correction has already been performed (via one of the correct_*
+        methods) then the used alpha value is also plotted for reference.
+
+        Parameters
+        ----------
+        cbv_type : str list
+            List of CBV types to use in correction {'ALL' => Use all}
+        cbv_indices : list of lists
+            List of CBV vectors to use in each of cbv_type passed. {'ALL' => Use all}
+            NOTE: 1-Based indexing!
+        alpha_range_log10 : [list of two] The start and end exponent for the logspace scan.
+            Default = [-4, 4]
+        ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
+            Optionally pass an extra design matrix to also be used in the fit
+        cadence_mask : np.ndarray of bools (optional)
+            Mask, where True indicates a cadence that should be used.
+
+        Returns
+        -------
+        `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+
+        alphaArray = np.logspace(alpha_range_log10[0], alpha_range_log10[1], num=100)
+
+        # We need to make a copy of self so that the scan's final fit parameters
+        # do not over-write any stored fit parameters
+        cbvCorrectorCopy = self.copy()
+
+        # Compute both metrics vs. alpha
+        overMetric = []
+        underMetric = []
+        for thisAlpha in alphaArray:
+            cbvCorrectorCopy.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices, 
+                                        alpha=thisAlpha, ext_dm=ext_dm,
+                                        cadence_mask=cadence_mask)
+            overMetric.append(cbvCorrectorCopy.over_fitting_metric(nSamples=1))
+            underMetric.append(cbvCorrectorCopy.under_fitting_metric())
+
+        # plot both
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        ax.semilogx(alphaArray, underMetric, 'b.', label='UnderFit')
+        ax.semilogx(alphaArray, overMetric, 'r.', label='OverFit')
+
+        if (isinstance(self.alpha, float)):
+            ax.semilogx([self.alpha, self.alpha], [0, 1.0], 'k-', 
+                label='corrected_lc Alpha = {0:2.3e}'.format(self.alpha))
+
+
+        plt.title('Goodness Metrics vs. L2-Norm Penalty (alpha)')
+        plt.xlabel('Regularization Factor Alpha')
+        plt.ylabel('Goodness Metric')
+        ax.grid(':', alpha=0.3)
+        ax.legend()
+
+        return ax
+
+    def copy(self):
+        """Returns a copy of this `cbvCorrector` object.
+
+        This method uses Python's `copy.deepcopy` function to ensure that all
+        objects stored within the cbvCorrector instance are fully copied.
+
+        Returns
+        -------
+        cbvCorrector_copy : `cbvCorrector`
+            A new object which is a copy of the original.
+        """
+        return copy.deepcopy(self)
+
+    def __repr__(self):
+        """ This will print all attributes of the class kinda like in
+        self.__dict__
+        """
+        dictionary = self.__dict__.copy()
+
+        dictionary['lc'] = '<{} targetid={} length={}>'.format(type(self.lc),
+                self.lc.targetid, len(self.lc))
+        if self.corrected_lc is not None:
+            dictionary['corrected_lc'] = '<{} targetid={} length={}>'.format(
+                    type(self.corrected_lc), self.corrected_lc.targetid, 
+                    len(self.corrected_lc))
+        
+        dict_string = '\n'
+        for key in dictionary.keys():
+            dict_string += '\t{} = {}\n'.format(key, dictionary[key])
+        
+        return dict_string
+
+def compute_correlation(fluxMatrix):
+    """  Finds the empirical target to target flux time series Pearson correlation.
+
+    Parameters
+    ----------
+    fluxMatrix : float 2-d array[ntargets,ncadences]
+        The matrix of target flux. There should be no gaps or Nans
+
+    Returns
+    -------
+    correlation_matrix : [float 2-d array] (nTargets x nTargets)
+        The target-target correlation
+    """
+
+    nCadences = len(fluxMatrix[:,0])
+
+    # Scale each flux value by the RMS flux for the given target.
+    rmsFlux = np.sqrt(np.sum(fluxMatrix**2.0, axis=0) / nCadences)
+    unitNormFlux = fluxMatrix / np.tile(rmsFlux, (nCadences, 1))
+
+    correlation_matrix = unitNormFlux.T.dot(unitNormFlux) / nCadences
+
+    return correlation_matrix
+
+
+#*******************************************************************************
+#*******************************************************************************
+#*******************************************************************************
 # Cotrending Basis Vectors Classes and Functions 
+#*******************************************************************************
+#*******************************************************************************
+#*******************************************************************************
 
 class CotrendingBasisVectors(TimeSeries):
     """
@@ -286,10 +1430,6 @@ class CotrendingBasisVectors(TimeSeries):
             # Make a deepcopy so we do not just return a modified original
             cbvs = copy.deepcopy(self)
 
-            trim_indices = np.nonzero(np.logical_not(
-                np.in1d(cbvs.cadenceno, lc.cadenceno)))[0]
-            cbvs.remove_rows(trim_indices)
-
             # NaN any cadences in light curve and not in CBVs
             # This requires us to add rows to the CBV table
             lc_nan_mask = np.logical_not(np.in1d(lc.cadenceno, cbvs.cadenceno))
@@ -306,6 +1446,22 @@ class CotrendingBasisVectors(TimeSeries):
                         dict_to_add['VECTOR_{}'.format(cbvIdx)] = np.nan
                 
                     cbvs.add_row(dict_to_add)
+
+            # There appears to be a bug in astropy.timeseries when using ts[x:y]
+            # in combination with ts.remove_row() or ts.remove_rows.
+            # See LightKurve Issue #836.
+            # To get around the error for now, we will attempt to use
+            # ts[x:y]. If it errors out then revert to remove_rows, which is
+            # REALLY slow.
+            try:
+                # This method is fast but might cause errors
+                keep_indices = np.nonzero(np.in1d(cbvs.cadenceno, lc.cadenceno))[0]
+                cbvs = cbvs[keep_indices]
+            except:
+                # This method is slow but appears to be more robust
+                trim_indices = np.nonzero(np.logical_not(
+                    np.in1d(cbvs.cadenceno, lc.cadenceno)))[0]
+                cbvs.remove_rows(trim_indices)
 
             # Now sort the CBVs by cadenceno
             cbvs.sort('CADENCENO')
