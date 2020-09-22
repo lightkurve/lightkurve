@@ -53,6 +53,10 @@ def _update_source(source, data):
     source.data = _to_unitless(data)
     return source
 
+def _isfinite(val):
+    val_actual = getattr(val, 'value', val)
+    return np.isfinite(val_actual)
+
 def prepare_bls_datasource(result, loc):
     """Prepare a bls result for bokeh plotting
 
@@ -561,16 +565,16 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                     return
                 period_values = period_values[ok]
                 result = model.power(period_values, duration_slider.value)
-                ok = np.isfinite(result['power']) & np.isfinite(result['duration']) &\
-                         np.isfinite(result['transit_time']) & np.isfinite(result['period'])
-                _update_source(bls_source, dict(
-                                                period=result['period'][ok],
-                                                power=result['power'][ok],
-                                                duration=result['duration'][ok],
-                                                transit_time=result['transit_time'][ok]))
-                loc = np.nanargmax(bls_source.data['power'])
-                best_period = bls_source.data['period'][loc]
-                best_t0 = bls_source.data['transit_time'][loc]
+                ok = _isfinite(result['power']) & _isfinite(result['duration']) &\
+                         _isfinite(result['transit_time']) & _isfinite(result['period'])
+                ok_result = dict(period=result['period'][ok],             # useful for accessing values with units needed later
+                                 power=result['power'][ok],
+                                 duration=result['duration'][ok],
+                                 transit_time=result['transit_time'][ok])
+                _update_source(bls_source, ok_result)
+                loc = np.nanargmax(ok_result['power'])
+                best_period = ok_result['period'][loc]
+                best_t0 = ok_result['transit_time'][loc]
 
                 minpow, maxpow = bls_source.data['power'].min()*0.95,  bls_source.data['power'].max()*1.05
                 fig_bls.y_range.start = minpow
@@ -593,8 +597,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                                              'flux': model_lc.flux[np.argsort(model_lc.time)]})
 
             f_model_lc = model_lc.fold(best_period, best_t0)
-            f_model_lc = LightCurve([-0.5], [1]).append(f_model_lc)
-            f_model_lc = f_model_lc.append(LightCurve([0.5], [1]))
+            f_model_lc = LightCurve(_to_timeDelta([-0.5], f_model_lc.time), [1]).append(f_model_lc)
+            f_model_lc = f_model_lc.append(LightCurve(_to_timeDelta([0.5], f_model_lc.time), [1]))
 
             _update_source(f_model_lc_source, {'phase': f_model_lc.time,
                                                'flux': f_model_lc.flux})
