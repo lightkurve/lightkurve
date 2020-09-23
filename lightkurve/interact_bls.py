@@ -449,6 +449,10 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
     def _round_strip_unit(val, decimals):
         return np.round(getattr(val, 'value', val), decimals)
 
+    def _to_lc(time, flux):
+        """Shorthand to create a LightCurve with time and flux used in creating a Model LightCurve"""
+        return LightCurve(time=time, flux=flux)
+
     def _create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
         """Create BLS interact user interface."""
         if minp is None:
@@ -507,10 +511,10 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         mf = model.model(lc.time, best_period, duration_slider.value, best_t0)
         mf /= np.median(mf)
         mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
-        model_lc = LightCurve(lc.time[mask], mf[mask])
+        model_lc = _to_lc(lc.time[mask], mf[mask])
         # Need to use raw value for best_t0 and best_period so that the result is of type Time, rather than TimeDelta
-        model_lc = model_lc.append(LightCurve(((lc.time[0] - best_t0.value) + best_period.value/2).reshape((1,)), [1]))
-        model_lc = model_lc.append(LightCurve(((lc.time[0] - best_t0.value) + 3*best_period.value/2).reshape((1,)), [1]))
+        model_lc = model_lc.append(_to_lc(((lc.time[0] - best_t0.value) + best_period.value/2).reshape((1,)), [1]))
+        model_lc = model_lc.append(_to_lc(((lc.time[0] - best_t0.value) + 3*best_period.value/2).reshape((1,)), [1]))
 
         model_lc_source = _to_ColumnDataSource(data=dict(
                                      time=model_lc.time.sort(),
@@ -528,8 +532,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         f_help_source = prepare_f_help_source(f)
 
         f_model_lc = model_lc.fold(best_period, best_t0)
-        f_model_lc = LightCurve(_to_timeDelta([-0.5], f_model_lc.time), [1]).append(f_model_lc)
-        f_model_lc = f_model_lc.append(LightCurve(_to_timeDelta([0.5], f_model_lc.time), [1]))
+        f_model_lc = _to_lc(_to_timeDelta([-0.5], f_model_lc.time), [1]).append(f_model_lc)
+        f_model_lc = f_model_lc.append(_to_lc(_to_timeDelta([0.5], f_model_lc.time), [1]))
 
         f_model_lc_source = _to_ColumnDataSource(data=dict(
                                  phase=f_model_lc.time,
@@ -593,14 +597,14 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             mf = model.model(lc.time, best_period, duration_slider.value, best_t0)
             mf /= np.median(mf)
             mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
-            model_lc = LightCurve(lc.time[mask], mf[mask])
+            model_lc = _to_lc(lc.time[mask], mf[mask])
 
             _update_source(model_lc_source, {'time': model_lc.time.sort(),
                                              'flux': model_lc.flux[np.argsort(model_lc.time)]})
 
             f_model_lc = model_lc.fold(best_period, best_t0)
-            f_model_lc = LightCurve(_to_timeDelta([-0.5], f_model_lc.time), [1]).append(f_model_lc)
-            f_model_lc = f_model_lc.append(LightCurve(_to_timeDelta([0.5], f_model_lc.time), [1]))
+            f_model_lc = _to_lc(_to_timeDelta([-0.5], f_model_lc.time), [1]).append(f_model_lc)
+            f_model_lc = f_model_lc.append(_to_lc(_to_timeDelta([0.5], f_model_lc.time), [1]))
 
             _update_source(f_model_lc_source, {'phase': f_model_lc.time,
                                                'flux': f_model_lc.flux})
