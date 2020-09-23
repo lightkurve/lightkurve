@@ -4,7 +4,7 @@ import warnings
 import numpy as np
 
 from astropy.convolution import convolve, Box1DKernel
-from astropy.time import TimeDelta
+from astropy.time import Time, TimeDelta
 from astropy.timeseries import BoxLeastSquares
 
 from .utils import LightkurveWarning
@@ -498,6 +498,9 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         # Set up BLS source
         bls_source = prepare_bls_datasource(result, loc)
+        bls_source_units = dict(transit_time_format=result['transit_time'].format,
+                                transit_time_scale=result['transit_time'].scale,
+                                period=result['period'].unit)
         bls_help_source = prepare_bls_help_source(bls_source, npoints_slider.value)
 
         # Set up the model LC
@@ -617,8 +620,9 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             """
             if len(new) > 0:
                 new = new[0]
-                best_period = bls_source.data['period'][new]
-                best_t0 = bls_source.data['transit_time'][new]
+                best_period = bls_source.data['period'][new] * bls_source_units['period']
+                best_t0 = Time(bls_source.data['transit_time'][new],
+                               format=bls_source_units['transit_time_format'], scale=bls_source_units['transit_time_scale'])
                 _update_params(best_period=best_period, best_t0=best_t0)
 
         def _update_model_slider(attr, old, new):
