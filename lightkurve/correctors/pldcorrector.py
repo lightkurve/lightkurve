@@ -185,68 +185,75 @@ class PLDCorrector(RegressionCorrector):
         # deviation to prevent the fit from going crazy.
         prior_sigma = np.nanstd(self.lc.flux.value) * 10
 
-        # Flux normalize the PLD components
-        pld_pixels = self.tpf.flux[:, pld_aperture_mask].reshape(len(self.tpf.flux), -1)
-        pld_pixels = np.array([r / f for r, f in zip(pld_pixels, self.lc.flux.value)])
-
         # Flux normalize background components for K2 and not for TESS by default
         bkg_pixels = self.tpf.flux[:, background_aperture_mask].reshape(len(self.tpf.flux), -1)
         if normalize_background_pixels:
-            bkg_flux = np.sum(self.tpf.flux[:, background_aperture_mask], -1)
+            bkg_flux = np.nansum(self.tpf.flux[:, background_aperture_mask], -1)
             bkg_pixels = np.array([r / f for r, f in zip(bkg_pixels, bkg_flux)])
         else:
             bkg_pixels = bkg_pixels.value
 
-        # Combine and remove NaNs
-        regressors = np.hstack((pld_pixels, bkg_pixels))
-        regressors = np.array([r[np.isfinite(r)] for r in regressors])
+        # Remove NaNs
+        bkg_pixels = np.array([r[np.isfinite(r)] for r in bkg_pixels])
 
-        # Use the DesignMatrix infrastructure to apply PCA to the regressors.
+        # Create background design matrix
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', message='.*low rank.*')
-            regressors_dm = DesignMatrix(regressors)
-        if isinstance(pca_components, (tuple, list)):
-            ncomp = pca_components[0]
-        else:
-            ncomp = pca_components
-        if ncomp > 0:
-            regressors_dm = regressors_dm.pca(ncomp)
-        regressors_pld = regressors_dm.values
+            dm_bkg = DesignMatrix(bkg_pixels, name='background')
+        # Apply PCA
+        dm_bkg = dm_bkg.pca(pca_components)
+        # Set prior sigma to 10 * standard deviation
+        dm_bkg.prior_sigma = np.ones(dm_bkg.shape[1]) * prior_sigma
 
-        # Create a DesignMatrix for each PLD order
-        all_pld = []
-        for order in range(1, pld_order+1):
-            reg_n = np.product(list(multichoose(regressors_pld.T, order)), axis=1).T
-            with warnings.catch_warnings():
-                warnings.filterwarnings('ignore', message='.*low rank.*')
-                pld_n = DesignMatrix(reg_n,
-                                     prior_sigma=np.ones(reg_n.shape[1]) * prior_sigma / reg_n.shape[1],
-                                     name=f"pld_order_{order}")
-            # Apply PCA. Check if pca_components has an entry for each order,
-            # otherwise use pca_components for PCA of higher order matrices.
-            if isinstance(pca_components, (tuple, list)):
-                ncomp = pca_components[order-1]
-            else:
-                ncomp = pca_components
-            if ncomp > 0:
-                pld_n = pld_n.pca(ncomp)
-                # Calling pca() resets the priors, so we set them again.
-                pld_n.prior_sigma = np.ones(pld_n.shape[1]) * prior_sigma / ncomp
-            all_pld.append(pld_n)
-
-        # Create the collection of DesignMatrix objects.
-        # DesignMatrix 1 contains the PLD pixel series
-        dm_pixels = DesignMatrixCollection(all_pld).to_designmatrix(name='pixel_series')
-        # DesignMatrix 2 contains splines plus a constant
+        # Create a design matric containing splines plus a constant
         dm_spline = spline(self.lc.time.value,
                            n_knots=spline_n_knots,
                            degree=spline_degree).append_constant()
-        # Set prior sigma to median flux / 3 to prevent crazy coefficients
+        # Set prior sigma to 10 * standard deviation
         dm_spline.prior_sigma = np.ones(dm_spline.shape[1]) * prior_sigma
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', message='.*Not all matrices are `SparseDesignMatrix` objects..*')
-            dm_collection = DMC([dm_pixels, dm_spline])
+        # Create a PLD matrix if there are pixels in the pld_aperture_mask
+        if np.sum(pld_aperture_mask) != 0:
+            # Flux normalize the PLD components
+            pld_pixels = self.tpf.flux[:, pld_aperture_mask].reshape(len(self.tpf.flux), -1)
+            pld_pixels = np.array([r / f for r, f in zip(pld_pixels, self.lc.flux.value)])
+            pld_pixels = np.array([r[np.isfinite(r)] for r in pld_pixels])
+
+            # Use the DesignMatrix infrastructure to apply PCA to the regressors.
+            with warnings.catch_warnings():
+                warnings.filterwarnings('ignore', message='.*low rank.*')
+                regressors_dm = DesignMatrix(pld_pixels)
+            if pca_components > 0:
+                regressors_dm = regressors_dm.pca(pca_components)
+            regressors_pld = regressors_dm.values
+
+            # Create a DesignMatrix for each PLD order
+            all_pld = []
+            for order in range(1, pld_order+1):
+                reg_n = np.product(list(multichoose(regressors_pld.T, order)), axis=1).T
+                with warnings.catch_warnings():
+                    warnings.filterwarnings('ignore', message='.*low rank.*')
+                    pld_n = DesignMatrix(reg_n,
+                                         prior_sigma=np.ones(reg_n.shape[1]) * prior_sigma / reg_n.shape[1],
+                                         name=f"pld_order_{order}")
+                # Apply PCA.
+                if pca_components > 0:
+                    pld_n = pld_n.pca(pca_components)
+                    # Calling pca() resets the priors, so we set them again.
+                    pld_n.prior_sigma = np.ones(pld_n.shape[1]) * prior_sigma / pca_components
+                all_pld.append(pld_n)
+
+            # Create the collection of DesignMatrix objects.
+            # DesignMatrix 1 contains the PLD pixel series
+            dm_pixels = DesignMatrixCollection(all_pld).to_designmatrix(name='pixel_series')
+
+            with warnings.catch_warnings():
+                warnings.filterwarnings('ignore', message='.*Not all matrices are `SparseDesignMatrix` objects..*')
+                dm_collection = DMC([dm_pixels, dm_bkg, dm_spline])
+        else:
+            with warnings.catch_warnings():
+                warnings.filterwarnings('ignore', message='.*Not all matrices are `SparseDesignMatrix` objects..*')
+                dm_collection = DMC([dm_bkg, dm_spline])
         return dm_collection
 
     @deprecated_renamed_argument('n_pca_terms', 'pca_components', '2.0', warning_type=LightkurveDeprecationWarning)
@@ -273,14 +280,10 @@ class PLDCorrector(RegressionCorrector):
             (`n=1`) uses only the pixel fluxes to construct the design matrix.
             Higher order populates the design matrix with columns constructed
             from the products of pixel fluxes. Default 3 for K2 and 1 for TESS.
-        pca_components : int or tuple of int
+        pca_components : int
             Number of terms added to the design matrix for each order of PLD
             pixel fluxes. Increasing this value may provide higher precision
             at the expense of slower speed and/or overfitting.
-            If performing PLD with `pld_order > 1`, `pca_components` can be
-            a tuple containing the number of terms for each order of PLD.
-            If a single int is passed, the same number of terms will be used
-            for each order.  If zero is passed, PCA will not be performed.
         pld_aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
             A boolean array describing the aperture such that `True` means
             that the pixel will be used when selecting the PLD basis vectors.
@@ -403,8 +406,8 @@ class PLDCorrector(RegressionCorrector):
             ax = axs[1]
             clc.plot(ax=ax, normalize=False, alpha=0.4,
                      label=f'corrected ({corr_cdpp:.0f})')
-            for key, color in zip(names, ['dodgerblue', 'r']):
-                if key in ['pixel_series', 'spline']:
+            for key, color in zip(names, ['dodgerblue', 'r', 'C1']):
+                if key in ['background', 'spline', 'pixel_series']:
                     tmplc = self.diagnostic_lightcurves[key] \
                             - np.median(self.diagnostic_lightcurves[key].flux) \
                             + np.median(self.lc.flux)
