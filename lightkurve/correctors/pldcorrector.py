@@ -217,6 +217,7 @@ class PLDCorrector(RegressionCorrector):
             # Flux normalize the PLD components
             pld_pixels = self.tpf.flux[:, pld_aperture_mask].reshape(len(self.tpf.flux), -1)
             pld_pixels = np.array([r / f for r, f in zip(pld_pixels, self.lc.flux.value)])
+            # Remove NaNs
             pld_pixels = np.array([r[np.isfinite(r)] for r in pld_pixels])
 
             # Use the DesignMatrix infrastructure to apply PCA to the regressors.
