@@ -509,9 +509,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
         model_lc = LightCurve(lc.time[mask], mf[mask])
         # Need to use raw value for best_t0 and best_period so that the result is of type Time, rather than TimeDelta
-        # TODO: the time is not quite right, which messes up the lightcurve display (the time-axis is zoomed way out)
-        # model_lc = model_lc.append(LightCurve([(lc.time[0].value - best_t0.value) + best_period.value/2], [1]))
-        # model_lc = model_lc.append(LightCurve([(lc.time[0].value - best_t0.value) + 3*best_period.value/2], [1]))
+        model_lc = model_lc.append(LightCurve(((lc.time[0] - best_t0.value) + best_period.value/2).reshape((1,)), [1]))
+        model_lc = model_lc.append(LightCurve(((lc.time[0] - best_t0.value) + 3*best_period.value/2).reshape((1,)), [1]))
 
         model_lc_source = _to_ColumnDataSource(data=dict(
                                      time=model_lc.time.sort(),
