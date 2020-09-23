@@ -521,6 +521,7 @@ class TargetPixelFile(object):
             with 'threshold' as the fallback.
             If 'background' is passed, all pixels fainter than the median flux
             will be used.
+            If 'empty' is passed, no pixels will be used.
 
         Returns
         -------
@@ -553,6 +554,8 @@ class TargetPixelFile(object):
             elif aperture_mask == 'background':
                 aperture_mask = ~self.create_threshold_mask(threshold=0,
                                                             reference_pixel=None)
+            elif aperture_mask == 'empty':
+                aperture_mask = np.zeros((self.shape[1], self.shape[2]), dtype=bool)
             elif np.issubdtype(aperture_mask.dtype, np.integer) and \
                 ((aperture_mask & 2) == 2).any():
                 # Kepler and TESS pipeline style integer flags

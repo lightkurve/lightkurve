@@ -115,7 +115,9 @@ class PLDCorrector(RegressionCorrector):
         return 'PLDCorrector (ID: {})'.format(self.lc.label)
 
     def create_design_matrix(self, pld_order=3, pca_components=16, pld_aperture_mask=None,
-                             spline_n_knots=None, spline_degree=3, sparse=False):
+                             background_aperture_mask='background', spline_n_knots=None,
+                             spline_degree=3, normalize_background_pixels=None,
+                             sparse=False):
         """Returns a `.DesignMatrixCollection` containing a `DesignMatrix` object
         for the background regressors, the PLD pixel component regressors, and
         the spline regressors.
@@ -165,6 +167,9 @@ class PLDCorrector(RegressionCorrector):
         # Validate the inputs
         pld_aperture_mask = self.tpf._parse_aperture_mask(pld_aperture_mask)
         self.pld_aperture_mask = pld_aperture_mask
+        background_aperture_mask = self.tpf._parse_aperture_mask(background_aperture_mask)
+        self.background_aperture_mask = background_aperture_mask
+        # background_aperture_mask = ~self.tpf.create_threshold_mask()
 
         if spline_n_knots is None:
             # Default to a spline per 50 data points
@@ -181,25 +186,20 @@ class PLDCorrector(RegressionCorrector):
         # by 3 to prevent the fit from going crazy.
         prior_sigma = np.nanstd(self.lc.flux.value) * 10
 
-        # Separate on-target and off-target pixels, which should be normalized
-        # separately to avoid introducing stellar signals to background pixels
-        on_target_mask = pld_aperture_mask & self.aperture_mask
-        off_target_mask = pld_aperture_mask & ~self.aperture_mask
+        # Flux normalize PLD components
+        pld_pixels = self.tpf.flux[:, pld_aperture_mask].reshape(len(self.tpf.flux), -1)
+        pld_pixels = np.array([r / f for r, f in zip(pld_pixels, self.lc.flux.value)])
 
-        # Flux normalize on-target regressors
-        on_target_pix = self.tpf.flux[:, on_target_mask].reshape(len(self.tpf.flux), -1)
-        on_target_pix = np.array([r / f for r, f in zip(on_target_pix, self.lc.flux.value)])
-
-        # Flux normalize off-target pixels for K2, and not for TESS
-        off_target_pix = self.tpf.flux[:, off_target_mask].reshape(len(self.tpf.flux), -1)
-        if self.tpf.meta.get('mission') == 'K2':
-            background_flux = np.sum(self.tpf.flux[:, off_target_mask], -1)
-            off_target_pix = np.array([r / f for r, f in zip(off_target_pix, background_flux)])
+        # Flux normalize background components for K2 and not for TESS by default
+        bkg_pixels = self.tpf.flux[:, background_aperture_mask].reshape(len(self.tpf.flux), -1)
+        if normalize_background_pixels:
+            bkg_flux = np.sum(self.tpf.flux[:, background_aperture_mask], -1)
+            bkg_pixels = np.array([r / f for r, f in zip(bkg_pixels, bkg_flux)])
         else:
-            off_target_pix = off_target_pix.value
+            bkg_pixels = bkg_pixels.value
 
         # Combine and remove NaNs
-        regressors = np.hstack((on_target_pix, off_target_pix))
+        regressors = np.hstack((pld_pixels, bkg_pixels))
         regressors = np.array([r[np.isfinite(r)] for r in regressors])
 
         # Use the DesignMatrix infrastructure to apply PCA to the regressors.
@@ -255,10 +255,10 @@ class PLDCorrector(RegressionCorrector):
     @deprecated_renamed_argument('gp_timescale', None, '2.0', warning_type=LightkurveDeprecationWarning)
     @deprecated_renamed_argument('aperture_mask', None, '2.0', warning_type=LightkurveDeprecationWarning)
     def correct(self, pld_order=None, pca_components=None, pld_aperture_mask=None,
-                spline_n_knots=None, spline_degree=5, restore_trend=True,
-                sparse=False, cadence_mask=None, sigma=5, niters=5,
-                propagate_errors=False, use_gp=None, gp_timescale=None,
-                aperture_mask=None):
+                background_aperture_mask='background', spline_n_knots=None,
+                spline_degree=5, normalize_background_pixels=None, restore_trend=True,
+                sparse=False, cadence_mask=None, sigma=5, niters=5, propagate_errors=False,
+                use_gp=None, gp_timescale=None, aperture_mask=None):
         """Returns a systematics-corrected light curve.
 
         If the parameters `pld_order` and `pca_components` are None, their
@@ -335,16 +335,23 @@ class PLDCorrector(RegressionCorrector):
         if pld_aperture_mask is None:
             if self.tpf.meta.get('mission') == 'K2':
                 # K2 noise is dominated by motion
-                pld_aperture_mask = 'all'
+                pld_aperture_mask = 'threshold'
             else:
                 # TESS noise is dominated by background
-                pld_aperture_mask = 'background'
+                pld_aperture_mask = 'empty'
+        if normalize_background_pixels is None:
+            if self.tpf.meta.get('mission') == 'K2':
+                normalize_background_pixels = True
+            else:
+                normalize_background_pixels = False
 
         dm = self.create_design_matrix(pld_aperture_mask=pld_aperture_mask,
+                                       background_aperture_mask=background_aperture_mask,
                                        pld_order=pld_order,
                                        pca_components=pca_components,
                                        spline_n_knots=spline_n_knots,
                                        spline_degree=spline_degree,
+                                       normalize_background_pixels=normalize_background_pixels,
                                        sparse=sparse)
 
         clc = super().correct(dm, cadence_mask=cadence_mask, sigma=sigma,
@@ -379,6 +386,10 @@ class PLDCorrector(RegressionCorrector):
         uncorr_cdpp = self.lc.estimate_cdpp()
         corr_cdpp = clc.estimate_cdpp()
 
+        # Get y-axis limits
+        ylim = [min(min(self.lc.flux.value), min(clc.flux.value)),
+                max(max(self.lc.flux.value), max(clc.flux.value))]
+
         # Use lightkurve plotting style
         with plt.style.context(MPLSTYLE):
             # Plot background model
@@ -387,7 +398,7 @@ class PLDCorrector(RegressionCorrector):
             self.lc.plot(ax=ax, normalize=False, clip_outliers=True,
                          label=f'uncorrected ({uncorr_cdpp:.0f})')
             ax.set_xlabel('')
-            ylim = ax.get_ylim()  # use same ylim for plots below
+            ax.set_ylim(ylim)  # use same ylim for all plots
 
             # Plot pixel and spline components
             ax = axs[1]
@@ -432,7 +443,7 @@ class PLDCorrector(RegressionCorrector):
 
         # Use lightkurve plotting style
         with plt.style.context(MPLSTYLE):
-            _, axs = plt.subplots(1, 2, figsize=(8, 4), sharey=True)
+            _, axs = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
             # Show light curve aperture mask
             ax = axs[0]
             self.tpf.plot(ax=ax, show_colorbar=False,
@@ -443,6 +454,10 @@ class PLDCorrector(RegressionCorrector):
             self.tpf.plot(ax=ax, show_colorbar=False,
                           aperture_mask=self.pld_aperture_mask,
                           title='pld_aperture_mask')
+            ax = axs[2]
+            self.tpf.plot(ax=ax, show_colorbar=False,
+                          aperture_mask=self.background_aperture_mask,
+                          title='background_aperture_mask')
         return axs
 
 
