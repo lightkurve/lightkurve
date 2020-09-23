@@ -6,6 +6,7 @@ import numpy as np
 from astropy.convolution import convolve, Box1DKernel
 from astropy.time import Time, TimeDelta
 from astropy.timeseries import BoxLeastSquares
+import astropy.units as u
 
 from .utils import LightkurveWarning
 
@@ -234,6 +235,16 @@ def prepare_f_help_source(f):
     return _to_ColumnDataSource(data=data)
 
 
+def _to_axis_label(label_base, unit):
+    if (unit) and (unit.to_string() != ''):
+        # bokeh does not support latex rendering. astropy's default string tends to be too verbose
+        # so we support a shortform for the typical use case
+        unit_str = "e/s" if unit == u.electron / u.second else unit.to_string()
+        return  f"{label_base} [{unit_str}]"
+    else:
+        return label_base
+
+
 def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, help_source):
     """Make a figure with a simple light curve scatter and model light curve line.
 
@@ -261,7 +272,7 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
                  toolbar_location="below",
                  border_fill_color="#FFFFFF", active_drag="box_zoom")
     fig.title.offset = -10
-    fig.yaxis.axis_label = 'Flux (e/s)'
+    fig.yaxis.axis_label = _to_axis_label('Flux', lc.flux.unit)
     if lc.time.format == 'bkjd':
         fig.xaxis.axis_label = 'Time - 2454833 (days)'
     elif lc.time.format == 'btjd':
@@ -322,7 +333,7 @@ def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help
                  toolbar_location="below",
                  border_fill_color="#FFFFFF", active_drag="box_zoom")
     fig.title.offset = -10
-    fig.yaxis.axis_label = 'Flux'
+    fig.yaxis.axis_label = _to_axis_label('Flux', f.flux.unit)
     fig.xaxis.axis_label = f'Phase [{f.time.format.upper()}]'
 
     # Scatter point for data
