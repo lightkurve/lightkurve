@@ -169,7 +169,6 @@ class PLDCorrector(RegressionCorrector):
         self.pld_aperture_mask = pld_aperture_mask
         background_aperture_mask = self.tpf._parse_aperture_mask(background_aperture_mask)
         self.background_aperture_mask = background_aperture_mask
-        # background_aperture_mask = ~self.tpf.create_threshold_mask()
 
         if spline_n_knots is None:
             # Default to a spline per 50 data points
@@ -182,11 +181,11 @@ class PLDCorrector(RegressionCorrector):
             DMC = DesignMatrixCollection
             spline = create_spline_matrix
 
-        # We set the width of all coefficient priors to median flux divided
-        # by 3 to prevent the fit from going crazy.
+        # We set the width of all coefficient priors to 10 times the standard
+        # deviation to prevent the fit from going crazy.
         prior_sigma = np.nanstd(self.lc.flux.value) * 10
 
-        # Flux normalize PLD components
+        # Flux normalize the PLD components
         pld_pixels = self.tpf.flux[:, pld_aperture_mask].reshape(len(self.tpf.flux), -1)
         pld_pixels = np.array([r / f for r, f in zip(pld_pixels, self.lc.flux.value)])
 
