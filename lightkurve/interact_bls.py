@@ -53,6 +53,16 @@ def _update_source(source, data):
     source.data = _to_unitless(data)
     return source
 
+def _at_ratio(values, ratio):
+    """Return a unitless scalar value that is at the given ratio in the range of the given values.
+
+       Conceptually, it is `max(values) - min(values) * ratio + min(values)`
+       It's frequently used to place the position the help icon of a plot based on the axis' values
+    """
+    result = (np.max(values) - np.min(values)) * ratio + np.min(values)
+    # return raw value without unit
+    return getattr(result, 'value', result)
+
 def _isfinite(val):
     val_actual = getattr(val, 'value', val)
     return np.isfinite(val_actual)
@@ -104,8 +114,8 @@ def prepare_folded_datasource(folded_lc):
 # Helper functions for help text...
 
 def prepare_lc_help_source(lc):
-    data = dict(time=[((np.max(lc.time) - np.min(lc.time)) * 0.98 + np.min(lc.time)).value],
-                flux=[((np.max(lc.flux) - np.min(lc.flux)) * 0.9 + np.min(lc.flux)).value],
+    data = dict(time=[_at_ratio(lc.time, 0.98)],
+                flux=[_at_ratio(lc.flux, 0.9)],
                 boxicon=['https://bokeh.pydata.org/en/latest/_images/BoxZoom.png'],
                 panicon=['https://bokeh.pydata.org/en/latest/_images/Pan.png'],
                 reseticon=['https://bokeh.pydata.org/en/latest/_images/Reset.png'],
@@ -158,7 +168,7 @@ def prepare_lc_help_source(lc):
 
 def prepare_bls_help_source(bls_source, slider_value):
     data = dict(period=[bls_source.data['period'][int(slider_value*0.95)]],
-                power=[(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98 + np.min(bls_source.data['power'])],
+                power=[_at_ratio(bls_source.data['power'], 0.98)],
                 helpme=['?'],
                 help=["""
                              <div style="width: 375px;">
@@ -190,8 +200,8 @@ def prepare_bls_help_source(bls_source, slider_value):
 
 
 def prepare_f_help_source(f):
-    data = dict(phase=[((np.max(f.time) - np.min(f.time)) * 0.98 + np.min(f.time)).value],
-                flux=[((np.max(f.flux) - np.min(f.flux)) * 0.98 + np.min(f.flux)).value],
+    data = dict(phase=[_at_ratio(f.time, 0.98)],
+                flux=[_at_ratio(f.flux, 0.98)],
                 helpme=['?'],
                 help=["""
                         <div style="width: 375px;">
@@ -542,7 +552,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         def _update_light_curve_plot(event):
             """If we zoom in on LC plot, update the binning."""
             mint, maxt = fig_lc.x_range.start, fig_lc.x_range.end
-            inwindow = (lc.time > mint) & (lc.time < maxt)
+            inwindow = (lc.time.value > mint) & (lc.time.value < maxt)
             nb = int(np.ceil(inwindow.sum()/5000))
             temp_lc = lc[inwindow]
             _update_source(lc_source, {'time': temp_lc.time[::nb],
@@ -650,16 +660,16 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         # Help Hover Call Backs
         def _update_folded_plot_help_reset(event):
-            f_help_source.data['phase'] = [(np.max(f.time) - np.min(f.time)) * 0.98 + np.min(f.time)]
-            f_help_source.data['flux'] = [(np.max(f.flux) - np.min(f.flux)) * 0.98 + np.min(f.flux)]
+            f_help_source.data['phase'] = [_at_ratio(f.time, 0.98)]
+            f_help_source.data['flux'] = [_at_ratio(f.flux, 0.98)]
 
         def _update_folded_plot_help(event):
             f_help_source.data['phase'] = [(fig_folded.x_range.end - fig_folded.x_range.start) * 0.95 + fig_folded.x_range.start]
             f_help_source.data['flux'] = [(fig_folded.y_range.end - fig_folded.y_range.start) * 0.95 + fig_folded.y_range.start]
 
         def _update_lc_plot_help_reset(event):
-            lc_help_source.data['time'] = [(np.max(lc.time) - np.min(lc.time)) * 0.98 + np.min(lc.time)]
-            lc_help_source.data['flux'] = [(np.max(lc.flux) - np.min(lc.flux)) * 0.9 + np.min(lc.flux)]
+            lc_help_source.data['time'] = [_at_ratio(lc.time, 0.98)]
+            lc_help_source.data['flux'] = [_at_ratio(lc.flux, 0.98)]
 
         def _update_lc_plot_help(event):
             lc_help_source.data['time'] = [(fig_lc.x_range.end - fig_lc.x_range.start) * 0.95 + fig_lc.x_range.start]
@@ -667,13 +677,11 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         def _update_bls_plot_help_event(event):
             bls_help_source.data['period'] = [bls_source.data['period'][int(npoints_slider.value*0.95)]]
-            bls_help_source.data['power'] = [(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98
-                                             + np.min(bls_source.data['power'])]
+            bls_help_source.data['power'] = [_at_ratio(bls_source.data['power'], 0.98)]
 
         def _update_bls_plot_help(attr, old, new):
             bls_help_source.data['period'] = [bls_source.data['period'][int(npoints_slider.value*0.95)]]
-            bls_help_source.data['power'] = [(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98
-                                             + np.min(bls_source.data['power'])]
+            bls_help_source.data['power'] = [_at_ratio(bls_source.data['power'], 0.98)]
 
         # Create all the figures.
         fig_folded = make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, f_help_source)
