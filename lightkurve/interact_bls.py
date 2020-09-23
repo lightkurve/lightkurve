@@ -59,9 +59,14 @@ def _at_ratio(values, ratio):
        Conceptually, it is `max(values) - min(values) * ratio + min(values)`
        It's frequently used to place the position the help icon of a plot based on the axis' values
     """
-    result = (np.max(values) - np.min(values)) * ratio + np.min(values)
-    # return raw value without unit
-    return getattr(result, 'value', result)
+    if getattr(values, 'end', None) is not None:
+        # case range ,with start / end
+        return (values.end - values.start) * ratio + values.start
+    else:
+        # case plain number array, Time, or Quantity (with .value)
+        result = (np.max(values) - np.min(values)) * ratio + np.min(values)
+        # return raw value without unit
+        return getattr(result, 'value', result)
 
 def _isfinite(val):
     val_actual = getattr(val, 'value', val)
@@ -115,7 +120,7 @@ def prepare_folded_datasource(folded_lc):
 
 def prepare_lc_help_source(lc):
     data = dict(time=[_at_ratio(lc.time, 0.98)],
-                flux=[_at_ratio(lc.flux, 0.9)],
+                flux=[_at_ratio(lc.flux, 0.95)],
                 boxicon=['https://bokeh.pydata.org/en/latest/_images/BoxZoom.png'],
                 panicon=['https://bokeh.pydata.org/en/latest/_images/Pan.png'],
                 reseticon=['https://bokeh.pydata.org/en/latest/_images/Reset.png'],
@@ -660,22 +665,23 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         # Help Hover Call Backs
         def _update_folded_plot_help_reset(event):
-            f_help_source.data['phase'] = [_at_ratio(f.time, 0.98)]
-            f_help_source.data['flux'] = [_at_ratio(f.flux, 0.98)]
+            f_help_source.data['phase'] = [_at_ratio(f.time, 0.95)]
+            f_help_source.data['flux'] = [_at_ratio(f.flux, 0.95)]
 
         def _update_folded_plot_help(event):
-            f_help_source.data['phase'] = [(fig_folded.x_range.end - fig_folded.x_range.start) * 0.95 + fig_folded.x_range.start]
-            f_help_source.data['flux'] = [(fig_folded.y_range.end - fig_folded.y_range.start) * 0.95 + fig_folded.y_range.start]
+            f_help_source.data['phase'] = [_at_ratio(fig_folded.x_range, 0.95)]
+            f_help_source.data['flux'] = [_at_ratio(fig_folded.y_range, 0.95)]
 
         def _update_lc_plot_help_reset(event):
             lc_help_source.data['time'] = [_at_ratio(lc.time, 0.98)]
-            lc_help_source.data['flux'] = [_at_ratio(lc.flux, 0.98)]
+            lc_help_source.data['flux'] = [_at_ratio(lc.flux, 0.95)]
 
         def _update_lc_plot_help(event):
-            lc_help_source.data['time'] = [(fig_lc.x_range.end - fig_lc.x_range.start) * 0.95 + fig_lc.x_range.start]
-            lc_help_source.data['flux'] = [(fig_lc.y_range.end - fig_lc.y_range.start) * 0.9 + fig_lc.y_range.start]
+            lc_help_source.data['time'] = [_at_ratio(fig_lc.x_range, 0.98)]
+            lc_help_source.data['flux'] = [_at_ratio(fig_lc.y_range, 0.95)]
 
         def _update_bls_plot_help_event(event):
+            # cannot use _at_ratio helper for period, because period is log scaled.
             bls_help_source.data['period'] = [bls_source.data['period'][int(npoints_slider.value*0.95)]]
             bls_help_source.data['power'] = [_at_ratio(bls_source.data['power'], 0.98)]
 
