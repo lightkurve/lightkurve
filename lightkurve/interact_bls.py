@@ -112,8 +112,8 @@ def prepare_folded_datasource(folded_lc):
         Bokeh style source for plotting
     """
     folded_src = _to_ColumnDataSource(data=dict(
-                                  phase=folded_lc.time.sort(),
-                                  flux=folded_lc.flux[np.argsort(folded_lc.time)]))
+                                  phase=folded_lc.time,
+                                  flux=folded_lc.flux))
     return folded_src
 
 
@@ -543,8 +543,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         model_lc = model_lc.append(_to_lc(_as_1d((lc.time[0] - best_t0.value) + 3*best_period.value/2), [1]))
 
         model_lc_source = _to_ColumnDataSource(data=dict(
-                                     time=model_lc.time.sort(),
-                                     flux=model_lc.flux[np.argsort(model_lc.time)]))
+                                     time=model_lc.time,
+                                     flux=model_lc.flux))
 
         # Set up the LC
         nb = int(np.ceil(len(lc.flux)/5000))
@@ -625,8 +625,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
             model_lc = _to_lc(lc.time[mask], mf[mask])
 
-            _update_source(model_lc_source, {'time': model_lc.time.sort(),
-                                             'flux': model_lc.flux[np.argsort(model_lc.time)]})
+            _update_source(model_lc_source, {'time': model_lc.time,
+                                             'flux': model_lc.flux})
 
             f_model_lc = model_lc.fold(best_period, best_t0)
             f_model_lc = _to_lc(_as_1d(f.time.min()), [1]).append(f_model_lc)
