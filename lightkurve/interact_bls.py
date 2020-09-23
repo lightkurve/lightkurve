@@ -323,7 +323,7 @@ def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help
                  border_fill_color="#FFFFFF", active_drag="box_zoom")
     fig.title.offset = -10
     fig.yaxis.axis_label = 'Flux'
-    fig.xaxis.axis_label = 'Phase'
+    fig.xaxis.axis_label = f'Phase [{f.time.format.upper()}]'
 
     # Scatter point for data
     fig.circle('phase', 'flux', line_width=1, color='#191919',
@@ -457,12 +457,12 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                   "you can install bokeh using e.g. `conda install bokeh`.")
         return None
 
-    def _to_timeDelta(val, time_reference):
-        """Convert the raw value as TimeDelta using the format / scale of the given reference Time object"""
-        return TimeDelta(val, format=time_reference.format, scale=time_reference.scale)
-
     def _round_strip_unit(val, decimals):
         return np.round(getattr(val, 'value', val), decimals)
+
+    def _as_1d(time):
+        """Convert scalar Time to a 1-d array, suitable to be used in creating LightCurve"""
+        return time.reshape((1,))
 
     def _to_lc(time, flux):
         """Shorthand to create a LightCurve with time and flux used in creating a Model LightCurve"""
@@ -528,8 +528,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
         model_lc = _to_lc(lc.time[mask], mf[mask])
         # Need to use raw value for best_t0 and best_period so that the result is of type Time, rather than TimeDelta
-        model_lc = model_lc.append(_to_lc(((lc.time[0] - best_t0.value) + best_period.value/2).reshape((1,)), [1]))
-        model_lc = model_lc.append(_to_lc(((lc.time[0] - best_t0.value) + 3*best_period.value/2).reshape((1,)), [1]))
+        model_lc = model_lc.append(_to_lc(_as_1d((lc.time[0] - best_t0.value) + best_period.value/2), [1]))
+        model_lc = model_lc.append(_to_lc(_as_1d((lc.time[0] - best_t0.value) + 3*best_period.value/2), [1]))
 
         model_lc_source = _to_ColumnDataSource(data=dict(
                                      time=model_lc.time.sort(),
@@ -547,8 +547,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         f_help_source = prepare_f_help_source(f)
 
         f_model_lc = model_lc.fold(best_period, best_t0)
-        f_model_lc = _to_lc(_to_timeDelta([-0.5], f_model_lc.time), [1]).append(f_model_lc)
-        f_model_lc = f_model_lc.append(_to_lc(_to_timeDelta([0.5], f_model_lc.time), [1]))
+        f_model_lc = _to_lc(_as_1d(f.time.min()), [1]).append(f_model_lc)
+        f_model_lc = f_model_lc.append(_to_lc(_as_1d(f.time.max()), [1]))
 
         f_model_lc_source = _to_ColumnDataSource(data=dict(
                                  phase=f_model_lc.time,
@@ -618,8 +618,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                                              'flux': model_lc.flux[np.argsort(model_lc.time)]})
 
             f_model_lc = model_lc.fold(best_period, best_t0)
-            f_model_lc = _to_lc(_to_timeDelta([-0.5], f_model_lc.time), [1]).append(f_model_lc)
-            f_model_lc = f_model_lc.append(_to_lc(_to_timeDelta([0.5], f_model_lc.time), [1]))
+            f_model_lc = _to_lc(_as_1d(f.time.min()), [1]).append(f_model_lc)
+            f_model_lc = f_model_lc.append(_to_lc(_as_1d(f.time.max()), [1]))
 
             _update_source(f_model_lc_source, {'phase': f_model_lc.time,
                                                'flux': f_model_lc.flux})
