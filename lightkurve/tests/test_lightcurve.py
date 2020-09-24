@@ -787,6 +787,27 @@ def test_flatten_robustness():
     assert_allclose(lc.flux, flat_lc.flux * trend_lc.flux)
 
 
+def test_flatten_returns_normalized():
+    """Ensure returned lightcurves from flatten() can be normalized"""
+    # Test for https://github.com/KeplerGO/lightkurve/issues/838
+    lc_flux_unit = u.Unit("electron/second")
+    lc = LightCurve(time=[1, 2, 3, 4, 5, 6],
+                    flux=[10.1, 20.2, 30.3, 40.4, 50.5, 60.6] * lc_flux_unit,
+                    flux_err=[0.01, 0.02, 0.03, 0.04, 0.05, 0.06] * lc_flux_unit
+                    )
+    flat_lc, trend_lc = lc.flatten(window_length=3, polyorder=1, return_trend=True)
+
+    assert(flat_lc.flux.unit is lc_flux_unit)
+    assert(flat_lc.flux_err.unit is lc_flux_unit)
+    assert(trend_lc.flux.unit is lc_flux_unit)
+    assert(trend_lc.flux_err.unit is lc_flux_unit)
+
+    # once the above assertions pass, the normalize() should work
+    # but we test it anyway just in case something else goes wrong
+    flat_lc.normalize(unit='percent')
+    trend_lc.normalize(unit='percent')
+
+
 def test_iterative_flatten():
     '''Test the iterative sigma clipping in flatten '''
     # Test a light curve with a single, buried outlier.
@@ -1052,6 +1073,23 @@ def test_mixed_instantiation():
 
     LightCurve(time=[1,2,3], flux=[1,2,3], data=Table({'flux_err': [3,4,5]}))
     LightCurve(time=[1,2,3], flux=[1,2,3], data={'flux_err': [3,4,5]})
+
+
+def test_assignment_time():
+    """Ensure time property can be reassigned"""
+    lc = KeplerLightCurve(time=Time([1,2,3], scale='tdb', format='bkjd'), flux=[4,5,6], flux_err=[7,8,9])
+    time_adjusted = lc.time - 0.5
+    lc.time = time_adjusted
+    assert_array_equal(lc.time, time_adjusted)
+
+    # case the input is not given format / scale, ensure default format / scale is applied
+    time_adjusted_raw = [11., 12., 13.]
+    lc.time = time_adjusted_raw
+    assert_array_equal(lc.time, Time(time_adjusted_raw, scale='tdb', format='bkjd'))
+
+    # case the input is scalar, it'd be broadcasted to the existing time's length
+    lc.time = 21
+    assert_array_equal(lc.time, Time([21, 21, 21], scale='tdb', format='bkjd'))
 
 
 def test_create_transit_mask():

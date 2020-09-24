@@ -3,27 +3,30 @@ import logging
 import sys
 import os
 import warnings
+from functools import wraps
+
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
+import astropy
 from astropy.utils.data import download_file
-from astropy.coordinates import SkyCoord
 from astropy.units.quantity import Quantity
 import astropy.units as u
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LinearStretch)
 from astropy.time import Time
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-from functools import wraps
 
-from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
+
 __all__ = ['LightkurveError', 'LightkurveWarning',
            'KeplerQualityFlags', 'TessQualityFlags',
-           'bkjd_to_astropy_time', 'btjd_to_astropy_time']
+           'bkjd_to_astropy_time', 'btjd_to_astropy_time',
+           'show_citation_instructions']
 
 
 class QualityFlags(object):
@@ -390,7 +393,7 @@ def btjd_to_astropy_time(btjd) -> Time:
 def plot_image(image, ax=None, scale='linear', origin='lower',
                xlabel='Pixel Column Number', ylabel='Pixel Row Number',
                clabel='Flux ($e^{-}s^{-1}$)', title=None, show_colorbar=True,
-               **kwargs):
+               vmin=None, vmax=None, **kwargs):
     """Utility function to plot a 2D image
 
     Parameters
@@ -415,6 +418,10 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
         Title for the plot.
     show_colorbar : bool
         Whether or not to show the colorbar
+    vmin : float
+        Minimum colorbar value. By default, the 2.5%-percentile is used.
+    vmax : float
+        Maximum colorbar value. By default, the 97.5%-percentile is used.
     kwargs : dict
         Keyword arguments to be passed to `matplotlib.pyplot.imshow`.
 
@@ -427,13 +434,19 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
         image = image.value
     if ax is None:
         _, ax = plt.subplots()
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", RuntimeWarning)  # ignore image NaN values
-        mask = np.nan_to_num(image) > 0
-        if mask.any() > 0:
-            vmin, vmax = PercentileInterval(95.).get_limits(image[mask])
-        else:
-            vmin, vmax = 0, 0
+
+    if vmin is None or vmax is None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)  # ignore image NaN values
+            mask = np.nan_to_num(image) > 0
+            if mask.any() > 0:
+                vmin_default, vmax_default = PercentileInterval(95.).get_limits(image[mask])
+            else:
+                vmin_default, vmax_default = 0, 0
+            if vmin is None:
+                vmin = vmin_default
+            if vmax is None:
+                vmax = vmax_default
 
     norm = None
     if scale is not None:
@@ -656,3 +669,49 @@ def _query_solar_system_objects(ra, dec, times, radius=0.1, location='kepler',
     if df is not None:
         df.reset_index(drop=True)
     return df
+
+
+def show_citation_instructions():
+    """Show citation instructions."""
+    from . import PACKAGEDIR, __citation__
+    if not is_notebook():
+        print(__citation__)
+    else:
+        from pathlib import Path
+        from IPython.display import HTML
+        import astroquery
+        templatefile = Path(PACKAGEDIR, 'data', 'show_citation_instructions.html')
+        template = open(templatefile, 'r').read()
+        template = template.replace("LIGHTKURVE_CITATION", __citation__)
+        template = template.replace("ASTROPY_CITATION", astropy.__citation__)
+        template = template.replace("ASTROQUERY_CITATION", astroquery.__citation__)
+        return HTML(template)
+
+
+def _get_notebook_environment():
+    """Returns 'jupyter', 'colab', or 'terminal'.
+
+    One can detect whether or not a piece of Python is running by executing
+    `get_ipython().__class__`, which returns the following result:
+
+        * Jupyter notebook: `ipykernel.zmqshell.ZMQInteractiveShell`
+        * Google colab: `google.colab._shell.Shell`
+        * IPython terminal: `IPython.terminal.interactiveshell.TerminalInteractiveShell`
+        * Python terminal: `NameError: name 'get_ipython' is not defined`
+    """
+    try:
+        ipy = str(type(get_ipython())).lower()
+        if 'zmqshell' in ipy:
+            return 'jupyter'
+        if 'colab' in ipy:
+            return 'colab'
+    except NameError:
+        pass  # get_ipython() is not a builtin
+    return 'terminal'
+
+
+def is_notebook():
+    """Returns `True` if we are running in a notebook."""
+    if _get_notebook_environment() in ['jupyter', 'colab']:
+        return True
+    return False

@@ -225,7 +225,9 @@ class LightCurve(TimeSeries):
 
     def __setattr__(self, name, value, **kwargs):
         """To get copied, attributes have to be stored in the meta dictionary!"""
-        if ('columns' in self.__dict__) and (name in self.__dict__['columns']):
+        if (name == 'time'):
+            self['time'] = value # astropy will convert value to Time if needed
+        elif ('columns' in self.__dict__) and (name in self.__dict__['columns']):
             if not isinstance(value, Quantity):
                 value = Quantity(value, dtype=value.dtype)
             self.replace_column(name, value)
@@ -576,15 +578,15 @@ class LightCurve(TimeSeries):
             mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
                     (np.nanstd(self.flux[mask] - trend_signal) * sigma + Quantity(1e-14, self.flux.unit))
             f = interp1d(self.time.value[mask][mask1], trend_signal[mask1], fill_value='extrapolate')
-            trend_signal = f(self.time.value)
+            trend_signal = Quantity(f(self.time.value), self.flux.unit)
             mask[mask] &= mask1
 
         flatten_lc = self.copy()
         with warnings.catch_warnings():
             # ignore invalid division warnings
             warnings.simplefilter("ignore", RuntimeWarning)
-            flatten_lc.flux = flatten_lc.flux / trend_signal
-            flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
+            flatten_lc.flux = flatten_lc.flux / trend_signal.value
+            flatten_lc.flux_err = flatten_lc.flux_err / trend_signal.value
         if return_trend:
             trend_lc = self.copy()
             trend_lc.flux = trend_signal
@@ -2216,6 +2218,31 @@ class KeplerLightCurve(LightCurve):
 
     @classmethod
     def read(cls, *args, **kwargs):
+        """Returns a `KeplerLightCurve` by reading the given file.
+
+        Parameters
+        ----------
+        filename : str
+            Local path or remote url of a Kepler light curve FITS file.
+        flux_column : str, optional
+            The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
+            Typically 'pdcsap_flux' or 'sap_flux'.
+        quality_bitmask : str or int, optional
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored
+                * "default": cadences with severe quality issues will be ignored
+                * "hard": more conservative choice of flags to ignore
+                  This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` class for details on the bitmasks.
+        format : str, optional
+            The format of the Kepler FITS file. Should be one of 'kepler', 'k2sff', 'everest'. Defaults to 'kepler'.
+        """
         # Default to Kepler file format
         if kwargs.get("format") is None:
             kwargs['format'] = "kepler"
@@ -2295,6 +2322,29 @@ class TessLightCurve(LightCurve):
 
     @classmethod
     def read(cls, *args, **kwargs):
+        """Returns a `TessLightCurve` by reading the given file.
+
+        Parameters
+        ----------
+        filename : str
+            Local path or remote url of a TESS light curve FITS file.
+        flux_column : str, optional
+            The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
+            Typically 'pdcsap_flux' or 'sap_flux'.
+        quality_bitmask : str or int, optional
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored
+                * "default": cadences with severe quality issues will be ignored
+                * "hard": more conservative choice of flags to ignore
+                  This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  This mask is not recommended.
+
+            See the :class:`TessQualityFlags <lightkurve.utils.TessQualityFlags>` class for details on the bitmasks.
+        """
         # Default to TESS file format
         if kwargs.get("format") is None:
             kwargs['format'] = "tess"
