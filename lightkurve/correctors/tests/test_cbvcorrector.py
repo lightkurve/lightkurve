@@ -245,9 +245,8 @@ def test_CBVCorrector():
     cbvCorrector =  CBVCorrector(sample_lc, do_not_load_cbvs=True)
     # Check that Nan was removed
     assert len(cbvCorrector.lc.flux) == 4
-    # Check that zero-centered median normalization occured
-    assert_allclose(np.array(cbvCorrector._lc_median), 3.0)
-    assert_allclose(np.mean(cbvCorrector.lc.flux), 0.0)
+    # Check that the median flux value is preserved
+    assert_allclose(np.nanmedian(cbvCorrector.lc.flux).value, np.nanmedian(sample_lc.flux).value)
 
     dm = DesignMatrix(pd.DataFrame({'a':np.ones(4), 'b':[1,2,4,5]}))
 
@@ -258,7 +257,8 @@ def test_CBVCorrector():
     # Check that returned lc is in absolute flux units
     assert lc.flux.unit == u.Unit("electron / second")
     # The design matrix should have completely zeroed the flux around the median
-    assert_allclose(lc.flux, cbvCorrector._lc_median)
+    lc_median = np.nanmedian(lc.flux)
+    assert_allclose(lc.flux, lc_median)
     ax = cbvCorrector.diagnose()
     assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
 
@@ -281,7 +281,8 @@ def test_CBVCorrector():
     assert isinstance(lc, TessLightCurve) 
     assert lc.flux.unit == u.Unit("electron / second")
     # The design matrix should have completely zeroed the flux around the median
-    assert_allclose(lc.flux, cbvCorrector._lc_median, rtol=1e-3)
+    lc_median = np.nanmedian(lc.flux)
+    assert_allclose(lc.flux, lc_median, rtol=1e-3)
     ax = cbvCorrector.diagnose()
     assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
     # Now add a strong regularization term and under-fit the data

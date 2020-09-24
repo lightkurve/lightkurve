@@ -36,24 +36,23 @@ __all__ = ['CBVCorrector', 'CotrendingBasisVectors', 'KeplerCotrendingBasisVecto
 # CBV Corrector Class
 
 class CBVCorrector(RegressionCorrector):
-    """ Class for removing systematics using CBV correctors for Kepler/K2/TESS
+    """ Class for removing systematics using Cotrending Basis Vectors (CBVs)
+    from Kepler/K2/TESS.
 
     On construction of this object, the relevent CBVs will be downloaded from
     MAST appropriate for the lightcurve object passed to the constructor.
 
-    For TESS there are multiple CBV types. All are loaded and the user must specify
-    which to use in the correction.
+    For TESS there are multiple CBV types. All are loaded and the user must
+    specify which to use in the correction.
 
     Attributes
     ----------
     lc  : LightCurve
-        The light curve to correct, stored zero-centered median normalized
-    denormalized_lc  : LightCurve
-        The light curve in electrons / second
-    cbvs    : CetrendingBasisVectors list
-        The retrieved CBVs, can contain multiple types
+        The light curve loaded into CBVCorrector in electrons / second
+    cbvs    : CotrendingBasisVectors list
+        The retrieved CBVs, can contain multiple types of CBVs
     interpolated_cbvs : bool
-        If true then the CBVs have been interpolated to the lightkurve
+        If true then the CBVs have been interpolated to the lightcurve
     cbv_design_matrix : DesignMatrix
         The retrieved CBVs ported into a DesignMatrix object
     extra_design_matrix : DesignMatrix
@@ -62,24 +61,20 @@ class CBVCorrector(RegressionCorrector):
         The design matrix collection composed of cbv_design_matrix and extra_design_matrix
     corrected_lc : LightCurve
         The returned light curve from regression_corrector.correct
-        stored zero-centered median normalized
-        TODO: Switch this to denormalized LC
-    denormalized_corrected_lc  : LightCurve
-        The light curve in electrons / second
+        in electrons / second
     coefficients : float ndarray
-        The fit coefficients corresponding to the design_matric_collection
-        As computed by regressioncorrection.correct
+        The fit coefficients corresponding to the design_matrix_collection
     coefficients_err : float ndarray
-        The error estimates for the coefficients, see regressioncorrection
+        The error estimates for the coefficients, see regressioncorrector
     model_lc : LightCurve
         The model fit to the lightcurve 'lc'
     diagnostic_lightcurves : dict
         Model fits for each of the sub design matrices fit in model_lc
     lc_neighborhood : LightCurveCollection
-        SAP light curves of all targets within the defined neighborhood of the
+        SPOC SAP light curves of all targets within the defined neighborhood of the
         target under study for use with the under-fitting metric
     lc_neighborhood_flux : list of arrays
-        Neighboring target flux aligned or interpoalted to the target under
+        Neighboring target flux aligned or interpolated to the target under
         study cadence
     cadence_mask : np.ndarray of bool
         Mask, where True indicates a cadence that was used in
@@ -91,14 +86,12 @@ class CBVCorrector(RegressionCorrector):
         Under-fitting score from the most recent run of correct_optimizer
     alpha : float
         L2-norm regularization term used in most recent fit
-        equal to:
+        Equivalent to:
             designmatrix prior sigma = np.median(self.lc.flux_err) / np.sqrt(alpha)
-
-
     """
 
     def __init__(self, lc, interpolate_cbvs=False, do_not_load_cbvs=False):
-        """ Constructor for CBVClass objects
+        """ Constructor
 
         This constructor will retrieve all relevant CBVs from MAST and then
         align them with the passed-in light curve.
@@ -110,6 +103,7 @@ class CBVCorrector(RegressionCorrector):
         interpolate_cbvs : bool
             By default, the cbvs will be 'aligned' to the lightcurve. If you
             wish to interpolate the cbvs instead then set this to True.
+            Uses Piecewise Cubic Hermite Interpolating Polynomial (PCHIP). 
         do_not_load_cbvs : bool
             If True then the CBVs will NOT be loaded from MAST. 
             Use this option if you wish to use the CBV corrector methods with only a 
@@ -122,13 +116,11 @@ class CBVCorrector(RegressionCorrector):
         if not isinstance(lc, LightCurve):
             raise Exception('<lc> must be a LightCurve class')
 
-        # This class wants zero-centered median normalized flux
-        # Store the median value so we can denormalize
         assert  lc.flux.unit==Unit('electron / second'), \
             'cbvCorrector expects light curve to be passed in e-/s units.'        
-        self._lc_median = np.nanmedian(lc.flux)
-        lc = lc.remove_nans().normalize()
-        lc.flux -= 1.0 
+
+        # We do not want any NaNs
+        lc = lc.remove_nans()
 
         # Call the RegresssionCorrector Constructor
         super(CBVCorrector, self).__init__(lc)
@@ -146,10 +138,11 @@ class CBVCorrector(RegressionCorrector):
                         channel=self.lc.channel))
             elif self.lc.mission == 'TESS':
                 # For TESS we load multiple CBV types
-            
+                # Single-Scale
                 cbvs.append(download_tess_cbvs(sector=self.lc.sector,
                     camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='SingleScale'))
             
+                # Multi-Scale
                 # Although there has always been 3 bands, there could be more,
                 # continue to load more bands until no more are left to load
                 iBand = int(0)
@@ -164,6 +157,7 @@ class CBVCorrector(RegressionCorrector):
                     else:
                         moreData = False
             
+                # Spike
                 cbvs.append(download_tess_cbvs(sector=self.lc.sector,
                     camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='Spike'))
             
@@ -184,7 +178,7 @@ class CBVCorrector(RegressionCorrector):
         self.cbvs = cbvs
         self.interpolated_cbvs = interpolate_cbvs
 
-        # Initiate all extra attributes to None
+        # Initialize all extra attributes to None
         self.cbv_design_matrix = None
         self.extra_design_matrix = None
         self.design_matrix_collection = None
@@ -200,43 +194,9 @@ class CBVCorrector(RegressionCorrector):
         self.under_fitting_score = None
         self.alpha = None
 
-    @property 
-    def denormalized_lc(self): 
-        """ The light curve is stored internally as zero-centered median 
-        normalized. This getter returns the denormalized light curve in
-        absolute flux units.
-        """
-        
-        lc = self.lc.copy()
-        lc.flux = (lc.flux+1.0) * self._lc_median
-        lc.flux_err = lc.flux_err * self._lc_median
-        assert  lc.flux.unit==Unit('electron / second'), \
-            'Bookkeeping Error, flux should be in units of e-/s.'        
-
-        return lc 
-
-    @property 
-    def denormalized_corrected_lc(self): 
-        """ The light curve is stored internally as zero-centered median 
-        normalized. This getter returns the denormalized light curve.
-        """
-
-        if (self.corrected_lc is None):
-            log.warning('A corrected light curve does not exist, please run '
-                    'correct first')
-            return None
-        
-        lc = self.corrected_lc.copy()
-        lc.flux = (lc.flux+1.0) * self._lc_median
-        lc.flux_err = lc.flux_err * self._lc_median
-        assert  lc.flux.unit==Unit('electron / second'), \
-            'Bookkeeping Error, flux should be in units of e-/s.'        
-
-        return lc 
-
     def correct_gaussian_prior(self, cbv_type=['SingleScale'],
             cbv_indices=[np.arange(1,9)], 
-            alpha=1e-20, ext_dm=None, cadence_mask=None):
+            alpha=1e-20, ext_dm=None, cadence_mask=None, **kwargs):
         """ Performs the correction using RegressionCorrector methods.
 
         This method will assemble the full design matrix collection composed of
@@ -265,6 +225,9 @@ class CBVCorrector(RegressionCorrector):
             Optionally pass an extra design matrix to also be used in the fit
         cadence_mask : np.ndarray of bools (optional)
             Mask, where True indicates a cadence that should be used.
+        **kwargs : dict
+            Additional keyword arguments passed to
+            `RegressionCorrector.correct`.
 
         Returns
         -------
@@ -293,19 +256,19 @@ class CBVCorrector(RegressionCorrector):
         if (alpha == 0.0):
             sigma = None
         else:
-            sigma = np.median(self.lc.flux_err) / np.sqrt(np.abs(alpha))
+            sigma = np.median(self.lc.flux_err.value) / np.sqrt(np.abs(alpha))
         self._set_prior_width(sigma)
             
         # Use RegressionCorrector.correct for the actual fitting
         super(CBVCorrector, self).correct(self.design_matrix_collection, 
-                cadence_mask=cadence_mask)
+                cadence_mask=cadence_mask, **kwargs)
 
         self.alpha = alpha
 
-        return self.denormalized_corrected_lc
+        return self.corrected_lc
 
     def correct_ElasticNet(self, cbv_type='SingleScale', cbv_indices=np.arange(1,9), 
-            alpha=1e-20, l1_ratio=0.01, ext_dm=None, cadence_mask=None):
+            alpha=1e-20, l1_ratio=0.01, ext_dm=None, cadence_mask=None, **kwargs):
         """ Performs the correction using scikit-learn's ElasticNet which
         utilizes combined L1- and L2-Norm priors as a regularizer.
 
@@ -314,6 +277,8 @@ class CBVCorrector(RegressionCorrector):
         scikit-learn.linear_model.ElasticNet to perform the correction.
 
         By default this method will use the first 8 "SingleScale" basis vectors.
+
+        This method will preserve the median value of the light curve flux.
 
         Note that the alpha term in scikit-learn's ElasticNet does not have the
         same scaling as when used in CBVCorrector.correct_gaussian_prior or 
@@ -337,6 +302,9 @@ class CBVCorrector(RegressionCorrector):
             Optionally pass an extra design matrix to also be used in the fit
         cadence_mask : np.ndarray of bools (optional)
             Mask, where True indicates a cadence that should be used.
+        **kwargs : dict
+            Additional keyword arguments passed to
+            `sklearn.linear_model.ElasticNet`.
 
         Returns
         -------
@@ -348,7 +316,7 @@ class CBVCorrector(RegressionCorrector):
         The following example will perform the ElasticNet correction using the
         SingleScale and Spike basis vectors with a strong regualrization alpha
         term of 1.0 and an L1 ratio of 0.9 which means predominantly a Lasso
-        regularization but a slight amount of Ridge Regression.
+        regularization but with a slight amount of Ridge Regression.
             >>> cbv_type = ['SingleScale', 'Spike']
             >>> cbv_indices = [np.arange(1,9), 'ALL']
             >>> corrected_lc = cbvCorrector.correct_ElasticNet(cbv_type=cbv_type, # doctest: +SKIP
@@ -365,7 +333,7 @@ class CBVCorrector(RegressionCorrector):
 
         # Use Scikit-learn ElasticNet
         self.regressor = linear_model.ElasticNet(alpha=alpha, l1_ratio=l1_ratio,
-                fit_intercept=False)
+                fit_intercept=False, **kwargs)
 
         X = self.design_matrix_collection.values
         y = self.lc.flux
@@ -373,18 +341,26 @@ class CBVCorrector(RegressionCorrector):
         # Set mask
         # note: ElasticNet has no internal way to do this so we have to just
         # remove the cadences from X and y
-        X = X[cadence_mask,:]
-        y = y[cadence_mask]
+        XMasked = X.copy()
+        yMasked = y.copy()
+        XMasked = XMasked[cadence_mask,:]
+        yMasked = yMasked[cadence_mask]
 
-        self.regressor.fit(X, y)
+        # Perform the ElasticNet fit
+        self.regressor.fit(XMasked, yMasked)
 
         # Finishing work
-        model_flux  = np.dot(X, self.regressor.coef_)
+        # When creating the model do not include the constant
+        model_flux  = np.dot(X[:,0:-1], self.regressor.coef_[0:-1])
+        model_flux -= np.median(model_flux)
+        # TODO: Propagation of uncertainties. They really do not change much.
         model_err   = np.zeros(len(model_flux))
         
         self.coefficients = self.regressor.coef_
         
-        self.model_lc = LightCurve(time=self.lc.time, flux=model_flux, flux_err=model_err)
+        self.model_lc = LightCurve(time=self.lc.time,
+                flux=model_flux*self.lc.flux.unit,
+                flux_err=model_err*self.lc.flux_err.unit)
         self.corrected_lc = self.lc.copy()
         self.corrected_lc.flux = self.lc.flux - self.model_lc.flux
         self.corrected_lc.flux_err = (self.lc.flux_err**2 + model_err**2)**0.5
@@ -392,7 +368,7 @@ class CBVCorrector(RegressionCorrector):
         self.cadence_mask = cadence_mask
         self.alpha = alpha
             
-        return self.denormalized_corrected_lc
+        return self.corrected_lc
 
     def correct_optimizer(self, cbv_type=['SingleScale'],
             cbv_indices=[np.arange(1,9)], 
@@ -401,13 +377,13 @@ class CBVCorrector(RegressionCorrector):
         """ Optimizes the correction by adjusting the L2-Norm (Ridge Regression)
         regularization penalty term, alpha, based on the introduced noise
         (over-fitting) and residual correlation (under-fitting) goodness
-        metrics. The optmization is performed using the
+        metrics. The optimization is performed using the
         scipy.optimize.minimize_scalar Brent's method.
 
         The optimizer attempts to maximize the over- and under-fitting goodness
         metrics.  However, once the target_over_score or target_under_score is
         reached, a "Leaky ReLU" is used so that the optimization "pressure"
-        concentrates on ther other metric so that both metrics rise above their
+        concentrates on the other metric until both metrics rise above their
         respective target scores, instead of driving a single metric to near
         1.0.
 
@@ -445,15 +421,14 @@ class CBVCorrector(RegressionCorrector):
         Examples
         --------
         The following example will perform the correction using the
-        SingleScale and Spike basis vectors. It will use an initial alpha value
-        of 1.0. The target over-fitting score is 0.5 and the target
+        SingleScale and Spike basis vectors. It will use alpha bounds of
+        [1.0,1e3]. The target over-fitting score is 0.5 and the target
         under-fitting score is 0.8. 
             >>> cbv_type = ['SingleScale', 'Spike']
             >>> cbv_indices = [np.arange(1,9), 'ALL']
             >>> cbvCorrector.correct_optimizer(cbv_type=cbv_type, cbv_indices=cbv_indices,  # doctest: +SKIP
-            >>> alpha_bounds=[1.0,1e3],  # doctest: +SKIP
-            >>> target_over_score=0.5, target_under_score=0.5) # doctest: +SKIP
-            >>> cbvCorrector.diagnose() # doctest: +SKIP
+            >>>     alpha_bounds=[1.0,1e3],  # doctest: +SKIP
+            >>>     target_over_score=0.5, target_under_score=0.8) # doctest: +SKIP
         """
 
         # Perform all the preparatory stuff common to all correct methods
@@ -498,15 +473,13 @@ class CBVCorrector(RegressionCorrector):
 
         print('Optimized Alpha: {0:2.3e}'.format(self.alpha))
 
-        return self.denormalized_corrected_lc
+        return self.corrected_lc
 
 
     def over_fitting_metric(self, nSamples=10):
         """ Uses a LombScarglePeriodogram to assess the change in broad-band
         power in a corrected light curve (in self.corrected_lc) to measure 
         degree of over-fitting.
-
-        This function expects a zero-centered median normalized light curve.
 
         The to_periodogram Lomb-Scargle method is used and the sampling band is
         from one frequency separation to the Nyquist frequency
@@ -523,7 +496,7 @@ class CBVCorrector(RegressionCorrector):
 
         Returns
         -------
-        over-fitting_metric : float
+        over_fitting_metric : float
             A float in the range [0,1] where 0 => Bad, 1 => Good
         """
 
@@ -535,12 +508,15 @@ class CBVCorrector(RegressionCorrector):
 
         # The fit can sometimes result in NaNs
         # Also ignore masked cadences
+        # Also median normalize original and correctod LCs
         orig_lc         = self.lc.copy()
         orig_lc         = orig_lc[self.cadence_mask]
-        orig_lc         = orig_lc.remove_nans()
+        orig_lc         = orig_lc.remove_nans().normalize()
+        orig_lc         -= 1.0
         corrected_lc    = self.corrected_lc.copy()
         corrected_lc    = corrected_lc[self.cadence_mask]
-        corrected_lc    = corrected_lc.remove_nans()
+        corrected_lc    = corrected_lc.remove_nans().normalize()
+        corrected_lc    -= 1.0
         if (len(corrected_lc.flux) == 0):
             return 1.0
 
@@ -570,7 +546,7 @@ class CBVCorrector(RegressionCorrector):
             # Compute the change in power
             pgChange = np.array(pgCorrected.power) - np.array(pgOrig.power)
 
-            # ignore nans
+            # Ignore nans
             pgChange = pgChange[~np.isnan(pgChange)]
             
             # If no increase in power in ANY bands then return a perfect loss
@@ -592,12 +568,7 @@ class CBVCorrector(RegressionCorrector):
 
         
         # We want the goodness to span (0,1]
-        # Use twice a reversed sigmoid to get a [0,1] range from a [0,inf) range
-        # We also want a goodness of 0.8 to mean the introduced noise is just
-        # begining to increase beyond the noise of WGN of the mean of the uncertainties
-        # 0.8 = sigmoidInv(0.4)
-        # So, subtract 0.6 from the metric so that a metric value of 1.0 returns
-        # a goodness of 0.8
+        # Use twice a reversed sigmoid to get a [0,1] range mapped from a [0,inf) range
         def sigmoidInv(x): return 2.0 / (1 + np.exp(x))
         # Make sure maximum score is 1.0
         metric = sigmoidInv(np.max([metric, 0.0]))
@@ -609,7 +580,7 @@ class CBVCorrector(RegressionCorrector):
         """ This goodness metric measures the degree of under-fitting of the
         CBVs to the light curve. It does so by measuring the mean residual target to
         target Pearson correlation between the target under study and a selection of
-        neighboring targets.
+        neighboring SPOC SAP target light curves.
 
         This function will begin with the given search_radius in arcseconds and
         finds all neighboring targets. If not enough were found (< min_targets)
@@ -631,7 +602,7 @@ class CBVCorrector(RegressionCorrector):
         Parameters
         ----------
         search_radius : float
-            Search Radius to find neighboring targets in arcseconds
+            Search radius to find neighboring targets in arcseconds
         min_targets : float
             Minimum number of targets to use in correlation metric
             Using too few can cause unreliable results. Default = 30
@@ -646,7 +617,7 @@ class CBVCorrector(RegressionCorrector):
 
         Returns
         -------
-        under-fitting_metric : float
+        under_fitting_metric : float
             A float in the range [0,1] where 0 => Bad, 1 => Good
         """
 
@@ -679,6 +650,7 @@ class CBVCorrector(RegressionCorrector):
 
         # Retrieve SAP light curves in a neighborhood around the target
         # Only do this once, check if lc set is already cached
+        # TODO: Consider taking a cut on magnitude as well
         if (self.lc_neighborhood is None or clear_cache):
             continue_searching = True
             while continue_searching:
@@ -723,17 +695,15 @@ class CBVCorrector(RegressionCorrector):
                     # Interpolate to corrected_lc cadence times
                     fInterp = PchipInterpolator(lc_neighborhood[-1].time.value,
                             lc_neighborhood[-1].flux.value, extrapolate=False)
-                   #lc_neighborhood[-1].flux.value = fInterp(self.corrected_lc.time.value)
                     lc_neighborhood_flux.append(fInterp(self.corrected_lc.time.value))
                 else:
                     # The CBVs were aligned so also align the neighboring
                     # lightcurves
                     lc_trim_mask = np.in1d(lc_neighborhood[-1].cadenceno, 
                             self.corrected_lc.cadenceno)
-                   #lc_neighborhood[-1] = lc_neighborhood[-1][lc_trim_mask]
                     lc_neighborhood_flux.append(lc_neighborhood[-1][lc_trim_mask].flux.value)
 
-            # store the unmolested lightcurve neighborhood but also save the
+            # Store the unmolested lightcurve neighborhood but also save the
             # aligned or interpolated neighborhood flux
             self.lc_neighborhood = LightCurveCollection(lc_neighborhood)
             self.lc_neighborhood_flux = lc_neighborhood_flux 
@@ -758,8 +728,9 @@ class CBVCorrector(RegressionCorrector):
             len(self.lc_neighborhood_flux)+1))
         for idx in np.arange(len(fluxMatrix[0,:])-1):
             fluxMatrix[:,idx] = self.lc_neighborhood_flux[idx]
-        # Add in target under study
-        fluxMatrix[:,-1] = corrected_lc.flux
+        # Add in target under study, and median normalize it
+        fluxMatrix[:,-1] = corrected_lc.normalize().flux
+        fluxMatrix[:,-1] -= 1.0
 
         # Ignore masked cadences and NaNs
         mask = np.logical_and(self.cadence_mask,
@@ -803,6 +774,8 @@ class CBVCorrector(RegressionCorrector):
         # We only want the last entry, which is for the target under study
         correlation = correlation[-1]
 
+        # We want the goodness to span (0,1]
+        # Use twice a reversed sigmoid to get a [0,1] range mapped from a [0,inf) range
         def sigmoidInv(x): return 2.0 / (1 + np.exp(x))
         metric = sigmoidInv(correlation)
 
@@ -811,7 +784,8 @@ class CBVCorrector(RegressionCorrector):
 
     def _correct_initialization(self, cbv_type='SingleScale', cbv_indices='ALL',
             ext_dm=None):
-        """ Performs all the preparatory work needed before applying a 'correct' method.
+        """ Performs all the preparatory work needed before applying a 'correct'
+        method.
 
         This helper function is used so that multiple correct methods can be used
         without the need to repeat preparatory code.
@@ -829,7 +803,6 @@ class CBVCorrector(RegressionCorrector):
             Can be None if only ext_dm is used
         ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
             Optionally pass an extra design matrix to additionally be used in the fit
-
         """
 
         assert not ((cbv_type is None) ^ (cbv_indices is None)), \
@@ -920,6 +893,12 @@ class CBVCorrector(RegressionCorrector):
             # Just use extra_design_matrix
             flattened_dm_list = [self.extra_design_matrix]
 
+        # Add in a constant to the design matrix collection
+        # Note: correct_ElasticNet ASSUMES the the last vector in the
+        # design_matrix_collection is the constant
+        flattened_dm_list.append(DesignMatrix(np.ones(flattened_dm_list[0].shape[0]),
+            columns=['Constant'], name='Constant'))
+
         self.design_matrix_collection = DesignMatrixCollection(flattened_dm_list)
         self.design_matrix_collection.validate()
 
@@ -957,10 +936,10 @@ class CBVCorrector(RegressionCorrector):
 
         Uses the paramaters in self.optimization_params.
 
-        Parameters
+        Parameters (in self.optimization_params)
         ----------
         alpha : float
-            regualrization penalty term value to set
+            regularization penalty term value to set
         cadence_mask : np.ndarray of bools (optional)
             Mask, where True indicates a cadence that should be used.
         target_over_score : float
@@ -974,7 +953,6 @@ class CBVCorrector(RegressionCorrector):
         -------
         penalty : float
             Penalty term for minimizer, based on goodness metrics
-
         """
 
         # Add in a width to the Gaussian priors
@@ -1140,6 +1118,9 @@ class CBVCorrector(RegressionCorrector):
         
         return dict_string
 
+#*******************************************************************************
+#*******************************************************************************
+#*******************************************************************************
 def compute_correlation(fluxMatrix):
     """  Finds the empirical target to target flux time series Pearson correlation.
 
