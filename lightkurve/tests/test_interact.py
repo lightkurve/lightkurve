@@ -109,21 +109,6 @@ def test_transform_and_ylim_funcs():
 
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
-def test_max_cadences():
-    """Test what is the max number of cadences allowed"""
-    import bokeh
-    with warnings.catch_warnings():
-        # Ignore the "TELESCOP is not equal to TESS" warning
-        warnings.simplefilter("ignore", LightkurveWarning)
-        tpfs = [KeplerTargetPixelFile(TABBY_TPF),
-                TessTargetPixelFile(example_tpf)]
-    for tpf in tpfs:
-        with pytest.raises(RuntimeError) as exc:
-            tpf.interact(max_cadences=2)
-            assert('Interact cannot display more than' in exc.value.args[0])
-
-
-@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_functions():
     """Do the helper functions in the interact module run without syntax error?"""
     import bokeh
