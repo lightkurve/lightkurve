@@ -54,7 +54,7 @@ lightkurve.targetpixelfile
   memory leak on indexing or slicing a tpf. [#829]
 
 - Modified ``interact()`` to use ``max_cadences=200000`` by default to allow
-  it to be used on fast-cadence TESS data.
+  it to be used on fast-cadence TESS data. [#856]
 
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
