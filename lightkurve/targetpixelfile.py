@@ -1002,7 +1002,7 @@ class TargetPixelFile(object):
             output_fn = "{}-targ.fits".format(self.targetid)
         self.hdu.writeto(output_fn, overwrite=overwrite, checksum=True)
 
-    def interact(self, notebook_url='localhost:8888', max_cadences=30000,
+    def interact(self, notebook_url='localhost:8888', max_cadences=200000,
                  aperture_mask='default', exported_filename=None,
                  transform_func=None, ylim_func=None, **kwargs):
         """Display an interactive Jupyter Notebook widget to inspect the pixel data.
@@ -1029,7 +1029,7 @@ class TargetPixelFile(object):
             properly. If no protocol is supplied in the URL, e.g. if it is
             of the form "localhost:8888", then "http" will be used.
         max_cadences : int
-            Raise a RuntimeError if the number of cadences shown is larger than
+            Print an error message if the number of cadences shown is larger than
             this value. This limit helps keep browsers from becoming unresponsive.
         aperture_mask : array-like, 'pipeline', 'threshold', 'default', or 'all'
             A boolean array describing the aperture such that `True` means
