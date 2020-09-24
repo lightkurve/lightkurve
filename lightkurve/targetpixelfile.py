@@ -1029,7 +1029,7 @@ class TargetPixelFile(object):
             properly. If no protocol is supplied in the URL, e.g. if it is
             of the form "localhost:8888", then "http" will be used.
         max_cadences : int
-            Raise a RuntimeError if the number of cadences shown is larger than
+            Print an error message if the number of cadences shown is larger than
             this value. This limit helps keep browsers from becoming unresponsive.
         aperture_mask : array-like, 'pipeline', 'threshold', 'default', or 'all'
             A boolean array describing the aperture such that `True` means
