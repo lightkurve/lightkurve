@@ -1002,7 +1002,7 @@ class TargetPixelFile(object):
             output_fn = "{}-targ.fits".format(self.targetid)
         self.hdu.writeto(output_fn, overwrite=overwrite, checksum=True)
 
-    def interact(self, notebook_url='localhost:8888', max_cadences=30000,
+    def interact(self, notebook_url='localhost:8888', max_cadences=200000,
                  aperture_mask='default', exported_filename=None,
                  transform_func=None, ylim_func=None, **kwargs):
         """Display an interactive Jupyter Notebook widget to inspect the pixel data.

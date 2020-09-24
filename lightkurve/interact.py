@@ -444,7 +444,7 @@ def make_default_export_name(tpf, suffix='custom-lc'):
 
 def show_interact_widget(tpf, notebook_url='localhost:8888',
                          lc=None,
-                         max_cadences=30000,
+                         max_cadences=200000,
                          aperture_mask='default',
                          exported_filename=None,
                          transform_func=None,
@@ -561,9 +561,21 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
     # Bokeh cannot handle many data points
     # https://github.com/bokeh/bokeh/issues/7490
-    if len(lc.cadenceno) > max_cadences:
-        msg = 'Interact cannot display more than {} cadences.'
-        raise RuntimeError(msg.format(max_cadences))
+    n_cadences = len(lc.cadenceno)
+    if n_cadences > max_cadences:
+        raise RuntimeError(
+            f"Interact cannot display more than {max_cadences} cadences "
+            "without suffering significant performance issues. You can "
+            "limit the number of cadences show using slicing, e.g. "
+            "`tpf[0:1000].interact()`. Alternatively, you can override "
+            "this limitation by passing the `max_cadences` argument."
+        )
+    elif n_cadences > 30000:
+        warnings.warn(f"The Target Pixel File contains {n_cadences} cadences. "
+                       "The performance of interact() is very slow for such a "
+                       "large number of frames. Consider using slicing, e.g. "
+                       "`tpf[0:1000].interact()`, to make interact run faster.",
+                       LightkurveWarning)
 
     def create_interact_ui(doc):
         # The data source includes metadata for hover-over tooltips
