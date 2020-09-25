@@ -269,6 +269,7 @@ class DesignMatrix():
             dm = self.copy()
         extra_df = pd.DataFrame(np.atleast_2d(np.ones(self.shape[0])).T, columns=['offset'])
         dm.df = pd.concat([self.df, extra_df], axis=1)
+        dm.columns = list(dm.df.columns)
         dm.prior_mu = np.append(self.prior_mu, prior_mu)
         dm.prior_sigma = np.append(self.prior_sigma, prior_sigma)
         return dm
