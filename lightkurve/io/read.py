@@ -27,10 +27,9 @@ def open(path_or_url, **kwargs):
 def read(path_or_url, **kwargs):
     """Reads any valid Kepler or TESS data file and returns an instance of
     `~lightkurve.lightcurve.LightCurve` or
-    `~lightkurve.targetpixelfile.TargetPixelFile`.
+    :class:`TargetPixelFile <lightkurve.targetpixelfile>`
 
-    This function will use the `detect_filetype()` function to
-    automatically detect the type of the data product, and return the
+    This function will automatically detect the type of the data product, and return the
     appropriate object. File types currently supported include::
 
         * `KeplerTargetPixelFile` (typical suffix "-targ.fits.gz");
@@ -42,22 +41,38 @@ def read(path_or_url, **kwargs):
     ----------
     path_or_url : str
         Path or URL of a FITS file.
+    quality_bitmask : str or int, optional
+        Bitmask (integer) which identifies the quality flag bitmask that should
+        be used to mask out bad cadences. If a string is passed, it has the
+        following meaning:
+
+            * "none": no cadences will be ignored
+            * "default": cadences with severe quality issues will be ignored
+            * "hard": more conservative choice of flags to ignore
+              This is known to remove good data.
+            * "hardest": removes all data that has been flagged
+              This mask is not recommended.
+
+        See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` or :class:`TessQualityFlags <lightkurve.utils.TessQualityFlags>` class for details on the bitmasks.
+    flux_column : str, optional
+        (Applicable to LightCurve products only) The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
+        Typically 'pdcsap_flux' or 'sap_flux'.
 
     Returns
     -------
-    data : a subclass of  `~lightkurve.targetpixelfile.TargetPixelFile` or
-        `~lightkurve.lightcurve.LightCurve`, depending on the detected file type.
+    data : a subclass of :class:`TargetPixelFile <lightkurve.targetpixelfile>` or `~lightkurve.lightcurve.LightCurve`
+           depending on the detected file type.
 
     Raises
     ------
-    ValueError : raised if the data product is not recognized as a Kepler or
-        TESS product.
+    ValueError : raised if the data product is not recognized as a Kepler or TESS product.
 
     Examples
     --------
     To read a target pixel file using its path or URL, simply use:
 
-        >>> tpf = read("mytpf.fits")  # doctest: +SKIP
+        >>> import lightkurve as lk
+        >>> tpf = lk.read("mytpf.fits")  # doctest: +SKIP
     """
     log.debug("Opening {}.".format(path_or_url))
     # pass header into `detect_filetype()`
