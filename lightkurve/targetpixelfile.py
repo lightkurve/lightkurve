@@ -1264,8 +1264,9 @@ class TargetPixelFile(object):
     
     
     @staticmethod
-    def from_fits_images(images, position, size=(11, 11), extension=1,
-                         target_id="unnamed-target", hdu0_keywords=None, **kwargs):
+    def from_fits_images(images_flux, position, images_raw_cnts=None, images_flux_err=None,
+                         images_flux_bkg=None, images_flux_bkg_err=None, images_cosmic_rays=None,
+                         size=(11, 11), extension=1, target_id="unnamed-target", hdu0_keywords=None, **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
         This method is intended to make it easy to cut out targets from
@@ -1273,16 +1274,32 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        images : list of str, or list of fits.ImageHDU objects
+        images_flux : list of str, or list of fits.ImageHDU objects
             Sorted list of FITS filename paths or ImageHDU objects to get
-            the data from.
+            the flux data from.
         position : astropy.SkyCoord
             Position around which to cut out pixels.
+        images_raw_cnts : list of str, or list of fits.ImageHDU objects
+            Sorted list of FITS filename paths or ImageHDU objects to get
+            the raw counts data from.
+        images_flux_err : list of str, or list of fits.ImageHDU objects
+            Sorted list of FITS filename paths or ImageHDU objects to get
+            the flux error data from.
+        images_flux_bkg : list of str, or list of fits.ImageHDU objects
+            Sorted list of FITS filename paths or ImageHDU objects to get
+            the background data from.
+        images_flux_bkg_err : list of str, or list of fits.ImageHDU objects
+            Sorted list of FITS filename paths or ImageHDU objects to get
+            the background error data from.
+        images_cosmic_rays : list of str, or list of fits.ImageHDU objects
+            Sorted list of FITS filename paths or ImageHDU objects to get
+            the cosmic rays data from.
         size : (int, int)
             Dimensions (cols, rows) to cut out around `position`.
         extension : int or str
             If `images` is a list of filenames, provide the extension number
-            or name to use. Default: 0.
+            or name to use. This should be the same for all flux inputs
+            provided. Default: 1.
         target_id : int or str
             Unique identifier of the target to be recorded in the TPF.
         hdu0_keywords : dict
@@ -1295,7 +1312,9 @@ class TargetPixelFile(object):
         tpf : TargetPixelFile
             A new Target Pixel File assembled from the images.
         """
-        if len(images) == 0:
+        len_images = len(images_flux)
+
+        if len_images == 0:
             raise ValueError('One or more images must be passed.')
         if not isinstance(position, SkyCoord):
             raise ValueError('Position must be an astropy.coordinates.SkyCoord.')
@@ -1316,20 +1335,36 @@ class TargetPixelFile(object):
             else:
                 hdu = fits.open(img)[extension]
             return hdu
+        
+        # Define a helper function to cutout images if not None
+        def _cutout_image(hdu, position, wcs_ref, size):
+            if hdu is None:
+                cutout_data = None
+                cutout_wcs = None
+            elif position is None:
+                cutout_data = hdu.data
+                cutout_wcs = hdu.wcs
+            else:
+                cutout = Cutout2D(hdu.data, position, wcs=wcs_ref,
+                                  size=size, mode='partial')
+                cutout_data = cutout.data
+                cutout_wcs = cutout.wcs
+            return cutout_data, cutout_wcs
 
         # Set the default extension if unspecified
         if extension is None:
             extension = 0
-            if isinstance(images[0], str) and images[0].endswith("ffic.fits"):
+            if isinstance(images_flux[0], str) and images_flux[0].endswith("ffic.fits"):
                 extension = 1  # TESS FFIs have the image data in extension #1
 
         # If no position is given, ensure the cut-out size matches the image size
         if position is None:
-            size = _open_image(images[0], extension).data.shape
+            size = _open_image(images_flux[0], extension).data.shape
 
         # Find middle image to use as a WCS reference
         try:
-            mid_hdu = _open_image(images[int(len(images) / 2) - 1], extension)
+            mid_hdu = _open_image(images_flux[int(len_images / 2) - 1], extension)
+
             wcs_ref = WCS(mid_hdu)
             column, row = wcs_ref.all_world2pix(
                             np.asarray([[position.ra.deg], [position.dec.deg]]).T,
@@ -1338,7 +1373,7 @@ class TargetPixelFile(object):
             raise e
 
         # Create a factory and set default keyword values based on the middle image
-        factory = TargetPixelFileFactory(n_cadences=len(images),
+        factory = TargetPixelFileFactory(n_cadences=len_images,
                                                n_rows=size[0],
                                                n_cols=size[1],
                                                target_id=target_id)
@@ -1353,16 +1388,22 @@ class TargetPixelFile(object):
 
         allkeys = hdu0_keywords.copy()
         allkeys.update(carry_keywords)
+        
+        img_list = [images_raw_cnts, images_flux, images_flux_err, images_flux_bkg, images_flux_bkg_err, images_cosmic_rays]
 
-        for idx, img in tqdm(enumerate(images), total=len(images)):
-            hdu = _open_image(img, extension)
-
-            if idx == 0:  # Get default keyword values from the first image
-                factory.keywords = hdu.header
-
+        for idx, img in tqdm(enumerate(images_flux), total=len_images):
+            # Open images if provided and get HDUs
+            hdu_list = [_open_image(i[idx], extension) if i is not None else None for i in img_list]
+                
+            # Use the header in the flux image for each frame
+            hdu_idx = hdu_list[1].header
+            
+            if idx == 0:  # Get default keyword values from the first flux image
+                factory.keywords = hdu_idx
 
             # Get positional shift of the image compared to the reference WCS
-            wcs_current = WCS(hdu.header)
+            wcs_current = WCS(hdu_idx)
+
             column_current, row_current = wcs_current.all_world2pix(
                 np.asarray([[position.ra.deg], [position.dec.deg]]).T, 0)[0]
             column_ref, row_ref = wcs_ref.all_world2pix(
@@ -1373,20 +1414,23 @@ class TargetPixelFile(object):
                 # standard for being too long, but we use it for consistency
                 # with the TPF column name.  Hence we ignore the warning.
                 warnings.simplefilter("ignore", AstropyWarning)
-                hdu.header['POS_CORR1'] = column_current - column_ref
-                hdu.header['POS_CORR2'] = row_current - row_ref
+                hdu_idx['POS_CORR1'] = column_current - column_ref
+                hdu_idx['POS_CORR2'] = row_current - row_ref
 
-            if position is None:
-                cutout = hdu
-            else:
-                cutout = Cutout2D(hdu.data, position, wcs=wcs_ref,
-                                  size=size, mode='partial')
-            factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
+            # Cutout (if neccessary) and get data
+            cutout_list = [_cutout_image(hdu, position, wcs_ref, size) for hdu in hdu_list]
+            # Flatten output list
+            cutout_list = flat_list = [item for sublist in cutout_list for item in sublist]
+            raw_cnts, _, flux, wcs, flux_err, _, flux_bkg, _, flux_bkg_err, _, cosmic_rays, _ = cutout_list
+            
+            factory.add_cadence(frameno=idx, raw_cnts=raw_cnts, flux=flux, flux_err=flux_err,
+                                flux_bkg=flux_bkg, flux_bkg_err=flux_bkg_err, cosmic_rays=cosmic_rays,
+                                header=hdu_idx)
 
         ext_info = {}
         ext_info['TFORM4'] = '{}J'.format(size[0] * size[1])
         ext_info['TDIM4'] = '({},{})'.format(size[0], size[1])
-        ext_info.update(cutout.wcs.to_header())
+        ext_info.update(wcs.to_header())
 
         # TPF contains multiple data columns that require WCS
         for m in [4, 5, 6, 7, 8, 9]:
@@ -2074,7 +2118,7 @@ class TessTargetPixelFile(TargetPixelFile):
     Parameters
     ----------
     path : str
-        Path to a Kepler Target Pixel (FITS) File.
+        Path to a TESS Target Pixel (FITS) File.
     quality_bitmask : "none", "default", "hard", "hardest", or int
         Bitmask that should be used to ignore bad-quality cadences.
         If a string is passed, it has the following meaning:
