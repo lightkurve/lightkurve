@@ -1298,8 +1298,8 @@ class TargetPixelFile(object):
             Dimensions (cols, rows) to cut out around `position`.
         extension : int or str
             If `images` is a list of filenames, provide the extension number
-            or name to use. This should be the same for `images_flux` and `image_bkg`
-            if provided. Default: 0.
+            or name to use. This should be the same for all flux inputs
+            provided. Default: 1.
         target_id : int or str
             Unique identifier of the target to be recorded in the TPF.
         hdu0_keywords : dict
