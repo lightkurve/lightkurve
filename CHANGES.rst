@@ -56,6 +56,9 @@ lightkurve.targetpixelfile
 - Modified ``interact()`` to use ``max_cadences=200000`` by default to allow
   it to be used on fast-cadence TESS data. [#856]
 
+- Modified `TargetPixelFactory` to support creating TESS Target Pixel Files
+  and to enable it to populate all data columns. [#768, #857]
+
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
 

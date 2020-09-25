@@ -15,6 +15,7 @@ developer, please open an issue!
 - `Michael Gully-Santiago <https://github.com/gully>`_
 - `Daniel Hey <https://github.com/danielhey>`_
 - `Oliver Hall <https://github.com/ojhall94>`_
+- `Sam Lee <https://github.com/orionlee>`_
 
 
 Contributors
@@ -34,12 +35,12 @@ The following GitHub members directly contributed code and bugfixes:
 - `Zachory K. Berta-Thompson <https://github.com/zkbt>`_
 - `Peter Williams <https://github.com/pkgw>`_
 - `Szabo Pal <https://github.com/zabop>`_
-- `Sam Lee <https://github.com/orionlee>`_
 - `Jeff Smith <https://github.com/jcsmithhere>`_
 - `Daniel Foreman-Mackey <https://github.com/dfm>`_
 - `Michael Higgins <Higgins00>`_
 - `Rebekah Hounsell <https://github.com/rebekah9969>`_
 - `Isabel Coleman <https://github.com/astrobel>`_
+- `Colin J. Burke <https://github.com/burke86>`_
 
 
 Community
