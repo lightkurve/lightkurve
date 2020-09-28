@@ -924,7 +924,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             The LightCurve from which to compute the Periodogram.
         duration : float, array_like, or `~astropy.units.Quantity`, optional
             The set of durations that will be considered.
-            Default to `0.25` if not specified.
+            Default to `[0.05, 0.10, 0.15, 0.20, 0.25, 0.33]` if not specified.
         period : array_like or `~astropy.units.Quantity`, optional
             The periods where the Periodogram should be computed.
             If not provided, a default will be created using
@@ -983,7 +983,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             dy = None
 
         # Validate user input for `duration`
-        duration = kwargs.pop("duration", 0.25)
+        duration = kwargs.pop("duration", [0.05, 0.10, 0.15, 0.20, 0.25, 0.33])
         if duration is not None and ~np.all(np.isfinite(duration)):
             raise ValueError("`duration` parameter contains illegal nan or inf value(s)")
 
