@@ -1715,9 +1715,9 @@ class LightCurve(TimeSeries):
         power spectrum object.
 
         This method will call either
-        `lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve()` or
-        `lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve()`,
-        which in turn wrap `astropy.stats.LombScargle` and `astropy.stats.BoxLeastSquares`.
+        `LombScarglePeriodogram.from_lightcurve() <lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve>` or
+        `BoxLeastSquaresPeriodogram.from_lightcurve() <lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve>`,
+        which in turn wrap `astropy`'s `~astropy.timeseries.LombScargle` and `~astropy.timeseries.BoxLeastSquares`.
 
         Optional keywords accepted if ``method='lombscargle'`` are:
         ``minimum_frequency``, ``maximum_frequency``, ``mininum_period``,
@@ -1738,8 +1738,8 @@ class LightCurve(TimeSeries):
             and ``'boxleastsquares'``.
         kwargs : dict
             Keyword arguments passed to either
-            `~lightkurve.periodogram.LombScarglePeriodogram` or
-            `~lightkurve.periodogram.BoxLeastSquaresPeriodogram`.
+            `LombScarglePeriodogram <lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve>` or
+            `BoxLeastSquaresPeriodogram <lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve>`.
 
         Returns
         -------
