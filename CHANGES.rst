@@ -79,7 +79,7 @@ lightkurve.correctors
   systematics removal methods to benefit from ``scipy.sparse`` speed-ups. [#732]
 
 - Modified ``PLDCorrector`` to make use of the new ``RegressionCorrector``
-  and ``DesignMatrix`` classes. [#746]
+  and ``DesignMatrix`` classes. [#746, #847]
 
 - Fixed a bug in ``SFFCorrector`` which caused correction to fail if a light
   curve's ``centroid_col`` or ``centroid_row`` columns contained NaNs. [#827]
