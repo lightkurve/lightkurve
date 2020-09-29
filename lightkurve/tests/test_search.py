@@ -316,3 +316,21 @@ def test_download_flux_column():
     """Can we pass reader keyword arguments to the download method?"""
     lc = search_lightcurve("Pi Men", sector=12).download(flux_column='sap_flux')
     assert_array_equal(lc.flux, lc.sap_flux)
+
+
+@pytest.mark.remote_data
+def test_cadence_filtering():
+    """Can we pass "fast", "short", exposure time to the cadence argument?"""
+    # Try `cadence="fast"`
+    res = search_lightcurve("AU Mic", sector=27, cadence="fast")
+    assert(len(res) == 1)
+    assert res.table['t_exptime'][0] == 20
+    # Try `cadence="short"`
+    res = search_lightcurve("AU Mic", sector=27, cadence="short")
+    assert(len(res) == 1)
+    assert res.table['t_exptime'][0] == 120
+    # Try `cadence=20`
+    res = search_lightcurve("AU Mic", sector=27, cadence=20)
+    assert(len(res) == 1)
+    assert res.table['t_exptime'][0] == 20
+    assert "fast" in res.table['productFilename'][0]
