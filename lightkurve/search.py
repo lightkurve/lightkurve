@@ -418,8 +418,13 @@ def search_targetpixelfile(target, radius=None, cadence=None,
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
-    cadence : str
-        'long' or 'short'.
+    cadence : 'long', 'short', 'fast', or float
+        'long' selects 10-min and 30-min cadence products;
+        'short' selects 1-min and 2-min products;
+        'fast' selects 20-sec products.
+        Alternatively, you can pass the exact exposure time in seconds as
+        an int or a float, e.g. ``cadence=600`` selects 10-minute cadence.
+        By default, all cadence modes are returned.
     mission : str, tuple of str
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     author : str, tuple of str, or "any"
@@ -522,8 +527,13 @@ def search_lightcurve(target, radius=None, cadence=None,
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
-    cadence : str
-        'long' or 'short'.
+    cadence : 'long', 'short', 'fast', or float
+        'long' selects 10-min and 30-min cadence products;
+        'short' selects 1-min and 2-min products;
+        'fast' selects 20-sec products.
+        Alternatively, you can pass the exact exposure time in seconds as
+        an int or a float, e.g. ``cadence=600`` selects 10-minute cadence.
+        By default, all cadence modes are returned.
     mission : str, tuple of str
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     author : str, tuple of str, or "any"
@@ -648,8 +658,13 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence=None,
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
     filetype : {'Target pixel', 'Lightcurve', 'FFI'}
         Type of files queried at MAST.
-    cadence : str
-        Desired cadence (`long`, `short`, `any`)
+    cadence : 'long', 'short', 'fast', or float
+        'long' selects 10-min and 30-min cadence products;
+        'short' selects 1-min and 2-min products;
+        'fast' selects 20-sec products.
+        Alternatively, you can pass the exact exposure time in seconds as
+        an int or a float, e.g. ``cadence=600`` selects 10-minute cadence.
+        By default, all cadence modes are returned.
     mission : str, list of str
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     provenance_name : str, list of str
@@ -914,8 +929,13 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         Desired quarter of observation for data products
     month : int or list
         Desired month of observation for data products
-    cadence : str
-        Desired cadence (`long`, `short`, `any`)
+    cadence : 'long', 'short', 'fast', or float
+        'long' selects 10-min and 30-min cadence products;
+        'short' selects 1-min and 2-min products;
+        'fast' selects 20-sec products.
+        Alternatively, you can pass the exact exposure time in seconds as
+        an int or a float, e.g. ``cadence=600`` selects 10-minute cadence.
+        By default, all cadence modes are returned.
     filetype : str
         Type of files queried at MAST (`Target Pixel` or `Lightcurve`).
 
