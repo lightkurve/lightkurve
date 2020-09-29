@@ -8,7 +8,6 @@ if no internet connection is available.
 import os
 import pytest
 
-import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 import tempfile
 from requests import HTTPError
@@ -30,11 +29,11 @@ def test_search_targetpixelfile():
     # ...including Campaign 4
     assert(len(search_targetpixelfile('EPIC 210634047', mission='K2', campaign=4).table) == 1)
     # KIC 11904151 (Kepler-10) was observed in LC in 15 Quarters
-    assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler').table) == 15)
+    assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler', cadence='long').table) == 15)
     # ...including quarter 11 but not 12:
-    assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler', quarter=11).unique_targets) == 1)
-    assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler', quarter=12).table) == 0)
-    search_targetpixelfile('KIC 11904151', quarter=11).download()
+    assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler', cadence='long', quarter=11).unique_targets) == 1)
+    assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler', cadence='long', quarter=12).table) == 0)
+    search_targetpixelfile('KIC 11904151', quarter=11, cadence='long').download()
     # with mission='TESS', it should return TESS observations
     tic = 'TIC 273985862'  # Has been observed in multiple sectors including 1
     assert(len(search_targetpixelfile(tic, mission='TESS').table) > 1)
@@ -45,6 +44,7 @@ def test_search_targetpixelfile():
     assert(len(search_targetpixelfile("pi Men")[-1]) == 1)
 
 
+@pytest.mark.remote_data
 def test_search_split_campaigns():
     """Searches should should work for split campaigns.
 
@@ -55,14 +55,14 @@ def test_search_split_campaigns():
     campaigns = [9, 10, 11]
     ids = ['EPIC 228162462', 'EPIC 228726301', 'EPIC 202975993']
     for c, idx in zip(campaigns, ids):
-        search = search_targetpixelfile(idx, campaign=c).table
+        search = search_targetpixelfile(idx, campaign=c, cadence='long').table
         assert(len(search) == 2)
 
 
 @pytest.mark.remote_data
 def test_search_lightcurve(caplog):
     # We should also be able to resolve it by its name instead of KIC ID
-    assert(len(search_lightcurve('Kepler-10', mission='Kepler').table) == 15)
+    assert(len(search_lightcurve('Kepler-10', mission='Kepler', cadence='long').table) == 15)
     # An invalid KIC/EPIC ID or target name should be dealt with gracefully
     search_lightcurve(-999)
     assert "Could not resolve" in caplog.text
@@ -149,19 +149,19 @@ def test_search_tesscut_download(caplog):
 @pytest.mark.remote_data
 def test_search_with_skycoord():
     """Can we pass both names, SkyCoord objects, and coordinate strings?"""
-    sr_name = search_targetpixelfile("Kepler-10", mission='Kepler')
+    sr_name = search_targetpixelfile("Kepler-10", mission='Kepler', cadence='long')
     assert len(sr_name) == 15  # Kepler-10 as observed during 15 quarters in long cadence
     # Can we search using a SkyCoord objects?
-    sr_skycoord = search_targetpixelfile(SkyCoord.from_name("Kepler_10"), mission='Kepler')
+    sr_skycoord = search_targetpixelfile(SkyCoord.from_name("Kepler_10"), mission='Kepler', cadence='long')
     assert_array_equal(sr_name.table['productFilename'], sr_skycoord.table['productFilename'])
     # Can we search using a string of "ra dec" decimals?
-    sr_decimal = search_targetpixelfile("285.67942179 +50.24130576", mission='Kepler')
+    sr_decimal = search_targetpixelfile("285.67942179 +50.24130576", mission='Kepler', cadence='long')
     assert_array_equal(sr_name.table['productFilename'], sr_decimal.table['productFilename'])
     # Can we search using a sexagesimal string?
-    sr_sexagesimal = search_targetpixelfile("19:02:43.1 +50:14:28.7", mission='Kepler')
+    sr_sexagesimal = search_targetpixelfile("19:02:43.1 +50:14:28.7", mission='Kepler', cadence='long')
     assert_array_equal(sr_name.table['productFilename'], sr_sexagesimal.table['productFilename'])
     # Can we search using the KIC ID?
-    sr_kic = search_targetpixelfile('KIC 11904151', mission='Kepler')
+    sr_kic = search_targetpixelfile('KIC 11904151', mission='Kepler', cadence='long')
     assert_array_equal(sr_name.table['productFilename'], sr_kic.table['productFilename'])
 
 
@@ -259,7 +259,7 @@ def test_corrupt_download_handling():
         os.makedirs(expected_dir)
         open(expected_fn, 'w').close()  # create "corrupt" i.e. empty file
         with pytest.raises(LightkurveError) as err:
-            search_targetpixelfile("Kepler-10", quarter=4).download(download_dir=tmpdirname)
+            search_targetpixelfile("Kepler-10", quarter=4, cadence='long').download(download_dir=tmpdirname)
         assert "may be corrupt" in err.value.args[0]
 
 
@@ -316,3 +316,21 @@ def test_download_flux_column():
     """Can we pass reader keyword arguments to the download method?"""
     lc = search_lightcurve("Pi Men", sector=12).download(flux_column='sap_flux')
     assert_array_equal(lc.flux, lc.sap_flux)
+
+
+@pytest.mark.remote_data
+def test_cadence_filtering():
+    """Can we pass "fast", "short", exposure time to the cadence argument?"""
+    # Try `cadence="fast"`
+    res = search_lightcurve("AU Mic", sector=27, cadence="fast")
+    assert(len(res) == 1)
+    assert res.table['t_exptime'][0] == 20
+    # Try `cadence="short"`
+    res = search_lightcurve("AU Mic", sector=27, cadence="short")
+    assert(len(res) == 1)
+    assert res.table['t_exptime'][0] == 120
+    # Try `cadence=20`
+    res = search_lightcurve("AU Mic", sector=27, cadence=20)
+    assert(len(res) == 1)
+    assert res.table['t_exptime'][0] == 20
+    assert "fast" in res.table['productFilename'][0]

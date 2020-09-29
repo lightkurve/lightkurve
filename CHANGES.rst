@@ -62,6 +62,14 @@ lightkurve.targetpixelfile
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
 
+- Added support for the new 20-second and 10-minute TESS cadence modes in the
+  search functions by allowing the exact exposure time to be specified via the
+  optional ``cadence`` argument.  In addition, the functions now also accept
+  ``cadence='fast'`` (for 20s) and ``cadence='ffi'`` (for 10m or 30m). [#831]
+
+- Modified the search functions to show the total exposure time of each data
+  product (``t_exptime``) in the search results table. [#831]
+
 - Added support for reading K2SFF and EVEREST community light curves via the
   ``LightCurve.read()`` and ``search_lightcurve()`` functions. [#739]
 
