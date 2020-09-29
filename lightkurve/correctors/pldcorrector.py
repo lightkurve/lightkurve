@@ -15,7 +15,6 @@ from itertools import combinations_with_replacement as multichoose
 import numpy as np
 import matplotlib.pyplot as plt
 
-import astropy.units as u
 from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 
 from .designmatrix import DesignMatrix, DesignMatrixCollection, \
@@ -23,7 +22,6 @@ from .designmatrix import DesignMatrix, DesignMatrixCollection, \
 from .regressioncorrector import RegressionCorrector
 from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
 from .. import MPLSTYLE
-from ..targetpixelfile import KeplerTargetPixelFile
 from ..utils import LightkurveDeprecationWarning
 
 
@@ -197,9 +195,7 @@ class PLDCorrector(RegressionCorrector):
         bkg_pixels = np.array([r[np.isfinite(r)] for r in bkg_pixels])
 
         # Create background design matrix
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', message='.*low rank.*')
-            dm_bkg = DesignMatrix(bkg_pixels, name='background')
+        dm_bkg = DesignMatrix(bkg_pixels, name='background')
         # Apply PCA
         dm_bkg = dm_bkg.pca(pca_components)
         # Set prior sigma to 10 * standard deviation
@@ -221,9 +217,7 @@ class PLDCorrector(RegressionCorrector):
             pld_pixels = np.array([r[np.isfinite(r)] for r in pld_pixels])
 
             # Use the DesignMatrix infrastructure to apply PCA to the regressors.
-            with warnings.catch_warnings():
-                warnings.filterwarnings('ignore', message='.*low rank.*')
-                regressors_dm = DesignMatrix(pld_pixels)
+            regressors_dm = DesignMatrix(pld_pixels)
             if pca_components > 0:
                 regressors_dm = regressors_dm.pca(pca_components)
             regressors_pld = regressors_dm.values
@@ -232,11 +226,9 @@ class PLDCorrector(RegressionCorrector):
             all_pld = []
             for order in range(1, pld_order+1):
                 reg_n = np.product(list(multichoose(regressors_pld.T, order)), axis=1).T
-                with warnings.catch_warnings():
-                    warnings.filterwarnings('ignore', message='.*low rank.*')
-                    pld_n = DesignMatrix(reg_n,
-                                         prior_sigma=np.ones(reg_n.shape[1]) * prior_sigma / reg_n.shape[1],
-                                         name=f"pld_order_{order}")
+                pld_n = DesignMatrix(reg_n,
+                                     prior_sigma=np.ones(reg_n.shape[1]) * prior_sigma / reg_n.shape[1],
+                                     name=f"pld_order_{order}")
                 # Apply PCA.
                 if pca_components > 0:
                     pld_n = pld_n.pca(pca_components)

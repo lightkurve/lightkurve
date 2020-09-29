@@ -69,7 +69,6 @@ class DesignMatrix():
             prior_sigma = np.ones(len(df.T)) * np.inf
         self.prior_mu = np.atleast_1d(prior_mu)
         self.prior_sigma = np.atleast_1d(prior_sigma)
-        self.validate()
 
     @property
     def X(self):
