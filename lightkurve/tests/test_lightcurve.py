@@ -1127,8 +1127,8 @@ def test_attr_access_columns():
 
     # Create a new column directly as an attribute: only attribute is created, not a column
     flux2_unitless = [6, 7, 8]
-    # TODO: assert UserWarning
-    lc.flux2 = flux2_unitless
+    with pytest.warns(UserWarning, match="new attribute name"):
+        lc.flux2 = flux2_unitless
     with pytest.raises(KeyError):
         lc['flux2']
     assert_array_equal(lc.flux2, flux2_unitless)
@@ -1156,6 +1156,14 @@ def test_attr_access_meta():
 
     lc.meta['bin'] = 'Some value'  # .bin: an existing method
     assert(lc.bin != lc.meta['bin'])
+
+    # Create a attribute: it is created as a object attribute, rather than meta
+    attr_value = 'bar_value'
+    with pytest.warns(UserWarning, match="new attribute name"):
+        lc.foo = attr_value
+    assert(lc.meta.get('foo', None) is None)
+    assert(lc.foo == attr_value)
+
 
 
 def test_attr_access_others():

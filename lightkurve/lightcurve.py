@@ -234,6 +234,8 @@ class LightCurve(TimeSeries):
         elif ('_meta' in self.__dict__) and (name in self.__dict__['_meta']):
             self.__dict__['_meta'][name] = value
         else:
+            warnings.warn("Lightkurve doesn't allow columns or meta values to be created via a new attribute name",
+                          UserWarning)
             super().__setattr__(name, value, **kwargs)
 
     def _base_repr_(self, html=False, descr_vals=None, **kwargs):
