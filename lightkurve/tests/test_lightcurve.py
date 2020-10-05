@@ -1092,6 +1092,85 @@ def test_assignment_time():
     assert_array_equal(lc.time, Time([21, 21, 21], scale='tdb', format='bkjd'))
 
 
+def test_attr_access_columns():
+    """Test accessing columns as attributes"""
+
+    u_e_s = u.electron / u.second
+    lc = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+
+    # Read/Write access of flux: explicitly defined as property
+    assert_array_equal(lc.flux, lc['flux'])
+    flux_updated = [7, 8, 9] * u_e_s
+    lc.flux = flux_updated
+    assert_array_equal(lc.flux, flux_updated)
+
+    # Read/Write access of cadenceno: not an explicit property, but present in most LightCurve objects in practice.
+    cadenceno_unitless = [101, 102, 103]
+    lc['cadenceno'] = cadenceno_unitless
+    assert_array_equal(lc['cadenceno'], cadenceno_unitless)
+    assert(lc.cadenceno is lc['cadenceno'])
+
+    # Read/Write access of new column
+    flux_adjusted = [7.1, 8.1, 9.1] * u_e_s
+    lc['flux_adjusted'] = flux_adjusted
+    assert_array_equal(lc['flux_adjusted'], flux_adjusted)
+    assert(lc.flux_adjusted is lc['flux_adjusted'])
+
+    # column name is an existing method / attribute: attribute access not available
+    info_col = [9, 8, 7] * u_e_s
+    lc['info'] = info_col  # .info is a built-in attribute (from base TimeSeries)
+    assert(type(lc.info) is not type(info_col))
+
+    bin_col = [5, 6, 7 ] * u_e_s
+    lc['bin'] = bin_col  # .bin is a built-in method
+    assert(type(lc.bin) is not type(bin_col))
+
+    # Create a new column directly as an attribute: only attribute is created, not a column
+    flux2_unitless = [6, 7, 8]
+    # TODO: assert UserWarning
+    lc.flux2 = flux2_unitless
+    with pytest.raises(KeyError):
+        lc['flux2']
+    assert_array_equal(lc.flux2, flux2_unitless)
+    assert(type(lc.flux2) is list)  # as it's just an attribute, there is no conversion done to Quantity
+
+
+
+def test_attr_access_meta():
+    """Test accessing meta values as attributes"""
+    u_e_s = u.electron / u.second
+    lc = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+
+    # Read/Write access of meta via attribute
+    lc.meta['sector'] = 14
+    assert(lc.sector == 14)
+
+    sector_corrected = 15
+    lc.sector = sector_corrected
+    assert(lc.sector == sector_corrected)
+    assert(lc.sector == lc.meta['sector'])
+
+    # meta key is an existing attribute / method: : attribute access not available
+    lc.meta['info'] = 'Some information'  # .info: an existing attribute
+    assert(lc.info != lc.meta['info'])
+
+    lc.meta['bin'] = 'Some value'  # .bin: an existing method
+    assert(lc.bin != lc.meta['bin'])
+
+
+def test_attr_access_others():
+    """Test accessing attributes, misc. boundary cases"""
+    u_e_s = u.electron / u.second
+    lc = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+
+    # case the name is present both as a column name and a meta key: column is returned
+    val_of_col = [5, 6, 7]
+    val_of_meta_key = 'value'
+    lc['foo'] = val_of_col
+    lc.meta['foo'] = val_of_meta_key
+    assert_array_equal(lc.foo, val_of_col) # lc.foo refers to the column
+
+
 def test_create_transit_mask():
     """Test for `LightCurve.create_transit_mask()`."""
     # Set planet parameters
