@@ -51,16 +51,17 @@ class HduToMetaMapping(collections.abc.Mapping):
     """Provides a read-only view of HDU header in `astropy.timeseries.TimeSeries.meta` format"""
 
     def __init__(self, hdu):
-        self._hdu = hdu
+        self._dict = {}
+        self._dict.update(hdu.header)
 
     def __getitem__(self, key):
-        return self._hdu.header[key]
+        return self._dict[key]
 
     def __len__(self):
-        return len(self._hdu.header)
+        return len(self._dict)
 
     def __iter__(self):
-        return iter(self._hdu.header)
+        return iter(self._dict)
 
 class TargetPixelFile(object):
     """Abstract class representing FITS files which contain time series imaging data.

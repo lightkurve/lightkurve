@@ -717,14 +717,13 @@ def test_tpf_meta():
     tpf = read(filename_tpf_one_center)
     assert tpf.meta.get('MISSION') == 'K2'
     assert tpf.meta['MISSION'] == 'K2'
-    assert tpf.meta['mission'] == 'K2'  # for the underlying hdu[0].header, key is case in-sensitive
+    assert tpf.meta.get('mission', None) is None  # key is case in-sensitive
     assert tpf.meta.get('CHANNEL') == 45
     # ensure meta is read-only view of the underlying self.hdu[0].header
     with pytest.raises(TypeError):
         tpf.meta['CHANNEL'] = 44
     with pytest.raises(TypeError):
         tpf.meta['KEY-NEW'] = 44
-    tpf.hdu[0].header['key1'] = 'val1'
 
 
 def test_estimate_background():
