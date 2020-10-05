@@ -185,7 +185,7 @@ class LightCurve(TimeSeries):
         # Ensure attributes are set if passed via deprecated kwargs
         for kw in deprecated_kws:
             if kw not in self.meta:
-                self.meta[kw] = deprecated_kws[kw]
+                self.meta[kw.upper()] = deprecated_kws[kw]
 
         # Ensure all required columns are in the right order
         with self._delay_required_column_checks():
@@ -219,21 +219,32 @@ class LightCurve(TimeSeries):
             return self.__class__.__dict__[name].__get__(self)
         elif name in self.columns:
             return self[name]
-        elif ('_meta' in self.__dict__) and (name in self.__dict__['_meta']):
-            return self.__dict__['_meta'][name]
+        elif ('_meta' in self.__dict__):
+            if (name in self.__dict__['_meta']):
+                return self.__dict__['_meta'][name]
+            elif (name.upper() in self.__dict__['_meta']):
+                return self.__dict__['_meta'][name.upper()]
         raise AttributeError(f"object has no attribute {name}")
 
     def __setattr__(self, name, value, **kwargs):
         """To get copied, attributes have to be stored in the meta dictionary!"""
+        to_set_as_attr = False
         if (name == 'time'):
             self['time'] = value # astropy will convert value to Time if needed
         elif ('columns' in self.__dict__) and (name in self.__dict__['columns']):
             if not isinstance(value, Quantity):
                 value = Quantity(value, dtype=value.dtype)
             self.replace_column(name, value)
-        elif ('_meta' in self.__dict__) and (name in self.__dict__['_meta']):
-            self.__dict__['_meta'][name] = value
+        elif ('_meta' in self.__dict__):
+            if (name in self.__dict__['_meta']):
+                self.__dict__['_meta'][name] = value
+            elif (name.upper() in self.__dict__['_meta']):
+                self.__dict__['_meta'][name.upper()] = value
+            else:
+                to_set_as_attr = True
         else:
+            to_set_as_attr = True
+        if to_set_as_attr:
             warnings.warn("Lightkurve doesn't allow columns or meta values to be created via a new attribute name",
                           UserWarning)
             super().__setattr__(name, value, **kwargs)
@@ -682,11 +693,11 @@ class LightCurve(TimeSeries):
 
         # Add extra column and meta data specific to FoldedLightCurve
         lc.add_column(self.time.copy(), name="time_original", index=len(self._required_columns))
-        lc.meta['period'] = period
-        lc.meta['epoch_time'] = epoch_time
-        lc.meta['epoch_phase'] = epoch_phase
-        lc.meta['wrap_phase'] = wrap_phase
-        lc.meta['normalize_phase'] = normalize_phase
+        lc.meta['PERIOD'] = period
+        lc.meta['EPOCH_TIME'] = epoch_time
+        lc.meta['EPOCH_PHASE'] = epoch_phase
+        lc.meta['WRAP_PHASE'] = wrap_phase
+        lc.meta['NORMALIZE_PHASE'] = normalize_phase
         lc.sort('time')
 
         return lc
@@ -749,7 +760,7 @@ class LightCurve(TimeSeries):
                           "not what you want".format(median_flux),
                           LightkurveWarning)
         # Warn if the light curve was already normalized before
-        if self.meta.get("normalized"):
+        if self.meta.get('NORMALIZED'):
             warnings.warn("The light curve already appears to be in relative "
                           "units; `normalize()` will convert the light curve "
                           "into relative units for a second time, which is "
@@ -776,7 +787,7 @@ class LightCurve(TimeSeries):
         elif unit == 'ppm':  # parts per million
             lc.flux = lc.flux.to(u.cds.ppm)
 
-        lc.meta['normalized'] = True
+        lc.meta['NORMALIZED'] = True
         return lc
 
     def remove_nans(self, column: str = 'flux'):
@@ -1331,14 +1342,14 @@ class LightCurve(TimeSeries):
                 ylabel = "Flux"
             else:
                 ylabel = f"{column}"
-            if normalize or self.meta.get("normalized"):
+            if normalize or self.meta.get('NORMALIZED'):
                 ylabel = "Normalized " + ylabel
             elif (self[column].unit) and (self[column].unit.to_string() != ''):
                 ylabel += f" [{self[column].unit.to_string('latex_inline')}]"
 
         # Default legend label
         if ('label' not in kwargs):
-            kwargs['label'] = self.meta.get('label')
+            kwargs['label'] = self.meta.get('LABEL')
 
         flux = self[column]
         try:
@@ -2017,7 +2028,7 @@ class LightCurve(TimeSeries):
             ax.set_xlabel("Phase")
             ax.set_ylabel("Cycle")
             ax.set_ylim(cyc.max(), 0)
-            ax.set_title(self.meta.get("label"))
+            ax.set_title(self.meta.get('LABEL'))
             a = cyc.max() * 0.1 / 12.
             b = (cyc.max() - cyc.min()) / (bs.max() - bs.min())
             ax.set_aspect(a/b)
@@ -2308,8 +2319,8 @@ class KeplerLightCurve(LightCurve):
                                                     overwrite=overwrite,
                                                     **extra_data)
 
-        hdu[0].header['QUARTER'] = self.meta.get('quarter')
-        hdu[0].header['CAMPAIGN'] = self.meta.get('campaign')
+        hdu[0].header['QUARTER'] = self.meta.get('QUARTER')
+        hdu[0].header['CAMPAIGN'] = self.meta.get('CAMPAIGN')
 
         hdu = _make_aperture_extension(hdu, aperture_mask)
 
@@ -2390,14 +2401,14 @@ class TessLightCurve(LightCurve):
         """
         tess_specific_data = {
             'OBJECT': '{}'.format(self.targetid),
-            'MISSION': self.meta.get('mission'),
-            'RA_OBJ': self.meta.get('ra'),
-            'TELESCOP': self.meta.get('mission'),
-            'CAMERA': self.meta.get('camera'),
-            'CCD': self.meta.get('ccd'),
-            'SECTOR': self.meta.get('sector'),
-            'TARGETID': self.meta.get('targetid'),
-            'DEC_OBJ': self.meta.get('dec'),
+            'MISSION': self.meta.get('MISSION'),
+            'RA_OBJ': self.meta.get('RA'),
+            'TELESCOP': self.meta.get('MISSION'),
+            'CAMERA': self.meta.get('CAMERA'),
+            'CCD': self.meta.get('CCD'),
+            'SECTOR': self.meta.get('SECTOR'),
+            'TARGETID': self.meta.get('TARGETID'),
+            'DEC_OBJ': self.meta.get('DEC'),
             'MOM_CENTR1': self.centroid_col,
             'MOM_CENTR2': self.centroid_row}
 

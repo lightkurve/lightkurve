@@ -28,7 +28,7 @@ def read_k2sff_lightcurve(filename, ext="BESTAPER", **kwargs):
                                  time_format='bkjd',
                                  ext=ext)
 
-    lc.meta['label'] = '{} (K2SFF)'.format(lc.meta.get("object"))
-    lc.meta['targetid'] = lc.meta.get('keplerid')
+    lc.meta['LABEL'] = '{} (K2SFF)'.format(lc.meta.get('OBJECT'))
+    lc.meta['TARGETID'] = lc.meta.get('KEPLERID')
 
     return KeplerLightCurve(data=lc, **kwargs)

@@ -54,9 +54,9 @@ def read_everest_lightcurve(filename,
                                 bitmask=quality_bitmask)
     lc = lc[quality_mask]
 
-    lc.meta['label'] = '{} (EVEREST)'.format(lc.meta.get("object"))
-    lc.meta['targetid'] = lc.meta.get('keplerid')
-    lc.meta['quality_bitmask'] = quality_bitmask
-    lc.meta['quality_mask'] = quality_mask
+    lc.meta['LABEL'] = '{} (EVEREST)'.format(lc.meta.get('OBJECT'))
+    lc.meta['TARGETID'] = lc.meta.get('KEPLERID')
+    lc.meta['QUALITY_BITMASK'] = quality_bitmask
+    lc.meta['QUALITY_MASK'] = quality_mask
 
     return KeplerLightCurve(data=lc, **kwargs)

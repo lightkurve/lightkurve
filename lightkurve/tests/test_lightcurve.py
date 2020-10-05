@@ -121,11 +121,11 @@ def test_KeplerLightCurveFile(path, mission):
 
     assert lc.mission.lower() == mission.lower()
     if lc.mission.lower() == 'kepler':
-        assert lc.meta.get('campaign') is None
+        assert lc.meta.get('CAMPAIGN') is None
         assert lc.quarter == 8
     elif lc.mission.lower() == 'k2':
         assert lc.campaign == 8
-        assert lc.meta.get('quarter') is None
+        assert lc.meta.get('QUARTER') is None
     assert lc.time.format == 'bkjd'
     assert lc.time.scale == 'tdb'
     assert lc.flux.unit == u.electron / u.second
@@ -177,7 +177,7 @@ def test_bitmasking(quality_bitmask, answer):
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
     lc = KeplerLightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1,
-                          targetid=999, label='mystar', meta={'ccd': 2})
+                          targetid=999, label='mystar', meta={'CCD': 2})
     fold = lc.fold(period=1)
     assert_almost_equal(fold.phase[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
@@ -185,7 +185,7 @@ def test_lightcurve_fold():
     assert fold.targetid == lc.targetid
     assert fold.label == lc.label
     assert set(lc.meta).issubset(set(fold.meta))
-    assert lc.meta['ccd'] == fold.meta['ccd']
+    assert lc.meta['CCD'] == fold.meta['CCD']
     assert_array_equal(np.sort(fold.time_original), lc.time)
     assert len(fold.time_original) == len(lc.time)
     fold = lc.fold(period=1, epoch_time=-0.1)
@@ -1142,20 +1142,20 @@ def test_attr_access_meta():
     lc = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
 
     # Read/Write access of meta via attribute
-    lc.meta['sector'] = 14
-    assert(lc.sector == 14)
+    lc.meta['SECTOR'] = 14
+    assert(lc.sector == 14)  # uppercased meta key is accessed as lowercased attributes
 
     sector_corrected = 15
     lc.sector = sector_corrected
     assert(lc.sector == sector_corrected)
-    assert(lc.sector == lc.meta['sector'])
+    assert(lc.sector == lc.meta['SECTOR'])
 
     # meta key is an existing attribute / method: : attribute access not available
-    lc.meta['info'] = 'Some information'  # .info: an existing attribute
-    assert(lc.info != lc.meta['info'])
+    lc.meta['INFO'] = 'Some information'  # .info: an existing attribute
+    assert(lc.info != lc.meta['INFO'])
 
-    lc.meta['bin'] = 'Some value'  # .bin: an existing method
-    assert(lc.bin != lc.meta['bin'])
+    lc.meta['BIN'] = 'Some value'  # .bin: an existing method
+    assert(lc.bin != lc.meta['BIN'])
 
     # Create a attribute: it is created as a object attribute, rather than meta
     attr_value = 'bar_value'
@@ -1164,6 +1164,13 @@ def test_attr_access_meta():
     assert(lc.meta.get('foo', None) is None)
     assert(lc.foo == attr_value)
 
+    # Case meta has 2 keys that only differs in case
+    lc.meta['KEYCASE'] = 'VALUE UPPER'
+    lc.meta['keycase'] = 'value lower'
+    # they are two different entries (case sensitive)
+    assert(lc.meta['KEYCASE'] == 'VALUE UPPER')
+    assert(lc.meta['keycase'] == 'value lower')
+    assert(lc.keycase == 'value lower')  # the meta entry with exact case is retrieved
 
 
 def test_attr_access_others():
@@ -1175,7 +1182,7 @@ def test_attr_access_others():
     val_of_col = [5, 6, 7]
     val_of_meta_key = 'value'
     lc['foo'] = val_of_col
-    lc.meta['foo'] = val_of_meta_key
+    lc.meta['FOO'] = val_of_meta_key
     assert_array_equal(lc.foo, val_of_col) # lc.foo refers to the column
 
 

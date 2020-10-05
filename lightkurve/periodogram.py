@@ -860,8 +860,8 @@ class LombScarglePeriodogram(Periodogram):
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
-                                      targetid=lc.meta.get('targetid'),
-                                      label=lc.meta.get('label'),
+                                      targetid=lc.meta.get('TARGETID'),
+                                      label=lc.meta.get('LABEL'),
                                       default_view=default_view, ls_obj=LS,
                                       nterms=nterms, ls_method=ls_method,
                                       meta=lc.meta)
@@ -888,7 +888,7 @@ class LombScarglePeriodogram(Periodogram):
         f = self._LS_object.model(time, frequency)
         lc = LightCurve(time=time,
                         flux=f,
-                        meta={'frequency':frequency},
+                        meta={'FREQUENCY':frequency},
                         label='LS Model',
                         targetid='{} LS Model'.format(self.targetid))
         return lc.normalize()
@@ -997,8 +997,8 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         return BoxLeastSquaresPeriodogram(frequency=1. / result.period,
                                           power=result.power,
                                           default_view='period',
-                                          label=lc.meta.get('label'),
-                                          targetid=lc.meta.get('targetid'),
+                                          label=lc.meta.get('LABEL'),
+                                          targetid=lc.meta.get('TARGETID'),
                                           transit_time=result.transit_time,
                                           duration=result.duration,
                                           depth=result.depth,
