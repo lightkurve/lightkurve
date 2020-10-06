@@ -62,6 +62,26 @@ class LightCurve(TimeSeries):
     **kwargs : dict
         Additional keyword arguments are passed to `~astropy.table.QTable`.
 
+    Attributes
+    ----------
+    meta : `dict`
+        meta data associated with the lightcurve. The header of the underlying FITS file (if applicable)
+        is available here as well.
+
+    Notes
+    -----
+    *Attribute access*: You can access a column or a ``meta`` value directly as an attribute.
+
+    >>> lc.flux    # shortcut for lc['flux']   # doctest: +SKIP
+    >>> lc.sector  # shortcut for lc.meta['SECTOR']   # doctest: +SKIP
+    >>> lc.flux = lc.flux * 1.05  # update the values of a column.   # doctest: +SKIP
+
+    In case the given name is both a column name and a key in ``meta``, the column will be returned.
+
+    Note that you *cannot* create a new column using the attribute interface. If you do so,
+    a new attribute is created instead, and a warning is raised.
+
+
     Examples
     --------
     >>> import lightkurve as lk
@@ -245,7 +265,8 @@ class LightCurve(TimeSeries):
         else:
             to_set_as_attr = True
         if to_set_as_attr:
-            warnings.warn("Lightkurve doesn't allow columns or meta values to be created via a new attribute name",
+            warnings.warn(("Lightkurve doesn't allow columns or meta values to be created via a new attribute name"
+                           " - see https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html"),
                           UserWarning)
             super().__setattr__(name, value, **kwargs)
 
