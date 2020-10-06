@@ -1142,3 +1142,16 @@ def test_row_repr():
     lc = LightCurve({'time': [1,2,3], 'flux':[1.,1.,1.]})
     lc[0].__repr__()
     lc[0]._repr_html_()
+
+
+def test_fill_gaps_units():
+    """Does `fill_gaps` behave correctly when flux is in units ppm?"""
+    lc = LightCurve({'time': [1, 2, 4, 5],
+                     'flux': [1, 1, 1, 1],
+                     'flux_err':[0.1, 0.1, 0.1, 0.1]})
+    lc = lc.normalize("ppm")
+    lc2 = lc.fill_gaps()
+    assert lc2.time[2].value == 3.
+    assert lc2.flux[2].value == 1e6
+    assert lc2.flux[2].unit == u.cds.ppm
+    assert lc2.flux_err[2] == 0.1

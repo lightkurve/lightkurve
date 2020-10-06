@@ -873,8 +873,8 @@ class LightCurve(TimeSeries):
         else:
             raise NotImplementedError("No such method as {}".format(method))
 
-        newdata['flux'] = f
-        newdata['flux_err'] = fe
+        newdata['flux'] = Quantity(f, lc.flux.unit)
+        newdata['flux_err'] = Quantity(fe, lc.flux_err.unit)
 
         if hasattr(lc, 'quality'):
             quality = np.zeros(len(ntime), dtype=lc.quality.dtype)
