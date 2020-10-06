@@ -81,6 +81,10 @@ class LightCurve(TimeSeries):
     Note that you *cannot* create a new column using the attribute interface. If you do so,
     a new attribute is created instead, and a warning is raised.
 
+    If you do create such attributes on purpose, please note that the attributes are not carried
+    over when the lightcurve object is copied, or a new lightcurve object is derived
+    based on a copy, e.g., ``normalize()``.
+
 
     Examples
     --------
@@ -273,7 +277,8 @@ class LightCurve(TimeSeries):
             to_set_as_attr = True
         if to_set_as_attr:
             if name not in self.__dict__ and not name.startswith("_") and not self._new_attributes_relax:
-                warnings.warn(("Lightkurve doesn't allow columns or meta values to be created via a new attribute name"
+                warnings.warn(("Lightkurve doesn't allow columns or meta values to be created via a new attribute name."
+                               "A new attribute is created. It will not be carried over when the object is copied."
                                " - see https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html"),
                               UserWarning, stacklevel=2)
             super().__setattr__(name, value, **kwargs)
