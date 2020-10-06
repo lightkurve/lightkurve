@@ -832,13 +832,13 @@ class LightCurve(TimeSeries):
         # Find missing time points
         # Most precise method, taking into account time variation due to orbit
         if hasattr(lc, 'cadenceno'):
-            dt = lc.time.value - np.median(np.diff(lc.time.value)) * lc.cadenceno
-            ncad = np.arange(lc.cadenceno[0], lc.cadenceno[-1] + 1, 1)
-            in_original = np.in1d(ncad, lc.cadenceno)
+            dt = lc.time.value - np.median(np.diff(lc.time.value)) * lc.cadenceno.value
+            ncad = np.arange(lc.cadenceno.value[0], lc.cadenceno.value[-1] + 1, 1)
+            in_original = np.in1d(ncad, lc.cadenceno.value)
             ncad = ncad[~in_original]
-            ndt = np.interp(ncad, lc.cadenceno, dt)
+            ndt = np.interp(ncad, lc.cadenceno.value, dt)
 
-            ncad = np.append(ncad, lc.cadenceno)
+            ncad = np.append(ncad, lc.cadenceno.value)
             ndt = np.append(ndt, dt)
             ncad, ndt = ncad[np.argsort(ncad)], ndt[np.argsort(ncad)]
             ntime = ndt + np.median(np.diff(lc.time.value)) * ncad
@@ -866,10 +866,10 @@ class LightCurve(TimeSeries):
         fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err)
         if method == 'gaussian_noise':
             try:
-                std = lc.estimate_cdpp()*1e-6
+                std = lc.estimate_cdpp().to(lc.flux.unit).value
             except:
-                std = lc.flux.std()
-            f[~in_original] = np.random.normal(lc.flux.mean(), std.value, (~in_original).sum())
+                std = np.nanstd(lc.flux.value)
+            f[~in_original] = np.random.normal(np.nanmean(lc.flux.value), std, (~in_original).sum())
         else:
             raise NotImplementedError("No such method as {}".format(method))
 
