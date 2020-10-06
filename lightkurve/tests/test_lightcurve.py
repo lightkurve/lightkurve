@@ -1134,6 +1134,13 @@ def test_attr_access_columns():
     assert_array_equal(lc.flux2, flux2_unitless)
     assert(type(lc.flux2) is list)  # as it's just an attribute, there is no conversion done to Quantity
 
+    # ensure no warning is raised when updating an existing attribute
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        lc.foo = 'bar'
+    with pytest.warns(None) as warn_record:
+        lc.foo = 'bar2'
+    assert len(warn_record) == 0
 
 
 def test_attr_access_meta():

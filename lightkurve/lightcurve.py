@@ -265,9 +265,10 @@ class LightCurve(TimeSeries):
         else:
             to_set_as_attr = True
         if to_set_as_attr:
-            warnings.warn(("Lightkurve doesn't allow columns or meta values to be created via a new attribute name"
-                           " - see https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html"),
-                          UserWarning)
+            if name not in self.__dict__:
+                warnings.warn(("Lightkurve doesn't allow columns or meta values to be created via a new attribute name"
+                               " - see https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html"),
+                              UserWarning, stacklevel=2)
             super().__setattr__(name, value, **kwargs)
 
     def _base_repr_(self, html=False, descr_vals=None, **kwargs):
