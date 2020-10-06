@@ -814,8 +814,11 @@ class LightCurve(object):
             if column == "quality":
                 continue
             old_values = getattr(lc, column)
-            new_values = np.empty(len(ntime), dtype=old_values.dtype)
-            new_values[~in_original] = np.nan
+            new_values = np.zeros(len(ntime), dtype=old_values.dtype)
+            try:
+                new_values[~in_original] = np.nan
+            except ValueError:
+                pass
             new_values[in_original] = np.copy(old_values)
             setattr(nlc, column, new_values)
 
