@@ -1,6 +1,8 @@
 1.11.3 (2020-10-06)
 ===================
 
+- Fixed inline plots not appearing in Jupyter Notebooks and Google Colab. [#865]
+
 - Fixed a bug in ``KeplerLightCurve.fill_gaps()`` which caused a ValueError
   to be raised. [#862]
 
