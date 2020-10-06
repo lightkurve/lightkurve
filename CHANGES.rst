@@ -109,6 +109,13 @@ lightkurve.periodogram
 
 
 
+1.11.3 (2020-10-06)
+===================
+
+- Fixed inline plots not appearing in Jupyter Notebooks and Google Colab. [#865]
+
+
+
 1.11.2 (2020-08-28)
 ===================
 
