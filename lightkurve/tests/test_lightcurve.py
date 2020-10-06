@@ -997,7 +997,7 @@ def test_bin_issue705():
 def test_SSOs():
     # TESS test
     lc = TessTargetPixelFile(asteroid_TPF).to_lightcurve(aperture_mask='all')
-    lc.mission = 'TESS' # needed to resolve default value for location argument
+    lc.meta['MISSION'] = 'TESS' # needed to resolve default value for location argument
     result = lc.query_solar_system_objects(cadence_mask='all', cache=False)
     assert(len(result) == 1)
     result = lc.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=False)

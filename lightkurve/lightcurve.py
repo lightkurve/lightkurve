@@ -110,6 +110,12 @@ class LightCurve(TimeSeries):
     _default_time_format = "jd"
     _default_time_scale = "tdb"
 
+    # To emulate pandas, we do not support creating new columns or meta data
+    # fields via attribute assignment, and raise a warning in __setattr__ when
+    # a new attribute is created.  We need to relax this warning during the
+    # initial construction of the object using `_new_attributes_relax`.
+    _new_attributes_relax = True
+
     def __init__(self, data=None, *args, time=None, flux=None, flux_err=None, **kwargs):
         # Delay checking for required columns until the end
         self._required_columns_relax = True
@@ -228,6 +234,7 @@ class LightCurve(TimeSeries):
         if self['flux'].unit != self['flux'].unit:
             raise ValueError("flux and flux_err must have the same units")
 
+        self._new_attributes_relax = False
         self._required_columns_relax = False
         self._check_required_columns()
 
@@ -265,7 +272,7 @@ class LightCurve(TimeSeries):
         else:
             to_set_as_attr = True
         if to_set_as_attr:
-            if name not in self.__dict__:
+            if name not in self.__dict__ and not name.startswith("_") and not self._new_attributes_relax:
                 warnings.warn(("Lightkurve doesn't allow columns or meta values to be created via a new attribute name"
                                " - see https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html"),
                               UserWarning, stacklevel=2)
@@ -1290,10 +1297,10 @@ class LightCurve(TimeSeries):
                 radius = 15*u.arcsecond.to(u.deg)
 
         res = _query_solar_system_objects(ra=self.ra, dec=self.dec,
-                                          times=self.astropy_time.jd[cadence_mask],
+                                          times=self.time.jd[cadence_mask],
                                           location=location, radius=radius, cache=cache)
         if return_mask:
-            return res, np.in1d(self.astropy_time.jd, res.epoch)
+            return res, np.in1d(self.time.jd, res.epoch)
         return res
 
     def _create_plot(self, method='plot', column='flux', ax=None, normalize=False,
