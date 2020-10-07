@@ -1192,6 +1192,10 @@ def test_attr_access_others():
     lc.meta['FOO'] = val_of_meta_key
     assert_array_equal(lc.foo, val_of_col) # lc.foo refers to the column
 
+    val_of_col_updated = [6, 7, 8] * u_e_s
+    lc.foo = val_of_col_updated  # should update the column rather than meta
+    assert_array_equal(lc.foo, val_of_col_updated)
+
 
 def test_create_transit_mask():
     """Test for `LightCurve.create_transit_mask()`."""
