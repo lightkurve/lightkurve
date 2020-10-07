@@ -47,6 +47,22 @@ __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
 
 
+class HduToMetaMapping(collections.abc.Mapping):
+    """Provides a read-only view of HDU header in `astropy.timeseries.TimeSeries.meta` format"""
+
+    def __init__(self, hdu):
+        self._dict = {}
+        self._dict.update(hdu.header)
+
+    def __getitem__(self, key):
+        return self._dict[key]
+
+    def __len__(self):
+        return len(self._dict)
+
+    def __iter__(self):
+        return iter(self._dict)
+
 class TargetPixelFile(object):
     """Abstract class representing FITS files which contain time series imaging data.
 
@@ -63,9 +79,7 @@ class TargetPixelFile(object):
         self.targetid = targetid
 
         # For consistency with `LightCurve`, provide a `meta` dictionary
-        self.meta = {}
-        self.meta.update(self.get_header(0))
-        self.meta = {k.lower(): v for k, v in self.meta.items()}
+        self.meta = HduToMetaMapping(self.hdu[0])
 
     def __getitem__(self, key):
         """Implements indexing and slicing.
@@ -1256,8 +1270,8 @@ class TargetPixelFile(object):
             warnings.simplefilter('ignore')
             newfits = fits.HDUList(hdus)
         return self.__class__(newfits, quality_bitmask=self.quality_bitmask)
-    
-    
+
+
     @staticmethod
     def from_fits_images(images_flux, position, images_raw_cnts=None, images_flux_err=None,
                          images_flux_bkg=None, images_flux_bkg_err=None, images_cosmic_rays=None,
@@ -1330,7 +1344,7 @@ class TargetPixelFile(object):
             else:
                 hdu = fits.open(img)[extension]
             return hdu
-        
+
         # Define a helper function to cutout images if not None
         def _cutout_image(hdu, position, wcs_ref, size):
             if hdu is None:
@@ -1383,16 +1397,16 @@ class TargetPixelFile(object):
 
         allkeys = hdu0_keywords.copy()
         allkeys.update(carry_keywords)
-        
+
         img_list = [images_raw_cnts, images_flux, images_flux_err, images_flux_bkg, images_flux_bkg_err, images_cosmic_rays]
 
         for idx, img in tqdm(enumerate(images_flux), total=len_images):
             # Open images if provided and get HDUs
             hdu_list = [_open_image(i[idx], extension) if i is not None else None for i in img_list]
-                
+
             # Use the header in the flux image for each frame
             hdu_idx = hdu_list[1].header
-            
+
             if idx == 0:  # Get default keyword values from the first flux image
                 factory.keywords = hdu_idx
 
@@ -1417,7 +1431,7 @@ class TargetPixelFile(object):
             # Flatten output list
             cutout_list = flat_list = [item for sublist in cutout_list for item in sublist]
             raw_cnts, _, flux, wcs, flux_err, _, flux_bkg, _, flux_bkg_err, _, cosmic_rays, _ = cutout_list
-            
+
             factory.add_cadence(frameno=idx, raw_cnts=raw_cnts, flux=flux, flux_err=flux_err,
                                 flux_bkg=flux_bkg, flux_bkg_err=flux_bkg_err, cosmic_rays=cosmic_rays,
                                 header=hdu_idx)
@@ -1735,7 +1749,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_keyword('OBJECT', default=self.targetid),
                 'targetid': self.targetid}
-        meta = {'aperture_mask': aperture_mask}
+        meta = {'APERTURE_MASK': aperture_mask}
         return KeplerLightCurve(time=self.time,
                                 flux=flux,
                                 flux_err=flux_err,
@@ -1961,7 +1975,7 @@ class TargetPixelFileFactory(object):
                           'returning generic TargetPixelFile instead.', LightkurveWarning)
             tpf = TargetPixelFile(hdulist, **kwargs)
         return tpf
-    
+
     def _hdulist(self, hdu0_keywords, ext_info):
         """Returns an astropy.io.fits.HDUList object."""
         return fits.HDUList([self._make_primary_hdu(hdu0_keywords=hdu0_keywords),
@@ -2233,7 +2247,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'dec': self.dec,
                 'label': self.get_keyword('OBJECT', default=self.targetid),
                 'targetid': self.targetid}
-        meta = {'aperture_mask': aperture_mask}
+        meta = {'APERTURE_MASK': aperture_mask}
         return TessLightCurve(time=self.time,
                               flux=flux,
                               flux_err=flux_err,

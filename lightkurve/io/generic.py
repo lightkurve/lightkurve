@@ -37,8 +37,7 @@ def read_generic_lightcurve(filename, flux_column,
     # Make sure the meta data also includes header fields from extension #0
     tab.meta.update(hdulist[0].header)
 
-    # Use lowercase for meta data fields
-    tab.meta = {k.lower(): v for k, v in tab.meta.items()}
+    tab.meta = {k : v for k, v in tab.meta.items()}
 
     # Some KEPLER files used to have a T column instead of TIME.
     if "T" in tab.colnames:
@@ -90,10 +89,10 @@ def read_generic_lightcurve(filename, flux_column,
     if 'centroid_row' not in tab.columns and centroid_row_column in tab.columns:
         tab.add_column(tab[centroid_row_column], name="centroid_row", index=5)
 
-    tab.meta['label'] = hdulist[0].header.get('OBJECT')
-    tab.meta['mission'] = hdulist[0].header.get('MISSION', hdulist[0].header.get('TELESCOP'))
-    tab.meta['ra'] = hdulist[0].header.get('RA_OBJ')
-    tab.meta['dec'] = hdulist[0].header.get('DEC_OBJ')
-    tab.meta['filename'] = filename
+    tab.meta['LABEL'] = hdulist[0].header.get('OBJECT')
+    tab.meta['MISSION'] = hdulist[0].header.get('MISSION', hdulist[0].header.get('TELESCOP'))
+    tab.meta['RA'] = hdulist[0].header.get('RA_OBJ')
+    tab.meta['DEC'] = hdulist[0].header.get('DEC_OBJ')
+    tab.meta['FILENAME'] = filename
 
     return LightCurve(time=time, data=tab)

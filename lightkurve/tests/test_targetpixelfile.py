@@ -687,7 +687,7 @@ def test_missing_pipeline_mask():
     tpf = search_tesscut("Proxima Cen", sector=12).download(cutout_size=1)
     lc = tpf.to_lightcurve()
     assert np.isfinite(lc.flux).any()
-    assert lc.meta.get('aperture_mask', None) == 'threshold'
+    assert lc.meta.get('APERTURE_MASK', None) == 'threshold'
 
     with pytest.raises(ValueError):
         # if aperture_mask is explicitly set as pipeline,
@@ -715,8 +715,15 @@ def test_parse_numeric_aperture_masks():
 def test_tpf_meta():
     """Can we access meta data using tpf.meta?"""
     tpf = read(filename_tpf_one_center)
-    assert tpf.meta.get('mission') == 'K2'
-    assert tpf.meta.get('channel') == 45
+    assert tpf.meta.get('MISSION') == 'K2'
+    assert tpf.meta['MISSION'] == 'K2'
+    assert tpf.meta.get('mission', None) is None  # key is case in-sensitive
+    assert tpf.meta.get('CHANNEL') == 45
+    # ensure meta is read-only view of the underlying self.hdu[0].header
+    with pytest.raises(TypeError):
+        tpf.meta['CHANNEL'] = 44
+    with pytest.raises(TypeError):
+        tpf.meta['KEY-NEW'] = 44
 
 
 def test_estimate_background():

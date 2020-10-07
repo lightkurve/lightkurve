@@ -287,7 +287,7 @@ def test_plot_deltanu_diagnostics():
 def test_stellar_estimator_calls():
     f, p, _, true_deltanu = generate_test_spectrum()
     snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
-    snr.meta = {'teff' : 3000}
+    snr.meta = {'TEFF': 3000}
 
     butler = snr.to_seismology()
     butler.estimate_numax()
@@ -304,10 +304,10 @@ def test_stellar_estimator_calls():
     log = butler.estimate_logg(3100)
 
     # Raise error if no teff available
-    butler.periodogram.meta['teff'] = None
+    butler.periodogram.meta['TEFF'] = None
     with pytest.raises(ValueError):
         mass = butler.estimate_mass()
-    with pytest.raises(ValueError):  
+    with pytest.raises(ValueError):
         rad = butler.estimate_radius()
     with pytest.raises(ValueError):
         log = butler.estimate_logg()

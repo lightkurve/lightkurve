@@ -148,7 +148,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     step_renderer : GlyphRenderer
     vertical_line : Span
     """
-    mission = lc.meta.get('mission')
+    mission = lc.meta.get('MISSION')
     if mission == 'K2':
         title = "Lightcurve for {} (K2 C{})".format(
             lc.label, lc.campaign)
@@ -551,7 +551,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         aperture_mask = np.zeros(tpf.flux.shape[1:]).astype(bool)
         aperture_mask[0, 0] = True
 
-    lc.meta['aperture_mask'] = aperture_mask
+    lc.meta['APERTURE_MASK'] = aperture_mask
 
     if transform_func is not None:
         lc = transform_func(lc)
@@ -617,7 +617,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
             selected_indices = np.array(selected_pixel_indices)
             selected_mask = np.isin(pixel_index_array, selected_indices)
             lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
-            lc_new.meta['aperture_mask'] = selected_mask
+            lc_new.meta['APERTURE_MASK'] = selected_mask
             if transform_func is not None:
                 lc_transformed = transform_func(lc_new)
                 if (len(lc_transformed) != len(lc_new)):
@@ -626,7 +626,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                             'Skipping the transformation...', LightkurveWarning)
                 else:
                     lc_new = lc_transformed
-                    lc_new.meta['aperture_mask'] = selected_mask
+                    lc_new.meta['APERTURE_MASK'] = selected_mask
             return lc_new
 
         def update_upon_pixel_selection(attr, old, new):
@@ -685,10 +685,10 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                                                     transform_func=transform_func)
                 lc_new.to_fits(exported_filename, overwrite=True,
                                flux_column_name='SAP_FLUX',
-                               aperture_mask=lc_new.meta['aperture_mask'].astype(np.int),
+                               aperture_mask=lc_new.meta['APERTURE_MASK'].astype(np.int),
                                SOURCE='lightkurve interact',
                                NOTE='custom mask',
-                               MASKNPIX=np.nansum(lc_new.meta['aperture_mask']))
+                               MASKNPIX=np.nansum(lc_new.meta['APERTURE_MASK']))
                 if message_on_save.text == " ":
                     text = '<font color="black"><i>Saved file {} </i></font>'
                     message_on_save.text = text.format(exported_filename)

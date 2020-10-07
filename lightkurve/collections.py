@@ -51,7 +51,7 @@ class Collection(object):
         if (isinstance(self[0], TargetPixelFile)):
             labels = np.asarray([tpf.targetid for tpf in self])
         else:
-            labels = np.asarray([lc.meta.get('label') for lc in self])
+            labels = np.asarray([lc.meta.get('LABEL') for lc in self])
 
         try:
             unique_labels = np.sort(np.unique(labels))
@@ -153,7 +153,7 @@ class LightCurveCollection(Collection):
                 if kwarg in kwargs:
                     kwargs.pop(kwarg)
 
-            labels = np.asarray([lc.meta.get('label') for lc in self])
+            labels = np.asarray([lc.meta.get('LABEL') for lc in self])
             try:
                 unique_labels = np.sort(np.unique(labels))
             except TypeError:  # sorting will fail if labels includes None

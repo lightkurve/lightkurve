@@ -318,24 +318,24 @@ class PLDCorrector(RegressionCorrector):
 
         # Set mission-specific values for pld_order and pca_components
         if pld_order is None:
-            if self.tpf.meta.get('mission') == 'K2':
+            if self.tpf.meta.get('MISSION') == 'K2':
                 pld_order = 3
             else:
                 pld_order = 1
         if pca_components is None:
-            if self.tpf.meta.get('mission') == 'K2':
+            if self.tpf.meta.get('MISSION') == 'K2':
                 pca_components = 16
             else:
                 pca_components = 3
         if pld_aperture_mask is None:
-            if self.tpf.meta.get('mission') == 'K2':
+            if self.tpf.meta.get('MISSION') == 'K2':
                 # K2 noise is dominated by motion
                 pld_aperture_mask = 'threshold'
             else:
                 # TESS noise is dominated by background
                 pld_aperture_mask = 'empty'
         if normalize_background_pixels is None:
-            if self.tpf.meta.get('mission') == 'K2':
+            if self.tpf.meta.get('MISSION') == 'K2':
                 normalize_background_pixels = True
             else:
                 normalize_background_pixels = False

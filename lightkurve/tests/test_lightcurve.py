@@ -121,11 +121,11 @@ def test_KeplerLightCurveFile(path, mission):
 
     assert lc.mission.lower() == mission.lower()
     if lc.mission.lower() == 'kepler':
-        assert lc.meta.get('campaign') is None
+        assert lc.meta.get('CAMPAIGN') is None
         assert lc.quarter == 8
     elif lc.mission.lower() == 'k2':
         assert lc.campaign == 8
-        assert lc.meta.get('quarter') is None
+        assert lc.meta.get('QUARTER') is None
     assert lc.time.format == 'bkjd'
     assert lc.time.scale == 'tdb'
     assert lc.flux.unit == u.electron / u.second
@@ -177,7 +177,7 @@ def test_bitmasking(quality_bitmask, answer):
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
     lc = KeplerLightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1,
-                          targetid=999, label='mystar', meta={'ccd': 2})
+                          targetid=999, label='mystar', meta={'CCD': 2})
     fold = lc.fold(period=1)
     assert_almost_equal(fold.phase[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
@@ -185,7 +185,7 @@ def test_lightcurve_fold():
     assert fold.targetid == lc.targetid
     assert fold.label == lc.label
     assert set(lc.meta).issubset(set(fold.meta))
-    assert lc.meta['ccd'] == fold.meta['ccd']
+    assert lc.meta['CCD'] == fold.meta['CCD']
     assert_array_equal(np.sort(fold.time_original), lc.time)
     assert len(fold.time_original) == len(lc.time)
     fold = lc.fold(period=1, epoch_time=-0.1)
@@ -997,7 +997,7 @@ def test_bin_issue705():
 def test_SSOs():
     # TESS test
     lc = TessTargetPixelFile(asteroid_TPF).to_lightcurve(aperture_mask='all')
-    lc.mission = 'TESS' # needed to resolve default value for location argument
+    lc.meta['MISSION'] = 'TESS' # needed to resolve default value for location argument
     result = lc.query_solar_system_objects(cadence_mask='all', cache=False)
     assert(len(result) == 1)
     result = lc.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=False)
@@ -1090,6 +1090,107 @@ def test_assignment_time():
     # case the input is scalar, it'd be broadcasted to the existing time's length
     lc.time = 21
     assert_array_equal(lc.time, Time([21, 21, 21], scale='tdb', format='bkjd'))
+
+
+def test_attr_access_columns():
+    """Test accessing columns as attributes"""
+
+    u_e_s = u.electron / u.second
+    lc = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+
+    # Read/Write access of flux: explicitly defined as property
+    assert_array_equal(lc.flux, lc['flux'])
+    flux_updated = [7, 8, 9] * u_e_s
+    lc.flux = flux_updated
+    assert_array_equal(lc.flux, flux_updated)
+
+    # Read/Write access of cadenceno: not an explicit property, but present in most LightCurve objects in practice.
+    cadenceno_unitless = [101, 102, 103]
+    lc['cadenceno'] = cadenceno_unitless
+    assert_array_equal(lc['cadenceno'], cadenceno_unitless)
+    assert(lc.cadenceno is lc['cadenceno'])
+
+    # Read/Write access of new column
+    flux_adjusted = [7.1, 8.1, 9.1] * u_e_s
+    lc['flux_adjusted'] = flux_adjusted
+    assert_array_equal(lc['flux_adjusted'], flux_adjusted)
+    assert(lc.flux_adjusted is lc['flux_adjusted'])
+
+    # column name is an existing method / attribute: attribute access not available
+    info_col = [9, 8, 7] * u_e_s
+    lc['info'] = info_col  # .info is a built-in attribute (from base TimeSeries)
+    assert(type(lc.info) is not type(info_col))
+
+    bin_col = [5, 6, 7 ] * u_e_s
+    lc['bin'] = bin_col  # .bin is a built-in method
+    assert(type(lc.bin) is not type(bin_col))
+
+    # Create a new column directly as an attribute: only attribute is created, not a column
+    flux2_unitless = [6, 7, 8]
+    with pytest.warns(UserWarning, match="new attribute name"):
+        lc.flux2 = flux2_unitless
+    with pytest.raises(KeyError):
+        lc['flux2']
+    assert_array_equal(lc.flux2, flux2_unitless)
+    assert(type(lc.flux2) is list)  # as it's just an attribute, there is no conversion done to Quantity
+
+    # ensure no warning is raised when updating an existing attribute
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        lc.foo = 'bar'
+    with pytest.warns(None) as warn_record:
+        lc.foo = 'bar2'
+    assert len(warn_record) == 0
+
+
+def test_attr_access_meta():
+    """Test accessing meta values as attributes"""
+    u_e_s = u.electron / u.second
+    lc = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+
+    # Read/Write access of meta via attribute
+    lc.meta['SECTOR'] = 14
+    assert(lc.sector == 14)  # uppercased meta key is accessed as lowercased attributes
+
+    sector_corrected = 15
+    lc.sector = sector_corrected
+    assert(lc.sector == sector_corrected)
+    assert(lc.sector == lc.meta['SECTOR'])
+
+    # meta key is an existing attribute / method: : attribute access not available
+    lc.meta['INFO'] = 'Some information'  # .info: an existing attribute
+    assert(lc.info != lc.meta['INFO'])
+
+    lc.meta['BIN'] = 'Some value'  # .bin: an existing method
+    assert(lc.bin != lc.meta['BIN'])
+
+    # Create a attribute: it is created as a object attribute, rather than meta
+    attr_value = 'bar_value'
+    with pytest.warns(UserWarning, match="new attribute name"):
+        lc.foo = attr_value
+    assert(lc.meta.get('foo', None) is None)
+    assert(lc.foo == attr_value)
+
+    # Case meta has 2 keys that only differs in case
+    lc.meta['KEYCASE'] = 'VALUE UPPER'
+    lc.meta['keycase'] = 'value lower'
+    # they are two different entries (case sensitive)
+    assert(lc.meta['KEYCASE'] == 'VALUE UPPER')
+    assert(lc.meta['keycase'] == 'value lower')
+    assert(lc.keycase == 'value lower')  # the meta entry with exact case is retrieved
+
+
+def test_attr_access_others():
+    """Test accessing attributes, misc. boundary cases"""
+    u_e_s = u.electron / u.second
+    lc = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+
+    # case the name is present both as a column name and a meta key: column is returned
+    val_of_col = [5, 6, 7]
+    val_of_meta_key = 'value'
+    lc['foo'] = val_of_col
+    lc.meta['FOO'] = val_of_meta_key
+    assert_array_equal(lc.foo, val_of_col) # lc.foo refers to the column
 
 
 def test_create_transit_mask():
