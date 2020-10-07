@@ -1142,3 +1142,26 @@ def test_row_repr():
     lc = LightCurve({'time': [1,2,3], 'flux':[1.,1.,1.]})
     lc[0].__repr__()
     lc[0]._repr_html_()
+
+
+def test_fill_gaps_with_cadenceno():
+    """Does `fill_gaps` work when a ``cadenceno`` column is present?
+    This is a regression test for #868."""
+    lc = LightCurve({'time': [1, 2, 4, 5],
+                     'flux': [1, 1, 1, 1],
+                     'cadenceno': [11, 12, 14, 15]})
+    lc.fill_gaps()  # raised a `UnitConversionError` in the past, cf. #868
+
+
+def test_fill_gaps_after_normalization():
+    """Does `fill_gaps` work correctly after normalization?
+    This is a regression test for #868."""
+    lc = LightCurve({'time': [1, 2, 4, 5],
+                     'flux': [1, 1, 1, 1],
+                     'flux_err':[0.1, 0.1, 0.1, 0.1]})
+    lc = lc.normalize("ppm")
+    lc2 = lc.fill_gaps()
+    assert lc2.time[2].value == 3.
+    assert lc2.flux[2].value == 1e6
+    assert lc2.flux[2].unit == u.cds.ppm
+    assert lc2.flux_err[2] == 0.1
