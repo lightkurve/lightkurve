@@ -1142,6 +1142,26 @@ def test_attr_access_columns():
         lc.foo = 'bar2'
     assert len(warn_record) == 0
 
+u_e_s = u.electron / u.second
+
+
+@pytest.mark.parametrize("new_col_val", [([2, 3, 4] * u_e_s),   # Quantity
+                                         (np.array([2, 3, 4])), # ndarray
+                                         ([2, 3, 4])            # list
+                                         ])
+def test_attr_access_columns_consistent_update(new_col_val):
+    """Replace/Update a column: ensure consistent behavior across column API and attribute API"""
+
+    lc1 = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+    lc1['flux'] = new_col_val
+
+    lc2 = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+    lc2.flux = new_col_val
+
+    # ensure the result type is the same,
+    # irrespective whether the update is done via column API or attribute API
+    assert(type(lc1['flux']) is type(lc2['flux']))
+
 
 def test_attr_access_meta():
     """Test accessing meta values as attributes"""
