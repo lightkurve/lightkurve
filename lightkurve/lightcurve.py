@@ -260,7 +260,9 @@ class LightCurve(TimeSeries):
     def __setattr__(self, name, value, **kwargs):
         """To get copied, attributes have to be stored in the meta dictionary!"""
         to_set_as_attr = False
-        if (name == 'time'):
+        if name in self.__dict__:
+            to_set_as_attr = True
+        elif (name == 'time'):
             self['time'] = value # astropy will convert value to Time if needed
         elif ('columns' in self.__dict__) and (name in self.__dict__['columns']):
             if not isinstance(value, Quantity):

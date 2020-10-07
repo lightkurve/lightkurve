@@ -1192,6 +1192,19 @@ def test_attr_access_others():
     lc.meta['FOO'] = val_of_meta_key
     assert_array_equal(lc.foo, val_of_col) # lc.foo refers to the column
 
+    val_of_col_updated = [6, 7, 8] * u_e_s
+    lc.foo = val_of_col_updated  # should update the column rather than meta
+    assert_array_equal(lc.foo, val_of_col_updated)
+
+    # case the same name is present as column name, meta key, and actual attribute
+    lc.bar = 'bar_attr_val'
+    lc['bar'] = [7, 8, 9]
+    lc.meta['BAR'] = 'bar_meta_val'
+    assert(lc.bar == 'bar_attr_val') # actual attribute takes priority
+
+    lc.bar = 'bar_attr_val_updated'
+    assert(lc.bar == 'bar_attr_val_updated') # the update should be done on actual attribute
+
 
 def test_create_transit_mask():
     """Test for `LightCurve.create_transit_mask()`."""
