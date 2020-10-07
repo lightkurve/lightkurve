@@ -41,6 +41,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Rebekah Hounsell <https://github.com/rebekah9969>`_
 - `Isabel Coleman <https://github.com/astrobel>`_
 - `Colin J. Burke <https://github.com/burke86>`_
+- `Andrew Vanderburg <https://github.com/avanderburg>`_
 
 
 Community
