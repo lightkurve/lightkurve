@@ -107,6 +107,9 @@ lightkurve.periodogram
 - Modified ``create_transit_mask`` method to return ``True`` during transits and
   ``False`` elsewhere for consistent mask syntax. [#808]
 
+- Modified ``BoxLeastSquaresPeriodogram`` to use ``duration=[0.05, 0.10, 0.15, 0.20, 0.25, 0.33]``
+  by default, which yields more accurate results (albeit slower). [#859, #860]
+
 
 
 1.11.3 (2020-10-06)

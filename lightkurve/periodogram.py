@@ -916,7 +916,53 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
     @staticmethod
     def from_lightcurve(lc, **kwargs):
-        """Creates a Periodogram from a LightCurve using the Box Least Squares (BLS) method."""
+        """Creates a Periodogram from a LightCurve using the Box Least Squares (BLS) method.
+
+        Parameters
+        ----------
+        lc : `LightCurve` object
+            The LightCurve from which to compute the Periodogram.
+        duration : float, array_like, or `~astropy.units.Quantity`, optional
+            The set of durations that will be considered.
+            Default to `[0.05, 0.10, 0.15, 0.20, 0.25, 0.33]` if not specified.
+        period : array_like or `~astropy.units.Quantity`, optional
+            The periods where the Periodogram should be computed.
+            If not provided, a default will be created using
+            `BoxLeastSquares.autoperiod()  <astropy.timeseries.BoxLeastSquares.autoperiod>`.
+        minimum_period, maximum_period : float or `~astropy.units.Quantity`, optional
+            If ``period`` is not provided, the minimum/maximum periods to search.
+            The defaults will be computed as described in the notes below.
+        frequency_factor : float, optional
+            If ``period`` is not provided, a factor to control the frequency spacing of periods
+            to be considered.
+        kwargs : dict
+            Keyword arguments passed to
+            `BoxLeastSquares.power() <astropy.timeseries.BoxLeastSquares.power>`
+
+        Returns
+        -------
+        Periodogram : `Periodogram` object
+            Returns a Periodogram object extracted from the lightcurve.
+
+        Notes
+        -----
+        If ``period`` is not provided, the default minimum period is computed from maximum duration and
+        the median observation time gap as
+
+        .. code-block:: python
+
+                minimum_period = max(median(diff(lc.time)) * 4,
+                                     max(duration) + median(diff(lc.time)))
+
+        The default maximum period is computed as
+
+        .. code-block:: python
+
+                maximum_period = (max(lc.time) - min(lc.time)) / 3
+
+        ensuring that any systems with at least 3 transits are within the range of searched periods.
+
+        """
         # BoxLeastSquares was added to `astropy.stats` in AstroPy v3.1 and then
         # moved to `astropy.timeseries` in v3.2, which makes the import below
         # somewhat complicated.
@@ -937,7 +983,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             dy = None
 
         # Validate user input for `duration`
-        duration = kwargs.pop("duration", 0.25)
+        duration = kwargs.pop("duration", [0.05, 0.10, 0.15, 0.20, 0.25, 0.33])
         if duration is not None and ~np.all(np.isfinite(duration)):
             raise ValueError("`duration` parameter contains illegal nan or inf value(s)")
 

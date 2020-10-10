@@ -287,7 +287,7 @@ def test_bls_period_recovery():
     flux_err = 0.01
 
     # Create the synthetic light curve
-    time = np.arange(0, 100, 0.1)
+    time = np.arange(0, 20, 0.02)
     flux = np.ones_like(time)
     transit_mask = np.abs((time-transit_time+0.5*period) % period-0.5*period) < 0.5*duration
     flux[transit_mask] = 1.0 - depth
