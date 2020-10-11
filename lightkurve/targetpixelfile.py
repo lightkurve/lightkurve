@@ -784,6 +784,11 @@ class TargetPixelFile(object):
         is_allnan = ~np.any(np.isfinite(self.flux[:, apmask]), axis=1)
         flux[is_allnan] = np.nan
 
+        # Similarly, if *all* pixel values across the TPF are exactly zero,
+        # we propagate NaN (cf. #873 for an example of this happening)
+        is_allzero = np.all(self.flux == 0, axis=(1, 2))
+        flux[is_allzero] = np.nan
+
         # Estimate flux_err
         with warnings.catch_warnings():
             # Ignore warnings due to negative errors
