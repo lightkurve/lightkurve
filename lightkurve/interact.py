@@ -392,6 +392,12 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
         fig.rect('xx', 'yy', 1, 1, source=tpf_source, fill_color='gray',
                 fill_alpha=0.4, line_color='white')
 
+    show_background_mask = True
+    if show_background_mask and getattr(tpf, 'background_mask', None) is not None:
+        bkg_source = prepare_tpf_datasource(tpf, tpf.background_mask)
+        fig.rect('xx', 'yy', 1, 1, source=bkg_source, fill_color='gray',
+                 fill_alpha=0.0, line_color='#4f4f4f')
+
     # Configure the stretch slider and its callback function
     if scale == 'log':
         start, end = np.log10(vlo), np.log10(vhi)
