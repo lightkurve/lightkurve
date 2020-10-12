@@ -44,6 +44,10 @@ except ImportError:
     pass
 
 
+def _to_unitless(items):
+    """Convert the values in the item list to unitless one"""
+    return [getattr(item, 'value', item) for item in items]
+
 def prepare_lightcurve_datasource(lc):
     """Prepare a bokeh ColumnDataSource object for tool tips.
 
@@ -180,7 +184,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     if ylim_func is None:
         ylims = get_lightcurve_y_limits(lc_source)
     else:
-        ylims = ylim_func(lc)
+        ylims = _to_unitless(ylim_func(lc))
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
 
     # Add step lines, circles, and hover-over tooltips
