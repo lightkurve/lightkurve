@@ -122,6 +122,15 @@ def test_interact_functions():
     lc_source = prepare_lightcurve_datasource(lc)
     get_lightcurve_y_limits(lc_source)
     make_lightcurve_figure_elements(lc, lc_source)
+
+    def ylim_func_sample(lc):
+        return (np.nanpercentile(lc.flux, 0.1), np.nanpercentile(lc.flux, 99.9))
+    make_lightcurve_figure_elements(lc, lc_source, ylim_func=ylim_func_sample)
+
+    def ylim_func_unitless(lc):
+        return (np.nanpercentile(lc.flux, 0.1).value, np.nanpercentile(lc.flux, 99.9).value)
+    make_lightcurve_figure_elements(lc, lc_source, ylim_func=ylim_func_unitless)
+
     make_tpf_figure_elements(tpf, tpf_source)
     show_interact_widget(tpf)
 
