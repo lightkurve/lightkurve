@@ -265,8 +265,6 @@ class LightCurve(TimeSeries):
         elif (name == 'time'):
             self['time'] = value # astropy will convert value to Time if needed
         elif ('columns' in self.__dict__) and (name in self.__dict__['columns']):
-            if not isinstance(value, Quantity):
-                value = Quantity(value, dtype=value.dtype)
             self.replace_column(name, value)
         elif ('_meta' in self.__dict__):
             if (name in self.__dict__['_meta']):
