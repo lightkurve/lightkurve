@@ -1374,7 +1374,7 @@ class TargetPixelFile(object):
         try:
             mid_hdu = _open_image(images_flux[int(len_images / 2) - 1], extension)
 
-            wcs_ref = WCS(mid_hdu, relax=True)
+            wcs_ref = WCS(mid_hdu)
             column, row = wcs_ref.all_world2pix(
                             np.asarray([[position.ra.deg], [position.dec.deg]]).T,
                             0)[0]
