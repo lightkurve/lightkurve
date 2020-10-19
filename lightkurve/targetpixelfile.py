@@ -1429,7 +1429,7 @@ class TargetPixelFile(object):
             # Cutout (if neccessary) and get data
             cutout_list = [_cutout_image(hdu, position, wcs_ref, size) for hdu in hdu_list]
             # Flatten output list
-            cutout_list = flat_list = [item for sublist in cutout_list for item in sublist]
+            cutout_list = [item for sublist in cutout_list for item in sublist]
             raw_cnts, _, flux, wcs, flux_err, _, flux_bkg, _, flux_bkg_err, _, cosmic_rays, _ = cutout_list
 
             factory.add_cadence(frameno=idx, raw_cnts=raw_cnts, flux=flux, flux_err=flux_err,
@@ -1439,7 +1439,7 @@ class TargetPixelFile(object):
         ext_info = {}
         ext_info['TFORM4'] = '{}J'.format(size[0] * size[1])
         ext_info['TDIM4'] = '({},{})'.format(size[0], size[1])
-        ext_info.update(wcs.to_header())
+        ext_info.update(wcs.to_header(relax=True))
 
         # TPF contains multiple data columns that require WCS
         for m in [4, 5, 6, 7, 8, 9]:
