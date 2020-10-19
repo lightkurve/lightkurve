@@ -1359,7 +1359,7 @@ class TargetPixelFile(object):
                 cutout_data = cutout.data
                 cutout_wcs = cutout.wcs
             return cutout_data, cutout_wcs
-        
+
         # Set the default extension if unspecified
         if extension is None:
             extension = 0
@@ -1380,7 +1380,7 @@ class TargetPixelFile(object):
                             0)[0]
         except Exception as e:
             raise e
-        
+
         # Create a factory and set default keyword values based on the middle image
         factory = TargetPixelFileFactory(n_cadences=len_images,
                                                n_rows=size[0],
@@ -1397,7 +1397,7 @@ class TargetPixelFile(object):
 
         allkeys = hdu0_keywords.copy()
         allkeys.update(carry_keywords)
-        
+
         img_list = [images_raw_cnts, images_flux, images_flux_err, images_flux_bkg, images_flux_bkg_err, images_cosmic_rays]
 
         for idx, img in tqdm(enumerate(images_flux), total=len_images):
@@ -1440,7 +1440,7 @@ class TargetPixelFile(object):
         ext_info['TFORM4'] = '{}J'.format(size[0] * size[1])
         ext_info['TDIM4'] = '({},{})'.format(size[0], size[1])
         ext_info.update(wcs.to_header(relax=True))
-        
+
         # TPF contains multiple data columns that require WCS
         for m in [4, 5, 6, 7, 8, 9]:
             if m > 4:
