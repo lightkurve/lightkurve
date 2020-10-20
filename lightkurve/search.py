@@ -78,10 +78,6 @@ class SearchResult(object):
 
     def __getitem__(self, key):
         """Implements indexing and slicing, e.g. SearchResult[2:5]."""
-        # this check is necessary due to an astropy bug
-        # for more information, see issue #445
-        if key == -1:
-            key = len(self.table) - 1
         selection = self.table[key]
         # Indexing a Table with an integer will return a Row
         if isinstance(selection, Row):
