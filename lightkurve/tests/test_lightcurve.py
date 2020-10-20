@@ -384,6 +384,21 @@ def test_lightcurve_scatter():
     plt.ylim(0.999, 1.001)
 
 
+@pytest.mark.xfail
+def test_lightcurve_plots_unitless():
+    """Sanity check to verify that lightcurve plotting works when data is unitless"""
+    lc = LightCurve(time=np.arange(10))
+    # make flux non-uniform to avoid warnings with clip_outliers=True during test
+    lc.flux = np.append(np.zeros(3), np.ones(7))
+    lc.flux_err = np.zeros(10)  # need flux_err to avoid warnings
+
+    lc.plot()
+    lc.scatter()
+    lc.errorbar()
+    lc.plot(normalize=True, clip_outliers=True)
+    plt.close('all')
+
+
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
     # A flat lightcurve should have a CDPP close to zero
