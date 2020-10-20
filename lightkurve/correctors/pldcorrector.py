@@ -102,11 +102,15 @@ class PLDCorrector(RegressionCorrector):
     .. [4] EVEREST pipeline webpage, https://rodluger.github.io/everest
     """
     def __init__(self, tpf, aperture_mask=None):
-        self.tpf = tpf
         if aperture_mask is None:
             aperture_mask = tpf.create_threshold_mask(3)
         self.aperture_mask = aperture_mask
-        lc = self.tpf.to_lightcurve(aperture_mask=aperture_mask)
+        lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
+        # Remove cadences that have NaN flux (cf. #874). We don't simply call
+        # `lc.remove_nans()` here because we need to mask both lc & tpf.
+        nan_mask = np.isnan(lc.flux)
+        lc = lc[~nan_mask]
+        self.tpf = tpf[~nan_mask]
         super().__init__(lc=lc)
 
     def __repr__(self):

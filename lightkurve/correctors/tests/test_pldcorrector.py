@@ -2,7 +2,7 @@ import pytest
 
 import matplotlib.pyplot as plt
 
-from ... import search_targetpixelfile, KeplerLightCurve, TessLightCurve
+from ... import search_targetpixelfile, search_tesscut, KeplerLightCurve, TessLightCurve
 from .. import PLDCorrector
 
 
@@ -91,3 +91,10 @@ def test_pld_corrector():
     assert(corrected_lc.estimate_cdpp() < raw_lc.estimate_cdpp())
     # make sure the returned object is the correct type (`TessLightCurve`)
     assert(isinstance(corrected_lc, TessLightCurve))
+
+
+@pytest.mark.remote_data
+def test_tpf_with_zero_flux_cadence():
+    """Regression test for #873."""
+    tpf = search_tesscut("TIC 123835353", sector=6).download(cutout_size=5)
+    tpf.to_corrector('pld').correct()
