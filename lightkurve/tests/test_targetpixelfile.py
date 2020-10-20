@@ -149,9 +149,9 @@ def test_tpf_zeros():
     lc = tpf.to_lightcurve(aperture_mask="all")
     assert len(lc.time) == len(lc.flux)
     assert np.all(lc.time == tpf.time)
-    assert np.all(lc.flux == 0)
+    assert np.all(np.isnan(lc.flux)) # we expect all NaNs because of #874
     # The default QUALITY bitmask should have removed all NaNs in the TIME
-    #assert ~np.any(np.isnan(tpf.time))
+    assert ~np.any(np.isnan(tpf.time.value))
 
 @pytest.mark.parametrize("centroid_method", [("moments"), ("quadratic")])
 def test_tpf_ones(centroid_method):
