@@ -46,7 +46,7 @@ asteroid_TPF = get_pkg_data_filename("data/asteroid_test.fits")
 def _to_lc_unitless(lc):
     lc_unitless = lc.copy()
     for colname in lc.colnames:
-        if colname != 'time':
+        if colname != 'time' and hasattr(lc[colname], 'value'):
             lc_unitless[colname] = lc[colname].value
     return lc_unitless
 
@@ -1305,12 +1305,16 @@ def test_row_repr():
     lc[0]._repr_html_()
 
 
-def test_fill_gaps_with_cadenceno():
+lc_for_fill_gaps_with_cadenceno = LightCurve({'time': [1, 2, 4, 5],
+                                              'flux': [1, 1, 1, 1]})
+lc_for_fill_gaps_with_cadenceno['cadenceno'] = u.Quantity([11, 12, 14, 15])
+
+@pytest.mark.parametrize("lc",
+                         [lc_for_fill_gaps_with_cadenceno,
+                          _to_lc_unitless(lc_for_fill_gaps_with_cadenceno)])
+def test_fill_gaps_with_cadenceno(lc):
     """Does `fill_gaps` work when a ``cadenceno`` column is present?
     This is a regression test for #868."""
-    lc = LightCurve({'time': [1, 2, 4, 5],
-                     'flux': [1, 1, 1, 1],
-                     'cadenceno': [11, 12, 14, 15]})
     lc.fill_gaps()  # raised a `UnitConversionError` in the past, cf. #868
 
 
@@ -1326,3 +1330,10 @@ def test_fill_gaps_after_normalization():
     assert lc2.flux[2].value == 1e6
     assert lc2.flux[2].unit == u.cds.ppm
     assert lc2.flux_err[2] == 0.1
+
+
+def test_copy_non_numeric_columns():
+    lc = LightCurve(time=[1, 2, 3], flux=[2, 3, 4])
+    lc['col1'] = ['a', 'b', 'c']
+    lc_copy = lc.copy()
+    assert_array_equal(lc_copy['col1'], lc['col1'])

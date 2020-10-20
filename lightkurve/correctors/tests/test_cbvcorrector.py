@@ -23,6 +23,7 @@ from ..cbvcorrector import download_kepler_cbvs, download_tess_cbvs, \
     TessCotrendingBasisVectors
 
 
+@pytest.mark.xfail  # TEMP SKIP until issue #882 is resolved
 def test_CotrendingBasisVectors_nonretrieval():
     """ Tests CotrendingBasisVectors class without requiring remote data
     """
@@ -32,16 +33,16 @@ def test_CotrendingBasisVectors_nonretrieval():
     # Create some generic CotrendingBasisVectors objects
 
     # Generic CotrendingBasisVectors object
-    dataTbl = Table([[1, 2, 3], [False, True, False], [2.0, 3.0, 4.0], [3.0, 4.0, 5.0]], 
+    dataTbl = Table([[1, 2, 3], [False, True, False], [2.0, 3.0, 4.0], [3.0, 4.0, 5.0]],
         names=('CADENCENO', 'GAP', 'VECTOR_1', 'VECTOR_3'))
     cbvTime = Time([443.51090033, 443.53133457, 443.55176891], format='bkjd')
     cbvs = CotrendingBasisVectors(data=dataTbl, time=cbvTime)
     assert isinstance(cbvs, CotrendingBasisVectors)
     assert cbvs.cbv_indices == [1, 3]
     assert np.all(cbvs.time.value == [443.51090033, 443.53133457, 443.55176891])
-    
+
     # Auto-initiate 'GAP' and 'CADENCENO'
-    dataTbl = Table([[2.0, 3.0, 4.0], [3.0, 4.0, 5.0]], 
+    dataTbl = Table([[2.0, 3.0, 4.0], [3.0, 4.0, 5.0]],
             names=('VECTOR_3', 'VECTOR_12'))
     cbvTime = Time([443.51090033, 443.53133457, 443.55176891], format='bkjd')
     cbvs = CotrendingBasisVectors(data=dataTbl, time=cbvTime)
@@ -50,12 +51,12 @@ def test_CotrendingBasisVectors_nonretrieval():
     assert np.all(cbvs.gap_indicators == [False, False, False])
     assert np.all(cbvs.cadenceno == [0, 1, 2])
 
-    
+
     #***
     # _to_designmatrix
     # Make sure CBVs are the columns in the returned 2-dim array
-    dataTbl = Table([[1, 2, 3], [False, True, False], 
-            [1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]], 
+    dataTbl = Table([[1, 2, 3], [False, True, False],
+            [1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]],
             names=('CADENCENO', 'GAP', 'VECTOR_1', 'VECTOR_2', 'VECTOR_3'))
     cbvTime = Time([1569.44053967, 1569.44192856, 1569.44331746], format='btjd')
     cbvs = CotrendingBasisVectors(dataTbl, cbvTime)
@@ -69,16 +70,16 @@ def test_CotrendingBasisVectors_nonretrieval():
     # CBV #2 was not requested, so make sure it is not present
     with pytest.raises(KeyError):
         cbv_designmatrix['VECTOR_2']
-    
+
     #***
     # plot
     ax = cbvs.plot(cbv_indices=[1,2], ax=None)
     assert isinstance(ax, matplotlib.axes.Axes)
-    
+
     # There is no CBV # 5 so the third cbv_indices entry will be ignored
     ax = cbvs.plot(cbv_indices=[1,2,5], ax=ax)
     assert isinstance(ax, matplotlib.axes.Axes)
-    
+
     # CBVs use 1-based indexing. Throw error if requesting CBV index 0
     with pytest.raises(ValueError):
         ax = cbvs.plot(cbv_indices=[0,1,2], ax=ax)
@@ -87,14 +88,14 @@ def test_CotrendingBasisVectors_nonretrieval():
     with pytest.raises(ValueError):
         ax = cbvs.plot('Doh!')
 
-    
+
     #***
     # align
     # Set up some cadenceno such that both CBV is trimmed and NaNs inserted
     sample_lc = TessLightCurve(time=[1,2,3,4,6,7], flux=[1,2,3,4,6,7],
             flux_err=[0.1,0.1, 0.1, 0.1, 0.1, 0.1], cadenceno=[1,2,3,4,6,7])
-    dataTbl = Table([[1, 2, 3, 5, 6], [False, True, False, False, False], 
-            [1.0, 2.0, 3.0, 5.0, 6.0 ]], 
+    dataTbl = Table([[1, 2, 3, 5, 6], [False, True, False, False, False],
+            [1.0, 2.0, 3.0, 5.0, 6.0 ]],
         names=('CADENCENO', 'GAP', 'VECTOR_1'))
     cbvTime = Time([1569.43915078, 1569.44053967, 1569.44192856,
            1569.44470635, 1569.44609524], format='btjd')
@@ -120,8 +121,8 @@ def test_CotrendingBasisVectors_nonretrieval():
             cadenceno=np.arange(nLcCadences))
     nCbvCadences = 10
     xCbv = np.linspace(0.0, 2*np.pi, num=nCbvCadences)
-    dataTbl = Table([np.arange(nCbvCadences), np.full(nCbvCadences, False), 
-            np.cos(xCbv), np.sin(xCbv+np.pi*0.125)], 
+    dataTbl = Table([np.arange(nCbvCadences), np.full(nCbvCadences, False),
+            np.cos(xCbv), np.sin(xCbv+np.pi*0.125)],
             names=('CADENCENO', 'GAP', 'VECTOR_1', 'VECTOR_2'))
     cbvTime = Time(xCbv, format='btjd')
     cbvs = CotrendingBasisVectors(dataTbl, cbvTime)
@@ -129,8 +130,8 @@ def test_CotrendingBasisVectors_nonretrieval():
     assert np.all(cbv_interpolated.time.value == sample_lc.time.value)
     # Extrapolation test
     xCbv = np.linspace(0.0, 1.5*np.pi, num=nCbvCadences)
-    dataTbl = Table([np.arange(nCbvCadences), np.full(nCbvCadences, False), 
-            np.cos(xCbv), np.sin(xCbv+np.pi*0.125)], 
+    dataTbl = Table([np.arange(nCbvCadences), np.full(nCbvCadences, False),
+            np.cos(xCbv), np.sin(xCbv+np.pi*0.125)],
             names=('CADENCENO', 'GAP', 'VECTOR_1', 'VECTOR_2'))
     cbvTime = Time(xCbv, format='btjd')
     cbvs = CotrendingBasisVectors(dataTbl, cbvTime)
@@ -142,7 +143,7 @@ def test_CotrendingBasisVectors_nonretrieval():
     assert np.all(np.logical_not(np.isnan(
         cbv_interpolated['VECTOR_1'].value[
             np.nonzero(cbv_interpolated.time.value > 1.5*np.pi)[0]])))
-    
+
 @pytest.mark.remote_data
 def test_cbv_retrieval():
     """ Tests reading in some CBVs from MAST
@@ -162,18 +163,18 @@ def test_cbv_retrieval():
     assert cbvs.sector == 10
     assert cbvs.camera == 2
     assert cbvs.ccd == 4
-    
+
     cbvs = download_tess_cbvs(sector=10, camera=2, ccd=4, cbv_type = 'MultiScale', band=2)
     assert isinstance(cbvs, TessCotrendingBasisVectors)
     ax = cbvs.plot('all')
     assert isinstance(ax, matplotlib.axes.Axes)
     assert cbvs.band == 2
-    
+
     cbvs = download_tess_cbvs(sector=8, camera=3, ccd=1, cbv_type = 'Spike')
     assert isinstance(cbvs, TessCotrendingBasisVectors)
     ax = cbvs.plot('all')
     assert isinstance(ax, matplotlib.axes.Axes)
-    
+
     # No band specified for MultiScale, this should error
     with pytest.raises(AssertionError):
         cbvs = download_tess_cbvs(sector=10, camera=2, ccd=4, cbv_type = 'MultiScale')

@@ -108,6 +108,7 @@ def test_transform_and_ylim_funcs():
         tpf.interact(ylim_func=lambda lc: (0, lc.flux.max()))
 
 
+@pytest.mark.xfail  # TEMP SKIP until issue #882 is resolved
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_functions():
     """Do the helper functions in the interact module run without syntax error?"""

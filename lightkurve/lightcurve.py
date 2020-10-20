@@ -236,11 +236,6 @@ class LightCurve(TimeSeries):
             if kw not in self.meta and kw not in self.columns:
                 self.add_column(deprecated_column_kws[kw], name=kw)
 
-        # Ensure all columns are Quantity objects
-        for col in self.columns:
-            if not isinstance(self[col], (Quantity, Time)):
-                self.replace_column(col, Quantity(self[col], dtype=self[col].dtype))
-
         # Ensure flux and flux_err have the same units
         if self['flux'].unit != self['flux'].unit:
             raise ValueError("flux and flux_err must have the same units")
@@ -886,13 +881,13 @@ class LightCurve(TimeSeries):
         # Find missing time points
         # Most precise method, taking into account time variation due to orbit
         if hasattr(lc, 'cadenceno'):
-            dt = lc.time.value - np.median(np.diff(lc.time.value)) * lc.cadenceno.value
-            ncad = np.arange(lc.cadenceno.value[0], lc.cadenceno.value[-1] + 1, 1)
-            in_original = np.in1d(ncad, lc.cadenceno.value)
+            dt = lc.time.value - np.median(np.diff(lc.time.value)) * _to_unitless(lc.cadenceno)
+            ncad = np.arange(_to_unitless(lc.cadenceno)[0], _to_unitless(lc.cadenceno)[-1] + 1, 1)
+            in_original = np.in1d(ncad, _to_unitless(lc.cadenceno))
             ncad = ncad[~in_original]
-            ndt = np.interp(ncad, lc.cadenceno.value, dt)
+            ndt = np.interp(ncad, _to_unitless(lc.cadenceno), dt)
 
-            ncad = np.append(ncad, lc.cadenceno.value)
+            ncad = np.append(ncad, _to_unitless(lc.cadenceno))
             ndt = np.append(ndt, dt)
             ncad, ndt = ncad[np.argsort(ncad)], ndt[np.argsort(ncad)]
             ntime = ndt + np.median(np.diff(lc.time.value)) * ncad
@@ -922,8 +917,8 @@ class LightCurve(TimeSeries):
             try:
                 std = lc.estimate_cdpp().to(lc.flux.unit).value
             except:
-                std = np.nanstd(lc.flux.value)
-            f[~in_original] = np.random.normal(np.nanmean(lc.flux.value), std, (~in_original).sum())
+                std = np.nanstd(_to_unitless(lc.flux))
+            f[~in_original] = np.random.normal(np.nanmean(_to_unitless(lc.flux)), std, (~in_original).sum())
         else:
             raise NotImplementedError("No such method as {}".format(method))
 
