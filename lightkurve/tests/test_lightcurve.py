@@ -384,7 +384,6 @@ def test_lightcurve_scatter():
     plt.ylim(0.999, 1.001)
 
 
-@pytest.mark.xfail
 def test_lightcurve_plots_unitless():
     """Sanity check to verify that lightcurve plotting works when data is unitless"""
     lc = LightCurve(time=np.arange(10))

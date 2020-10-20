@@ -36,6 +36,17 @@ __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve', 'FoldedLightCurve
 log = logging.getLogger(__name__)
 
 
+def _to_unitless(data):
+    """Convert various types of data with units to raw unitless ones, e.g., ``Quantity``, ``Column``, ``Time``."""
+    if hasattr(data, 'value'):
+        # this case is mainly to handle Time (of which np.asarray does not work)
+        # it works for Quantity as a by-product
+        return data.value
+    else:
+        # for Column, and edge cases that the data is already unitless.
+        return np.asarray(data)
+
+
 class LightCurve(TimeSeries):
     """Class to hold time series brightness data for an astronomical object.
 
@@ -1411,7 +1422,7 @@ class LightCurve(TimeSeries):
             if ax is None:
                 fig, ax = plt.subplots(1)
             if method == 'scatter':
-                sc = ax.scatter(self.time.value, flux, **kwargs)
+                sc = ax.scatter(_to_unitless(self.time), flux, **kwargs)
                 # Colorbars should only be plotted if the user specifies, and there is
                 # a color specified that is not a string (e.g. 'C1') and is iterable.
                 if show_colorbar and ('c' in kwargs) and \
@@ -1422,11 +1433,12 @@ class LightCurve(TimeSeries):
                     cbar.ax.minorticks_off()
             elif method == 'errorbar':
                 if np.any(~np.isnan(flux_err)):
-                    ax.errorbar(x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs)
+
+                    ax.errorbar(x=_to_unitless(self.time), y=_to_unitless(flux), yerr=_to_unitless(flux_err), **kwargs)
                 else:
                     log.warning(f"Column `{column}` has no associated errors.")
             else:
-                ax.plot(self.time.value, flux.value, **kwargs)
+                ax.plot(_to_unitless(self.time), _to_unitless(flux), **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
@@ -1435,7 +1447,7 @@ class LightCurve(TimeSeries):
                 ax.legend(loc='best')
 
             if clip_outliers and len(flux) > 0:
-                ymin, ymax = np.percentile(flux.value, [2.5, 97.5])
+                ymin, ymax = np.percentile(_to_unitless(flux), [2.5, 97.5])
                 margin = 0.05 * (ymax - ymin)
                 ax.set_ylim(ymin - margin, ymax + margin)
 
