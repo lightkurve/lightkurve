@@ -43,6 +43,14 @@ filename_K2_custom = get_pkg_data_filename("data/test_K2_interact_generated_cust
 asteroid_TPF = get_pkg_data_filename("data/asteroid_test.fits")
 
 
+def _to_lc_unitless(lc):
+    lc_unitless = lc.copy()
+    for colname in lc.colnames:
+        if colname != 'time':
+            lc_unitless[colname] = lc[colname].value
+    return lc_unitless
+
+
 def test_invalid_lightcurve():
     """Invalid LightCurves should not be allowed."""
     time = np.array([1, 2, 3, 4, 5])
@@ -778,10 +786,15 @@ def test_flatten_with_nans():
     assert(np.isfinite(flat_lc.flux_err).sum() == 3)
 
 
-def test_flatten_robustness():
+# flatten should work with integer fluxes
+lc_for_flatten_robustness = LightCurve(time=[1, 2, 3, 4, 5, 6], flux=[10, 20, 30, 40, 50, 60])
+
+
+@pytest.mark.parametrize("lc",
+                         [lc_for_flatten_robustness,
+                          _to_lc_unitless(lc_for_flatten_robustness)])
+def test_flatten_robustness(lc):
     """Test various special cases for flatten()."""
-    # flatten should work with integer fluxes
-    lc = LightCurve(time=[1, 2, 3, 4, 5, 6], flux=[10, 20, 30, 40, 50, 60])
     expected_result = np.array([1.,  1.,  1.,  1.,  1., 1.])
     flat_lc = lc.flatten(window_length=3, polyorder=1)
     assert_allclose(flat_lc.flux, expected_result)

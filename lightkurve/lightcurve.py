@@ -622,7 +622,7 @@ class LightCurve(TimeSeries):
                     # Scipy outputs a warning here that is not useful, will be fixed in version 1.2
                     with warnings.catch_warnings():
                         warnings.simplefilter('ignore', FutureWarning)
-                        trsig = signal.savgol_filter(x=self.flux.value[mask][l:h],
+                        trsig = signal.savgol_filter(x=_to_unitless(self.flux)[mask][l:h],
                                                                  window_length=window_length,
                                                                  polyorder=polyorder,
                                                                  **kwargs)
