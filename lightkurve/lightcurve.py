@@ -37,14 +37,10 @@ log = logging.getLogger(__name__)
 
 
 def _to_unitless(data):
-    """Convert various types of data with units to raw unitless ones, e.g., ``Quantity``, ``Column``, ``Time``."""
-    if hasattr(data, 'value'):
-        # this case is mainly to handle Time (of which np.asarray does not work)
-        # it works for Quantity as a by-product
-        return data.value
-    else:
-        # for Column, and edge cases that the data is already unitless.
-        return np.asarray(data)
+    """Convert various types of data with units to raw unitless ones, e.g., ``Quantity``, ``Column`."""
+    # Note: data MUST NOT be `Time`,
+    # as np.asarray(time_obj) creates an ndarray of `Time` objects, rather than the raw time values
+    return np.asarray(data)
 
 
 class LightCurve(TimeSeries):
@@ -1422,7 +1418,7 @@ class LightCurve(TimeSeries):
             if ax is None:
                 fig, ax = plt.subplots(1)
             if method == 'scatter':
-                sc = ax.scatter(_to_unitless(self.time), flux, **kwargs)
+                sc = ax.scatter(self.time.value, flux, **kwargs)
                 # Colorbars should only be plotted if the user specifies, and there is
                 # a color specified that is not a string (e.g. 'C1') and is iterable.
                 if show_colorbar and ('c' in kwargs) and \
@@ -1434,11 +1430,11 @@ class LightCurve(TimeSeries):
             elif method == 'errorbar':
                 if np.any(~np.isnan(flux_err)):
 
-                    ax.errorbar(x=_to_unitless(self.time), y=_to_unitless(flux), yerr=_to_unitless(flux_err), **kwargs)
+                    ax.errorbar(x=self.time.value, y=_to_unitless(flux), yerr=_to_unitless(flux_err), **kwargs)
                 else:
                     log.warning(f"Column `{column}` has no associated errors.")
             else:
-                ax.plot(_to_unitless(self.time), _to_unitless(flux), **kwargs)
+                ax.plot(self.time.value, _to_unitless(flux), **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
