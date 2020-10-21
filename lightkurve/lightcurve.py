@@ -2028,7 +2028,7 @@ class LightCurve(TimeSeries):
 
         # If the method is average we need to denormalize the plot
         if method in ['mean', 'median']:
-            ar *= np.nanmedian(self.flux.value)
+            ar *= np.nanmedian(_to_unitless(self.flux))
 
         d = np.max([np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 5)),
                     np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 95))])

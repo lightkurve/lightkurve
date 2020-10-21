@@ -990,10 +990,15 @@ def test_from_stingray():
         pass  # stingray is not a required dependency
 
 
-def test_river():
-    lc = LightCurve(time=np.arange(100),
-                    flux=np.random.normal(1, 0.01, 100),
-                    flux_err=np.random.normal(0, 0.01, 100))
+lc_for_river = LightCurve(time=np.arange(100),
+                               flux=np.random.normal(1, 0.01, 100),
+                               flux_err=np.random.normal(0, 0.01, 100))
+
+
+@pytest.mark.parametrize("lc",
+                         [lc_for_river,
+                          _to_lc_unitless(lc_for_river)])
+def test_river(lc):
     lc.plot_river(10, 1)
     plt.close()
     folded_lc = lc.fold(10, 1)
