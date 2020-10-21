@@ -26,7 +26,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
-    validate_method, _query_solar_system_objects
+    validate_method, _query_solar_system_objects, _to_unitless
 )
 from .utils import LightkurveWarning, LightkurveDeprecationWarning
 
@@ -34,13 +34,6 @@ from .utils import LightkurveWarning, LightkurveDeprecationWarning
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve', 'FoldedLightCurve']
 
 log = logging.getLogger(__name__)
-
-
-def _to_unitless(data):
-    """Convert various types of data with units to raw unitless ones, e.g., ``Quantity``, ``Column`."""
-    # Note: data MUST NOT be `Time`,
-    # as np.asarray(time_obj) creates an ndarray of `Time` objects, rather than the raw time values
-    return np.asarray(data)
 
 
 class LightCurve(TimeSeries):

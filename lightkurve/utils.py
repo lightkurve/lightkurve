@@ -22,12 +22,37 @@ from astropy.time import Time
 
 log = logging.getLogger(__name__)
 
+# Import the optional Bokeh dependency
+try:
+    from bokeh.plotting import ColumnDataSource
+except ImportError:
+    pass
 
 __all__ = ['LightkurveError', 'LightkurveWarning',
            'KeplerQualityFlags', 'TessQualityFlags',
            'bkjd_to_astropy_time', 'btjd_to_astropy_time',
            'show_citation_instructions']
 
+
+def _to_unitless(data):
+    """Convert array-like data with units to raw unitless ones, e.g., ``Quantity``, ``Column`, `Time`."""
+    if hasattr(data, 'value'):
+        # this case is mainly to handle Time (of which np.asarray does not work)
+        # it works for Quantity as a by-product
+        return data.value
+    else:
+        # for Column, and edge cases that the data is already unitless.
+        return np.asarray(data)
+
+
+def _to_unitless_dict(data):
+    """Convert the array-like values in the data dict to unitless one"""
+    return {key: _to_unitless(val) for key, val in data.items()}
+
+
+def _to_ColumnDataSource(data):
+    """Convet the array-like values in the data dict to unitless one for use with ColumnDataSource"""
+    return ColumnDataSource(data=_to_unitless_dict(data))
 
 class QualityFlags(object):
     """Abstract class"""

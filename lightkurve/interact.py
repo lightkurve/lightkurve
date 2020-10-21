@@ -24,7 +24,7 @@ from astropy.coordinates import SkyCoord, Angle
 from astropy.stats import sigma_clip
 from astropy.utils.exceptions import AstropyUserWarning
 
-from .utils import KeplerQualityFlags, LightkurveWarning
+from .utils import KeplerQualityFlags, LightkurveWarning, _to_ColumnDataSource
 
 log = logging.getLogger(__name__)
 
@@ -80,13 +80,12 @@ def prepare_lightcurve_datasource(lc):
         if len(flag_str_list) > 1:
             qual_strings.append("; ".join(flag_str_list))
 
-    lc_source = ColumnDataSource(data=dict(
-                                 time=lc.time.value,
-                                 time_iso=human_time,
-                                 flux=lc.flux.value,
-                                 cadence=lc.cadenceno.value,
-                                 quality_code=lc.quality.value,
-                                 quality=np.array(qual_strings)))
+    lc_source = _to_ColumnDataSource(data=dict(time=lc.time,
+                                               time_iso=human_time,
+                                               flux=lc.flux,
+                                               cadence=lc.cadenceno,
+                                               quality_code=lc.quality,
+                                               quality=np.array(qual_strings)))
     return lc_source
 
 
