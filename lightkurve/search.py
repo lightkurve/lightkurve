@@ -1,6 +1,7 @@
 """Defines tools to retrieve Kepler data from the archive at MAST."""
 from __future__ import division
 import os
+from functools import lru_cache
 import glob
 import logging
 import re
@@ -388,6 +389,7 @@ class SearchResult(object):
         return path
 
 
+@lru_cache
 def search_targetpixelfile(target, radius=None, cadence=None,
                            mission=('Kepler', 'K2', 'TESS'),
                            author=('Kepler', 'K2', 'SPOC'),
@@ -497,6 +499,7 @@ def search_lightcurvefile(*args, **kwargs):
     return search_lightcurve(*args, **kwargs)
 
 
+@lru_cache
 def search_lightcurve(target, radius=None, cadence=None,
                       mission=('Kepler', 'K2', 'TESS'),
                       author=('Kepler', 'K2', 'SPOC'),
@@ -602,6 +605,7 @@ def search_lightcurve(target, radius=None, cadence=None,
         return SearchResult(None)
 
 
+@lru_cache
 def search_tesscut(target, sector=None):
     """Searches MAST for TESS Full Frame Image cutouts containing a desired target or region.
 
