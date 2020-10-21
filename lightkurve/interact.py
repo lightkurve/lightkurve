@@ -24,7 +24,7 @@ from astropy.coordinates import SkyCoord, Angle
 from astropy.stats import sigma_clip
 from astropy.utils.exceptions import AstropyUserWarning
 
-from .utils import KeplerQualityFlags, LightkurveWarning, _to_ColumnDataSource
+from .utils import KeplerQualityFlags, LightkurveWarning, _to_unitless_list, _to_ColumnDataSource
 
 log = logging.getLogger(__name__)
 
@@ -43,10 +43,6 @@ except ImportError:
     # We will print a nice error message in the `show_interact_widget` function
     pass
 
-
-def _to_unitless(items):
-    """Convert the values in the item list to unitless one"""
-    return [getattr(item, 'value', item) for item in items]
 
 def prepare_lightcurve_datasource(lc):
     """Prepare a bokeh ColumnDataSource object for tool tips.
@@ -183,7 +179,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     if ylim_func is None:
         ylims = get_lightcurve_y_limits(lc_source)
     else:
-        ylims = _to_unitless(ylim_func(lc))
+        ylims = _to_unitless_list(ylim_func(lc))
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
 
     # Add step lines, circles, and hover-over tooltips

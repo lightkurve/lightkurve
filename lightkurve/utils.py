@@ -40,9 +40,17 @@ def _to_unitless(data):
         # this case is mainly to handle Time (of which np.asarray does not work)
         # it works for Quantity as a by-product
         return data.value
+    elif np.isscalar(data):
+        # case already an unitless scalar, do nothing.
+        return data
     else:
-        # for Column, and edge cases that the data is already unitless.
+        # for Column, and edge cases that the data is already unitless (e.g., ndarray or list)
         return np.asarray(data)
+
+
+def _to_unitless_list(items):
+    """Convert the values in the item list to unitless one."""
+    return [_to_unitless(item) for item in items]
 
 
 def _to_unitless_dict(data):
