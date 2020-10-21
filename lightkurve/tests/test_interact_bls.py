@@ -37,7 +37,6 @@ def test_graceful_exit_outside_notebook():
     result = lc.interact_bls()
     assert(result is None)
 
-@pytest.mark.xfail  # TEMP SKIP until issue #882 is resolved
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports,
                     reason="requires bokeh and astropy.stats.bls")
