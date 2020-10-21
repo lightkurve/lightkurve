@@ -77,6 +77,8 @@ lightkurve.search
   such as 'KIC 5112705' or 'TIC 261136679', only return products known under
   those names, unless a search radius is specified. [#796]
 
+- Improved the speed of all search functions by caching repeat queries. [#885]
+
 lightkurve.correctors
 ^^^^^^^^^^^^^^^^^^^^^
 
