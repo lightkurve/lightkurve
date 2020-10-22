@@ -19,7 +19,7 @@ from scipy.interpolate import PchipInterpolator
 from .designmatrix import DesignMatrix, DesignMatrixCollection
 from .. import MPLSTYLE
 from ..lightcurve import LightCurve
-from ..utils import channel_to_module_output, validate_method
+from ..utils import channel_to_module_output, validate_method, _to_unitless
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ __all__ = ['CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
            'TessCotrendingBasisVectors', 'download_kepler_cbvs', 'download_tess_cbvs']
 
 #*******************************************************************************
-# Cotrending Basis Vectors Classes and Functions 
+# Cotrending Basis Vectors Classes and Functions
 
 class CotrendingBasisVectors(TimeSeries):
     """
@@ -43,9 +43,9 @@ class CotrendingBasisVectors(TimeSeries):
     Instantiate multiple objects to store multiple set of CBVS, for example, to
     save each of the three multi-scale bands in TESS.
 
-    CotrendingBasisVectors calls the standard __init__ from 
+    CotrendingBasisVectors calls the standard __init__ from
     astropy.timeseries.TimeSeries
-    
+
     Parameters
     ----------
     data : `~astropy.table.Table`
@@ -55,13 +55,13 @@ class CotrendingBasisVectors(TimeSeries):
         If 'GAP' is not given then it is filled with all False.
         If 'CADENCENO' is not given then it is filled with np.arange(nCadences)
     time : `~astropy.time.Time`
-        Time values. 
+        Time values.
     **kwargs : dict
         Additional keyword arguments are passed to `~astropy.table.QTable`.
 
     Attributes
     ----------
-    cadenceno       : int array-like 
+    cadenceno       : int array-like
         Cadence indices
     time            : flaot array-like
         CBV cadence times
@@ -136,7 +136,7 @@ class CotrendingBasisVectors(TimeSeries):
         Parameters
         ----------
         cbv_indices : list of ints
-            List of CBV vectors to use. 1-based indexing! 
+            List of CBV vectors to use. 1-based indexing!
             {'all' => Use all}
         name : str
             A Name for the DesignMatrix
@@ -153,7 +153,7 @@ class CotrendingBasisVectors(TimeSeries):
 
         if (isinstance(cbv_indices, str) and (cbv_indices == 'all')):
             cbv_indices = self.cbv_indices
-                    
+
         cbv_names = []
         cbv_matrix = np.array([])
         for idx in cbv_indices:
@@ -163,7 +163,7 @@ class CotrendingBasisVectors(TimeSeries):
                 if len(cbv_matrix) == 0:
                     cbv_matrix =  np.array(self['VECTOR_{}'.format(idx)])[...,None]
                 else:
-                    cbv_matrix = np.hstack((cbv_matrix, 
+                    cbv_matrix = np.hstack((cbv_matrix,
                         np.array(self['VECTOR_{}'.format(idx)])[...,None]))
                 cbv_names.append('VECTOR_{}'.format(idx))
 
@@ -253,7 +253,7 @@ class CotrendingBasisVectors(TimeSeries):
     def align(self, lc):
         """Aligns the CBVs to a light curve. The lightCurve object might not
         have the same cadences as the CBVs. This will trim the CBVs to be
-        aligned with the light curve. 
+        aligned with the light curve.
 
         This method will use the cadence number (lc.cadenceno) to
         perform the synchronization. Only cadence numbers that exist in both
@@ -300,11 +300,11 @@ class CotrendingBasisVectors(TimeSeries):
                 for idx in lc_nan_indices:
                     dict_to_add = {}
                     dict_to_add['time'] = lc.time[idx]
-                    dict_to_add['CADENCENO'] = lc.cadenceno[idx].value
+                    dict_to_add['CADENCENO'] = _to_unitless(lc.cadenceno[idx])
                     dict_to_add['GAP'] = True
                     for cbvIdx in cbvs.cbv_indices:
                         dict_to_add['VECTOR_{}'.format(cbvIdx)] = np.nan
-                
+
                     cbvs.add_row(dict_to_add)
 
             # Now sort the CBVs by cadenceno
@@ -318,19 +318,19 @@ class CotrendingBasisVectors(TimeSeries):
 
     def interpolate(self, lc, extrapolate=False):
         """Interpolates the CBV to the cadence times in the given light curve
-        using Piecewise Cubic Hermite Interpolating Polynomial (PCHIP). 
+        using Piecewise Cubic Hermite Interpolating Polynomial (PCHIP).
 
         Uses scipy.interpolate.PchipInterpolator
 
         Each CBV is interpolated independently. All gaps are set to False.
         The cadence numbers are taken from the light curve.
-        
+
         Parameters
         ----------
         lc : LightCurve object
             The reference light curve cadence times to interpolate to
         extrapolate : bool, optional
-            Whether to extrapolate to out-of-bounds points based on first 
+            Whether to extrapolate to out-of-bounds points based on first
             and last intervals, or to return NaNs.
 
         Returns
@@ -341,7 +341,7 @@ class CotrendingBasisVectors(TimeSeries):
 
         if not isinstance(lc, LightCurve):
             raise Exception('<lc> must be a LightCurve class')
-        
+
         # Create the new cbv object with no basis vectors, yet...
         cbvNewTime = lc.time.copy()
         # Gaps are all false
@@ -442,7 +442,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
             dataTbl = Table.read(hdu[extName], format="fits")
             dataTbl.meta.update(hdu[0].header)
             dataTbl.meta.update(hdu[extName].header)
-  
+
             # TimeSeries-based objects require a dedicated time column
             # Replace NaNs with default time '2000-01-01', otherwise,
             # astropy.time.Time complains
@@ -451,14 +451,14 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
             timeData[nanHere] = Time(['2000-01-01'], scale='utc').mjd
             cbvTime = Time(timeData, format='mjd')
             dataTbl.remove_column('TIME_MJD')
-            
+
             # Gaps are labelled as 'GAPFLAG' so rename!
             dataTbl['GAP'] = dataTbl['GAPFLAG']
             dataTbl.remove_column('GAPFLAG')
 
             dataTbl.meta['MISSION'] = mission
             dataTbl.meta['CBV_TYPE'] = 'SingleScale'
-            
+
         except:
             dataTbl = None
             cbvTime = None
@@ -492,7 +492,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
             self.meta['QUARTER'] = quarter
         else:
             pass
-        
+
     @property
     def campaign(self):
         return self.meta.get('CAMPAIGN', None)
@@ -503,7 +503,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
             self.meta['CAMPAIGN'] = campaign
         else:
             pass
-        
+
     @property
     def module(self):
         return self.meta.get('MODULE', None)
@@ -511,7 +511,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
     @module.setter
     def module(self, module):
         self.meta['MODULE'] = module
-        
+
     @property
     def output(self):
         return self.meta.get('OUTPUT', None)
@@ -519,7 +519,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
     @output.setter
     def output(self, output):
         self.meta['OUTPUT'] = output
-        
+
     def __repr__(self):
 
         if self.mission == 'Kepler':
@@ -584,7 +584,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
         cbv_type : str
             'SingleScale', 'MultiScale' or 'Spike'
         band : int
-            Band number for 'MultiScale' CBVs 
+            Band number for 'MultiScale' CBVs
             Ignored for 'SingleScale' or 'Spike'
         **kwargs : Optional arguments
             Passed to the TimeSeries superclass
@@ -620,7 +620,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
             dataTbl = Table.read(hdu[extName], format="fits")
             dataTbl.meta.update(hdu[0].header)
             dataTbl.meta.update(hdu[extName].header)
-  
+
             # TimeSeries-based objects require a dedicated time column
             # Replace NaNs with default time '2000-01-01', otherwise,
             # astropy.time.Time complains
@@ -629,7 +629,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
             timeData[nanHere] = Time(['2000-01-01'], scale='utc').mjd
             cbvTime = Time(timeData, format='btjd')
             dataTbl.remove_column('TIME')
-            
+
             dataTbl.meta['MISSION'] = 'TESS'
             dataTbl.meta['CBV_TYPE'] = cbv_type
             dataTbl.meta['BAND'] = band
@@ -664,7 +664,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
     @band.setter
     def band(self, band):
         self.meta['BAND'] = band
-        
+
     @property
     def sector(self):
         return self.meta.get('SECTOR', None)
@@ -672,7 +672,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
     @sector.setter
     def sector(self, sector):
         self.meta['SECTOR'] = sector
-        
+
     @property
     def camera(self):
         return self.meta.get('CAMERA', None)
@@ -680,7 +680,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
     @camera.setter
     def camera(self, camera):
         self.meta['CAMERA'] = camera
-        
+
     @property
     def ccd(self):
         return self.meta.get('CCD', None)
@@ -688,12 +688,12 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
     @ccd.setter
     def ccd(self, ccd):
         self.meta['CCD'] = ccd
-        
+
     def __repr__(self):
 
         if (self.cbv_type == 'MultiScale'):
             repr_string = 'TESS CBVs, Sector.Camera.CCD : {}.{}.{}, CBVType.Band: {}.{}, nCBVs : {}' \
-                ''.format(self.sector, self.camera, self.ccd, self.cbv_type, 
+                ''.format(self.sector, self.camera, self.ccd, self.cbv_type,
                     self.band, len(self.cbv_indices))
         else:
             repr_string = 'TESS CBVs, Sector.Camera.CCD : {}.{}.{}, CBVType : {}, nCBVS : {}'\
@@ -771,10 +771,10 @@ def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
     elif (mission == 'K2'):
         cbvBaseUrl = "http://archive.stsci.edu/missions/k2/cbv/"
 
-    try:     
+    try:
         soup = BeautifulSoup(requests.get(cbvBaseUrl).text, 'html.parser')
         cbv_files = [fn['href'] for fn in soup.find_all('a') if fn['href'].endswith('fits')]
- 
+
         if mission == 'Kepler':
             quarter = 'q{:02}'.format(quarter)
             for cbv_file in cbv_files:
@@ -835,9 +835,9 @@ def download_tess_cbvs(sector=None, camera=None,
 
     # The easiest way to obtain a link to the CBV file for a TESS Sector and
     # camera.CCD is
-    # 
+    #
     # 1. Download the bulk download curl script (with a predictable url) for the
-    # desired sector and search it for the camera.CCD needed 
+    # desired sector and search it for the camera.CCD needed
     # 2. Download the CBV FITS file based on the link in the curl script
     #
     # The bulk download curl links have urls such as:
@@ -858,7 +858,7 @@ def download_tess_cbvs(sector=None, camera=None,
         assert  isinstance(band, int),  'band must be passed for multi-scale CBVs'
     else:
         assert  band is None,  'band must NOT be passed for single-scale or spike CBVs'
-        
+
     curlBaseUrl = 'https://archive.stsci.edu/missions/tess/download_scripts/sector/tesscurl_sector_'
     curlEndUrl = '_cbv.sh'
     curlUrl = curlBaseUrl + str(sector) + curlEndUrl
@@ -880,15 +880,15 @@ def download_tess_cbvs(sector=None, camera=None,
     else:
         raise Exception('Error parsing sector string when getting TESS CBV FITS files')
 
-    try: 
+    try:
 
-        # Read in the relevent curl script file and find the line for the CBV 
+        # Read in the relevent curl script file and find the line for the CBV
         # data we are looking for
         data = urllib.request.urlopen(curlUrl)
         foundIndex = None
         for line in data:
             strLine = str(line)
-            if curlSearchString in strLine: 
+            if curlSearchString in strLine:
                 foundIndex = strLine.index(curlSearchString)
                 break
         if (foundIndex is None):
@@ -899,9 +899,9 @@ def download_tess_cbvs(sector=None, camera=None,
         htmlEndIndex = strLine.rfind('fits')
         # Add 4 for length of 'fits' string
         tess_cbv_url  = strLine[htmlStartIndex:htmlEndIndex+4]
-        
+
         hdu = pyfits.open(tess_cbv_url)
-            
+
         # Check that this is a TESS CBV FITS file
         mission = hdu['Primary'].header['TELESCOP']
         validate_method(mission, ['tess'])

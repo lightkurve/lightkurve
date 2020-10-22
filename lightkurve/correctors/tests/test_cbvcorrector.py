@@ -21,10 +21,10 @@ from ..designmatrix import DesignMatrix
 from ..cbvcorrector import download_kepler_cbvs, download_tess_cbvs, \
     CotrendingBasisVectors, KeplerCotrendingBasisVectors, \
     TessCotrendingBasisVectors
+from ...tests.test_lightcurve import _to_lc_unitless
 
-
-@pytest.mark.xfail  # TEMP SKIP until issue #882 is resolved
-def test_CotrendingBasisVectors_nonretrieval():
+@pytest.mark.parametrize("use_unitless_lc", [False, True])
+def test_CotrendingBasisVectors_nonretrieval(use_unitless_lc):
     """ Tests CotrendingBasisVectors class without requiring remote data
     """
 
@@ -94,6 +94,9 @@ def test_CotrendingBasisVectors_nonretrieval():
     # Set up some cadenceno such that both CBV is trimmed and NaNs inserted
     sample_lc = TessLightCurve(time=[1,2,3,4,6,7], flux=[1,2,3,4,6,7],
             flux_err=[0.1,0.1, 0.1, 0.1, 0.1, 0.1], cadenceno=[1,2,3,4,6,7])
+    sample_lc.cadenceno.unit = u.dimensionless_unscaled  # ensure the codepath with cadenceno as Quantity is tested
+    if use_unitless_lc:
+        sample_lc = _to_lc_unitless(sample_lc)
     dataTbl = Table([[1, 2, 3, 5, 6], [False, True, False, False, False],
             [1.0, 2.0, 3.0, 5.0, 6.0 ]],
         names=('CADENCENO', 'GAP', 'VECTOR_1'))
