@@ -48,6 +48,7 @@ class QTimeSeries(TimeSeries):
             # the logic is based on those in the grandparent QTable
             qcol = Quantity(col.data, u.dimensionless_unscaled, dtype=col.dtype, copy=False)
             qcol.info = col.info
+            qcol.info.indices = col.info.indices
             col = qcol
         return col
 
