@@ -384,6 +384,20 @@ def test_lightcurve_scatter():
     plt.ylim(0.999, 1.001)
 
 
+def test_lightcurve_plots_unitless():
+    """Sanity check to verify that lightcurve plotting works when data is unitless."""
+    lc = LightCurve(time=np.arange(10))
+    # make flux non-uniform to avoid warnings with clip_outliers=True during test
+    lc.flux = np.append(np.zeros(3), np.ones(7))
+    lc.flux_err = np.zeros(10)  # need flux_err to avoid warnings
+
+    lc.plot()
+    lc.scatter()
+    lc.errorbar()
+    lc.plot(normalize=True, clip_outliers=True)
+    plt.close('all')
+
+
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
     # A flat lightcurve should have a CDPP close to zero
@@ -1299,3 +1313,22 @@ def test_fill_gaps_after_normalization():
     assert lc2.flux[2].value == 1e6
     assert lc2.flux[2].unit == u.cds.ppm
     assert lc2.flux_err[2] == 0.1
+
+
+@pytest.mark.parametrize("new_col_val", [([2, 3, 4] * u_e_s),   # Quantity
+                                         (np.array([2, 3, 4])), # ndarray
+                                         ([2, 3, 4])            # list
+                                         ])
+def test_force_numeric_columns_as_quantity(new_col_val):
+    lc = LightCurve(time=[1, 2, 3])
+    lc['col1'] = new_col_val
+    exp_dtype = lc['col1'].dtype
+    assert isinstance(lc['col1'], u.Quantity)
+    assert lc['col1'].dtype is exp_dtype
+
+
+def test_support_non_numeric_columns():
+    lc = LightCurve(time=[1, 2, 3], flux=[2, 3, 4])
+    lc['col1'] = ['a', 'b', 'c']
+    lc_copy = lc.copy()
+    assert_array_equal(lc_copy['col1'], lc['col1'])

@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 from copy import deepcopy
 
 from astropy.stats import sigma_clip
-from astropy.table import Table
+from astropy.table import Table, Column
 from astropy.io import fits
 from astropy.time import Time, TimeDelta
 from astropy import units as u
@@ -36,7 +36,24 @@ __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve', 'FoldedLightCurve
 log = logging.getLogger(__name__)
 
 
-class LightCurve(TimeSeries):
+class QTimeSeries(TimeSeries):
+    def _convert_col_for_table(self, col):
+        """Force all numeric columns as Quantity, not just those with units.
+
+           Override grandparent ``QTable`` behavior.
+        """
+        col = super()._convert_col_for_table(col)
+        if (isinstance(col, Column) and getattr(col, 'unit', None) is None and
+                np.issubdtype(getattr(col, 'dtype', None), np.number)):
+            # the logic is based on those in the grandparent QTable
+            qcol = Quantity(col.data, u.dimensionless_unscaled, dtype=col.dtype, copy=False)
+            qcol.info = col.info
+            qcol.info.indices = col.info.indices
+            col = qcol
+        return col
+
+
+class LightCurve(QTimeSeries):
     """Class to hold time series brightness data for an astronomical object.
 
     Compared to the generic `~astropy.timeseries.TimeSeries` class, `LightCurve`
@@ -228,11 +245,6 @@ class LightCurve(TimeSeries):
         for kw in deprecated_column_kws:
             if kw not in self.meta and kw not in self.columns:
                 self.add_column(deprecated_column_kws[kw], name=kw)
-
-        # Ensure all columns are Quantity objects
-        for col in self.columns:
-            if not isinstance(self[col], (Quantity, Time)):
-                self.replace_column(col, Quantity(self[col], dtype=self[col].dtype))
 
         # Ensure flux and flux_err have the same units
         if self['flux'].unit != self['flux'].unit:
