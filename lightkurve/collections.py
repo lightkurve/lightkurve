@@ -8,6 +8,7 @@ import numpy as np
 
 from astropy.table import vstack
 from astropy.utils.decorators import deprecated
+from astropy.units import Quantity
 
 from . import MPLSTYLE
 from .targetpixelfile import TargetPixelFile
@@ -146,7 +147,7 @@ class LightCurveCollection(Collection):
         # e.g. the `cadenceno` and `quality` columns.  This causes issues with
         # the __repr__ and the parsing of quality values.
         for col in stack.colnames:
-            if hasattr(stack[col], 'dtype') and stack[col].dtype != lcs[0][col].dtype:
+            if isinstance(stack[col], Quantity) and stack[col].dtype != lcs[0][col].dtype:
                 stack[col] = stack[col].astype(lcs[0][col].dtype)
 
         return stack
