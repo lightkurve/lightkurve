@@ -7,9 +7,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from astropy.table import vstack
+from astropy.utils.decorators import deprecated
 
 from . import MPLSTYLE
 from .targetpixelfile import TargetPixelFile
+from .utils import LightkurveDeprecationWarning
+
 
 log = logging.getLogger(__name__)
 
@@ -97,8 +100,23 @@ class LightCurveCollection(Collection):
     def __init__(self, lightcurves):
         super(LightCurveCollection, self).__init__(lightcurves)
 
+    @property
+    @deprecated("2.0", warning_type=LightkurveDeprecationWarning)
+    def PDCSAP_FLUX(self):
+        """DEPRECATED. Replaces `LightCurveFileCollection.PDCSAP_FLUX`.
+        Provided for backwards-compatibility with Lightkurve v1.x;
+        will be removed soon."""
+        return LightCurveCollection([lc.PDCSAP_FLUX for lc in self])
 
-    def stitch(self, corrector_func=lambda x:x.normalize()):
+    @property
+    @deprecated("2.0", warning_type=LightkurveDeprecationWarning)
+    def SAP_FLUX(self):
+        """DEPRECATED. Replaces `LightCurveFileCollection.SAP_FLUX`.
+        Provided for backwards-compatibility with Lightkurve v1.x;
+        will be removed soon."""
+        return LightCurveCollection([lc.SAP_FLUX for lc in self])
+
+    def stitch(self, corrector_func=lambda x: x.normalize()):
         """ Stitch all light curves in the collection into a single lk.LightCurve
 
         Any function passed to `corrector_func` will be applied to each light curve
