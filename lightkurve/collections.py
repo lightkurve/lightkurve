@@ -139,7 +139,17 @@ class LightCurveCollection(Collection):
             corrector_func = lambda x: x
         lcs = [corrector_func(lc) for lc in self]
         # Need `join_type='inner'` until AstroPy supports masked Quantities
-        return vstack(lcs, join_type='inner', metadata_conflicts='silent')
+        stack = vstack(lcs, join_type='inner', metadata_conflicts='silent')
+
+        # Temporary workaround for https://github.com/astropy/astropy/issues/10958
+        # AstroPy `vstack` converts integer Quantity columns to floating point,
+        # e.g. the `cadenceno` and `quality` columns.  This causes issues with
+        # the __repr__ and the parsing of quality values.
+        for col in stack.colnames:
+            if hasattr(stack[col], 'dtype') and stack[col].dtype != lcs[0][col].dtype:
+                stack[col] = stack[col].astype(lcs[0][col].dtype)
+
+        return stack
 
     def plot(self, ax=None, offset=0., **kwargs) -> matplotlib.axes.Axes:
         """Plots all light curves in the collection on a single plot.
