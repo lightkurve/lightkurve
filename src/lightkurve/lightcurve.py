@@ -1224,6 +1224,7 @@ class LightCurve(QTimeSeries):
         time_bin_start=None,
         n_bins=None,
         aggregate_func=None,
+        bins=None,
         binsize=None,
     ):
         """Bins a lightcurve in equally-spaced bins in time.
@@ -1236,16 +1237,21 @@ class LightCurve(QTimeSeries):
         Parameters
         ----------
         time_bin_size : `~astropy.units.Quantity`, float
-            The time interval for the binned time series. (Default unit: days.)
+            The time interval for the binned time series.
+            (Default: 0.5 days; default unit: days.)
         time_bin_start : `~astropy.time.Time`, optional
             The start time for the binned time series. Defaults to the first
             time in the sampled time series.
         n_bins : int, optional
             The number of bins to use. Defaults to the number needed to fit all
-            the original points.
+            the original points. Note that this will create this number of bins
+            of length ``time_bin_size`` independent of the lightkurve length.
         aggregate_func : callable, optional
             The function to use for combining points in the same bin. Defaults
             to np.nanmean.
+        bins : int or iterable of ints
+            The number of bins to divide the lightkurve into. In contrast to
+            ``n_bins`` this sets the length of ``time_bin_size`` accordingly.
         binsize : int
             In Lightkurve v1.x, the default behavior of `bin()` was to create
             bins which contained an equal number data points in each bin.
@@ -1263,14 +1269,15 @@ class LightCurve(QTimeSeries):
         binned_lc : `LightCurve`
             A new light curve which has been binned.
         """
-        # Backwards compatibility with Lightkurve v1.x
-        if time_bin_size is None and binsize is not None:
-            time_bin_size = (self.time[binsize] - self.time[0]).to(u.day)
+        if binsize is not None and bins is not None:
+            raise ValueError("Only one of ``bins`` and ``binsize`` can be specified.")
+        elif ((binsize is not None or bins is not None)
+              and (time_bin_size is not None or n_bins is not None)):
+            raise ValueError("``bins`` or ``binsize`` conflicts with "
+                             "``n_bins`` or ``time_bin_size``.")
+        elif bins is not None and np.array(bins).dtype != np.int:
+            raise TypeError("``bins`` must have integer type.")
 
-        if time_bin_size is None:
-            time_bin_size = 0.5 * u.day
-        if not isinstance(time_bin_size, Quantity):
-            time_bin_size *= u.day
         if time_bin_start is None:
             time_bin_start = self.time[0]
         if not isinstance(time_bin_start, (Time, TimeDelta)):
@@ -1282,6 +1289,20 @@ class LightCurve(QTimeSeries):
                 time_bin_start = Time(
                     time_bin_start, format=self.time.format, scale=self.time.scale
                 )
+
+        # Backwards compatibility with Lightkurve v1.x
+        if time_bin_size is None:
+            if bins is not None:
+                i = len(self.time) - np.searchsorted(self.time, time_bin_start - 1 * u.ns)
+                time_bin_size = ((self.time[-1] - time_bin_start) * i / ((i -1) * bins)).to(u.day)
+                print(bins, len(self.time), i, self.time[-1] - time_bin_start, time_bin_size)
+            elif binsize is not None:
+                i = np.searchsorted(self.time, time_bin_start - 1 * u.ns)
+                time_bin_size = (self.time[i + binsize] - self.time[i]).to(u.day)
+            else:
+                time_bin_size = 0.5 * u.day
+        if not isinstance(time_bin_size, Quantity):
+            time_bin_size *= u.day
 
         # Call AstroPy's aggregate_downsample
         with warnings.catch_warnings():
