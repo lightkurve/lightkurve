@@ -59,6 +59,9 @@ lightkurve.targetpixelfile
 - Modified `TargetPixelFactory` to support creating TESS Target Pixel Files
   and to enable it to populate all data columns. [#768, #857]
 
+- Fixed a bug in ``TargetPixelFile.wcs`` which caused it to raise Error if
+the tpf does not contain expected WCS keywords in the header. [#892]
+
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
 

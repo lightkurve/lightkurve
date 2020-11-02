@@ -375,7 +375,7 @@ class TargetPixelFile(object):
                             'NAXIS2': 'NAXIS2'}
             mywcs = {}
             for oldkey, newkey in wcs_keywords.items():
-                if (self.hdu[1].header[oldkey] != Undefined):
+                if self.hdu[1].header.get(oldkey, None) is not None:
                    mywcs[newkey] = self.hdu[1].header[oldkey]
             return WCS(mywcs)
 
