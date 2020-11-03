@@ -4,7 +4,7 @@ from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
 from astropy import units as u
 from astropy.time import Time, TimeDelta
-from astropy.table import Table
+from astropy.table import Table, Column, MaskedColumn
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -1317,15 +1317,29 @@ def test_fill_gaps_after_normalization():
 
 @pytest.mark.parametrize("new_col_val", [([2, 3, 4] * u_e_s),   # Quantity
                                          (np.array([2, 3, 4])), # ndarray
-                                         ([2, 3, 4])            # list
+                                         ([2, 3, 4]),           # list
+                                         Column([2, 3, 4]),     # Column
+                                         MaskedColumn([2, -1, 4], mask=[False, True, False], fill_value=-999)
                                          ])
-def test_force_numeric_columns_as_quantity(new_col_val):
+def test_columns_have_value_accessor(new_col_val):
+    """Ensure resulting column has  ``.value`` accessor to raw data, irrespective of type of input.
+
+       The test won't be needed once https://github.com/astropy/astropy/pull/10962 is in astropy release
+       and Lightkurve requires the correspond astropy release.
+    """
+    expected_raw_value = new_col_val
+    if hasattr(new_col_val, 'value'):
+        expected_raw_value = new_col_val.value
+    elif hasattr(new_col_val, 'data'):
+        expected_raw_value = new_col_val.data
+
     lc = LightCurve(time=[1, 2, 3])
     lc['col1'] = new_col_val
-    exp_dtype = lc['col1'].dtype
-    assert isinstance(lc['col1'], u.Quantity)
-    assert lc['col1'].dtype is exp_dtype
-
+    assert_array_equal(lc['col1'].value, expected_raw_value)
+    # additional check for MaskedColumn, to ensure we don't lose its properties
+    if isinstance(new_col_val, MaskedColumn):
+        assert_array_equal(lc['col1'].mask, new_col_val.mask)
+        assert lc['col1'].fill_value == new_col_val.fill_value
 
 def test_support_non_numeric_columns():
     lc = LightCurve(time=[1, 2, 3], flux=[2, 3, 4])
