@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 from copy import deepcopy
 
 from astropy.stats import sigma_clip
-from astropy.table import Table, Column
+from astropy.table import Table, Column, MaskedColumn
 from astropy.io import fits
 from astropy.time import Time, TimeDelta
 from astropy import units as u
@@ -36,17 +36,37 @@ __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve', 'FoldedLightCurve
 log = logging.getLogger(__name__)
 
 
+class QColumn(Column):
+    """(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``."""
+    @property
+    def value(self):
+        return self.data
+
+
+class QMaskedColumn(MaskedColumn):
+    """(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``."""
+    @property
+    def value(self):
+        return self.data
+
+
 class QTimeSeries(TimeSeries):
     def _convert_col_for_table(self, col):
-        """Force all numeric columns as Quantity, not just those with units.
+        """Ensure resulting column has  ``.value`` accessor to raw data, irrespective of type of input.
 
-           Override grandparent ``QTable`` behavior.
+        It won't be needed once https://github.com/astropy/astropy/pull/10962 is in astropy release
+        and Lightkurve requires the correspond astropy release.
         """
         col = super()._convert_col_for_table(col)
-        if (isinstance(col, Column) and getattr(col, 'unit', None) is None and
-                np.issubdtype(getattr(col, 'dtype', None), np.number)):
-            # the logic is based on those in the grandparent QTable
-            qcol = Quantity(col.data, u.dimensionless_unscaled, dtype=col.dtype, copy=False)
+        if (isinstance(col, Column) and getattr(col, 'unit', None) is None and (not hasattr(col, 'value'))):
+            # the logic is similar to those in the grandparent QTable for Quantity
+            if isinstance(col, MaskedColumn):
+                qcol = QMaskedColumn(data=col.data, name=col.name, dtype=col.dtype, description=col.description,
+                                     mask=col.mask, fill_value=col.fill_value,
+                                     format=col.format, meta=col.meta, copy=False)
+            else:
+                qcol = QColumn(data=col.data, name=col.name, dtype=col.dtype, description=col.description,
+                               format=col.format, meta=col.meta, copy=False)
             qcol.info = col.info
             qcol.info.indices = col.info.indices
             col = qcol

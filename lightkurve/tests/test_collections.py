@@ -5,6 +5,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 
 from ..lightcurve import LightCurve
+from ..search import search_lightcurve
 from ..targetpixelfile import KeplerTargetPixelFile
 from ..collections import LightCurveCollection, TargetPixelFileCollection
 
@@ -106,3 +107,12 @@ def test_tpfcollection_plot():
     coll = TargetPixelFileCollection([tpf])
     coll.plot()
     plt.close('all')
+
+
+@pytest.mark.remote_data
+def test_stitch_repr():
+    """Regression test for #884."""
+    lc = search_lightcurve("Pi Men", mission='TESS', sector=1).download()
+    # The line below used to raise `ValueError: Unable to parse format string
+    # "{:10d}" for entry "70445.0" in column "cadenceno"`
+    LightCurveCollection((lc,lc)).stitch().__repr__()
