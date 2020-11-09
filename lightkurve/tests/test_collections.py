@@ -192,10 +192,10 @@ def test_stitch_repr():
 def test_accessor_tess_sector():
     lc0 = TessLightCurve(time=np.arange(1, 5), flux=np.arange(1, 5),
                          flux_err=np.arange(1, 5), targetid=50000)
-    lc0.sector = 14
+    lc0.meta['SECTOR'] = 14
     lc1 = TessLightCurve(time=np.arange(10, 15), flux=np.arange(10, 15),
                          flux_err=np.arange(10, 15), targetid=120334)
-    lc1.sector = 26
+    lc1.meta['SECTOR'] = 26
     lcc = LightCurveCollection([lc0, lc1])
     assert((lcc.sector == [14, 26]).all())
     # The sector accessor can be used to generate boolean array
@@ -234,10 +234,10 @@ def test_accessor_kepler_quarter():
     # scaled down version of tess sector test, as they share the same codepath
     lc0 = KeplerLightCurve(time=np.arange(1, 5), flux=np.arange(1, 5),
                            flux_err=np.arange(1, 5), targetid=50000)
-    lc0.quarter = 2
+    lc0.meta['QUARTER'] = 2
     lc1 = KeplerLightCurve(time=np.arange(10, 15), flux=np.arange(10, 15),
                            flux_err=np.arange(10, 15), targetid=120334)
-    lc1.quarter = 1
+    lc1.meta['QUARTER'] = 1
     lcc = LightCurveCollection([lc0, lc1])
     assert((lcc.quarter == [2, 1]).all())
 
@@ -254,10 +254,10 @@ def test_accessor_k2_campaign():
     # scaled down version of tess sector test, as they share the same codepath
     lc0 = KeplerLightCurve(time=np.arange(1, 5), flux=np.arange(1, 5),
                            flux_err=np.arange(1, 5), targetid=50000)
-    lc0.campaign = 2
+    lc0.meta['CAMPAIGN'] = 2
     lc1 = KeplerLightCurve(time=np.arange(10, 15), flux=np.arange(10, 15),
                            flux_err=np.arange(10, 15), targetid=120334)
-    lc1.campaign = 1
+    lc1.meta['CAMPAIGN'] = 1
     lcc = LightCurveCollection([lc0, lc1])
     assert((lcc.campaign == [2, 1]).all())
 
