@@ -435,6 +435,15 @@ def make_bls_figure_elements(result, bls_source, help_source):
 
 def _preprocess_lc_for_bls(lc):
     clean = lc.remove_nans()
+    # convert to  normalized unscaled flux if needed,
+    # so that its scale is the same as the BLS model lc (to be generated),
+    # making it easier to be visualized in the same plot.
+    if not clean.meta.get('NORMALIZED', False):
+        clean = clean.normalize()
+    elif clean.flux.unit != u.dimensionless_unscaled:
+        # case normalized, but in other units (percents, etc.)
+        clean.flux = clean.flux.to(u.dimensionless_unscaled)
+        clean.flux_err = clean.flux_err.to(u.dimensionless_unscaled)
     return clean
 
 

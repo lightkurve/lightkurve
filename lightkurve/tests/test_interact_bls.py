@@ -2,6 +2,7 @@
 import pytest
 
 from astropy.timeseries import BoxLeastSquares
+import astropy.units as u
 import numpy as np
 
 from ..lightcurve import KeplerLightCurve, TessLightCurve
@@ -77,6 +78,16 @@ def test_preprocess_lc():
 
     clean = _preprocess_lc_for_bls(lc)
     assert not np.isnan(clean.flux).any()   # ensure processed lc has no nan
+    assert clean.meta.get('NORMALIZED', False)
+    assert clean.flux.unit == u.dimensionless_unscaled
+
+    # case the lc is normalized, but in other units
+    lc = lc.normalize(unit='percent')
+    clean = _preprocess_lc_for_bls(lc)
+    assert not np.isnan(clean.flux).any()   # ensure processed lc has no nan
+    assert clean.meta.get('NORMALIZED', False)
+    assert clean.flux.unit == u.dimensionless_unscaled
+
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports,
