@@ -26,6 +26,11 @@ lightkurve.lightcurve
 - Added a ``column`` parameter to ``LightCurve.remove_nans()`` to enable
   cadences to be removed which contain NaN values in a specific column. [#828]
 
+- ``interact_bls()``: added the support zoom by scrolling mouse wheel. [#854]
+
+- ``interact_bls()``: modified so that it normalizes the lightcurve to match the
+  generated transit model.  [#854]
+
 lightkurve.targetpixelfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
