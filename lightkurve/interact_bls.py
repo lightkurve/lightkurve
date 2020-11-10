@@ -268,7 +268,7 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
     """
     # Make figure
     fig = figure(title='Light Curve', plot_height=300, plot_width=900,
-                 tools="pan,box_zoom,reset",
+                 tools="pan,box_zoom,wheel_zoom,reset",
                  toolbar_location="below",
                  border_fill_color="#FFFFFF", active_drag="box_zoom")
     fig.title.offset = -10
@@ -329,7 +329,7 @@ def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help
 
     # Build Figure
     fig = figure(title='Folded Light Curve', plot_height=340, plot_width=450,
-                 tools="pan,box_zoom,reset",
+                 tools="pan,box_zoom,wheel_zoom,reset",
                  toolbar_location="below",
                  border_fill_color="#FFFFFF", active_drag="box_zoom")
     fig.title.offset = -10
@@ -383,7 +383,7 @@ def make_bls_figure_elements(result, bls_source, help_source):
 
     # Build Figure
     fig = figure(title='BLS Periodogram', plot_height=340, plot_width=450,
-                 tools="pan,box_zoom,tap,reset",
+                 tools="pan,box_zoom,wheel_zoom,tap,reset",
                  toolbar_location="below",
                  border_fill_color="#FFFFFF", x_axis_type='log', active_drag="box_zoom")
     fig.title.offset = -10
