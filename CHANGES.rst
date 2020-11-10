@@ -31,6 +31,9 @@ lightkurve.lightcurve
 - ``interact_bls()``: modified so that it normalizes the lightcurve to match the
   generated transit model.  [#854]
 
+- Fixed a bug in ``interact_bls()`` that caused the LightCurve panel improperly
+  scaled. [#902]
+
 lightkurve.targetpixelfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
