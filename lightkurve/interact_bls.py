@@ -433,6 +433,11 @@ def make_bls_figure_elements(result, bls_source, help_source):
     return fig, vertical_line
 
 
+def _preprocess_lc_for_bls(lc):
+    clean = lc.remove_nans()
+    return clean
+
+
 def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                          maximum_period=None, resolution=2000):
     """Show the BLS interact widget.
@@ -752,6 +757,10 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                             [Spacer(width=70), duration_slider, Spacer(width=50), npoints_slider],
                             [Spacer(width=70), double_button, Spacer(width=70), half_button, Spacer(width=300), text_output]
                                 ]))
+
+
+    # TODO: pre-process LC
+    lc = _preprocess_lc_for_bls(lc)
 
     output_notebook(verbose=False, hide_banner=True)
     return show(_create_interact_ui, notebook_url=notebook_url)

@@ -1649,8 +1649,7 @@ class LightCurve(QTimeSeries):
         .. [1] https://docs.astropy.org/en/stable/timeseries/bls.html
         """
         from .interact_bls import show_interact_widget
-        clean = self.remove_nans()
-        return show_interact_widget(clean, notebook_url=notebook_url, minimum_period=minimum_period,
+        return show_interact_widget(self, notebook_url=notebook_url, minimum_period=minimum_period,
                                     maximum_period=maximum_period, resolution=resolution)
 
     def to_table(self) -> Table:
