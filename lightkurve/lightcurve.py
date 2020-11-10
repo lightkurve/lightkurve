@@ -1609,8 +1609,7 @@ class LightCurve(QTimeSeries):
         Behind the scenes, the widget uses the AstroPy implementation of BLS [1]_.
 
         This feature only works inside an active Jupyter Notebook.
-        It requires Bokeh v1.0 (or later) and AstroPy v3.1 (or later),
-        which are optional dependencies. An error message will be shown
+        It requires Bokeh v1.0 (or later). An error message will be shown
         if these dependencies are not available.
 
         Parameters
@@ -1629,7 +1628,7 @@ class LightCurve(QTimeSeries):
             will be used.
         maximum_period : float or None
             Maximum period to evaluate the BLS to. If None, the time coverage of the
-            lightcurve / 4 will be used.
+            lightcurve / 2 will be used.
         resolution : int
             Number of points to use in the BLS panel. Lower this value for faster
             but less accurate performance. You can also vary this value using the
@@ -1647,7 +1646,7 @@ class LightCurve(QTimeSeries):
 
         References
         ----------
-        .. [1] http://docs.astropy.org/en/latest/stats/bls.html
+        .. [1] https://docs.astropy.org/en/stable/timeseries/bls.html
         """
         from .interact_bls import show_interact_widget
         clean = self.remove_nans()
