@@ -47,6 +47,20 @@ __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
 
 
+# OPEN: consider to move to utils and
+# consolidate with the helper in lightcurve.py (for time label)
+_TIME_LABEL_DICT_BRIEF = {
+    '':     'Phase',
+    'bkjd': '[BKJD days]',
+    'btjd': '[BTJD days]'
+}
+
+
+def _time_label_brief(time):
+    format = getattr(time, 'format', '')
+    return _TIME_LABEL_DICT_BRIEF.get(format, format.upper())
+
+
 class HduToMetaMapping(collections.abc.Mapping):
     """Provides a read-only view of HDU header in `astropy.timeseries.TimeSeries.meta` format"""
 
@@ -1502,7 +1516,8 @@ class TargetPixelFile(object):
         if style == 'lightkurve' or style is None:
             style = MPLSTYLE
         if title is None:
-            title = f'Target ID: {self.targetid}'
+            title = 'Target ID: {0}, {1:.2f} - {2:.2f} {3}'\
+                .format(self.targetid, self.time[0].value, self.time[-1].value, _time_label_brief(self.time))
         if corrector_func is None:
             corrector_func = lambda x: x.remove_outliers()
         if show_flux:
