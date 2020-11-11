@@ -1543,9 +1543,9 @@ class TargetPixelFile(object):
                 ax.get_xaxis().set_ticks([])
                 ax.get_yaxis().set_ticks([])
                 if periodogram:
-                    ax.set(title=title, xlabel='Frequency', ylabel='Power')
+                    ax.set(title=title, xlabel='Frequency / Column (pixel)', ylabel='Power / Row (pixel)')
                 else:
-                    ax.set(title=title, xlabel='Time', ylabel='Flux')
+                    ax.set(title=title, xlabel='Time / Column (pixel)', ylabel='Flux / Row (pixel)')
 
             gs = gridspec.GridSpec(self.shape[1], self.shape[2], wspace=0.01, hspace=0.01)
 
@@ -1583,6 +1583,15 @@ class TargetPixelFile(object):
                     gax.set_yticklabels('')
                     gax.set_xticks([])
                     gax.set_yticks([])
+
+                    # add row/column numbers to start / end
+                    if x == 0 and y == 0:
+                        gax.set_xlabel(f'{self.column}')
+                        gax.set_ylabel(f'{self.row}')
+                    if x == 0 and y == self.shape[2] - 1:  # lower right
+                        gax.set_xlabel(f'{self.column + self.shape[2] - 1}')
+                    if x == self.shape[1] - 1 and y == 0:  # upper left
+                        gax.set_ylabel(f'{self.row + self.shape[1] - 1}')
 
             fig.set_size_inches((y*1.5, x*1.5))
 
