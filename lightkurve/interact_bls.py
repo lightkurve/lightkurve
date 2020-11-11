@@ -268,7 +268,7 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
     """
     # Make figure
     fig = figure(title='Light Curve', plot_height=300, plot_width=900,
-                 tools="pan,box_zoom,reset",
+                 tools="pan,box_zoom,wheel_zoom,reset",
                  toolbar_location="below",
                  border_fill_color="#FFFFFF", active_drag="box_zoom")
     fig.title.offset = -10
@@ -329,7 +329,7 @@ def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help
 
     # Build Figure
     fig = figure(title='Folded Light Curve', plot_height=340, plot_width=450,
-                 tools="pan,box_zoom,reset",
+                 tools="pan,box_zoom,wheel_zoom,reset",
                  toolbar_location="below",
                  border_fill_color="#FFFFFF", active_drag="box_zoom")
     fig.title.offset = -10
@@ -383,7 +383,7 @@ def make_bls_figure_elements(result, bls_source, help_source):
 
     # Build Figure
     fig = figure(title='BLS Periodogram', plot_height=340, plot_width=450,
-                 tools="pan,box_zoom,tap,reset",
+                 tools="pan,box_zoom,wheel_zoom,tap,reset",
                  toolbar_location="below",
                  border_fill_color="#FFFFFF", x_axis_type='log', active_drag="box_zoom")
     fig.title.offset = -10
@@ -431,6 +431,20 @@ def make_bls_figure_elements(result, bls_source, help_source):
                             mode='mouse', point_policy="snap_to_data"))
 
     return fig, vertical_line
+
+
+def _preprocess_lc_for_bls(lc):
+    clean = lc.remove_nans()
+    # convert to  normalized unscaled flux if needed,
+    # so that its scale is the same as the BLS model lc (to be generated),
+    # making it easier to be visualized in the same plot.
+    if not clean.meta.get('NORMALIZED', False):
+        clean = clean.normalize()
+    elif clean.flux.unit != u.dimensionless_unscaled:
+        # case normalized, but in other units (percents, etc.)
+        clean.flux = clean.flux.to(u.dimensionless_unscaled)
+        clean.flux_err = clean.flux_err.to(u.dimensionless_unscaled)
+    return clean
 
 
 def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
@@ -752,6 +766,10 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                             [Spacer(width=70), duration_slider, Spacer(width=50), npoints_slider],
                             [Spacer(width=70), double_button, Spacer(width=70), half_button, Spacer(width=300), text_output]
                                 ]))
+
+
+    # TODO: pre-process LC
+    lc = _preprocess_lc_for_bls(lc)
 
     output_notebook(verbose=False, hide_banner=True)
     return show(_create_interact_ui, notebook_url=notebook_url)
