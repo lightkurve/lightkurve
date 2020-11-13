@@ -1358,3 +1358,13 @@ def test_timedelta():
 def test_issue_916():
     """Regression test for #916: Can we flatten after folding?"""
     LightCurve(flux=np.random.randn(100)).fold(period=2.5).flatten()
+
+
+@pytest.mark.remote_data
+def test_search_neighbors():
+    """The closest neighbor to Proxima Cen in Sector 11 is TIC 388852407."""
+    lc = search_lightcurve("Proxima Cen", sector=11).download()
+    search = lc.search_neighbors(limit=1, radius=300)
+    assert len(search) == 1
+    assert search.distance.value < 300
+    assert search.target_name[0] == '388852407'
