@@ -46,6 +46,7 @@ pytest = "^6.1.2"
 pytest-cov = "^2.10.1"
 pytest-remotedata = "^0.3.2"
 pytest-doctestplus = "^0.8.0"
+pytest-xdist = "^2.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
