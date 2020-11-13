@@ -23,15 +23,15 @@ jobs:
         include:
           - name: 3.7
             python-version: 3.7
-            pip-command: pip install .[all,test]
+            pip-command: pip install .
             pytest-command: pytest
           - name: 3.8-remote-data
             python-version: 3.8
-            pip-command: pip install .[all,test]
+            pip-command: pip install .
             pytest-command: pytest --remote-data --doctest-modules
           - name: 3.8-no-optional-dependencies
             python-version: 3.8
-            pip-command: pip install .[test]
+            pip-command: pip install .
             pytest-command: pytest
     steps:
     - uses: actions/checkout@v1
@@ -42,7 +42,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        pip install numpy  # celerite needs numpy to build, so we install it first
+        python -m pip install -r requirements-test.txt
         ${{ matrix.pip-command }}
     - name: Test with ${{ matrix.pytest-command }}
       run: |
@@ -64,7 +64,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        pip install .[test]
+        python -m pip install -r requirements-test.txt
+        pip install .
     - name: Test with pytest --remote-data
       run: |
         pytest --remote-data
@@ -84,7 +85,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        pip install .[all,test]
+        python -m pip install -r requirements-test.txt
+        pip install .
     - name: Test with pytest
       run: |
         pytest
@@ -104,7 +106,7 @@ jobs:
     - name: Install flake8
       run: |
         python -m pip install --upgrade pip
-        pip install flake8
+        python -m pip install flake8
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names

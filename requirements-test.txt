@@ -3,4 +3,3 @@ pytest-remotedata
 pytest-doctestplus
 pytest-cov
 codecov
-codacy-coverage
