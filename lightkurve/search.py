@@ -7,6 +7,7 @@ import re
 import warnings
 from requests import HTTPError
 
+from memoization import cached
 import numpy as np
 from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
@@ -423,7 +424,7 @@ class SearchResult(object):
             log.debug("Finished downloading.")
         return path
 
-
+@cached
 def search_targetpixelfile(target, radius=None, cadence=None,
                            mission=('Kepler', 'K2', 'TESS'),
                            author=('Kepler', 'K2', 'SPOC'),
@@ -533,6 +534,7 @@ def search_lightcurvefile(*args, **kwargs):
     return search_lightcurve(*args, **kwargs)
 
 
+@cached
 def search_lightcurve(target, radius=None, cadence=None,
                       mission=('Kepler', 'K2', 'TESS'),
                       author=('Kepler', 'K2', 'SPOC'),
@@ -638,6 +640,7 @@ def search_lightcurve(target, radius=None, cadence=None,
         return SearchResult(None)
 
 
+@cached
 def search_tesscut(target, sector=None):
     """Searches MAST for TESS Full Frame Image cutouts containing a desired target or region.
 
