@@ -19,12 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: [3.6, 3.7, 3.8-remote-data, 3.8-no-optional-dependencies]
+        name: [3.7, 3.8-remote-data, 3.8-no-optional-dependencies]
         include:
-          - name: 3.6
-            python-version: 3.6
-            pip-command: pip install .[all,test]
-            pytest-command: pytest
           - name: 3.7
             python-version: 3.7
             pip-command: pip install .[all,test]
