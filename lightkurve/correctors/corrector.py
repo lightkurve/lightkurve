@@ -1,43 +1,141 @@
 """Implements the abstract `Corrector` base class.
 """
 from abc import ABC, abstractmethod
+from lightkurve.utils import is_notebook
 
-import matplotlib
+import numpy as np
+
+from .metrics import overfit_metric_lombscargle
 from .. import LightCurve
 
 
 class Corrector(ABC):
-    """Abstract base class documenting the structure of classes intended
-    to remove systematic noise from light curves.
+    """Abstract base class documenting the required structure of classes
+    designed to remove systematic noise from light curves.
 
     Attributes
     ----------
-    lc : LightCurve
-        Original, uncorrected light curve, usually assigned by the constructor.
+    original_lc : LightCurve
+        The uncorrected light curve.  Must be passed into (or computed by) the
+        constructor method.
     corrected_lc : LightCurve
-        Corrected light curve, assigned by each call to the `correct()` method.
+        Corrected light curve. Must be updated upon each call to the `correct()` method.
+    cadence_mask : np.array of dtype=bool
+        Boolean array with the same length as `original_lc`.
+        True indicates that a cadence should be used to fit the noise model.
+        By setting certain cadences to False, users can exclude those cadences
+        from informing the noise model, which will help prevent the overfitting
+        of those signals (e.g. exoplanet transits).
+        By default, the cadence mask is True across all cadences.
 
     Methods
     -------
     __init__()
         Accepts all the data required to execute the correction.
+        The constructor must set the `original_lc` attribute.
     correct() -> LightCurve
-        Executes the correction, accepting any optional parameters that
+        Executes the correction, optionally accepting meaningful parameters that
         can be used to modify the way the correction is applied.
+        This method must set or update the `corrected_lc` attribute on each run.
     diagnose() -> matplotlib.axes.Axes
         Creates plots to elucidate the user's most recent call to `correct()`.
     """
 
-    lc: LightCurve = None
-    corrected_lc: LightCurve = None
+    @property
+    def original_lc(self) -> LightCurve:
+        if hasattr(self, "_original_lc"):
+            return self._original_lc
+        else:
+            raise AttributeError("`original_lc` has not been instantiated yet.")
+
+    @original_lc.setter
+    def original_lc(self, original_lc):
+        self._original_lc = original_lc
+
+    @property
+    def corrected_lc(self) -> LightCurve:
+        if hasattr(self, "_corrected_lc"):
+            return self._corrected_lc
+        else:
+            raise AttributeError(
+                "You need to call the `correct()` method "
+                "before you can access `corrected_lc`."
+            )
+
+    @corrected_lc.setter
+    def corrected_lc(self, corrected_lc):
+        self._corrected_lc = corrected_lc
+
+    @property
+    def cadence_mask(self) -> np.array:
+        if hasattr(self, "_cadence_mask"):
+            return self._cadence_mask
+        else:
+            return np.ones(len(self.original_lc), dtype=bool)
+
+    @cadence_mask.setter
+    def cadence_mask(self, cadence_mask):
+        self.cadence_mask = cadence_mask
+
+    def __init__(self, original_lc: LightCurve) -> None:
+        """Constructor method.
+
+        The constructor shall:
+        * accept all data required to run the correction (e.g. light curves,
+        target pixel files, engineering data).
+        * instantiate the `original_lc` property.
+        """
+        self.original_lc = original_lc
 
     @abstractmethod
-    def correct(self) -> LightCurve:
-        """Returns a corrected LightCurve, and also stores it as the
-        `Corrector.corrected_lc` attribute."""
-        pass
+    def correct(
+        self, cadence_mask: np.array = None, optimize: bool = False
+    ) -> LightCurve:
+        """Returns a `LightCurve` from which systematic noise has been removed.
+
+        This method shall:
+        * accept meaningful parameters that can be used to tune the correction,
+          including:
+          - `optimize`: should an optimizer be used to tune the parameters?
+          - `cadence_mask`: flags cadences to be used to fit the noise model.
+        * store all parameters as object attributes (e.g. `self.optimize`, `self.cadence_mask`);
+        * store helpful diagnostic information as object attributes;
+        * store the result in the `self.corrected_lc` attribute;
+        * return `self.corrected_lc`.
+        """
+        if cadence_mask:
+            self.cadence_mask = cadence_mask
+        # ... perform correction ...
+        # self.corrected_lc = corrected_lc
+        # return corrected_lc
 
     @abstractmethod
-    def diagnose(self) -> matplotlib.axes.Axes:
-        """Returns plots which elucidate the most recent call to `correct()`."""
+    def diagnose(self) -> "matplotlib.axes.Axes":
+        """Returns plots which elucidate the most recent call to `correct()`.
+
+        This method shall plot useful diagnostic information which have been
+        stored as object attributes during the most recent call to `correct()`.
+        """
         pass
+
+    def overfit_metric(self, **kwargs) -> float:
+        """Uses a LombScarglePeriodogram to assess the change in broad-band
+        power in a corrected light curve to measure the degree of over-fitting.
+
+        The to_periodogram Lomb-Scargle method is used and the sampling band is
+        from one frequency separation to the Nyquist frequency
+
+        This over-fitting goodness metric is calibrated such that a metric
+        value of 0.5 means the introduced noise due to over-fitting is at the
+        same power level as the uncertainties in the light curve.
+
+        Returns
+        -------
+        overfit_metric : float
+            A float in the range [0,1] where 0 => Bad, 1 => Good
+        """
+        return overfit_metric_lombscargle(
+            self.original_lc[self.cadence_mask],
+            self.corrected_lc[self.cadence_mask],
+            **kwargs
+        )

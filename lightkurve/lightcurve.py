@@ -2167,7 +2167,6 @@ class LightCurve(QTimeSeries):
 
         return in_transit
 
-
     def search_neighbors(self, limit: int = 10, radius: float = 3600.,
                          **search_criteria) -> "SearchResult":
         """Search the data archive at MAST for the most nearby light curves.
@@ -2220,13 +2219,16 @@ class LightCurve(QTimeSeries):
 
         # Note: we increase `limit` by one below to account for the fact that the
         # current light curve will be returned by the search operation
+        log.info(f"Started searching for up to {limit} neighbors within {radius} arcseconds.")
         result = search_lightcurve(f"{self.ra} {self.dec}",
                                    radius=radius,
                                    limit=limit + 1,
                                    **search_criteria)
 
         # Filter by distance > 0 to avoid returning the current light curve
-        return result[result.distance > 0]
+        result = result[result.distance > 0]
+        log.info(f"Found {len(result)} neighbors.")
+        return result
 
 
 class FoldedLightCurve(LightCurve):
