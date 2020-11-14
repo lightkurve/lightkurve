@@ -3,12 +3,10 @@
 from abc import ABC, abstractmethod
 
 import matplotlib
-from lightkurve.utils import is_notebook
-
 import numpy as np
 
-from .metrics import overfit_metric_lombscargle
 from .. import LightCurve
+from .metrics import overfit_metric_lombscargle, underfit_metric_neighbors
 
 
 class Corrector(ABC):
