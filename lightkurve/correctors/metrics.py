@@ -1,10 +1,16 @@
-"""Metrics to assess under- and over-fitting of systematic noise."""
+"""Metrics to assess under- and over-fitting of systematic noise.
+
+This module provides two metrics, `overfit_metric_lombscargle` and `underfit_metric_neighbors`,
+which enable users to assess whether the noise in a systematics-corrected light curve has been
+under- or over-fitted.  These features were contributed by Jeff Smith (cf. https://github.com/KeplerGO/lightkurve/pull/855)
+and are in turn inspired by similar metrics in use by the PDC module of the official Kepler/TESS pipeline.
+"""
 import logging
 
 import numpy as np
 from scipy.interpolate import PchipInterpolator
 
-from .. import LightCurve
+from .. import LightCurve, LightCurveCollection
 
 log = logging.getLogger(__name__)
 
@@ -157,7 +163,7 @@ def underfit_metric_neighbors(
         A float in the range [0,1] where 0 => Bad, 1 => Good
     """
     # Download neighbor light curves
-    lcfCol = download_neighbors(
+    lcfCol = _download_neighbors(
         lc=corrected_lc,
         radius=radius,
         min_targets=min_targets,
@@ -268,13 +274,13 @@ def underfit_metric_neighbors(
     return metric
 
 
-def download_neighbors(
+def _download_neighbors(
     lc: LightCurve,
     radius: float = 6000.0,
     min_targets: int = 30,
     max_targets: int = 50,
     flux_column="sap_flux",
-) -> "LightCurveCollection":
+) -> LightCurveCollection:
     """Returns a collection of neighbor light curves.
 
     Parameters
