@@ -117,7 +117,7 @@ class Corrector(ABC):
         """
         pass
 
-    def overfit_metric(self, **kwargs) -> float:
+    def compute_overfit_metric(self, **kwargs) -> float:
         """Uses a LombScarglePeriodogram to assess the change in broad-band
         power in a corrected light curve to measure the degree of over-fitting.
 
@@ -139,7 +139,7 @@ class Corrector(ABC):
             **kwargs
         )
 
-    def underfit_metric(self, **kwargs) -> float:
+    def compute_underfit_metric(self, **kwargs) -> float:
         """Measures the degree of under-fitting the noise.
 
         See the docstring of `lightkurve.correctors.metrics.underfit_metric_neighbors`

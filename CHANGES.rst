@@ -32,7 +32,7 @@ lightkurve.lightcurve
   generated transit model.  [#854]
 
 - Added the ``LightCurve.search_neighbors()`` convenience method to search for
-  light curves around an existing one.
+  light curves around an existing one. [#907]
 
 lightkurve.targetpixelfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -117,10 +117,10 @@ lightkurve.correctors
   curve's ``centroid_col`` or ``centroid_row`` columns contained NaNs. [#827]
 
 - Improved the ``Corrector`` abstract base class to better document the desired
-  structure of its sub-classes.
+  structure of its sub-classes. [#907]
 
 - Added a ``metrics`` module with two functions to measure the degree of
-  over- and under-fitting of a corrected light curve.
+  over- and under-fitting of a corrected light curve. [#907]
 
 lightkurve.seismology
 ^^^^^^^^^^^^^^^^^^^^^
