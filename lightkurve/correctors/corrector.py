@@ -68,14 +68,13 @@ class Corrector(ABC):
 
     @property
     def cadence_mask(self) -> np.array:
-        if hasattr(self, "_cadence_mask"):
-            return self._cadence_mask
-        else:
-            return np.ones(len(self.original_lc), dtype=bool)
+        if not hasattr(self, "_cadence_mask"):
+            self._cadence_mask = np.ones(len(self.original_lc), dtype=bool)
+        return self._cadence_mask
 
     @cadence_mask.setter
     def cadence_mask(self, cadence_mask):
-        self.cadence_mask = cadence_mask
+        self._cadence_mask = cadence_mask
 
     def __init__(self, original_lc: LightCurve) -> None:
         """Constructor method.
@@ -139,3 +138,16 @@ class Corrector(ABC):
             self.corrected_lc[self.cadence_mask],
             **kwargs
         )
+
+    def under_metric(self, **kwargs) -> float:
+        """Measures the degree of under-fitting the noise.
+
+        See the docstring of `lightkurve.correctors.metrics.underfit_metric_neighbors`
+        for details.
+
+        Returns
+        -------
+        underfit_metric : float
+            A float in the range [0,1] where 0 => Bad, 1 => Good
+        """
+        return underfit_metric_neighbors(self.corrected_lc[self.cadence_mask], **kwargs)
