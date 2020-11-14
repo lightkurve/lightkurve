@@ -10,7 +10,7 @@ import logging
 import numpy as np
 from scipy.interpolate import PchipInterpolator
 
-from .. import LightCurve, LightCurveCollection
+from .. import LightCurve
 
 log = logging.getLogger(__name__)
 
@@ -280,7 +280,7 @@ def _download_neighbors(
     min_targets: int = 30,
     max_targets: int = 50,
     flux_column="sap_flux",
-) -> LightCurveCollection:
+):
     """Returns a collection of neighbor light curves.
 
     Parameters
