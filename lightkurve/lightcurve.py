@@ -2167,7 +2167,7 @@ class LightCurve(QTimeSeries):
         return in_transit
 
     def search_neighbors(self, limit: int = 10, radius: float = 3600.,
-                         **search_criteria) -> "SearchResult":
+                         **search_criteria):
         """Search the data archive at MAST for the most nearby light curves.
 
         By default, the 10 nearest neighbors located within 3600 arcseconds

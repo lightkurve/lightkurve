@@ -139,7 +139,7 @@ class Corrector(ABC):
             **kwargs
         )
 
-    def under_metric(self, **kwargs) -> float:
+    def underfit_metric(self, **kwargs) -> float:
         """Measures the degree of under-fitting the noise.
 
         See the docstring of `lightkurve.correctors.metrics.underfit_metric_neighbors`
