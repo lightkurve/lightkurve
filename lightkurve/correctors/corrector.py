@@ -1,6 +1,8 @@
 """Implements the abstract `Corrector` base class.
 """
 from abc import ABC, abstractmethod
+
+import matplotlib
 from lightkurve.utils import is_notebook
 
 import numpy as np
@@ -109,7 +111,7 @@ class Corrector(ABC):
         # return corrected_lc
 
     @abstractmethod
-    def diagnose(self) -> "matplotlib.axes.Axes":
+    def diagnose(self) -> matplotlib.axes.Axes:
         """Returns plots which elucidate the most recent call to `correct()`.
 
         This method shall plot useful diagnostic information which have been

@@ -3,7 +3,6 @@ import os
 import datetime
 import logging
 import warnings
-from functools import lru_cache
 import collections
 
 import numpy as np
@@ -25,7 +24,7 @@ from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 from astropy.utils.exceptions import AstropyUserWarning
 
 from . import PACKAGEDIR, MPLSTYLE
-from .utils import (is_notebook, running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
+from .utils import (running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
     validate_method, _query_solar_system_objects
 )
 from .utils import LightkurveWarning, LightkurveDeprecationWarning
