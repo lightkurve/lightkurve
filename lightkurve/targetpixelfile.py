@@ -1552,15 +1552,20 @@ class TargetPixelFile(object):
                         pixel_list.append(lc)
 
         with plt.style.context(style):
-            fig = plt.figure()
-            if ax is None:  # Configure axes if none is given
+            if ax is None:
+                fig = plt.figure()
                 ax = plt.gca()
-                ax.get_xaxis().set_ticks([])
-                ax.get_yaxis().set_ticks([])
-                if periodogram:
-                    ax.set(title=title, xlabel='Frequency / Column (pixel)', ylabel='Power / Row (pixel)')
-                else:
-                    ax.set(title=title, xlabel='Time / Column (pixel)', ylabel='Flux / Row (pixel)')
+                set_size = True
+            else:
+                fig = ax.get_figure()
+                set_size = False
+
+            ax.get_xaxis().set_ticks([])
+            ax.get_yaxis().set_ticks([])
+            if periodogram:
+                ax.set(title=title, xlabel='Frequency / Column (pixel)', ylabel='Power / Row (pixel)')
+            else:
+                ax.set(title=title, xlabel='Time / Column (pixel)', ylabel='Flux / Row (pixel)')
 
             gs = gridspec.GridSpec(self.shape[1], self.shape[2], wspace=0.01, hspace=0.01)
 
@@ -1608,7 +1613,8 @@ class TargetPixelFile(object):
                     if x == self.shape[1] - 1 and y == 0:  # upper left
                         gax.set_ylabel(f'{self.row + self.shape[1] - 1}')
 
-            fig.set_size_inches((y*1.5, x*1.5))
+            if set_size:  # use default size when caller does not supply ax
+                fig.set_size_inches((y*1.5, x*1.5))
 
         return ax
 
