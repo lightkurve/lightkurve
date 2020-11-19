@@ -49,5 +49,5 @@ pytest-doctestplus = "^0.8.0"
 pytest-xdist = "^2.1.0"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["setuptools", "poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
