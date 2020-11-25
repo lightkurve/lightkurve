@@ -692,6 +692,13 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence=None,
                         "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
                         "".format(target))
 
+    # Specifying quarter, campaign, or quarter should constrain the mission
+    if quarter:
+        mission = "Kepler"
+    if campaign:
+        mission = "K2"
+    if sector:
+        mission = "TESS"
     # Ensure mission is a list
     mission = np.atleast_1d(mission).tolist()
 
@@ -947,21 +954,22 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
 
     mask = np.ones(len(products), dtype=bool)
 
-    # Kepler data needs a special filter for quarter, month, and file type
+    # Kepler data needs a special filter for quarter and month
     mask &= ~np.array([prov.lower() == 'kepler' for prov in products['provenance_name']])
     if 'kepler' in provenance_lower and campaign is None and sector is None:
-        mask |= _mask_kepler_products(products, quarter=quarter, month=month,
-                                      filetype=filetype)
+        mask |= _mask_kepler_products(products, quarter=quarter, month=month)
 
-    # K2 data needs a special filter for file type
-    mask &= ~np.array([prov.lower() == 'k2' for prov in products['provenance_name']])
-    if 'k2' in provenance_lower and quarter is None and sector is None:
-        mask |= _mask_k2_products(products, campaign=campaign, filetype=filetype)
-
-    # TESS SPOC data needs a special filter for file type
-    mask &= ~np.array([prov.lower() == 'spoc' for prov in products['provenance_name']])
-    if 'spoc' in provenance_lower and quarter is None and campaign is None:
-        mask |= _mask_spoc_products(products, sector=sector, filetype=filetype)
+    # HLSP products need to be filtered by extension
+    if filetype.lower() == "lightcurve":
+        mask &= np.array(
+            [uri.lower().endswith("lc.fits") for uri in products["productFilename"]]
+        )
+    elif filetype.lower() == "target pixel":
+        mask &= np.array(
+            [uri.lower().endswith(("tp.fits", "targ.fits.gz")) for uri in products["productFilename"]]
+        )
+    elif filetype.lower() == "ffi":
+        mask &= np.array(['TESScut' in desc for desc in products['description']])
 
     # Allow only fits files
     mask &= np.array([uri.lower().endswith('fits') or
@@ -979,15 +987,11 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     return products
 
 
-def _mask_kepler_products(products, quarter=None, month=None,
-                          filetype='Target Pixel'):
+def _mask_kepler_products(products, quarter=None, month=None):
     """Returns a mask flagging the Kepler products that match the criteria."""
     mask = np.array([proj.lower() == 'kepler' for proj in products['provenance_name']])
     if mask.sum() == 0:
         return mask
-
-    # Filter on product type
-    mask &= np.array([filetype in desc for desc in products['description']])
 
     # Identify quarter by the description.
     # This is necessary because the `sequence_number` field was not populated
@@ -1024,36 +1028,6 @@ def _mask_kepler_products(products, quarter=None, month=None,
                     pass
             if not (date in permitted_dates):
                 mask[idx] = False
-
-    return mask
-
-
-def _mask_k2_products(products, campaign=None, filetype='Target Pixel'):
-    """Returns a mask flagging the K2 products that match the criteria."""
-    mask = np.array([prov.lower() == 'k2' for prov in products['provenance_name']])
-    if mask.sum() == 0:
-        return mask
-
-    # Filter on product type
-    mask &= np.array([filetype in desc for desc in products['description']])
-
-    return mask
-
-
-def _mask_spoc_products(products, sector=None, filetype='Target Pixel'):
-    """Returns a mask flagging the TESS products that match the criteria."""
-    mask = np.array([p.lower() == 'spoc' for p in products['provenance_name']])
-    if mask.sum() == 0:
-        return mask
-
-    # Filter on product type
-    if filetype.lower() == 'lightcurve':
-        description_string = 'Light curves'
-    elif filetype.lower() == 'target pixel':
-        description_string = 'Target pixel files'
-    elif filetype.lower() == 'ffi':
-        description_string = 'TESScut'
-    mask &= np.array([description_string in desc for desc in products['description']])
 
     return mask
 

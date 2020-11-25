@@ -90,6 +90,8 @@ lightkurve.search
   such as 'KIC 5112705' or 'TIC 261136679', only return products known under
   those names, unless a search radius is specified. [#796]
 
+- Added support for the QLP and SPOC FFI HLSP light curve products.
+
 lightkurve.correctors
 ^^^^^^^^^^^^^^^^^^^^^
 

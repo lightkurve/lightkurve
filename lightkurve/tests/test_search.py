@@ -334,3 +334,15 @@ def test_cadence_filtering():
     assert(len(res) == 1)
     assert res.table['t_exptime'][0] == 20
     assert "fast" in res.table['productFilename'][0]
+
+
+def test_ffi_hlsp():
+    """Can SPOC, QLP (FFI), and TESS-SPOC (FFI) light curves be accessed?"""
+    search = search_lightcurve("TrES-2 b", mission="tess", author="any", sector=26)  # aka TOI 2140.01
+    assert "QLP" in search.table["author"]
+    assert "TESS-SPOC" in search.table["author"]
+    assert "SPOC" in search.table["author"]
+    # tess-spoc also products tpfs
+    search = search_targetpixelfile("TrES-2 b", mission="tess", author="any", sector=26)
+    assert "TESS-SPOC" in search.table["author"]
+    assert "SPOC" in search.table["author"]
