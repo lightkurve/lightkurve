@@ -100,11 +100,6 @@ class SearchResult(object):
         return np.asarray(np.unique(self.table['obsid']), dtype='int64')
 
     @property
-    def target_name(self):
-        """Returns an array of target names"""
-        return self.table['target_name'].data.data
-
-    @property
     def ra(self):
         """Returns an array of RA values for targets in search"""
         return self.table['s_ra'].data.data
@@ -113,6 +108,31 @@ class SearchResult(object):
     def dec(self):
         """Returns an array of dec values for targets in search"""
         return self.table['s_dec'].data.data
+
+    @property
+    def observation(self):
+        return self.table['observation'].data.data
+
+    @property
+    def author(self):
+        return self.table['author'].data.data
+
+    @property
+    def target_name(self):
+        """Returns an array of target names"""
+        return self.table['target_name'].data.data
+
+    @property
+    def t_exptime(self):
+        return self.table['t_exptime'].quantity
+
+    @property
+    def productFilename(self):
+        return self.table['productFilename'].data.data
+
+    @property
+    def distance(self):
+        return self.table['distance'].quantity
 
     def _download_one(self, table, quality_bitmask, download_dir, cutout_size, **kwargs):
         """Private method used by `download()` and `download_all()` to download
