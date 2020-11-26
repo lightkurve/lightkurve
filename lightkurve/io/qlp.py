@@ -1,19 +1,23 @@
-"""Reader for official TESS light curve FITS files produced by the Ames SPOC pipeline."""
+"""Reader for MIT Quicklook Pipeline (QLP) light curve files.
+
+Website: http://archive.stsci.edu/hlsp/qlp
+Product description: https://archive.stsci.edu/hlsps/qlp/hlsp_qlp_tess_ffi_all_tess_v1_data-prod-desc.pdf
+"""
 from ..lightcurve import TessLightCurve
 from ..utils import TessQualityFlags
 
 from .generic import read_generic_lightcurve
 
 
-def read_tess_lightcurve(filename,
-                         flux_column="pdcsap_flux",
-                         quality_bitmask="default"):
+def read_qlp_lightcurve(filename,
+                        flux_column="kspsap_flux",
+                        quality_bitmask="default"):
     """Returns a `TessLightCurve`.
 
     Parameters
     ----------
     filename : str
-        Local path or remote url of a TESS light curve FITS file.
+        Local path or remote url of a QLP light curve FITS file.
     flux_column : 'pdcsap_flux' or 'sap_flux'
         Which column in the FITS file contains the preferred flux data?
     quality_bitmask : str or int
@@ -47,4 +51,8 @@ def read_tess_lightcurve(filename,
     lc.meta['TARGETID'] = lc.meta.get('TICID')
     lc.meta['QUALITY_BITMASK'] = quality_bitmask
     lc.meta['QUALITY_MASK'] = quality_mask
+
+    # QLP light curves are normalized by default
+    lc.meta['NORMALIZED'] = True
+
     return TessLightCurve(data=lc)

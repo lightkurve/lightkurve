@@ -90,6 +90,8 @@ def read(path_or_url, **kwargs):
         return KeplerLightCurve.read(path_or_url, format='kepler', **kwargs)
     elif filetype == "TessLightCurve":
         return TessLightCurve.read(path_or_url, format='tess', **kwargs)
+    elif filetype == "QLP":
+        return TessLightCurve.read(path_or_url, format='qlp', **kwargs)
     elif filetype == "K2SFF":
         return KeplerLightCurve.read(path_or_url, format='k2sff', **kwargs)
     elif filetype == "EVEREST":
