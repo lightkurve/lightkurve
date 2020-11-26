@@ -346,3 +346,13 @@ def test_ffi_hlsp():
     search = search_targetpixelfile("TrES-2 b", mission="tess", author="any", sector=26)
     assert "TESS-SPOC" in search.table["author"]
     assert "SPOC" in search.table["author"]
+
+
+def test_qlp_lightcurve():
+    """Can we search and download an MIT QLP light curve?"""
+    search = search_lightcurve("TrES-2 b", sector=26, author="qlp")
+    assert len(search) == 1
+    assert search.author[0] == "QLP"
+    assert search.t_exptime[0] == 30*u.minute  # Sector 26 had 30-minute FFIs
+    lc = search.download()
+    all(lc.flux == lc.kspsap_flux)

@@ -62,15 +62,15 @@ class SearchResult(object):
         self.table['#'] = None
         for idx in range(len(self.table)):
             self.table['#'][idx] = idx
+        self.table['t_exptime'].unit = "s"
+        self.table['t_exptime'].format = ".0f"
+        self.table['distance'].unit = "arcsec"
 
     def __repr__(self, html=False):
         out = 'SearchResult containing {} data products.'.format(len(self.table))
         if len(self.table) == 0:
             return out
         columns = ['#', 'observation', 'author', 'target_name', 't_exptime', 'productFilename', 'distance']
-        self.table['t_exptime'].unit = "sec"
-        self.table['t_exptime'].format = ".0f"
-        self.table['distance'].unit = "arcsec"
         return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, html=html))
 
     def _repr_html_(self):
