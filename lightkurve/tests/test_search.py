@@ -334,3 +334,38 @@ def test_cadence_filtering():
     assert(len(res) == 1)
     assert res.table['t_exptime'][0] == 20
     assert "fast" in res.table['productFilename'][0]
+
+
+@pytest.mark.remote_data
+def test_ffi_hlsp():
+    """Can SPOC, QLP (FFI), and TESS-SPOC (FFI) light curves be accessed?"""
+    search = search_lightcurve("TrES-2 b", mission="tess", author="any", sector=26)  # aka TOI 2140.01
+    assert "QLP" in search.table["author"]
+    assert "TESS-SPOC" in search.table["author"]
+    assert "SPOC" in search.table["author"]
+    # tess-spoc also products tpfs
+    search = search_targetpixelfile("TrES-2 b", mission="tess", author="any", sector=26)
+    assert "TESS-SPOC" in search.table["author"]
+    assert "SPOC" in search.table["author"]
+
+
+@pytest.mark.remote_data
+def test_qlp_ffi_lightcurve():
+    """Can we search and download an MIT QLP FFI light curve?"""
+    search = search_lightcurve("TrES-2 b", sector=26, author="qlp")
+    assert len(search) == 1
+    assert search.author[0] == "QLP"
+    assert search.t_exptime[0] == 30*u.minute  # Sector 26 had 30-minute FFIs
+    lc = search.download()
+    all(lc.flux == lc.kspsap_flux)
+
+
+@pytest.mark.remote_data
+def test_spoc_ffi_lightcurve():
+    """Can we search and download a SPOC FFI light curve?"""
+    search = search_lightcurve("TrES-2 b", sector=26, author="tess-spoc")
+    assert len(search) == 1
+    assert search.author[0] == "TESS-SPOC"
+    assert search.t_exptime[0] == 30*u.minute  # Sector 26 had 30-minute FFIs
+    lc = search.download()
+    all(lc.flux == lc.pdcsap_flux)

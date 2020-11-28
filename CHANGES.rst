@@ -90,6 +90,9 @@ lightkurve.search
   such as 'KIC 5112705' or 'TIC 261136679', only return products known under
   those names, unless a search radius is specified. [#796]
 
+- Added support for searching and reading QLP and SPOC Full Frame Image (FFI)
+  light curves available as High Level Science Products from MAST. [#913]
+
 lightkurve.correctors
 ^^^^^^^^^^^^^^^^^^^^^
 

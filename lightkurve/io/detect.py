@@ -1,10 +1,11 @@
 """Provides a function to automatically detect Kepler/TESS file types."""
+from astropy.io.fits import HDUList
 
 
 __all__ = ['detect_filetype']
 
 
-def detect_filetype(hdulist):
+def detect_filetype(hdulist: HDUList) -> str:
     """Returns Kepler and TESS file types given a FITS object.
 
     This function will detect the file type by looking at both the TELESCOP and
@@ -20,6 +21,7 @@ def detect_filetype(hdulist):
         * `'EVEREST'`
         * `'K2SC'`
         * `'K2VARCAT'`
+        * `'QLP'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -34,6 +36,11 @@ def detect_filetype(hdulist):
         A string describing the detected filetype. If the filetype is not
         recognized, `None` will be returned.
     """
+    # Is it a MIT/QLP TESS FFI Quicklook Pipeline light curve?
+    # cf. http://archive.stsci.edu/hlsp/qlp
+    if "mit/qlp" in hdulist[0].header.get('origin', '').lower():
+        return "QLP"
+
     # Is it a K2VARCAT file?
     # There are no self-identifying keywords in the header, so go by filename.
     if "hlsp_k2varcat" in (hdulist.filename() or ""):
