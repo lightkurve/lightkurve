@@ -93,6 +93,9 @@ lightkurve.search
 - Added support for searching and reading QLP and SPOC Full Frame Image (FFI)
   light curves available as High Level Science Products from MAST. [#913]
 
+- Improved the performance of `download()` operations by checking if a file
+  exists in local cache prior to contacting MAST.
+
 lightkurve.correctors
 ^^^^^^^^^^^^^^^^^^^^^
 

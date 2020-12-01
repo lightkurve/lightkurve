@@ -31,8 +31,7 @@ def read_generic_lightcurve(filename, flux_column,
     # Raise an exception if the requested extension is invalid
     if isinstance(ext, str):
         validate_method(ext, supported_methods=[hdu.name.lower() for hdu in hdulist])
-    hdu = hdulist[ext]
-    tab = Table.read(hdu, format='fits')
+    tab = Table(hdulist[ext].data)
 
     # Make sure the meta data also includes header fields from extension #0
     tab.meta.update(hdulist[0].header)
@@ -45,9 +44,12 @@ def read_generic_lightcurve(filename, flux_column,
 
     for colname in tab.colnames:
         # Ensure units have the correct astropy format
-        if tab[colname].unit == 'e-/s':
+        # Speed-up: comparing units by their string representation is 1000x
+        # faster than performing full-blown unit comparison
+        unitstr = str(tab[colname].unit)
+        if unitstr == 'e-/s':
             tab[colname].unit = 'electron/s'
-        if tab[colname].unit == 'pixels':
+        elif unitstr == 'pixels':
             tab[colname].unit = 'pixel'
 
         # Rename columns to lowercase
@@ -63,14 +65,14 @@ def read_generic_lightcurve(filename, flux_column,
 
     # Prepare a special time column
     if not time_format:
-        if hdu.header.get('BJDREFI') == 2454833:
+        if hdulist[ext].header.get('BJDREFI') == 2454833:
             time_format = 'bkjd'
-        elif hdu.header.get('BJDREFI') == 2457000:
+        elif hdulist[ext].header.get('BJDREFI') == 2457000:
             time_format = 'btjd'
         else:
             raise ValueError(f"Input file has unclear time format: {filename}")
     time = Time(tab['time'].data,
-                scale=hdu.header.get('TIMESYS', 'tdb').lower(),
+                scale=hdulist[ext].header.get('TIMESYS', 'tdb').lower(),
                 format=time_format)
     tab.remove_column('time')
 
