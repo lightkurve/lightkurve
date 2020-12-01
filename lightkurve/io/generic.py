@@ -31,7 +31,7 @@ def read_generic_lightcurve(filename, flux_column,
     # Raise an exception if the requested extension is invalid
     if isinstance(ext, str):
         validate_method(ext, supported_methods=[hdu.name.lower() for hdu in hdulist])
-    tab = Table(hdulist[ext].data)
+    tab = Table.read(hdulist[ext], format="fits")
 
     # Make sure the meta data also includes header fields from extension #0
     tab.meta.update(hdulist[0].header)
