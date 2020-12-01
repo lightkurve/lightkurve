@@ -258,7 +258,7 @@ def _unique_key_for_processing_neighbors(
 ):
     """Returns a unique key that will determine whether a cached version of a
     call to `_download_and_preprocess_neighbors` can be re-used."""
-    return f"{corrected_lc.ra}{corrected_lc.dec}{radius}{min_targets}{max_targets}{flux_column}{interpolate}"
+    return f"{corrected_lc.ra}{corrected_lc.dec}{corrected_lc.cadenceno}{radius}{min_targets}{max_targets}{flux_column}{interpolate}"
 
 
 @cached(custom_key_maker=_unique_key_for_processing_neighbors)
