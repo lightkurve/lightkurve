@@ -9,8 +9,10 @@ import logging
 
 import numpy as np
 from scipy.interpolate import PchipInterpolator
+from memoization import cached
 
 from .. import LightCurve
+
 
 log = logging.getLogger(__name__)
 
@@ -156,6 +158,10 @@ def underfit_metric_neighbors(
         Maximum number of targets to use in correlation metric
         Using too many can slow down the metric due to large data
         download. Default = 50
+    interpolate : bool
+        If `True`, the flux values of the neighboring light curves will be
+        interpolated to match the times of the `corrected_lc`.
+        If `False`, the flux values will simply be aligned by time where possible.
 
     Returns
     -------
@@ -163,46 +169,14 @@ def underfit_metric_neighbors(
         A float in the range [0,1] where 0 => Bad, 1 => Good
     """
     # Download neighbor light curves
-    lcfCol = _download_neighbors(
-        lc=corrected_lc,
+    lc_neighborhood, lc_neighborhood_flux = _download_and_preprocess_neighbors(
+        corrected_lc=corrected_lc,
         radius=radius,
         min_targets=min_targets,
         max_targets=max_targets,
+        interpolate=interpolate,
         flux_column="sap_flux",
     )
-
-    # Pre-process the neighbor light curves
-    lc_neighborhood = []
-    lc_neighborhood_flux = []
-    # Extract SAP light curves
-    # We want zero-centered median normalized light curves
-    for lc in lcfCol:
-        lcSAP = lc.remove_nans().normalize()
-        lcSAP.flux -= 1.0
-        lc_neighborhood.append(lcSAP)
-        # Align or interpolate the neighboring target with the target under study
-        if interpolate:
-            # Interpolate to corrected_lc cadence times
-            fInterp = PchipInterpolator(
-                lc_neighborhood[-1].time.value,
-                lc_neighborhood[-1].flux.value,
-                extrapolate=False,
-            )
-            lc_neighborhood_flux.append(fInterp(corrected_lc.time.value))
-        else:
-            # The CBVs were aligned so also align the neighboring
-            # lightcurves
-            lc_trim_mask = np.in1d(
-                lc_neighborhood[-1].cadenceno, corrected_lc.cadenceno
-            )
-            lc_neighborhood_flux.append(lc_neighborhood[-1][lc_trim_mask].flux.value)
-
-    # Store the unmolested lightcurve neighborhood but also save the
-    # aligned or interpolated neighborhood flux
-    from .. import LightCurveCollection
-
-    lc_neighborhood = LightCurveCollection(lc_neighborhood)
-    lc_neighborhood_flux = lc_neighborhood_flux
 
     # If there happens to be any cadences in the corrected_lc
     # that are not in the neighboring targets then those need to
@@ -274,18 +248,33 @@ def underfit_metric_neighbors(
     return metric
 
 
-def _download_neighbors(
-    lc: LightCurve,
+def _unique_key_for_processing_neighbors(
+    corrected_lc: LightCurve,
     radius: float = 6000.0,
     min_targets: int = 30,
     max_targets: int = 50,
-    flux_column="sap_flux",
+    interpolate: bool = False,
+    flux_column: str = "sap_flux",
+):
+    """Returns a unique key that will determine whether a cached version of a
+    call to `_download_and_preprocess_neighbors` can be re-used."""
+    return f"{corrected_lc.ra}{corrected_lc.dec}{radius}{min_targets}{max_targets}{flux_column}{interpolate}"
+
+
+@cached(custom_key_maker=_unique_key_for_processing_neighbors)
+def _download_and_preprocess_neighbors(
+    corrected_lc: LightCurve,
+    radius: float = 6000.0,
+    min_targets: int = 30,
+    max_targets: int = 50,
+    interpolate: bool = False,
+    flux_column: str = "sap_flux",
 ):
     """Returns a collection of neighbor light curves.
 
     Parameters
     ----------
-    lc : LightCurve
+    corrected_lc : LightCurve
         Light curve around which to look for neighbors.
     radius : float
         Conesearch radius in arcseconds.
@@ -296,8 +285,20 @@ def _download_neighbors(
         Maximum number of targets to use in correlation metric
         Using too many can slow down the metric due to large data
         download.
+    interpolate : bool
+        If `True`, the flux values of the neighboring light curves will be
+        interpolated to match the times of the `corrected_lc`.
+        If `False`, the flux values will simply be aligned by time where possible.
+
+    Returns
+    -------
+    lc_neighborhood : LightCurveCollection
+        Collection of all neighboring light curves used.
+    lc_neighborhood_flux : list
+        List containing the flux arrays of the neighboring light curves,
+        interpolated and aligned with `corrected_lc` if requested.
     """
-    search = lc.search_neighbors(limit=max_targets, radius=radius)
+    search = corrected_lc.search_neighbors(limit=max_targets, radius=radius)
     if len(search) < min_targets:
         raise ValueError(
             f"Unable to find at least {min_targets} neighbors within {radius} arcseconds radius."
@@ -305,7 +306,42 @@ def _download_neighbors(
     log.info(
         f"Downloading {len(search)} neighbor light curves. This might take a while."
     )
-    return search.download_all(flux_column=flux_column)
+    lcfCol = search.download_all(flux_column=flux_column)
+
+    # Pre-process the neighbor light curves
+    lc_neighborhood = []
+    lc_neighborhood_flux = []
+    # Extract SAP light curves
+    # We want zero-centered median normalized light curves
+    for lc in lcfCol:
+        lcSAP = lc.remove_nans().normalize()
+        lcSAP.flux -= 1.0
+        lc_neighborhood.append(lcSAP)
+        # Align or interpolate the neighboring target with the target under study
+        if interpolate:
+            # Interpolate to corrected_lc cadence times
+            fInterp = PchipInterpolator(
+                lc_neighborhood[-1].time.value,
+                lc_neighborhood[-1].flux.value,
+                extrapolate=False,
+            )
+            lc_neighborhood_flux.append(fInterp(corrected_lc.time.value))
+        else:
+            # The CBVs were aligned so also align the neighboring
+            # lightcurves
+            lc_trim_mask = np.in1d(
+                lc_neighborhood[-1].cadenceno, corrected_lc.cadenceno
+            )
+            lc_neighborhood_flux.append(lc_neighborhood[-1][lc_trim_mask].flux.value)
+
+    # Store the unmolested lightcurve neighborhood but also save the
+    # aligned or interpolated neighborhood flux
+    from .. import LightCurveCollection  # local import to avoid circular import
+
+    lc_neighborhood = LightCurveCollection(lc_neighborhood)
+    lc_neighborhood_flux = lc_neighborhood_flux
+
+    return lc_neighborhood, lc_neighborhood_flux
 
 
 def _compute_correlation(fluxMatrix):

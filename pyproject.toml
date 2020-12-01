@@ -35,7 +35,7 @@ fbpca = ">=1.0"
 numba = ">=0.39.0"
 bokeh = ">=1.0"
 ipython = ">=6.0.0"
-memoization = ">=0.3.0"
+memoization = ">=0.3.1"
 
 [tool.poetry.dev-dependencies]
 jupyterlab = "^2.0.0"
@@ -48,6 +48,7 @@ pytest-cov = "^2.10.1"
 pytest-remotedata = "^0.3.2"
 pytest-doctestplus = "^0.8.0"
 pytest-xdist = "^2.1.0"
+line-profiler = "^3.1.0"
 
 [build-system]
 requires = ["setuptools", "poetry-core>=1.0.0"]
