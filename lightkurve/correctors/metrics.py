@@ -46,7 +46,6 @@ def overfit_metric_lombscargle(
         A float in the range [0,1] where 0 => Bad, 1 => Good
     """
     # The fit can sometimes result in NaNs
-    # Also ignore masked cadences
     # Also median normalize original and correctod LCs
     orig_lc = original_lc.copy()
     orig_lc = orig_lc.remove_nans().normalize()
@@ -168,7 +167,7 @@ def underfit_metric_neighbors(
     under_fitting_metric : float
         A float in the range [0,1] where 0 => Bad, 1 => Good
     """
-    # Download neighbor light curves
+    # Download and pre-process neighboring light curves
     lc_neighborhood, lc_neighborhood_flux = _download_and_preprocess_neighbors(
         corrected_lc=corrected_lc,
         radius=radius,
@@ -270,7 +269,7 @@ def _download_and_preprocess_neighbors(
     interpolate: bool = False,
     flux_column: str = "sap_flux",
 ):
-    """Returns a collection of neighbor light curves.
+    """Returns a collection of neighboring light curves.
 
     Parameters
     ----------
@@ -304,11 +303,11 @@ def _download_and_preprocess_neighbors(
             f"Unable to find at least {min_targets} neighbors within {radius} arcseconds radius."
         )
     log.info(
-        f"Downloading {len(search)} neighbor light curves. This might take a while."
+        f"Downloading {len(search)} neighboring light curves. This might take a while."
     )
     lcfCol = search.download_all(flux_column=flux_column)
 
-    # Pre-process the neighbor light curves
+    # Pre-process the neighboring light curves
     lc_neighborhood = []
     lc_neighborhood_flux = []
     # Extract SAP light curves
