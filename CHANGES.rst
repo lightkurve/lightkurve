@@ -94,7 +94,7 @@ lightkurve.search
   light curves available as High Level Science Products from MAST. [#913]
 
 - Improved the performance of `download()` operations by checking if a file
-  exists in local cache prior to contacting MAST.
+  exists in local cache prior to contacting MAST. [#915]
 
 lightkurve.correctors
 ^^^^^^^^^^^^^^^^^^^^^
