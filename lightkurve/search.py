@@ -176,11 +176,27 @@ class SearchResult(object):
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
                               'Full Frame Image cutouts.', LightkurveWarning)
-            from astroquery.mast import Observations
-            log.debug("Started downloading {}.".format(table[:1]['dataURL'][0]))
-            path = Observations.download_products(table[:1], mrp_only=False,
-                                                  download_dir=download_dir)['Local Path'][0]
-            log.debug("Finished downloading.")
+            # Whenever `astroquery.mast.Observations.download_products` is called,
+            # a HTTP request will be sent to determine the length of the file
+            # prior to checking if the file already exists in the local cache.
+            # For performance, we skip this HTTP request and immediately try to
+            # find the file in the cache.  The path we check here is consistent
+            # with the one hard-coded inside `astroquery.mast.Observations._download_files()`
+            # in Astroquery v0.4.1.  It would be good to submit a PR to astroquery
+            # so we can avoid having to use this hard-coded hack.
+            path = os.path.join(download_dir.rstrip('/'),
+                                "mastDownload",
+                                table['obs_collection'][0],
+                                table['obs_id'][0],
+                                table['productFilename'][0])
+            if os.path.exists(path):
+                log.debug("File found in local cache.")
+            else:
+                from astroquery.mast import Observations
+                log.debug("Started downloading {}.".format(table[:1]['dataURL'][0]))
+                path = Observations.download_products(table[:1], mrp_only=False,
+                                                      download_dir=download_dir)['Local Path'][0]
+                log.debug("Finished downloading.")
             return read(path, quality_bitmask=quality_bitmask, **kwargs)
 
     @suppress_stdout

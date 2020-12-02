@@ -76,8 +76,16 @@ def test_search_lightcurve(caplog):
     assert(len(search_lightcurve('297.5835, 40.98339', quarter=6).table) == 1)
     # Should be able to resolve a SkyCoord
     c = SkyCoord('297.5835 40.98339', unit=(u.deg, u.deg))
-    assert(len(search_lightcurve(c, quarter=6).table) == 1)
-    search_lightcurve(c, quarter=6).download()
+    search = search_lightcurve(c, quarter=6)
+    assert(len(search.table) == 1)
+    assert(len(search) == 1)
+    # We should be able to download a light curve
+    search.download()
+    # The second call to download should use the local cache
+    caplog.clear()
+    caplog.set_level("DEBUG")
+    search.download()
+    assert "found in local cache" in caplog.text
     # with mission='TESS', it should return TESS observations
     tic = 'TIC 273985862'
     assert(len(search_lightcurve(tic, mission='TESS').table) > 1)
