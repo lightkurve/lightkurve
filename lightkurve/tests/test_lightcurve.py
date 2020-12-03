@@ -1346,3 +1346,15 @@ def test_support_non_numeric_columns():
     lc['col1'] = ['a', 'b', 'c']
     lc_copy = lc.copy()
     assert_array_equal(lc_copy['col1'], lc['col1'])
+
+
+def test_timedelta():
+    """Can the time column be initialized using TimeDelta?"""
+    td = TimeDelta([-0.5, 0, +0.5])
+    LightCurve(time=td)
+    LightCurve(data={'time': td})
+
+
+def test_issue_916():
+    """Regression test for #916: Can we flatten after folding?"""
+    LightCurve(flux=np.random.randn(100)).fold(period=2.5).flatten()
