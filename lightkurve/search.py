@@ -7,6 +7,7 @@ import re
 import warnings
 from requests import HTTPError
 
+from memoization import cached
 import numpy as np
 from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
@@ -124,6 +125,8 @@ class SearchResult(object):
 
     @property
     def t_exptime(self):
+        """Returns an array of cadence exposure times for targets in search
+        in seconds"""
         return self.table['t_exptime'].quantity
 
     @property
@@ -132,6 +135,7 @@ class SearchResult(object):
 
     @property
     def distance(self):
+        """Returns an array of distance to search point in arceseconds"""
         return self.table['distance'].quantity
 
     def _download_one(self, table, quality_bitmask, download_dir, cutout_size, **kwargs):
@@ -423,7 +427,7 @@ class SearchResult(object):
             log.debug("Finished downloading.")
         return path
 
-
+@cached
 def search_targetpixelfile(target, radius=None, cadence=None,
                            mission=('Kepler', 'K2', 'TESS'),
                            author=('Kepler', 'K2', 'SPOC'),
@@ -533,6 +537,7 @@ def search_lightcurvefile(*args, **kwargs):
     return search_lightcurve(*args, **kwargs)
 
 
+@cached
 def search_lightcurve(target, radius=None, cadence=None,
                       mission=('Kepler', 'K2', 'TESS'),
                       author=('Kepler', 'K2', 'SPOC'),
@@ -638,6 +643,7 @@ def search_lightcurve(target, radius=None, cadence=None,
         return SearchResult(None)
 
 
+@cached
 def search_tesscut(target, sector=None):
     """Searches MAST for TESS Full Frame Image cutouts containing a desired target or region.
 

@@ -31,6 +31,9 @@ lightkurve.lightcurve
 - ``interact_bls()``: modified so that it normalizes the lightcurve to match the
   generated transit model.  [#854]
 
+- Added the ``LightCurve.search_neighbors()`` convenience method to search for
+  light curves around an existing one. [#907]
+
 lightkurve.targetpixelfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -96,6 +99,8 @@ lightkurve.search
 - Improved the performance of `download()` operations by checking if a file
   exists in local cache prior to contacting MAST. [#915]
 
+- Added automated caching of the search operations. [#907]
+
 lightkurve.correctors
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -110,6 +115,12 @@ lightkurve.correctors
 
 - Fixed a bug in ``SFFCorrector`` which caused correction to fail if a light
   curve's ``centroid_col`` or ``centroid_row`` columns contained NaNs. [#827]
+
+- Improved the ``Corrector`` abstract base class to better document the desired
+  structure of its sub-classes. [#907]
+
+- Added a ``metrics`` module with two functions to measure the degree of
+  over- and under-fitting of a corrected light curve. [#907]
 
 lightkurve.seismology
 ^^^^^^^^^^^^^^^^^^^^^

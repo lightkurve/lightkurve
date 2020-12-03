@@ -3,7 +3,6 @@ import os
 import datetime
 import logging
 import warnings
-
 import collections
 
 import numpy as np
@@ -2166,6 +2165,69 @@ class LightCurve(QTimeSeries):
             in_transit |= np.abs((self.time.value - tt + hp) % per - hp) < 0.5*dur
 
         return in_transit
+
+    def search_neighbors(self, limit: int = 10, radius: float = 3600.,
+                         **search_criteria):
+        """Search the data archive at MAST for the most nearby light curves.
+
+        By default, the 10 nearest neighbors located within 3600 arcseconds
+        are returned. You can override these defaults by changing the `limit`
+        and `radius` parameters.
+
+        If the LightCurve object is a Kepler, K2, or TESS light curve,
+        the default behavior of this method is to only return light curves
+        obtained during the exact same quarter, campaign, or sector.
+        This is useful to enable coeval light curves to be inspected for
+        spurious noise signals in common between multiple neighboring targets.
+        You can override this default behavior by passing a `mission`,
+        `quarter`, `campaign`, or `sector` argument yourself.
+
+        Please refer to the docstring of `search_lightcurve` for a complete
+        list of search parameters accepted.
+
+        Parameters
+        ----------
+        limit : int
+            Maximum number of results to return.
+        radius : float or `astropy.units.Quantity` object
+            Conesearch radius.  If a float is given it will be assumed to be in
+            units of arcseconds.
+        **search_criteria : kwargs
+            Extra criteria to be passed to `search_lightcurve`.
+
+        Returns
+        -------
+        result : :class:`SearchResult` object
+            Object detailing the neighbor light curves found, sorted by
+            distance from the current light curve.
+        """
+        # Local import to avoid circular dependency
+        from .search import search_lightcurve
+
+        # By default, only return results from the same sector/quarter/campaign
+        if ('mission' not in search_criteria
+                and 'sector' not in search_criteria
+                and 'quarter' not in search_criteria
+                and 'campaign' not in search_criteria):
+            if (self.mission == 'TESS'):
+                search_criteria['sector'] = self.sector
+            elif (self.mission == 'Kepler'):
+                search_criteria['quarter'] = self.quarter
+            elif (self.mission == 'K2'):
+                search_criteria['campaign'] = self.campaign
+
+        # Note: we increase `limit` by one below to account for the fact that the
+        # current light curve will be returned by the search operation
+        log.info(f"Started searching for up to {limit} neighbors within {radius} arcseconds.")
+        result = search_lightcurve(f"{self.ra} {self.dec}",
+                                   radius=radius,
+                                   limit=limit + 1,
+                                   **search_criteria)
+
+        # Filter by distance > 0 to avoid returning the current light curve
+        result = result[result.distance > 0]
+        log.info(f"Found {len(result)} neighbors.")
+        return result
 
 
 class FoldedLightCurve(LightCurve):
