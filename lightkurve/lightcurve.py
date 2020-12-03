@@ -190,7 +190,7 @@ class LightCurve(QTimeSeries):
             if time is None and flux is not None:
                 time = np.arange(len(flux))
             # We are tolerant of missing time format
-            if time is not None and not isinstance(time, Time):
+            if time is not None and not isinstance(time, (Time, TimeDelta)):
                 # Lightkurve v1.x supported specifying the time_format
                 # as a constructor kwarg
                 time = Time(time,
@@ -199,7 +199,7 @@ class LightCurve(QTimeSeries):
 
         # Also be tolerant of missing time format if time is passed via `data`
         if data and 'time' in data.keys():
-            if not isinstance(data['time'], Time):
+            if not isinstance(data['time'], (Time, TimeDelta)):
                 data['time'] = Time(data['time'],
                             format=deprecated_kws.get("time_format", self._default_time_format),
                             scale=deprecated_kws.get("time_scale", self._default_time_scale))
