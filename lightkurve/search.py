@@ -125,6 +125,8 @@ class SearchResult(object):
 
     @property
     def t_exptime(self):
+        """Returns an array of cadence exposure times for targets in search
+        in seconds"""
         return self.table['t_exptime'].quantity
 
     @property
@@ -133,6 +135,7 @@ class SearchResult(object):
 
     @property
     def distance(self):
+        """Returns an array of distance to search point in arceseconds"""
         return self.table['distance'].quantity
 
     def _download_one(self, table, quality_bitmask, download_dir, cutout_size, **kwargs):

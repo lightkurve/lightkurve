@@ -1,8 +1,9 @@
 import numpy as np
 import pytest
+from numpy.testing import (assert_allclose)
 
 from ... import LightCurve, search_lightcurve
-from ..metrics import overfit_metric_lombscargle, underfit_metric_neighbors
+from ..metrics import overfit_metric_lombscargle, underfit_metric_neighbors, _compute_correlation
 
 
 def test_overfit_metric_lombscargle():
@@ -47,3 +48,25 @@ def test_underfit_metric_neighbors():
     notnan = ~np.isnan(lc_sap.flux)
     lc_sap.flux.value[notnan] = np.ones(notnan.sum())
     assert underfit_metric_neighbors(lc_sap, min_targets=3, max_targets=3) == 1.0
+
+
+
+def test_compute_correlation():
+    """ Simple test to verify the correction function works"""
+    
+    # Fully correlated matrix
+    fluxMatrix = np.array([[1,1,1,1], [1,1,1,1], [1,1,1,1], [1,1,1,1]])
+    correlation_matrix = _compute_correlation(fluxMatrix)
+    assert np.all(correlation_matrix == 1.0)
+
+    # Partially correlated
+    fluxMatrix = np.array([[ 1.0, -1.0,  1.0, -1.0], 
+                           [-1.0,  1.0,  1.0, -1.0], 
+                           [ 1.0, -1.0,  1.0, -1.0], 
+                           [-1.0,  1.0, -1.0,  1.0]])
+    correlation_matrix = _compute_correlation(fluxMatrix)
+    correlation_truth = np.array([[ 1.0, -1.0,  0.5, -0.5], 
+                           [-1.0,  1.0, -0.5,  0.5], 
+                           [ 0.5, -0.5,  1.0, -1.0], 
+                           [-0.5,  0.5, -1.0,  1.0]])
+    assert_allclose(correlation_matrix, correlation_truth)

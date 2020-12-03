@@ -118,15 +118,10 @@ class Corrector(ABC):
         pass
 
     def compute_overfit_metric(self, **kwargs) -> float:
-        """Uses a LombScarglePeriodogram to assess the change in broad-band
-        power in a corrected light curve to measure the degree of over-fitting.
+        """ Measures the degree of over-fitting in the correction.
 
-        The to_periodogram Lomb-Scargle method is used and the sampling band is
-        from one frequency separation to the Nyquist frequency
-
-        This over-fitting goodness metric is calibrated such that a metric
-        value of 0.5 means the introduced noise due to over-fitting is at the
-        same power level as the uncertainties in the light curve.
+        See the docstring of `lightkurve.correctors.metrics.overfit_metric_lombscargle`
+        for details.
 
         Returns
         -------
@@ -134,13 +129,14 @@ class Corrector(ABC):
             A float in the range [0,1] where 0 => Bad, 1 => Good
         """
         return overfit_metric_lombscargle(
+            # Ignore masked cadences in the computation
             self.original_lc[self.cadence_mask],
             self.corrected_lc[self.cadence_mask],
             **kwargs
         )
 
     def compute_underfit_metric(self, **kwargs) -> float:
-        """Measures the degree of under-fitting the noise.
+        """Measures the degree of under-fitting the correction.
 
         See the docstring of `lightkurve.correctors.metrics.underfit_metric_neighbors`
         for details.

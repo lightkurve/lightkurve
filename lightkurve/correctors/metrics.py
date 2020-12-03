@@ -97,9 +97,12 @@ def overfit_metric_lombscargle(
             # We want the goodness to begin to degrade when the introduced
             # noise is greater than the uncertainties.
             # So, when Sigmoid > 0.5 (given twiceSigmoidInv defn.)
-            result = np.sum(pgChange[pgChange > 0.0]) / (
-                (len(np.nonzero(pgChange > 0.0)[0])) * meanCorrectedUncertPower
-            )
+            denominator = (len(np.nonzero(pgChange > 0.0)[0])) * meanCorrectedUncertPower
+            if (denominator == 0):
+                # Suppress divide by zero warning
+                result = np.inf
+            else:
+                result = np.sum(pgChange[pgChange > 0.0]) / denominator
             metric_per_iter.append(result)
 
     metric = np.mean(metric_per_iter)
@@ -281,8 +284,8 @@ def _download_and_preprocess_neighbors(
         Minimum number of targets to return.
         A `ValueError` will be raised if this number cannot be obtained.
     max_targets : int
-        Maximum number of targets to use in correlation metric
-        Using too many can slow down the metric due to large data
+        Maximum number of targets to return.
+        Using too many can slow down this function due to large data
         download.
     interpolate : bool
         If `True`, the flux values of the neighboring light curves will be
@@ -361,6 +364,8 @@ def _compute_correlation(fluxMatrix):
 
     # Scale each flux value by the RMS flux for the given target.
     rmsFlux = np.sqrt(np.sum(fluxMatrix ** 2.0, axis=0) / nCadences)
+    # If RMS is zero then set to Inf so that we don't get a divide by zero warning
+    rmsFlux[np.nonzero(rmsFlux == 0.0)[0]] = np.inf
     unitNormFlux = fluxMatrix / np.tile(rmsFlux, (nCadences, 1))
 
     correlation_matrix = unitNormFlux.T.dot(unitNormFlux) / nCadences
