@@ -1094,7 +1094,16 @@ class LightCurve(QTimeSeries):
             The function to use for combining points in the same bin. Defaults
             to np.nanmean.
         binsize : int
-            DEPRECATED.
+            In Lightkurve v1.x, the default behavior of `bin()` was to create
+            bins which contained an equal number data points in each bin.
+            This type of binning is discouraged because it usually makes more sense to
+            create equally-sized bins in time duration, which is the new default
+            behavior in Lightkurve v2.x.  Nevertheless, this `binsize` parameter
+            allows users to simulate the old behavior of Lightkurve v1.x.
+            For ease of implementation, setting this parameter is identical to passing
+            ``time_bin_size = lc.time[binsize] - time[0]``, which means that
+            the bins are not guaranteed to contain an identical number of
+            data points.
 
         Returns
         -------
