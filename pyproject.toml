@@ -16,6 +16,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
 ]
+include = ["AUTHORS.rst", "CHANGES.rst", "CONTRIBUTING.rst", "CITATION"]
 
 [tool.poetry.dependencies]
 python = "^3.6.1"
@@ -49,6 +50,7 @@ pytest-remotedata = "^0.3.2"
 pytest-doctestplus = "^0.8.0"
 pytest-xdist = "^2.1.0"
 line-profiler = "^3.1.0"
+jupyter = "^1.0.0"
 
 [build-system]
 requires = ["setuptools", "poetry-core>=1.0.0"]
