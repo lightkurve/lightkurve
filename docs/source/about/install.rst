@@ -81,8 +81,12 @@ If you want to experiment with the latest development version of
 
     $ git clone https://github.com/KeplerGO/lightkurve.git
     $ cd lightkurve
-    $ python -m pip install -e .
+    $ python -m pip install .
 
-This is recommended for anyone who wants to edit the source code.
+If you want to have a so-called editable install which enables the installed
+version to immediately reflect changes made in the source tree, you can use:
+
+    $ python shim-setup.py develop
+
 Please see our guide on :ref:`contributing to lightkurve<contributing>`
 for additional instructions.
