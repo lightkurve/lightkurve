@@ -76,8 +76,16 @@ def test_search_lightcurve(caplog):
     assert(len(search_lightcurve('297.5835, 40.98339', quarter=6).table) == 1)
     # Should be able to resolve a SkyCoord
     c = SkyCoord('297.5835 40.98339', unit=(u.deg, u.deg))
-    assert(len(search_lightcurve(c, quarter=6).table) == 1)
-    search_lightcurve(c, quarter=6).download()
+    search = search_lightcurve(c, quarter=6)
+    assert(len(search.table) == 1)
+    assert(len(search) == 1)
+    # We should be able to download a light curve
+    search.download()
+    # The second call to download should use the local cache
+    caplog.clear()
+    caplog.set_level("DEBUG")
+    search.download()
+    assert "found in local cache" in caplog.text
     # with mission='TESS', it should return TESS observations
     tic = 'TIC 273985862'
     assert(len(search_lightcurve(tic, mission='TESS').table) > 1)
@@ -334,3 +342,38 @@ def test_cadence_filtering():
     assert(len(res) == 1)
     assert res.table['t_exptime'][0] == 20
     assert "fast" in res.table['productFilename'][0]
+
+
+@pytest.mark.remote_data
+def test_ffi_hlsp():
+    """Can SPOC, QLP (FFI), and TESS-SPOC (FFI) light curves be accessed?"""
+    search = search_lightcurve("TrES-2 b", mission="tess", author="any", sector=26)  # aka TOI 2140.01
+    assert "QLP" in search.table["author"]
+    assert "TESS-SPOC" in search.table["author"]
+    assert "SPOC" in search.table["author"]
+    # tess-spoc also products tpfs
+    search = search_targetpixelfile("TrES-2 b", mission="tess", author="any", sector=26)
+    assert "TESS-SPOC" in search.table["author"]
+    assert "SPOC" in search.table["author"]
+
+
+@pytest.mark.remote_data
+def test_qlp_ffi_lightcurve():
+    """Can we search and download an MIT QLP FFI light curve?"""
+    search = search_lightcurve("TrES-2 b", sector=26, author="qlp")
+    assert len(search) == 1
+    assert search.author[0] == "QLP"
+    assert search.t_exptime[0] == 30*u.minute  # Sector 26 had 30-minute FFIs
+    lc = search.download()
+    all(lc.flux == lc.kspsap_flux)
+
+
+@pytest.mark.remote_data
+def test_spoc_ffi_lightcurve():
+    """Can we search and download a SPOC FFI light curve?"""
+    search = search_lightcurve("TrES-2 b", sector=26, author="tess-spoc")
+    assert len(search) == 1
+    assert search.author[0] == "TESS-SPOC"
+    assert search.t_exptime[0] == 30*u.minute  # Sector 26 had 30-minute FFIs
+    lc = search.download()
+    all(lc.flux == lc.pdcsap_flux)

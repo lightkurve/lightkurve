@@ -1,4 +1,0 @@
-include README.rst AUTHORS.rst CHANGES.rst CONTRIBUTING.rst LICENSE CITATION
-include requirements.txt
-include lightkurve/data/*
-include lightkurve/tests/data/*
