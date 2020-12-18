@@ -3,7 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    = -j auto
-SPHINXBUILD   = sphinx-build
+SPHINXBUILD   = poetry run python -m sphinx
 SPHINXPROJ    = lightkurve
 SOURCEDIR     = source
 BUILDDIR      = ../../lightkurve-docs
