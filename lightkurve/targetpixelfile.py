@@ -47,6 +47,20 @@ __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
 
 
+# OPEN: consider to move to utils and
+# consolidate with the helper in lightcurve.py (for time label)
+_TIME_LABEL_DICT_BRIEF = {
+    '':     'Phase',
+    'bkjd': '[BKJD days]',
+    'btjd': '[BTJD days]'
+}
+
+
+def _time_label_brief(time):
+    format = getattr(time, 'format', '')
+    return _TIME_LABEL_DICT_BRIEF.get(format, format.upper())
+
+
 class HduToMetaMapping(collections.abc.Mapping):
     """Provides a read-only view of HDU header in `astropy.timeseries.TimeSeries.meta` format"""
 
@@ -1502,7 +1516,8 @@ class TargetPixelFile(object):
         if style == 'lightkurve' or style is None:
             style = MPLSTYLE
         if title is None:
-            title = f'Target ID: {self.targetid}'
+            title = 'Target ID: {0}, {1:.2f} - {2:.2f} {3}'\
+                .format(self.targetid, self.time[0].value, self.time[-1].value, _time_label_brief(self.time))
         if corrector_func is None:
             corrector_func = lambda x: x.remove_outliers()
         if show_flux:
@@ -1537,15 +1552,20 @@ class TargetPixelFile(object):
                         pixel_list.append(lc)
 
         with plt.style.context(style):
-            fig = plt.figure()
-            if ax is None:  # Configure axes if none is given
+            if ax is None:
+                fig = plt.figure()
                 ax = plt.gca()
-                ax.get_xaxis().set_ticks([])
-                ax.get_yaxis().set_ticks([])
-                if periodogram:
-                    ax.set(title=title, xlabel='Frequency', ylabel='Power')
-                else:
-                    ax.set(title=title, xlabel='Time', ylabel='Flux')
+                set_size = True
+            else:
+                fig = ax.get_figure()
+                set_size = False
+
+            ax.get_xaxis().set_ticks([])
+            ax.get_yaxis().set_ticks([])
+            if periodogram:
+                ax.set(title=title, xlabel='Frequency / Column (pixel)', ylabel='Power / Row (pixel)')
+            else:
+                ax.set(title=title, xlabel='Time / Column (pixel)', ylabel='Flux / Row (pixel)')
 
             gs = gridspec.GridSpec(self.shape[1], self.shape[2], wspace=0.01, hspace=0.01)
 
@@ -1584,7 +1604,17 @@ class TargetPixelFile(object):
                     gax.set_xticks([])
                     gax.set_yticks([])
 
-            fig.set_size_inches((y*1.5, x*1.5))
+                    # add row/column numbers to start / end
+                    if x == 0 and y == 0:
+                        gax.set_xlabel(f'{self.column}')
+                        gax.set_ylabel(f'{self.row}')
+                    if x == 0 and y == self.shape[2] - 1:  # lower right
+                        gax.set_xlabel(f'{self.column + self.shape[2] - 1}')
+                    if x == self.shape[1] - 1 and y == 0:  # upper left
+                        gax.set_ylabel(f'{self.row + self.shape[1] - 1}')
+
+            if set_size:  # use default size when caller does not supply ax
+                fig.set_size_inches((y*1.5, x*1.5))
 
         return ax
 
