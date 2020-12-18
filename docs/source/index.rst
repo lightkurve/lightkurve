@@ -1,5 +1,12 @@
 .. title:: Lightkurve docs
 
+************************
+lightkurve documentation
+************************
+
+**Version**: |version|
+
+
 .. container:: lead
 
     Lightkurve
@@ -55,3 +62,14 @@
       </div>
     </div>
   </div>
+
+
+.. toctree::
+    :maxdepth: 3
+    :hidden:
+    :titlesonly:
+
+    quickstart
+    tutorials/index
+    api/index
+    about/index

@@ -99,7 +99,7 @@ nbsphinx_prolog = r"""
 """
 
 # -- Options for HTML output ----------------------------------------------
-html_theme = 'amunra_sphinx_theme'
+html_theme = 'pydata_sphinx_theme'
 
 html_theme_options = {
     "navbar_title": "Lightkurve v" + version,
@@ -114,6 +114,12 @@ html_theme_options = {
                       Please <a href="/about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>""",
     "analytics_id": "UA-69171-9"
+}
+
+html_theme_options = {
+    "external_links": [],
+    "github_url": "https://github.com/KeplerGO/Lightkurve",
+    "google_analytics_id": "UA-69171-9",
 }
 
 html_title = "Lightkurve"
