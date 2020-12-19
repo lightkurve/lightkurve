@@ -16,12 +16,14 @@ import lightkurve
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
     'sphinx.ext.mathjax',
     'sphinx.ext.intersphinx',
     'nbsphinx',
     'numpydoc',
-    'sphinx_automodapi.automodapi',
     'sphinxcontrib.rawfiles']
+
+autosummary_generate = True
 
 # Disable RequireJS because it creates a conflict with bootstrap.js.
 # This conflict breaks the navigation toggle button.
