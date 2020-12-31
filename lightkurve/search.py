@@ -7,6 +7,7 @@ import re
 import warnings
 from requests import HTTPError
 
+from memoization import cached
 import numpy as np
 from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
@@ -62,12 +63,15 @@ class SearchResult(object):
         self.table['#'] = None
         for idx in range(len(self.table)):
             self.table['#'][idx] = idx
+        self.table['t_exptime'].unit = "s"
+        self.table['t_exptime'].format = ".0f"
+        self.table['distance'].unit = "arcsec"
 
     def __repr__(self, html=False):
         out = 'SearchResult containing {} data products.'.format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = ['#', 'observation', 'author', 'target_name', 'productFilename', 'distance']
+        columns = ['#', 'observation', 'author', 'target_name', 't_exptime', 'productFilename', 'distance']
         return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, html=html))
 
     def _repr_html_(self):
@@ -75,10 +79,6 @@ class SearchResult(object):
 
     def __getitem__(self, key):
         """Implements indexing and slicing, e.g. SearchResult[2:5]."""
-        # this check is necessary due to an astropy bug
-        # for more information, see issue #445
-        if key == -1:
-            key = len(self.table) - 1
         selection = self.table[key]
         # Indexing a Table with an integer will return a Row
         if isinstance(selection, Row):
@@ -101,11 +101,6 @@ class SearchResult(object):
         return np.asarray(np.unique(self.table['obsid']), dtype='int64')
 
     @property
-    def target_name(self):
-        """Returns an array of target names"""
-        return self.table['target_name'].data.data
-
-    @property
     def ra(self):
         """Returns an array of RA values for targets in search"""
         return self.table['s_ra'].data.data
@@ -114,6 +109,34 @@ class SearchResult(object):
     def dec(self):
         """Returns an array of dec values for targets in search"""
         return self.table['s_dec'].data.data
+
+    @property
+    def observation(self):
+        return self.table['observation'].data.data
+
+    @property
+    def author(self):
+        return self.table['author'].data.data
+
+    @property
+    def target_name(self):
+        """Returns an array of target names"""
+        return self.table['target_name'].data.data
+
+    @property
+    def t_exptime(self):
+        """Returns an array of cadence exposure times for targets in search
+        in seconds"""
+        return self.table['t_exptime'].quantity
+
+    @property
+    def productFilename(self):
+        return self.table['productFilename'].data.data
+
+    @property
+    def distance(self):
+        """Returns an array of distance to search point in arceseconds"""
+        return self.table['distance'].quantity
 
     def _download_one(self, table, quality_bitmask, download_dir, cutout_size, **kwargs):
         """Private method used by `download()` and `download_all()` to download
@@ -157,11 +180,27 @@ class SearchResult(object):
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
                               'Full Frame Image cutouts.', LightkurveWarning)
-            from astroquery.mast import Observations
-            log.debug("Started downloading {}.".format(table[:1]['dataURL'][0]))
-            path = Observations.download_products(table[:1], mrp_only=False,
-                                                  download_dir=download_dir)['Local Path'][0]
-            log.debug("Finished downloading.")
+            # Whenever `astroquery.mast.Observations.download_products` is called,
+            # a HTTP request will be sent to determine the length of the file
+            # prior to checking if the file already exists in the local cache.
+            # For performance, we skip this HTTP request and immediately try to
+            # find the file in the cache.  The path we check here is consistent
+            # with the one hard-coded inside `astroquery.mast.Observations._download_files()`
+            # in Astroquery v0.4.1.  It would be good to submit a PR to astroquery
+            # so we can avoid having to use this hard-coded hack.
+            path = os.path.join(download_dir.rstrip('/'),
+                                "mastDownload",
+                                table['obs_collection'][0],
+                                table['obs_id'][0],
+                                table['productFilename'][0])
+            if os.path.exists(path):
+                log.debug("File found in local cache.")
+            else:
+                from astroquery.mast import Observations
+                log.debug("Started downloading {}.".format(table[:1]['dataURL'][0]))
+                path = Observations.download_products(table[:1], mrp_only=False,
+                                                      download_dir=download_dir)['Local Path'][0]
+                log.debug("Finished downloading.")
             return read(path, quality_bitmask=quality_bitmask, **kwargs)
 
     @suppress_stdout
@@ -388,8 +427,8 @@ class SearchResult(object):
             log.debug("Finished downloading.")
         return path
 
-
-def search_targetpixelfile(target, radius=None, cadence='long',
+@cached
+def search_targetpixelfile(target, radius=None, cadence=None,
                            mission=('Kepler', 'K2', 'TESS'),
                            author=('Kepler', 'K2', 'SPOC'),
                            quarter=None, month=None, campaign=None, sector=None,
@@ -415,8 +454,13 @@ def search_targetpixelfile(target, radius=None, cadence='long',
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
-    cadence : str
-        'long' or 'short'.
+    cadence : 'long', 'short', 'fast', or float
+        'long' selects 10-min and 30-min cadence products;
+        'short' selects 1-min and 2-min products;
+        'fast' selects 20-sec products.
+        Alternatively, you can pass the exact exposure time in seconds as
+        an int or a float, e.g. ``cadence=600`` selects 10-minute cadence.
+        By default, all cadence modes are returned.
     mission : str, tuple of str
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     author : str, tuple of str, or "any"
@@ -493,7 +537,8 @@ def search_lightcurvefile(*args, **kwargs):
     return search_lightcurve(*args, **kwargs)
 
 
-def search_lightcurve(target, radius=None, cadence='long',
+@cached
+def search_lightcurve(target, radius=None, cadence=None,
                       mission=('Kepler', 'K2', 'TESS'),
                       author=('Kepler', 'K2', 'SPOC'),
                       quarter=None, month=None, campaign=None, sector=None,
@@ -519,8 +564,13 @@ def search_lightcurve(target, radius=None, cadence='long',
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
-    cadence : str
-        'long' or 'short'.
+    cadence : 'long', 'short', 'fast', or float
+        'long' selects 10-min and 30-min cadence products;
+        'short' selects 1-min and 2-min products;
+        'fast' selects 20-sec products.
+        Alternatively, you can pass the exact exposure time in seconds as
+        an int or a float, e.g. ``cadence=600`` selects 10-minute cadence.
+        By default, all cadence modes are returned.
     mission : str, tuple of str
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     author : str, tuple of str, or "any"
@@ -593,6 +643,7 @@ def search_lightcurve(target, radius=None, cadence='long',
         return SearchResult(None)
 
 
+@cached
 def search_tesscut(target, sector=None):
     """Searches MAST for TESS Full Frame Image cutouts containing a desired target or region.
 
@@ -627,7 +678,7 @@ def search_tesscut(target, sector=None):
         return SearchResult(None)
 
 
-def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
+def _search_products(target, radius=None, filetype="Lightcurve", cadence=None,
                      mission=('Kepler', 'K2', 'TESS'),
                      provenance_name=('Kepler', 'K2', 'SPOC'),
                      t_exptime=(0, 9999), quarter=None, month=None,
@@ -645,8 +696,13 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
     filetype : {'Target pixel', 'Lightcurve', 'FFI'}
         Type of files queried at MAST.
-    cadence : str
-        Desired cadence (`long`, `short`, `any`)
+    cadence : 'long', 'short', 'fast', or float
+        'long' selects 10-min and 30-min cadence products;
+        'short' selects 1-min and 2-min products;
+        'fast' selects 20-sec products.
+        Alternatively, you can pass the exact exposure time in seconds as
+        an int or a float, e.g. ``cadence=600`` selects 10-minute cadence.
+        By default, all cadence modes are returned.
     mission : str, list of str
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     provenance_name : str, list of str
@@ -678,6 +734,13 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                         "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
                         "".format(target))
 
+    # Specifying quarter, campaign, or quarter should constrain the mission
+    if quarter:
+        mission = "Kepler"
+    if campaign:
+        mission = "K2"
+    if sector:
+        mission = "TESS"
     # Ensure mission is a list
     mission = np.atleast_1d(mission).tolist()
 
@@ -760,6 +823,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                                 'observation': f'TESS Sector {s}',
                                 'target_name': str(target),
                                 'targetid': str(target),
+                                't_exptime': observations['t_exptime'][idx],
                                 'productFilename': 'TESSCut',
                                 'provenance_name': 'MAST',
                                 'author': 'MAST',
@@ -893,7 +957,7 @@ def _query_mast(target, radius=None,
 
 
 def _filter_products(products, campaign=None, quarter=None, month=None,
-                     sector=None, cadence='long', limit=None,
+                     sector=None, cadence=None, limit=None,
                      project=('Kepler', 'K2', 'TESS'),
                      provenance_name=('Kepler', 'K2', 'SPOC'),
                      filetype='Target Pixel'):
@@ -910,8 +974,13 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         Desired quarter of observation for data products
     month : int or list
         Desired month of observation for data products
-    cadence : str
-        Desired cadence (`long`, `short`, `any`)
+    cadence : 'long', 'short', 'fast', or float
+        'long' selects 10-min and 30-min cadence products;
+        'short' selects 1-min and 2-min products;
+        'fast' selects 20-sec products.
+        Alternatively, you can pass the exact exposure time in seconds as
+        an int or a float, e.g. ``cadence=600`` selects 10-minute cadence.
+        By default, all cadence modes are returned.
     filetype : str
         Type of files queried at MAST (`Target Pixel` or `Lightcurve`).
 
@@ -927,27 +996,30 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
 
     mask = np.ones(len(products), dtype=bool)
 
-    # Kepler data needs a special filter for quarter, month, and file type
+    # Kepler data needs a special filter for quarter and month
     mask &= ~np.array([prov.lower() == 'kepler' for prov in products['provenance_name']])
     if 'kepler' in provenance_lower and campaign is None and sector is None:
-        mask |= _mask_kepler_products(products, quarter=quarter, month=month,
-                                      cadence=cadence, filetype=filetype)
+        mask |= _mask_kepler_products(products, quarter=quarter, month=month)
 
-    # K2 data needs a special filter for file type
-    mask &= ~np.array([prov.lower() == 'k2' for prov in products['provenance_name']])
-    if 'k2' in provenance_lower and quarter is None and sector is None:
-        mask |= _mask_k2_products(products, campaign=campaign,
-                                  cadence=cadence, filetype=filetype)
-
-    # TESS SPOC data needs a special filter for file type
-    mask &= ~np.array([prov.lower() == 'spoc' for prov in products['provenance_name']])
-    if 'spoc' in provenance_lower and quarter is None and campaign is None:
-        mask |= _mask_spoc_products(products, sector=sector, filetype=filetype)
+    # HLSP products need to be filtered by extension
+    if filetype.lower() == "lightcurve":
+        mask &= np.array(
+            [uri.lower().endswith("lc.fits") for uri in products["productFilename"]]
+        )
+    elif filetype.lower() == "target pixel":
+        mask &= np.array(
+            [uri.lower().endswith(("tp.fits", "targ.fits.gz")) for uri in products["productFilename"]]
+        )
+    elif filetype.lower() == "ffi":
+        mask &= np.array(['TESScut' in desc for desc in products['description']])
 
     # Allow only fits files
     mask &= np.array([uri.lower().endswith('fits') or
                       uri.lower().endswith('fits.gz')
                       for uri in products['productFilename']])
+
+    # Filter by cadence
+    mask &= _mask_by_cadence(products, cadence)
 
     products = products[mask]
 
@@ -957,21 +1029,11 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     return products
 
 
-def _mask_kepler_products(products, quarter=None, month=None, cadence='long',
-                          filetype='Target Pixel'):
+def _mask_kepler_products(products, quarter=None, month=None):
     """Returns a mask flagging the Kepler products that match the criteria."""
     mask = np.array([proj.lower() == 'kepler' for proj in products['provenance_name']])
     if mask.sum() == 0:
         return mask
-
-    # Filters on cadence and product type
-    if cadence in ['short', 'sc']:
-        description_string = "{} Short".format(filetype)
-    elif cadence in ['any', 'both']:
-        description_string = "{}".format(filetype)
-    else:
-        description_string = "{} Long".format(filetype)
-    mask &= np.array([description_string in desc for desc in products['description']])
 
     # Identify quarter by the description.
     # This is necessary because the `sequence_number` field was not populated
@@ -1012,39 +1074,17 @@ def _mask_kepler_products(products, quarter=None, month=None, cadence='long',
     return mask
 
 
-def _mask_k2_products(products, campaign=None, cadence='long', filetype='Target Pixel'):
-    """Returns a mask flagging the K2 products that match the criteria."""
-    mask = np.array([prov.lower() == 'k2' for prov in products['provenance_name']])
-    if mask.sum() == 0:
-        return mask
-
-    # Filters on cadence and product type
-    if cadence in ['short', 'sc']:
-        description_string = "{} Short".format(filetype)
-    elif cadence in ['any', 'both']:
-        description_string = "{}".format(filetype)
-    else:
-        description_string = "{} Long".format(filetype)
-    mask &= np.array([description_string in desc for desc in products['description']])
-
-    return mask
-
-
-def _mask_spoc_products(products, sector=None, filetype='Target Pixel'):
-    """Returns a mask flagging the TESS products that match the criteria."""
-    mask = np.array([p.lower() == 'spoc' for p in products['provenance_name']])
-    if mask.sum() == 0:
-        return mask
-
-    # Filter on product type
-    if filetype.lower() == 'lightcurve':
-        description_string = 'Light curves'
-    elif filetype.lower() == 'target pixel':
-        description_string = 'Target pixel files'
-    elif filetype.lower() == 'ffi':
-        description_string = 'TESScut'
-    mask &= np.array([description_string in desc for desc in products['description']])
-
+def _mask_by_cadence(products, cadence):
+    """Helper function to filter by exposure time."""
+    mask = np.ones(len(products), dtype=bool)
+    if isinstance(cadence, (int, float)):
+        mask &= products['t_exptime'] == cadence
+    elif cadence in ['fast']:
+        mask &= products['t_exptime'] < 60
+    elif cadence in ['short']:
+        mask &= (products['t_exptime'] >= 60) & (products['t_exptime'] < 300)
+    elif cadence in ['long', 'ffi']:
+        mask &= products['t_exptime'] >= 300
     return mask
 
 

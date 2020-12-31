@@ -2,6 +2,8 @@
 import pytest
 
 from astropy.timeseries import BoxLeastSquares
+import astropy.units as u
+import numpy as np
 
 from ..lightcurve import KeplerLightCurve, TessLightCurve
 from .test_lightcurve import KEPLER10, TESS_SIM
@@ -65,6 +67,26 @@ def test_helper_functions():
     make_lightcurve_figure_elements(lc, lc, lc_source, lc_source, lc_help)
     make_folded_figure_elements(lc.fold(1), lc.fold(1), f_source, f_source, f_help)
     make_bls_figure_elements(result, bls_source, bls_help)
+
+
+@pytest.mark.remote_data
+def test_preprocess_lc():
+    '''Test to ensure the lightcurve is pre-processed before applying BLS for correctness and consistent output'''
+    from ..interact_bls import _preprocess_lc_for_bls
+    lc = KeplerLightCurve.read(KEPLER10)
+    assert np.isnan(lc.flux).any()  # ensure the test data has nan in flux
+
+    clean = _preprocess_lc_for_bls(lc)
+    assert not np.isnan(clean.flux).any()   # ensure processed lc has no nan
+    assert clean.meta.get('NORMALIZED', False)
+    assert clean.flux.unit == u.dimensionless_unscaled
+
+    # case the lc is normalized, but in other units
+    lc = lc.normalize(unit='percent')
+    clean = _preprocess_lc_for_bls(lc)
+    assert not np.isnan(clean.flux).any()   # ensure processed lc has no nan
+    assert clean.meta.get('NORMALIZED', False)
+    assert clean.flux.unit == u.dimensionless_unscaled
 
 
 @pytest.mark.remote_data

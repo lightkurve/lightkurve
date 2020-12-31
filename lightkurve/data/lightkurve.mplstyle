@@ -8,10 +8,10 @@ image.cmap : viridis
 
 text.color : 4c4c4c
 
-scatter.marker : o
+scatter.marker : .
 
 lines.linewidth  : 0.5
-lines.markersize : 1
+lines.markersize : 2
 
 axes.formatter.use_mathtext : True
 axes.spines.top   : True

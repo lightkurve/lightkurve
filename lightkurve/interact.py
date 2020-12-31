@@ -44,6 +44,10 @@ except ImportError:
     pass
 
 
+def _to_unitless(items):
+    """Convert the values in the item list to unitless one"""
+    return [getattr(item, 'value', item) for item in items]
+
 def prepare_lightcurve_datasource(lc):
     """Prepare a bokeh ColumnDataSource object for tool tips.
 
@@ -148,7 +152,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     step_renderer : GlyphRenderer
     vertical_line : Span
     """
-    mission = lc.meta.get('mission')
+    mission = lc.meta.get('MISSION')
     if mission == 'K2':
         title = "Lightcurve for {} (K2 C{})".format(
             lc.label, lc.campaign)
@@ -180,7 +184,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     if ylim_func is None:
         ylims = get_lightcurve_y_limits(lc_source)
     else:
-        ylims = ylim_func(lc)
+        ylims = _to_unitless(ylim_func(lc))
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
 
     # Add step lines, circles, and hover-over tooltips
@@ -444,7 +448,7 @@ def make_default_export_name(tpf, suffix='custom-lc'):
 
 def show_interact_widget(tpf, notebook_url='localhost:8888',
                          lc=None,
-                         max_cadences=30000,
+                         max_cadences=200000,
                          aperture_mask='default',
                          exported_filename=None,
                          transform_func=None,
@@ -551,7 +555,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         aperture_mask = np.zeros(tpf.flux.shape[1:]).astype(bool)
         aperture_mask[0, 0] = True
 
-    lc.meta['aperture_mask'] = aperture_mask
+    lc.meta['APERTURE_MASK'] = aperture_mask
 
     if transform_func is not None:
         lc = transform_func(lc)
@@ -561,9 +565,18 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
     # Bokeh cannot handle many data points
     # https://github.com/bokeh/bokeh/issues/7490
-    if len(lc.cadenceno) > max_cadences:
-        msg = 'Interact cannot display more than {} cadences.'
-        raise RuntimeError(msg.format(max_cadences))
+    n_cadences = len(lc.cadenceno)
+    if n_cadences > max_cadences:
+        log.error(f"Error: interact cannot display more than {max_cadences} "
+                  "cadences without suffering significant performance issues. "
+                  "You can limit the number of cadences show using slicing, e.g. "
+                  "`tpf[0:1000].interact()`. Alternatively, you can override "
+                  "this limitation by passing the `max_cadences` argument.")
+    elif n_cadences > 30000:
+        log.warning(f"Warning: the pixel file contains {n_cadences} cadences. "
+                    "The performance of interact() is very slow for such a "
+                    "large number of frames. Consider using slicing, e.g. "
+                    "`tpf[0:1000].interact()`, to make interact run faster.")
 
     def create_interact_ui(doc):
         # The data source includes metadata for hover-over tooltips
@@ -608,7 +621,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
             selected_indices = np.array(selected_pixel_indices)
             selected_mask = np.isin(pixel_index_array, selected_indices)
             lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
-            lc_new.meta['aperture_mask'] = selected_mask
+            lc_new.meta['APERTURE_MASK'] = selected_mask
             if transform_func is not None:
                 lc_transformed = transform_func(lc_new)
                 if (len(lc_transformed) != len(lc_new)):
@@ -617,7 +630,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                             'Skipping the transformation...', LightkurveWarning)
                 else:
                     lc_new = lc_transformed
-                    lc_new.meta['aperture_mask'] = selected_mask
+                    lc_new.meta['APERTURE_MASK'] = selected_mask
             return lc_new
 
         def update_upon_pixel_selection(attr, old, new):
@@ -676,10 +689,10 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                                                     transform_func=transform_func)
                 lc_new.to_fits(exported_filename, overwrite=True,
                                flux_column_name='SAP_FLUX',
-                               aperture_mask=lc_new.meta['aperture_mask'].astype(np.int),
+                               aperture_mask=lc_new.meta['APERTURE_MASK'].astype(np.int),
                                SOURCE='lightkurve interact',
                                NOTE='custom mask',
-                               MASKNPIX=np.nansum(lc_new.meta['aperture_mask']))
+                               MASKNPIX=np.nansum(lc_new.meta['APERTURE_MASK']))
                 if message_on_save.text == " ":
                     text = '<font color="black"><i>Saved file {} </i></font>'
                     message_on_save.text = text.format(exported_filename)

@@ -39,7 +39,8 @@ In brief, the steps are as follows:
 .. code-block:: bash
 
     $ cd lightkurve
-    $ python -m pip install -e .
+    $ python -m pip install .
+    $ python shim-setup.py develop
 
 4. Add the KeplerGO remote to your GitHub enviroment:
 

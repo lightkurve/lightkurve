@@ -126,3 +126,4 @@ def test_designmatrix_rank():
         dm = DesignMatrix({'a': [1, 2, 3], 'b': [1, 1, 1], 'c': [1, 1, 1],
                            'd': [1, 1, 1], 'e': [3, 4, 5]})
         assert dm.rank == 2
+        dm.validate(rank=True) # Should raise a warning

@@ -109,21 +109,6 @@ def test_transform_and_ylim_funcs():
 
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
-def test_max_cadences():
-    """Test what is the max number of cadences allowed"""
-    import bokeh
-    with warnings.catch_warnings():
-        # Ignore the "TELESCOP is not equal to TESS" warning
-        warnings.simplefilter("ignore", LightkurveWarning)
-        tpfs = [KeplerTargetPixelFile(TABBY_TPF),
-                TessTargetPixelFile(example_tpf)]
-    for tpf in tpfs:
-        with pytest.raises(RuntimeError) as exc:
-            tpf.interact(max_cadences=2)
-            assert('Interact cannot display more than' in exc.value.args[0])
-
-
-@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_functions():
     """Do the helper functions in the interact module run without syntax error?"""
     import bokeh
@@ -137,6 +122,15 @@ def test_interact_functions():
     lc_source = prepare_lightcurve_datasource(lc)
     get_lightcurve_y_limits(lc_source)
     make_lightcurve_figure_elements(lc, lc_source)
+
+    def ylim_func_sample(lc):
+        return (np.nanpercentile(lc.flux, 0.1), np.nanpercentile(lc.flux, 99.9))
+    make_lightcurve_figure_elements(lc, lc_source, ylim_func=ylim_func_sample)
+
+    def ylim_func_unitless(lc):
+        return (np.nanpercentile(lc.flux, 0.1).value, np.nanpercentile(lc.flux, 99.9).value)
+    make_lightcurve_figure_elements(lc, lc_source, ylim_func=ylim_func_unitless)
+
     make_tpf_figure_elements(tpf, tpf_source)
     show_interact_widget(tpf)
 

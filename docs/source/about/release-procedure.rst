@@ -38,7 +38,8 @@ The procedure requires the following steps:
 
 .. code-block:: bash
 
-    $ python setup.py release
+    $ poetry build
+    $ poetry publish
 
 8. Update the version number on the `Lightkurve conda feedstock <https://github.com/conda-forge/lightkurve-feedstock>`_.
 A friendly robot will tend to open a PR to make this change within 1-2 hours, so all we need to do is review any necessary changes in the dependencies and make sure the PR is merged.

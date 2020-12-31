@@ -13,7 +13,7 @@ def read_tess_lightcurve(filename,
     Parameters
     ----------
     filename : str
-        Local path or remote url of a Kepler light curve FITS file.
+        Local path or remote url of a TESS light curve FITS file.
     flux_column : 'pdcsap_flux' or 'sap_flux'
         Which column in the FITS file contains the preferred flux data?
     quality_bitmask : str or int
@@ -29,7 +29,7 @@ def read_tess_lightcurve(filename,
             * "hardest": removes all data that has been flagged
               (`quality_bitmask=2096639`). This mask is not recommended.
 
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
+        See the :class:`TessQualityFlags` class for details on the bitmasks.
     """
     lc = read_generic_lightcurve(filename,
                                  flux_column=flux_column,
@@ -44,7 +44,7 @@ def read_tess_lightcurve(filename,
                                 bitmask=quality_bitmask)
     lc = lc[quality_mask]
 
-    lc.meta['targetid'] = lc.meta.get('ticid')
-    lc.meta['quality_bitmask'] = quality_bitmask
-    lc.meta['quality_mask'] = quality_mask
+    lc.meta['TARGETID'] = lc.meta.get('TICID')
+    lc.meta['QUALITY_BITMASK'] = quality_bitmask
+    lc.meta['QUALITY_MASK'] = quality_mask
     return TessLightCurve(data=lc)

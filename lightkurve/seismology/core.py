@@ -604,10 +604,10 @@ class Seismology(object):
         This code structure borrows from work done in Bellinger et al. (2019), which
         also functions as an accessible explanation of seismic scaling relations.
 
-        If no value of effective temperature is given, this function will check the 
+        If no value of effective temperature is given, this function will check the
         meta data of the `Periodogram` object used to create the `Seismology` object.
-        These data will often contain an effective tempearture from the Kepler Input 
-        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+        These data will often contain an effective tempearture from the Kepler Input
+        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract),
         or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
         catalogues are estimated using photometry, and so have large associated uncertainties
         (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
@@ -642,10 +642,10 @@ class Seismology(object):
         numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
         if teff is None:
-            teff = self.periodogram.meta.get('teff')
+            teff = self.periodogram.meta.get('TEFF')
             if teff is None:
                 raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
-                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
+                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['TEFF']` is missing")
             else:
                 log.info("Using value for effective temperature from the Kepler Input Catalogue."
                         "These temperatue values may sometimes differ significantly from modern estimates.")
@@ -675,10 +675,10 @@ class Seismology(object):
         This code structure borrows from work done in Bellinger et al. (2019), which
         also functions as an accessible explanation of seismic scaling relations.
 
-        If no value of effective temperature is given, this function will check the 
+        If no value of effective temperature is given, this function will check the
         meta data of the `Periodogram` object used to create the `Seismology` object.
-        These data will often contain an effective tempearture from the Kepler Input 
-        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+        These data will often contain an effective tempearture from the Kepler Input
+        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract),
         or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
         catalogues are estimated using photometry, and so have large associated uncertainties
         (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
@@ -697,7 +697,7 @@ class Seismology(object):
             degree. If not given an astropy unit, assumed to be in units of
             microhertz.
         teff : float
-            The effective temperature of the star. In units of Kelvin. 
+            The effective temperature of the star. In units of Kelvin.
         numax_err : float
             Error on numax. Assumed to be same units as numax
         deltanu_err : float
@@ -713,10 +713,10 @@ class Seismology(object):
         numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
         if teff is None:
-            teff = self.periodogram.meta.get('teff')
+            teff = self.periodogram.meta.get('TEFF')
             if teff is None:
                 raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
-                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
+                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['TEFF']` is missing")
             else:
                 log.info("Using value for effective temperature from the Kepler Input Catalogue."
                         "These temperatue values may sometimes differ significantly from modern estimates.")
@@ -751,10 +751,10 @@ class Seismology(object):
         This code structure borrows from work done in Bellinger et al. (2019), which
         also functions as an accessible explanation of seismic scaling relations.
 
-        If no value of effective temperature is given, this function will check the 
+        If no value of effective temperature is given, this function will check the
         meta data of the `Periodogram` object used to create the `Seismology` object.
-        These data will often contain an effective tempearture from the Kepler Input 
-        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+        These data will often contain an effective tempearture from the Kepler Input
+        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract),
         or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
         catalogues are estimated using photometry, and so have large associated uncertainties
         (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
@@ -782,10 +782,10 @@ class Seismology(object):
         """
         numax = self._validate_numax(numax)
         if teff is None:
-            teff = self.periodogram.meta.get('teff')
+            teff = self.periodogram.meta.get('TEFF')
             if teff is None:
                 raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
-                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['teff']` is missing")
+                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['TEFF']` is missing")
             else:
                 log.info("Using value for effective temperature from the Kepler Input Catalogue."
                         "These temperatue values may sometimes differ significantly from modern estimates.")

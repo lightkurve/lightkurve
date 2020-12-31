@@ -1,6 +1,0 @@
-pytest>=6.0.1
-pytest-remotedata
-pytest-doctestplus
-pytest-cov
-codecov
-codacy-coverage

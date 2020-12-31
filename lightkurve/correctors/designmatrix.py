@@ -69,7 +69,6 @@ class DesignMatrix():
             prior_sigma = np.ones(len(df.T)) * np.inf
         self.prior_mu = np.atleast_1d(prior_mu)
         self.prior_sigma = np.atleast_1d(prior_sigma)
-        self.validate()
 
     @property
     def X(self):
@@ -269,6 +268,7 @@ class DesignMatrix():
             dm = self.copy()
         extra_df = pd.DataFrame(np.atleast_2d(np.ones(self.shape[0])).T, columns=['offset'])
         dm.df = pd.concat([self.df, extra_df], axis=1)
+        dm.columns = list(dm.df.columns)
         dm.prior_mu = np.append(self.prior_mu, prior_mu)
         dm.prior_sigma = np.append(self.prior_sigma, prior_sigma)
         return dm

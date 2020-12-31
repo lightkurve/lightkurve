@@ -1,15 +1,17 @@
 """Defines collections of data products."""
 import logging
-import warnings
 
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
 from astropy.table import vstack
+from astropy.utils.decorators import deprecated
 
 from . import MPLSTYLE
 from .targetpixelfile import TargetPixelFile
+from .utils import LightkurveDeprecationWarning
+
 
 log = logging.getLogger(__name__)
 
@@ -19,19 +21,54 @@ __all__ = ['LightCurveCollection', 'TargetPixelFileCollection']
 class Collection(object):
     """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
 
+    A collection can be indexed by standard Python list syntax.
+    Additionally, it can be indexed by a subset of `numpy.ndarray` syntax: boolean array indexing and integer array indexing.
+
     Attributes
     ----------
     data: array-like
         List of data objects.
+
+    Examples
+    --------
+    Filter a collection by boolean array indexing.
+
+        >>> lcc_filtered = lcc[(lcc.sector >= 13) & (lcc.sector <= 19)]  # doctest: +SKIP
+        >>> lc22 = lcc[lcc.sector == 22][0]  # doctest: +SKIP
+
+    Filter a collection by integer array indexing to get the object at index 0 and 2.
+
+        >>>  lcc_filtered = lcc[0, 2]  # doctest: +SKIP
     """
     def __init__(self, data):
-        self.data = data
+        if data is not None:
+            # ensure we have our own container
+            self.data = [item for item in data]
+        else:
+            self.data = []
 
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, index):
-        return self.data[index]
+    def __getitem__(self, index_or_mask):
+        if (isinstance(index_or_mask, (int, np.integer, slice))):
+            return self.data[index_or_mask]
+        elif (all([isinstance(i, (bool, np.bool_)) for i in index_or_mask])):
+            # case indexOrMask is bool array like, e.g., np.ndarray, collections.abc.Sequence, etc.
+
+            # note: filter using nd.array is very slow
+            #   np.array(self.data)[np.nonzero(indexOrMask)]
+            # specifically, nd.array(self.data) is very slow, as it deep copies the data
+            # so we create the filtered list on our own
+            if (len(index_or_mask) != len(self.data)):
+                raise IndexError(f'boolean index did not match indexed array; dimension is {len(self.data)} '
+                                 f'but corresponding boolean dimension is {len(index_or_mask)}')
+            return type(self)([self.data[i] for i in np.nonzero(index_or_mask)[0]])
+        elif (all([isinstance(i, (int, np.integer)) for i in index_or_mask])):
+            # case int array like, follow ndarray behavior
+            return type(self)([self.data[i] for i in index_or_mask])
+        else:
+            raise IndexError('only integers, slices (`:`) and integer or boolean arrays are valid indices')
 
     def __setitem__(self, index, obj):
         self.data[index] = obj
@@ -51,7 +88,7 @@ class Collection(object):
         if (isinstance(self[0], TargetPixelFile)):
             labels = np.asarray([tpf.targetid for tpf in self])
         else:
-            labels = np.asarray([lc.meta.get('label') for lc in self])
+            labels = np.asarray([lc.meta.get('LABEL') for lc in self])
 
         try:
             unique_labels = np.sort(np.unique(labels))
@@ -85,6 +122,47 @@ class Collection(object):
             result += '\n'
         return result
 
+    def _safeGetScalarAttr(self, attrName):
+        # return np.nan when the attribute is missing, so that the returned value can be used in a comparison
+        # e.g., lcc[lcc.sector < 25]
+        return np.array([getattr(lcOrTpf, attrName, np.nan) for lcOrTpf in self.data])
+
+    @property
+    def sector(self):
+        """(TESS-specific) the sectors of the lightcurves / target pixel files.
+
+        The TESS sectors of the lightcurves / target pixel files; `numpy.nan` for those with no sector.
+        The attribute is useful for filtering a collection by sector.
+
+        Examples
+        --------
+        Plot two lightcurves, one from TESS sectors 13 to 19, and one for sector 22
+
+            >>> import lightkurve as lk
+            >>> lcc = lk.search_lightcurve('TIC286923464', mission='TESS').download_all()  # doctest: +SKIP
+            >>> lcc_filtered = lcc[(lcc.sector >= 13) & (lcc.sector <= 19)]  # doctest: +SKIP
+            >>> lcc_filtered.plot()  # doctest: +SKIP
+            >>> lcc[lcc.sector == 22][0].plot()  # doctest: +SKIP
+
+        """
+        return self._safeGetScalarAttr('sector')
+
+    @property
+    def quarter(self):
+        """(Kepler-specific) the quarters of the lightcurves / target pixel files.
+
+        The Kepler quarters of the lightcurves / target pixel files; `numpy.nan` for those with none.
+        """
+        return self._safeGetScalarAttr('quarter')
+
+    @property
+    def campaign(self):
+        """(K2-specific) the campaigns of the lightcurves / target pixel files.
+
+        The K2 campaigns of the lightcurves / target pixel files; `numpy.nan` for those with none.
+        """
+        return self._safeGetScalarAttr('campaign')
+
 
 class LightCurveCollection(Collection):
     """Class to hold a collection of LightCurve objects.
@@ -97,8 +175,23 @@ class LightCurveCollection(Collection):
     def __init__(self, lightcurves):
         super(LightCurveCollection, self).__init__(lightcurves)
 
+    @property
+    @deprecated("2.0", warning_type=LightkurveDeprecationWarning)
+    def PDCSAP_FLUX(self):
+        """DEPRECATED. Replaces `LightCurveFileCollection.PDCSAP_FLUX`.
+        Provided for backwards-compatibility with Lightkurve v1.x;
+        will be removed soon."""
+        return LightCurveCollection([lc.PDCSAP_FLUX for lc in self])
 
-    def stitch(self, corrector_func=lambda x:x.normalize()):
+    @property
+    @deprecated("2.0", warning_type=LightkurveDeprecationWarning)
+    def SAP_FLUX(self):
+        """DEPRECATED. Replaces `LightCurveFileCollection.SAP_FLUX`.
+        Provided for backwards-compatibility with Lightkurve v1.x;
+        will be removed soon."""
+        return LightCurveCollection([lc.SAP_FLUX for lc in self])
+
+    def stitch(self, corrector_func=lambda x: x.normalize()):
         """ Stitch all light curves in the collection into a single lk.LightCurve
 
         Any function passed to `corrector_func` will be applied to each light curve
@@ -118,7 +211,7 @@ class LightCurveCollection(Collection):
             Stitched light curve.
         """
         if corrector_func is None:
-            corrector_func = lambda x: x
+            corrector_func = lambda x: x  # noqa: E731
         lcs = [corrector_func(lc) for lc in self]
         # Need `join_type='inner'` until AstroPy supports masked Quantities
         return vstack(lcs, join_type='inner', metadata_conflicts='silent')
@@ -153,7 +246,7 @@ class LightCurveCollection(Collection):
                 if kwarg in kwargs:
                     kwargs.pop(kwarg)
 
-            labels = np.asarray([lc.meta.get('label') for lc in self])
+            labels = np.asarray([lc.meta.get('LABEL') for lc in self])
             try:
                 unique_labels = np.sort(np.unique(labels))
             except TypeError:  # sorting will fail if labels includes None

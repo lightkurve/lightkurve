@@ -4,7 +4,7 @@ from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
 from astropy import units as u
 from astropy.time import Time, TimeDelta
-from astropy.table import Table
+from astropy.table import Table, Column, MaskedColumn
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -121,11 +121,11 @@ def test_KeplerLightCurveFile(path, mission):
 
     assert lc.mission.lower() == mission.lower()
     if lc.mission.lower() == 'kepler':
-        assert lc.meta.get('campaign') is None
+        assert lc.meta.get('CAMPAIGN') is None
         assert lc.quarter == 8
     elif lc.mission.lower() == 'k2':
         assert lc.campaign == 8
-        assert lc.meta.get('quarter') is None
+        assert lc.meta.get('QUARTER') is None
     assert lc.time.format == 'bkjd'
     assert lc.time.scale == 'tdb'
     assert lc.flux.unit == u.electron / u.second
@@ -177,7 +177,7 @@ def test_bitmasking(quality_bitmask, answer):
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
     lc = KeplerLightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1,
-                          targetid=999, label='mystar', meta={'ccd': 2})
+                          targetid=999, label='mystar', meta={'CCD': 2})
     fold = lc.fold(period=1)
     assert_almost_equal(fold.phase[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
@@ -185,7 +185,7 @@ def test_lightcurve_fold():
     assert fold.targetid == lc.targetid
     assert fold.label == lc.label
     assert set(lc.meta).issubset(set(fold.meta))
-    assert lc.meta['ccd'] == fold.meta['ccd']
+    assert lc.meta['CCD'] == fold.meta['CCD']
     assert_array_equal(np.sort(fold.time_original), lc.time)
     assert len(fold.time_original) == len(lc.time)
     fold = lc.fold(period=1, epoch_time=-0.1)
@@ -382,6 +382,20 @@ def test_lightcurve_scatter():
     lc.scatter(ax=ax[1,0], c=lc.time.value, **scatterkw)
     lc.fold(**foldkw).scatter(ax=ax[1,1], c=foldedtimeinorder, **scatterkw)
     plt.ylim(0.999, 1.001)
+
+
+def test_lightcurve_plots_unitless():
+    """Sanity check to verify that lightcurve plotting works when data is unitless."""
+    lc = LightCurve(time=np.arange(10))
+    # make flux non-uniform to avoid warnings with clip_outliers=True during test
+    lc.flux = np.append(np.zeros(3), np.ones(7))
+    lc.flux_err = np.zeros(10)  # need flux_err to avoid warnings
+
+    lc.plot()
+    lc.scatter()
+    lc.errorbar()
+    lc.plot(normalize=True, clip_outliers=True)
+    plt.close('all')
 
 
 def test_cdpp():
@@ -997,7 +1011,7 @@ def test_bin_issue705():
 def test_SSOs():
     # TESS test
     lc = TessTargetPixelFile(asteroid_TPF).to_lightcurve(aperture_mask='all')
-    lc.mission = 'TESS' # needed to resolve default value for location argument
+    lc.meta['MISSION'] = 'TESS' # needed to resolve default value for location argument
     result = lc.query_solar_system_objects(cadence_mask='all', cache=False)
     assert(len(result) == 1)
     result = lc.query_solar_system_objects(cadence_mask=np.asarray([True]), cache=False)
@@ -1092,6 +1106,140 @@ def test_assignment_time():
     assert_array_equal(lc.time, Time([21, 21, 21], scale='tdb', format='bkjd'))
 
 
+def test_attr_access_columns():
+    """Test accessing columns as attributes"""
+
+    u_e_s = u.electron / u.second
+    lc = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+
+    # Read/Write access of flux: explicitly defined as property
+    assert_array_equal(lc.flux, lc['flux'])
+    flux_updated = [7, 8, 9] * u_e_s
+    lc.flux = flux_updated
+    assert_array_equal(lc.flux, flux_updated)
+
+    # Read/Write access of cadenceno: not an explicit property, but present in most LightCurve objects in practice.
+    cadenceno_unitless = [101, 102, 103]
+    lc['cadenceno'] = cadenceno_unitless
+    assert_array_equal(lc['cadenceno'], cadenceno_unitless)
+    assert(lc.cadenceno is lc['cadenceno'])
+
+    # Read/Write access of new column
+    flux_adjusted = [7.1, 8.1, 9.1] * u_e_s
+    lc['flux_adjusted'] = flux_adjusted
+    assert_array_equal(lc['flux_adjusted'], flux_adjusted)
+    assert(lc.flux_adjusted is lc['flux_adjusted'])
+
+    # column name is an existing method / attribute: attribute access not available
+    info_col = [9, 8, 7] * u_e_s
+    lc['info'] = info_col  # .info is a built-in attribute (from base TimeSeries)
+    assert(type(lc.info) is not type(info_col))
+
+    bin_col = [5, 6, 7 ] * u_e_s
+    lc['bin'] = bin_col  # .bin is a built-in method
+    assert(type(lc.bin) is not type(bin_col))
+
+    # Create a new column directly as an attribute: only attribute is created, not a column
+    flux2_unitless = [6, 7, 8]
+    with pytest.warns(UserWarning, match="new attribute name"):
+        lc.flux2 = flux2_unitless
+    with pytest.raises(KeyError):
+        lc['flux2']
+    assert_array_equal(lc.flux2, flux2_unitless)
+    assert(type(lc.flux2) is list)  # as it's just an attribute, there is no conversion done to Quantity
+
+    # ensure no warning is raised when updating an existing attribute
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        lc.foo = 'bar'
+    with pytest.warns(None) as warn_record:
+        lc.foo = 'bar2'
+    assert len(warn_record) == 0
+
+u_e_s = u.electron / u.second
+
+
+@pytest.mark.parametrize("new_col_val", [([2, 3, 4] * u_e_s),   # Quantity
+                                         (np.array([2, 3, 4])), # ndarray
+                                         ([2, 3, 4])            # list
+                                         ])
+def test_attr_access_columns_consistent_update(new_col_val):
+    """Replace/Update a column: ensure consistent behavior across column API and attribute API"""
+
+    lc1 = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+    lc1['flux'] = new_col_val
+
+    lc2 = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+    lc2.flux = new_col_val
+
+    # ensure the result type is the same,
+    # irrespective whether the update is done via column API or attribute API
+    assert(type(lc1['flux']) is type(lc2['flux']))
+
+
+def test_attr_access_meta():
+    """Test accessing meta values as attributes"""
+    u_e_s = u.electron / u.second
+    lc = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+
+    # Read/Write access of meta via attribute
+    lc.meta['SECTOR'] = 14
+    assert(lc.sector == 14)  # uppercased meta key is accessed as lowercased attributes
+
+    sector_corrected = 15
+    lc.sector = sector_corrected
+    assert(lc.sector == sector_corrected)
+    assert(lc.sector == lc.meta['SECTOR'])
+
+    # meta key is an existing attribute / method: : attribute access not available
+    lc.meta['INFO'] = 'Some information'  # .info: an existing attribute
+    assert(lc.info != lc.meta['INFO'])
+
+    lc.meta['BIN'] = 'Some value'  # .bin: an existing method
+    assert(lc.bin != lc.meta['BIN'])
+
+    # Create a attribute: it is created as a object attribute, rather than meta
+    attr_value = 'bar_value'
+    with pytest.warns(UserWarning, match="new attribute name"):
+        lc.foo = attr_value
+    assert(lc.meta.get('foo', None) is None)
+    assert(lc.foo == attr_value)
+
+    # Case meta has 2 keys that only differs in case
+    lc.meta['KEYCASE'] = 'VALUE UPPER'
+    lc.meta['keycase'] = 'value lower'
+    # they are two different entries (case sensitive)
+    assert(lc.meta['KEYCASE'] == 'VALUE UPPER')
+    assert(lc.meta['keycase'] == 'value lower')
+    assert(lc.keycase == 'value lower')  # the meta entry with exact case is retrieved
+
+
+def test_attr_access_others():
+    """Test accessing attributes, misc. boundary cases"""
+    u_e_s = u.electron / u.second
+    lc = LightCurve(time=Time([1, 2, 3], scale='tdb', format='jd'), flux=[4, 5, 6] * u_e_s)
+
+    # case the name is present both as a column name and a meta key: column is returned
+    val_of_col = [5, 6, 7]
+    val_of_meta_key = 'value'
+    lc['foo'] = val_of_col
+    lc.meta['FOO'] = val_of_meta_key
+    assert_array_equal(lc.foo, val_of_col) # lc.foo refers to the column
+
+    val_of_col_updated = [6, 7, 8] * u_e_s
+    lc.foo = val_of_col_updated  # should update the column rather than meta
+    assert_array_equal(lc.foo, val_of_col_updated)
+
+    # case the same name is present as column name, meta key, and actual attribute
+    lc.bar = 'bar_attr_val'
+    lc['bar'] = [7, 8, 9]
+    lc.meta['BAR'] = 'bar_meta_val'
+    assert(lc.bar == 'bar_attr_val') # actual attribute takes priority
+
+    lc.bar = 'bar_attr_val_updated'
+    assert(lc.bar == 'bar_attr_val_updated') # the update should be done on actual attribute
+
+
 def test_create_transit_mask():
     """Test for `LightCurve.create_transit_mask()`."""
     # Set planet parameters
@@ -1142,3 +1290,81 @@ def test_row_repr():
     lc = LightCurve({'time': [1,2,3], 'flux':[1.,1.,1.]})
     lc[0].__repr__()
     lc[0]._repr_html_()
+
+
+def test_fill_gaps_with_cadenceno():
+    """Does `fill_gaps` work when a ``cadenceno`` column is present?
+    This is a regression test for #868."""
+    lc = LightCurve({'time': [1, 2, 4, 5],
+                     'flux': [1, 1, 1, 1],
+                     'cadenceno': [11, 12, 14, 15]})
+    lc.fill_gaps()  # raised a `UnitConversionError` in the past, cf. #868
+
+
+def test_fill_gaps_after_normalization():
+    """Does `fill_gaps` work correctly after normalization?
+    This is a regression test for #868."""
+    lc = LightCurve({'time': [1, 2, 4, 5],
+                     'flux': [1, 1, 1, 1],
+                     'flux_err':[0.1, 0.1, 0.1, 0.1]})
+    lc = lc.normalize("ppm")
+    lc2 = lc.fill_gaps()
+    assert lc2.time[2].value == 3.
+    assert lc2.flux[2].value == 1e6
+    assert lc2.flux[2].unit == u.cds.ppm
+    assert lc2.flux_err[2] == 0.1
+
+
+@pytest.mark.parametrize("new_col_val", [([2, 3, 4] * u_e_s),   # Quantity
+                                         (np.array([2, 3, 4])), # ndarray
+                                         ([2, 3, 4]),           # list
+                                         Column([2, 3, 4]),     # Column
+                                         MaskedColumn([2, -1, 4], mask=[False, True, False], fill_value=-999)
+                                         ])
+def test_columns_have_value_accessor(new_col_val):
+    """Ensure resulting column has  ``.value`` accessor to raw data, irrespective of type of input.
+
+       The test won't be needed once https://github.com/astropy/astropy/pull/10962 is in astropy release
+       and Lightkurve requires the correspond astropy release.
+    """
+    expected_raw_value = new_col_val
+    if hasattr(new_col_val, 'value'):
+        expected_raw_value = new_col_val.value
+    elif hasattr(new_col_val, 'data'):
+        expected_raw_value = new_col_val.data
+
+    lc = LightCurve(time=[1, 2, 3])
+    lc['col1'] = new_col_val
+    assert_array_equal(lc['col1'].value, expected_raw_value)
+    # additional check for MaskedColumn, to ensure we don't lose its properties
+    if isinstance(new_col_val, MaskedColumn):
+        assert_array_equal(lc['col1'].mask, new_col_val.mask)
+        assert lc['col1'].fill_value == new_col_val.fill_value
+
+def test_support_non_numeric_columns():
+    lc = LightCurve(time=[1, 2, 3], flux=[2, 3, 4])
+    lc['col1'] = ['a', 'b', 'c']
+    lc_copy = lc.copy()
+    assert_array_equal(lc_copy['col1'], lc['col1'])
+
+
+def test_timedelta():
+    """Can the time column be initialized using TimeDelta?"""
+    td = TimeDelta([-0.5, 0, +0.5])
+    LightCurve(time=td)
+    LightCurve(data={'time': td})
+
+
+def test_issue_916():
+    """Regression test for #916: Can we flatten after folding?"""
+    LightCurve(flux=np.random.randn(100)).fold(period=2.5).flatten()
+
+
+@pytest.mark.remote_data
+def test_search_neighbors():
+    """The closest neighbor to Proxima Cen in Sector 11 is TIC 388852407."""
+    lc = search_lightcurve("Proxima Cen", sector=11).download()
+    search = lc.search_neighbors(limit=1, radius=300)
+    assert len(search) == 1
+    assert search.distance.value < 300
+    assert search.target_name[0] == '388852407'

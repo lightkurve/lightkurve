@@ -26,6 +26,17 @@ lightkurve.lightcurve
 - Added a ``column`` parameter to ``LightCurve.remove_nans()`` to enable
   cadences to be removed which contain NaN values in a specific column. [#828]
 
+- ``interact_bls()``: added the support zoom by scrolling mouse wheel. [#854]
+
+- ``interact_bls()``: modified so that it normalizes the lightcurve to match the
+  generated transit model.  [#854]
+
+- Fixed a bug in ``interact_bls()`` that caused the LightCurve panel improperly
+  scaled. [#902]
+
+- Added the ``LightCurve.search_neighbors()`` convenience method to search for
+  light curves around an existing one. [#907]
+
 lightkurve.targetpixelfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -53,8 +64,30 @@ lightkurve.targetpixelfile
 - Fixed a bug in ``TargetPixelFile.__getitem__()`` which caused a substantial
   memory leak on indexing or slicing a tpf. [#829]
 
+- Modified ``interact()`` to use ``max_cadences=200000`` by default to allow
+  it to be used on fast-cadence TESS data. [#856]
+
+- Modified `TargetPixelFactory` to support creating TESS Target Pixel Files
+  and to enable it to populate all data columns. [#768, #857]
+
+- Fixed a bug in ``TargetPixelFile.wcs`` which caused it to raise Error if
+  the tpf does not contain expected WCS keywords in the header. [#892]
+
+lightkurve.collections
+^^^^^^^^^^^^^^^^^^^^^^
+
+- Added the ability to filter a collection by `quarter`, `campaign` or `sector`. [#815]
+
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
+
+- Added support for the new 20-second and 10-minute TESS cadence modes in the
+  search functions by allowing the exact exposure time to be specified via the
+  optional ``cadence`` argument.  In addition, the functions now also accept
+  ``cadence='fast'`` (for 20s) and ``cadence='ffi'`` (for 10m or 30m). [#831]
+
+- Modified the search functions to show the total exposure time of each data
+  product (``t_exptime``) in the search results table. [#831]
 
 - Added support for reading K2SFF and EVEREST community light curves via the
   ``LightCurve.read()`` and ``search_lightcurve()`` functions. [#739]
@@ -62,6 +95,14 @@ lightkurve.search
 - Modified the search functions such that exact mission target identifiers,
   such as 'KIC 5112705' or 'TIC 261136679', only return products known under
   those names, unless a search radius is specified. [#796]
+
+- Added support for searching and reading QLP and SPOC Full Frame Image (FFI)
+  light curves available as High Level Science Products from MAST. [#913]
+
+- Improved the performance of `download()` operations by checking if a file
+  exists in local cache prior to contacting MAST. [#915]
+
+- Added automated caching of the search operations. [#907]
 
 lightkurve.correctors
 ^^^^^^^^^^^^^^^^^^^^^
@@ -73,10 +114,16 @@ lightkurve.correctors
   systematics removal methods to benefit from ``scipy.sparse`` speed-ups. [#732]
 
 - Modified ``PLDCorrector`` to make use of the new ``RegressionCorrector``
-  and ``DesignMatrix`` classes. [#746]
+  and ``DesignMatrix`` classes. [#746, #847]
 
 - Fixed a bug in ``SFFCorrector`` which caused correction to fail if a light
   curve's ``centroid_col`` or ``centroid_row`` columns contained NaNs. [#827]
+
+- Improved the ``Corrector`` abstract base class to better document the desired
+  structure of its sub-classes. [#907]
+
+- Added a ``metrics`` module with two functions to measure the degree of
+  over- and under-fitting of a corrected light curve. [#907]
 
 lightkurve.seismology
 ^^^^^^^^^^^^^^^^^^^^^
@@ -92,6 +139,16 @@ lightkurve.periodogram
 
 - Modified ``create_transit_mask`` method to return ``True`` during transits and
   ``False`` elsewhere for consistent mask syntax. [#808]
+
+- Modified ``BoxLeastSquaresPeriodogram`` to use ``duration=[0.05, 0.10, 0.15, 0.20, 0.25, 0.33]``
+  by default, which yields more accurate results (albeit slower). [#859, #860]
+
+
+
+1.11.3 (2020-10-06)
+===================
+
+- Fixed inline plots not appearing in Jupyter Notebooks and Google Colab. [#865]
 
 
 

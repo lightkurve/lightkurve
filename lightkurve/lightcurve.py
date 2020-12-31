@@ -3,7 +3,6 @@ import os
 import datetime
 import logging
 import warnings
-
 import collections
 
 import numpy as np
@@ -14,7 +13,7 @@ from matplotlib import pyplot as plt
 from copy import deepcopy
 
 from astropy.stats import sigma_clip
-from astropy.table import Table
+from astropy.table import Table, Column, MaskedColumn
 from astropy.io import fits
 from astropy.time import Time, TimeDelta
 from astropy import units as u
@@ -36,7 +35,44 @@ __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve', 'FoldedLightCurve
 log = logging.getLogger(__name__)
 
 
-class LightCurve(TimeSeries):
+class QColumn(Column):
+    """(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``."""
+    @property
+    def value(self):
+        return self.data
+
+
+class QMaskedColumn(MaskedColumn):
+    """(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``."""
+    @property
+    def value(self):
+        return self.data
+
+
+class QTimeSeries(TimeSeries):
+    def _convert_col_for_table(self, col):
+        """Ensure resulting column has  ``.value`` accessor to raw data, irrespective of type of input.
+
+        It won't be needed once https://github.com/astropy/astropy/pull/10962 is in astropy release
+        and Lightkurve requires the correspond astropy release.
+        """
+        col = super()._convert_col_for_table(col)
+        if (isinstance(col, Column) and getattr(col, 'unit', None) is None and (not hasattr(col, 'value'))):
+            # the logic is similar to those in the grandparent QTable for Quantity
+            if isinstance(col, MaskedColumn):
+                qcol = QMaskedColumn(data=col.data, name=col.name, dtype=col.dtype, description=col.description,
+                                     mask=col.mask, fill_value=col.fill_value,
+                                     format=col.format, meta=col.meta, copy=False)
+            else:
+                qcol = QColumn(data=col.data, name=col.name, dtype=col.dtype, description=col.description,
+                               format=col.format, meta=col.meta, copy=False)
+            qcol.info = col.info
+            qcol.info.indices = col.info.indices
+            col = qcol
+        return col
+
+
+class LightCurve(QTimeSeries):
     """Class to hold time series brightness data for an astronomical object.
 
     Compared to the generic `~astropy.timeseries.TimeSeries` class, `LightCurve`
@@ -61,6 +97,30 @@ class LightCurve(TimeSeries):
         Uncertainty on each flux data point.
     **kwargs : dict
         Additional keyword arguments are passed to `~astropy.table.QTable`.
+
+    Attributes
+    ----------
+    meta : `dict`
+        meta data associated with the lightcurve. The header of the underlying FITS file (if applicable)
+        is available here as well.
+
+    Notes
+    -----
+    *Attribute access*: You can access a column or a ``meta`` value directly as an attribute.
+
+    >>> lc.flux    # shortcut for lc['flux']   # doctest: +SKIP
+    >>> lc.sector  # shortcut for lc.meta['SECTOR']   # doctest: +SKIP
+    >>> lc.flux = lc.flux * 1.05  # update the values of a column.   # doctest: +SKIP
+
+    In case the given name is both a column name and a key in ``meta``, the column will be returned.
+
+    Note that you *cannot* create a new column using the attribute interface. If you do so,
+    a new attribute is created instead, and a warning is raised.
+
+    If you do create such attributes on purpose, please note that the attributes are not carried
+    over when the lightcurve object is copied, or a new lightcurve object is derived
+    based on a copy, e.g., ``normalize()``.
+
 
     Examples
     --------
@@ -89,6 +149,12 @@ class LightCurve(TimeSeries):
     # ``Time`` object using the following format and scale:
     _default_time_format = "jd"
     _default_time_scale = "tdb"
+
+    # To emulate pandas, we do not support creating new columns or meta data
+    # fields via attribute assignment, and raise a warning in __setattr__ when
+    # a new attribute is created.  We need to relax this warning during the
+    # initial construction of the object using `_new_attributes_relax`.
+    _new_attributes_relax = True
 
     def __init__(self, data=None, *args, time=None, flux=None, flux_err=None, **kwargs):
         # Delay checking for required columns until the end
@@ -123,7 +189,7 @@ class LightCurve(TimeSeries):
             if time is None and flux is not None:
                 time = np.arange(len(flux))
             # We are tolerant of missing time format
-            if time is not None and not isinstance(time, Time):
+            if time is not None and not isinstance(time, (Time, TimeDelta)):
                 # Lightkurve v1.x supported specifying the time_format
                 # as a constructor kwarg
                 time = Time(time,
@@ -132,7 +198,7 @@ class LightCurve(TimeSeries):
 
         # Also be tolerant of missing time format if time is passed via `data`
         if data and 'time' in data.keys():
-            if not isinstance(data['time'], Time):
+            if not isinstance(data['time'], (Time, TimeDelta)):
                 data['time'] = Time(data['time'],
                             format=deprecated_kws.get("time_format", self._default_time_format),
                             scale=deprecated_kws.get("time_scale", self._default_time_scale))
@@ -185,7 +251,7 @@ class LightCurve(TimeSeries):
         # Ensure attributes are set if passed via deprecated kwargs
         for kw in deprecated_kws:
             if kw not in self.meta:
-                self.meta[kw] = deprecated_kws[kw]
+                self.meta[kw.upper()] = deprecated_kws[kw]
 
         # Ensure all required columns are in the right order
         with self._delay_required_column_checks():
@@ -199,15 +265,11 @@ class LightCurve(TimeSeries):
             if kw not in self.meta and kw not in self.columns:
                 self.add_column(deprecated_column_kws[kw], name=kw)
 
-        # Ensure all columns are Quantity objects
-        for col in self.columns:
-            if not isinstance(self[col], (Quantity, Time)):
-                self.replace_column(col, Quantity(self[col], dtype=self[col].dtype))
-
         # Ensure flux and flux_err have the same units
         if self['flux'].unit != self['flux'].unit:
             raise ValueError("flux and flux_err must have the same units")
 
+        self._new_attributes_relax = False
         self._required_columns_relax = False
         self._check_required_columns()
 
@@ -219,21 +281,37 @@ class LightCurve(TimeSeries):
             return self.__class__.__dict__[name].__get__(self)
         elif name in self.columns:
             return self[name]
-        elif ('_meta' in self.__dict__) and (name in self.__dict__['_meta']):
-            return self.__dict__['_meta'][name]
+        elif ('_meta' in self.__dict__):
+            if (name in self.__dict__['_meta']):
+                return self.__dict__['_meta'][name]
+            elif (name.upper() in self.__dict__['_meta']):
+                return self.__dict__['_meta'][name.upper()]
         raise AttributeError(f"object has no attribute {name}")
 
     def __setattr__(self, name, value, **kwargs):
         """To get copied, attributes have to be stored in the meta dictionary!"""
-        if (name == 'time'):
+        to_set_as_attr = False
+        if name in self.__dict__:
+            to_set_as_attr = True
+        elif (name == 'time'):
             self['time'] = value # astropy will convert value to Time if needed
         elif ('columns' in self.__dict__) and (name in self.__dict__['columns']):
-            if not isinstance(value, Quantity):
-                value = Quantity(value, dtype=value.dtype)
             self.replace_column(name, value)
-        elif ('_meta' in self.__dict__) and (name in self.__dict__['_meta']):
-            self.__dict__['_meta'][name] = value
+        elif ('_meta' in self.__dict__):
+            if (name in self.__dict__['_meta']):
+                self.__dict__['_meta'][name] = value
+            elif (name.upper() in self.__dict__['_meta']):
+                self.__dict__['_meta'][name.upper()] = value
+            else:
+                to_set_as_attr = True
         else:
+            to_set_as_attr = True
+        if to_set_as_attr:
+            if name not in self.__dict__ and not name.startswith("_") and not self._new_attributes_relax:
+                warnings.warn(("Lightkurve doesn't allow columns or meta values to be created via a new attribute name."
+                               "A new attribute is created. It will not be carried over when the object is copied."
+                               " - see https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html"),
+                              UserWarning, stacklevel=2)
             super().__setattr__(name, value, **kwargs)
 
     def _base_repr_(self, html=False, descr_vals=None, **kwargs):
@@ -680,11 +758,11 @@ class LightCurve(TimeSeries):
 
         # Add extra column and meta data specific to FoldedLightCurve
         lc.add_column(self.time.copy(), name="time_original", index=len(self._required_columns))
-        lc.meta['period'] = period
-        lc.meta['epoch_time'] = epoch_time
-        lc.meta['epoch_phase'] = epoch_phase
-        lc.meta['wrap_phase'] = wrap_phase
-        lc.meta['normalize_phase'] = normalize_phase
+        lc.meta['PERIOD'] = period
+        lc.meta['EPOCH_TIME'] = epoch_time
+        lc.meta['EPOCH_PHASE'] = epoch_phase
+        lc.meta['WRAP_PHASE'] = wrap_phase
+        lc.meta['NORMALIZE_PHASE'] = normalize_phase
         lc.sort('time')
 
         return lc
@@ -747,7 +825,7 @@ class LightCurve(TimeSeries):
                           "not what you want".format(median_flux),
                           LightkurveWarning)
         # Warn if the light curve was already normalized before
-        if self.meta.get("normalized"):
+        if self.meta.get('NORMALIZED'):
             warnings.warn("The light curve already appears to be in relative "
                           "units; `normalize()` will convert the light curve "
                           "into relative units for a second time, which is "
@@ -774,7 +852,7 @@ class LightCurve(TimeSeries):
         elif unit == 'ppm':  # parts per million
             lc.flux = lc.flux.to(u.cds.ppm)
 
-        lc.meta['normalized'] = True
+        lc.meta['NORMALIZED'] = True
         return lc
 
     def remove_nans(self, column: str = 'flux'):
@@ -832,13 +910,13 @@ class LightCurve(TimeSeries):
         # Find missing time points
         # Most precise method, taking into account time variation due to orbit
         if hasattr(lc, 'cadenceno'):
-            dt = lc.time.value - np.median(np.diff(lc.time.value)) * lc.cadenceno
-            ncad = np.arange(lc.cadenceno[0], lc.cadenceno[-1] + 1, 1)
-            in_original = np.in1d(ncad, lc.cadenceno)
+            dt = lc.time.value - np.median(np.diff(lc.time.value)) * lc.cadenceno.value
+            ncad = np.arange(lc.cadenceno.value[0], lc.cadenceno.value[-1] + 1, 1)
+            in_original = np.in1d(ncad, lc.cadenceno.value)
             ncad = ncad[~in_original]
-            ndt = np.interp(ncad, lc.cadenceno, dt)
+            ndt = np.interp(ncad, lc.cadenceno.value, dt)
 
-            ncad = np.append(ncad, lc.cadenceno)
+            ncad = np.append(ncad, lc.cadenceno.value)
             ndt = np.append(ndt, dt)
             ncad, ndt = ncad[np.argsort(ncad)], ndt[np.argsort(ncad)]
             ntime = ndt + np.median(np.diff(lc.time.value)) * ncad
@@ -866,15 +944,15 @@ class LightCurve(TimeSeries):
         fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err)
         if method == 'gaussian_noise':
             try:
-                std = lc.estimate_cdpp()*1e-6
+                std = lc.estimate_cdpp().to(lc.flux.unit).value
             except:
-                std = lc.flux.std()
-            f[~in_original] = np.random.normal(lc.flux.mean(), std.value, (~in_original).sum())
+                std = np.nanstd(lc.flux.value)
+            f[~in_original] = np.random.normal(np.nanmean(lc.flux.value), std, (~in_original).sum())
         else:
             raise NotImplementedError("No such method as {}".format(method))
 
-        newdata['flux'] = f
-        newdata['flux_err'] = fe
+        newdata['flux'] = Quantity(f, lc.flux.unit)
+        newdata['flux_err'] = Quantity(fe, lc.flux_err.unit)
 
         if hasattr(lc, 'quality'):
             quality = np.zeros(len(ntime), dtype=lc.quality.dtype)
@@ -1015,7 +1093,16 @@ class LightCurve(TimeSeries):
             The function to use for combining points in the same bin. Defaults
             to np.nanmean.
         binsize : int
-            DEPRECATED.
+            In Lightkurve v1.x, the default behavior of `bin()` was to create
+            bins which contained an equal number data points in each bin.
+            This type of binning is discouraged because it usually makes more sense to
+            create equally-sized bins in time duration, which is the new default
+            behavior in Lightkurve v2.x.  Nevertheless, this `binsize` parameter
+            allows users to simulate the old behavior of Lightkurve v1.x.
+            For ease of implementation, setting this parameter is identical to passing
+            ``time_bin_size = lc.time[binsize] - time[0]``, which means that
+            the bins are not guaranteed to contain an identical number of
+            data points.
 
         Returns
         -------
@@ -1255,16 +1342,16 @@ class LightCurve(TimeSeries):
                 radius = 15*u.arcsecond.to(u.deg)
 
         res = _query_solar_system_objects(ra=self.ra, dec=self.dec,
-                                          times=self.astropy_time.jd[cadence_mask],
+                                          times=self.time.jd[cadence_mask],
                                           location=location, radius=radius, cache=cache)
         if return_mask:
-            return res, np.in1d(self.astropy_time.jd, res.epoch)
+            return res, np.in1d(self.time.jd, res.epoch)
         return res
 
     def _create_plot(self, method='plot', column='flux', ax=None, normalize=False,
                      xlabel=None, ylabel=None, title='', style='lightkurve',
                      show_colorbar=True, colorbar_label='', offset=None,
-                     **kwargs) -> matplotlib.axes.Axes:
+                     clip_outliers=False, **kwargs) -> matplotlib.axes.Axes:
         """Implements `plot()`, `scatter()`, and `errorbar()` to avoid code duplication.
 
         Parameters
@@ -1296,6 +1383,8 @@ class LightCurve(TimeSeries):
             Offset value to apply to the Y axis values before plotting. Use this
             to avoid light curves from overlapping on the same plot. By default,
             no offset is applies.
+        clip_outliers : bool
+            If ``True``, clip the y axis limit to the 95%-percentile range.
         kwargs : dict
             Dictionary of arguments to be passed to Matplotlib's `plot`,
             `scatter`, or `errorbar` methods.
@@ -1327,14 +1416,14 @@ class LightCurve(TimeSeries):
                 ylabel = "Flux"
             else:
                 ylabel = f"{column}"
-            if normalize or self.meta.get("normalized"):
+            if normalize or self.meta.get('NORMALIZED'):
                 ylabel = "Normalized " + ylabel
             elif (self[column].unit) and (self[column].unit.to_string() != ''):
                 ylabel += f" [{self[column].unit.to_string('latex_inline')}]"
 
         # Default legend label
         if ('label' not in kwargs):
-            kwargs['label'] = self.meta.get('label')
+            kwargs['label'] = self.meta.get('LABEL')
 
         flux = self[column]
         try:
@@ -1384,6 +1473,11 @@ class LightCurve(TimeSeries):
             legend_labels = ax.get_legend_handles_labels()
             if (np.sum([len(a) for a in legend_labels]) != 0):
                 ax.legend(loc='best')
+
+            if clip_outliers and len(flux) > 0:
+                ymin, ymax = np.percentile(flux.value, [2.5, 97.5])
+                margin = 0.05 * (ymax - ymin)
+                ax.set_ylim(ymin - margin, ymax + margin)
 
         return ax
 
@@ -1523,8 +1617,7 @@ class LightCurve(TimeSeries):
         Behind the scenes, the widget uses the AstroPy implementation of BLS [1]_.
 
         This feature only works inside an active Jupyter Notebook.
-        It requires Bokeh v1.0 (or later) and AstroPy v3.1 (or later),
-        which are optional dependencies. An error message will be shown
+        It requires Bokeh v1.0 (or later). An error message will be shown
         if these dependencies are not available.
 
         Parameters
@@ -1543,7 +1636,7 @@ class LightCurve(TimeSeries):
             will be used.
         maximum_period : float or None
             Maximum period to evaluate the BLS to. If None, the time coverage of the
-            lightcurve / 4 will be used.
+            lightcurve / 2 will be used.
         resolution : int
             Number of points to use in the BLS panel. Lower this value for faster
             but less accurate performance. You can also vary this value using the
@@ -1561,11 +1654,10 @@ class LightCurve(TimeSeries):
 
         References
         ----------
-        .. [1] http://docs.astropy.org/en/latest/stats/bls.html
+        .. [1] https://docs.astropy.org/en/stable/timeseries/bls.html
         """
         from .interact_bls import show_interact_widget
-        clean = self.remove_nans()
-        return show_interact_widget(clean, notebook_url=notebook_url, minimum_period=minimum_period,
+        return show_interact_widget(self, notebook_url=notebook_url, minimum_period=minimum_period,
                                     maximum_period=maximum_period, resolution=resolution)
 
     def to_table(self) -> Table:
@@ -1659,9 +1751,9 @@ class LightCurve(TimeSeries):
         power spectrum object.
 
         This method will call either
-        `lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve()` or
-        `lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve()`,
-        which in turn wrap `astropy.stats.LombScargle` and `astropy.stats.BoxLeastSquares`.
+        `LombScarglePeriodogram.from_lightcurve() <lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve>` or
+        `BoxLeastSquaresPeriodogram.from_lightcurve() <lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve>`,
+        which in turn wrap `astropy`'s `~astropy.timeseries.LombScargle` and `~astropy.timeseries.BoxLeastSquares`.
 
         Optional keywords accepted if ``method='lombscargle'`` are:
         ``minimum_frequency``, ``maximum_frequency``, ``mininum_period``,
@@ -1682,8 +1774,8 @@ class LightCurve(TimeSeries):
             and ``'boxleastsquares'``.
         kwargs : dict
             Keyword arguments passed to either
-            `~lightkurve.periodogram.LombScarglePeriodogram` or
-            `~lightkurve.periodogram.BoxLeastSquaresPeriodogram`.
+            `LombScarglePeriodogram <lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve>` or
+            `BoxLeastSquaresPeriodogram <lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve>`.
 
         Returns
         -------
@@ -2008,7 +2100,7 @@ class LightCurve(TimeSeries):
             ax.set_xlabel("Phase")
             ax.set_ylabel("Cycle")
             ax.set_ylim(cyc.max(), 0)
-            ax.set_title(self.meta.get("label"))
+            ax.set_title(self.meta.get('LABEL'))
             a = cyc.max() * 0.1 / 12.
             b = (cyc.max() - cyc.min()) / (bs.max() - bs.min())
             ax.set_aspect(a/b)
@@ -2073,6 +2165,69 @@ class LightCurve(TimeSeries):
             in_transit |= np.abs((self.time.value - tt + hp) % per - hp) < 0.5*dur
 
         return in_transit
+
+    def search_neighbors(self, limit: int = 10, radius: float = 3600.,
+                         **search_criteria):
+        """Search the data archive at MAST for the most nearby light curves.
+
+        By default, the 10 nearest neighbors located within 3600 arcseconds
+        are returned. You can override these defaults by changing the `limit`
+        and `radius` parameters.
+
+        If the LightCurve object is a Kepler, K2, or TESS light curve,
+        the default behavior of this method is to only return light curves
+        obtained during the exact same quarter, campaign, or sector.
+        This is useful to enable coeval light curves to be inspected for
+        spurious noise signals in common between multiple neighboring targets.
+        You can override this default behavior by passing a `mission`,
+        `quarter`, `campaign`, or `sector` argument yourself.
+
+        Please refer to the docstring of `search_lightcurve` for a complete
+        list of search parameters accepted.
+
+        Parameters
+        ----------
+        limit : int
+            Maximum number of results to return.
+        radius : float or `astropy.units.Quantity` object
+            Conesearch radius.  If a float is given it will be assumed to be in
+            units of arcseconds.
+        **search_criteria : kwargs
+            Extra criteria to be passed to `search_lightcurve`.
+
+        Returns
+        -------
+        result : :class:`SearchResult` object
+            Object detailing the neighbor light curves found, sorted by
+            distance from the current light curve.
+        """
+        # Local import to avoid circular dependency
+        from .search import search_lightcurve
+
+        # By default, only return results from the same sector/quarter/campaign
+        if ('mission' not in search_criteria
+                and 'sector' not in search_criteria
+                and 'quarter' not in search_criteria
+                and 'campaign' not in search_criteria):
+            if (self.mission == 'TESS'):
+                search_criteria['sector'] = self.sector
+            elif (self.mission == 'Kepler'):
+                search_criteria['quarter'] = self.quarter
+            elif (self.mission == 'K2'):
+                search_criteria['campaign'] = self.campaign
+
+        # Note: we increase `limit` by one below to account for the fact that the
+        # current light curve will be returned by the search operation
+        log.info(f"Started searching for up to {limit} neighbors within {radius} arcseconds.")
+        result = search_lightcurve(f"{self.ra} {self.dec}",
+                                   radius=radius,
+                                   limit=limit + 1,
+                                   **search_criteria)
+
+        # Filter by distance > 0 to avoid returning the current light curve
+        result = result[result.distance > 0]
+        log.info(f"Found {len(result)} neighbors.")
+        return result
 
 
 class FoldedLightCurve(LightCurve):
@@ -2299,8 +2454,8 @@ class KeplerLightCurve(LightCurve):
                                                     overwrite=overwrite,
                                                     **extra_data)
 
-        hdu[0].header['QUARTER'] = self.meta.get('quarter')
-        hdu[0].header['CAMPAIGN'] = self.meta.get('campaign')
+        hdu[0].header['QUARTER'] = self.meta.get('QUARTER')
+        hdu[0].header['CAMPAIGN'] = self.meta.get('CAMPAIGN')
 
         hdu = _make_aperture_extension(hdu, aperture_mask)
 
@@ -2381,14 +2536,14 @@ class TessLightCurve(LightCurve):
         """
         tess_specific_data = {
             'OBJECT': '{}'.format(self.targetid),
-            'MISSION': self.meta.get('mission'),
-            'RA_OBJ': self.meta.get('ra'),
-            'TELESCOP': self.meta.get('mission'),
-            'CAMERA': self.meta.get('camera'),
-            'CCD': self.meta.get('ccd'),
-            'SECTOR': self.meta.get('sector'),
-            'TARGETID': self.meta.get('targetid'),
-            'DEC_OBJ': self.meta.get('dec'),
+            'MISSION': self.meta.get('MISSION'),
+            'RA_OBJ': self.meta.get('RA'),
+            'TELESCOP': self.meta.get('MISSION'),
+            'CAMERA': self.meta.get('CAMERA'),
+            'CCD': self.meta.get('CCD'),
+            'SECTOR': self.meta.get('SECTOR'),
+            'TARGETID': self.meta.get('TARGETID'),
+            'DEC_OBJ': self.meta.get('DEC'),
             'MOM_CENTR1': self.centroid_col,
             'MOM_CENTR2': self.centroid_row}
 

@@ -31,14 +31,12 @@ def read_generic_lightcurve(filename, flux_column,
     # Raise an exception if the requested extension is invalid
     if isinstance(ext, str):
         validate_method(ext, supported_methods=[hdu.name.lower() for hdu in hdulist])
-    hdu = hdulist[ext]
-    tab = Table.read(hdu, format='fits')
+    tab = Table.read(hdulist[ext], format="fits")
 
     # Make sure the meta data also includes header fields from extension #0
     tab.meta.update(hdulist[0].header)
 
-    # Use lowercase for meta data fields
-    tab.meta = {k.lower(): v for k, v in tab.meta.items()}
+    tab.meta = {k : v for k, v in tab.meta.items()}
 
     # Some KEPLER files used to have a T column instead of TIME.
     if "T" in tab.colnames:
@@ -46,9 +44,12 @@ def read_generic_lightcurve(filename, flux_column,
 
     for colname in tab.colnames:
         # Ensure units have the correct astropy format
-        if tab[colname].unit == 'e-/s':
+        # Speed-up: comparing units by their string representation is 1000x
+        # faster than performing full-blown unit comparison
+        unitstr = str(tab[colname].unit)
+        if unitstr == 'e-/s':
             tab[colname].unit = 'electron/s'
-        if tab[colname].unit == 'pixels':
+        elif unitstr == 'pixels':
             tab[colname].unit = 'pixel'
 
         # Rename columns to lowercase
@@ -64,14 +65,14 @@ def read_generic_lightcurve(filename, flux_column,
 
     # Prepare a special time column
     if not time_format:
-        if hdu.header.get('BJDREFI') == 2454833:
+        if hdulist[ext].header.get('BJDREFI') == 2454833:
             time_format = 'bkjd'
-        elif hdu.header.get('BJDREFI') == 2457000:
+        elif hdulist[ext].header.get('BJDREFI') == 2457000:
             time_format = 'btjd'
         else:
             raise ValueError(f"Input file has unclear time format: {filename}")
     time = Time(tab['time'].data,
-                scale=hdu.header.get('TIMESYS', 'tdb').lower(),
+                scale=hdulist[ext].header.get('TIMESYS', 'tdb').lower(),
                 format=time_format)
     tab.remove_column('time')
 
@@ -90,10 +91,10 @@ def read_generic_lightcurve(filename, flux_column,
     if 'centroid_row' not in tab.columns and centroid_row_column in tab.columns:
         tab.add_column(tab[centroid_row_column], name="centroid_row", index=5)
 
-    tab.meta['label'] = hdulist[0].header.get('OBJECT')
-    tab.meta['mission'] = hdulist[0].header.get('MISSION', hdulist[0].header.get('TELESCOP'))
-    tab.meta['ra'] = hdulist[0].header.get('RA_OBJ')
-    tab.meta['dec'] = hdulist[0].header.get('DEC_OBJ')
-    tab.meta['filename'] = filename
+    tab.meta['LABEL'] = hdulist[0].header.get('OBJECT')
+    tab.meta['MISSION'] = hdulist[0].header.get('MISSION', hdulist[0].header.get('TELESCOP'))
+    tab.meta['RA'] = hdulist[0].header.get('RA_OBJ')
+    tab.meta['DEC'] = hdulist[0].header.get('DEC_OBJ')
+    tab.meta['FILENAME'] = filename
 
     return LightCurve(time=time, data=tab)

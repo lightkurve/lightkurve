@@ -4,7 +4,9 @@ import warnings
 import numpy as np
 
 from astropy.convolution import convolve, Box1DKernel
+from astropy.time import Time, TimeDelta
 from astropy.timeseries import BoxLeastSquares
+import astropy.units as u
 
 from .utils import LightkurveWarning
 
@@ -31,6 +33,45 @@ from .lightcurve import LightCurve
 
 __all__ = ['show_interact_widget']
 
+#
+# Convert Time / Quantity to unitless ones for the use with bokeh
+# Otherwise, Bokeh will complain:
+# - NotImplementedError('cannot make a list of Quantities.  Get list of values with q.value.tolist()')
+# - TypeError('Object of type Time is not JSON serializable')
+# - TypeError('Object of type TimeDelta is not JSON serializable')
+#
+
+def _to_unitless(data):
+    """Convet the values in the data dict to unitless one"""
+    return { key: getattr(val, 'value', val) for key, val in data.items() }
+
+def _to_ColumnDataSource(data):
+    """Convet the values in the data dict to unitless one for use with ColumnDataSource"""
+    return ColumnDataSource(data=_to_unitless(data))
+
+def _update_source(source, data):
+    """Convet the values in the data dict to unitless one and use it to update the given DataSource"""
+    source.data = _to_unitless(data)
+    return source
+
+def _at_ratio(values, ratio):
+    """Return a unitless scalar value that is at the given ratio in the range of the given values.
+
+       Conceptually, it is `max(values) - min(values) * ratio + min(values)`
+       It's frequently used to place the position the help icon of a plot based on the axis' values
+    """
+    if getattr(values, 'end', None) is not None:
+        # case range ,with start / end
+        return (values.end - values.start) * ratio + values.start
+    else:
+        # case plain number array, Time, or Quantity (with .value)
+        result = (np.max(values) - np.min(values)) * ratio + np.min(values)
+        # return raw value without unit
+        return getattr(result, 'value', result)
+
+def _isfinite(val):
+    val_actual = getattr(val, 'value', val)
+    return np.isfinite(val_actual)
 
 def prepare_bls_datasource(result, loc):
     """Prepare a bls result for bokeh plotting
@@ -47,7 +88,7 @@ def prepare_bls_datasource(result, loc):
     bls_source : Bokeh.plotting.ColumnDataSource
         Bokeh style source for plotting
     """
-    bls_source = ColumnDataSource(data=dict(
+    bls_source = _to_ColumnDataSource(data=dict(
                                         period=result['period'],
                                         power=result['power'],
                                         depth=result['depth'],
@@ -70,17 +111,17 @@ def prepare_folded_datasource(folded_lc):
     folded_source : Bokeh.plotting.ColumnDataSource
         Bokeh style source for plotting
     """
-    folded_src = ColumnDataSource(data=dict(
-                                  phase=np.sort(folded_lc.time),
-                                  flux=folded_lc.flux[np.argsort(folded_lc.time)]))
+    folded_src = _to_ColumnDataSource(data=dict(
+                                  phase=folded_lc.time,
+                                  flux=folded_lc.flux))
     return folded_src
 
 
 # Helper functions for help text...
 
 def prepare_lc_help_source(lc):
-    data = dict(time=[(np.max(lc.time) - np.min(lc.time)) * 0.98 + np.min(lc.time)],
-                flux=[(np.max(lc.flux) - np.min(lc.flux)) * 0.9 + np.min(lc.flux)],
+    data = dict(time=[_at_ratio(lc.time, 0.98)],
+                flux=[_at_ratio(lc.flux, 0.95)],
                 boxicon=['https://bokeh.pydata.org/en/latest/_images/BoxZoom.png'],
                 panicon=['https://bokeh.pydata.org/en/latest/_images/Pan.png'],
                 reseticon=['https://bokeh.pydata.org/en/latest/_images/Reset.png'],
@@ -128,12 +169,12 @@ def prepare_lc_help_source(lc):
                                  </div>
                              </div>
                          """])
-    return ColumnDataSource(data=data)
+    return _to_ColumnDataSource(data=data)
 
 
 def prepare_bls_help_source(bls_source, slider_value):
     data = dict(period=[bls_source.data['period'][int(slider_value*0.95)]],
-                power=[(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98 + np.min(bls_source.data['power'])],
+                power=[_at_ratio(bls_source.data['power'], 0.98)],
                 helpme=['?'],
                 help=["""
                              <div style="width: 375px;">
@@ -161,12 +202,12 @@ def prepare_bls_help_source(bls_source, slider_value):
                                  </div>
                              </div>
                          """])
-    return ColumnDataSource(data=data)
+    return _to_ColumnDataSource(data=data)
 
 
 def prepare_f_help_source(f):
-    data = dict(phase=[(np.max(f.time) - np.min(f.time)) * 0.98 + np.min(f.time)],
-                flux=[(np.max(f.flux) - np.min(f.flux)) * 0.98 + np.min(f.flux)],
+    data = dict(phase=[_at_ratio(f.time, 0.98)],
+                flux=[_at_ratio(f.flux, 0.98)],
                 helpme=['?'],
                 help=["""
                         <div style="width: 375px;">
@@ -191,7 +232,17 @@ def prepare_f_help_source(f):
                             </div>
                         </div>
                 """])
-    return ColumnDataSource(data=data)
+    return _to_ColumnDataSource(data=data)
+
+
+def _to_axis_label(label_base, unit):
+    if (unit) and (unit.to_string() != ''):
+        # bokeh does not support latex rendering. astropy's default string tends to be too verbose
+        # so we support a shortform for the typical use case
+        unit_str = "e/s" if unit == u.electron / u.second else unit.to_string()
+        return  f"{label_base} [{unit_str}]"
+    else:
+        return label_base
 
 
 def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, help_source):
@@ -217,11 +268,11 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
     """
     # Make figure
     fig = figure(title='Light Curve', plot_height=300, plot_width=900,
-                 tools="pan,box_zoom,reset",
+                 tools="pan,box_zoom,wheel_zoom,reset",
                  toolbar_location="below",
                  border_fill_color="#FFFFFF", active_drag="box_zoom")
     fig.title.offset = -10
-    fig.yaxis.axis_label = 'Flux (e/s)'
+    fig.yaxis.axis_label = _to_axis_label('Flux', lc.flux.unit)
     if lc.time.format == 'bkjd':
         fig.xaxis.axis_label = 'Time - 2454833 (days)'
     elif lc.time.format == 'btjd':
@@ -278,12 +329,12 @@ def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help
 
     # Build Figure
     fig = figure(title='Folded Light Curve', plot_height=340, plot_width=450,
-                 tools="pan,box_zoom,reset",
+                 tools="pan,box_zoom,wheel_zoom,reset",
                  toolbar_location="below",
                  border_fill_color="#FFFFFF", active_drag="box_zoom")
     fig.title.offset = -10
-    fig.yaxis.axis_label = 'Flux'
-    fig.xaxis.axis_label = 'Phase'
+    fig.yaxis.axis_label = _to_axis_label('Flux', f.flux.unit)
+    fig.xaxis.axis_label = f'Phase [{f.time.format.upper()}]'
 
     # Scatter point for data
     fig.circle('phase', 'flux', line_width=1, color='#191919',
@@ -332,7 +383,7 @@ def make_bls_figure_elements(result, bls_source, help_source):
 
     # Build Figure
     fig = figure(title='BLS Periodogram', plot_height=340, plot_width=450,
-                 tools="pan,box_zoom,tap,reset",
+                 tools="pan,box_zoom,wheel_zoom,tap,reset",
                  toolbar_location="below",
                  border_fill_color="#FFFFFF", x_axis_type='log', active_drag="box_zoom")
     fig.title.offset = -10
@@ -382,6 +433,20 @@ def make_bls_figure_elements(result, bls_source, help_source):
     return fig, vertical_line
 
 
+def _preprocess_lc_for_bls(lc):
+    clean = lc.remove_nans()
+    # convert to  normalized unscaled flux if needed,
+    # so that its scale is the same as the BLS model lc (to be generated),
+    # making it easier to be visualized in the same plot.
+    if not clean.meta.get('NORMALIZED', False):
+        clean = clean.normalize()
+    elif clean.flux.unit != u.dimensionless_unscaled:
+        # case normalized, but in other units (percents, etc.)
+        clean.flux = clean.flux.to(u.dimensionless_unscaled)
+        clean.flux_err = clean.flux_err.to(u.dimensionless_unscaled)
+    return clean
+
+
 def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                          maximum_period=None, resolution=2000):
     """Show the BLS interact widget.
@@ -417,12 +482,24 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                   "you can install bokeh using e.g. `conda install bokeh`.")
         return None
 
+    def _round_strip_unit(val, decimals):
+        return np.round(getattr(val, 'value', val), decimals)
+
+    def _as_1d(time):
+        """Convert scalar Time to a 1-d array, suitable to be used in creating LightCurve"""
+        return time.reshape((1,))
+
+    def _to_lc(time, flux):
+        """Shorthand to create a LightCurve with time and flux used in creating a Model LightCurve"""
+        return LightCurve(time=time, flux=flux)
+
     def _create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
         """Create BLS interact user interface."""
         if minp is None:
             minp = 0.3
         if maxp is None:
-            maxp = (lc.time[-1] - lc.time[0])/2
+            maxp = ((lc.time[-1].value - lc.time[0].value)/2)
+        # TODO: consider to accept Time as minp / maxp, and convert it to unitless days
 
         time_format = ''
         if lc.time.format == 'bkjd':
@@ -459,25 +536,26 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         double_button = Button(label="Double Period", button_type="danger", width=100)
         half_button = Button(label="Half Period", button_type="danger", width=100)
         text_output = Paragraph(text="Period: {} days, T0: {}{}".format(
-                                                    np.round(best_period, 7),
-                                                    np.round(best_t0, 7), time_format),
+                                                    _round_strip_unit(best_period, 7),
+                                                    _round_strip_unit(best_t0, 7), time_format),
                                 width=350, height=40)
 
         # Set up BLS source
         bls_source = prepare_bls_datasource(result, loc)
+        bls_source_units = dict(transit_time_format=result['transit_time'].format,
+                                transit_time_scale=result['transit_time'].scale,
+                                period=result['period'].unit)
         bls_help_source = prepare_bls_help_source(bls_source, npoints_slider.value)
 
         # Set up the model LC
         mf = model.model(lc.time, best_period, duration_slider.value, best_t0)
         mf /= np.median(mf)
         mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
-        model_lc = LightCurve(lc.time[mask], mf[mask])
-        model_lc = model_lc.append(LightCurve([(lc.time[0] - best_t0) + best_period/2], [1]))
-        model_lc = model_lc.append(LightCurve([(lc.time[0] - best_t0) + 3*best_period/2], [1]))
+        model_lc = _to_lc(lc.time[mask], mf[mask])
 
-        model_lc_source = ColumnDataSource(data=dict(
-                                     time=np.sort(model_lc.time),
-                                     flux=model_lc.flux[np.argsort(model_lc.time)]))
+        model_lc_source = _to_ColumnDataSource(data=dict(
+                                     time=model_lc.time,
+                                     flux=model_lc.flux))
 
         # Set up the LC
         nb = int(np.ceil(len(lc.flux)/5000))
@@ -491,21 +569,21 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         f_help_source = prepare_f_help_source(f)
 
         f_model_lc = model_lc.fold(best_period, best_t0)
-        f_model_lc = LightCurve([-0.5], [1]).append(f_model_lc)
-        f_model_lc = f_model_lc.append(LightCurve([0.5], [1]))
+        f_model_lc = _to_lc(_as_1d(f.time.min()), [1]).append(f_model_lc)
+        f_model_lc = f_model_lc.append(_to_lc(_as_1d(f.time.max()), [1]))
 
-        f_model_lc_source = ColumnDataSource(data=dict(
+        f_model_lc_source = _to_ColumnDataSource(data=dict(
                                  phase=f_model_lc.time,
                                  flux=f_model_lc.flux))
 
         def _update_light_curve_plot(event):
             """If we zoom in on LC plot, update the binning."""
             mint, maxt = fig_lc.x_range.start, fig_lc.x_range.end
-            inwindow = (lc.time > mint) & (lc.time < maxt)
+            inwindow = (lc.time.value > mint) & (lc.time.value < maxt)
             nb = int(np.ceil(inwindow.sum()/5000))
             temp_lc = lc[inwindow]
-            lc_source.data = {'time': temp_lc.time[::nb],
-                              'flux': temp_lc.flux[::nb]}
+            _update_source(lc_source, {'time': temp_lc.time[::nb],
+                                       'flux': temp_lc.flux[::nb]})
 
         def _update_folded_plot(event):
             loc = np.argmax(bls_source.data['power'])
@@ -516,8 +594,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             f = lc.fold(best_period, best_t0)
             inwindow = (f.time > minphase) & (f.time < maxphase)
             nb = int(np.ceil(inwindow.sum()/10000))
-            f_source.data = {'phase': f[inwindow].time[::nb],
-                             'flux': f[inwindow].flux[::nb]}
+            _update_source(f_source, {'phase': f[inwindow].time[::nb],
+                                      'flux': f[inwindow].flux[::nb]})
 
         # Function to update the widget
         def _update_params(all=False, best_period=None, best_t0=None):
@@ -530,16 +608,16 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                     return
                 period_values = period_values[ok]
                 result = model.power(period_values, duration_slider.value)
-                ok = np.isfinite(result['power']) & np.isfinite(result['duration']) &\
-                         np.isfinite(result['transit_time']) & np.isfinite(result['period'])
-                bls_source.data = dict(
-                                     period=result['period'][ok],
-                                     power=result['power'][ok],
-                                     duration=result['duration'][ok],
-                                     transit_time=result['transit_time'][ok])
-                loc = np.nanargmax(bls_source.data['power'])
-                best_period = bls_source.data['period'][loc]
-                best_t0 = bls_source.data['transit_time'][loc]
+                ok = _isfinite(result['power']) & _isfinite(result['duration']) &\
+                         _isfinite(result['transit_time']) & _isfinite(result['period'])
+                ok_result = dict(period=result['period'][ok],             # useful for accessing values with units needed later
+                                 power=result['power'][ok],
+                                 duration=result['duration'][ok],
+                                 transit_time=result['transit_time'][ok])
+                _update_source(bls_source, ok_result)
+                loc = np.nanargmax(ok_result['power'])
+                best_period = ok_result['period'][loc]
+                best_t0 = ok_result['transit_time'][loc]
 
                 minpow, maxpow = bls_source.data['power'].min()*0.95,  bls_source.data['power'].max()*1.05
                 fig_bls.y_range.start = minpow
@@ -550,31 +628,31 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             f = lc.fold(best_period, best_t0)
             inwindow = (f.time > minphase) & (f.time < maxphase)
             nb = int(np.ceil(inwindow.sum()/10000))
-            f_source.data = {'phase': f[inwindow].time[::nb],
-                             'flux': f[inwindow].flux[::nb]}
+            _update_source(f_source, {'phase': f[inwindow].time[::nb],
+                                      'flux': f[inwindow].flux[::nb]})
 
             mf = model.model(lc.time, best_period, duration_slider.value, best_t0)
             mf /= np.median(mf)
             mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
-            model_lc = LightCurve(lc.time[mask], mf[mask])
+            model_lc = _to_lc(lc.time[mask], mf[mask])
 
-            model_lc_source.data = {'time': np.sort(model_lc.time),
-                                    'flux': model_lc.flux[np.argsort(model_lc.time)]}
+            _update_source(model_lc_source, {'time': model_lc.time,
+                                             'flux': model_lc.flux})
 
             f_model_lc = model_lc.fold(best_period, best_t0)
-            f_model_lc = LightCurve([-0.5], [1]).append(f_model_lc)
-            f_model_lc = f_model_lc.append(LightCurve([0.5], [1]))
+            f_model_lc = _to_lc(_as_1d(f.time.min()), [1]).append(f_model_lc)
+            f_model_lc = f_model_lc.append(_to_lc(_as_1d(f.time.max()), [1]))
 
-            f_model_lc_source.data = {'phase': f_model_lc.time,
-                                      'flux': f_model_lc.flux}
+            _update_source(f_model_lc_source, {'phase': f_model_lc.time,
+                                               'flux': f_model_lc.flux})
 
-            vertical_line.update(location=best_period)
+            vertical_line.update(location=best_period.value)
             fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(
-                                        np.round(best_period, 7),
-                                        np.round(best_t0, 7), time_format)
+                                        _round_strip_unit(best_period, 7),
+                                        _round_strip_unit(best_t0, 7), time_format)
             text_output.text = "Period: {} days, \t T0: {}{}".format(
-                                        np.round(best_period, 7),
-                                        np.round(best_t0, 7), time_format)
+                                        _round_strip_unit(best_period, 7),
+                                        _round_strip_unit(best_t0, 7), time_format)
 
         # Callbacks
         def _update_upon_period_selection(attr, old, new):
@@ -582,8 +660,9 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             """
             if len(new) > 0:
                 new = new[0]
-                best_period = bls_source.data['period'][new]
-                best_t0 = bls_source.data['transit_time'][new]
+                best_period = bls_source.data['period'][new] * bls_source_units['period']
+                best_t0 = Time(bls_source.data['transit_time'][new],
+                               format=bls_source_units['transit_time_format'], scale=bls_source_units['transit_time_scale'])
                 _update_params(best_period=best_period, best_t0=best_t0)
 
         def _update_model_slider(attr, old, new):
@@ -608,34 +687,33 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         # Help Hover Call Backs
         def _update_folded_plot_help_reset(event):
-            f_help_source.data['phase'] = [(np.max(f.time) - np.min(f.time)) * 0.98 + np.min(f.time)]
-            f_help_source.data['flux'] = [(np.max(f.flux) - np.min(f.flux)) * 0.98 + np.min(f.flux)]
+            f_help_source.data['phase'] = [_at_ratio(f.time, 0.95)]
+            f_help_source.data['flux'] = [_at_ratio(f.flux, 0.95)]
 
         def _update_folded_plot_help(event):
-            f_help_source.data['phase'] = [(fig_folded.x_range.end - fig_folded.x_range.start) * 0.95 + fig_folded.x_range.start]
-            f_help_source.data['flux'] = [(fig_folded.y_range.end - fig_folded.y_range.start) * 0.95 + fig_folded.y_range.start]
+            f_help_source.data['phase'] = [_at_ratio(fig_folded.x_range, 0.95)]
+            f_help_source.data['flux'] = [_at_ratio(fig_folded.y_range, 0.95)]
 
         def _update_lc_plot_help_reset(event):
-            lc_help_source.data['time'] = [(np.max(lc.time) - np.min(lc.time)) * 0.98 + np.min(lc.time)]
-            lc_help_source.data['flux'] = [(np.max(lc.flux) - np.min(lc.flux)) * 0.9 + np.min(lc.flux)]
+            lc_help_source.data['time'] = [_at_ratio(lc.time, 0.98)]
+            lc_help_source.data['flux'] = [_at_ratio(lc.flux, 0.95)]
 
         def _update_lc_plot_help(event):
-            lc_help_source.data['time'] = [(fig_lc.x_range.end - fig_lc.x_range.start) * 0.95 + fig_lc.x_range.start]
-            lc_help_source.data['flux'] = [(fig_lc.y_range.end - fig_lc.y_range.start) * 0.9 + fig_lc.y_range.start]
+            lc_help_source.data['time'] = [_at_ratio(fig_lc.x_range, 0.98)]
+            lc_help_source.data['flux'] = [_at_ratio(fig_lc.y_range, 0.95)]
 
         def _update_bls_plot_help_event(event):
+            # cannot use _at_ratio helper for period, because period is log scaled.
             bls_help_source.data['period'] = [bls_source.data['period'][int(npoints_slider.value*0.95)]]
-            bls_help_source.data['power'] = [(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98
-                                             + np.min(bls_source.data['power'])]
+            bls_help_source.data['power'] = [_at_ratio(bls_source.data['power'], 0.98)]
 
         def _update_bls_plot_help(attr, old, new):
             bls_help_source.data['period'] = [bls_source.data['period'][int(npoints_slider.value*0.95)]]
-            bls_help_source.data['power'] = [(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98
-                                             + np.min(bls_source.data['power'])]
+            bls_help_source.data['power'] = [_at_ratio(bls_source.data['power'], 0.98)]
 
         # Create all the figures.
         fig_folded = make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, f_help_source)
-        fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(np.round(best_period, 7), np.round(best_t0, 5), time_format)
+        fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(_round_strip_unit(best_period, 7), _round_strip_unit(best_t0, 5), time_format)
         fig_bls, vertical_line = make_bls_figure_elements(result, bls_source, bls_help_source)
         fig_lc = make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, lc_help_source)
 
@@ -652,7 +730,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         npoints_slider.on_change('value', _update_model_slider)
 
         # Make sure the vertical line always goes to the best period.
-        vertical_line.update(location=best_period)
+        vertical_line.update(location=best_period.value)
 
         # If we pan in the BLS panel, update everything
         fig_bls.on_event(PanEnd, _update_model_slider_EVENT)
@@ -685,6 +763,10 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                             [Spacer(width=70), duration_slider, Spacer(width=50), npoints_slider],
                             [Spacer(width=70), double_button, Spacer(width=70), half_button, Spacer(width=300), text_output]
                                 ]))
+
+
+    # TODO: pre-process LC
+    lc = _preprocess_lc_for_bls(lc)
 
     output_notebook(verbose=False, hide_banner=True)
     return show(_create_interact_ui, notebook_url=notebook_url)

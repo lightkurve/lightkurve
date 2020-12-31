@@ -149,9 +149,9 @@ def test_tpf_zeros():
     lc = tpf.to_lightcurve(aperture_mask="all")
     assert len(lc.time) == len(lc.flux)
     assert np.all(lc.time == tpf.time)
-    assert np.all(lc.flux == 0)
+    assert np.all(np.isnan(lc.flux)) # we expect all NaNs because of #874
     # The default QUALITY bitmask should have removed all NaNs in the TIME
-    #assert ~np.any(np.isnan(tpf.time))
+    assert ~np.any(np.isnan(tpf.time.value))
 
 @pytest.mark.parametrize("centroid_method", [("moments"), ("quadratic")])
 def test_tpf_ones(centroid_method):
@@ -687,7 +687,7 @@ def test_missing_pipeline_mask():
     tpf = search_tesscut("Proxima Cen", sector=12).download(cutout_size=1)
     lc = tpf.to_lightcurve()
     assert np.isfinite(lc.flux).any()
-    assert lc.meta.get('aperture_mask', None) == 'threshold'
+    assert lc.meta.get('APERTURE_MASK', None) == 'threshold'
 
     with pytest.raises(ValueError):
         # if aperture_mask is explicitly set as pipeline,
@@ -715,5 +715,22 @@ def test_parse_numeric_aperture_masks():
 def test_tpf_meta():
     """Can we access meta data using tpf.meta?"""
     tpf = read(filename_tpf_one_center)
-    assert tpf.meta.get('mission') == 'K2'
-    assert tpf.meta.get('channel') == 45
+    assert tpf.meta.get('MISSION') == 'K2'
+    assert tpf.meta['MISSION'] == 'K2'
+    assert tpf.meta.get('mission', None) is None  # key is case in-sensitive
+    assert tpf.meta.get('CHANNEL') == 45
+    # ensure meta is read-only view of the underlying self.hdu[0].header
+    with pytest.raises(TypeError):
+        tpf.meta['CHANNEL'] = 44
+    with pytest.raises(TypeError):
+        tpf.meta['KEY-NEW'] = 44
+
+
+def test_estimate_background():
+    """Verifies tpf.estimate_background()."""
+    # Create a TPF with 100 electron/second in every pixel
+    tpf = read(filename_tpf_all_zeros) + 100.
+    # The resulting background should be 100 e/s/pixel
+    bg = tpf.estimate_background(aperture_mask='all')
+    assert_array_equal(bg.flux.value, 100)
+    assert bg.flux.unit == tpf.flux.unit / u.pixel

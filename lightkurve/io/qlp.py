@@ -1,22 +1,23 @@
-"""Reader for K2 EVEREST light curves."""
-from ..lightcurve import KeplerLightCurve
-from ..utils import KeplerQualityFlags
+"""Reader for MIT Quicklook Pipeline (QLP) light curve files.
+
+Website: http://archive.stsci.edu/hlsp/qlp
+Product description: https://archive.stsci.edu/hlsps/qlp/hlsp_qlp_tess_ffi_all_tess_v1_data-prod-desc.pdf
+"""
+from ..lightcurve import TessLightCurve
+from ..utils import TessQualityFlags
 
 from .generic import read_generic_lightcurve
 
 
-def read_everest_lightcurve(filename,
-                            flux_column="flux",
-                            quality_bitmask="default",
-                            **kwargs):
-    """Read an EVEREST light curve file.
-
-    More information: https://archive.stsci.edu/hlsp/everest
+def read_qlp_lightcurve(filename,
+                        flux_column="kspsap_flux",
+                        quality_bitmask="default"):
+    """Returns a `TessLightCurve`.
 
     Parameters
     ----------
     filename : str
-        Local path or remote url of a Kepler light curve FITS file.
+        Local path or remote url of a QLP light curve FITS file.
     flux_column : 'pdcsap_flux' or 'sap_flux'
         Which column in the FITS file contains the preferred flux data?
     quality_bitmask : str or int
@@ -32,31 +33,26 @@ def read_everest_lightcurve(filename,
             * "hardest": removes all data that has been flagged
               (`quality_bitmask=2096639`). This mask is not recommended.
 
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-
-    Returns
-    -------
-    lc : `KeplerLightCurve`
-        A populated light curve object.
+        See the :class:`TessQualityFlags` class for details on the bitmasks.
     """
     lc = read_generic_lightcurve(filename,
                                  flux_column=flux_column,
-                                 quality_column='quality',
-                                 cadenceno_column='cadn',
-                                 time_format='bkjd')
+                                 time_format='btjd')
 
     # Filter out poor-quality data
     # NOTE: Unfortunately Astropy Table masking does not yet work for columns
     # that are Quantity objects, so for now we remove poor-quality data instead
     # of masking. Details: https://github.com/astropy/astropy/issues/10119
-    quality_mask = KeplerQualityFlags.create_quality_mask(
+    quality_mask = TessQualityFlags.create_quality_mask(
                                 quality_array=lc['quality'],
                                 bitmask=quality_bitmask)
     lc = lc[quality_mask]
 
-    lc.meta['LABEL'] = '{} (EVEREST)'.format(lc.meta.get('OBJECT'))
-    lc.meta['TARGETID'] = lc.meta.get('KEPLERID')
+    lc.meta['TARGETID'] = lc.meta.get('TICID')
     lc.meta['QUALITY_BITMASK'] = quality_bitmask
     lc.meta['QUALITY_MASK'] = quality_mask
 
-    return KeplerLightCurve(data=lc, **kwargs)
+    # QLP light curves are normalized by default
+    lc.meta['NORMALIZED'] = True
+
+    return TessLightCurve(data=lc)
