@@ -2,7 +2,8 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS    = -j auto
+#SPHINXOPTS    = -j auto    # PARALLEL BUILDS DO NOT WORK IN RECENT SPHINX VERSIONS DUE TO A SECURITY ISSUE
+SPHINXOPTS    =
 SPHINXBUILD   = poetry run python -m sphinx
 SPHINXPROJ    = lightkurve
 SOURCEDIR     = source
@@ -31,4 +32,4 @@ clean:
 	# Remove previous output
 	-rm -rf $(BUILDDIR)/*
 	# Force autogenerating the API docs
-	-rm source/api/lightkurve.*
+	-rm source/reference/api/*
