@@ -74,6 +74,7 @@ The following methods all return a new `LightCurve` object.
   :toctree: api/
    
   LightCurve.append
+  LightCurve.copy
   LightCurve.bin
   LightCurve.fill_gaps
   LightCurve.flatten
@@ -96,6 +97,8 @@ Conversions
   LightCurve.to_periodogram
   LightCurve.to_seismology
   LightCurve.to_table
+  LightCurve.read
+  LightCurve.write
 
 
 
