@@ -71,5 +71,5 @@ lightkurve documentation
 
     quickstart
     tutorials/index
-    api/index
+    reference/index
     about/index
