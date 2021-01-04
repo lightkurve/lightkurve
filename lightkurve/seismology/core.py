@@ -66,6 +66,10 @@ class Seismology(object):
         Periodogram to be analyzed. Must be background-corrected,
         e.g. using `periodogram.flatten()`.
     """
+
+    periodogram = None
+    """The periodogram from which seismological parameters are being extracted."""
+
     def __init__(self, periodogram):
         if not isinstance(periodogram, SNRPeriodogram):
             warnings.warn("Seismology received a periodogram which does not appear "
@@ -85,7 +89,7 @@ class Seismology(object):
 
     @staticmethod
     def from_lightcurve(lc, **kwargs):
-        """Returns a `Seismology` object given a `~lightkurve.lightcurve.LightCurve` object."""
+        """Returns a `Seismology` object given a `LightCurve`."""
         log.info("Building a Seismology object directly from a light curve "
                  "uses default periodogram parameters. For further tuneability, "
                  "create a periodogram object first, using `to_periodogram`.")
