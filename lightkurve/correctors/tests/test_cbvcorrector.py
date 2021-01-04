@@ -21,7 +21,7 @@ from ..designmatrix import DesignMatrix
 from ..cbvcorrector import download_kepler_cbvs, download_tess_cbvs, \
     CotrendingBasisVectors, KeplerCotrendingBasisVectors, \
     TessCotrendingBasisVectors
-from ..cbvcorrector import compute_correlation, CBVCorrector
+from ..cbvcorrector import CBVCorrector
 
 
 #*******************************************************************************
@@ -216,25 +216,6 @@ def test_cbv_retrieval():
 #*******************************************************************************
 #*******************************************************************************
 # CBVCorrector Unit Tests
-
-def test_compute_correlation():
-    
-    # Fully correlated matrix
-    fluxMatrix = np.array([[1,1,1,1], [1,1,1,1], [1,1,1,1], [1,1,1,1]])
-    correlation_matrix = compute_correlation(fluxMatrix)
-    assert np.all(correlation_matrix == 1.0)
-
-    # Partially correlated
-    fluxMatrix = np.array([[ 1.0, -1.0,  1.0, -1.0], 
-                           [-1.0,  1.0,  1.0, -1.0], 
-                           [ 1.0, -1.0,  1.0, -1.0], 
-                           [-1.0,  1.0, -1.0,  1.0]])
-    correlation_matrix = compute_correlation(fluxMatrix)
-    correlation_truth = np.array([[ 1.0, -1.0,  0.5, -0.5], 
-                           [-1.0,  1.0, -0.5,  0.5], 
-                           [ 0.5, -0.5,  1.0, -1.0], 
-                           [-0.5,  0.5, -1.0,  1.0]])
-    assert_allclose(correlation_matrix, correlation_truth)
 
 def test_CBVCorrector():
 

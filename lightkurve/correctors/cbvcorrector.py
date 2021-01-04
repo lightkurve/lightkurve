@@ -25,12 +25,13 @@ from ..utils import channel_to_module_output, validate_method
 from ..search import search_lightcurve
 from .regressioncorrector import RegressionCorrector
 from ..collections import LightCurveCollection
+from .metrics import overfit_metric_lombscargle, underfit_metric_neighbors, minTargetsError
 
 log = logging.getLogger(__name__)
 
 __all__ = ['CBVCorrector', 'CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
         'TessCotrendingBasisVectors', 'download_kepler_cbvs',
-        'download_tess_cbvs', 'compute_correlation']
+        'download_tess_cbvs']
 
 #*******************************************************************************
 # CBV Corrector Class
@@ -458,7 +459,7 @@ class CBVCorrector(RegressionCorrector):
         # Only display over- or under-fitting scores if requested to optimize
         # for each
         if (self.optimization_params['target_over_score'] > 0):
-            self.over_fitting_score = self.over_fitting_metric(nSamples=10)
+            self.over_fitting_score = self.over_fitting_metric(n_samples=10)
             print('Optimized Over-fitting metric: {}'.format(self.over_fitting_score))
         else:
             self.over_fitting_score = -1.0
@@ -475,22 +476,16 @@ class CBVCorrector(RegressionCorrector):
 
         return self.corrected_lc
 
+    def over_fitting_metric(self, 
+            n_samples: int = 10):
+        """ Computes the over-fitting metric using 
+        metrics.overfit_metric_lombscargle
 
-    def over_fitting_metric(self, nSamples=10):
-        """ Uses a LombScarglePeriodogram to assess the change in broad-band
-        power in a corrected light curve (in self.corrected_lc) to measure 
-        degree of over-fitting.
-
-        The to_periodogram Lomb-Scargle method is used and the sampling band is
-        from one frequency separation to the Nyquist frequency
-
-        This over-fitting goodness metric is callibrated such that a metric
-        value of 0.5 means the introduced noise due to over-fitting is at the
-        same power level as the uncertainties in the light curve.
+        See that function for a description of the algorithm.
 
         Parameters
         ----------
-        nSamples : int
+        n_samples : int
             The number of times to compute and average the metric
             This can stabalize the value, defaut = 10
 
@@ -506,102 +501,39 @@ class CBVCorrector(RegressionCorrector):
                     'correct first')
             return None
 
-        # The fit can sometimes result in NaNs
-        # Also ignore masked cadences
-        # Also median normalize original and correctod LCs
+        # Ignore masked cadences
         orig_lc         = self.lc.copy()
         orig_lc         = orig_lc[self.cadence_mask]
-        orig_lc         = orig_lc.remove_nans().normalize()
-        orig_lc         -= 1.0
         corrected_lc    = self.corrected_lc.copy()
         corrected_lc    = corrected_lc[self.cadence_mask]
-        corrected_lc    = corrected_lc.remove_nans().normalize()
-        corrected_lc    -= 1.0
-        if (len(corrected_lc.flux) == 0):
-            return 1.0
 
-        # Perform the measurement multiple times and averge to stabalize the metric
+        return overfit_metric_lombscargle (orig_lc, corrected_lc, n_samples=n_samples)
 
-        metric_per_iter = np.full_like(np.arange(nSamples), np.nan, dtype=np.double)
-        for idx in np.arange(nSamples):
+    def under_fitting_metric(self, 
+            radius: float = None, 
+            min_targets: int = 30,
+            max_targets: int = 50):
+        """  Computes the under-fitting metric using 
+        metrics.underfit_metric_neighbors
 
-            pgOrig = orig_lc.to_periodogram()
-            # Use the same periods in the corrected flux as just used in the
-            # original flux
-            pgCorrected = corrected_lc.to_periodogram(frequency=pgOrig.frequency)
-            
-            # Get an estimate of the PSD at the uncertainties limit
-            # The raw and corrected uncertainties should be essentially identical so 
-            # use the corrected
-            # TODO: the periodogram of WGN should be analytical to compute!
-            nNonGappedCadences = len(orig_lc.flux)
-            meanCorrectedUncertainties = np.nanmean(corrected_lc.flux_err)
-            WGNCorrectedUncert = (np.random.randn(nNonGappedCadences,1) * 
-                    meanCorrectedUncertainties).T[0]
-            model_err   = np.zeros(nNonGappedCadences)
-            noise_lc = LightCurve(time=orig_lc.time, flux=WGNCorrectedUncert, flux_err=model_err)
-            pgCorrectedUncert = noise_lc.to_periodogram()
-            meanCorrectedUncertPower = np.nanmean(np.array(pgCorrectedUncert.power))
-            
-            # Compute the change in power
-            pgChange = np.array(pgCorrected.power) - np.array(pgOrig.power)
+        See that function for a description of the algorithm.
 
-            # Ignore nans
-            pgChange = pgChange[~np.isnan(pgChange)]
-            
-            # If no increase in power in ANY bands then return a perfect loss
-            # function
-            if (len(np.nonzero(pgChange>0.0)[0]) == 0):
-                metric_per_iter[idx] = 0.0
-                continue
-            
-            # We are only concerned with bands where the power increased so
-            # when(pgCorrected - pgOrig) > 0 
-            # Normalize by the noise in the uncertainty
-            # We want the goodness to begin to degrade when the introduced 
-            # noise is greater than the uncertainties.
-            # So, when Sigmoid > 0.5 (given twiceSigmoidInv defn.)
-            metric_per_iter[idx] = (np.sum(pgChange[pgChange>0.0]) / 
-                    ((len(np.nonzero(pgChange>0.0)[0]))*meanCorrectedUncertPower))
+        For TESS, the default radius is 5000 arcseconds.
+        For Kepler/K2, the default radius is 1000 arcseconds
 
-        metric = np.mean(metric_per_iter)
-
-        
-        # We want the goodness to span (0,1]
-        # Use twice a reversed sigmoid to get a [0,1] range mapped from a [0,inf) range
-        def sigmoidInv(x): return 2.0 / (1 + np.exp(x))
-        # Make sure maximum score is 1.0
-        metric = sigmoidInv(np.max([metric, 0.0]))
-
-        return metric
-    
-    def under_fitting_metric(self, search_radius=None, min_targets=30,
-            max_targets=50, clear_cache=False):
-        """ This goodness metric measures the degree of under-fitting of the
-        CBVs to the light curve. It does so by measuring the mean residual target to
-        target Pearson correlation between the target under study and a selection of
-        neighboring SPOC SAP target light curves.
-
-        This function will begin with the given search_radius in arcseconds and
+        This function will begin with the given radius in arcseconds and
         finds all neighboring targets. If not enough were found (< min_targets)
-        the search_radius is increased until a minimum number are found.
+        the radius is increased until a minimum number are found.
 
-        For TESS, the default search_radius is 5000 arcseconds.
-        For Kepler/K2, the default search_radius is 1000 arcseconds
-
-        The downloaded neighboring targets will normally be "aligned" to the
-        corrected_lc meaning the cadence numbers are used to align the targets
+        The downloaded neighboring targets will be "aligned" to the
+        corrected_lc, meaning the cadence numbers are used to align the targets
         to the corrected_lc. However, if the CBVCorrector object was
         instantiated with interpolated_cbvs=True then the targets will be
         interpolated to the corrected_lc cadence times.
 
-        The returned under-fitting goodness metric is callibrated such that a
-        value of 0.95 means the residual correlations in the target is
-        equivalent to chance correlations of White Gaussian Noise.
-
         Parameters
         ----------
-        search_radius : float
+        radius : float
             Search radius to find neighboring targets in arcseconds
         min_targets : float
             Minimum number of targets to use in correlation metric
@@ -610,10 +542,6 @@ class CBVCorrector(RegressionCorrector):
             Maximum number of targets to use in correlation metric
             Using too many can slow down the metric due to large data
             download. Default = 50
-        clear_cache : bool
-            If true then force the method to re-find the neighboring targets.
-            Otherwise, the neighboring targets are only found once the first
-            time this function is called within the object.
 
         Returns
         -------
@@ -627,160 +555,55 @@ class CBVCorrector(RegressionCorrector):
                     'correct first')
             return None
 
-        # Set default search_radius if one is not provided.
-        if (search_radius is None):
+        # Set default radius if one is not provided.
+        if (radius is None):
             if (self.lc.mission == 'TESS'):
-                search_radius = 5000
+                radius = 5000
             else:
-                search_radius = 1000
+                radius = 1000
 
-        # Make a copy of search_radius because it changes locally
-        dynamic_search_radius = search_radius
+        if self.interpolated_cbvs:
+            interpolate = True
+        else:
+            interpolate = False
+
+        # Make a copy of radius because it changes locally
+        dynamic_search_radius = radius
         # Max search radius is the diagonal distance along a CCD in arcseconds
         # 1 pixel in TESS is 21.09 arcseconds
         # 1 pixel in Kepler/K2 is 3.98 arcseconds
         if (self.lc.mission == 'TESS'):
             # 24 degrees of a TESS CCD array (2 CCD's wide) is 86,400 arcseconds
             max_search_radius = np.sqrt(2) * (86400/2.0)
-        else:
+        elif (self.lc.mission == 'Kepler' or self.lc.mission == 'Kepler'):
             # One Kepler CCD spans 4,096 arcseconds
             max_search_radius = np.sqrt(2) * 4096
+        else:
+            raise Exception('Unknown mission')
 
-        coord_str = '{} {}'.format(self.lc.meta['ra'], self.lc.meta['dec'])
-
-        # Retrieve SAP light curves in a neighborhood around the target
-        # Only do this once, check if lc set is already cached
-        # TODO: Consider taking a cut on magnitude as well
-        if (self.lc_neighborhood is None or clear_cache):
-            continue_searching = True
-            while continue_searching:
-                if (self.lc.mission == 'TESS'):
-                    search_result = search_lightcurve(coord_str,
-                        mission=self.lc.mission, sector=self.lc.sector,
-                        radius=dynamic_search_radius, limit=max_targets)
-                elif (self.lc.mission == 'Kepler'):
-                    search_result = search_lightcurve(coord_str,
-                        mission=self.lc.mission, quarter=self.lc.quarter,
-                        radius=dynamic_search_radius, limit=max_targets)
-                elif (self.lc.mission == 'K2'):
-                    search_result = search_lightcurve(coord_str,
-                        mission=self.lc.mission, campaign=self.lc.campaign,
-                        radius=dynamic_search_radius, limit=max_targets)
-                # Check if too few found
-                if (len(search_result) < min_targets):
-                    if (dynamic_search_radius > max_search_radius):
-                        # hit the edge fo the CCD, we have to give up
-                        raise Exception('Not enough neighboring targets were '
-                            'found. under_fitting_metric failed')
-                    # Too few found, increase search radius
-                    dynamic_search_radius *= 1.5
-                else:
-                    continue_searching = False
-                
-            print('Found {} neighboring targets for under-fitting '
-                    'metric'.format(len(search_result)))
-            print('Downloading... this might take a while')
-            lcfCol = search_result.download_all(flux_column='sap_flux')
-
-            lc_neighborhood = []
-            lc_neighborhood_flux = []
-            # Extract SAP light curves
-            # We want zero-centered median normalized light curves
-            for lc in lcfCol:
-                lcSAP = lc.remove_nans().normalize()
-                lcSAP.flux -= 1.0
-                lc_neighborhood.append(lcSAP)
-                # Align or interpolate the neighboring target with the target under study
-                if self.interpolated_cbvs:
-                    # Interpolate to corrected_lc cadence times
-                    fInterp = PchipInterpolator(lc_neighborhood[-1].time.value,
-                            lc_neighborhood[-1].flux.value, extrapolate=False)
-                    lc_neighborhood_flux.append(fInterp(self.corrected_lc.time.value))
-                else:
-                    # The CBVs were aligned so also align the neighboring
-                    # lightcurves
-                    lc_trim_mask = np.in1d(lc_neighborhood[-1].cadenceno, 
-                            self.corrected_lc.cadenceno)
-                    lc_neighborhood_flux.append(lc_neighborhood[-1][lc_trim_mask].flux.value)
-
-            # Store the unmolested lightcurve neighborhood but also save the
-            # aligned or interpolated neighborhood flux
-            self.lc_neighborhood = LightCurveCollection(lc_neighborhood)
-            self.lc_neighborhood_flux = lc_neighborhood_flux 
-
-            
-            print('Neighboring targets ready for use')
-
+        # Ignore masked cadences
+        corrected_lc    = self.corrected_lc.copy()
+        corrected_lc    = corrected_lc[self.cadence_mask]
         
-        # If there happens to be any cadences in the corrected_lc
-        # that are not in the neighboring targets then those need to
-        # be NaNed.
-        # If we interpolated the CBVs then this should not occur
-        corrected_lc = self.corrected_lc.copy()
-        if not self.interpolated_cbvs:
-            corrected_lc_trim_mask = np.logical_not(np.in1d(self.corrected_lc.cadenceno,
-                    self.lc_neighborhood[0].cadenceno))
-            corrected_lc.flux.value[corrected_lc_trim_mask] = np.nan
-
-
-        # Create fluxMatrix. The last entry is the target under study
-        fluxMatrix = np.zeros((len(self.lc_neighborhood_flux[0]),
-            len(self.lc_neighborhood_flux)+1))
-        for idx in np.arange(len(fluxMatrix[0,:])-1):
-            fluxMatrix[:,idx] = self.lc_neighborhood_flux[idx]
-        # Add in target under study, and median normalize it
-        fluxMatrix[:,-1] = corrected_lc.normalize().flux
-        fluxMatrix[:,-1] -= 1.0
-
-        # Ignore masked cadences and NaNs
-        mask = np.logical_and(self.cadence_mask,
-                ~np.isnan(corrected_lc.flux))
-        fluxMatrix = fluxMatrix[mask,:]
-
-        # Determine the target-target correlation between target and
-        # neighborhood
-        correlationMatrix = compute_correlation(fluxMatrix)
-
-        # The selection basis for targets used for the PDC-MAP SVD  uses median
-        # absolute correlation per star.  However, here we wish to overemphasize
-        # any residual correlation between a handfull of targets and not the
-        # overall correlation (which should almost always be low).
-
-        # We want a residual correlation larger than random correlations of WGN
-        # to mean a meaningful correlation. The median Pearson correlation of
-        # WGN of nCadences is approximated by the equation: 
-        # 0.0010288 + 0.80304 nCadences^ -0.50128
-        nCadences = len(fluxMatrix[:,0])
-        beta = [0.0007, 0.8083, -0.5023]
-        WGNCorrelation = (beta[0]+beta[1]*(nCadences**(beta[2])))
-
-        # badLimit is the goodness value for WGN correlations
-        # I.e. anything above this goodness value is equivalent to random correlations
-        # I.e. 0.95 = sigmoidInv(WGNCorr * correlationScale)
-        badLimit = 0.95
-        correlationScale = 1 / (WGNCorrelation) * np.log((2.0 / badLimit) - 1.0)
-
-        # Over-emphasize any individual correlation groups. Note the power of 
-        # three after taking the absolute value
-        # of the correlation. Also, the mean is used so that outliers are *not* ignored. 
-        # Zero diagonal elements
-        correlationMatrix = (np.tril(correlationMatrix, k=-1) + 
-                                np.triu(correlationMatrix, k=+1))
-
-
-        # Add up the correlation over all targets ignoring NaNs (no corrected fit)
-        correlation = correlationScale*np.nanmean(np.abs(correlationMatrix)**3, axis=0)
-
-        # We only want the last entry, which is for the target under study
-        correlation = correlation[-1]
-
-        # We want the goodness to span (0,1]
-        # Use twice a reversed sigmoid to get a [0,1] range mapped from a [0,inf) range
-        def sigmoidInv(x): return 2.0 / (1 + np.exp(x))
-        metric = sigmoidInv(correlation)
+        # Dynamically increase radius until min_targets reached.
+        continue_searching = True
+        while (continue_searching):
+            try:
+                metric = underfit_metric_neighbors (corrected_lc, 
+                            dynamic_search_radius, min_targets, max_targets, 
+                            interpolate)
+            except minTargetsError:
+                # Too few targets found, try increasing search radius
+                if (dynamic_search_radius > max_search_radius):
+                    # Hit the edge of the CCD, we have to give up
+                    raise Exception('Not enough neighboring targets were '
+                        'found. under_fitting_metric failed')
+                # Too few found, increase search radius
+                dynamic_search_radius *= 1.5
+            else:
+                continue_searching = False
 
         return metric
-
 
     def _correct_initialization(self, cbv_type='SingleScale', cbv_indices='ALL',
             ext_dm=None):
@@ -966,7 +789,7 @@ class CBVCorrector(RegressionCorrector):
         # Do not compute and ignore if target score < 0
         if (self.optimization_params['target_over_score'] > 0):
             overMetric = self.over_fitting_metric(
-                nSamples=self.optimization_params['over_metric_nSamples'])
+                n_samples=self.optimization_params['over_metric_nSamples'])
         else: 
             overMetric = 1.0
 
@@ -1064,7 +887,7 @@ class CBVCorrector(RegressionCorrector):
             cbvCorrectorCopy.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices, 
                                         alpha=thisAlpha, ext_dm=ext_dm,
                                         cadence_mask=cadence_mask)
-            overMetric.append(cbvCorrectorCopy.over_fitting_metric(nSamples=1))
+            overMetric.append(cbvCorrectorCopy.over_fitting_metric(n_samples=1))
             underMetric.append(cbvCorrectorCopy.under_fitting_metric())
 
         # plot both
@@ -1117,34 +940,6 @@ class CBVCorrector(RegressionCorrector):
             dict_string += '\t{} = {}\n'.format(key, dictionary[key])
         
         return dict_string
-
-#*******************************************************************************
-#*******************************************************************************
-#*******************************************************************************
-def compute_correlation(fluxMatrix):
-    """  Finds the empirical target to target flux time series Pearson correlation.
-
-    Parameters
-    ----------
-    fluxMatrix : float 2-d array[ntargets,ncadences]
-        The matrix of target flux. There should be no gaps or Nans
-
-    Returns
-    -------
-    correlation_matrix : [float 2-d array] (nTargets x nTargets)
-        The target-target correlation
-    """
-
-    nCadences = len(fluxMatrix[:,0])
-
-    # Scale each flux value by the RMS flux for the given target.
-    rmsFlux = np.sqrt(np.sum(fluxMatrix**2.0, axis=0) / nCadences)
-    unitNormFlux = fluxMatrix / np.tile(rmsFlux, (nCadences, 1))
-
-    correlation_matrix = unitNormFlux.T.dot(unitNormFlux) / nCadences
-
-    return correlation_matrix
-
 
 #*******************************************************************************
 #*******************************************************************************

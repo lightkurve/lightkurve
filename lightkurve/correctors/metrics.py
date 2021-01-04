@@ -130,17 +130,13 @@ def underfit_metric_neighbors(
     target Pearson correlation between the target under study and a selection of
     neighboring SPOC SAP target light curves.
 
-    This function will begin with the given search_radius in arcseconds and
-    finds all neighboring targets. If not enough were found (< min_targets)
-    the search_radius is increased until a minimum number are found.
-
-    For TESS, the default search_radius is 5000 arcseconds.
-    For Kepler/K2, the default search_radius is 1000 arcseconds
+    This function will search within the given radiu in arceseconds and find the 
+    min_targets nearest targets up until max_targets is reached. If less than 
+    min_targets is found a minTargetsError Exception is raised.
 
     The downloaded neighboring targets will normally be "aligned" to the
-    corrected_lc meaning the cadence numbers are used to align the targets
-    to the corrected_lc. However, if the CBVCorrector object was
-    instantiated with interpolated_cbvs=True then the targets will be
+    corrected_lc, meaning the cadence numbers are used to align the targets
+    to the corrected_lc. However, if interpolate=True then the targets will be
     interpolated to the corrected_lc cadence times.
 
     The returned under-fitting goodness metric is callibrated such that a
@@ -249,6 +245,8 @@ def underfit_metric_neighbors(
 
     return metric
 
+# Custom exception to track when minimum targets is not reached
+class minTargetsError(Exception): pass
 
 def _unique_key_for_processing_neighbors(
     corrected_lc: LightCurve,
@@ -273,6 +271,8 @@ def _download_and_preprocess_neighbors(
     flux_column: str = "sap_flux",
 ):
     """Returns a collection of neighboring light curves.
+
+    If less than min_targets a minTargetsError Exception is raised.
 
     Parameters
     ----------
@@ -302,7 +302,7 @@ def _download_and_preprocess_neighbors(
     """
     search = corrected_lc.search_neighbors(limit=max_targets, radius=radius)
     if len(search) < min_targets:
-        raise ValueError(
+        raise minTargetsError(
             f"Unable to find at least {min_targets} neighbors within {radius} arcseconds radius."
         )
     log.info(
