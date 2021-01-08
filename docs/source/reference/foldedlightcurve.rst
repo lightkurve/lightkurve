@@ -13,6 +13,10 @@ and `~FoldedLightCurve.even_mask` attributes.
 The class also overrides the plotting methods to provide defaults that are
 suitable for plotting phase-folded data.
 
+
+Constructor
+~~~~~~~~~~~
+
 .. autosummary::
    :toctree: api/
 

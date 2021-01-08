@@ -33,8 +33,7 @@ class SearchError(Exception):
 
 
 class SearchResult(object):
-    """Container for the results returned by `search_targetpixelfile`,
-    `search_lightcurve`, or `search_tesscut`.
+    """Container for the results returned by the search functions.
 
     The purpose of this class is to provide a convenient way to inspect and
     download products that have been identified using one of the data search
@@ -42,10 +41,14 @@ class SearchResult(object):
 
     Parameters
     ----------
-    table : `astropy.table.Table` object
+    table : `~astropy.table.Table` object
         Astropy table returned by a join of the astroquery `Observations.query_criteria()`
         and `Observations.get_product_list()` methods.
     """
+    
+    table = None
+    """`~astropy.table.Table` containing the full search results returned by the MAST API."""
+
     def __init__(self, table=None):
         if table is None:
             self.table = Table()
