@@ -128,6 +128,10 @@ html_title = "Lightkurve"
 
 html_static_path = ['_static']
 
+html_css_files = [
+    'css/custom.css',
+]
+
 # Raw files we want to copy using the sphinxcontrib-rawfiles extension:
 # - CNAME tells GitHub the domain name to use for hosting the docs
 # - .nojekyll prevents GitHub from hiding the `_static` dir
