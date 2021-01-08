@@ -4,7 +4,7 @@
 API
 ===
 
-This page gives an overview of all public lightkurve objects, functions and
+This page gives an overview of all lightkurve objects, functions and
 methods.
 
 
@@ -19,7 +19,6 @@ methods.
    seismology
    correctors
    misc
-   genindex
    
 
 If you are looking for a specific class or function not listed here, try consulting the API index or search page:

@@ -29,6 +29,7 @@ which provides an easy way to select and download data.
 .. autosummary::
   :toctree: api/
 
+  SearchResult
   SearchResult.download
   SearchResult.download_all
 
@@ -52,3 +53,4 @@ For example, a search result can be filtered by exposure time using
   SearchResult.distance
   SearchResult.ra
   SearchResult.dec
+  SearchResult.table
