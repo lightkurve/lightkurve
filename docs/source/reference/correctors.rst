@@ -18,7 +18,7 @@ known to be effective at removing different types of noise.
 
 
 Pixel Level Decorrelation (PLD)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autosummary::
   :toctree: api/
@@ -94,4 +94,4 @@ A DesignMatrix supports the following operations:
 .. autosummary::
   :toctree: api/
 
-  Corrector
+  correctors.corrector.Corrector
