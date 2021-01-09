@@ -55,7 +55,7 @@ can be extracted from the pixel data, and on the removal of instrument noise
 
 
 2.3. Removing instrumental noise
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
     :maxdepth: 1
