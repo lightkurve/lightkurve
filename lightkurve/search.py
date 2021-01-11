@@ -28,6 +28,9 @@ __all__ = ['search_targetpixelfile', 'search_lightcurve',
            'SearchResult']
 
 
+AUTHORS_SUPPORTED = ('kepler', 'k2', 'spoc', 'tess-spoc', 'qlp', 'k2sff', 'everest', 'k2sc', 'k2varcat')t
+
+
 class SearchError(Exception):
     pass
 
@@ -430,7 +433,7 @@ class SearchResult(object):
 @cached
 def search_targetpixelfile(target, radius=None, cadence=None,
                            mission=('Kepler', 'K2', 'TESS'),
-                           author=('Kepler', 'K2', 'SPOC'),
+                           author=None,
                            quarter=None, month=None, campaign=None, sector=None,
                            limit=None):
     """Searches the `public data archive at MAST <https://archive.stsci.edu>`_
@@ -465,8 +468,9 @@ def search_targetpixelfile(target, radius=None, cadence=None,
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     author : str, tuple of str, or "any"
         Author of the data product (`provenance_name` in the MAST API).
-        Defaults to the official products: ('Kepler', 'K2', 'SPOC').
-        Use "any" to retrieve all light curves regardless of the author.
+        Official Kepler, K2, and TESS pipeline products have author names
+        'Kepler', 'K2', and 'SPOC'.
+        By default, all light curves are returned regardless of the author.
     quarter, campaign, sector : int, list of ints
         Kepler Quarter, K2 Campaign, or TESS Sector number.
         By default all quarters/campaigns/sectors will be returned.
@@ -540,7 +544,7 @@ def search_lightcurvefile(*args, **kwargs):
 @cached
 def search_lightcurve(target, radius=None, cadence=None,
                       mission=('Kepler', 'K2', 'TESS'),
-                      author=('Kepler', 'K2', 'SPOC'),
+                      author=None,
                       quarter=None, month=None, campaign=None, sector=None,
                       limit=None):
     """Searches the `public data archive at MAST <https://archive.stsci.edu>`_ for a Kepler or TESS
@@ -575,9 +579,10 @@ def search_lightcurve(target, radius=None, cadence=None,
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     author : str, tuple of str, or "any"
         Author of the data product (`provenance_name` in the MAST API).
-        Defaults to the official products: ('Kepler', 'K2', 'SPOC').
-        Community-provided products that are supported include ('K2SFF', 'EVEREST').
-        Use "any" to retrieve all light curves regardless of the author.
+        Official Kepler, K2, and TESS pipeline products have author names
+        'Kepler', 'K2', and 'SPOC'.
+        Community-provided products that are supported include 'K2SFF', 'EVEREST'.
+        By default, all light curves are returned regardless of the author.
     quarter, campaign, sector : int, list of ints
         Kepler Quarter, K2 Campaign, or TESS Sector number.
         By default all quarters/campaigns/sectors will be returned.
@@ -680,7 +685,7 @@ def search_tesscut(target, sector=None):
 
 def _search_products(target, radius=None, filetype="Lightcurve", cadence=None,
                      mission=('Kepler', 'K2', 'TESS'),
-                     provenance_name=('Kepler', 'K2', 'SPOC'),
+                     provenance_name=None,
                      t_exptime=(0, 9999), quarter=None, month=None,
                      campaign=None, sector=None, limit=None,
                      **extra_query_criteria):
@@ -843,7 +848,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence=None,
 
 def _query_mast(target, radius=None,
                 project=('Kepler', 'K2', 'TESS'),
-                provenance_name=("Kepler", "K2", "SPOC"),
+                provenance_name=None,
                 t_exptime=(0, 9999),
                 sequence_number=None,
                 **extra_query_criteria):
@@ -959,7 +964,7 @@ def _query_mast(target, radius=None,
 def _filter_products(products, campaign=None, quarter=None, month=None,
                      sector=None, cadence=None, limit=None,
                      project=('Kepler', 'K2', 'TESS'),
-                     provenance_name=('Kepler', 'K2', 'SPOC'),
+                     provenance_name=None,
                      filetype='Target Pixel'):
     """Helper function which filters a SearchResult's products table by one or
     more criteria.
