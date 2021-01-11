@@ -430,7 +430,7 @@ class SearchResult(object):
 @cached
 def search_targetpixelfile(target, radius=None, cadence=None,
                            mission=('Kepler', 'K2', 'TESS'),
-                           author=('Kepler', 'K2', 'SPOC'),
+                           author=('Kepler', 'K2', 'SPOC', 'TESS-SPOC'),
                            quarter=None, month=None, campaign=None, sector=None,
                            limit=None):
     """Searches the `public data archive at MAST <https://archive.stsci.edu>`_
@@ -465,7 +465,7 @@ def search_targetpixelfile(target, radius=None, cadence=None,
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     author : str, tuple of str, or "any"
         Author of the data product (`provenance_name` in the MAST API).
-        Defaults to the official products: ('Kepler', 'K2', 'SPOC').
+        Defaults to the official pipeline products ('Kepler', 'K2', 'SPOC', 'TESS-SPOC').
         Use "any" to retrieve all light curves regardless of the author.
     quarter, campaign, sector : int, list of ints
         Kepler Quarter, K2 Campaign, or TESS Sector number.
@@ -540,7 +540,7 @@ def search_lightcurvefile(*args, **kwargs):
 @cached
 def search_lightcurve(target, radius=None, cadence=None,
                       mission=('Kepler', 'K2', 'TESS'),
-                      author=('Kepler', 'K2', 'SPOC'),
+                      author=('Kepler', 'K2', 'SPOC', 'TESS-SPOC'),
                       quarter=None, month=None, campaign=None, sector=None,
                       limit=None):
     """Searches the `public data archive at MAST <https://archive.stsci.edu>`_ for a Kepler or TESS
@@ -575,7 +575,7 @@ def search_lightcurve(target, radius=None, cadence=None,
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     author : str, tuple of str, or "any"
         Author of the data product (`provenance_name` in the MAST API).
-        Defaults to the official products: ('Kepler', 'K2', 'SPOC').
+        Defaults to the official products: ('Kepler', 'K2', 'SPOC', 'TESS-SPOC').
         Community-provided products that are supported include ('K2SFF', 'EVEREST').
         Use "any" to retrieve all light curves regardless of the author.
     quarter, campaign, sector : int, list of ints

@@ -275,7 +275,7 @@ def test_corrupt_download_handling():
 def test_indexerror_631():
     """Regression test for #631; avoid IndexError."""
     # This previously triggered an exception:
-    result = search_lightcurve("KIC 8462852", sector=15, radius=1)
+    result = search_lightcurve("KIC 8462852", sector=15, radius=1, author="spoc")
     assert len(result) == 1
 
 
@@ -309,7 +309,7 @@ def test_overlapping_targets_718():
 
     # Searching by `target_name` should not preven a KIC identifier to work
     # in a TESS data search
-    search = search_targetpixelfile('KIC 8462852', mission='TESS', sector=15)
+    search = search_targetpixelfile('KIC 8462852', mission='TESS', sector=15, author='spoc')
     assert len(search) == 1
 
 
