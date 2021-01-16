@@ -231,6 +231,16 @@ def test_CBVCorrector():
 
     dm = DesignMatrix(pd.DataFrame({'a':np.ones(4), 'b':[1,2,4,5]}))
 
+    #***
+    # RegressioNCorrector.correct passthrough method
+    lc = cbvCorrector.correct_RegressionCorrector(dm)
+    # Check that returned lc is in absolute flux units
+    assert isinstance(lc, TessLightCurve)
+    # The design matrix should have completely zeroed the flux around the median
+    lc_median = np.nanmedian(lc.flux)
+    assert_allclose(lc.flux, lc_median)
+
+    #***
     # Gaussian Prior fit
     lc = cbvCorrector.correct_gaussian_prior(cbv_type=None, cbv_indices=None,
         alpha=1e-9, ext_dm=dm)
@@ -246,7 +256,7 @@ def test_CBVCorrector():
     # Now add a strong regularization term and under-fit the data
     lc = cbvCorrector.correct_gaussian_prior(cbv_type=None, cbv_indices=None,
         alpha=1e9, ext_dm=dm)
-    # There should virtually no change in the flux
+    # There should be virtually no change in the flux
     assert_allclose(lc.flux, sample_lc.remove_nans().flux)
 
     # This should error because the dm has incorrect number of cadences
@@ -269,9 +279,8 @@ def test_CBVCorrector():
     # Now add a strong regularization term and under-fit the data
     lc = cbvCorrector.correct_ElasticNet(cbv_type=None, cbv_indices=None,
         alpha=1e9, l1_ratio=0.5, ext_dm=dm)
-    # There should virtually no change in the flux
+    # There should be virtually no change in the flux
     assert_allclose(lc.flux, sample_lc.remove_nans().flux)
-
 
     #***
     # Correction optimizer
@@ -280,7 +289,7 @@ def test_CBVCorrector():
     # So let's just verify it fails as expected (not much else we can do)
     dm_err = DesignMatrix(pd.DataFrame({'a':np.ones(5), 'b':[1,2,4,5,6]}))
     with pytest.raises(ValueError):
-        lc = cbvCorrector.correct_optimizer(cbv_type=None, cbv_indices=None, 
+        lc = cbvCorrector.correct(cbv_type=None, cbv_indices=None, 
             alpha_bounds=[1e-4, 1e4], ext_dm=dm_err,
             target_over_score=0.5, target_under_score=0.8)
 
@@ -318,7 +327,7 @@ def test_CBVCorrector_retrieval():
     assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
 
     # Correction optimizer
-    lc = cbvCorrector.correct_optimizer(cbv_type=cbv_type, cbv_indices=cbv_indices, 
+    lc = cbvCorrector.correct(cbv_type=cbv_type, cbv_indices=cbv_indices, 
         alpha_bounds=[1e-4, 1e4],
         target_over_score=0.5, target_under_score=0.8)
     assert isinstance(lc, TessLightCurve) 

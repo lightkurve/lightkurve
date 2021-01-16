@@ -61,8 +61,7 @@ class CBVCorrector(RegressionCorrector):
     design_matrix_collection   : DesignMatrixCollection
         The design matrix collection composed of cbv_design_matrix and extra_design_matrix
     corrected_lc : LightCurve
-        The returned light curve from regression_corrector.correct
-        in electrons / second
+        The returned light curve from correct() in electrons / second
     coefficients : float ndarray
         The fit coefficients corresponding to the design_matrix_collection
     coefficients_err : float ndarray
@@ -79,12 +78,12 @@ class CBVCorrector(RegressionCorrector):
         study cadence
     cadence_mask : np.ndarray of bool
         Mask, where True indicates a cadence that was used in
-        regressioncorrector.correct.
-        Note: The saved cadence_mask is overwritten for each call to correct.
+        RegressionCorrector.correct.
+        Note: The saved cadence_mask is overwritten for each call to correct().
     over_fitting_score : float
-        Over-fitting score from the most recent run of correct_optimizer
+        Over-fitting score from the most recent run of correct()
     under_fitting_score : float
-        Under-fitting score from the most recent run of correct_optimizer
+        Under-fitting score from the most recent run of correct()
     alpha : float
         L2-norm regularization term used in most recent fit
         Equivalent to:
@@ -261,7 +260,7 @@ class CBVCorrector(RegressionCorrector):
         self._set_prior_width(sigma)
             
         # Use RegressionCorrector.correct for the actual fitting
-        super(CBVCorrector, self).correct(self.design_matrix_collection, 
+        self.correct_RegressionCorrector(self.design_matrix_collection, 
                 cadence_mask=cadence_mask, **kwargs)
 
         self.alpha = alpha
@@ -283,7 +282,7 @@ class CBVCorrector(RegressionCorrector):
 
         Note that the alpha term in scikit-learn's ElasticNet does not have the
         same scaling as when used in CBVCorrector.correct_gaussian_prior or 
-        CBVCorrector.correct_optimizer. Do not assume similar results with a
+        CBVCorrector.correct. Do not assume similar results with a
         similar alpha value.
 
         Parameters
@@ -371,14 +370,14 @@ class CBVCorrector(RegressionCorrector):
             
         return self.corrected_lc
 
-    def correct_optimizer(self, cbv_type=['SingleScale'],
+    def correct(self, cbv_type=['SingleScale'],
             cbv_indices=[np.arange(1,9)], 
             ext_dm=None, cadence_mask=None, alpha_bounds=[1e-4,1e4], 
             target_over_score=0.5, target_under_score=0.5, max_iter=100):
         """ Optimizes the correction by adjusting the L2-Norm (Ridge Regression)
         regularization penalty term, alpha, based on the introduced noise
         (over-fitting) and residual correlation (under-fitting) goodness
-        metrics. The optimization is performed using the
+        metrics. The numercial optimization is performed using the
         scipy.optimize.minimize_scalar Brent's method.
 
         The optimizer attempts to maximize the over- and under-fitting goodness
@@ -427,7 +426,7 @@ class CBVCorrector(RegressionCorrector):
         under-fitting score is 0.8. 
             >>> cbv_type = ['SingleScale', 'Spike']
             >>> cbv_indices = [np.arange(1,9), 'ALL']
-            >>> cbvCorrector.correct_optimizer(cbv_type=cbv_type, cbv_indices=cbv_indices,  # doctest: +SKIP
+            >>> cbvCorrector.correct(cbv_type=cbv_type, cbv_indices=cbv_indices,  # doctest: +SKIP
             >>>     alpha_bounds=[1.0,1e3],  # doctest: +SKIP
             >>>     target_over_score=0.5, target_under_score=0.8) # doctest: +SKIP
         """
@@ -475,6 +474,15 @@ class CBVCorrector(RegressionCorrector):
         print('Optimized Alpha: {0:2.3e}'.format(self.alpha))
 
         return self.corrected_lc
+
+    def correct_RegressionCorrector(self, design_matrix_collection, **kwargs):
+        """ Pass-through method to gain access to the superclass 
+        RegressionCorrector.correct() method.
+        """
+
+        # All this does is call the superclass 'correct' method as pass the
+        # input arguments.
+        return super(CBVCorrector, self).correct(design_matrix_collection, **kwargs)
 
     def over_fitting_metric(self, 
             n_samples: int = 10):
@@ -783,7 +791,7 @@ class CBVCorrector(RegressionCorrector):
         sigma = np.median(self.lc.flux_err.value) / np.sqrt(np.abs(alpha))
         self._set_prior_width(sigma)                
         # Use RegressionCorrector.correct for the actual fitting
-        super(CBVCorrector, self).correct(self.design_matrix_collection, 
+        self.correct_RegressionCorrector(self.design_matrix_collection, 
             cadence_mask=self.optimization_params['cadence_mask'])
 
         # Do not compute and ignore if target score < 0
