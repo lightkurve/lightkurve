@@ -25,7 +25,7 @@ from ..utils import channel_to_module_output, validate_method
 from ..search import search_lightcurve
 from .regressioncorrector import RegressionCorrector
 from ..collections import LightCurveCollection
-from .metrics import overfit_metric_lombscargle, underfit_metric_neighbors, minTargetsError
+from .metrics import overfit_metric_lombscargle, underfit_metric_neighbors, MinTargetsError
 
 log = logging.getLogger(__name__)
 
@@ -260,14 +260,14 @@ class CBVCorrector(RegressionCorrector):
         self._set_prior_width(sigma)
             
         # Use RegressionCorrector.correct for the actual fitting
-        self.correct_RegressionCorrector(self.design_matrix_collection, 
+        self.correct_regressioncorrector(self.design_matrix_collection, 
                 cadence_mask=cadence_mask, **kwargs)
 
         self.alpha = alpha
 
         return self.corrected_lc
 
-    def correct_ElasticNet(self, cbv_type='SingleScale', cbv_indices=np.arange(1,9), 
+    def correct_elasticnet(self, cbv_type='SingleScale', cbv_indices=np.arange(1,9), 
             alpha=1e-20, l1_ratio=0.01, ext_dm=None, cadence_mask=None, **kwargs):
         """ Performs the correction using scikit-learn's ElasticNet which
         utilizes combined L1- and L2-Norm priors as a regularizer.
@@ -319,7 +319,7 @@ class CBVCorrector(RegressionCorrector):
         regularization but with a slight amount of Ridge Regression.
             >>> cbv_type = ['SingleScale', 'Spike']
             >>> cbv_indices = [np.arange(1,9), 'ALL']
-            >>> corrected_lc = cbvCorrector.correct_ElasticNet(cbv_type=cbv_type, # doctest: +SKIP
+            >>> corrected_lc = cbvCorrector.correct_elasticnet(cbv_type=cbv_type, # doctest: +SKIP
             >>>     cbv_indices=cbv_indices, alpha=1.0, l1_ratio=0.9) # doctest: +SKIP
         """
         
@@ -475,7 +475,7 @@ class CBVCorrector(RegressionCorrector):
 
         return self.corrected_lc
 
-    def correct_RegressionCorrector(self, design_matrix_collection, **kwargs):
+    def correct_regressioncorrector(self, design_matrix_collection, **kwargs):
         """ Pass-through method to gain access to the superclass 
         RegressionCorrector.correct() method.
         """
@@ -600,7 +600,7 @@ class CBVCorrector(RegressionCorrector):
                 metric = underfit_metric_neighbors (corrected_lc, 
                             dynamic_search_radius, min_targets, max_targets, 
                             interpolate)
-            except minTargetsError:
+            except MinTargetsError:
                 # Too few targets found, try increasing search radius
                 if (dynamic_search_radius > max_search_radius):
                     # Hit the edge of the CCD, we have to give up
@@ -725,7 +725,7 @@ class CBVCorrector(RegressionCorrector):
             flattened_dm_list = [self.extra_design_matrix]
 
         # Add in a constant to the design matrix collection
-        # Note: correct_ElasticNet ASSUMES the the last vector in the
+        # Note: correct_elasticnet ASSUMES the the last vector in the
         # design_matrix_collection is the constant
         flattened_dm_list.append(DesignMatrix(np.ones(flattened_dm_list[0].shape[0]),
             columns=['Constant'], name='Constant'))
@@ -791,7 +791,7 @@ class CBVCorrector(RegressionCorrector):
         sigma = np.median(self.lc.flux_err.value) / np.sqrt(np.abs(alpha))
         self._set_prior_width(sigma)                
         # Use RegressionCorrector.correct for the actual fitting
-        self.correct_RegressionCorrector(self.design_matrix_collection, 
+        self.correct_regressioncorrector(self.design_matrix_collection, 
             cadence_mask=self.optimization_params['cadence_mask'])
 
         # Do not compute and ignore if target score < 0

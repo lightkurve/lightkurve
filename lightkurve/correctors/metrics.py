@@ -132,7 +132,7 @@ def underfit_metric_neighbors(
 
     This function will search within the given radiu in arceseconds and find the 
     min_targets nearest targets up until max_targets is reached. If less than 
-    min_targets is found a minTargetsError Exception is raised.
+    min_targets is found a MinTargetsError Exception is raised.
 
     The downloaded neighboring targets will normally be "aligned" to the
     corrected_lc, meaning the cadence numbers are used to align the targets
@@ -246,7 +246,7 @@ def underfit_metric_neighbors(
     return metric
 
 # Custom exception to track when minimum targets is not reached
-class minTargetsError(Exception): pass
+class MinTargetsError(Exception): pass
 
 def _unique_key_for_processing_neighbors(
     corrected_lc: LightCurve,
@@ -272,7 +272,7 @@ def _download_and_preprocess_neighbors(
 ):
     """Returns a collection of neighboring light curves.
 
-    If less than min_targets a minTargetsError Exception is raised.
+    If less than min_targets a MinTargetsError Exception is raised.
 
     Parameters
     ----------
@@ -302,7 +302,7 @@ def _download_and_preprocess_neighbors(
     """
     search = corrected_lc.search_neighbors(limit=max_targets, radius=radius)
     if len(search) < min_targets:
-        raise minTargetsError(
+        raise MinTargetsError(
             f"Unable to find at least {min_targets} neighbors within {radius} arcseconds radius."
         )
     log.info(

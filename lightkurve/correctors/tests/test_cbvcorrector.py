@@ -233,7 +233,7 @@ def test_CBVCorrector():
 
     #***
     # RegressioNCorrector.correct passthrough method
-    lc = cbvCorrector.correct_RegressionCorrector(dm)
+    lc = cbvCorrector.correct_regressioncorrector(dm)
     # Check that returned lc is in absolute flux units
     assert isinstance(lc, TessLightCurve)
     # The design matrix should have completely zeroed the flux around the median
@@ -267,7 +267,7 @@ def test_CBVCorrector():
 
     #***
     # ElasticNet fit
-    lc = cbvCorrector.correct_ElasticNet(cbv_type=None, cbv_indices=None,
+    lc = cbvCorrector.correct_elasticnet(cbv_type=None, cbv_indices=None,
         alpha=1e-20, l1_ratio=0.5, ext_dm=dm)
     assert isinstance(lc, TessLightCurve) 
     assert lc.flux.unit == u.Unit("electron / second")
@@ -277,7 +277,7 @@ def test_CBVCorrector():
     ax = cbvCorrector.diagnose()
     assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
     # Now add a strong regularization term and under-fit the data
-    lc = cbvCorrector.correct_ElasticNet(cbv_type=None, cbv_indices=None,
+    lc = cbvCorrector.correct_elasticnet(cbv_type=None, cbv_indices=None,
         alpha=1e9, l1_ratio=0.5, ext_dm=dm)
     # There should be virtually no change in the flux
     assert_allclose(lc.flux, sample_lc.remove_nans().flux)
@@ -292,6 +292,7 @@ def test_CBVCorrector():
         lc = cbvCorrector.correct(cbv_type=None, cbv_indices=None, 
             alpha_bounds=[1e-4, 1e4], ext_dm=dm_err,
             target_over_score=0.5, target_under_score=0.8)
+
 
 @pytest.mark.remote_data
 def test_CBVCorrector_retrieval():
@@ -319,7 +320,7 @@ def test_CBVCorrector_retrieval():
     assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
 
     # ElasticNet corrections
-    lc = cbvCorrector.correct_ElasticNet(cbv_type=cbv_type, cbv_indices=cbv_indices,
+    lc = cbvCorrector.correct_elasticnet(cbv_type=cbv_type, cbv_indices=cbv_indices,
         alpha=1e1, l1_ratio=0.5)
     assert isinstance(lc, TessLightCurve) 
     assert lc.flux.unit == u.Unit("electron / second")
