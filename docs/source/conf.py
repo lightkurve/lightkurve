@@ -133,6 +133,12 @@ html_css_files = [
     'css/custom.css',
 ]
 
+html_sidebars = {
+  "tutorials/*": [],
+  "tutorials/*/*": [],
+  "tutorials/*/*/*": []
+}
+
 # Raw files we want to copy using the sphinxcontrib-rawfiles extension:
 # - CNAME tells GitHub the domain name to use for hosting the docs
 # - .nojekyll prevents GitHub from hiding the `_static` dir

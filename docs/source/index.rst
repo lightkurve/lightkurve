@@ -10,14 +10,6 @@ A friendly Python package for TESS & Kepler time series analysis.
 
 .. **Version**: |version|
 
-.. raw:: html
-
-    <a href="quickstart.html" class="btn btn-primary">Quickstart →</a>
-
-
-What is Lightkurve?
--------------------
-
 Lightkurve offers a user-friendly way to analyze time series data obtained by telescopes,
 in particular NASA’s TESS and Kepler exoplanet missions.
 Lightkurve aims to lower barriers, promote best practices, reduce costs,

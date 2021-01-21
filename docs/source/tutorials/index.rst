@@ -4,22 +4,36 @@ Tutorials
 =========
 
 
-1. The Lightkurve API
----------------------
+1. Getting started with Lightkurve
+----------------------------------
 
-The first set of tutorials cover the basics of using Lightkurve.
-This includes getting to grips with the file types and how to load and work
-with data from the Kepler, K2, and TESS missions. For a complete listing of
-all classes and methods, please consult the `API docs <../api/index.html>`_.
+The first set of tutorials covers the basics of using Lightkurve.
+This includes getting to grips with the basic Lightkurve objects
+and how to load and work with data products from the Kepler, K2, and TESS missions.
+For a complete listing of all classes and methods, please consult the `API docs <../reference/index.html>`_.
+
+1.1. Lightkurve objects
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
     :maxdepth: 1
 
-    01-target-pixel-files.ipynb
-    01-what-are-lightcurves.ipynb
-    01-using-the-periodogram-class.ipynb
+    1-getting-started/what-are-lightcurve-objects.ipynb
+    1-getting-started/what-are-targetpixelfile-objects.ipynb
+    1-getting-started/what-are-periodogram-objects.ipynb
+    
 
+1.2. Working with Kepler & TESS data products
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. toctree::
+    :maxdepth: 1
+
+    1-getting-started/searching-for-data-products.ipynb
+    1-getting-started/using-light-curve-file-products.ipynb
+    1-getting-started/using-target-pixel-file-products.ipynb
+    1-getting-started/plotting-target-pixel-files.ipynb
+    1-getting-started/interactively-inspecting-data.ipynb
 
 
 2. Creating and correcting light curves
@@ -27,7 +41,7 @@ all classes and methods, please consult the `API docs <../api/index.html>`_.
 
 The second section focuses on the various ways in which light curves
 can be extracted from the pixel data, and on the removal of instrument noise
-("systematics") from those light curves.
+(often referred to as *systematics*) from those light curves.
 
 2.1. Creating light curves
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -35,13 +49,10 @@ can be extracted from the pixel data, and on the removal of instrument noise
 .. toctree::
     :maxdepth: 1
 
-    03-making-custom-apertures.ipynb
-    03-how-to-use-prf-photometry.ipynb
-    03-cutting-out-tpfs-from-tess-ffis.ipynb
-    03-making-fits-files.ipynb
-    03-appending-lightcurves.ipynb
-    03-using-river-plots.ipynb
-
+    2-creating-light-curves/2-1-custom-aperture-photometry.ipynb
+    2-creating-light-curves/2-1-combining-multiple-quarters.ipynb
+    2-creating-light-curves/2-1-cutting-out-tpfs.ipynb
+    2-creating-light-curves/2-1-saving-a-light-curve.ipynb
 
 
 2.2. Identifying instrument noise
@@ -50,8 +61,11 @@ can be extracted from the pixel data, and on the removal of instrument noise
 .. toctree::
     :maxdepth: 1
 
-    04-interact-with-lightcurves-and-tpf.ipynb
-    04-identify-rolling-band.ipynb
+    2-creating-light-curves/2-2-kepler-noise-1-data-gaps-and-quality-flags.ipynb
+    2-creating-light-curves/2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects.ipynb
+    2-creating-light-curves/2-2-kepler-noise-3-seasonal-and-detector-effects.ipynb
+    2-creating-light-curves/2-2-kepler-noise-4-electronic-noise.ipynb    
+    2-creating-light-curves/2-2-identifying-rolling-band.ipynb
 
 
 2.3. Removing instrumental noise
