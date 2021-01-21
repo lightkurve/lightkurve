@@ -21,8 +21,13 @@ from ..designmatrix import DesignMatrix
 from ..cbvcorrector import download_kepler_cbvs, download_tess_cbvs, \
     CotrendingBasisVectors, KeplerCotrendingBasisVectors, \
     TessCotrendingBasisVectors
+from ..cbvcorrector import CBVCorrector
 
 
+#*******************************************************************************
+#*******************************************************************************
+#*******************************************************************************
+# CotrendingBasisVectors unit tests
 def test_CotrendingBasisVectors_nonretrieval():
     """ Tests CotrendingBasisVectors class without requiring remote data
     """
@@ -205,3 +210,172 @@ def test_cbv_retrieval():
     assert cbvs.campaign == 15
     assert cbvs.module == 8
     assert cbvs.output == 4
+
+
+#*******************************************************************************
+#*******************************************************************************
+#*******************************************************************************
+# CBVCorrector Unit Tests
+
+def test_CBVCorrector():
+
+    # Create a CBVCorrector without reading CBVs from MAST
+    sample_lc = TessLightCurve(time=[1,2,3,4,5], flux=[1,2,np.nan,4,5], flux_err=[0.1, 0.1, 0.1, 0.1, 0.1],
+            cadenceno=[1,2,3,4,5], flux_unit=u.Unit('electron / second'))
+
+    cbvCorrector =  CBVCorrector(sample_lc, do_not_load_cbvs=True)
+    # Check that Nan was removed
+    assert len(cbvCorrector.lc.flux) == 4
+    # Check that the median flux value is preserved
+    assert_allclose(np.nanmedian(cbvCorrector.lc.flux).value, np.nanmedian(sample_lc.flux).value)
+
+    dm = DesignMatrix(pd.DataFrame({'a':np.ones(4), 'b':[1,2,4,5]}))
+
+    #***
+    # RegressioNCorrector.correct passthrough method
+    lc = cbvCorrector.correct_regressioncorrector(dm)
+    # Check that returned lc is in absolute flux units
+    assert isinstance(lc, TessLightCurve)
+    # The design matrix should have completely zeroed the flux around the median
+    lc_median = np.nanmedian(lc.flux)
+    assert_allclose(lc.flux, lc_median)
+
+    #***
+    # Gaussian Prior fit
+    lc = cbvCorrector.correct_gaussian_prior(cbv_type=None, cbv_indices=None,
+        alpha=1e-9, ext_dm=dm)
+    assert isinstance(lc, TessLightCurve)
+    # Check that returned lc is in absolute flux units
+    assert lc.flux.unit == u.Unit("electron / second")
+    # The design matrix should have completely zeroed the flux around the median
+    lc_median = np.nanmedian(lc.flux)
+    assert_allclose(lc.flux, lc_median)
+    ax = cbvCorrector.diagnose()
+    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
+
+    # Now add a strong regularization term and under-fit the data
+    lc = cbvCorrector.correct_gaussian_prior(cbv_type=None, cbv_indices=None,
+        alpha=1e9, ext_dm=dm)
+    # There should be virtually no change in the flux
+    assert_allclose(lc.flux, sample_lc.remove_nans().flux)
+
+    # This should error because the dm has incorrect number of cadences
+    dm_err = DesignMatrix(pd.DataFrame({'a':np.ones(5), 'b':[1,2,4,5,6]}))
+    with pytest.raises(ValueError):
+        lc = cbvCorrector.correct_gaussian_prior(cbv_type=None, cbv_indices=None,
+            alpha=1e-2, ext_dm=dm_err)
+
+    #***
+    # ElasticNet fit
+    lc = cbvCorrector.correct_elasticnet(cbv_type=None, cbv_indices=None,
+        alpha=1e-20, l1_ratio=0.5, ext_dm=dm)
+    assert isinstance(lc, TessLightCurve) 
+    assert lc.flux.unit == u.Unit("electron / second")
+    # The design matrix should have completely zeroed the flux around the median
+    lc_median = np.nanmedian(lc.flux)
+    assert_allclose(lc.flux, lc_median, rtol=1e-3)
+    ax = cbvCorrector.diagnose()
+    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
+    # Now add a strong regularization term and under-fit the data
+    lc = cbvCorrector.correct_elasticnet(cbv_type=None, cbv_indices=None,
+        alpha=1e9, l1_ratio=0.5, ext_dm=dm)
+    # There should be virtually no change in the flux
+    assert_allclose(lc.flux, sample_lc.remove_nans().flux)
+
+    #***
+    # Correction optimizer
+    # The optimizer cannot be run without downloading targest from MAST for use
+    # within the under-fitting metric.
+    # So let's just verify it fails as expected (not much else we can do)
+    dm_err = DesignMatrix(pd.DataFrame({'a':np.ones(5), 'b':[1,2,4,5,6]}))
+    with pytest.raises(ValueError):
+        lc = cbvCorrector.correct(cbv_type=None, cbv_indices=None, 
+            alpha_bounds=[1e-4, 1e4], ext_dm=dm_err,
+            target_over_score=0.5, target_under_score=0.8)
+
+
+@pytest.mark.remote_data
+def test_CBVCorrector_retrieval():
+    """ Tests CBVCorrector by retrieving some sample Kepler/TESS light curves
+    and correcting them
+    """
+
+    #***
+    # A good TESS example of both over- and under-fitting
+    # The "over-fitted" curve looks better to the eye, but eyes can be deceiving!
+    lc = search_lightcurve('TIC 357126143', mission='tess', sector=10).download(flux_column='sap_flux')
+    cbvCorrector =  CBVCorrector(lc)
+    assert isinstance(cbvCorrector, CBVCorrector)
+
+    cbv_type = ['SingleScale', 'Spike']
+    cbv_indices = [np.arange(1,9), 'ALL']
+
+    # Gaussian Prior correction
+    lc = cbvCorrector.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices,
+        alpha=1e-2)
+    assert isinstance(lc, TessLightCurve) 
+    # Check that returned lightcurve is in flux units
+    assert lc.flux.unit == u.Unit("electron / second")
+    ax = cbvCorrector.diagnose()
+    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
+
+    # ElasticNet corrections
+    lc = cbvCorrector.correct_elasticnet(cbv_type=cbv_type, cbv_indices=cbv_indices,
+        alpha=1e1, l1_ratio=0.5)
+    assert isinstance(lc, TessLightCurve) 
+    assert lc.flux.unit == u.Unit("electron / second")
+    ax = cbvCorrector.diagnose()
+    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
+
+    # Correction optimizer
+    lc = cbvCorrector.correct(cbv_type=cbv_type, cbv_indices=cbv_indices, 
+        alpha_bounds=[1e-4, 1e4],
+        target_over_score=0.5, target_under_score=0.8)
+    assert isinstance(lc, TessLightCurve) 
+    assert lc.flux.unit == u.Unit("electron / second")
+    ax = cbvCorrector.diagnose()
+    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
+
+    # Goodness metric scan plot
+    ax = cbvCorrector.goodness_metric_scan_plot(cbv_type=cbv_type, cbv_indices=cbv_indices)
+    assert isinstance(ax, matplotlib.axes.Axes)
+
+    # Try multi-scale basis vectors
+    cbv_type = ['MultiScale.1', 'MultiScale.2', 'MultiScale.3']
+    cbv_indices = ['ALL', 'ALL', 'ALL']
+    lc = cbvCorrector.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices,
+        alpha=1e-2)
+    assert isinstance(lc, TessLightCurve) 
+    
+    #***
+    # A Kepler and K2 example
+    lc = search_lightcurve('KIC 6508221', mission='kepler', quarter=5).download(flux_column='sap_flux')
+    cbvCorrector =  CBVCorrector(lc)
+    lc = cbvCorrector.correct_gaussian_prior(alpha=1.0)
+    assert isinstance(lc, KeplerLightCurve) 
+    assert lc.flux.unit == u.Unit("electron / second")
+
+    lc = search_lightcurve('EPIC 247887989', mission='K2').download(flux_column='sap_flux')
+    cbvCorrector =  CBVCorrector(lc)
+    lc = cbvCorrector.correct_gaussian_prior(alpha=1.0)
+    assert isinstance(lc, KeplerLightCurve) 
+    assert lc.flux.unit == u.Unit("electron / second")
+
+    #***
+    # Try some expected failures
+
+    # cbv_type and cbv_indices not the same list lengths
+    with pytest.raises(AssertionError):
+        lc = cbvCorrector.correct_gaussian_prior(cbv_type=['SingleScale', 'Spike'], 
+                cbv_indices=['all'], alpha=1e-2)
+
+    # cbv_type is not a list
+    with pytest.raises(AssertionError):
+        lc = cbvCorrector.correct_gaussian_prior(cbv_type='SingleScale', 
+                cbv_indices=['all'], alpha=1e-2)
+
+    # cbv_indices is not a list
+    with pytest.raises(AssertionError):
+        lc = cbvCorrector.correct_gaussian_prior(cbv_type=['SingleScale'], 
+                cbv_indices='all', alpha=1e-2)
+

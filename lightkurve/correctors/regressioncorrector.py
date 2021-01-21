@@ -198,7 +198,7 @@ class RegressionCorrector(Corrector):
 
         Returns
         -------
-        `.LightCurve`
+        corrected_lc : `.LightCurve`
             Corrected light curve, with noise removed.
         """
         if not isinstance(design_matrix_collection, DesignMatrixCollection):

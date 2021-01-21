@@ -2277,6 +2277,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'sector': self.sector,
                 'camera': self.camera,
                 'ccd': self.ccd,
+                'mission': self.mission,
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
