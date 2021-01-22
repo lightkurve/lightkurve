@@ -709,7 +709,7 @@ class LombScarglePeriodogram(Periodogram):
             normalization='amplitude', oversample_factor will be set to 5. If
             normalization='psd', it will be 1. These defaults can be
             overridden.
-         freq_unit : `astropy.units.core.CompositeUnit`
+        freq_unit : `astropy.units.core.CompositeUnit`
             Default: None. The desired frequency units for the Lomb Scargle
             periodogram. This implies that 1/freq_unit is the units for period.
             With default normalization ('amplitude'), the freq_unit is set to
