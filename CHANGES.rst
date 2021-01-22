@@ -111,6 +111,9 @@ lightkurve.search
 
 - Added automated caching of the search operations. [#907]
 
+- Modified the search operations to show all available data products at
+  MAST by default, including community-contributed light curves. [#933]
+
 lightkurve.correctors
 ^^^^^^^^^^^^^^^^^^^^^
 
