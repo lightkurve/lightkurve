@@ -1775,6 +1775,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             the median flux will be used.
             If 'default' is passed, 'pipeline' mask will be used when available,
             with 'threshold' as the fallback.
+        flux_method: Here the user can input three parameters - 'sum', 'median', and 'mode',
+            The default is 'sum'.
         centroid_method : str, 'moments' or 'quadratic'
             For the details on this arguments, please refer to the documentation
             for `TargetPixelFile.estimate_centroids`.
@@ -2276,6 +2278,8 @@ class TessTargetPixelFile(TargetPixelFile):
             the median flux will be used.
             If 'default' is passed, 'pipeline' mask will be used when available,
             with 'threshold' as the fallback.
+        flux_method: Here the user can input three parameters - 'sum', 'median', and 'mode',
+            The default is 'sum'.
         centroid_method : str, 'moments' or 'quadratic'
             For the details on this arguments, please refer to the documentation
             for `TargetPixelFile.estimate_centroids`.
