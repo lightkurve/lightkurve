@@ -10,6 +10,8 @@ Major changes
 - ``LightCurve`` is now a sub-class of ``astropy.time.TimeSeries`` to enable it
   to have arbitrary columns and to enable closer integration with AstroPy. [#744]
 
+- Updated the online docs with a new template, a dozen new tutorials, and a
+  re-organized API reference guide. [#926]
 
 Other changes
 -------------
