@@ -28,9 +28,6 @@ __all__ = ['search_targetpixelfile', 'search_lightcurve',
            'SearchResult']
 
 
-AUTHORS_SUPPORTED = ('kepler', 'k2', 'spoc', 'tess-spoc', 'qlp', 'k2sff', 'everest', 'k2sc', 'k2varcat')t
-
-
 class SearchError(Exception):
     pass
 
