@@ -30,7 +30,7 @@ from .test_synthetic_data import filename_synthetic_flat
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
 filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
-filename_fluxmode = get_pkg_data_filename("data/nova.fits")
+filename_fluxmethod = get_pkg_data_filename("data/nova.fits")
 
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
@@ -739,13 +739,13 @@ def test_estimate_background():
 
 def test_fluxmode():
     """This should verify the median flux use in an aperture"""
-    tpf = read(filename_fluxmode)
+    tpf = read(filename_fluxmethod)
     aper = np.zeros(tpf.shape[1:], dtype=bool)
     aper[4:8, 4:7] = True
     lc_n = tpf.extract_aperture_photometry(aperture_mask=aper, centroid_method='moments')
-    lc_sum = tpf.extract_aperture_photometry(aperture_mask=aper, flux_median="sum", centroid_method='moments')
-    lc_med = tpf.extract_aperture_photometry(aperture_mask=aper, flux_median="median", centroid_method='moments')
-    lc_mean = tpf.extract_aperture_photometry(aperture_mask=aper, flux_median="mean", centroid_method='moments')
+    lc_sum = tpf.extract_aperture_photometry(aperture_mask=aper, flux_method="sum", centroid_method='moments')
+    lc_med = tpf.extract_aperture_photometry(aperture_mask=aper, flux_method="median", centroid_method='moments')
+    lc_mean = tpf.extract_aperture_photometry(aperture_mask=aper, flux_method="mean", centroid_method='moments')
     assert lc_n.flux.value[0] == np.nansum(tpf.flux.value[0][aper])
     assert lc_sum.flux.value[0] == np.nansum(tpf.flux.value[0][aper])
     assert lc_med.flux.value[0] == np.nanmedian(tpf.flux.value[0][aper])
