@@ -33,8 +33,7 @@ class SearchError(Exception):
 
 
 class SearchResult(object):
-    """Container for the results returned by `search_targetpixelfile`,
-    `search_lightcurve`, or `search_tesscut`.
+    """Container for the results returned by the search functions.
 
     The purpose of this class is to provide a convenient way to inspect and
     download products that have been identified using one of the data search
@@ -42,10 +41,14 @@ class SearchResult(object):
 
     Parameters
     ----------
-    table : `astropy.table.Table` object
+    table : `~astropy.table.Table` object
         Astropy table returned by a join of the astroquery `Observations.query_criteria()`
         and `Observations.get_product_list()` methods.
     """
+    
+    table = None
+    """`~astropy.table.Table` containing the full search results returned by the MAST API."""
+
     def __init__(self, table=None):
         if table is None:
             self.table = Table()
@@ -97,45 +100,47 @@ class SearchResult(object):
 
     @property
     def obsid(self):
-        """Returns an array of MAST observation IDs"""
+        """MAST observation ID for each data product found."""
         return np.asarray(np.unique(self.table['obsid']), dtype='int64')
 
     @property
     def ra(self):
-        """Returns an array of RA values for targets in search"""
+        """Right Ascension coordinate for each data product found."""
         return self.table['s_ra'].data.data
 
     @property
     def dec(self):
-        """Returns an array of dec values for targets in search"""
+        """Declination coordinate for each data product found."""
         return self.table['s_dec'].data.data
 
     @property
     def observation(self):
+        """Kepler quarter or TESS sector names for each data product found."""
         return self.table['observation'].data.data
 
     @property
     def author(self):
+        """Pipeline name for each data product found."""
         return self.table['author'].data.data
 
     @property
     def target_name(self):
-        """Returns an array of target names"""
+        """Target name for each data product found."""
         return self.table['target_name'].data.data
 
     @property
     def t_exptime(self):
-        """Returns an array of cadence exposure times for targets in search
-        in seconds"""
+        """Exposure time for each data product found."""
         return self.table['t_exptime'].quantity
 
     @property
     def productFilename(self):
+        """Filename for each data product found."""
         return self.table['productFilename'].data.data
 
     @property
     def distance(self):
-        """Returns an array of distance to search point in arceseconds"""
+        """Distance from the search position for each data product found."""
         return self.table['distance'].quantity
 
     def _download_one(self, table, quality_bitmask, download_dir, cutout_size, **kwargs):
@@ -205,7 +210,7 @@ class SearchResult(object):
 
     @suppress_stdout
     def download(self, quality_bitmask='default', download_dir=None, cutout_size=None, **kwargs):
-        """Returns a single `LightCurve` or `TargetPixelFile` object.
+        """Download and open the first data product in the search result.
 
         If multiple files are present in `SearchResult.table`, only the first
         will be downloaded.
@@ -269,11 +274,13 @@ class SearchResult(object):
 
     @suppress_stdout
     def download_all(self, quality_bitmask='default', download_dir=None, cutout_size=None, **kwargs):
-        """Returns a `~lightkurve.collections.TargetPixelFileCollection` or
+        """Download and open all data products in the search result.
+
+        This method will returns a `~lightkurve.collections.TargetPixelFileCollection` or
         `~lightkurve.collections.LightCurveCollection`.
 
-         Parameters
-         ----------
+        Parameters
+        ----------
         quality_bitmask : str or int, optional
             Bitmask (integer) which identifies the quality flag bitmask that should
             be used to mask out bad cadences. If a string is passed, it has the
@@ -433,8 +440,7 @@ def search_targetpixelfile(target, radius=None, cadence=None,
                            author=('Kepler', 'K2', 'SPOC'),
                            quarter=None, month=None, campaign=None, sector=None,
                            limit=None):
-    """Searches the `public data archive at MAST <https://archive.stsci.edu>`_
-    for target pixel files.
+    """Search the `MAST data archive <https://archive.stsci.edu>`_ for target pixel files.
 
     This function fetches a data table that lists the Target Pixel Files (TPFs)
     that fall within a region of sky centered around the position of `target`
@@ -543,8 +549,7 @@ def search_lightcurve(target, radius=None, cadence=None,
                       author=('Kepler', 'K2', 'SPOC'),
                       quarter=None, month=None, campaign=None, sector=None,
                       limit=None):
-    """Searches the `public data archive at MAST <https://archive.stsci.edu>`_ for a Kepler or TESS
-    :class:`LightCurve <lightkurve.lightcurve.LightCurve>`.
+    """Search the `MAST data archive <https://archive.stsci.edu>`_ for light curves.
 
     This function fetches a data table that lists the Light Curve Files
     that fall within a region of sky centered around the position of `target`
@@ -645,7 +650,8 @@ def search_lightcurve(target, radius=None, cadence=None,
 
 @cached
 def search_tesscut(target, sector=None):
-    """Searches MAST for TESS Full Frame Image cutouts containing a desired target or region.
+    """Search the `MAST TESSCut service <https://mast.stsci.edu/tesscut/>`_ for a region
+    of sky that is available as a TESS Full Frame Image cutout.
 
     This feature uses the `TESScut service <https://mast.stsci.edu/tesscut/>`_
     provided by the TESS data archive at MAST.  If you use this service in

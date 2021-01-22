@@ -1,57 +1,38 @@
 .. title:: Lightkurve docs
 
-.. container:: lead
+.. rst-class:: frontpage
 
-    Lightkurve
+**********
+Lightkurve
+**********
 
-    A friendly package for Kepler & TESS time series analysis in Python.
+A friendly Python package for TESS & Kepler time series analysis.
 
-    .. raw:: html
+.. **Version**: |version|
 
-        <a href="quickstart.html" class="btn btn-primary">Quickstart →</a>
-
-
-.. raw:: html
-
-  <div class="container">
-    <hr>
-    <div class="row">
-      <div class="col-lg-6">
-        <p style="font-size: 1.2em; font-weight: 700;">
-         Time domain astronomy made easy for all
-        </p>
-        <p>
-          Lightkurve offers a user-friendly way
-          to analyze time series data obtained by telescopes,
-          in particular NASA’s Kepler and TESS exoplanet missions.
-        </p>
-        <p>
-          Lightkurve aims to lower barriers, promote best practices, reduce costs,
-          and improve scientific fidelity
-          by providing accessible Python <a href="api/index.html">tools</a> and
-          <a href="tutorials/index.html">tutorials</a>.
-        </p>
-      </div> 
-
-      <div class="col-lg-6">
+Lightkurve offers a user-friendly way to analyze time series data obtained by telescopes,
+in particular NASA’s TESS and Kepler exoplanet missions.
+Lightkurve aims to lower barriers, promote best practices, reduce costs,
+and improve scientific fidelity by providing accessible open source
+Python :ref:`tools <api>` and :ref:`tutorials <tutorials>`
+for time domain astronomy.
 
 
 .. code-block:: python
+    :caption: Example: downloading & plotting a phase-folded light curve of Proxima Centauri obtained by TESS.
 
     import lightkurve as lk
+    lightcurve = lk.search_lightcurve("Proxima Centauri", mission="TESS").download()
+    lightcurve.fold(period=11.184).plot()
 
-    pixels = lk.search_targetpixelfile("Kepler-10").download()
-    pixels.plot()
+Documentation
+-------------
 
-    lightcurve = pixels.to_lightcurve()
-    lightcurve.plot()
+.. toctree::
+    :maxdepth: 1
+    :titlesonly:
 
-    exoplanet = lightcurve.flatten().fold(period=0.838)
-    exoplanet.plot()
-
-
-.. raw:: html
-
-      </div>
-    </div>
-  </div>
+    quickstart
+    tutorials/index
+    reference/index
+    about/index

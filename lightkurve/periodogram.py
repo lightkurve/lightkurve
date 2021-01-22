@@ -62,6 +62,13 @@ class Periodogram(object):
     meta : dict
         Free-form metadata associated with the Periodogram.
     """
+
+    frequency = None
+    """The array of frequency values."""
+
+    power = None
+    """The array of power values."""
+
     def __init__(self, frequency, power, nyquist=None, label=None,
                  targetid=None, default_view='frequency', meta={}):
         # Input validation
@@ -111,22 +118,22 @@ class Periodogram(object):
 
     @property
     def period(self):
-        """Returns the array of periods, i.e. 1/frequency."""
+        """The array of periods, i.e. 1/frequency."""
         return 1. / self.frequency
 
     @property
     def max_power(self):
-        """Returns the power of the highest peak in the periodogram."""
+        """Power of the highest peak in the periodogram."""
         return np.nanmax(self.power)
 
     @property
     def frequency_at_max_power(self):
-        """Returns the frequency corresponding to the highest peak in the periodogram."""
+        """Frequency value corresponding to the highest peak in the periodogram."""
         return self.frequency[np.nanargmax(self.power)]
 
     @property
     def period_at_max_power(self):
-        """Returns the period corresponding to the highest peak in the periodogram."""
+        """Period value corresponding to the highest peak in the periodogram."""
         return 1. / self.frequency_at_max_power
 
     def bin(self, binsize=10, method='mean'):
@@ -596,7 +603,7 @@ class LombScarglePeriodogram(Periodogram):
                         nterms=1, nyquist_factor=1, oversample_factor=None,
                         freq_unit=None, normalization="amplitude", ls_method='fast',
                         **kwargs):
-        """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
+        """Creates a `Periodogram` from a LightCurve using the Lomb-Scargle method.
 
         By default, the periodogram will be created for a regular grid of
         frequencies from one frequency separation to the Nyquist frequency,
@@ -702,7 +709,7 @@ class LombScarglePeriodogram(Periodogram):
             normalization='amplitude', oversample_factor will be set to 5. If
             normalization='psd', it will be 1. These defaults can be
             overridden.
-         freq_unit : `astropy.units.core.CompositeUnit`
+        freq_unit : `astropy.units.core.CompositeUnit`
             Default: None. The desired frequency units for the Lomb Scargle
             periodogram. This implies that 1/freq_unit is the units for period.
             With default normalization ('amplitude'), the freq_unit is set to
@@ -916,7 +923,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
     @staticmethod
     def from_lightcurve(lc, **kwargs):
-        """Creates a Periodogram from a LightCurve using the Box Least Squares (BLS) method.
+        """Creates a `Periodogram` from a LightCurve using the Box Least Squares (BLS) method.
 
         Parameters
         ----------

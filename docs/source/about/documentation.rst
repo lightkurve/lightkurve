@@ -20,14 +20,20 @@ Building documentation
     latest version of the documentation is available online at
     `docs.lightkurve.org <https://docs.lightkurve.org/>`_ .
 
-Building the *lightkurve* documentation requires `sphinx` and a few extra packages. To install them::
+Building the *lightkurve* documentation requires `sphinx` and a few extra packages. We recommend using `poetry` to install the development dependencies::
 
-    $ cd docs
-    $ pip install -r requirements.txt
+    $ poetry install
 
-If you encounter the error ``Pandoc wasn't found``, install `pandoc` as well. Follow its `installation instruction <https://pandoc.org/installing.html>`_  , or use `conda`::
+.. note::
 
-    $ conda install --channel=conda-forge pandoc
+    If you encounter the error ``Pandoc wasn't found``, you will have to install ``pandoc`` separately as well following its `installation instruction <https://pandoc.org/installing.html>`_  .
+    For example, on Mac OS you can install ``pandoc`` using ``homebrew``::
+
+        $ brew install pandoc
+
+    An alternative method is to install pandoc using ``conda``::
+
+        $ conda install --channel=conda-forge pandoc
 
 To build the documentation in HTML format, execute::
 

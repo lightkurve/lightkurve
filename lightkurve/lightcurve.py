@@ -73,7 +73,7 @@ class QTimeSeries(TimeSeries):
 
 
 class LightCurve(QTimeSeries):
-    """Class to hold time series brightness data for an astronomical object.
+    """Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.
 
     Compared to the generic `~astropy.timeseries.TimeSeries` class, `LightCurve`
     ensures that each object has `time`, `flux`, and `flux_err` columns.
@@ -329,8 +329,8 @@ class LightCurve(QTimeSeries):
     # of these required columns auto-completion.
 
     @property
-    def time(self):
-        """The time values."""
+    def time(self) -> Time:
+        """Time values stored as an AstroPy `~astropy.time.Time` object."""
         return self['time']
 
     @time.setter
@@ -338,8 +338,8 @@ class LightCurve(QTimeSeries):
         self['time'] = time
 
     @property
-    def flux(self):
-        """The brightness values."""
+    def flux(self) -> Quantity:
+        """Brightness values stored as an AstroPy `~astropy.units.Quantity` object."""
         return self['flux']
 
     @flux.setter
@@ -347,8 +347,8 @@ class LightCurve(QTimeSeries):
         self['flux'] = flux
 
     @property
-    def flux_err(self):
-        """The brightness uncertainty."""
+    def flux_err(self) -> Quantity:
+        """Brightness uncertainties stored as an AstroPy `~astropy.units.Quantity` object."""
         return self['flux_err']
 
     @flux_err.setter
@@ -1252,7 +1252,8 @@ class LightCurve(QTimeSeries):
         which returns a list of asteroids/comets/planets given a location, time,
         and search cone.
 
-        Notes:
+        Notes
+        -----
         * This method will use the `ra` and `dec` properties of the `LightCurve`
           object to determine the position of the search cone.
         * The size of the search cone is 15 spacecraft pixels by default. You
@@ -2231,8 +2232,7 @@ class LightCurve(QTimeSeries):
 
 
 class FoldedLightCurve(LightCurve):
-    """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
-    in which the ``time`` parameter represents phase values.
+    """Subclass of `LightCurve` in which the ``time`` parameter represents phase values.
 
     Compared to the `~lightkurve.lightcurve.LightCurve` base class, this class
     has extra meta data entries (``period``, ``epoch_time``, ``epoch_phase``,
@@ -2243,6 +2243,7 @@ class FoldedLightCurve(LightCurve):
 
     @property
     def phase(self):
+        """Alias for `LightCurve.time`."""
         return self.time
 
     @property

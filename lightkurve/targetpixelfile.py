@@ -858,7 +858,8 @@ class TargetPixelFile(object):
         which returns a list of asteroids/comets/planets given a location, time,
         and search cone.
 
-        Notes:
+        Notes
+        -----
         * This method will use the `ra` and `dec` properties of the `LightCurve`
           object to determine the position of the search cone.
         * The size of the search cone is 5 spacecraft pixels + TPF dimension by default. You

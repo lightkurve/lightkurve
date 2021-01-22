@@ -61,6 +61,7 @@ class PLDCorrector(RegressionCorrector):
       - :math:`a_l` is the first-order PLD coefficient on the linear term
       - :math:`b_{lm}` is the second-order PLD coefficient on the :math:`l^\text{th}`,
         :math:`m^\text{th}` pixel pair
+
     We perform Principal Component Analysis (PCA) to reduce the number of
     vectors in our final model to limit the set to best capture instrumental
     noise. With a PCA-reduced set of vectors, we can construct a design matrix
