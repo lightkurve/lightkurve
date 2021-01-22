@@ -40,6 +40,11 @@ lightkurve.lightcurve
 lightkurve.targetpixelfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+- Added the ability for the user to specify how they want the flux calculated
+  using ``extract_aperture_photometry``. The default is 'sum', but they
+  there is now the option of using a ``flux_method`` keyword to specifiy if the
+  user wants ``sum``, ``median``, or ``mean``. [#932]
+
 - Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
   ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
 

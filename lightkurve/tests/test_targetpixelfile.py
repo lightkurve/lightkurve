@@ -734,3 +734,18 @@ def test_estimate_background():
     bg = tpf.estimate_background(aperture_mask='all')
     assert_array_equal(bg.flux.value, 100)
     assert bg.flux.unit == tpf.flux.unit / u.pixel
+
+
+def test_fluxmode():
+    """This should verify the median flux use in an aperture"""
+    tpf = read(filename_tpf_one_center)
+    lc_n = tpf.extract_aperture_photometry(aperture_mask="all")
+    lc_sum = tpf.extract_aperture_photometry(aperture_mask="all", flux_method="sum")
+    lc_med = tpf.extract_aperture_photometry(aperture_mask="all", flux_method="median")
+    lc_mean = tpf.extract_aperture_photometry(aperture_mask="all", flux_method="mean")
+    assert lc_n.flux.value[0] == np.nansum(tpf.flux.value[0])
+    assert lc_sum.flux.value[0] == np.nansum(tpf.flux.value[0])
+    assert lc_med.flux.value[0] == np.nanmedian(tpf.flux.value[0])
+    assert lc_mean.flux.value[0] == np.nanmean(tpf.flux.value[0])
+    
+    
