@@ -776,7 +776,7 @@ class TargetPixelFile(object):
         row_centr = Quantity(row_centr, unit='pixel')
         return col_centr, row_centr
 
-    def _aperture_photometry(self, aperture_mask, flux_method, centroid_method='moments'):
+    def _aperture_photometry(self, aperture_mask, flux_method='sum', centroid_method='moments'):
         """Helper method for ``extract_aperture photometry``.
 
         Returns
@@ -800,11 +800,11 @@ class TargetPixelFile(object):
             
         elif flux_method == "mean":
             flux = np.nanmean(self.flux[:, apmask], axis=1)
-            
-        #Want default flux to be sum if not specified
-        #In the future we may wish to add a user specified function 
         else:
-            flux = np.nansum(self.flux[:, apmask], axis=1)
+            raise ValueError("`flux_method` must be one of 'sum', 'median', or 'mean'.")
+            
+        #In the future we may wish to add a user specified function 
+
         # We use ``np.nansum`` above to be robust against a subset of pixels
         # being NaN, however if *all* pixels are NaN, we propagate a NaN.
         is_allnan = ~np.any(np.isfinite(self.flux[:, apmask]), axis=1)
@@ -828,8 +828,6 @@ class TargetPixelFile(object):
             elif flux_method == "mean":
                 flux_err = np.nanmean(self.flux_err[:, apmask]**2, axis=1)**0.5
                 
-            else:
-                flux_err = np.nansum(self.flux_err[:, apmask]**2, axis=1)**0.5
             is_allnan = ~np.any(np.isfinite(self.flux_err[:, apmask]), axis=1)
             flux_err[is_allnan] = np.nan
 
@@ -1762,7 +1760,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """'Kepler' or 'K2'. ('MISSION' header keyword)"""
         return self.get_keyword('MISSION')
 
-    def extract_aperture_photometry(self, aperture_mask='default', flux_method='default', centroid_method='moments'):
+    def extract_aperture_photometry(self, aperture_mask='default', flux_method='sum', centroid_method='moments'):
         """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
@@ -2263,7 +2261,7 @@ class TessTargetPixelFile(TargetPixelFile):
     def mission(self):
         return 'TESS'
 
-    def extract_aperture_photometry(self, aperture_mask='default', flux_method='default', centroid_method='moments'):
+    def extract_aperture_photometry(self, aperture_mask='default', flux_method='sum', centroid_method='moments'):
         """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
