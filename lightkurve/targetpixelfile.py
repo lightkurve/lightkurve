@@ -776,7 +776,7 @@ class TargetPixelFile(object):
         row_centr = Quantity(row_centr, unit='pixel')
         return col_centr, row_centr
 
-    def _aperture_photometry(self, aperture_mask, flux_mode, centroid_method='moments'):
+    def _aperture_photometry(self, aperture_mask, flux_method, centroid_method='moments'):
         """Helper method for ``extract_aperture photometry``.
 
         Returns
@@ -792,13 +792,13 @@ class TargetPixelFile(object):
         centroid_col, centroid_row = self.estimate_centroids(apmask, method=centroid_method)
 
         # Estimate flux
-        if flux_mode == "sum":
+        if flux_method == "sum":
             flux = np.nansum(self.flux[:, apmask], axis=1)
             
-        elif flux_mode == "median":
+        elif flux_method == "median":
             flux = np.nanmedian(self.flux[:, apmask], axis=1)
             
-        elif flux_mode == "mean":
+        elif flux_method == "mean":
             flux = np.nanmean(self.flux[:, apmask], axis=1)
             
         #Want default flux to be sum if not specified
@@ -819,13 +819,13 @@ class TargetPixelFile(object):
         with warnings.catch_warnings():
             # Ignore warnings due to negative errors
             warnings.simplefilter("ignore", RuntimeWarning)
-            if flux_mode == "sum":
+            if flux_method == "sum":
                 flux_err = np.nansum(self.flux_err[:, apmask]**2, axis=1)**0.5
                 
-            elif flux_mode == "median":
+            elif flux_method == "median":
                 flux_err = np.nanmedian(self.flux_err[:, apmask]**2, axis=1)**0.5
                 
-            elif flux_mode == "mean":
+            elif flux_method == "mean":
                 flux_err = np.nanmean(self.flux_err[:, apmask]**2, axis=1)**0.5
                 
             else:
@@ -1762,7 +1762,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """'Kepler' or 'K2'. ('MISSION' header keyword)"""
         return self.get_keyword('MISSION')
 
-    def extract_aperture_photometry(self, aperture_mask='default', flux_mode='default', centroid_method='moments'):
+    def extract_aperture_photometry(self, aperture_mask='default', flux_method='default', centroid_method='moments'):
         """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
@@ -1793,7 +1793,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         flux, flux_err, centroid_col, centroid_row = \
             self._aperture_photometry(aperture_mask=aperture_mask,
-                                      flux_mode=flux_mode,
+                                      flux_method=flux_method,
                                       centroid_method=centroid_method)
         keys = {'centroid_col': centroid_col,
                 'centroid_row': centroid_row,
@@ -2263,7 +2263,7 @@ class TessTargetPixelFile(TargetPixelFile):
     def mission(self):
         return 'TESS'
 
-    def extract_aperture_photometry(self, aperture_mask='default', flux_mode='default', centroid_method='moments'):
+    def extract_aperture_photometry(self, aperture_mask='default', flux_method='default', centroid_method='moments'):
         """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
@@ -2293,7 +2293,7 @@ class TessTargetPixelFile(TargetPixelFile):
 
         flux, flux_err, centroid_col, centroid_row = \
             self._aperture_photometry(aperture_mask=aperture_mask,
-                                      flux_mode=flux_mode,
+                                      flux_method=flux_method,
                                       centroid_method=centroid_method)
         keys = {'centroid_col': centroid_col,
                 'centroid_row': centroid_row,
