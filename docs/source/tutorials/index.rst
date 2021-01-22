@@ -55,8 +55,8 @@ can be extracted from the pixel data, and on the removal of instrument noise
     2-creating-light-curves/2-1-saving-a-light-curve.ipynb
 
 
-2.2. Identifying instrument noise
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2.2. Identifying instrumental noise
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
     :maxdepth: 1
@@ -66,6 +66,7 @@ can be extracted from the pixel data, and on the removal of instrument noise
     2-creating-light-curves/2-2-kepler-noise-3-seasonal-and-detector-effects.ipynb
     2-creating-light-curves/2-2-kepler-noise-4-electronic-noise.ipynb    
     2-creating-light-curves/2-2-identifying-rolling-band.ipynb
+    2-creating-light-curves/2-2-how-to-use-cbvs.ipynb
 
 
 2.3. Removing instrumental noise
@@ -74,16 +75,17 @@ can be extracted from the pixel data, and on the removal of instrument noise
 .. toctree::
     :maxdepth: 1
 
-    04-how-to-use-cbvs.ipynb
-    04-how-to-remove-tess-scattered-light-using-regressioncorrector.ipynb
-    04-how-to-detrend.ipynb
+    2-creating-light-curves/2-3-how-to-use-cbvcorrector.ipynb
+    2-creating-light-curves/2-3-removing-scattered-light-using-regressioncorrector.ipynb
+    2-creating-light-curves/2-3-k2-pldcorrector.ipynb
+    2-creating-light-curves/2-3-k2-sffcorrector.ipynb
 
 
 3. Science examples
 -------------------
 
-In the final section we cover some data analysis tasks that astronomers might
-commonly want to do with time series data.
+In the final section we demonstrate scientific data analysis tasks which astronomers
+commonly apply to time series data.
 
 3.1. Exoplanet examples
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -91,25 +93,36 @@ commonly want to do with time series data.
 .. toctree::
     :maxdepth: 1
 
-    02-recover-a-planet.ipynb
-    02-how-to-recover-the-first-tess-candidate.ipynb
-    05-advanced_patterns_binning.ipynb
+    3-science-examples/exoplanets-identifying-transiting-planet-signals.ipynb
+    3-science-examples/exoplanets-recover-a-known-planet.ipynb
+    3-science-examples/exoplanets-recover-first-tess-candidate.ipynb
+    3-science-examples/exoplanets-machine-learning-preprocessing.ipynb
+    3-science-examples/exoplanets-visualizing-periodic-signals-using-a-river-plot.ipynb
 
+3.2. Rotation rates and periodic signals
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-3.2. Asteroseismology examples
+.. toctree::
+    :maxdepth: 1
+
+    3-science-examples/periodograms-creating-periodograms.ipynb
+    3-science-examples/periodograms-measuring-a-rotation-period.ipynb
+    3-science-examples/periodograms-verifying-the-location-of-a-signal.ipynb
+    3-science-examples/periodograms-optimizing-the-snr.ipynb
+
+3.3. Asteroseismology examples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
     :maxdepth: 1
 
-    02-how-to-optimize-periodogram-snr.ipynb
-    02-asteroseismology.ipynb
+    3-science-examples/asteroseismology-estimating-mass-and-radius.ipynb
+    3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb
 
-
-3.3. Other examples
+3.4. Other examples
 ~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
     :maxdepth: 1
 
-    02-how-to-make-a-supernova-lightcurve.ipynb
+    3-science-examples/other-supernova-lightcurve.ipynb

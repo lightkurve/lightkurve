@@ -93,7 +93,7 @@ nbsphinx_prolog = r"""
 
     .. raw:: html
 
-        <div style="float:right; margin-top:1em; margin-bottom:-1em;">
+        <div style="float:right; margin-bottom:1em;">
             <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/{{ docname }}"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
             <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/{{ docname }}"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
             <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/{{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
@@ -104,25 +104,12 @@ nbsphinx_prolog = r"""
 # -- Options for HTML output ----------------------------------------------
 html_theme = 'pydata_sphinx_theme'
 
-html_theme_options = {
-    "navbar_title": "Lightkurve v" + version,
-    "navbar_links": [
-        ("Quickstart", "quickstart"),
-        ("Tutorials", "tutorials/index"),
-        ("API", "api/index"),
-        ("About", "about/index"),
-    ],
-    "github_link": "https://github.com/KeplerGO/Lightkurve",
-    "footer_text": """Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="/about/citing.html">cite us</a> or
-                      <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>""",
-    "analytics_id": "UA-69171-9"
-}
 
 html_theme_options = {
     "external_links": [],
     "github_url": "https://github.com/KeplerGO/Lightkurve",
     "google_analytics_id": "UA-69171-9",
+    "search_bar_position": "navbar",
 }
 
 html_title = "Lightkurve "
@@ -153,5 +140,4 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
                        'matplotlib': ('https://matplotlib.org', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-                       'oktopus': ('https://keplergo.github.io/oktopus', None),
                        'astropy': ('https://docs.astropy.org/en/latest/', None)}
