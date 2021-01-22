@@ -89,9 +89,9 @@ def test_search_lightcurve(caplog):
     # with mission='TESS', it should return TESS observations
     tic = 'TIC 273985862'
     assert(len(search_lightcurve(tic, mission='TESS').table) > 1)
-    assert(len(search_lightcurve(tic, mission='TESS', sector=1, radius=100).table) == 2)
-    search_lightcurve(tic, mission='TESS', sector=1).download()
-    assert(len(search_lightcurve("pi Mensae", sector=1).table) == 1)
+    assert(len(search_lightcurve(tic, mission='TESS', author='spoc', sector=1, radius=100).table) == 2)
+    search_lightcurve(tic, mission='TESS', author='SPOC', sector=1).download()
+    assert(len(search_lightcurve("pi Mensae", author='SPOC', sector=1).table) == 1)
 
 
 @pytest.mark.remote_data
@@ -197,12 +197,12 @@ def test_collections():
     # TargetPixelFileCollection class
     assert(len(search_targetpixelfile('EPIC 205998445', mission='K2',radius=900).table) == 4)
     # LightCurveFileCollection class with set targetlimit
-    assert(len(search_lightcurve('EPIC 205998445', mission='K2', radius=900, limit=3).download_all()) == 3)
+    assert(len(search_lightcurve('EPIC 205998445', mission='K2', radius=900, limit=3, author='K2').download_all()) == 3)
     # if fewer targets are found than targetlimit, should still download all available
     assert(len(search_targetpixelfile('EPIC 205998445', mission='K2', radius=900, limit=6).table) == 4)
     # if download() is used when multiple files are available, should only download 1
     with pytest.warns(LightkurveWarning, match='4 files available to download'):
-        assert(isinstance(search_targetpixelfile('EPIC 205998445', mission='K2', radius=900).download(),
+        assert(isinstance(search_targetpixelfile('EPIC 205998445', mission='K2', radius=900, author="K2").download(),
                           KeplerTargetPixelFile))
 
 
@@ -275,7 +275,7 @@ def test_corrupt_download_handling():
 def test_indexerror_631():
     """Regression test for #631; avoid IndexError."""
     # This previously triggered an exception:
-    result = search_lightcurve("KIC 8462852", sector=15, radius=1)
+    result = search_lightcurve("KIC 8462852", sector=15, radius=1, author="spoc")
     assert len(result) == 1
 
 
@@ -309,7 +309,7 @@ def test_overlapping_targets_718():
 
     # Searching by `target_name` should not preven a KIC identifier to work
     # in a TESS data search
-    search = search_targetpixelfile('KIC 8462852', mission='TESS', sector=15)
+    search = search_targetpixelfile('KIC 8462852', mission='TESS', sector=15, author="spoc")
     assert len(search) == 1
 
 
@@ -323,7 +323,7 @@ def test_tesscut_795():
 @pytest.mark.remote_data
 def test_download_flux_column():
     """Can we pass reader keyword arguments to the download method?"""
-    lc = search_lightcurve("Pi Men", sector=12).download(flux_column='sap_flux')
+    lc = search_lightcurve("Pi Men", author='SPOC', sector=12).download(flux_column='sap_flux')
     assert_array_equal(lc.flux, lc.sap_flux)
 
 

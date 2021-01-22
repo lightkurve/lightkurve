@@ -1063,8 +1063,8 @@ def test_fold_v2():
 @pytest.mark.remote_data
 def test_combine_kepler_tess():
     """Can we append or stitch a TESS light curve to a Kepler light curve?"""
-    lc_kplr = search_lightcurve("Kepler-10", mission='Kepler')[0].download()
-    lc_tess = search_lightcurve("Kepler-10", mission='TESS')[0].download()
+    lc_kplr = search_lightcurve("Kepler-10", mission='Kepler', author="Kepler")[0].download()
+    lc_tess = search_lightcurve("Kepler-10", mission='TESS', author="SPOC")[0].download()
     # Can we use append()?
     lc = lc_kplr.append(lc_tess)
     assert(len(lc) == len(lc_kplr)+len(lc_tess))
@@ -1364,7 +1364,7 @@ def test_issue_916():
 def test_search_neighbors():
     """The closest neighbor to Proxima Cen in Sector 11 is TIC 388852407."""
     lc = search_lightcurve("Proxima Cen", sector=11).download()
-    search = lc.search_neighbors(limit=1, radius=300)
+    search = lc.search_neighbors(limit=1, radius=300, author="spoc", sector="11")
     assert len(search) == 1
     assert search.distance.value < 300
     assert search.target_name[0] == '388852407'
