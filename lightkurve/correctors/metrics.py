@@ -254,11 +254,12 @@ def _unique_key_for_processing_neighbors(
     min_targets: int = 30,
     max_targets: int = 50,
     interpolate: bool = False,
+    author: tuple = ("Kepler", "K2", "SPOC"),
     flux_column: str = "sap_flux",
 ):
     """Returns a unique key that will determine whether a cached version of a
     call to `_download_and_preprocess_neighbors` can be re-used."""
-    return f"{corrected_lc.ra}{corrected_lc.dec}{corrected_lc.cadenceno}{radius}{min_targets}{max_targets}{flux_column}{interpolate}"
+    return f"{corrected_lc.ra}{corrected_lc.dec}{corrected_lc.cadenceno}{radius}{min_targets}{max_targets}{author}{flux_column}{interpolate}"
 
 
 @cached(custom_key_maker=_unique_key_for_processing_neighbors)
@@ -268,6 +269,7 @@ def _download_and_preprocess_neighbors(
     min_targets: int = 30,
     max_targets: int = 50,
     interpolate: bool = False,
+    author: tuple = ("Kepler", "K2", "SPOC"),
     flux_column: str = "sap_flux",
 ):
     """Returns a collection of neighboring light curves.
@@ -300,7 +302,7 @@ def _download_and_preprocess_neighbors(
         List containing the flux arrays of the neighboring light curves,
         interpolated and aligned with `corrected_lc` if requested.
     """
-    search = corrected_lc.search_neighbors(limit=max_targets, radius=radius)
+    search = corrected_lc.search_neighbors(limit=max_targets, radius=radius, author=author)
     if len(search) < min_targets:
         raise MinTargetsError(
             f"Unable to find at least {min_targets} neighbors within {radius} arcseconds radius."

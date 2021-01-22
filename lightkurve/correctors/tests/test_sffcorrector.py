@@ -188,6 +188,6 @@ def test_sff_tess_warning():
 def test_sff_nan_centroids():
     """Regression test for #827: SFF failed if light curve contained
     NaNs in its `centroid_col` or `centroid_row` columns."""
-    lc = search_lightcurve("EPIC 211083408").download()
+    lc = search_lightcurve("EPIC 211083408", author="K2").download()
     # This previously raised a ValueError:
     lc[200:500].remove_nans().to_corrector("sff").correct()

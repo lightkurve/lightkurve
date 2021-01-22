@@ -303,7 +303,7 @@ def test_CBVCorrector_retrieval():
     #***
     # A good TESS example of both over- and under-fitting
     # The "over-fitted" curve looks better to the eye, but eyes can be deceiving!
-    lc = search_lightcurve('TIC 357126143', mission='tess', sector=10).download(flux_column='sap_flux')
+    lc = search_lightcurve('TIC 357126143', mission='tess', author='spoc', sector=10).download(flux_column='sap_flux')
     cbvCorrector =  CBVCorrector(lc)
     assert isinstance(cbvCorrector, CBVCorrector)
 
@@ -349,13 +349,13 @@ def test_CBVCorrector_retrieval():
     
     #***
     # A Kepler and K2 example
-    lc = search_lightcurve('KIC 6508221', mission='kepler', quarter=5).download(flux_column='sap_flux')
+    lc = search_lightcurve('KIC 6508221', mission='kepler', author='kepler', quarter=5).download(flux_column='sap_flux')
     cbvCorrector =  CBVCorrector(lc)
     lc = cbvCorrector.correct_gaussian_prior(alpha=1.0)
     assert isinstance(lc, KeplerLightCurve) 
     assert lc.flux.unit == u.Unit("electron / second")
 
-    lc = search_lightcurve('EPIC 247887989', mission='K2').download(flux_column='sap_flux')
+    lc = search_lightcurve('EPIC 247887989', mission='k2', author='k2').download(flux_column='sap_flux')
     cbvCorrector =  CBVCorrector(lc)
     lc = cbvCorrector.correct_gaussian_prior(alpha=1.0)
     assert isinstance(lc, KeplerLightCurve) 
