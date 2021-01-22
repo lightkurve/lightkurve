@@ -30,7 +30,6 @@ from .test_synthetic_data import filename_synthetic_flat
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
 filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
-filename_fluxmethod = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
 
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
@@ -739,16 +738,14 @@ def test_estimate_background():
 
 def test_fluxmode():
     """This should verify the median flux use in an aperture"""
-    tpf = read(filename_fluxmethod)
-    aper = np.zeros(tpf.shape[1:], dtype=bool)
-    aper[0:3, 0:3] = True
-    lc_n = tpf.extract_aperture_photometry(aperture_mask=aper, centroid_method='moments')
-    lc_sum = tpf.extract_aperture_photometry(aperture_mask=aper, flux_method="sum", centroid_method='moments')
-    lc_med = tpf.extract_aperture_photometry(aperture_mask=aper, flux_method="median", centroid_method='moments')
-    lc_mean = tpf.extract_aperture_photometry(aperture_mask=aper, flux_method="mean", centroid_method='moments')
-    assert lc_n.flux.value[0] == np.nansum(tpf.flux.value[0][aper])
-    assert lc_sum.flux.value[0] == np.nansum(tpf.flux.value[0][aper])
-    assert lc_med.flux.value[0] == np.nanmedian(tpf.flux.value[0][aper])
-    assert lc_mean.flux.value[0] == np.nanmean(tpf.flux.value[0][aper])
+    tpf = read(filename_tpf_one_center)
+    lc_n = tpf.extract_aperture_photometry(aperture_mask="all")
+    lc_sum = tpf.extract_aperture_photometry(aperture_mask="all", flux_method="sum")
+    lc_med = tpf.extract_aperture_photometry(aperture_mask="all", flux_method="median")
+    lc_mean = tpf.extract_aperture_photometry(aperture_mask="all", flux_method="mean")
+    assert lc_n.flux.value[0] == np.nansum(tpf.flux.value[0])
+    assert lc_sum.flux.value[0] == np.nansum(tpf.flux.value[0])
+    assert lc_med.flux.value[0] == np.nanmedian(tpf.flux.value[0])
+    assert lc_mean.flux.value[0] == np.nanmean(tpf.flux.value[0])
     
     
