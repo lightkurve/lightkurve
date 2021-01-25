@@ -1,10 +1,11 @@
 import os
 import warnings
+import tempfile
 
 import pytest
 
 from ...utils import LightkurveDeprecationWarning, LightkurveError
-from ... import PACKAGEDIR, KeplerTargetPixelFile, TessTargetPixelFile
+from ... import PACKAGEDIR, KeplerTargetPixelFile, TessTargetPixelFile, LightCurve
 from .. import read
 
 
@@ -58,3 +59,22 @@ def test_filenotfound():
     """Regression test for #540; ensure lk.read() yields `FileNotFoundError`."""
     with pytest.raises(FileNotFoundError):
         read("DOESNOTEXIST")
+
+
+def test_basic_ascii_io():
+    """Verify we do not break the basic ascii i/o functionality provided by AstroPy Table."""
+    # Part I: Can we read a LightCurve from a CSV file?
+    with tempfile.NamedTemporaryFile() as csvfile:
+        csvfile.write(b"time,flux,flux_err,color\n1,2,3,red\n4,5,6,green\n7,8,9,blue")
+        csvfile.flush()
+        lc_csv = LightCurve.read(csvfile.name, format="ascii.csv")
+        assert lc_csv.time[0].value == 1
+        assert lc_csv.flux[1] == 5
+        assert lc_csv.color[2] == "blue"
+
+    # Part II: can we write the light curve to a tab-separated ascii file, and read it back in?
+    with tempfile.NamedTemporaryFile() as tabfile:
+        lc_csv.write(tabfile.name, format='ascii.tab', overwrite=True)
+        lc_rst = LightCurve.read(tabfile.name, format='ascii.tab')
+        assert lc_rst.color[2] == "blue"
+        assert (lc_csv == lc_rst).all()
