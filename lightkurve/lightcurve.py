@@ -2046,10 +2046,10 @@ class LightCurve(QTimeSeries):
 
         ar = np.empty((n, np.max(cyc) + 1))
         ar[:] = np.nan
-        bs = np.linspace(minimum_phase, maximum_phase, n)
-        cycs = np.arange(0, np.max(cyc) + 1)
+        bs = np.linspace(minimum_phase, maximum_phase, n + 1)
+        cycs = np.arange(0, np.max(cyc) + 2)
 
-        ph_masks = [(ph > bs[jdx]) & (ph <= bs[jdx+1]) for jdx in range(n-1)]
+        ph_masks = [(ph > bs[jdx]) & (ph <= bs[jdx+1]) for jdx in range(n)]
         qual_mask = np.isfinite(y)
         for cyc1 in np.unique(cyc):
             cyc_mask = cyc == cyc1

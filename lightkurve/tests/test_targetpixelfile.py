@@ -375,7 +375,7 @@ def test_tpf_from_images():
     # Not without a wcs...
     with pytest.raises(Exception):
         TargetPixelFile.from_fits_images(_create_image_array(), size=(3, 3),
-                                               position=SkyCoord(-234.75, 8.3393, unit='deg'))
+                                         position=SkyCoord(-234.75, 8.3393, unit='deg'))
 
     # Make a fake WCS based on astropy.docs...
     w = wcs.WCS(naxis=2)
@@ -392,9 +392,13 @@ def test_tpf_from_images():
 
     # Now this should work.
     images = _create_image_array(header=header)
-    tpf = TargetPixelFile.from_fits_images(images, size=(3, 3),
-                                                 position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
-    assert isinstance(tpf, TargetPixelFile)
+    with warnings.catch_warnings():
+        # Ignore "LightkurveWarning: Could not detect filetype as TESSTargetPixelFile or KeplerTargetPixelFile, returning generic TargetPixelFile instead." 
+        warnings.simplefilter("ignore", LightkurveWarning)
+        tpf = TargetPixelFile.from_fits_images(images,
+                                               size=(3, 3),
+                                               position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+        assert isinstance(tpf, TargetPixelFile)
 
 
     with warnings.catch_warnings():
@@ -420,15 +424,18 @@ def test_tpf_from_images():
             hdu.writeto(tmpfile.name)
             hdus.append(hdu)
 
-        # Should be able to run with a list of file names
-        tpf_tmpfiles = TargetPixelFile.from_fits_images(tmpfile_names,
-                            size=(3, 3),
-                            position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+        with warnings.catch_warnings():
+            # Ignore "LightkurveWarning: Could not detect filetype as TESSTargetPixelFile or KeplerTargetPixelFile, returning generic TargetPixelFile instead." 
+            warnings.simplefilter("ignore", LightkurveWarning)
+            # Should be able to run with a list of file names
+            tpf_tmpfiles = TargetPixelFile.from_fits_images(tmpfile_names,
+                                size=(3, 3),
+                                position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
-        # Should be able to run with a list of HDUlists
-        tpf_hdus = TargetPixelFile.from_fits_images(hdus,
-                            size=(3, 3),
-                            position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+            # Should be able to run with a list of HDUlists
+            tpf_hdus = TargetPixelFile.from_fits_images(hdus,
+                                size=(3, 3),
+                                position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
         # Clean up the temporary files we created
         for filename in tmpfile_names:
@@ -456,9 +463,12 @@ def test_tpf_wcs_from_images():
     header['CRVAL2P'] = 20
     ra, dec = 23.2336, 45.235
 
-    # Now this should work.
-    tpf = TargetPixelFile.from_fits_images(_create_image_array(header=header), size=(3, 3),
-                                                 position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+    with warnings.catch_warnings():
+        # Ignore "LightkurveWarning: Could not detect filetype as TESSTargetPixelFile or KeplerTargetPixelFile, returning generic TargetPixelFile instead." 
+        warnings.simplefilter("ignore", LightkurveWarning)
+        # Now this should work.
+        tpf = TargetPixelFile.from_fits_images(_create_image_array(header=header), size=(3, 3),
+                                               position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
     assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
     assert tpf.hdu[1].header['1CTYP5'] == 'RA---TAN'
     assert tpf.hdu[1].header['2CTYP5'] == 'DEC--TAN'
@@ -560,27 +570,27 @@ def test_tpf_tess():
 def test_tpf_slicing(tpf_type):
     """Test indexing and slicing of TargetPixelFile objects."""
     with warnings.catch_warnings():
-        # Ignore the "TELESCOP is not equal to TESS" warning
+        # Ignore "LightkurveWarning: A Kepler data product is being opened using the `TessTargetPixelFile` class. Please use `KeplerTargetPixelFile` instead." 
         warnings.simplefilter("ignore", LightkurveWarning)
         tpf = tpf_type(filename_tpf_one_center)
 
-    assert tpf[0].time == tpf.time[0]
-    assert tpf[-1].time == tpf.time[-1]
-    assert tpf[5:10].shape == tpf.flux[5:10].shape
-    assert tpf[0].targetid == tpf.targetid
-    assert_array_equal(tpf[tpf.time < tpf.time[5]].time, tpf.time[0:5])
+        assert tpf[0].time == tpf.time[0]
+        assert tpf[-1].time == tpf.time[-1]
+        assert tpf[5:10].shape == tpf.flux[5:10].shape
+        assert tpf[0].targetid == tpf.targetid
+        assert_array_equal(tpf[tpf.time < tpf.time[5]].time, tpf.time[0:5])
 
-    frame = tpf[5]
-    assert frame.shape[0] == 1
-    assert frame.shape[1:] == tpf.shape[1:]
-    assert_array_equal(frame.time[0], tpf.time[5])
-    assert_array_equal(frame.flux[0], tpf.flux[5])
+        frame = tpf[5]
+        assert frame.shape[0] == 1
+        assert frame.shape[1:] == tpf.shape[1:]
+        assert_array_equal(frame.time[0], tpf.time[5])
+        assert_array_equal(frame.flux[0], tpf.flux[5])
 
-    frames = tpf[100:200]
-    assert frames.shape[0] == 100
-    assert frames.shape[1:] == tpf.shape[1:]
-    assert_array_equal(frames.time, tpf.time[100:200])
-    assert_array_equal(frames.flux, tpf.flux[100:200])
+        frames = tpf[100:200]
+        assert frames.shape[0] == 100
+        assert frames.shape[1:] == tpf.shape[1:]
+        assert_array_equal(frames.time, tpf.time[100:200])
+        assert_array_equal(frames.flux, tpf.flux[100:200])
 
 
 def test_endianness():
