@@ -1413,11 +1413,11 @@ class LightCurve(QTimeSeries):
 
         # Default ylabel
         if ylabel is None:
-            if "flux" in column:
+            if "flux" == column:
                 ylabel = "Flux"
             else:
                 ylabel = f"{column}"
-            if normalize or self.meta.get('NORMALIZED'):
+            if normalize or (column == "flux" and self.meta.get('NORMALIZED')):
                 ylabel = "Normalized " + ylabel
             elif (self[column].unit) and (self[column].unit.to_string() != ''):
                 ylabel += f" [{self[column].unit.to_string('latex_inline')}]"
@@ -2210,11 +2210,12 @@ class LightCurve(QTimeSeries):
                 and 'sector' not in search_criteria
                 and 'quarter' not in search_criteria
                 and 'campaign' not in search_criteria):
-            if (self.mission == 'TESS'):
+            mission = self.meta.get('MISSION', None)
+            if mission == 'TESS':
                 search_criteria['sector'] = self.sector
-            elif (self.mission == 'Kepler'):
+            elif mission == 'Kepler':
                 search_criteria['quarter'] = self.quarter
-            elif (self.mission == 'K2'):
+            elif mission == 'K2':
                 search_criteria['campaign'] = self.campaign
 
         # Note: we increase `limit` by one below to account for the fact that the
