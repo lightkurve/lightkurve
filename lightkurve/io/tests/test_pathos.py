@@ -21,7 +21,7 @@ def test_read_pathos():
     exts.extend([f'AP{ap}_FLUX_COR' for ap in [1,2,3,4]])
 
     for ext in exts:
-        lc = read_pathos_lightcurve(url, ext=ext)
+        lc = read_pathos_lightcurve(url, flux_column=ext)
         assert type(lc).__name__ == "TESSLightCurve"
         # Are `time` and `flux` consistent with the FITS file?
         assert_array_equal(f[1].data['TIME'], lc.time.value)
