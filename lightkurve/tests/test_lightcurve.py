@@ -1363,7 +1363,7 @@ def test_issue_916():
 @pytest.mark.remote_data
 def test_search_neighbors():
     """The closest neighbor to Proxima Cen in Sector 11 is TIC 388852407."""
-    lc = search_lightcurve("Proxima Cen", sector=11).download()
+    lc = search_lightcurve("Proxima Cen", author="spoc", sector=11).download()
     search = lc.search_neighbors(limit=1, radius=300, author="spoc", sector="11")
     assert len(search) == 1
     assert search.distance.value < 300

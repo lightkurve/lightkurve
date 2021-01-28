@@ -333,7 +333,7 @@ def test_cadence_filtering():
     # Try `cadence="fast"`
     res = search_lightcurve("AU Mic", sector=27, cadence="fast")
     assert(len(res) == 1)
-    assert res.table['t_exptime'][0] == 20
+    assert res.exptime[0].value == 20
     # Try `cadence="short"`
     res = search_lightcurve("AU Mic", sector=27, cadence="short")
     assert(len(res) == 1)
@@ -364,7 +364,7 @@ def test_qlp_ffi_lightcurve():
     search = search_lightcurve("TrES-2b", sector=26, author="qlp")
     assert len(search) == 1
     assert search.author[0] == "QLP"
-    assert search.t_exptime[0] == 30*u.minute  # Sector 26 had 30-minute FFIs
+    assert search.exptime[0] == 30*u.minute  # Sector 26 had 30-minute FFIs
     lc = search.download()
     all(lc.flux == lc.kspsap_flux)
 
@@ -375,6 +375,6 @@ def test_spoc_ffi_lightcurve():
     search = search_lightcurve("TrES-2b", sector=26, author="tess-spoc")
     assert len(search) == 1
     assert search.author[0] == "TESS-SPOC"
-    assert search.t_exptime[0] == 30*u.minute  # Sector 26 had 30-minute FFIs
+    assert search.exptime[0] == 30*u.minute  # Sector 26 had 30-minute FFIs
     lc = search.download()
     all(lc.flux == lc.pdcsap_flux)

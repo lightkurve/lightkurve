@@ -66,15 +66,15 @@ class SearchResult(object):
         self.table['#'] = None
         for idx in range(len(self.table)):
             self.table['#'][idx] = idx
-        self.table['t_exptime'].unit = "s"
-        self.table['t_exptime'].format = ".0f"
+        self.table['exptime'].unit = "s"
+        self.table['exptime'].format = ".0f"
         self.table['distance'].unit = "arcsec"
 
     def __repr__(self, html=False):
         out = 'SearchResult containing {} data products.'.format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = ['#', 'observation', 'author', 'target_name', 't_exptime', 'productFilename', 'distance']
+        columns = ['#', 'observation', 'author', 'target_name', 'exptime', 'productFilename', 'distance']
         return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, html=html))
 
     def _repr_html_(self):
@@ -129,9 +129,9 @@ class SearchResult(object):
         return self.table['target_name'].data.data
 
     @property
-    def t_exptime(self):
+    def exptime(self):
         """Exposure time for each data product found."""
-        return self.table['t_exptime'].quantity
+        return self.table['exptime'].quantity
 
     @property
     def productFilename(self):
@@ -435,7 +435,7 @@ class SearchResult(object):
         return path
 
 @cached
-def search_targetpixelfile(target, radius=None, cadence=None,
+def search_targetpixelfile(target, radius=None, exptime=None, cadence=None,
                            mission=('Kepler', 'K2', 'TESS'),
                            author=None,
                            quarter=None, month=None, campaign=None, sector=None,
@@ -460,13 +460,15 @@ def search_targetpixelfile(target, radius=None, cadence=None,
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
-    cadence : 'long', 'short', 'fast', or float
+    exptime : 'long', 'short', 'fast', or float
         'long' selects 10-min and 30-min cadence products;
         'short' selects 1-min and 2-min products;
         'fast' selects 20-sec products.
         Alternatively, you can pass the exact exposure time in seconds as
         an int or a float, e.g. ``cadence=600`` selects 10-minute cadence.
         By default, all cadence modes are returned.
+    cadence : 'long', 'short', 'fast', or float
+        Synonym for `exptime`. Will likely be deprecated in the future.
     mission : str, tuple of str
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     author : str, tuple of str, or "any"
@@ -529,7 +531,7 @@ def search_targetpixelfile(target, radius=None, cadence=None,
     """
     try:
         return _search_products(target, radius=radius, filetype="Target Pixel",
-                                cadence=cadence, mission=mission,
+                                exptime=exptime or cadence, mission=mission,
                                 provenance_name=author,
                                 quarter=quarter, month=month,
                                 campaign=campaign, sector=sector,
@@ -545,7 +547,7 @@ def search_lightcurvefile(*args, **kwargs):
 
 
 @cached
-def search_lightcurve(target, radius=None, cadence=None,
+def search_lightcurve(target, radius=None, exptime=None, cadence=None,
                       mission=('Kepler', 'K2', 'TESS'),
                       author=None,
                       quarter=None, month=None, campaign=None, sector=None,
@@ -570,13 +572,15 @@ def search_lightcurve(target, radius=None, cadence=None,
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
-    cadence : 'long', 'short', 'fast', or float
+    exptime : 'long', 'short', 'fast', or float
         'long' selects 10-min and 30-min cadence products;
         'short' selects 1-min and 2-min products;
         'fast' selects 20-sec products.
         Alternatively, you can pass the exact exposure time in seconds as
         an int or a float, e.g. ``cadence=600`` selects 10-minute cadence.
         By default, all cadence modes are returned.
+    cadence : 'long', 'short', 'fast', or float
+        Synonym for `exptime`. This keyword will likely be deprecated in the future.
     mission : str, tuple of str
         'Kepler', 'K2', or 'TESS'. By default, all will be returned.
     author : str, tuple of str, or "any"
@@ -641,7 +645,7 @@ def search_lightcurve(target, radius=None, cadence=None,
     """
     try:
         return _search_products(target, radius=radius, filetype="Lightcurve",
-                                cadence=cadence, mission=mission,
+                                exptime=exptime or cadence, mission=mission,
                                 provenance_name=author,
                                 quarter=quarter, month=month,
                                 campaign=campaign, sector=sector, limit=limit)
@@ -686,10 +690,10 @@ def search_tesscut(target, sector=None):
         return SearchResult(None)
 
 
-def _search_products(target, radius=None, filetype="Lightcurve", cadence=None,
+def _search_products(target, radius=None, filetype="Lightcurve",
                      mission=('Kepler', 'K2', 'TESS'),
                      provenance_name=None,
-                     t_exptime=(0, 9999), quarter=None, month=None,
+                     exptime=(0, 9999), quarter=None, month=None,
                      campaign=None, sector=None, limit=None,
                      **extra_query_criteria):
     """Helper function which returns a SearchResult object containing MAST
@@ -704,7 +708,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence=None,
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
     filetype : {'Target pixel', 'Lightcurve', 'FFI'}
         Type of files queried at MAST.
-    cadence : 'long', 'short', 'fast', or float
+    exptime : 'long', 'short', 'fast', or float
         'long' selects 10-min and 30-min cadence products;
         'short' selects 1-min and 2-min products;
         'fast' selects 20-sec products.
@@ -771,7 +775,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence=None,
     observations = _query_mast(target, radius=radius,
                                project=mission,
                                provenance_name=provenance_name,
-                               t_exptime=t_exptime,
+                               exptime=exptime,
                                sequence_number=campaign or sector,
                                **extra_query_criteria)
     log.debug("MAST found {} observations. "
@@ -809,7 +813,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence=None,
 
         masked_result = _filter_products(result, filetype=filetype,
                                          campaign=campaign, quarter=quarter,
-                                         cadence=cadence, project=mission,
+                                         exptime=exptime, project=mission,
                                          provenance_name=provenance_name,
                                          month=month, sector=sector, limit=limit)
         log.debug("MAST found {} matching data products.".format(len(masked_result)))
@@ -831,7 +835,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence=None,
                                 'observation': f'TESS Sector {s}',
                                 'target_name': str(target),
                                 'targetid': str(target),
-                                't_exptime': observations['t_exptime'][idx],
+                                'exptime': observations['exptime'][idx],
                                 'productFilename': 'TESSCut',
                                 'provenance_name': 'MAST',
                                 'author': 'MAST',
@@ -852,7 +856,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence=None,
 def _query_mast(target, radius=None,
                 project=('Kepler', 'K2', 'TESS'),
                 provenance_name=None,
-                t_exptime=(0, 9999),
+                exptime=(0, 9999),
                 sequence_number=None,
                 **extra_query_criteria):
     """Helper function which wraps `astroquery.mast.Observations.query_criteria()`
@@ -875,7 +879,7 @@ def _query_mast(target, radius=None,
         Provenance of the observation.  Common options include 'Kepler', 'K2',
         'SPOC', 'K2SFF', 'EVEREST', 'KEPSEISMIC'.
         This parameter is case-insensitive.
-    t_exptime : (float, float) tuple
+    exptime : (float, float) tuple
         Exposure time range in seconds. Common values include `(59, 61)`
         for Kepler short cadence and `(1799, 1801)` for Kepler long cadence.
     sequence_number : int, list of int
@@ -906,8 +910,8 @@ def _query_mast(target, radius=None,
         query_criteria['provenance_name'] = provenance_name
     if sequence_number is not None:
         query_criteria['sequence_number'] = sequence_number
-    if t_exptime is not None:
-        query_criteria['t_exptime'] = t_exptime
+    if exptime is not None:
+        query_criteria['t_exptime'] = exptime
 
     # If an exact KIC ID is passed, we will search by the exact `target_name`
     # under which MAST will know the object to prevent source confusion.
@@ -932,9 +936,12 @@ def _query_mast(target, radius=None,
                   f"target_name='{exact_target_name}'.")
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=NoResultsWarning)
+            warnings.filterwarnings("ignore", message="t_exptime is continuous")
             obs = Observations.query_criteria(target_name=exact_target_name,
                                               **query_criteria)
         if len(obs) > 0:
+            # We use `exptime` as an alias for `t_exptime`
+            obs['exptime'] = obs['t_exptime']
             # astroquery does not report distance when querying by `target_name`;
             # we add it here so that the table returned always has this column.
             obs['distance'] = 0.
@@ -955,9 +962,12 @@ def _query_mast(target, radius=None,
                   f"{radius.to(u.arcsec)} arcsec of objectname='{target}'.")
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=NoResultsWarning)
+            warnings.filterwarnings("ignore", message="t_exptime is continuous")
             obs = Observations.query_criteria(objectname=target,
                                               **query_criteria)
         obs.sort('distance')
+        # We use `exptime` as an alias for `t_exptime`
+        obs['exptime'] = obs['t_exptime']
         return obs
     except ResolverError as exc:
         # MAST failed to resolve the object name to sky coordinates
@@ -965,7 +975,7 @@ def _query_mast(target, radius=None,
 
 
 def _filter_products(products, campaign=None, quarter=None, month=None,
-                     sector=None, cadence=None, limit=None,
+                     sector=None, exptime=None, limit=None,
                      project=('Kepler', 'K2', 'TESS'),
                      provenance_name=None,
                      filetype='Target Pixel'):
@@ -982,7 +992,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         Desired quarter of observation for data products
     month : int or list
         Desired month of observation for data products
-    cadence : 'long', 'short', 'fast', or float
+    exptime : 'long', 'short', 'fast', or float
         'long' selects 10-min and 30-min cadence products;
         'short' selects 1-min and 2-min products;
         'fast' selects 20-sec products.
@@ -1027,7 +1037,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
                       for uri in products['productFilename']])
 
     # Filter by cadence
-    mask &= _mask_by_cadence(products, cadence)
+    mask &= _mask_by_exptime(products, exptime)
 
     products = products[mask]
 
@@ -1082,17 +1092,17 @@ def _mask_kepler_products(products, quarter=None, month=None):
     return mask
 
 
-def _mask_by_cadence(products, cadence):
+def _mask_by_exptime(products, exptime):
     """Helper function to filter by exposure time."""
     mask = np.ones(len(products), dtype=bool)
-    if isinstance(cadence, (int, float)):
-        mask &= products['t_exptime'] == cadence
-    elif cadence in ['fast']:
-        mask &= products['t_exptime'] < 60
-    elif cadence in ['short']:
-        mask &= (products['t_exptime'] >= 60) & (products['t_exptime'] < 300)
-    elif cadence in ['long', 'ffi']:
-        mask &= products['t_exptime'] >= 300
+    if isinstance(exptime, (int, float)):
+        mask &= products['exptime'] == exptime
+    elif exptime in ['fast']:
+        mask &= products['exptime'] < 60
+    elif exptime in ['short']:
+        mask &= (products['exptime'] >= 60) & (products['exptime'] < 300)
+    elif exptime in ['long', 'ffi']:
+        mask &= products['exptime'] >= 300
     return mask
 
 
