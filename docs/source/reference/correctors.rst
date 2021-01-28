@@ -12,9 +12,19 @@ At the core of the package lies the generic `.RegressionCorrector` class.
 It uses linear regression to correlate a light curve against a `.DesignMatrix`
 of column vectors which are known to correlate with additive noise components.
 
-The `PLDCorrector` and `SFFCorrector` classes extend `RegressionCorrector`
+The `CBVCorrector`, `PLDCorrector`, and `SFFCorrector` classes extend `RegressionCorrector`
 by providing the user with pre-configured `DesignMatrix` objects which are
 known to be effective at removing different types of noise.
+
+Cotrending Basis Vectors (CBV)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+  :toctree: api/
+
+  CBVCorrector
+  CBVCorrector.correct
+  CBVCorrector.diagnose
 
 
 Pixel Level Decorrelation (PLD)
