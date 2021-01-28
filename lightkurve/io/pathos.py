@@ -18,8 +18,8 @@ def read_pathos_lightcurve(filename,
     ----------
     filename : str
         Local path or remote url of PATHOS light curve FITS file.
-    flux_column : 'PSF_FLUX_COR' or 'AP#_FLUX_COR' (# = 1, 2, 3, or 4)
-        or 'PSF_FLUX_RAW' or 'AP#_FLUX_RAW' (# = 1, 2, 3, or 4)
+    flux_column : 'psf_flux_cor' or 'ap#_flux_cor' (# = 1, 2, 3, or 4)
+        or 'psf_flux_raw' or 'ap#_flux_raw' (# = 1, 2, 3, or 4)
         Which column in the FITS file contains the preferred flux data?
     quality_bitmask : str or int
         Bitmask (integer) which identifies the quality flag bitmask that should
@@ -37,7 +37,7 @@ def read_pathos_lightcurve(filename,
         See the :class:`TessQualityFlags` class for details on the bitmasks.
     """
     lc = read_generic_lightcurve(filename,
-                                 flux_column=flux_column,
+                                 flux_column=flux_column.lower(),
                                  time_format='btjd',
                                  quality_column="DQUALITY")
 

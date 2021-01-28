@@ -6,6 +6,15 @@ from numpy.testing import assert_array_equal
 
 from ... import search_lightcurve
 from ..pathos import read_pathos_lightcurve
+from .detect import detect_filetype
+
+@pytest.mark.remote_data
+def test_detect_pathos():
+    """Can we detect the correct format for PATHOS files?"""
+    url = "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HLSP/pathos/s0008/hlsp_pathos_tess_lightcurve_tic-0093270923-s0008_tess_v1_llc.fits"
+    f = fits.open(url)
+
+    assert detect_filetype(f)=="PATHOS"
 
 
 @pytest.mark.remote_data

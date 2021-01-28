@@ -45,7 +45,7 @@ def detect_filetype(hdulist: HDUList) -> str:
 
     # Is it a PATHOS TESS light curve?
     # cf. http://archive.stsci.edu/hlsp/pathos
-    if "pathos" in hdulist[0].header.get('origin', '').lower():
+    if "pathos" in (hdulist.filename() or ""):
         return "PATHOS"
 
     # Is it a K2VARCAT file?
