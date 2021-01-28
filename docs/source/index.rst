@@ -26,6 +26,7 @@ for time domain astronomy.
     lightcurve = lk.search_lightcurve("Proxima Centauri", mission="TESS").download()
     lightcurve.fold(period=11.184).plot()
 
+
 Documentation
 -------------
 
@@ -33,6 +34,7 @@ Documentation
     :maxdepth: 1
     :titlesonly:
 
+    What's new? <whats-new-v2.ipynb>
     quickstart
     tutorials/index
     reference/index

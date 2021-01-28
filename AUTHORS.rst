@@ -48,6 +48,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Nuno Ramos Carvalho <https://github.com/nunorc>`_
 - `Derek Homeier <https://github.com/dhomeier>`_
 - `Scott Fleming <https://github.com/scfleming>`_
+- `Susan Mullally <https://github.com/mustaric>`_
 
 
 Community
@@ -57,7 +58,6 @@ We are grateful to the following community members for sharing corrections & sug
 - `Clare Brasseur <https://github.com/ceb8>`_
 - `Doug Caldwell <https://github.com/dacmess>`_
 - TJ Jaffe
-- `Susan Mullally <https://github.com/mustaric>`_
 - `Elisa Quintana <https://github.com/elisaquintana>`_
 - Jeff Van Cleve
 - Ashley Villar
