@@ -46,7 +46,7 @@ def read_pathos_lightcurve(filename,
     # that are Quantity objects, so for now we remove poor-quality data instead
     # of masking. Details: https://github.com/astropy/astropy/issues/10119
     quality_mask = TessQualityFlags.create_quality_mask(
-                                quality_array=lc['quality'],
+                                quality_array=lc['dquality'],
                                 bitmask=quality_bitmask)
     lc = lc[quality_mask]
 

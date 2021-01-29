@@ -6,7 +6,7 @@ from numpy.testing import assert_array_equal
 
 from ... import search_lightcurve
 from ..pathos import read_pathos_lightcurve
-from .detect import detect_filetype
+from ..detect import detect_filetype
 
 @pytest.mark.remote_data
 def test_detect_pathos():
@@ -31,10 +31,12 @@ def test_read_pathos():
 
     for ext in exts:
         lc = read_pathos_lightcurve(url, flux_column=ext)
-        assert type(lc).__name__ == "TESSLightCurve"
+        assert type(lc).__name__ == "TessLightCurve"
         # Are `time` and `flux` consistent with the FITS file?
-        assert_array_equal(f[1].data['TIME'], lc.time.value)
-        assert_array_equal(f[1].data[ext], lc.flux.value)
+        assert_array_equal(f[1].data['TIME'][lc.meta['QUALITY_MASK']],
+                           lc.time.value)
+        assert_array_equal(f[1].data[ext][lc.meta['QUALITY_MASK']],
+                           lc.flux.value)
         fluxes.append(lc.flux)
     # Different extensions should show different fluxes
     for i in range(9):
@@ -47,5 +49,5 @@ def test_search_pathos():
     assert len(search) == 1
     assert search.table["author"][0] == "PATHOS"
     lc = search.download()
-    assert type(lc).__name__ == "TESSLightCurve"
+    assert type(lc).__name__ == "TessLightCurve"
     assert lc.sector == 8
