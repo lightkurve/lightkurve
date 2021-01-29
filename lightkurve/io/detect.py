@@ -48,7 +48,7 @@ def detect_filetype(hdulist: HDUList) -> str:
     # The 'pathos' name doesn't stay in the filename if when we use fits.open
     # to download a file, so we have to check for all the important columns
     # This will cause problems if another HLSP has the exact same colnames...
-    if all(x in f[1].columns.names for x in ["PSF_FLUX_RAW", "PSF_FLUX_COR", "AP4_FLUX_RAW", "AP4_FLUX_COR", "SKY_LOCAL"]):
+    if all(x in hdulist[1].columns.names for x in ["PSF_FLUX_RAW", "PSF_FLUX_COR", "AP4_FLUX_RAW", "AP4_FLUX_COR", "SKY_LOCAL"]):
         return "PATHOS"
 
     # Is it a K2VARCAT file?
