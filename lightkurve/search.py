@@ -41,6 +41,7 @@ AUTHOR_LINKS = {
     "CDIPS": "https://archive.stsci.edu/hlsp/cdips",
     "K2SFF": "https://archive.stsci.edu/hlsp/k2sff",
     "EVEREST": "https://archive.stsci.edu/hlsp/everest",
+    "TESScut": "https://mast.stsci.edu/tesscut/"
 }
 
 
@@ -884,9 +885,9 @@ def _search_products(target, radius=None, filetype="Lightcurve",
                                 'targetid': str(target),
                                 't_min': observations['t_min'][idx],
                                 'exptime': observations['exptime'][idx],
-                                'productFilename': 'TESSCut',
-                                'provenance_name': 'MAST',
-                                'author': 'MAST',
+                                'productFilename': 'TESScut',
+                                'provenance_name': 'TESScut',
+                                'author': 'TESScut',
                                 'distance': 0.0,
                                 'sequence_number': s,
                                 'project': 'TESS',
