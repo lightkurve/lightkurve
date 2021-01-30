@@ -14,6 +14,7 @@ from astropy.coordinates import SkyCoord
 from astropy.io import ascii
 from astropy import units as u
 from astropy.utils import deprecated
+from astropy.time import Time
 
 from .targetpixelfile import TargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveCollection
@@ -26,6 +27,21 @@ log = logging.getLogger(__name__)
 __all__ = ['search_targetpixelfile', 'search_lightcurve',
            'search_lightcurvefile', 'search_tesscut',
            'SearchResult']
+
+
+# Which external links should we display in the SearchResult repr?
+AUTHOR_LINKS = {
+    "Kepler": "https://archive.stsci.edu/kepler/data_products.html",
+    "K2": "https://archive.stsci.edu/k2/data_products.html",
+    "SPOC": "https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html",
+    "TESS-SPOC": "https://archive.stsci.edu/hlsp/tess-spoc",
+    "QLP": "https://archive.stsci.edu/hlsp/qlp",
+    "TASOC": "https://archive.stsci.edu/hlsp/tasoc",
+    "PATHOS": "https://archive.stsci.edu/hlsp/pathos",
+    "CDIPS": "https://archive.stsci.edu/hlsp/cdips",
+    "K2SFF": "https://archive.stsci.edu/hlsp/k2sff",
+    "EVEREST": "https://archive.stsci.edu/hlsp/everest",
+}
 
 
 class SearchError(Exception):
@@ -56,26 +72,55 @@ class SearchResult(object):
             self.table = table
             if len(table) > 0:
                 self._add_columns()
+                self._sort_table()
+
+    def _sort_table(self):
+        """Sort the table of search results by distance, author, and filename.
+
+        The reason we include "author" in the sort criteria is that Lightkurve v1 only
+        showed data products created by the official pipelines (i.e. author equal to
+        "Kepler", "K2", or "SPOC"). To maintain backwards compatibility, we want to
+        show products from these authors at the top, so that `search.download()`
+        operations tend to download the same product in Lightkurve v1 vs v2.
+        This ordering is not a judgement on the quality of one product vs another,
+        because we love all pipelines!
+        """
+        sort_priority = {"Kepler": 1,
+                         "K2": 1,
+                         "SPOC": 1,
+                         "TESS-SPOC": 2,
+                         "QLP": 3}
+        self.table["sort_order"] = [sort_priority.get(author, 9) for author in self.table["author"]]
+        self.table.sort(['distance', 'year', 'mission', 'sort_order', 'exptime'])
 
     def _add_columns(self):
-        """Adds user-friendly index (``#``) column.
-
-        These columns are not part of the MAST Portal API, but they make the
-        display of search results much nicer in Lightkurve.
+        """Adds a user-friendly index (``#``) column and adds column unit
+        and display format information.
         """
         self.table['#'] = None
-        for idx in range(len(self.table)):
-            self.table['#'][idx] = idx
         self.table['exptime'].unit = "s"
         self.table['exptime'].format = ".0f"
         self.table['distance'].unit = "arcsec"
+
+        # Add the year column from `t_min` or `productFilename`
+        year = np.floor(Time(self.table["t_min"], format="mjd").decimalyear)
+        self.table["year"] = year.astype(int)
+        # `t_min` is incorrect for Kepler products, so we extract year from the filename for those =(
+        for idx in np.where(self.table["author"] == "Kepler")[0]:
+            self.table["year"][idx] = re.findall(r"\d+.(\d{4})\d+", self.table["productFilename"][idx])[0]
 
     def __repr__(self, html=False):
         out = 'SearchResult containing {} data products.'.format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = ['#', 'observation', 'author', 'target_name', 'exptime', 'productFilename', 'distance']
-        return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, html=html))
+        columns = ['#', 'mission', 'year', 'author', 'exptime', 'target_name', 'distance']
+        self.table["#"] = [idx for idx in range(len(self.table))]
+        out += '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, html=html))
+        # Make sure author names show up as clickable links
+        if html:
+            for author, url in AUTHOR_LINKS.items():
+                out = out.replace(f">{author}<", f"><a href='{url}'>{author}</a><")
+        return out
 
     def _repr_html_(self):
         return self.__repr__(html=True)
@@ -114,29 +159,29 @@ class SearchResult(object):
         return self.table['s_dec'].data.data
 
     @property
-    def observation(self):
+    def mission(self):
         """Kepler quarter or TESS sector names for each data product found."""
-        return self.table['observation'].data.data
+        return self.table['mission'].data
+
+    @property
+    def year(self):
+        """Year the observation was made."""
+        return self.table['year'].data
 
     @property
     def author(self):
         """Pipeline name for each data product found."""
-        return self.table['author'].data.data
+        return self.table['author'].data
 
     @property
     def target_name(self):
         """Target name for each data product found."""
-        return self.table['target_name'].data.data
+        return self.table['target_name'].data
 
     @property
     def exptime(self):
         """Exposure time for each data product found."""
         return self.table['exptime'].quantity
-
-    @property
-    def productFilename(self):
-        """Filename for each data product found."""
-        return self.table['productFilename'].data.data
 
     @property
     def distance(self):
@@ -794,20 +839,22 @@ def _search_products(target, radius=None, filetype="Lightcurve",
 
         # Add the user-friendly 'author' column (synonym for 'provenance_name')
         result['author'] = result['provenance_name']
-        # Add the user-friendly 'observation' column
-        result['observation'] = None
+        # Add the user-friendly 'mission' column
+        result['mission'] = None
         obs_prefix = {'Kepler': 'Quarter', 'K2': 'Campaign', 'TESS': 'Sector'}
         for idx in range(len(result)):
             obs_project = result['project'][idx]
-            obs_seqno = result['sequence_number'][idx]
+            tmp_seqno = result['sequence_number'][idx]
+            obs_seqno = f"{tmp_seqno:02d}" if tmp_seqno else ""
             # Kepler sequence_number values were not populated at the time of
             # writing this code, so we parse them from the description field.
             if obs_project == 'Kepler' and result['sequence_number'].mask[idx]:
                 try:
-                    obs_seqno = re.findall(r".*Q(\d+)", result['description'][idx])[0]
+                    tmp_seqno = re.findall(r".*Q(\d+)", result['description'][idx])[0]
+                    obs_seqno = f"{int(tmp_seqno):02d}"
                 except IndexError:
                     obs_seqno = ""
-            result['observation'][idx] = "{} {} {}".format(obs_project,
+            result['mission'][idx] = "{} {} {}".format(obs_project,
                                                            obs_prefix.get(obs_project, ""),
                                                            obs_seqno)
 
@@ -832,9 +879,10 @@ def _search_products(target, radius=None, filetype="Lightcurve",
             # if the desired sector is available, add a row
             if s in np.atleast_1d(sector) or sector is None:
                 cutouts.append({'description': f'TESS FFI Cutout (sector {s})',
-                                'observation': f'TESS Sector {s}',
+                                'mission': f'TESS Sector {s:02d}',
                                 'target_name': str(target),
                                 'targetid': str(target),
+                                't_min': observations['t_min'][idx],
                                 'exptime': observations['exptime'][idx],
                                 'productFilename': 'TESSCut',
                                 'provenance_name': 'MAST',
