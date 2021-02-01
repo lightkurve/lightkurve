@@ -22,6 +22,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'K2SC'`
         * `'K2VARCAT'`
         * `'QLP'`
+        * `'PATHOS'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -36,10 +37,19 @@ def detect_filetype(hdulist: HDUList) -> str:
         A string describing the detected filetype. If the filetype is not
         recognized, `None` will be returned.
     """
+
     # Is it a MIT/QLP TESS FFI Quicklook Pipeline light curve?
     # cf. http://archive.stsci.edu/hlsp/qlp
     if "mit/qlp" in hdulist[0].header.get('origin', '').lower():
         return "QLP"
+
+    # Is it a PATHOS TESS light curve?
+    # cf. http://archive.stsci.edu/hlsp/pathos
+    # The 'pathos' name doesn't stay in the filename if when we use fits.open
+    # to download a file, so we have to check for all the important columns
+    # This will cause problems if another HLSP has the exact same colnames...
+    if all(x in hdulist[1].columns.names for x in ["PSF_FLUX_RAW", "PSF_FLUX_COR", "AP4_FLUX_RAW", "AP4_FLUX_COR", "SKY_LOCAL"]):
+        return "PATHOS"
 
     # Is it a K2VARCAT file?
     # There are no self-identifying keywords in the header, so go by filename.
