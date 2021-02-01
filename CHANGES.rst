@@ -96,15 +96,15 @@ lightkurve.search
 - Modified the search functions to show the total exposure time of each data
   product (``t_exptime``) in the search results table. [#831]
 
-- Added support for reading K2SFF and EVEREST community light curves via the
-  ``LightCurve.read()`` and ``search_lightcurve()`` functions. [#739]
+- Added support for searching and reading QLP and SPOC Full Frame Image (FFI)
+  light curves available as High Level Science Products from MAST. [#913]
+
+- Added support for reading K2SFF, EVEREST, and PATHOS community light curves via the
+  ``LightCurve.read()`` and ``search_lightcurve()`` functions. [#739, #935]
 
 - Modified the search functions such that exact mission target identifiers,
   such as 'KIC 5112705' or 'TIC 261136679', only return products known under
   those names, unless a search radius is specified. [#796]
-
-- Added support for searching and reading QLP and SPOC Full Frame Image (FFI)
-  light curves available as High Level Science Products from MAST. [#913]
 
 - Improved the performance of `download()` operations by checking if a file
   exists in local cache prior to contacting MAST. [#915]

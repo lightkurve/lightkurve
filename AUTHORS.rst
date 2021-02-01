@@ -42,6 +42,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Isabel Coleman <https://github.com/astrobel>`_
 - `Colin J. Burke <https://github.com/burke86>`_
 - `Andrew Vanderburg <https://github.com/avanderburg>`_
+- `Stephanie Douglas <https://github.com/stephtdouglas>`_
 
 
 Community
