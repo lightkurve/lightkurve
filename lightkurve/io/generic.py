@@ -13,7 +13,10 @@ from ..lightcurve import LightCurve
 log = logging.getLogger(__name__)
 
 
-def read_generic_lightcurve(filename, flux_column,
+def read_generic_lightcurve(filename,
+                            time_column='time',
+                            flux_column='flux',
+                            flux_err_column='flux_err',
                             quality_column='quality',
                             cadenceno_column='cadenceno',
                             centroid_col_column='mom_centr1',
@@ -38,10 +41,6 @@ def read_generic_lightcurve(filename, flux_column,
 
     tab.meta = {k : v for k, v in tab.meta.items()}
 
-    # Some KEPLER files used to have a T column instead of TIME.
-    if "T" in tab.colnames:
-        tab.rename_column("T", "TIME")
-
     for colname in tab.colnames:
         # Ensure units have the correct astropy format
         # Speed-up: comparing units by their string representation is 1000x
@@ -54,6 +53,12 @@ def read_generic_lightcurve(filename, flux_column,
 
         # Rename columns to lowercase
         tab.rename_column(colname, colname.lower())
+
+    # Some KEPLER files used to have a T column instead of TIME.
+    if time_column == "time" and "time" not in tab.columns and "t" in tab.colnames:
+        tab.rename_column("t", "time")
+    if time_column != "time":
+        tab.rename_column(time_column, "time")
 
     # We *have* to remove rows with TIME=NaN because the Astropy Time
     # object does not support the presence of NaNs.
@@ -80,8 +85,12 @@ def read_generic_lightcurve(filename, flux_column,
     # we make sure standard columns and attributes exist.
     if 'flux' not in tab.columns:
         tab.add_column(tab[flux_column], name="flux", index=0)
-    if 'flux_err' not in tab.columns and f"{flux_column}_err" in tab.columns:
-        tab.add_column(tab[f"{flux_column}_err"], name="flux_err", index=1)
+    if 'flux_err' not in tab.columns:
+        # Try falling back to `{flux_column}_err` if possible
+        if flux_err_column not in tab.columns:
+            flux_err_column = flux_column + "_err"
+        if flux_err_column in tab.columns:
+            tab.add_column(tab[flux_err_column], name="flux_err", index=1)
     if 'quality' not in tab.columns and quality_column in tab.columns:
         tab.add_column(tab[quality_column], name="quality", index=2)
     if 'cadenceno' not in tab.columns and cadenceno_column in tab.columns:

@@ -9,9 +9,7 @@ from ..utils import TessQualityFlags
 from .generic import read_generic_lightcurve
 
 
-def read_tasoc_lightcurve(filename,
-                            flux_column="FLUX_RAW",
-                            quality_bitmask="default"):
+def read_tasoc_lightcurve(filename, flux_column="FLUX_RAW", quality_bitmask=None):
     """Returns a `TessLightCurve`.
 
     Parameters
@@ -23,15 +21,11 @@ def read_tasoc_lightcurve(filename,
         By default, "FLUX_RAW" is used. It contains the T'DA extracted lightcurve,
         with no corrections applied to the raw light curves. Corrected lightcurves 
         may become available in the future.
-
     """
     lc = read_generic_lightcurve(filename,
                                  flux_column=flux_column.lower(),
                                  time_format='btjd')
-   
-
     lc.meta['TARGETID'] = lc.meta.get('TICID')
     # TASOC light curves are normalized by default
     lc.meta['NORMALIZED'] = True
-
     return TessLightCurve(data=lc)
