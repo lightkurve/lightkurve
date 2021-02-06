@@ -88,13 +88,16 @@ lightkurve.collections
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
 
+- Added support for downloading and reading TASOC FITS files that contain
+  extracted lightcurves [#939].
+
 - Added support for the new 20-second and 10-minute TESS cadence modes in the
   search functions by allowing the exact exposure time to be specified via the
   optional ``cadence`` argument.  In addition, the functions now also accept
   ``cadence='fast'`` (for 20s) and ``cadence='ffi'`` (for 10m or 30m). [#831]
 
 - Modified the search functions to show the total exposure time of each data
-  product (``t_exptime``) in the search results table. [#831]
+  product (``t_exptime``) in the search results table. [#831]  
 
 - Added support for searching and reading QLP and SPOC Full Frame Image (FFI)
   light curves available as High Level Science Products from MAST. [#913]

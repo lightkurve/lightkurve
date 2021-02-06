@@ -1,5 +1,6 @@
 """Provides a function to automatically detect Kepler/TESS file types."""
 from astropy.io.fits import HDUList
+from astropy.io import fits
 
 
 __all__ = ['detect_filetype']
@@ -23,6 +24,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'K2VARCAT'`
         * `'QLP'`
         * `'PATHOS'`
+        * `'TASOC'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -51,6 +53,12 @@ def detect_filetype(hdulist: HDUList) -> str:
     if all(x in hdulist[1].columns.names for x in ["PSF_FLUX_RAW", "PSF_FLUX_COR", "AP4_FLUX_RAW", "AP4_FLUX_COR", "SKY_LOCAL"]):
         return "PATHOS"
 
+    # Is it a TASOC TESS light curve?
+    # cf. https://tasoc.dk and https://archive.stsci.edu/hlsp/tasoc
+    if hdulist[0].header.get('ORIGIN') == "TASOC/Aarhus":
+        return "TASOC"
+
+    
     # Is it a K2VARCAT file?
     # There are no self-identifying keywords in the header, so go by filename.
     if "hlsp_k2varcat" in (hdulist.filename() or ""):
