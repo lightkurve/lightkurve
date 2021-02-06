@@ -19,16 +19,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: [3.7, 3.8, 3.9-remote-data]
+        name: [3.6, 3.7, 3.8-remote-data]
         include:
+          - name: 3.6
+            python-version: 3.6
+            pytest-command: poetry run pytest
           - name: 3.7
             python-version: 3.7
             pytest-command: poetry run pytest
-          - name: 3.8
+          - name: 3.8-remote-data
             python-version: 3.8
-            pytest-command: poetry run pytest
-          - name: 3.9-remote-data
-            python-version: 3.9
             pytest-command: poetry run pytest --remote-data --doctest-modules
     steps:
     - uses: actions/checkout@v1
