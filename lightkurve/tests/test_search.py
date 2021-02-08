@@ -344,6 +344,30 @@ def test_cadence_filtering():
     assert res.table['t_exptime'][0] == 20
     assert "fast" in res.table['productFilename'][0]
 
+    # Now do the same with the new exptime argument,
+    # because `cadence` may be deprecated.
+    # Try `exptime="fast"`
+    res = search_lightcurve("AU Mic", sector=27, exptime="fast")
+    assert(len(res) == 1)
+    assert res.exptime[0].value == 20
+    # Try `exptime="short"`
+    res = search_lightcurve("AU Mic", sector=27, exptime="short")
+    assert(len(res) == 1)
+    assert res.table['t_exptime'][0] == 120
+    # Try `exptime=20`
+    res = search_lightcurve("AU Mic", sector=27, exptime=20)
+    assert(len(res) == 1)
+    assert res.table['t_exptime'][0] == 20
+    assert "fast" in res.table['productFilename'][0]
+
+
+@pytest.mark.remote_data
+def test_search_slicing_regression():
+    # Regression test: slicing after calling __repr__ failed.
+    res = search_lightcurve("AU Mic", exptime=20)
+    res.__repr__()
+    res[res.exptime.value < 100]
+
 
 @pytest.mark.remote_data
 def test_ffi_hlsp():
