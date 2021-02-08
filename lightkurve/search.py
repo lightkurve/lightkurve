@@ -98,7 +98,8 @@ class SearchResult(object):
         """Adds a user-friendly index (``#``) column and adds column unit
         and display format information.
         """
-        self.table['#'] = None
+        if '#' not in self.table.columns:
+            self.table['#'] = None
         self.table['exptime'].unit = "s"
         self.table['exptime'].format = ".0f"
         self.table['distance'].unit = "arcsec"
