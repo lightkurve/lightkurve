@@ -10,8 +10,8 @@ Major changes
 - ``LightCurve`` is now a sub-class of ``astropy.time.TimeSeries`` to enable it
   to have arbitrary columns and to enable closer integration with AstroPy. [#744]
 
-- Updated the online docs with a new template, a dozen new tutorials, and a
-  re-organized API reference guide. [#926]
+- Updated the online docs with a new template, added a dozen new tutorials, and
+  extended the API reference guide. [#926]
 
 Other changes
 -------------
@@ -19,11 +19,14 @@ Other changes
 lightkurve.lightcurve
 ^^^^^^^^^^^^^^^^^^^^^
 
-- Added a ``column`` parameter to ``LightCurve``'s ``plot()``, ``scatter()``,
-  and ``errorbar()`` methods to enable any column to be plotted. [#765]
+- Added the ``LightCurve.search_neighbors()`` convenience method to search for
+  light curves around an existing one. [#907]
 
 - Added the ``LightCurve.create_transit_mask(period, transit_time, duration)``
   method to conveniently mask planet or eclipsing binary transits. [#808]
+
+- Added a ``column`` parameter to ``LightCurve``'s ``plot()``, ``scatter()``,
+  and ``errorbar()`` methods to enable any column to be plotted. [#765]
 
 - Added a ``column`` parameter to ``LightCurve.remove_nans()`` to enable
   cadences to be removed which contain NaN values in a specific column. [#828]
@@ -33,19 +36,11 @@ lightkurve.lightcurve
 - ``interact_bls()``: modified so that it normalizes the lightcurve to match the
   generated transit model.  [#854]
 
-- Fixed a bug in ``interact_bls()`` that caused the LightCurve panel improperly
-  scaled. [#902]
-
-- Added the ``LightCurve.search_neighbors()`` convenience method to search for
-  light curves around an existing one. [#907]
+- ``interact_bls()``: fixed a bug which caused the LightCurve panel to be scaled
+  incorrectly. [#902]
 
 lightkurve.targetpixelfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- Added the ability for the user to specify how they want the flux calculated
-  using ``extract_aperture_photometry``. The default is 'sum', but they
-  there is now the option of using a ``flux_method`` keyword to specifiy if the
-  user wants ``sum``, ``median``, or ``mean``. [#932]
 
 - Added the ability to perform math with ``TargetPixelFile`` objects, e.g.,
   ``tpf = tpf - 100`` will subtract 100 from the ``tpf.flux`` values. [#665]
@@ -59,6 +54,9 @@ lightkurve.targetpixelfile
 - Added a ``column`` parameter to ``TargetPixelFile.plot()`` to enable any
   column in a pixel file to be plotted (e.g. ``column="BKG_FLUX"``). [#738]
 
+- Added the ``flux_method`` keyword to ``extract_aperture_photometry`` to allow
+  photometry to be obtained using ``"sum"``, ``"median"``, or ``"mean"``. [#932]
+
 - Modified ``to_lightcurve()`` to default to using ``aperture_mask='threshold'``
   if the ``'pipeline'`` mask is missing or empty, e.g. for TESSCut files. [#833]
 
@@ -68,54 +66,48 @@ lightkurve.targetpixelfile
 - Modified ``_parse_aperture_mask()`` to ensure that masks composed of integer
   or floats are always converted to booleans. [#694]
 
-- Fixed a bug in ``TargetPixelFile.__getitem__()`` which caused a substantial
-  memory leak on indexing or slicing a tpf. [#829]
-
 - Modified ``interact()`` to use ``max_cadences=200000`` by default to allow
   it to be used on fast-cadence TESS data. [#856]
 
-- Modified `TargetPixelFactory` to support creating TESS Target Pixel Files
+- Modified ``TargetPixelFactory`` to support creating TESS Target Pixel Files
   and to enable it to populate all data columns. [#768, #857]
 
-- Fixed a bug in ``TargetPixelFile.wcs`` which caused it to raise Error if
-  the tpf does not contain expected WCS keywords in the header. [#892]
+- Fixed a bug in ``TargetPixelFile.__getitem__()`` which caused a substantial
+  memory leak when indexing or slicing a tpf. [#829]
+
+- Fixed a bug in ``TargetPixelFile.wcs`` which caused it to raise an error if
+  the tpf does not contain all expected WCS keywords. [#892]
 
 lightkurve.collections
 ^^^^^^^^^^^^^^^^^^^^^^
 
-- Added the ability to filter a collection by `quarter`, `campaign` or `sector`. [#815]
+- Added the ability to filter a collection by ``quarter``, ``campaign`` or ``sector``. [#815]
 
 lightkurve.search
 ^^^^^^^^^^^^^^^^^
 
-- Added support for downloading and reading TASOC FITS files that contain
-  extracted lightcurves [#939].
-
 - Added support for the new 20-second and 10-minute TESS cadence modes in the
   search functions by allowing the exact exposure time to be specified via the
-  optional ``cadence`` argument.  In addition, the functions now also accept
-  ``cadence='fast'`` (for 20s) and ``cadence='ffi'`` (for 10m or 30m). [#831]
-
-- Modified the search functions to show the total exposure time of each data
-  product (``t_exptime``) in the search results table. [#831]  
-
-- Added support for searching and reading QLP and SPOC Full Frame Image (FFI)
-  light curves available as High Level Science Products from MAST. [#913]
-
-- Added support for reading K2SFF, EVEREST, and PATHOS community light curves via the
-  ``LightCurve.read()`` and ``search_lightcurve()`` functions. [#739, #935]
-
-- Modified the search functions such that exact mission target identifiers,
-  such as 'KIC 5112705' or 'TIC 261136679', only return products known under
-  those names, unless a search radius is specified. [#796]
-
-- Improved the performance of `download()` operations by checking if a file
-  exists in local cache prior to contacting MAST. [#915]
-
-- Added automated caching of the search operations. [#907]
+  optional ``exptime`` argument.  In addition, the functions now also accept
+  ``exptime='fast'`` (for 20s) and ``exptime='ffi'`` (for 10m or 30m). [#831]
 
 - Modified the search operations to show all available data products at
   MAST by default, including community-contributed light curves. [#933]
+
+- Modified the search functions to show the author and exposure time of each
+  data product in the search results table. [#831]  
+
+- Added support for reading in High Level Science Product light curves, including
+  TESS-SPOC, QLP, TASOC, K2SFF, EVEREST, PATHOS. [#739, #913, #935, #939]
+
+- Modified the search functions such that exact mission target identifiers,
+  such as "KIC 5112705" or "TIC 261136679", only return products known under
+  those names, unless a search radius is specified. [#796]
+
+- Added in-memory caching of the search operations. [#907]
+
+- Improved the performance of ``download()`` operations by checking if a file
+  exists in local cache prior to contacting MAST. [#915]
 
 lightkurve.correctors
 ^^^^^^^^^^^^^^^^^^^^^
@@ -123,7 +115,7 @@ lightkurve.correctors
 - Added the ``CotrendingBasisVectors`` class to provide a convenient interface
   to work with TESS and Kepler basis vector data products. [#826]
 
-- Changed the ``CBVCorrector`` class to perform the correction in a way that is
+- Modified the ``CBVCorrector`` class to perform the correction in a way that is
   more similar to the official Kepler/TESS pipeline. [#855]
 
 - Added ``SparseDesignMatrix`` and modified ``RegressionCorrector`` to enable
@@ -135,7 +127,7 @@ lightkurve.correctors
 - Fixed a bug in ``SFFCorrector`` which caused correction to fail if a light
   curve's ``centroid_col`` or ``centroid_row`` columns contained NaNs. [#827]
 
-- Improved the ``Corrector`` abstract base class to better document the desired
+- Modified the ``Corrector`` abstract base class to better document the desired
   structure of its sub-classes. [#907]
 
 - Added a ``metrics`` module with two functions to measure the degree of
