@@ -37,7 +37,7 @@ __all__ = ['CBVCorrector', 'CotrendingBasisVectors', 'KeplerCotrendingBasisVecto
 # CBV Corrector Class
 
 class CBVCorrector(RegressionCorrector):
-    """ Class for removing systematics using Cotrending Basis Vectors (CBVs)
+    """Class for removing systematics using Cotrending Basis Vectors (CBVs)
     from Kepler/K2/TESS.
 
     On construction of this object, the relevent CBVs will be downloaded from
@@ -50,7 +50,7 @@ class CBVCorrector(RegressionCorrector):
     ----------
     lc  : LightCurve
         The light curve loaded into CBVCorrector in electrons / second
-    cbvs    : CotrendingBasisVectors list
+    cbvs : CotrendingBasisVectors list
         The retrieved CBVs, can contain multiple types of CBVs
     interpolated_cbvs : bool
         If true then the CBVs have been interpolated to the lightcurve
@@ -58,7 +58,7 @@ class CBVCorrector(RegressionCorrector):
         The retrieved CBVs ported into a DesignMatrix object
     extra_design_matrix : DesignMatrix
         An extra design matrix to include in the fit with the CBVs
-    design_matrix_collection   : DesignMatrixCollection
+    design_matrix_collection : DesignMatrixCollection
         The design matrix collection composed of cbv_design_matrix and extra_design_matrix
     corrected_lc : LightCurve
         The returned light curve from correct() in electrons / second
@@ -86,12 +86,11 @@ class CBVCorrector(RegressionCorrector):
         Under-fitting score from the most recent run of correct()
     alpha : float
         L2-norm regularization term used in most recent fit
-        Equivalent to:
-            designmatrix prior sigma = np.median(self.lc.flux_err) / np.sqrt(alpha)
+        Equivalent to: designmatrix prior sigma = np.median(self.lc.flux_err) / np.sqrt(alpha)
     """
 
     def __init__(self, lc, interpolate_cbvs=False, do_not_load_cbvs=False):
-        """ Constructor
+        """Constructor
 
         This constructor will retrieve all relevant CBVs from MAST and then
         align them with the passed-in light curve.
@@ -108,11 +107,7 @@ class CBVCorrector(RegressionCorrector):
             If True then the CBVs will NOT be loaded from MAST. 
             Use this option if you wish to use the CBV corrector methods with only a 
             custom design matrix (via the ext_dm argument in the corrector methods)
-
-        Examples
-        --------
         """
-
         if not isinstance(lc, LightCurve):
             raise Exception('<lc> must be a LightCurve class')
 
@@ -423,7 +418,8 @@ class CBVCorrector(RegressionCorrector):
         The following example will perform the correction using the
         SingleScale and Spike basis vectors. It will use alpha bounds of
         [1.0,1e3]. The target over-fitting score is 0.5 and the target
-        under-fitting score is 0.8. 
+        under-fitting score is 0.8.
+
             >>> cbv_type = ['SingleScale', 'Spike']
             >>> cbv_indices = [np.arange(1,9), 'ALL']
             >>> cbvCorrector.correct(cbv_type=cbv_type, cbv_indices=cbv_indices,  # doctest: +SKIP
