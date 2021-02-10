@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.hdu
+====================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: KeplerTargetPixelFile.hdu

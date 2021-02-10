@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.Seismology.estimate_mass &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lightkurve.Seismology.estimate_logg" href="lightkurve.Seismology.estimate_logg.html" />
+    <link rel="prev" title="lightkurve.Seismology.estimate_radius" href="lightkurve.Seismology.estimate_radius.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../tutorials/index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../about/index.html">About</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+        
+        
+          
+            
+                <li class="">
+                    <a href="../search.html">Downloading data</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../lightcurve.html">LightCurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../foldedlightcurve.html">FoldedLightCurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../targetpixelfile.html">TargetPixelFile</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../periodogram.html">Periodogram</a>
+                </li>
+            
+          
+            
+  
+                <li class="active">
+                    <a href="../seismology.html">Seismology</a>
+                    <ul>
+                    
+                        <li class="">
+                            <a href="lightkurve.Seismology.html">lightkurve.Seismology</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.Seismology.from_lightcurve.html">lightkurve.Seismology.from_lightcurve</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.Seismology.periodogram.html">lightkurve.Seismology.periodogram</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.Seismology.estimate_numax.html">lightkurve.Seismology.estimate_numax</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.Seismology.estimate_deltanu.html">lightkurve.Seismology.estimate_deltanu</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.Seismology.estimate_radius.html">lightkurve.Seismology.estimate_radius</a>
+                        </li>
+                    
+                        <li class="active">
+                            <a href="">lightkurve.Seismology.estimate_mass</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.Seismology.estimate_logg.html">lightkurve.Seismology.estimate_logg</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.Seismology.diagnose_numax.html">lightkurve.Seismology.diagnose_numax</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.Seismology.diagnose_deltanu.html">lightkurve.Seismology.diagnose_deltanu</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.Seismology.plot_echelle.html">lightkurve.Seismology.plot_echelle</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.Seismology.interact_echelle.html">lightkurve.Seismology.interact_echelle</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../correctors.html">Correcting systematics</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../misc.html">Miscellaneous utilities</a>
+                </li>
+            
+          
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="lightkurve-seismology-estimate-mass">
+<h1>lightkurve.Seismology.estimate_mass<a class="headerlink" href="#lightkurve-seismology-estimate-mass" title="Permalink to this headline">¶</a></h1>
+<dl class="py method">
+<dt id="lightkurve.Seismology.estimate_mass">
+<code class="sig-prename descclassname">Seismology.</code><code class="sig-name descname">estimate_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">teff</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">numax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">deltanu</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.Seismology.estimate_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates mass using the asteroseismic scaling relations.</p>
+<p>The two global observable seismic parameters, numax and deltanu, along with
+temperature, scale with fundamental stellar properties (Brown et al. 1991;
+Kjeldsen &amp; Bedding 1995). These scaling relations can be rearranged to
+calculate a stellar mass as</p>
+<p>M = Msol * (numax/numax_sol)^3(deltanu/deltanusol)^-4(Teff/Teffsol)^1.5</p>
+<p>where M is the mass and Teff is the effective temperature, and the suffix
+‘sol’ indicates a solar value. In this method we use the solar values for
+numax and deltanu as given in Huber et al. (2011) and for Teff as given in
+Prsa et al. (2016).</p>
+<p>This code structure borrows from work done in Bellinger et al. (2019), which
+also functions as an accessible explanation of seismic scaling relations.</p>
+<p>If no value of effective temperature is given, this function will check the
+meta data of the <a class="reference internal" href="lightkurve.Periodogram.html#lightkurve.Periodogram" title="lightkurve.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object used to create the <a class="reference internal" href="lightkurve.Seismology.html#lightkurve.Seismology" title="lightkurve.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object.
+These data will often contain an effective tempearture from the Kepler Input
+Catalogue (KIC, <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract">https://ui.adsabs.harvard.edu/abs/2011AJ….142..112B/abstract</a>),
+or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
+catalogues are estimated using photometry, and so have large associated uncertainties
+(roughly 200 K, see KIC). For more better results, spectroscopic measurements of
+temperature are often more precise.</p>
+<p>NOTE: These scaling relations are scaled to the Sun, and therefore do not
+always produce an entirely accurate result for more evolved stars.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>numax</strong><span class="classifier">float</span></dt><dd><p>The frequency of maximum power of the seismic mode envelope. If not
+given an astropy unit, assumed to be in units of microhertz.</p>
+</dd>
+<dt><strong>deltanu</strong><span class="classifier">float</span></dt><dd><p>The frequency spacing between two consecutive overtones of equal radial
+degree. If not given an astropy unit, assumed to be in units of
+microhertz.</p>
+</dd>
+<dt><strong>teff</strong><span class="classifier">float</span></dt><dd><p>The effective temperature of the star. In units of Kelvin.</p>
+</dd>
+<dt><strong>numax_err</strong><span class="classifier">float</span></dt><dd><p>Error on numax. Assumed to be same units as numax</p>
+</dd>
+<dt><strong>deltanu_err</strong><span class="classifier">float</span></dt><dd><p>Error on deltanu. Assumed to be same units as deltanu</p>
+</dd>
+<dt><strong>teff_err</strong><span class="classifier">float</span></dt><dd><p>Error on Teff. Assumed to be same units as Teff.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>mass</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeismologyQuantity</span></code></span></dt><dd><p>Stellar mass estimate.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="lightkurve.Seismology.estimate_radius.html" title="previous page">lightkurve.Seismology.estimate_radius</a>
+    <a class='right-next' id="next-link" href="lightkurve.Seismology.estimate_logg.html" title="next page">lightkurve.Seismology.estimate_logg</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

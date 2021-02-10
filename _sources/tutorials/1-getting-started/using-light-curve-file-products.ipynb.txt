@@ -1,0 +1,1233 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "zmyJVTgDegLW"
+   },
+   "source": [
+    "# Using Light Curve Files with Lightkurve"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "qAFe53UOTKon"
+   },
+   "source": [
+    "## Learning Goals\n",
+    "\n",
+    "By the end of this tutorial, you will:\n",
+    "\n",
+    "- Understand how NASA's *Kepler* Mission collected and released light curve data products.\n",
+    "- Be able to download and plot light curve files from the data archive using [Lightkurve](https://docs.lightkurve.org).\n",
+    "- Be able to access light curve metadata.\n",
+    "- Understand the time and brightness units."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "fpDuPWW6hzh_"
+   },
+   "source": [
+    "## Introduction\n",
+    "\n",
+    "The [*Kepler*](https://archive.stsci.edu/kepler), [*K2*](https://archive.stsci.edu/k2), and [*TESS*](https://archive.stsci.edu/tess) telescopes observe stars for long periods of time, from just under a month to four years. By doing so they observe how the brightness of stars change over time. A series of these brightness observations is referred to as a [light curve](https://www.nasa.gov/kepler/education/lightcurves/) of a star.\n",
+    "\n",
+    "Light curves of stars observed by the *Kepler*, *K2*, or *TESS* missions are created from the raw images collected by these telescopes using software built for this purpose by the mission teams. In this tutorial, we will learn how to use the Lightkurve package to download these preprocessed light curves from *Kepler*'s data archive, plot them, and understand their properties and units.\n",
+    "\n",
+    "Much of the explanation below is inspired by [Kinemuchi et al. (2012)](https://arxiv.org/pdf/1207.3093.pdf), an excellent paper introducing and explaining the terminology surrounding the *Kepler* mission and its data. You can find detailed information on the mission and its data products in the official [*Kepler* Instrument Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf) and the [*Kepler* Data Processing Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf).\n",
+    "\n",
+    "We will use the *Kepler* mission as the main example, but these tools are extensible to *TESS* and *K2* as well. For example, while in this tutorial we will learn to work with Lightkurve's [`KeplerLightCurve`](https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html) objects, there are also [`TessLightCurve`](https://docs.lightkurve.org/api/lightkurve.lightcurve.TessLightCurve.html) objects that work in the same way."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "PPvxoxn5fNRG"
+   },
+   "source": [
+    "## Imports\n",
+    "\n",
+    "This tutorial only requires the [**Lightkurve**](http://docs.lightkurve.org/) package, which in turn uses `matplotlib` for plotting."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "1dH7Te6hfkvx"
+   },
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk\n",
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "kYmOYSuls30s"
+   },
+   "source": [
+    "## 1. About NASA's Photometric Space Telescopes"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "oK6pr6qDPmK2"
+   },
+   "source": [
+    "In order to understand the data produced by NASA's *Kepler*, *K2*, and *TESS* missions, it is useful to understand a little about how these data were obtained."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "E4_5ufDMPmK2"
+   },
+   "source": [
+    "### 1.1. [*Kepler*](https://www.nasa.gov/mission_pages/kepler/overview/index.html)\n",
+    "\n",
+    "During its nominal mission, the *Kepler* telescope made observations using 21 pairs of rectangular charge-coupled device (CCD) camera chips (also called *modules*), each consisting of four 1100 x 2048 pixel *channels*. Each observed star fell on one of these 84 CCD channels. Recording the channel numbers for each star was important, because the *Kepler* spacecraft rotated by 90 degrees roughly four times a year. These rotations divide what are referred to as observing *quarters*. While the same star may be observed in multiple quarters, it may fall on a different CCD channel each time.\n",
+    "\n",
+    "*Kepler* observed a single field in the sky, although not all stars in this field were recorded as light curves. Instead, pixels were selected around a predetermined list of target stars, which were then downloaded. These downloaded measurements are stored in *target pixel files* (TPFs). By adding up the flux (a measurement of an object's brightness per unit time) measured by the pixels in which a target star appears, the total brightness of a star can be measured. If you make this measurement at different times, you obtain a light curve.\n",
+    "\n",
+    "*Kepler* recorded the brightness measurements at two different cadences: a Short Cadence (SC, 58.85 seconds) and a Long Cadence (LC, 29.4 minutes). For more details, read: [*Kepler* Instrument Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf), Section 2.1. *Mission Overview* and 2.6. *Pixels of Interest*, and the [*Kepler* Archive Manual](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf) Chapter 2: *Kepler* Data Products.\n",
+    "\n",
+    "<img src=\"https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/active-missions/tess/_images/Keplerfieldofviewstarchart.gif?t=tn2400\">\n",
+    "\n",
+    "*Figure:* The field of view of the *Kepler* mission. The rectangles represent the CCD modules described above.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "hkyT0l9EPmK4"
+   },
+   "source": [
+    "### 1.2. [*K2*](https://www.nasa.gov/feature/ames/nasas-k2-mission-the-kepler-space-telescopes-second-chance-to-shine)\n",
+    "\n",
+    "The *Kepler* mission ended in 2013 following the loss of two reaction wheels, leaving the spacecraft unable to stay fixed on one portion of the sky. Instead, it changed its focus to the ecliptic plane, and performed 80-day observing campaigns of 19 separate fields. *K2* data are very similar to *Kepler* data, but are subject to higher levels of instrument noise due to the increased instability of the spacecraft. For more details read the [*K2* Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/KSCI-19116-002.pdf), specifically *Section 2: What's New in K2*.\n",
+    "\n",
+    "<!-- <img src=\"https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_images/footprint-all-campaigns.png?t=tn2400\">\n",
+    "\n",
+    "*Figure*: Representation of the 19 ecliptic observing Campaigns by the *K2* mission. The mission ended in Campaign 19 due to spacecraft failure, and Campaign 20 was never started. -->"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "D7ulMFgSPmK5"
+   },
+   "source": [
+    "### 1.3. [*TESS*](https://tess.mit.edu/)\n",
+    "\n",
+    "The Transiting Exoplanet Survey Satellite (*TESS*) succeeded *Kepler* in 2018. The data it collects are very similar to those from *Kepler* and *K2*, but *TESS* covers a much larger area of the sky at a lower resolution. *TESS* observes large sectors of the sky for 27 days at a time. The overlap of these sectors means that stars near the ecliptic poles will receive a year of uninterrupted data, while those near the ecliptic receive only ~27 days. Compared to *Kepler*, *TESS* observes in several different cadence modes, including 20 seconds, 120 seconds, 10 minutes, and 30 minutes. For more details, see the [Mission Overview](https://tess.mit.edu/science/) and the [*TESS* Instrument Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/active-missions/tess/_documents/TESS_Instrument_Handbook_v0.1.pdf), specifically *Section 2: Introduction to TESS*.\n",
+    "\n",
+    "\n",
+    "Some stars that have been observed by *TESS* will also have been observed by *Kepler*, and in some rare cases *K2*.\n",
+    "<!-- <img src=\"https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/active-missions/tess/_images/Tess%20coverage%20map.png?t=tn992\" width=\"500\">\n",
+    "\n",
+    "*Figure*: A representation of how the different observing sectors of *TESS* overlap. The grey area where no observations take place is the ecliptic. The white lines indicate celestial coordinates (i.e. the north pole on the Figure lies above the north pole of Earth). -->"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "41HrZlzqi1U5"
+   },
+   "source": [
+    "## 2. Downloading a Light Curve File"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "-WFvehoMkIDa"
+   },
+   "source": [
+    "The light curves of stars created by the *Kepler* mission are stored at the [Mikulksi Archive for Space Telescopes](https://archive.stsci.edu/kepler/) (MAST) archive, along with metadata about the observations, such as which CCD channel was used at each time."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "_vVu6JugHj6O"
+   },
+   "source": [
+    "Lightkurve's built-in tools allow us to search for light curve files in the archive, and download them and their metadata. In this example, we will start by downloading one quarter of *Kepler* data for a star named [Kepler-8](http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/), a star somewhat larger than the Sun, and the host of a [hot Jupiter planet](https://en.wikipedia.org/wiki/Hot_Jupiter). "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "EuIqyV0YIWND"
+   },
+   "source": [
+    "Using Lightkurve's [`search_lightcurve`](http://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html) function, we can find an itemized list of different light curve file products available for Kepler-8:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 442
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 2876,
+     "status": "ok",
+     "timestamp": 1598411282748,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "hcpStCZ7IJct",
+    "outputId": "2235858d-55c2-4bb2-b095-1b6ee8ebdbad"
+   },
+   "outputs": [],
+   "source": [
+    "search_result = lk.search_lightcurve(\"Kepler-8\", author=\"Kepler\", cadence=\"long\")\n",
+    "search_result"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "lVLJYXmhIQS0"
+   },
+   "source": [
+    "In this list, each row represents a different observing period. We find that *Kepler* recorded the maxmimum of 18 quarters of data for this target across four years. The **observation** column lists the *Kepler* Quarter. The **target_name** represents the *Kepler* Input Catalogue (KIC) ID of the target, and the **productFilename** column is the name of the FITS files downloaded from MAST. The **distance** column shows the separation on the sky between the searched coordinates and the downloaded objects — this is only relevant when you pass a `radius` argument to the `search_lightcurve` function to search for targets within a given search radius around a set of coordinates.\n",
+    "\n",
+    "The [`search_lightcurve`](http://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html)  function takes several additional arguments, such as the `quarter` number or the `mission` name. You can find examples of its use in the [online documentation](http://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html) for this function.\n",
+    "\n",
+    "The search function returns a [`SearchResult`](https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html) object which has several convenient operations. For example, we can select the fourth data product in the list as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 79
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 2957,
+     "status": "ok",
+     "timestamp": 1598411415420,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "ND6NeQXroD2k",
+    "outputId": "35d7df6b-0d44-4d96-e6ff-4ce2b7bc1729"
+   },
+   "outputs": [],
+   "source": [
+    "search_result[4]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "ViV32XjeoTyH"
+   },
+   "source": [
+    "We can download this data product using the `download()` method:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "LrGKm1J_I06X"
+   },
+   "outputs": [],
+   "source": [
+    "klc = search_result[4].download()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "VggPAWCMxb_E"
+   },
+   "source": [
+    "This instruction is identical to the following line:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "tdSB08TZxVlX"
+   },
+   "outputs": [],
+   "source": [
+    "klc = lk.search_lightcurve(\"Kepler-8\", author=\"Kepler\", cadence=\"long\", quarter=4).download()\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "QG7NzLOFqJTm"
+   },
+   "source": [
+    "The `klc` variable we have obtained in this way is a [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html) object. This object contains time, flux, and flux error information, as well as a whole lot of data about spacecraft systematics. We can view all of them by calling the object by itself:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 548
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 445,
+     "status": "ok",
+     "timestamp": 1598411449790,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "3_ab1auTJG45",
+    "outputId": "b01368b6-2cd0-479d-a326-91fc043ccc1b"
+   },
+   "outputs": [],
+   "source": [
+    "klc"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "kbyfq_c6JLAS"
+   },
+   "source": [
+    "This object provides a convenient way to interact with the data file that has been returned by the archive, which contains both the light curve data and metadata about the observations.\n",
+    "\n",
+    "Before diving into the properties of the light curve file, we can plot the data, also using Lightkurve."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 1092,
+     "status": "ok",
+     "timestamp": 1598411480541,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "-MSfDW-FJmyO",
+    "outputId": "2ee9edcc-4580-4b77-905d-30bbbd7e89c8"
+   },
+   "outputs": [],
+   "source": [
+    "%matplotlib inline\n",
+    "klc.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "-TCbuQWaPmLK"
+   },
+   "source": [
+    "On this plot, the y-axis is flux in electrons per second. This unit may appear counterintutive, as flux is a measure of brightness. The CCD cameras measure an electrical charge, and so light is recorded as electrons, not photons as you might expect. On the x-axis we have time in Barycentric Kepler Julian Date (BKJD). In short, the x-axis values are days since the start of the *Kepler* mission. The repeating dips in brightness are transits, the effect of a planet orbiting Kepler-8 and passing between us and the star."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "4rifJm0FPmLK"
+   },
+   "source": [
+    "### Note\n",
+    "\n",
+    "You can also download light curve FITS files from the archive by hand, store them on your local disk, and open them using the `lk.read(<filename>)` function. This function will return a [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html)  object just as in the above example. You can find out where Lightkurve stored a light curve file using the `filename` attribute:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 52
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 514,
+     "status": "ok",
+     "timestamp": 1598411547611,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "aFiaMvn2wBrr",
+    "outputId": "4f3f24e0-baac-45a3-b6d6-6e5a7c466c5b"
+   },
+   "outputs": [],
+   "source": [
+    "klc.filename"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "i8-13ApfJn5l"
+   },
+   "source": [
+    "## 3. The SAP and PDCSAP Light Curves"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Ku2tnoE0LHvj"
+   },
+   "source": [
+    "As you can see in the Table above, there are two different types of flux stored in the [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html)  object. These correspond to different levels of data treatment performed for this star by NASA's [*Kepler* Data Processing Pipeline](https://github.com/nasa/kepler-pipeline/): the simple aperture photometry (SAP) flux, and the presearch data conditioning SAP (PDCSAP) flux. \n",
+    "\n",
+    "By default, a [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html) will set the PDCSAP flux to its `.flux` property. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "5pCad88OZWxV"
+   },
+   "source": [
+    "To compare the PDCSAP and the SAP flux, we can use the `column` keyword while plotting.\n",
+    "\n",
+    "**Note**: alternatively, you can replace the `flux` column with the `sap_flux` column by using `klc.flux = klc['sap_flux']`.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 1081,
+     "status": "ok",
+     "timestamp": 1598411618875,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "x3d0KwojZeRU",
+    "outputId": "886daacc-89bc-48c7-bfb6-1ad4e4c5b6cf"
+   },
+   "outputs": [],
+   "source": [
+    "ax = klc.plot(column='pdcsap_flux', label='PDCSAP Flux', normalize=True)\n",
+    "klc.plot(column='sap_flux', label='SAP Flux', normalize=True, ax=ax);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "-P3Sw3q2ZXFU"
+   },
+   "source": [
+    "In brief:\n",
+    "\n",
+    "* The SAP light curve is calculated by summing together the brightness of pixels that fall within an aperture set by the *Kepler* mission. This is often referred to as the *optimal aperture*, but in spite of its name can sometimes be improved upon! Because the SAP light curve is a sum of the brightness in chosen pixels, it is still subject to systematic artifacts of the mission.\n",
+    "\n",
+    "* The PDCSAP light curve is subject to more treatment than the SAP light curve, and is specifically intended for detecting planets. The PDCSAP pipeline attempts to remove systematic artifacts while keeping planetary transits intact.\n",
+    "\n",
+    "Looking at the figure we made above, you can see that the SAP light curve has a long-term change in brightness that has been removed in the PDCSAP light curve, while keeping the transits at the same depth. For most inspections, a PDCSAP light curve is what you want to use, but when looking at astronomical phenomena that aren't planets (for example, long-term variability), the SAP flux may be preferred."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "1kiEJMntM0lS"
+   },
+   "source": [
+    "For now, let's continue to use the PDCSAP flux only. Because this is the default `.flux` property of our light curve object, we don't need to change anything."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "QEMvFFHt1GmJ"
+   },
+   "source": [
+    "### Note\n",
+    "\n",
+    "The `plot()` methods in Lightkurve always return a [Matplotlib](https://matplotlib.org/) object. This is useful because it lets us manipulate the plot using standard Matplotlib functions. For example, we can set the title as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 409
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 1038,
+     "status": "ok",
+     "timestamp": 1598411761988,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "PW0JtUdN1Edt",
+    "outputId": "4ee23b57-1a0a-4adf-a4b0-2a8af3044796"
+   },
+   "outputs": [],
+   "source": [
+    "ax = klc.plot() \n",
+    "ax.set_title(\"PDCSAP light curve of Kepler-8\");"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "PnfQZh0pxvDS"
+   },
+   "source": [
+    "And the figure can be saved as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "4n4WgwPQxLz6"
+   },
+   "outputs": [],
+   "source": [
+    "ax.figure.savefig('demo-lightcurve.png')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "RnYPeb8bPJcO"
+   },
+   "source": [
+    "## 4. Accessing the Metadata"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "VYPAC5XrP-AQ"
+   },
+   "source": [
+    "When downloading data from MAST, that data usually comes in the format of a FITS file. These FITS files carry a wealth of metadata about the observation. When these are loaded in to Lightkurve to create a [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html), all of the metadata are stored in the `.meta` property of the object.\n",
+    "\n",
+    "We can view these metadata by calling this property, as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 1000
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 359,
+     "status": "ok",
+     "timestamp": 1598412020718,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "f4-QjyATPmLW",
+    "outputId": "ab1049a7-c617-452d-d29e-ebd67b071661"
+   },
+   "outputs": [],
+   "source": [
+    "klc.meta"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "9A8HvYu5cSGu"
+   },
+   "source": [
+    "As you can see, there is a lot here if you don't know what you are looking for! These metadata don't just include information about the observations, but also data from the [*Kepler* Input Catalogue](https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract) (KIC) used to select observing targets, such as their magnitudes and temperature."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "21vUfjLy8xcR"
+   },
+   "source": [
+    "The `.meta` property is a [Python dictionary](https://docs.python.org/3/tutorial/datastructures.html#dictionaries), which has some convenient features. For example, we can retrieve the value of an individual keyword as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 421,
+     "status": "ok",
+     "timestamp": 1598412035354,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "Jzy3IZ0g8tCf",
+    "outputId": "5b19b2e0-6629-449e-fb35-946d13e073c0"
+   },
+   "outputs": [],
+   "source": [
+    "klc.meta['QUARTER']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "xzvZWOp3dPn-"
+   },
+   "source": [
+    "Alternatively, we can use the `.get()` method, which accounts for queries that aren't in the dictionary."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 35
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 520,
+     "status": "ok",
+     "timestamp": 1598412059413,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "jmoGdcrSdaKF",
+    "outputId": "83a103e9-4345-423a-b65e-c6ffc797075b"
+   },
+   "outputs": [],
+   "source": [
+    "klc.meta.get('MISSION')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "frVy-1dCPmLZ"
+   },
+   "source": [
+    "A feature of the [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html) object is that the metadata can also be accessed via user-friendly object properties for convenience. For example, the *Kepler* Quarter number is directly accessible via the `quarter` property:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 3891,
+     "status": "ok",
+     "timestamp": 1598412097739,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "81Uw9hwwmFtQ",
+    "outputId": "637bd19b-232f-4bb0-ea0b-22c940ff1c01"
+   },
+   "outputs": [],
+   "source": [
+    "klc.quarter"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "TMLOAjRTQ720"
+   },
+   "source": [
+    "## 5. Understanding the Data Arrays and Units"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "_XrmxkxtR-Ty"
+   },
+   "source": [
+    "As we saw above, the [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html)  object is a table that contains many arrays other than the PDCSAP and SAP fluxes. Detailed information on each of these can be found in the [*Kepler* Archive Manual](http://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/archive_manual.pdf), *Section 2.3.1. Light Curve Files*.\n",
+    "\n",
+    "The first six columns appear in all [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html)  objects, and contain the most commonly used information. These are:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "0hLqk2y8Sw_j"
+   },
+   "source": [
+    "- `time`: the time measurements at each cadence.\n",
+    "- `flux`: the flux of the target star at each time measurement. This is populated with PDCSAP flux by default.\n",
+    "- `flux_err`: the statistical uncertainty on each flux data point.\n",
+    "- `quality`: information on the data quality at each time measurement.\n",
+    "- `centroid_col` & `centroid_row`: the position of the target star on the CCD at each observation. This changes over time due to, for example, small jitters of the spacecraft.\n",
+    "\n",
+    "\n",
+    "The remaining columns are more detailed information on the observation. Some of these are duplicated in the first five columns described above:\n",
+    "\n",
+    "- `timecorr`: correction values that allow users to revert back to non-barycentric timestamps.\n",
+    "- `cadenceno`: these are mission-specific identifiers of each exposure.\n",
+    "- `sap_flux` & `sap_flux_err`: the SAP flux and associated error.\n",
+    "- `sap_bkg` & `sap_bkg_err`: the calculated background (and associated error) inside the aperture used to calculate the SAP flux.\n",
+    "- `pdcsap_flux` & `pdcsap_flux_err`: the PDCSAP flux and associated error. Duplicated by default in `flux` and `flux_err`.\n",
+    "- `sap_quality`: information on the data quality at each time measurement. Duplicated in `quality`.\n",
+    "- `psf_centr1` & `psf_centr2` (and errors): the column and row centroid positions of a PSF model fit to the target star.\n",
+    "- `mom_centr1` & `mom_centr2` (and errors): the column and row centroid positions of the target star, weighted by flux. Duplicated in `centroid_col` and `centroid_row` respectively.\n",
+    "- `pos_corr1` & `pos_corr2`: the column and row components of the calculated image motion."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "bqG4nbZYel3T"
+   },
+   "source": [
+    "These columns can be accessed as properties of the [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html) , for example, as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 40
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 387,
+     "status": "ok",
+     "timestamp": 1598412300324,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "j7vpHi6-esaZ",
+    "outputId": "f4810568-f186-4e12-ee4f-7a449884f216"
+   },
+   "outputs": [],
+   "source": [
+    "klc.sap_bkg"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "bVioOw_OX5WU"
+   },
+   "source": [
+    "The unit information of the arrays are stored using Astropy's [`astropy.units`](https://docs.astropy.org/en/stable/units/) module, which means that they are an Astropy [`Quantity`](https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity) object. We can view the units as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 52
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 594,
+     "status": "ok",
+     "timestamp": 1598412378410,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "BXGH-2lbYM70",
+    "outputId": "3382ed83-cf3e-45c2-d0bb-35e5a7bc60e9"
+   },
+   "outputs": [],
+   "source": [
+    "print(f'Centroid column unit: {klc.centroid_col.unit}')\n",
+    "print(f'Flux unit: {klc.flux.unit}')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "HH79vFV2e3yE"
+   },
+   "source": [
+    "You can access the data in the form of a standard NumPy array using the `value` attribute:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 52
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 541,
+     "status": "ok",
+     "timestamp": 1598412415984,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "jv0RBYlNe8o7",
+    "outputId": "07f7acf7-2bae-4ed9-8035-8a561e9b5f94"
+   },
+   "outputs": [],
+   "source": [
+    "klc.centroid_col.value"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "jtqSUfMFeyDW"
+   },
+   "source": [
+    "We can also plot the data using the [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html)'s `plot()` method by passing a `column` keyword argument:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 389
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 1001,
+     "status": "ok",
+     "timestamp": 1598412515732,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "hVvnR_HEeEPF",
+    "outputId": "2ef71786-c22b-4a00-d578-a480be31c4fc"
+   },
+   "outputs": [],
+   "source": [
+    "ax = klc.plot(column='mom_centr1', label='Flux-weighted column position')\n",
+    "klc.plot(ax=ax, column='psf_centr1', label='PSF centroid column position');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "DqSED5jKYX1N"
+   },
+   "source": [
+    "Finally, the `.time` property is a little different. Instead of an Astropy `Quantity` object, it is an Astropy [`Time`](https://docs.astropy.org/en/stable/time/) object, and has some additional time scale and format information."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 72
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 450,
+     "status": "ok",
+     "timestamp": 1598412589636,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "MiqWlWB5gI5e",
+    "outputId": "bc0fc612-5801-4448-84b1-51b2ac4a8585"
+   },
+   "outputs": [],
+   "source": [
+    "klc.time"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 52
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 536,
+     "status": "ok",
+     "timestamp": 1598412590379,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "zdFdd4HWgMX2",
+    "outputId": "4e847e75-40f7-4f23-8225-582ce34e6542"
+   },
+   "outputs": [],
+   "source": [
+    "print(f'Time scale: {klc.time.scale}')\n",
+    "print(f'Time format: {klc.time.format}')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "3I_WHW1Ogb4y"
+   },
+   "source": [
+    "Here, the *time format* is the unit of time, in this case Barycentric Kepler Julian Date (BKJD). The *time scale* indicates how the time is measured, in this case by taking the Barycentric Dynamical Time (TDB). This detailed information may be important when comparing observations of a periodic event (such as a planet transit) with observations made with other telescopes on Earth."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "6dCElz6bPmMO"
+   },
+   "source": [
+    "## Exercises"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "IXuRc_ZDPmMO"
+   },
+   "source": [
+    "Some stars, such as Kepler-10, have been observed both with *Kepler* and *TESS*. In this exercise, download and plot the *TESS* PDCSAP flux only. You can do this by either selecting it from the `SearchResult` returned by [`search_lightcurve()`](https://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html) or by using the `mission` keyword argument when searching."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "AxFfQVvVPmMP"
+   },
+   "outputs": [],
+   "source": [
+    "#search_result = lk.search_lightcurvefile(...)\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 79
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 2402,
+     "status": "ok",
+     "timestamp": 1598412671485,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "h5Fg1FNzPmMS",
+    "outputId": "accc4e03-6a77-44e9-aad5-38a1ec805cc8"
+   },
+   "outputs": [],
+   "source": [
+    "# Solution:\n",
+    "search_result = lk.search_lightcurve('Kepler-10', mission='TESS')\n",
+    "search_result"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 1629,
+     "status": "ok",
+     "timestamp": 1598412680051,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "h6pt0og8PmMU",
+    "outputId": "47aef53e-e6e6-41f6-e338-74836e7f2664"
+   },
+   "outputs": [],
+   "source": [
+    "search_result.download().plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "lhbv9ZKRPmMY"
+   },
+   "source": [
+    "## About this Notebook"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "nU-5JtvpPmMZ"
+   },
+   "source": [
+    "**Authors:** Oliver Hall (oliver.hall@esa.int), Geert Barentsen\n",
+    "\n",
+    "**Updated On**: 2020-08-31"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "ZANsIso_B_si"
+   },
+   "source": [
+    "## Citing Lightkurve and Astropy\n",
+    "\n",
+    "If you use `lightkurve` or `astropy` for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 85
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 56019,
+     "status": "ok",
+     "timestamp": 1595851407661,
+     "user": {
+      "displayName": "Oliver Hall",
+      "photoUrl": "",
+      "userId": "08831861496876617563"
+     },
+     "user_tz": -60
+    },
+    "id": "7vUtrWVjnlY7",
+    "outputId": "146b4877-705d-4ac1-a247-2cfa31b8b60e"
+   },
+   "outputs": [],
+   "source": [
+    "lk.show_citation_instructions()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "CNf3nI0trtA-"
+   },
+   "source": [
+    "<img style=\"float: right;\" src=\"https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png\" alt=\"Space Telescope Logo\" width=\"200px\"/>\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "collapsed_sections": [],
+   "name": "Using-Light-Curve-Products-with-Lightkurve.ipynb",
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

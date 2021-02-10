@@ -1,0 +1,6 @@
+﻿lightkurve.DesignMatrix.validate
+================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: DesignMatrix.validate

@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.cutout
+=======================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.cutout

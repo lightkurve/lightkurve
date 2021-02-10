@@ -1,0 +1,6 @@
+﻿lightkurve.FoldedLightCurve.even\_mask
+======================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: FoldedLightCurve.even_mask

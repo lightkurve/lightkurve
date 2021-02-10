@@ -1,0 +1,865 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "6eUXGz8G94ZQ"
+   },
+   "source": [
+    "# How to estimate a star's mass and radius using asteroseismology"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "CqMHYBsI96w6"
+   },
+   "source": [
+    "## Learning Goals\n",
+    "\n",
+    "In this tutorial you will learn:\n",
+    "\n",
+    "- What the periodogram of a star with solar-like oscillations looks like.\n",
+    "- How the oscillations can be characterized by two key metrics ($\\nu_{\\rm max}$ and $\\Delta\\nu$). \n",
+    "- How these metrics can be used to estimate a star's mass, radius, and surface gravity."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "xsLsB9PV-IdJ"
+   },
+   "source": [
+    "## Introduction\n",
+    "\n",
+    "Stars of all shapes and sizes oscillate. In many cases, these oscillations are created by standing waves formed inside of the star, which disturb the stellar surface. The study of these types of internal oscillations is called *asteroseismology*.\n",
+    "\n",
+    "This tutorial focuses on a very common type of oscillating star: *solar-like oscillators*. This type includes main sequence stars like the Sun as well as many red giant stars. Stars of this type experience convection in the outer layers of their atmospheres. As material moves up and down in these layers, the turbulent motion forms damped standing waves throughout the stellar interior. Because these waves probe the full stellar interior, we can estimate fundamental properties of a star by studying how these waves disturb the surface of the star. Properties which can be inferred in this way include mass, radius, surface gravity, and even age for the most advanced studies.\n",
+    "\n",
+    "In this tutorial we will explain two key metrics asteroseismologists use to characterize the oscillations of a Sun-like star: the average frequency spacing $\\Delta\\nu$, and the frequency of maximum oscillation amplitude $\\nu_{\\rm max}$. We will also demonstrate how these metrics can be used to estimate the mass, radius, and surface gravity of a star."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "_-ldXN0k-DaL"
+   },
+   "source": [
+    "## Imports\n",
+    "\n",
+    "This tutorial requires **[Lightkurve](https://docs.lightkurve.org)** (for its features to handle *Kepler* data) and **[NumPy](https://numpy.org/)** (to help plot some additional details on figures).  We will use **[Matplotlib](https://matplotlib.org/)** for plotting."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "9vxrKDrS-FjI"
+   },
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk\n",
+    "import numpy as np\n",
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Ahkq0CCwrokE"
+   },
+   "source": [
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "szMCbZPa-YI5"
+   },
+   "source": [
+    "## 1. Plotting the Frequency Spectrum of a Sun-Like Star"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Zq1yZeY2-aJi"
+   },
+   "source": [
+    "The frequency spectrum (also known as periodogram) of a solar-like oscillator like the Sun shows a rich spectrum of modes of oscillation, equally spaced in frequency, colloquially referred to as a \"comb.\"\n",
+    "\n",
+    "We will investigate this spectrum using the Sun-like star KIC 10963065 as an example. This star is also colloquially known as \"Rudy\" (cf. [Lund et al. 2016](https://arxiv.org/pdf/1612.00436.pdf)). In order to get a good resolution in the frequency domain, we start by downloading and combining four quarters of Short Cadence *Kepler* data as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "_MqdHCoz-bSg"
+   },
+   "outputs": [],
+   "source": [
+    "search_result = lk.search_lightcurve('KIC 10963065',\n",
+    "                                     cadence='short', \n",
+    "                                     author='Kepler',\n",
+    "                                     quarter=(2,5,6,7))\n",
+    "lc = search_result.download_all().stitch()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "83w84X7O-cFt"
+   },
+   "source": [
+    "In one of the companion tutorials, we already identified the location of the modes of oscillation, so we'll zoom in on that region right away when creating the periodogram. We also set the [`normalization='psd'`](https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve) keyword argument, to match the common conventions in asteroseismology of solar-like oscillators."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 411
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 3856,
+     "status": "ok",
+     "timestamp": 1600230552390,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "YdQYN0b-iL1e",
+    "outputId": "eb3d43a1-499c-421e-808f-43713a602df4"
+   },
+   "outputs": [],
+   "source": [
+    "pg = lc.to_periodogram(normalization='psd',\n",
+    "                       minimum_frequency=1500,\n",
+    "                       maximum_frequency=2700)\n",
+    "ax = pg.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "wrAT_dq2iYDK"
+   },
+   "source": [
+    "In this spectrum we can see that the modes of oscillation rise up from the noise, reach a peak, and then decrease in power. This region, where the modes are visible, is commonly referred to as the *mode envelope*. The peak of this envelope is what we call the *frequency of maximum oscillation amplitude*, or $\\nu_{\\rm max}$ (colloquially called \"numax\").\n",
+    "\n",
+    "An approximation of the shape of the envelope (roughly a Gaussian function) is shown as the dashed line in the figure below. We also overlay a smoothed version of the power spectrum, and annotate the location of the oscillation modes with arrows. Making this figure is an optional step, but it helps to visualize the oscillation features:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 411
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 1366,
+     "status": "ok",
+     "timestamp": 1600230592217,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "dfp4Nbck-iyP",
+    "outputId": "e824f004-0249-40c0-e25d-d94773df4878"
+   },
+   "outputs": [],
+   "source": [
+    "# Plot a smoothed version of the power spectrum on top in green\n",
+    "ax = pg.plot(label='Original spectrum')\n",
+    "pg.smooth(filter_width=1).plot(ax=ax,\n",
+    "                               color='green',\n",
+    "                               label='Smoothed spectrum')\n",
+    "\n",
+    "# Highlight the \"mode envelope\" using a Gaussian curve\n",
+    "f = pg.frequency.value\n",
+    "ax.plot(f, 5e-11*np.exp(-(f-2100)**2/(2*230**2)),\n",
+    "        lw=5, ls='--', zorder=0,\n",
+    "        color='blue', label='Mode envelope');\n",
+    "\n",
+    "# Annotate the modes using red arrows\n",
+    "for i in range(6):\n",
+    "  ax.annotate('',\n",
+    "              xy=(1831.66+i*103.8, 5.2e-11),\n",
+    "              xytext=(1831.66+i*103.8, 7e-11), \n",
+    "              arrowprops=dict(arrowstyle='->',\n",
+    "              color='red',\n",
+    "              linewidth=1.5))\n",
+    "ax.legend();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "KsnuTxCl-jjB"
+   },
+   "source": [
+    "A distinctive feature in the spectrum is the equal spacing of the modes of oscillation. The spacing between two consecutive overtones of the same radial order (for example, radial oscillations, dipole oscillations, etc.) is what we call the *average large frequency spacing*, or $\\Delta\\nu$ (colloquially called \"deltanu\"). In the figure above, the arrows point to dipole modes of oscillation (hemispheres expanding and contracting alternately), and are all evenly spaced.\n",
+    "\n",
+    "Both of these metrics, $\\nu_{\\rm max}$ and $\\Delta\\nu$, are very useful because they are related to the mass, radius, and temperature of the star. The next step in our tutorial is to estimate the values of these metrics, using Lightkurve's tools."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "9jWfV4ik-lB4"
+   },
+   "source": [
+    "## 2. Estimating the Frequency of Maximum Amplitude $\\nu_{\\rm max}$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "GF3kZ0uI-mi_"
+   },
+   "source": [
+    "The frequency of maximum amplitude can be estimated in a number of ways. An obvious estimate would be to take the frequency that corresponds to the maximum amplitude in the power spectrum. This would not be a robust estimate however, because the maximum peak is very sensitive to noise and sampling effects. \n",
+    "\n",
+    "Instead, one of the most commonly used methods to estimate $\\nu_{\\rm max}$ is the 2D autocorrelation function (ACF) method. Literature publications using this method include, for example, [Huber et al. (2009)](https://arxiv.org/abs/0910.2764) and [Viani et al. (2019)](https://arxiv.org/abs/1905.08333). A version of this method is provided by the Lightkurve package.\n",
+    "\n",
+    "Before diving into Lightkurve's tools, we will need to prepare our [`Periodogram`](https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html) object. We do this by first removing background noise using the [`flatten()`](https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.flatten) method:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 393
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 1689,
+     "status": "ok",
+     "timestamp": 1600231082818,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "dn-BeCwc-oI0",
+    "outputId": "98013e74-345f-4f97-a2c9-d0f44b721e59"
+   },
+   "outputs": [],
+   "source": [
+    "snr = pg.flatten()\n",
+    "ax = snr.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "gVPXkoUEmeF7"
+   },
+   "source": [
+    "Next, we need to convert the periodogram to a [`Seismology`](https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology) object, which hosts Lightkurve's asteroseismology tools:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "LTDbIca--pFo"
+   },
+   "outputs": [],
+   "source": [
+    "seismology = snr.to_seismology()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "PyeuroRa-qW9"
+   },
+   "source": [
+    "Lightkurve's estimation method uses the autocorrelation function (ACF). Autocorrelation values are the result of calculating the correlation of the data with itself as it is gradually shifted over itself. One way to imagine how the ACF method works is by holding your hands up side by side and slowly shifting them past one another. Where your fingers overlap, the ACF will be high, and vice versa."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "3krZClnz2DnB"
+   },
+   "source": [
+    "\n",
+    "The [`Seismology`](https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology) object provides both `estimate` and `diagnose` methods. The former estimates the value, and the latter shows us how it was calculated. First, let's call [`estimate_numax()`](https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.estimate_numax):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 3952,
+     "status": "ok",
+     "timestamp": 1600231089673,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "Poi4Tpcd-rnO",
+    "outputId": "7c4d9aaa-17ee-4aed-c5a3-ddcc3ccafa83"
+   },
+   "outputs": [],
+   "source": [
+    "seismology.estimate_numax()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "hN0wCxri-shH"
+   },
+   "source": [
+    "Here, the [`estimate_numax()`](https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.estimate_numax) function has measured a value for $\\nu_{\\rm max}$ from our `SNRPeriodogram`, and has stored it as a property of the [`Seismology`](https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology) object. We can access the value as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 271,
+     "status": "ok",
+     "timestamp": 1600231089674,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "i8H9eO15_ar9",
+    "outputId": "d30f4b65-0400-4693-c37f-1bcbfe59119a"
+   },
+   "outputs": [],
+   "source": [
+    "seismology.numax.value"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "_QbB-JH7_bdp"
+   },
+   "source": [
+    "Before moving on, let's have a look at exactly how $\\nu_{\\rm max}$ was measured, using the [`diagnose_numax()`](https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.diagnose_numax) function."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 997
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 80156,
+     "status": "ok",
+     "timestamp": 1600130326019,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "VQ1cEi6-_dVg",
+    "outputId": "6e1b3605-c763-4193-dbff-16863554e510"
+   },
+   "outputs": [],
+   "source": [
+    "seismology.diagnose_numax();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "r_q9oK3R_eJC"
+   },
+   "source": [
+    "The figure above shows three plots, so let's break them down, one by one:\n",
+    "\n",
+    "1. The top panel shows the original periodogram. \n",
+    "2. The middle panel shows an image representing the ACF values calculated for different parts of the power spectrum. In this case, each segment used to calculate the ACF is $250\\, \\mu\\rm{Hz}$ wide, which you can see on the y-axis. The x-axis is the central frequency of each segment, and the z-axis (the color) shows the strength of the autocorrelation function. As we get closer to the frequency of maximum oscillation, the colors get darker, and so the ACF is increasing.\n",
+    "3. The bottom panel shows the same autocorrelation values as the middle panel, but collapsed (that is, summed) along the y-axis. The integrated value of the ACF is strongest closest to the frequency of maximum oscillation. The blue line over the top is a smoothed version of the collapsed ACF. Lightkurve estimates  $\\nu_{\\rm max}$ by computing the maximum of the smoothed blue line. The resulting estimate is marked across all three panels using the vertical red line.\n",
+    "\n",
+    "Now that we have estimated a value for $\\nu_{\\rm{max}}$, calculating $\\Delta\\nu$ becomes faster. We can observe the features of $\\Delta\\nu$ in the middle panel above: there are repeating peaks in the ACF, corresponding to repeating features overlapping, just like the fingers on your hand. The spacing between these repeating peaks will be used to estimate $\\Delta\\nu$."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "KPM8SPqu_hzA"
+   },
+   "source": [
+    "## 3. Estimating the Frequency Spacing $\\Delta\\nu$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "35CWZ61_hkFC"
+   },
+   "source": [
+    "In order to estimate $\\Delta\\nu$ efficiently, we can use the fact that we only need to investigate the ACF in the region surrounding $\\nu_{\\rm max}$. In this region, peaks in the ACF will show up corresponding to the repeating comb structure overlapping with itself.\n",
+    "\n",
+    "Having an estimate of $\\nu_{\\rm max}$ also makes measuring $\\Delta\\nu$ possible in a second way. Using well-established empirical relations which have been published in the literature, we can infer the Full Width Half Maximum (FWHM) of the mode envelope based on the value of $\\nu_{\\rm max}$. This helps us further narrow down the region in which to calculate the ACF.  Lightkurve uses the relationships published by [Mosser et al. 2010](https://arxiv.org/abs/1004.0449) and [Lund et al. 2017](https://arxiv.org/abs/1612.00436), which are:\n",
+    "\n",
+    "$$\n",
+    "\\textrm{FWHM} \\approx 0.25 \\times \\nu_{\\rm max}\\, \\text{for main sequence stars, and}$$\n",
+    "\n",
+    "$$\\textrm{FWHM} \\approx 0.66 \\times \\nu_{\\rm max}^{0.88}\\, \\text{for red giants.}$$\n",
+    "\n",
+    "We can also use $\\nu_{\\rm max}$ to make a rough estimate of $\\Delta\\nu$ to guide our search for the true $\\Delta\\nu$. This is roughly\n",
+    "\n",
+    "$$\\Delta\\nu \\approx 0.294 \\times \\nu_{\\rm max}^{0772}\\, ,$$\n",
+    "\n",
+    "which we assume to be the same for all solar-like oscillators ([Stello et al. 2009](https://arxiv.org/abs/0909.5193))."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "CnsZRghQhijU"
+   },
+   "source": [
+    "To understand how this works in practice, let's first [`estimate_deltanu()`](https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.estimate_deltanu), and then [`diagnose_deltanu()`](https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.diagnose_deltanu)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 978,
+     "status": "ok",
+     "timestamp": 1600234078400,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "esMnrljZ_jz0",
+    "outputId": "52761a54-a149-4519-fb6f-ca96029b693a"
+   },
+   "outputs": [],
+   "source": [
+    "seismology.estimate_deltanu()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "qRfsq3Sl34UZ"
+   },
+   "source": [
+    "Now let's see how this $\\Delta\\nu$ value was obtained."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 697
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 2432,
+     "status": "ok",
+     "timestamp": 1600234081641,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "AYkaOm8g37vX",
+    "outputId": "597b209d-5dc2-488a-9985-5a27f55e916f"
+   },
+   "outputs": [],
+   "source": [
+    "seismology.diagnose_deltanu();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "LdLbip5W4ICX"
+   },
+   "source": [
+    "In the top panel we see the region in the frequency spectrum for which the ACF is evaluated, which is one FWHM on either side of $\\nu_{\\rm max}$. This region encompasses the strongest modes of oscillation.\n",
+    "\n",
+    "In the bottom panel we can see the ACF, that is, the result of calculating the correlation of the data with itself as it is shifted over itself. Where modes of oscillation overlap with one another, there will be a spike in the ACF. Because the modes are regularly spaced, these spikes will also be regularly spaced, and will reflect the spacing between modes of oscillation.\n",
+    "\n",
+    "The inset on the upper right hand corner shows a region around the *empirically* estimated $\\Delta\\nu$, which is based on the literature equations shown above. Using the [Scipy](https://www.scipy.org/) [`find_peaks()`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html) function, Lightkurve finds the tip of the ACF peak nearest to this estimate, and reports this as the *measured* $\\Delta\\nu$."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "dLhEAvv3_j6F"
+   },
+   "source": [
+    "## 4. Estimating Stellar Mass, Radius, and Surface Gravity"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Cr3Gu2P8_j_1"
+   },
+   "source": [
+    "Having obtained estimates for $\\Delta\\nu$ and $\\nu_\\rm{max}$, we can now estimate the star's mass ($M$), radius ($R$), and surface gravity ($g$) given an estimate for the star's effective temperature ($T_\\rm{eff}$). Asteroseismologists have established three *scaling relations* between these properties. These scaling relations read as follows:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "JCXPHZcO_lr8"
+   },
+   "source": [
+    "$$\\frac{M}{M_\\odot} \\simeq \\left(\\frac{\\nu_\\rm{max}}{\\nu_\\rm{max,\\odot}}\\right)^3 \\left(\\frac{\\Delta\\nu}{\\Delta\\nu_{\\odot}}\\right)^{-4}\\left(\\frac{T_{\\rm eff}}{T_{\\rm eff,\\odot}}\\right)^{3/2}\\, ,$$\n",
+    "\n",
+    "$$\n",
+    "\\frac{R}{R_\\odot} \\simeq \\left(\\frac{\\nu_\\rm{max}}{\\nu_\\rm{max,\\odot}}\\right) \\left(\\frac{\\Delta\\nu}{\\Delta\\nu_{\\odot}}\\right)^{-2}\\left(\\frac{T_{\\rm eff}}{T_{\\rm eff,\\odot}}\\right)^{1/2}\\, \\text{and}\n",
+    "$$\n",
+    "\n",
+    "$$\n",
+    "\\frac{g}{g_\\odot} \\simeq \\left(\\frac{\\nu_\\rm{max}}{\\nu_\\rm{max,\\odot}}\\right) \\left(\\frac{T_{\\rm eff}}{T_{\\rm eff,\\odot}}\\right)^{1/2}\\,\n",
+    "$$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "jG2kIGb_m79_"
+   },
+   "source": [
+    "where the $\\odot$ symbol represents the Sun. In Lightkurve, the solar values used are $\\nu_{\\rm max, \\odot} = 3090\\, \\mu\\rm{Hz}$, $\\Delta\\nu_\\odot = 135.1\\, \\mu{\\rm Hz}$ ([Huber et al. 2010](https://arxiv.org/abs/1010.4566)) and $T_{\\rm eff, \\odot} = 5777.2\\, \\rm{K}$ ([Prša et al. 2016](https://arxiv.org/abs/1605.09788))."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "jbMU6Ka8n5qx"
+   },
+   "source": [
+    "These scaling relations are built into Lightkurve. We can call them as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 1003,
+     "status": "ok",
+     "timestamp": 1600234086297,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "66QlH667oCBJ",
+    "outputId": "d7e3cabf-7b77-4307-cb1d-78ba16ea9542"
+   },
+   "outputs": [],
+   "source": [
+    "seismology.estimate_mass()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 444,
+     "status": "ok",
+     "timestamp": 1600234091530,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "xr5Q8avboCHE",
+    "outputId": "de25ee3a-8254-48b0-c047-e49596f7289d"
+   },
+   "outputs": [],
+   "source": [
+    "seismology.estimate_radius()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 317,
+     "status": "ok",
+     "timestamp": 1600234092922,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "jR_uNnNNoFlc",
+    "outputId": "212f7458-1469-4c4d-9dd4-f18d747c1eaa"
+   },
+   "outputs": [],
+   "source": [
+    "seismology.estimate_logg()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Ol3JmPLOoISI"
+   },
+   "source": [
+    "For the last one, surface gravity ($g$) is expressed in log space (that is, $\\log g$), which is the convention in stellar physics. If we look at our  [`Seismology`](https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology) object now, we'll see that it has stored all of these variables in one place."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 119
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 289,
+     "status": "ok",
+     "timestamp": 1600234134919,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "ccGl7kUNoTno",
+    "outputId": "4c1fc4ac-93f6-4ab0-eb49-d29e2ec8afcc"
+   },
+   "outputs": [],
+   "source": [
+    "seismology"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "LwsRjUnXoVEe"
+   },
+   "source": [
+    "## 5. Closing Remarks\n",
+    "\n",
+    "In this tutorial, we have seen how Lightkurve's tools can be used to estimate the mass, radius, and surface gravity of a solar-like oscillator. We did this by first estimating the seismic observables $\\nu_{\\rm max}$ and $\\Delta\\nu$. \n",
+    "It is important to remember, however, that these are *estimates*, and that the method built into Lightkurve is an adaptation of established 2D ACF methods designed to provide first look estimates of stellar properties. Lightkurve's implementation has not been tested thoroughly in the literature yet, and it does not provide uncertainties yet.\n",
+    "\n",
+    "If you're interested in learning more about asteroseismology, we recommend the following review papers:\n",
+    "\n",
+    "- [Chaplin & Miglio (2013)](https://arxiv.org/pdf/1303.1957.pdf) provides a review on asteroseismology of solar-like oscillators with *Kepler*, including an explanation of the seismic scaling relations.\n",
+    "- [Aerts (2019)](https://arxiv.org/pdf/1912.12300.pdf) provides a comprehensive review that covers asteroseismology of a wide range of oscillating stars, including solar-like oscillators.\n",
+    "\n",
+    "Or even better, get in contact and collaborate with an asteroseismologist!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "eTCiB1-J_olM"
+   },
+   "source": [
+    "## About this Notebook\n",
+    "\n",
+    "**Authors**: Oliver Hall (oliver.hall@esa.int), Geert Barentsen\n",
+    "\n",
+    "**Updated On**: 2020-09-29"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "EIQvB3On_qy_"
+   },
+   "source": [
+    "## Citing Lightkurve and Astropy\n",
+    "\n",
+    "If you use `lightkurve` or `astropy` for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 144
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 940,
+     "status": "ok",
+     "timestamp": 1600130472720,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "DiojBx-vNTWE",
+    "outputId": "d6193855-2c06-4ffe-9d24-47e3a9a2b02c"
+   },
+   "outputs": [],
+   "source": [
+    "lk.show_citation_instructions()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "URWzHJMG_-ce"
+   },
+   "source": [
+    "<img style=\"float: left;\" src=\"https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png\" alt=\"Space Telescope Logo\" width=\"200px\"/>\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "collapsed_sections": [],
+   "name": "How-to-Estimate-a-Stars-Mass-and-Radius-using-Asteroseismology.ipynb",
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

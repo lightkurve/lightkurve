@@ -1,0 +1,990 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "zmyJVTgDegLW"
+   },
+   "source": [
+    "# Using Target Pixel Files with Lightkurve"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "px3Cl_ZzY4m6"
+   },
+   "source": [
+    "## Learning Goals\n",
+    "\n",
+    "By the end of this tutorial, you will:\n",
+    "\n",
+    "- Be able to download and plot target pixel files from the data archive using [Lightkurve](https://docs.lightkurve.org).\n",
+    "- Be able to access target pixel file metadata.\n",
+    "- Understand where to find more details about *Kepler* target pixel files.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "zNk1NmIcfkMC"
+   },
+   "source": [
+    "## Introduction"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "fpDuPWW6hzh_"
+   },
+   "source": [
+    "The [*Kepler*](https://www.nasa.gov/mission_pages/kepler/main/index.html), [*K2*](https://www.nasa.gov/mission_pages/kepler/main/index.html), and [*TESS*](https://tess.mit.edu/) telescopes observe stars for long periods of time, from just under a month to four years. By doing so they observe how the brightnesses of stars change over time.\n",
+    "\n",
+    "*Kepler* selected certain pixels around targeted stars to be downloaded from the spacecraft. These were stored as *target pixel files* that contain data for each observed cadence. In this tutorial, we will learn how to use Lightkurve to download these raw data, plot them, and understand their properties and units.\n",
+    "\n",
+    "It is recommended that you first read the tutorial on how to use *Kepler* light curve products with Lightkurve. That tutorial will introduce you to some specifics of how *Kepler*, *K2*, and *TESS* make observations, and how these are displayed as light curves. It also introduces some important terms and concepts that are referred to in this tutorial.\n",
+    "\n",
+    "*Kepler* observed a single field in the sky, although not all stars in this field were recorded. Instead, pixels were selected around certain targeted stars. This series of cutouts were downloaded and stored as an array of images in target pixel files, or TPFs. By summing up the amount of light (the *flux*) captured by the pixels in which the star appears, you can make a measurement of the brightness of a star over time.\n",
+    "\n",
+    "TPFs are an important resource when studying an astronomical object with *Kepler*, *K2*, or *TESS*. The files allow us to understand the original images that were collected, and identify potential sources of noise or instrument-induced trends which may be less obvious in derived light curves. In this tutorial, we will use the *Kepler* mission as the main example, but these tools equally work for *TESS* and *K2*."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "PPvxoxn5fNRG"
+   },
+   "source": [
+    "## Imports\n",
+    "\n",
+    "This tutorial requires **[Lightkurve](https://docs.lightkurve.org)**, which in turn uses `matplotlib` for plotting."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "1dH7Te6hfkvx"
+   },
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk\n",
+    "%matplotlib inline "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "TIf0mdYqnhiZ"
+   },
+   "source": [
+    "## 1. What is a Target Pixel File?\n",
+    "\n",
+    "The target pixel file (TPF) of a star contains an image for each observing cadence, either a 30-minute Long Cadence or one-minute Short Cadence exposure in the case of *Kepler*. The files also include metadata detailing how the observation was made, as well as post-processing information such as the estimated intensity of the astronomical background in each image. (Read the [*Kepler* Archive Manual](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/archive_manual.pdf), Section 2.3.2 for more information.)\n",
+    "\n",
+    "TPFs are stored in a [FITS file format](https://fits.gsfc.nasa.gov/fits_primer.html). The Lightkurve package allows us to work with these binary files without having to worry about the details of the file structure. For examples on how to work with FITS files directly, read this tutorial on [Plotting Images from *Kepler* Target Pixel Files](https://github.com/spacetelescope/notebooks/blob/master/notebooks/MAST/Kepler/Kepler_TPF/kepler_tpf.ipynb)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "41HrZlzqi1U5"
+   },
+   "source": [
+    "## 2. Downloading a Target Pixel File"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "-WFvehoMkIDa"
+   },
+   "source": [
+    "The TPFs of stars observed by the *Kepler* mission are stored on the [Mikulksi Archive for Space Telescopes](https://archive.stsci.edu/kepler/) (MAST) archive, along with metadata about the observations, such as which charge-coupled device (CCD) was used at each time."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "_vVu6JugHj6O"
+   },
+   "source": [
+    "Lightkurve's built-in tools allow us to search and download TPFs from the archive. As we did in the accompanying tutorial on light curves, we will start by downloading one quarter (a *Kepler* observing period approximately 90 days in duration) of *Kepler* data for the star named [Kepler-8](http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/), a star somewhat larger than the Sun, and the host of a [hot Jupiter planet](https://en.wikipedia.org/wiki/Hot_Jupiter)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "EuIqyV0YIWND"
+   },
+   "source": [
+    "Using the [`search_targetpixelfile`](https://docs.lightkurve.org/api/lightkurve.search.search_targetpixelfile.html) function, we can find an itemized list of different TPFs available for Kepler-8."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 442
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 14762,
+     "status": "ok",
+     "timestamp": 1598458625383,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "hcpStCZ7IJct",
+    "outputId": "37bdbbdd-59eb-4ee1-d4f8-2e85f8f180b2"
+   },
+   "outputs": [],
+   "source": [
+    "search_result = lk.search_targetpixelfile(\"Kepler-8\", author=\"Kepler\", cadence=\"long\")\n",
+    "search_result"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "vEqLXQSDoUco"
+   },
+   "source": [
+    "In this list, each row represents a different observing period. We find that *Kepler* recorded 18 quarters of data for this target across four years. The `search_targetpixelfile()` function takes several additional arguments, such as the `quarter` number or the `mission` name. You can find examples of its use in the [online documentation](http://docs.lightkurve.org/api/lightkurve.search.search_targetpixelfile.html) for this function.\n",
+    "\n",
+    "The search function returns a [`SearchResult`](https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html) object which has several convenient operations. For example, we can select the fourth data product in the list as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 79
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 14757,
+     "status": "ok",
+     "timestamp": 1598458625386,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "QOEovJgkofIf",
+    "outputId": "9d04b6ee-196f-4133-bb19-b1f75832aeee"
+   },
+   "outputs": [],
+   "source": [
+    "search_result[4]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "0BY-cimHotti"
+   },
+   "source": [
+    "We can download this data product using the `download()` method."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "LrGKm1J_I06X"
+   },
+   "outputs": [],
+   "source": [
+    "tpf = search_result[4].download()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "FxKwOG3Go8TT"
+   },
+   "source": [
+    "This instruction is identical to the following line:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "WY9N8ou-pAB0"
+   },
+   "outputs": [],
+   "source": [
+    "tpf = lk.search_targetpixelfile(\"Kepler-8\", author=\"Kepler\", cadence=\"long\", quarter=4).download()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "flbTGIWOpQyV"
+   },
+   "source": [
+    "The `tpf_file` variable we have obtained in this way is a [`KeplerTargetPixelFile`](https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html) object."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 16314,
+     "status": "ok",
+     "timestamp": 1598458626964,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "98HbSjCdpcYm",
+    "outputId": "40e19a9c-be82-400f-cd9c-3ec1335cd2b9"
+   },
+   "outputs": [],
+   "source": [
+    "tpf"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "s163SxRnpdYf"
+   },
+   "source": [
+    "This file object provides a convenient way to interact with the data file that has been returned by the archive, which contains both the TPF as well as metadata about the observations.\n",
+    "\n",
+    "Before diving into the properties of the `KeplerTargetPixelFile`, we can plot the data, also using Lightkurve."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 420
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 17241,
+     "status": "ok",
+     "timestamp": 1598458627899,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "Y_jFU5OGpd6o",
+    "outputId": "07529c4e-9d5d-47a4-ba11-16ca727eb523"
+   },
+   "outputs": [],
+   "source": [
+    "%matplotlib inline\n",
+    "tpf.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "NvOge8Rppw1K"
+   },
+   "source": [
+    "What you are seeing in this figure are pixels on the CCD camera, with which Kepler-8 was observed. The color indicates the amount of flux in each pixel, in electrons per second. The y-axis shows the pixel row, and the x-axis shows the pixel column. The title tells us the *Kepler* Input Catalogue (KIC) identification number of the target, and the observing cadence of this image. By default, `plot()` shows the first observation cadence in the quarter, but this can be changed by passing optional keyword arguments. You can type `help(tpf.plot)` to see a full list of those options."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "J7fgNwrIqOKu"
+   },
+   "source": [
+    "### Note\n",
+    "\n",
+    "You can also download TPF FITS files from the archive by hand, store them on your local disk, and open them using the `lk.read(<filename>)` function. This function will return a [`KeplerTargetPixelFile`](https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html) object just as in the above example. You can find out where Lightkurve stored a given TPF by typing `tpf.path`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 35
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 17233,
+     "status": "ok",
+     "timestamp": 1598458627901,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "ZQsNGZGndxGG",
+    "outputId": "d4ff8da2-bf32-4551-aced-0bc9750ee573"
+   },
+   "outputs": [],
+   "source": [
+    "tpf.path"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "RnYPeb8bPJcO"
+   },
+   "source": [
+    "## 3. Accessing the Metadata"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "VYPAC5XrP-AQ"
+   },
+   "source": [
+    "Our [`KeplerTargetPixelFile`](https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html) includes the observation's metadata, loaded from the header of the TPF files downloaded from MAST. Many of these are similar to the metadata stored in the [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html), which are discussed in the accompanying tutorial."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Tt3GXT4LrKNn"
+   },
+   "source": [
+    "The headers containing the metadata can be accessed from the [`KeplerTargetPixelFile`](https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html) through the `get_header()` method.\n",
+    "\n",
+    "For example, the first extension (\"extension 0\") of the file provides metadata related to the star, such as its magnitude in different passbands, its movement and position on the sky, and its location on *Kepler*'s CCD detector:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 1000
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 17229,
+     "status": "ok",
+     "timestamp": 1598458627903,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "CbMck1dqraXf",
+    "outputId": "5fda30df-f09c-4fe7-bc94-4da872f9ae87"
+   },
+   "outputs": [],
+   "source": [
+    "tpf.get_header(ext=0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "xxaE-9qSutKT"
+   },
+   "source": [
+    "This is an Astropy [`astropy.io.fits.Header`](https://docs.astropy.org/en/stable/io/fits/api/headers.html) object, which has many convenient features. For example, you can retrieve the value of an individual keyword as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 17221,
+     "status": "ok",
+     "timestamp": 1598458627904,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "I-OdcLDKutWR",
+    "outputId": "b7dcefdd-51be-43ca-88b3-4a712ba4fbee"
+   },
+   "outputs": [],
+   "source": [
+    "tpf.get_header(ext=0).get('QUARTER')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "KG6rOB66utpH"
+   },
+   "source": [
+    "When constructing a [`KeplerTargetPixelFile`](https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html) from a FITS file, Lightkurve carries a subset of the metadata through into user-friendly object properties for convenience, which are available through shorthands (for example, `tpf.quarter`). You can view these properties with the the [`show_properties()`](https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties) method:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 575
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 17214,
+     "status": "ok",
+     "timestamp": 1598458627906,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "Z7dqJy7twKqB",
+    "outputId": "b2621461-08c1-4339-d9e9-e3939d7e106a"
+   },
+   "outputs": [],
+   "source": [
+    "tpf.show_properties()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "_A-Rx5LN1hd8"
+   },
+   "source": [
+    "A new piece of metadata not included in the [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html) objects is the [World Coordinate System](https://fits.gsfc.nasa.gov/fits_wcs.html) (WCS). The WCS contains information about how pixel positions map to celestial sky coordinates. This is important when comparing a TPF from a *Kepler*, *K2*, or *TESS* observation to an observation of the same star with a different telescope.\n",
+    "\n",
+    "You can access the WCS using `tpf.wcs`, which is an Astropy WCS object:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 17208,
+     "status": "ok",
+     "timestamp": 1598458627908,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "RNSQdygirs84",
+    "outputId": "9f90d545-365a-403b-d35d-b913d0e2d6c2"
+   },
+   "outputs": [],
+   "source": [
+    "type(tpf.wcs)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "hXXEiUrEf1-X"
+   },
+   "source": [
+    "For example, you can obtain the sky coordinates for the bottom left corner of the TPF as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 52
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 17204,
+     "status": "ok",
+     "timestamp": 1598458627909,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "TQ605X9RfSZx",
+    "outputId": "79d92100-16c3-491a-8019-f54e054b0405"
+   },
+   "outputs": [],
+   "source": [
+    "tpf.wcs.pixel_to_world(0, 0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "fTPgSmPCOeym"
+   },
+   "source": [
+    "Altogether, the metadata contains a lot of information, and you will rarely use it all, but it is important to know that it is available if you need it. For more details and a better overview of all of the metadata stored in a TPF, read the [*Kepler* Archive Manual](http://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/archive_manual.pdf), specifically:\n",
+    "  - Section 2.3.2 Target Pixel Data\n",
+    "  - Appendix A.1: Target Pixel File Headers"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "MbgP7U-9rs9M"
+   },
+   "source": [
+    "## 4. Time, Flux, and Background"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "rXQrHyPukS1B"
+   },
+   "source": [
+    "Finally, we have the most important properties of the TPF: the time and flux information. Just like a `KeplerLightCurve` object, we can access the time information as an Astropy `Time` object as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 52
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 393,
+     "status": "ok",
+     "timestamp": 1598458810955,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "ajuuDHv4kTyF",
+    "outputId": "521da14a-2ba7-4a70-c50d-181b5f76a1a2"
+   },
+   "outputs": [],
+   "source": [
+    "tpf.time"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "aQ7iv-Fwkmx9"
+   },
+   "source": [
+    "The pixel brightness data is available as an Astropy `Quantity` object named `tpf.flux`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 60
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 500,
+     "status": "ok",
+     "timestamp": 1598459014943,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "5IfhFBTUkkil",
+    "outputId": "f0b60528-edc0-42b4-e9e2-f9b8854f523f"
+   },
+   "outputs": [],
+   "source": [
+    "tpf.flux"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "mXjVM2VHlL87"
+   },
+   "source": [
+    "This object is a three-dimensional array, where each entry in the array represents one observing cadence. In our example, the flux array is composed of 4116 images, which are 5x5 pixels in size each:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 426,
+     "status": "ok",
+     "timestamp": 1598459062040,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "GqKnx3gglJPv",
+    "outputId": "97856074-a038-4586-8ff2-da757fcb6626"
+   },
+   "outputs": [],
+   "source": [
+    "tpf.flux.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "TLR6pKTthowD"
+   },
+   "source": [
+    "We can access the values of the first 5x5 pixel image as a NumPy array as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 191
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 17197,
+     "status": "ok",
+     "timestamp": 1598458627913,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "YorUZ0eYWvsp",
+    "outputId": "417c1d84-97d7-439a-9a75-92ba917c9cd6"
+   },
+   "outputs": [],
+   "source": [
+    "tpf.flux[0].value"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Fj8cJvbars9N"
+   },
+   "source": [
+    "At each cadence the TPF has four different flux-related data properties:\n",
+    "\n",
+    "- `tpf.flux`: the stellar brightness after the background is removed.\n",
+    "- `tpf.flux_err`: the statistical uncertainty on the stellar flux after background removal.\n",
+    "- `tpf.flux_bkg`: the astronomical background brightness of the image.\n",
+    "- `tpf.flux_bkg_err`: the statistical uncertainty on the background flux.\n",
+    "\n",
+    "All four of these data arrays are in units of electrons per second.\n",
+    "\n",
+    "**Note**: for *Kepler*, the flux background isn't a measurement made using the local TPF data. Instead, at each cadence, the *Kepler* pipeline fits a model to thousands of empty pixels across each CCD in order to estimate a continuum background across the the CCD. For more details read the [*Kepler* Instrument Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf), Section 2.6.2.4. In the case of *TESS*, local background pixels contained within a TPF are used instead."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "WKB9TBNGTO86"
+   },
+   "source": [
+    "**Note**: The `tpf.flux` values seen above have been quality-masked. This means that cadences of observations that violated the `quality_bitmask` parameter are removed, and so `tpf.flux` represents the data that you probably want to use to do your science. The `quality_bitmask` can also be accessed as a property of a [`KeplerTargetPixelFile`](https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html). For specific details on the `quality` flags, read the [*Kepler* Archive Manual](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf), Section 2.3.1.1.\n",
+    "\n",
+    "If you want to access flux and background flux measurements that *have not* been quality masked, you can pass a custom `quality_bitmask` parameter to the `download()` or `read()` method as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "XjsKGtPxiOse"
+   },
+   "outputs": [],
+   "source": [
+    "search = lk.search_targetpixelfile(\"Kepler-8\", author=\"Kepler\", cadence=\"long\", quarter=4)\n",
+    "tpf = search.download(quality_bitmask=0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "pI4q-I8PjC99"
+   },
+   "source": [
+    "You can see that the flux array of this object now has more cadences (4397) than the original one above (4116):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 439,
+     "status": "ok",
+     "timestamp": 1598459193421,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "75mYnCyXjAim",
+    "outputId": "54aa42d4-78a5-4641-9f8e-87409aa9e7b5"
+   },
+   "outputs": [],
+   "source": [
+    "tpf.flux.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "gnmgbYhdifRc"
+   },
+   "source": [
+    "Alternatively, we can access the unmasked contents of the original TPF FITS file at any time using the `hdu` property:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 358,
+     "status": "ok",
+     "timestamp": 1598459224249,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "DMgWz2g7X8LH",
+    "outputId": "e5d8396f-e436-4860-9733-6b43b07b37ae"
+   },
+   "outputs": [],
+   "source": [
+    "tpf.hdu[1].data['FLUX'].shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "lhbv9ZKRPmMY"
+   },
+   "source": [
+    "## About this Notebook"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "nU-5JtvpPmMZ"
+   },
+   "source": [
+    "**Authors:** Oliver Hall (oliver.hall@esa.int), Geert Barentsen\n",
+    "\n",
+    "**Updated On**: 2020-09-15"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "ZANsIso_B_si"
+   },
+   "source": [
+    "## Citing Lightkurve and Astropy\n",
+    "\n",
+    "If you use `lightkurve` or `astropy` for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard. \n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 85
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 20255,
+     "status": "ok",
+     "timestamp": 1598458630991,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "7vUtrWVjnlY7",
+    "outputId": "0fac20b7-14f2-4413-862e-d472fc0b3726"
+   },
+   "outputs": [],
+   "source": [
+    "lk.show_citation_instructions()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "zlFMVwBqCPXc"
+   },
+   "source": [
+    "<img style=\"float: right;\" src=\"https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png\" alt=\"Space Telescope Logo\" width=\"200px\"/>\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "collapsed_sections": [],
+   "name": "Using_Target_Pixel_File_Products_with_Lightkurve.ipynb",
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

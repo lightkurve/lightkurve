@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.remove\_nans
+==================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.remove_nans

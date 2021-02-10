@@ -1,0 +1,6 @@
+﻿lightkurve.SearchResult.target\_name
+====================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: SearchResult.target_name

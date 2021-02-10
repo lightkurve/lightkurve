@@ -1,0 +1,6 @@
+﻿lightkurve.SearchResult.exptime
+===============================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: SearchResult.exptime

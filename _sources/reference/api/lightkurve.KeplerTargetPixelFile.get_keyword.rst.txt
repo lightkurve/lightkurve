@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.get\_keyword
+=============================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.get_keyword

@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.shape
+======================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: KeplerTargetPixelFile.shape

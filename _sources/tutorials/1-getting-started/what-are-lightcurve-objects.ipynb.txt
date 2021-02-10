@@ -1,0 +1,205 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# What are `LightCurve` objects?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "`LightCurve` objects are data objects which encapsulate the brightness of a star over time. They provide a series of common operations, for example folding, binning, plotting, etc. There are a range of subclasses of `LightCurve` objects specific to telescopes, including `KeplerLightCurve` for Kepler and K2 data and `TessLightCurve` for TESS data.\n",
+    "\n",
+    "Although *lightkurve* was designed with Kepler, K2 and TESS in mind, these objects can be used for a range of astronomy data.\n",
+    "\n",
+    "You can create a `LightCurve` object from a `TargetPixelFile` object using Simple Aperture Photometry (see our tutorial for more information on Target Pixel Files [here](http://lightkurve.keplerscience.org/tutorials/1.02-target-pixel-files.html). Aperture Photometry is the simple act of summing up the values of all the pixels in a pre-defined aperture, as a function of time. By carefully choosing the shape of the aperture mask, you can avoid nearby contaminants or improve the strength of the specific signal you are trying to measure relative to the background.\n",
+    "\n",
+    "To demonstrate, lets create a `KeplerLightCurve` from a `KeplerTargetPixelFile`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from lightkurve import search_targetpixelfile\n",
+    "\n",
+    "# First we open a Target Pixel File from MAST, this one is already cached from our previous tutorial!\n",
+    "tpf = search_targetpixelfile('KIC 6922244', author=\"Kepler\", cadence=\"long\", quarter=4).download()\n",
+    "\n",
+    "# Then we convert the target pixel file into a light curve using the pipeline-defined aperture mask.\n",
+    "lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We've built a new `KeplerLightCurve` object called `lc`. Note in this case we've passed an **aperture_mask** to the `to_lightcurve` method. The default is to use the *Kepler* pipeline aperture. (You can pass your own aperture, which is a boolean `numpy` array.) By summing all the pixels in the aperture we have created a Simple Aperture Photometry (SAP) lightcurve.\n",
+    "\n",
+    "`KeplerLightCurve` has many useful functions that you can use. As with Target Pixel Files you can access the meta data very simply:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.meta['MISSION']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.meta['QUARTER']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "And you still have access to time and flux attributes. In a light curve, there is only one flux point for every time stamp:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.time"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.flux"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can also check the \"CDPP\" noise metric of the lightcurve using the built in method:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.estimate_cdpp()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now we can use the built in `plot` function on the `KeplerLightCurve` object to plot the time series. You can pass `plot` any keywords you would normally pass to `matplotlib.pyplot.plot`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%matplotlib inline\n",
+    "lc.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "There are a set of useful functions in `LightCurve` objects which you can use to work with the data. These include:\n",
+    "* `flatten()`: Remove long term trends using a [Savitzky–Golay filter](https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter)\n",
+    "* `remove_outliers()`: Remove outliers using simple sigma clipping\n",
+    "* `remove_nans()`: Remove infinite or NaN values (these can occur during thruster firings)\n",
+    "* `fold()`: Fold the data at a particular period\n",
+    "* `bin()`: Reduce the time resolution of the array, taking the average value in each bin.\n",
+    "\n",
+    "We can use these simply on a light curve object"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "flat_lc = lc.flatten(window_length=401)\n",
+    "flat_lc.plot();"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "folded_lc = flat_lc.fold(period=3.5225)\n",
+    "folded_lc.plot();"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "binned_lc = folded_lc.bin(time_bin_size=0.01)\n",
+    "binned_lc.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Or we can do these all in a single (long) line!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.remove_nans().flatten(window_length=401).fold(period=3.5225).bin(time_bin_size=0.01).plot();"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

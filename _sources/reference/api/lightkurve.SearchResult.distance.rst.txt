@@ -1,0 +1,6 @@
+﻿lightkurve.SearchResult.distance
+================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: SearchResult.distance

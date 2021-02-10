@@ -1,0 +1,781 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "pvoEpEKIh6dg"
+   },
+   "source": [
+    "# Instrumental Noise in _Kepler_ and _K2_ #2: Spurious Signals and Time Sampling Effects"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "L57_f2QscO85"
+   },
+   "source": [
+    "## Learning Goals\n",
+    "\n",
+    "By the end of this tutorial, you will:\n",
+    "\n",
+    "- Understand the causes behind various spurious signals in _Kepler_ and _K2_ data.\n",
+    "- Be able to identify which data products are affected by these signals.\n",
+    "- Be able to recognize quality issues specific to Short Cadence data."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "D0ixWhW-cTfm"
+   },
+   "source": [
+    "## Introduction\n",
+    "\n",
+    "This tutorial is the second part of a series on identifying instrumental and systematic sources of noise in _Kepler_ and _K2_ data. The first tutorial in this series is suggested (but not necessary) reading for working through this one. Assumed knowledge for this tutorial is a working familiarity with _Kepler_ light curve files, periodograms, and a basic understanding of aperture photometry."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "f0yfyjrD2ERM"
+   },
+   "source": [
+    "## Imports\n",
+    "\n",
+    "We'll use **[Lightkurve](https://docs.lightkurve.org/)** for downloading and handling _Kepler_ data throughout this tutorial. We'll also use **[NumPy](https://numpy.org/)** to handle arrays for aperture masks."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "LQ6s2Mlwc4l9"
+   },
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk\n",
+    "import numpy as np\n",
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "4pkFNT6QRQDz"
+   },
+   "source": [
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "XMPMikC-cq3N"
+   },
+   "source": [
+    "## 1. Background\n",
+    "\n",
+    "The _Kepler_ space telescope observed the same patch of sky for four continuous years, between 2009 and 2013. Over the course of 18 observing quarters, it collected light curves and pixel data for 150,000 stars in 30-minute Long Cadence mode, and 512 stars per quarter in one-minute Short Cadence mode. Following the failure of two of the telescope's four reaction wheels, the telescope continued as the _K2_ mission, which observed along the ecliptic plane for 20 observing campaigns.\n",
+    "\n",
+    "_Kepler_ and _K2_ time series data have been extensively analysed, in both the time domain and the frequency domain. In this tutorial, we'll look at spurious signals — that is, signals introduced by non-astronomical sources — in data from both missions, across simple aperture photometry (SAP) and presearch data conditioning SAP (PDCSAP), as well as in individual pixel time series from target pixel files (TPFs). Many of the effects we'll cover were corrected by the presearch data conditioning (PDC) pipeline, but are still of interest to anyone working closely with pixel data or performing custom photometry. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "cDi6lNTbiMLt"
+   },
+   "source": [
+    "## 2. Early _Kepler_ Mission Spurious Signals\n",
+    "\n",
+    "As _Kepler_ data processing evolved over the course of the mission, there were issues in the first few quarters that were mitigated by various alterations to the algorithms and systems involved. In this section, we're going to look at two spurious signals that you might come across in the first year of data from the _Kepler_ mission."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "y0TBdeDoidW3"
+   },
+   "source": [
+    "### 2.1 Focus changes\n",
+    "\n",
+    "Throughout the nominal _Kepler_ mission, there was a regular momentum desaturation of the reaction wheels which controlled the telescope's pointing. In Quarters 1–3, an issue with the onboard temperature controller meant that momentum desaturation events induced non-sinusoidal variations with periods on order a few hours, reflecting a heating cycle. This was fixed at the end of Quarter 3, greatly reducing the amplitude of the focus changes, to the point that they can't be seen at all in Quarters 8–13. ([_Kepler_ Data Characteristics Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf), Section 5.2.)\n",
+    "\n",
+    "For a closer look at data quality events caused by the reaction wheels, see part one of this tutorial series, and the [_Kepler_ Data Characteristics Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf), Section 5.3.\n",
+    "\n",
+    "The focus changes are corrected by the PDC pipeline, but if you're working with simple aperture photometry you might come across some spurious signals. The following code selects one pixel from a TPF and plots its SAP light curve:\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 394
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 2461,
+     "status": "ok",
+     "timestamp": 1599076561707,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "owwK6_8FiqAW",
+    "outputId": "b2487abe-d90d-42ff-d84e-1d39bc1e21aa"
+   },
+   "outputs": [],
+   "source": [
+    "tpf_fc = lk.search_targetpixelfile('KIC 2436365', cadence='long', quarter=1).download()\n",
+    "one_pixel_mask = np.zeros((tpf_fc.shape[1], tpf_fc.shape[2]), dtype='bool')\n",
+    "one_pixel_mask[1,2] = True\n",
+    "ax = tpf_fc.to_lightcurve(aperture_mask=one_pixel_mask).plot()\n",
+    "ax.set_xlim(150, 165)\n",
+    "ax.set_ylim(ymax=3100);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "4K1re2i4HLGj"
+   },
+   "source": [
+    "Notice the jagged pattern which repeats around five times every day. This is the signal introduced by focus changes. KIC 2436365 is a non-variable star, which means that this pattern is the only variable signal present, and there is no confusion as to what we're looking at. In variable stars, this pattern could cause an effect similar to signal dilution, where actual stellar variability or transit events are attenuated by the presence of another signal."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "toThkPwYign7"
+   },
+   "source": [
+    "### 2.2 Variable fine guidance stars\n",
+    "\n",
+    "_Kepler_'s attitude was controlled by Fine Guidance Sensors (FGS). This involved measuring the centroids of 40 guide stars. In the early mission, the centroid measurement was dependent on the star's flux. This meant that variable guide stars could influence the signal of any star they were used to calibrate. ([_Kepler_ Data Characteristics Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf), Section 4.5.)\n",
+    "\n",
+    "This issue was largely fixed after Quarter 1. Of the 40 FGS stars, only two used during Quarter 2 were variable: an intrinsic variable with a 2.9-day period, and an eclipsing binary with an 18.3-day period. These signals may be partially visible in the photometry of any target on the affected modules, in Quarters 0–2.\n",
+    "\n",
+    "As an example, let's look at a star that shows a remnant of the 2.9-day period. We'll only inspect the first three quarters, as the signal is significantly diluted in the full time series."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 401
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 3873,
+     "status": "ok",
+     "timestamp": 1599076681280,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "pAmdaEH5ivIG",
+    "outputId": "d984f930-fc49-44f6-8a8c-8124ef26286d"
+   },
+   "outputs": [],
+   "source": [
+    "lc_fgs = lk.search_lightcurve('KIC 2436676', author=\"Kepler\", quarter=[0, 1, 2]).download_all().stitch()\n",
+    "ax = lc_fgs.to_periodogram().plot()\n",
+    "ax.set_xlim(0,1)\n",
+    "ax.axvline(0.35, c='r')\n",
+    "ax.axvline(0.7, c='r', ls='--');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "9csT-pzsTQ8w"
+   },
+   "source": [
+    "The signal of the variable FGS star is present around 0.35 cycles per day, and has a harmonic where you'd expect it at 0.7 c/d. Because of the way this signal is introduced into the data, it remains low amplitude, and is unlikely to have an effect on the majority of _Kepler_ analysis. In fact, when studying a star with its own strong signal, and/or all 17 quarters of data, the variable FGS signal is unlikely to show up at all.\n",
+    "\n",
+    "For an accuracy check, let's look at the same region in Quarters 3 and 4, which has a comparable sampling rate in the periodogram, to show that there is no signal present:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 418
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 7676,
+     "status": "ok",
+     "timestamp": 1599076800188,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "eNhaGzpAixX9",
+    "outputId": "610a055c-d528-45de-c5fc-2a089de6812b"
+   },
+   "outputs": [],
+   "source": [
+    "lc_no_fgs = lk.search_lightcurve('KIC 2436676', quarter=[3,4]).download_all().stitch()\n",
+    "ax = lc_no_fgs.to_periodogram().plot()\n",
+    "ax.set_xlim(0,1)\n",
+    "ax.axvline(0.35, c='r')\n",
+    "ax.axvline(0.7, c='r', ls='--');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "XrAHv-dw3uH2"
+   },
+   "source": [
+    "## 3. Variable Guide Stars in _K2_\n",
+    "\n",
+    "Like _Kepler_, the _K2_ mission used guide stars to assist with pointing as part of the FGS. Where _Kepler_ used 40 guide stars throughout the whole mission, in _K2_ it was harder to find suitable guide stars in _K2_'s visually crowded fields along the ecliptic plane, and so four stars were used in each campaign. This predictably reduced pointing stability, as each guide star in _K2_ contributed more to the overall pointing.\n",
+    "\n",
+    "The majority of _K2_ guide stars were stable. However, one of the Campaign 6 guide stars was an eclipsing binary with a period of 0.6046 days. By [folding](https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.fold) an affected light curve on this period, we can see the impact of the eclipsing binary on an otherwise non-variable target.\n",
+    "\n",
+    "The example below is from the [_K2_ Data Release Notes 35](https://archive.stsci.edu/missions/k2/doc/drn/KSCI-19156-001_K2-DRN35_C6.pdf) on the reprocessing of Campaign 6:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 405
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 8148,
+     "status": "ok",
+     "timestamp": 1599841160533,
+     "user": {
+      "displayName": "Susan Mullally",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14GhoAkTlu5JCXqC32438ISJU86DPSZdvoBOLwtOQMfU=s64",
+      "userId": "01921813910966567332"
+     },
+     "user_tz": 240
+    },
+    "id": "PczC965hLWDA",
+    "outputId": "4bb9a9de-fe49-4be8-c06a-52eb6e6f3fad"
+   },
+   "outputs": [],
+   "source": [
+    "lc_k2gs = lk.search_lightcurve(\"EPIC 212592841\", author=\"K2\", campaign=6).download()\n",
+    "lc_k2gs.fold(period=0.6046).remove_outliers().bin(time_bin_size=0.001).plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "mPYeetA_i1Xn"
+   },
+   "source": [
+    "## 4. PDC Long Period Attenuation\n",
+    "\n",
+    "The _Kepler_ PDC pipeline is designed to prepare data for planet searches, which is focused on short-period transit signals; long-period signals are often instrumental systematics, such as flux variations caused by pixel-level temperature changes. To remove these systematics, the pipeline corrects variability with a period of roughly 10 days or more — or a frequency of less than 0.1 c/d ([_Kepler_ Data Characteristics Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf), Section 5.15). Of course, this also results in the loss of any long-period stellar variability. As such, it is suggested that you perform your own photometry, such as outlined in the custom aperture photometry tutorial, if you're searching for long periods.\n",
+    "\n",
+    "The star we'll use as an example was studied by [Yu et al. 2020](https://arxiv.org/pdf/2001.10878.pdf); this paper also includes a brief discussion of the attenuation of long-period signals in PDCSAP data.\n",
+    "\n",
+    "Let's look at the PDC data first:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 404
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 2678,
+     "status": "ok",
+     "timestamp": 1597740217654,
+     "user": {
+      "displayName": "Oliver Hall",
+      "photoUrl": "",
+      "userId": "08831861496876617563"
+     },
+     "user_tz": -120
+    },
+    "id": "cm8SxaNKjUBN",
+    "outputId": "4c72799c-57e4-4ea2-d6b1-54a29720b52c"
+   },
+   "outputs": [],
+   "source": [
+    "lc_pdca = lk.search_lightcurve(\"KIC 7624629\", author=\"Kepler\", quarter=9).download()\n",
+    "lc_pdca.plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "jYcK5sBnx1VB"
+   },
+   "source": [
+    "As you can see, there looks to be some periodicity of around four days in this star; there are also massive spikes and a strange-looking long-period trend. This is the result of overcorrection by the PDC pipeline. When we look at the SAP flux, we can see the true long-period trend present in this star:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 404
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 1197,
+     "status": "ok",
+     "timestamp": 1597740230489,
+     "user": {
+      "displayName": "Oliver Hall",
+      "photoUrl": "",
+      "userId": "08831861496876617563"
+     },
+     "user_tz": -120
+    },
+    "id": "z7jKsJJwjVaG",
+    "outputId": "63d02f04-2e03-4209-f68e-c8741e7d999a"
+   },
+   "outputs": [],
+   "source": [
+    "lc_pdca.plot(column=\"sap_flux\");"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "wYM4reWrytA2"
+   },
+   "source": [
+    "This looks like a smooth curve, but that's because this is such high amplitude variation; note the scale of the y-axis. Zooming in reveals a noisier curve, though small-scale structure is generally of less interest when studying such stars."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "qgHSIrILiucS"
+   },
+   "source": [
+    "## 5. Short Cadence Issues\n",
+    "\n",
+    "The spurious signals that we've looked at so far have been in Long Cadence _Kepler_ data. These signals can also be found in Short Cadence data; however, there are two further time sampling effects that are unique to Short Cadence data, which we will explore in the following section. We'll also look at one Short Cadence effect unique to _K2_ data."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "ck78tXrSjEdl"
+   },
+   "source": [
+    "### 5.1 Requantization gaps\n",
+    "\n",
+    "As part of onboard data compression, Short Cadence data for stars at fluxes brighter than 20,000 $\\rm{e^{-}s^{-1}}$ is _requantized_, meaning the flux measurements settle into \"bands\" at preferred values. This phenomenon can be seen in single-pixel time series, but averages out over multiple pixels when performing simple aperture photometry.\n",
+    "\n",
+    "This star, KIC 11182716, is shown in the [_Kepler_ Data Characteristics Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf), Section 5.10. It has a _Kepler_ magnitude of Kp = 11.994, which puts it at the lower end of stars that saturate the detector. The code below extracts the time series for one bright pixel and plots the light curve as a series of dots to show the requantization bands:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 404
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 6891,
+     "status": "ok",
+     "timestamp": 1599076980135,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "_bWreV_ejX0Z",
+    "outputId": "37b8b0cc-9502-44a6-bd49-b096f6f4dbd0"
+   },
+   "outputs": [],
+   "source": [
+    "tpf_scrq = lk.search_targetpixelfile('KIC 11182716', cadence='short', quarter=0).download()\n",
+    "one_pixel_mask = np.zeros((tpf_scrq.shape[1],tpf_scrq.shape[2]), dtype='bool')\n",
+    "one_pixel_mask[4,4] = True\n",
+    "lc_scrq = tpf_scrq.to_lightcurve(aperture_mask=one_pixel_mask)\n",
+    "lc_scrq.plot(marker='.', linewidth=0);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "KiDiB5g1jMbd"
+   },
+   "source": [
+    "### 5.2 Nyquist alias spurious frequencies\n",
+    "\n",
+    "The PDC pipeline uses [cotrending basis vectors](https://keplerscience.arc.nasa.gov/data-products.html#cotrending-basis-vectors-cbvs) (CBVs) to correct both Long and Short Cadence data. However, as the CBVs are created based on Long Cadence data, they cannot correct for spurious signals above the Long Cadence Nyquist frequency, 283$\\mu$Hz (24 c/d).\n",
+    "\n",
+    "The most prominent of these spurious frequencies is the Long Cadence sampling rate, introduced by onboard electronics ([_Kepler_ Data Characteristics Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf), Section 5.11). This frequency (566.4$\\mu$Hz, or 48.94 c/d) and integer multiples show up throughout Short Cadence data. In the plot below, we've marked 48.94 c/d and its first eight multiples with arrows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 422
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 32334,
+     "status": "ok",
+     "timestamp": 1599077104820,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "cdEa2xcxjYUO",
+    "outputId": "a604c5e0-54d5-4f87-8b68-c8ee7c698b74"
+   },
+   "outputs": [],
+   "source": [
+    "lc_scsf = lk.search_lightcurve('KIC 11182716', author=\"Kepler\", cadence='short').download_all().stitch()\n",
+    "ax = lc_scsf.remove_outliers().to_periodogram().plot()\n",
+    "\n",
+    "for i in range(8):\n",
+    "  i+=1 \n",
+    "  if i == 8:\n",
+    "    ax.annotate('', xy=(i*48.94, 1.1e-5), xytext=(i*48.94, 3e-5), arrowprops=dict(arrowstyle='->', color='r', linewidth=1.5))\n",
+    "  else:\n",
+    "    ax.annotate('', xy=(i*48.94, 1.1e-5), xytext=(i*48.94, 3e-5), arrowprops=dict(arrowstyle='->', color='r', linewidth=1.5, alpha=0.5))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "37pwPuru71Ki"
+   },
+   "source": [
+    "More multiples of this frequency show up in fainter stars. We can begin to see this in KIC 2303576, which has a _Kepler_ magnitude of Kp = 17.445, and shows both the eighth and ninth multiples of the Long Cadence sampling rate:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 401
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 7832,
+     "status": "ok",
+     "timestamp": 1597800576648,
+     "user": {
+      "displayName": "Isabel Colman",
+      "photoUrl": "",
+      "userId": "10998846152189153702"
+     },
+     "user_tz": -600
+    },
+    "id": "XJO04pD1jcia",
+    "outputId": "c1b03666-b206-4d5a-f798-3f785bb567bb"
+   },
+   "outputs": [],
+   "source": [
+    "lc_scsf = lk.search_lightcurve('KIC 2303576', author=\"Kepler\", cadence='short').download_all().stitch()\n",
+    "ax = lc_scsf.remove_outliers().to_periodogram().plot()\n",
+    "\n",
+    "for i in range(9):\n",
+    "  i+=1 \n",
+    "  if i == 8 or i ==9:\n",
+    "    ax.annotate('', xy=(i*48.94, 0.0015), xytext=(i*48.94, 0.003), arrowprops=dict(arrowstyle='->', color='r', linewidth=1.5))\n",
+    "  else:\n",
+    "    ax.annotate('', xy=(i*48.94, 0.0015), xytext=(i*48.94, 0.003), arrowprops=dict(arrowstyle='->', color='r', linewidth=1.5, alpha=0.5))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "peo0aqz76jQ9"
+   },
+   "source": [
+    "A list of other spurious frequencies present in Short Cadence data can be found in Table 5 of the [_Kepler_ Data Characteristics Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "HlUHmQ9i29Ix"
+   },
+   "source": [
+    "### 5.3 _K2_ Short Cadence data\n",
+    "\n",
+    "All _K2_ data is affected by the six-hour thruster firings to correct for pointing drift. The PDCSAP pipeline uses CBVs to remove this effect in Long Cadence data. As with _Kepler_ Short Cadence data, applying these same corrections to Short Cadence data leaves some systematics intact. _K2_ Short Cadence data is subject to the two issues noted above, as well as further spurious frequencies introduced by the six-hour drift.\n",
+    "\n",
+    "The following example is taken from the [_K2_ Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19116-002.pdf). First, let's download some data for our star, EPIC 211414081, and see what the SAP data looks like. Again, we're using some extra arguments with our plotting function to display the light curve as individual points, which makes the scale of the outliers clearer."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 404
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 5751,
+     "status": "ok",
+     "timestamp": 1599077163335,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "mNOWE3mQ5uHk",
+    "outputId": "14dfb3ef-f758-430c-c58d-8c24e02667a9"
+   },
+   "outputs": [],
+   "source": [
+    "lc_k2 = lk.search_lightcurve('EPIC 211414081', author=\"K2\", cadence='short', campaign=5).download()\n",
+    "lc_k2.plot(column='sap_flux', marker='.', linewidth=0);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "dDy6GBjb92q4"
+   },
+   "source": [
+    "The PDCSAP time series for this target shows the effect of the six-hour systematics as regular spikes and occasional dramatic outliers:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 1576,
+     "status": "ok",
+     "timestamp": 1599077170492,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "_ERp-WG8-SSR",
+    "outputId": "17e957ae-19cb-47c7-f2e9-d651a0526bb4"
+   },
+   "outputs": [],
+   "source": [
+    "lc_k2.plot(marker='.', linewidth=0);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "DmbxOcbl_AME"
+   },
+   "source": [
+    "The [_K2_ Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19116-002.pdf) cautions that no detrending method can 100% remove the effects of thruster firing, even in Long Cadence data. However, as Short Cadence data are harder to correct than Long Cadence, some Short Cadence targets may be better suited to custom aperture photometry than using PDCSAP.\n",
+    "\n",
+    "Let's look at how this manifests in a periodogram:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 423
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 2444,
+     "status": "ok",
+     "timestamp": 1599077175451,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "L3feMnsA_C2C",
+    "outputId": "a326a2a3-d65f-4f49-8607-d4af61140434"
+   },
+   "outputs": [],
+   "source": [
+    "lc_k2.remove_outliers().to_periodogram().plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "k3mknVEr_R8M"
+   },
+   "source": [
+    "We can see a series of high-amplitude spikes at four cycles/day, or a six-hour period. Two harmonics of the Long Cadence sampling frequency are also present, as above. Comparing the scale of these two sets of spurious frequencies, we can see the negative impact of the six-hour drift on _K2_ Short Cadence data.\n",
+    "\n",
+    "As some remnant of the six-hour drift will always remain in _K2_ data, these signals may appear in Long Cadence data too, but not to the same extent. When working with Short Cadence data, a complementary approach to custom aperture photometry could be manual periodogram cleaning, using software such as [Period04](https://www.univie.ac.at/tops/Period04/). However, only the lower frequencies are impacted here, which luckily does not interfere with the Short Cadence advantage over Long Cadence: its ability to probe higher frequencies. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "vbge5j28DVeN"
+   },
+   "source": [
+    "## About this Notebook\n",
+    "\n",
+    "**Author:** [Isabel Colman](http://orcid.org/0000-0001-8196-516X) (`isabel.colman@sydney.edu.au`)  \n",
+    "\n",
+    "**Updated on:** 2020-09-29\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "lqLn0kF5fvvT"
+   },
+   "source": [
+    "## Citing Lightkurve and Astropy\n",
+    "\n",
+    "If you use `lightkurve` or `astropy` for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 144
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 386,
+     "status": "ok",
+     "timestamp": 1600729831984,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "7vUtrWVjnlY7",
+    "outputId": "7bb44145-64d8-44f9-bb75-ee5527552f5d"
+   },
+   "outputs": [],
+   "source": [
+    "lk.show_citation_instructions()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "y1HbVfHwDVeN"
+   },
+   "source": [
+    "<img style=\"float: right;\" src=\"https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png\" alt=\"Space Telescope Logo\" width=\"200px\"/>"
+   ]
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "collapsed_sections": [],
+   "name": "Instrumental noise in Kepler and K2 #2: spurious signals and time sampling effects.ipynb",
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

@@ -1,0 +1,128 @@
+﻿lightkurve.FoldedLightCurve
+===========================
+
+.. currentmodule:: lightkurve
+
+.. autoclass:: FoldedLightCurve
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FoldedLightCurve.__init__
+      ~FoldedLightCurve.add_column
+      ~FoldedLightCurve.add_columns
+      ~FoldedLightCurve.add_index
+      ~FoldedLightCurve.add_row
+      ~FoldedLightCurve.append
+      ~FoldedLightCurve.argsort
+      ~FoldedLightCurve.as_array
+      ~FoldedLightCurve.bin
+      ~FoldedLightCurve.convert_bytestring_to_unicode
+      ~FoldedLightCurve.convert_unicode_to_bytestring
+      ~FoldedLightCurve.copy
+      ~FoldedLightCurve.create_transit_mask
+      ~FoldedLightCurve.errorbar
+      ~FoldedLightCurve.estimate_cdpp
+      ~FoldedLightCurve.field
+      ~FoldedLightCurve.fill_gaps
+      ~FoldedLightCurve.filled
+      ~FoldedLightCurve.flatten
+      ~FoldedLightCurve.fold
+      ~FoldedLightCurve.from_pandas
+      ~FoldedLightCurve.from_stingray
+      ~FoldedLightCurve.from_timeseries
+      ~FoldedLightCurve.group_by
+      ~FoldedLightCurve.index_column
+      ~FoldedLightCurve.index_mode
+      ~FoldedLightCurve.insert_row
+      ~FoldedLightCurve.interact_bls
+      ~FoldedLightCurve.items
+      ~FoldedLightCurve.itercols
+      ~FoldedLightCurve.iterrows
+      ~FoldedLightCurve.keep_columns
+      ~FoldedLightCurve.keys
+      ~FoldedLightCurve.more
+      ~FoldedLightCurve.normalize
+      ~FoldedLightCurve.pformat
+      ~FoldedLightCurve.pformat_all
+      ~FoldedLightCurve.plot
+      ~FoldedLightCurve.plot_river
+      ~FoldedLightCurve.pprint
+      ~FoldedLightCurve.pprint_all
+      ~FoldedLightCurve.query_solar_system_objects
+      ~FoldedLightCurve.read
+      ~FoldedLightCurve.remove_column
+      ~FoldedLightCurve.remove_columns
+      ~FoldedLightCurve.remove_indices
+      ~FoldedLightCurve.remove_nans
+      ~FoldedLightCurve.remove_outliers
+      ~FoldedLightCurve.remove_row
+      ~FoldedLightCurve.remove_rows
+      ~FoldedLightCurve.rename_column
+      ~FoldedLightCurve.rename_columns
+      ~FoldedLightCurve.replace_column
+      ~FoldedLightCurve.reverse
+      ~FoldedLightCurve.round
+      ~FoldedLightCurve.scatter
+      ~FoldedLightCurve.search_neighbors
+      ~FoldedLightCurve.show_in_browser
+      ~FoldedLightCurve.show_in_notebook
+      ~FoldedLightCurve.show_properties
+      ~FoldedLightCurve.sort
+      ~FoldedLightCurve.to_corrector
+      ~FoldedLightCurve.to_csv
+      ~FoldedLightCurve.to_fits
+      ~FoldedLightCurve.to_pandas
+      ~FoldedLightCurve.to_periodogram
+      ~FoldedLightCurve.to_seismology
+      ~FoldedLightCurve.to_stingray
+      ~FoldedLightCurve.to_table
+      ~FoldedLightCurve.to_timeseries
+      ~FoldedLightCurve.values
+      ~FoldedLightCurve.values_equal
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FoldedLightCurve.ColumnClass
+      ~FoldedLightCurve.PDCSAP_FLUX
+      ~FoldedLightCurve.SAP_FLUX
+      ~FoldedLightCurve.astropy_time
+      ~FoldedLightCurve.colnames
+      ~FoldedLightCurve.dtype
+      ~FoldedLightCurve.even_mask
+      ~FoldedLightCurve.flux
+      ~FoldedLightCurve.flux_err
+      ~FoldedLightCurve.flux_quantity
+      ~FoldedLightCurve.flux_unit
+      ~FoldedLightCurve.groups
+      ~FoldedLightCurve.has_masked_columns
+      ~FoldedLightCurve.has_masked_values
+      ~FoldedLightCurve.has_mixin_columns
+      ~FoldedLightCurve.hdu
+      ~FoldedLightCurve.iloc
+      ~FoldedLightCurve.indices
+      ~FoldedLightCurve.info
+      ~FoldedLightCurve.loc
+      ~FoldedLightCurve.loc_indices
+      ~FoldedLightCurve.mask
+      ~FoldedLightCurve.masked
+      ~FoldedLightCurve.meta
+      ~FoldedLightCurve.odd_mask
+      ~FoldedLightCurve.phase
+      ~FoldedLightCurve.time
+      ~FoldedLightCurve.time_format
+      ~FoldedLightCurve.time_scale
+      ~FoldedLightCurve.write
+   
+   

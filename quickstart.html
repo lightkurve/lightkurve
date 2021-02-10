@@ -4,110 +4,191 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Quickstart &#8212; Lightkurve</title>
-    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quickstart &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="_static/css/amunra.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.3da636dd464baa7582d2.js">
+
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <!-- Load Bootstrap viewport and Javascript (Javascript is needed for the navbar toggle) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
+    <link rel="next" title="Tutorials" href="tutorials/index.html" />
+    <link rel="prev" title="What’s new in Lightkurve 2?" href="whats-new-v2.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
-      <!-- Google Analytics -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'UA-69171-9');
-      </script>
-    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
 
-  </head><body>
-<header>
-<nav class="navbar navbar-expand-lg navbar-light border-bottom">
-  <div class="container">
-    <a class="navbar-brand" href="index.html">Lightkurve v1.11</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <a class="navbar-brand" href="index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarsExample07">
-
-    
-      <!-- Custom navbar -->
-      <ul class="navbar-nav mr-auto">
-          
-          <li class="nav-item active">
-          
-            <a class="nav-link" href="#">Quickstart</a>
-          </li>
-          
-          <li class="nav-item">
-          
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="">Quickstart</a>
+        </li>
+        
+        <li class="nav-item ">
             <a class="nav-link" href="tutorials/index.html">Tutorials</a>
-          </li>
-          
-          <li class="nav-item">
-          
-            <a class="nav-link" href="api/index.html">API</a>
-          </li>
-          
-          <li class="nav-item">
-          
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="reference/index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
             <a class="nav-link" href="about/index.html">About</a>
-          </li>
+        </li>
+        
+        
       </ul>
-    
 
-        <form class="form-inline my-2 my-md-0 ml-auto" action="search.html" method="get">
-            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
-        </form>
 
-        <!-- GitHub icon -->
+      <form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
         
-          <a href="https://github.com/KeplerGO/Lightkurve">
-            <svg class="github-icon" viewBox="0 0 16 16" version="1.1" height="22" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-          </a>
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
         
+        
+      </ul>
     </div>
-  </div>
-</nav>
-</header>
-
-<div class="container"  role="main">
+</div>
+    </nav>
     
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+          
+        
+        
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   
 <style>
 /* CSS for nbsphinx extension */
 
 /* remove conflicting styling from Sphinx themes */
-div.nbinput.container,
-div.nbinput.container div.prompt,
-div.nbinput.container div.input_area,
-div.nbinput.container div[class*=highlight],
-div.nbinput.container div[class*=highlight] pre,
-div.nboutput.container,
-div.nboutput.container div.prompt,
-div.nboutput.container div.output_area,
-div.nboutput.container div[class*=highlight],
-div.nboutput.container div[class*=highlight] pre {
-    background: none;
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
     border: none;
-    padding: 0 0;
+    padding: 0;
     margin: 0;
     box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
 }
 
 /* avoid gaps between output lines */
@@ -208,7 +289,7 @@ div.nboutput.container div.output_area {
 div.nbinput.container div.input_area {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f5f5f5;
+    /*background: #f5f5f5;*/
 }
 
 /* override MathJax center alignment in output cells */
@@ -274,6 +355,7 @@ div.nboutput.container div.output_area.rendered_html,
 div.nboutput.container div.output_area > div.output_javascript,
 div.nboutput.container div.output_area:not(.rendered_html) > img{
     padding: 5px;
+    margin: 0;
 }
 
 /* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
@@ -321,18 +403,18 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div style="float:right; margin-top:1em; margin-bottom:-1em;">
+<div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/quickstart.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
     <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/quickstart.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
     <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/quickstart.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
 <br style="clear:both;"><div class="section" id="Quickstart">
 <h1>Quickstart<a class="headerlink" href="#Quickstart" title="Permalink to this headline">¶</a></h1>
-<p>If you have a working version of <a class="reference external" href="https://www.anaconda.com/distribution">Anaconda Python</a> installed on your system, it is easy to install Lightkurve and its dependencies using the <code class="docutils literal notranslate"><span class="pre">conda</span></code> package manager. In a terminal window, type:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install --channel conda-forge lightkurve
+<p>If you have a working version of Python installed on your system, it is easy to install Lightkurve and its dependencies using the <code class="docutils literal notranslate"><span class="pre">pip</span></code> package manager. In a terminal window or Jupyter notebook cell, type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>! python -m pip install lightkurve --upgrade
 </pre></div>
 </div>
-<p>If you are using a different Python distribution, you can also install Lightkurve using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">lightkurve</span></code>. See our <a class="reference external" href="about/install.html">installation instructions</a> page for details and troubleshooting information.</p>
+<p>See our <a class="reference internal" href="about/install.html"><span class="doc">installation instructions</span></a> page for details and troubleshooting information.</p>
 <p>With Lightkurve installed, it is easy to extract brightness time series data (astronomers call this a <em>light curve</em>) from the tiny images of stars collected by NASA’s Kepler and TESS planet-hunting telescopes.</p>
 <p>For example, let’s download and display the pixels of a famous star named <a class="reference external" href="https://en.wikipedia.org/wiki/KIC_8462852">KIC 8462852</a>, also known as <em>Tabby’s Star</em> or <em>Boyajian’s Star</em>, which is known to show unusual light fluctuations.</p>
 <p>First, we start Python and use the <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> function to obtain the Kepler pixel data for the star from the <a class="reference external" href="https://archive.stsci.edu/kepler/">data archive</a>:</p>
@@ -342,7 +424,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_targetpixelfile</span>
-<span class="n">pixelfile</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="mi">8462852</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="o">=</span><span class="s1">&#39;hardest&#39;</span><span class="p">);</span>
+<span class="n">pixelfile</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;KIC 8462852&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
@@ -356,14 +438,23 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 8462852, Cadence: 66714&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/quickstart_4_0.png" src="_images/quickstart_4_0.png" />
+<img alt="_images/quickstart_4_1.png" src="_images/quickstart_4_1.png" />
 </div>
 </div>
-<p>It looks like the star is an isolated object, so we can extract a lightcurve by simply summing up all the pixel values in each image:</p>
+<p>It looks like the star is an isolated object, so we can extract a light curve by simply summing up all the pixel values in each image:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -373,13 +464,13 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>The above method returned a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object which gives us access to the flux over time, which are both available as array objects. The time is in units of <em>days</em> and the flux is in units <em>electrons/second</em>.</p>
+<p>The above method returned a <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object which gives us access to the number of photons received by the spacecraft over time (known as the <em>flux</em>). The time is an <a class="reference external" href="https://docs.astropy.org/en/stable/time/">AstroPy Time object</a> in units of <em>days</em>:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span>
+<span></span><span class="n">lc</span><span class="o">.</span><span class="n">time</span>
 </pre></div>
 </div>
 </div>
@@ -389,15 +480,31 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(array([1472.11777934, 1472.13821223, 1472.15864492, ..., 1557.89718798,
-        1557.9380561 , 1557.95849016]),
- array([258645.03, 258660.05, 258690.08, ..., 258929.86, 258884.66,
-        258865.6 ], dtype=float32))
+&lt;Time object: scale=&#39;tdb&#39; format=&#39;bkjd&#39; value=[1472.11777934 1472.13821223 1472.15864492 ... 1557.91762194 1557.9380561
+ 1557.95849016]&gt;
 </pre></div></div>
+</div>
+<p>The flux is an <a class="reference external" href="https://docs.astropy.org/en/stable/units/">AstroPy Quantity object</a> in units <em>electrons/second</em>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$[258645.03,~258660.05,~258690.08,~\dots,~258948.84,~258884.66,~258865.59] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
 </div>
 <p>We can plot these data using the <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -405,11 +512,20 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/quickstart_10_0.png" src="_images/quickstart_10_0.png" />
+<img alt="_images/quickstart_12_1.png" src="_images/quickstart_12_1.png" />
 </div>
 </div>
 <p>The plot reveals a short-lived 20% dip in the brightness of the star. It looks like we re-discovered one of the <a class="reference external" href="https://en.wikipedia.org/wiki/KIC_8462852#Luminosity">intriguing dips in Tabby’s star</a>.</p>
@@ -418,16 +534,43 @@ div.rendered_html tbody tr:hover {
 </div>
 
 
-</div>
-<div class="container footer">
-    <hr>
-    <p class="text-center">
-      
-        Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="/about/citing.html">cite us</a> or
-                      <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
-      
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="whats-new-v2.html" title="previous page">What’s new in Lightkurve 2?</a>
+    <a class='right-next' id="next-link" href="tutorials/index.html" title="next page">Tutorials</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
     </p>
-</div>
+  </div>
+</footer>
   </body>
 </html>

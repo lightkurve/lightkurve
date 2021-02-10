@@ -4,140 +4,230 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Lightkurve docs &#8212; Lightkurve</title>
-    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lightkurve docs &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="_static/css/amunra.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.3da636dd464baa7582d2.js">
+
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <!-- Load Bootstrap viewport and Javascript (Javascript is needed for the navbar toggle) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
+    <link rel="next" title="What’s new in Lightkurve 2?" href="whats-new-v2.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
-      <!-- Google Analytics -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'UA-69171-9');
-      </script>
-    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
 
-  </head><body>
-<header>
-<nav class="navbar navbar-expand-lg navbar-light border-bottom">
-  <div class="container">
-    <a class="navbar-brand" href="#">Lightkurve v1.11</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <a class="navbar-brand" href="#">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarsExample07">
-
-    
-      <!-- Custom navbar -->
-      <ul class="navbar-nav mr-auto">
-          
-          <li class="nav-item">
-          
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
             <a class="nav-link" href="quickstart.html">Quickstart</a>
-          </li>
-          
-          <li class="nav-item">
-          
+        </li>
+        
+        <li class="nav-item ">
             <a class="nav-link" href="tutorials/index.html">Tutorials</a>
-          </li>
-          
-          <li class="nav-item">
-          
-            <a class="nav-link" href="api/index.html">API</a>
-          </li>
-          
-          <li class="nav-item">
-          
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="reference/index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
             <a class="nav-link" href="about/index.html">About</a>
-          </li>
+        </li>
+        
+        
       </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
     
 
-        <form class="form-inline my-2 my-md-0 ml-auto" action="search.html" method="get">
-            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
-        </form>
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
 
-        <!-- GitHub icon -->
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
         
-          <a href="https://github.com/KeplerGO/Lightkurve">
-            <svg class="github-icon" viewBox="0 0 16 16" version="1.1" height="22" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-          </a>
         
-    </div>
-  </div>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#documentation" class="nav-link">Documentation</a>
+        </li>
+    
+    </ul>
 </nav>
-</header>
 
-<div class="container"  role="main">
-    
-  <div class="lead docutils container">
-<p>Lightkurve</p>
-<p>A friendly package for Kepler &amp; TESS time series analysis in Python.</p>
-<a href="quickstart.html" class="btn btn-primary">Quickstart →</a></div>
-<div class="container">
-  <hr>
-  <div class="row">
-    <div class="col-lg-6">
-      <p style="font-size: 1.2em; font-weight: 700;">
-       Time domain astronomy made easy for all
-      </p>
-      <p>
-        Lightkurve offers a user-friendly way
-        to analyze time series data obtained by telescopes,
-        in particular NASA’s Kepler and TESS exoplanet missions.
-      </p>
-      <p>
-        Lightkurve aims to lower barriers, promote best practices, reduce costs,
-        and improve scientific fidelity
-        by providing accessible Python <a href="api/index.html">tools</a> and
-        <a href="tutorials/index.html">tutorials</a>.
-      </p>
-    </div>
 
-    <div class="col-lg-6"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+              
+          </div>
+          
 
-<span class="n">pixels</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<span class="n">pixels</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-
-<span class="n">lightcurve</span> <span class="o">=</span> <span class="n">pixels</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
-<span class="n">lightcurve</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-
-<span class="n">exoplanet</span> <span class="o">=</span> <span class="n">lightcurve</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">0.838</span><span class="p">)</span>
-<span class="n">exoplanet</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="frontpage section" id="lightkurve">
+<h1>Lightkurve<a class="headerlink" href="#lightkurve" title="Permalink to this headline">¶</a></h1>
+<p>A friendly Python package for making discoveries with Kepler &amp; TESS.</p>
+<p>Lightkurve offers a user-friendly way to analyze time series data on the brightness of planets, stars, and galaxies.
+The package is focused on supporting science with NASA’s Kepler and TESS space telescopes,
+but can equally be used to analyze light curves obtained by your backyard telescope.
+Lightkurve aims to lower barriers, promote best practices, reduce costs,
+and improve scientific fidelity by providing accessible open source
+Python <a class="reference internal" href="reference/index.html#api"><span class="std std-ref">tools</span></a> and <a class="reference internal" href="tutorials/index.html#tutorials"><span class="std std-ref">tutorials</span></a>
+for time domain astronomy.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Example: downloading &amp; plotting a phase-folded light curve of Proxima Centauri.</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<span class="n">lightcurve</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;Proxima Centauri&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s2">&quot;TESS&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="n">lightcurve</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">11.184</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-    </div>
-  </div>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="whats-new-v2.html">What's new?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about/index.html">About</a></li>
+</ul>
+</div>
+</div>
 </div>
 
-</div>
-<div class="container footer">
-    <hr>
-    <p class="text-center">
-      
-        Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="/about/citing.html">cite us</a> or
-                      <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
-      
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='right-next' id="next-link" href="whats-new-v2.html" title="next page">What’s new in Lightkurve 2?</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
     </p>
-</div>
+  </div>
+</footer>
   </body>
 </html>

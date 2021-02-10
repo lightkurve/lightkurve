@@ -1,0 +1,1031 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Combining multiple quarters of Kepler data &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?" href="2-1-cutting-out-tpfs.html" />
+    <link rel="prev" title="Creating your own light curves using custom aperture photometry" href="2-1-custom-aperture-photometry.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../reference/index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../about/index.html">About</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar">
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Learning-Goals" class="nav-link">Learning Goals</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Introduction" class="nav-link">Introduction</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Imports" class="nav-link">Imports</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#1.-What-is-a-Kepler-Quarter?" class="nav-link">1. What is a Kepler Quarter?</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#2.-Downloading-Multiple-KeplerLightCurve-Objects-at-Once" class="nav-link">2. Downloading Multiple KeplerLightCurve Objects at Once</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#Note:" class="nav-link">Note:</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#3.-Investigating-the-Data" class="nav-link">3. Investigating the Data</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#4.-Normalizing-a-Light-Curve" class="nav-link">4. Normalizing a Light Curve</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#5.-Combining-Multiple-Observations-into-a-Single-Light-Curve" class="nav-link">5. Combining Multiple Observations into a Single Light Curve</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#About-this-Notebook" class="nav-link">About this Notebook</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Citing-Lightkurve-and-Astropy" class="nav-link">Citing Lightkurve and Astropy</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div style="float:right; margin-bottom:1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/2-creating-light-curves/2-1-combining-multiple-quarters.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/2-creating-light-curves/2-1-combining-multiple-quarters.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/2-creating-light-curves/2-1-combining-multiple-quarters.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+</div>
+<br style="clear:both;"><div class="section" id="Combining-multiple-quarters-of-Kepler-data">
+<h1>Combining multiple quarters of <em>Kepler</em> data<a class="headerlink" href="#Combining-multiple-quarters-of-Kepler-data" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Learning-Goals">
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
+<p>By the end of this tutorial, you will:</p>
+<ul class="simple">
+<li><p>Understand a <em>Kepler</em> Quarter.</p></li>
+<li><p>Understand how to download multiple quarters of data at once.</p></li>
+<li><p>Learn how to normalize <em>Kepler</em> data.</p></li>
+<li><p>Understand how to combine multiple quarters of data.</p></li>
+</ul>
+</div>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://archive.stsci.edu/kepler">Kepler</a>, <a class="reference external" href="https://archive.stsci.edu/k2">K2</a>, and <a class="reference external" href="https://archive.stsci.edu/tess">TESS</a> telescopes observe stars for long periods of time. These long, time series observations are broken up into separate chunks, called quarters for the <em>Kepler</em> mission, campaigns for <em>K2</em>, and sectors for <em>TESS</em>.</p>
+<p>Building light curves with as much data as is available is useful when searching for small signals, such as planetary transits or stellar pulsations. In this tutorial, we will learn how to use Lightkurve’s tools to download and stitch together multiple quarters of <em>Kepler</em> observations.</p>
+<p>It is recommended to first read the tutorial discussing how to use <em>Kepler</em> light curve products with Lightkurve. That tutorial will introduce you to some specifics of how <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> make observations, and how these are displayed as light curves. It also introduces some important terms and concepts that are referred to in this tutorial.</p>
+<p>This tutorial demonstrates how to access and combine multiple quarters of data from the <em>Kepler</em> space telescope, using the Lightkurve package.</p>
+<p>When accessing <em>Kepler</em> data through MAST, it will be stored in three-month chunks, corresponding to a quarter of observations. By combining and normalizing these separate observations, you can form a single light curve that spans all observed quarters. Utilizing all of the data available is especially important when looking at repeating signals, such as planet transits and stellar oscillations.</p>
+<p>We will use the <em>Kepler</em> mission as an example, but these tools are extensible to <em>TESS</em> and <em>K2</em> as well.</p>
+</div>
+<div class="section" id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial requires the <a class="reference external" href="http://docs.lightkurve.org/">Lightkurve</a> package, which in turn uses <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> for plotting.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="1.-What-is-a-Kepler-Quarter?">
+<h2>1. What is a <em>Kepler</em> Quarter?<a class="headerlink" href="#1.-What-is-a-Kepler-Quarter?" title="Permalink to this headline">¶</a></h2>
+<p>In order to search for planets around other stars, the <em>Kepler</em> space telescope performed near-continuous monitoring of a single field of view, from an Earth-trailing orbit. However, this posed a challenge. If the space telescope is trailing Earth and maintaining steady pointing, its solar panels would slowly receive less and less sunlight.</p>
+<p>In order to make sure the solar panels remained oriented towards the Sun, <em>Kepler</em> performed quarterly rolls, one every 93 days. The infographic below helps visualize this, and shows the points in the orbit where the rolls took place.</p>
+<p>After each roll, <em>Kepler</em> retained its fine-pointing at the same field of view. Because the camera rotated by 90 degrees, all of the target stars fell on different parts of the charge-coupled device (CCD) camera. This had an effect on the amount of flux recorded for the same star, because different CCD pixels have different sensitivities. The way in which the flux from the same stars was distributed on the CCD (called the point spread function or PSF) also changed after each roll, due to focus
+changes and other instrumental effects. As a result, the aperture mask set for a star had to be recomputed after each roll, and may capture slightly different amounts of flux.</p>
+<p>The data obtained between rolls is referred to as a quarter. While there are changes to the flux <em>systematics</em>, not much else changes quarter to quarter, and the majority of the target list remains identical. This means that, after removing systematic trends (such as was done for the presearch data conditioning simple aperture photometry (PDCSAP) flux), multiple quarters together can form one continuous observation.</p>
+<!-- ![](https://keplergo.arc.nasa.gov/images/program/Orbit_Mar5_09L.gif) --><p><img alt="0d613ed01f0d4c08bb18159bfbde52f0" class="no-scaled-link" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Kepler_space_telescope_orbit.png/800px-Kepler_space_telescope_orbit.png" style="width: 800px;" /></p>
+<p><em>Figure</em>: Infographic showcasing the necessity of <em>Kepler</em>’s quarterly rolls and its Earth-trailing orbit. Source: <a class="reference external" href="https://keplergo.arc.nasa.gov/ExtendedMissionOverview.shtml">Kepler Science Center</a>.</p>
+<p><strong>Note</strong>: Observations by <em>K2</em> and <em>TESS</em> are also broken down into chunks of a month or more, called campaigns (for <em>K2</em>) and sectors (for <em>TESS</em>). While not discussed in this tutorial, the tools below work for these data products as well.</p>
+</div>
+<div class="section" id="2.-Downloading-Multiple-KeplerLightCurve-Objects-at-Once">
+<h2>2. Downloading Multiple <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> Objects at Once<a class="headerlink" href="#2.-Downloading-Multiple-KeplerLightCurve-Objects-at-Once" title="Permalink to this headline">¶</a></h2>
+<p>To start, we can use Lightkurve’s <code class="docutils literal notranslate"><span class="pre">`search_lightcurve()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html">https://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html</a>&gt;`__ function to see what data are available for our target star on the <a class="reference external" href="https://archive.stsci.edu/kepler/">Mikulski Archive for Space Telescopes</a> (MAST) archive. We will use the star <a class="reference external" href="http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/">Kepler-8</a>, a star somewhat larger than the Sun, and the host of a <a class="reference external" href="https://en.wikipedia.org/wiki/Hot_Jupiter">hot Jupiter
+planet</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;Kepler-8&quot;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">&quot;long&quot;</span><span class="p">)</span>
+<span class="n">search_result</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+SearchResult containing 18 data products.
+
+<table id="table6433753888">
+<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
+<tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>1</td><td>Kepler Quarter 01</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>2</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>3</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>4</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>5</td><td>Kepler Quarter 05</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>6</td><td>Kepler Quarter 06</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>7</td><td>Kepler Quarter 07</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>8</td><td>Kepler Quarter 08</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>9</td><td>Kepler Quarter 09</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>10</td><td>Kepler Quarter 10</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>11</td><td>Kepler Quarter 11</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>12</td><td>Kepler Quarter 12</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>13</td><td>Kepler Quarter 13</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>14</td><td>Kepler Quarter 14</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>15</td><td>Kepler Quarter 15</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>16</td><td>Kepler Quarter 16</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>17</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+</table></div>
+</div>
+<p>In this list, each row represents a different observing quarter, for a total of 18 quarters across four years. The <strong>observation</strong> column lists the <em>Kepler</em> Quarter. The <strong>target_name</strong> represents the <em>Kepler</em> Input Catalogue (KIC) ID of the target, and the <strong>productFilename</strong> column is the name of the FITS files downloaded from MAST. The <strong>distance</strong> column shows the separation on the sky between the searched coordinates and the downloaded objects — this is only relevant when searching for
+specific coordinates in the sky, and not when looking for individual objects.</p>
+<p>Instead of downloading a single quarter using the <code class="docutils literal notranslate"><span class="pre">`download()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html#lightkurve.search.SearchResult.download">https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html#lightkurve.search.SearchResult.download</a>&gt;`__ function, we can use the <code class="docutils literal notranslate"><span class="pre">`download_all()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html#lightkurve.search.SearchResult.download_all">https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html#lightkurve.search.SearchResult.download_all</a>&gt;`__ function to access all 18 quarters at once (this might take a while).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_collection</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>
+<span class="n">lc_collection</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+LightCurveCollection of 18 objects:
+        KIC 6922244 (18 KeplerLightCurves) Quarters: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+</pre></div></div>
+</div>
+<p>All of the downloaded data are stored in a <code class="docutils literal notranslate"><span class="pre">`LightCurveCollection</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection">https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection</a>&gt;`__. This object acts as a wrapper for 18 separate <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ objects, listed above.</p>
+<p>We can access the <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ objects and interact with them as usual through the <code class="docutils literal notranslate"><span class="pre">`LightCurveCollection</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection">https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection</a>&gt;`__.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_Q4</span> <span class="o">=</span> <span class="n">lc_collection</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">lc_Q4</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<i>KeplerLightCurve targetid=6922244 length=4116</i>
+<table id="table6435754048" class="table-striped table-bordered table-condensed">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>quality</th><th>timecorr</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>sap_flux</th><th>sap_flux_err</th><th>sap_bkg</th><th>sap_bkg_err</th><th>pdcsap_flux</th><th>pdcsap_flux_err</th><th>sap_quality</th><th>psf_centr1</th><th>psf_centr1_err</th><th>psf_centr2</th><th>psf_centr2_err</th><th>mom_centr1</th><th>mom_centr1_err</th><th>mom_centr2</th><th>mom_centr2_err</th><th>pos_corr1</th><th>pos_corr2</th></tr></thead>
+<thead><tr><th></th><th>electron / s</th><th>electron / s</th><th></th><th>d</th><th>pix</th><th>pix</th><th></th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th></tr></thead>
+<thead><tr><th>object</th><th>float32</th><th>float32</th><th>int32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>int32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
+<tr><td>352.37632485035283</td><td>nan</td><td>nan</td><td>0</td><td>-1.410670e-03</td><td>682.69125</td><td>190.13296</td><td>11914</td><td>4.3689148e+04</td><td>6.6459765e+00</td><td>1.6722699e+03</td><td>4.6767941e-01</td><td>nan</td><td>nan</td><td>0</td><td>682.60927</td><td>7.8001787e-05</td><td>190.36814</td><td>1.1752916e-04</td><td>682.69125</td><td>1.8638317e-04</td><td>190.13296</td><td>1.8306405e-04</td><td>9.8764673e-02</td><td>-1.7217098e-01</td></tr>
+<tr><td>352.3967580484896</td><td>5.2490750e+04</td><td>8.0003128e+00</td><td>10000000000000</td><td>-1.411072e-03</td><td>682.69084</td><td>190.13270</td><td>11915</td><td>4.3698070e+04</td><td>6.6462421e+00</td><td>1.6698400e+03</td><td>4.6764868e-01</td><td>5.2490750e+04</td><td>8.0003128e+00</td><td>10000000000000</td><td>682.60900</td><td>7.7997785e-05</td><td>190.36777</td><td>1.1751152e-04</td><td>682.69084</td><td>1.8633612e-04</td><td>190.13270</td><td>1.8303936e-04</td><td>9.8700106e-02</td><td>-1.7229939e-01</td></tr>
+<tr><td>352.4376244455707</td><td>5.2484055e+04</td><td>7.9999790e+00</td><td>10000</td><td>-1.411874e-03</td><td>682.69038</td><td>190.13302</td><td>11917</td><td>4.3694105e+04</td><td>6.6461620e+00</td><td>1.6731306e+03</td><td>4.6705514e-01</td><td>5.2484055e+04</td><td>7.9999790e+00</td><td>10000</td><td>682.60862</td><td>7.7994831e-05</td><td>190.36848</td><td>1.1754913e-04</td><td>682.69038</td><td>1.8634219e-04</td><td>190.13302</td><td>1.8301954e-04</td><td>9.8306537e-02</td><td>-1.7180158e-01</td></tr>
+<tr><td>352.45805764463876</td><td>5.2491809e+04</td><td>8.0006199e+00</td><td>0</td><td>-1.412275e-03</td><td>682.69084</td><td>190.13257</td><td>11918</td><td>4.3698316e+04</td><td>6.6463132e+00</td><td>1.6741406e+03</td><td>4.6687824e-01</td><td>5.2491809e+04</td><td>8.0006199e+00</td><td>0</td><td>682.60872</td><td>7.7998680e-05</td><td>190.36792</td><td>1.1751390e-04</td><td>682.69084</td><td>1.8635279e-04</td><td>190.13257</td><td>1.8304381e-04</td><td>9.8410256e-02</td><td>-1.7202987e-01</td></tr>
+<tr><td>352.4784908439324</td><td>5.2478277e+04</td><td>7.9992733e+00</td><td>0</td><td>-1.412676e-03</td><td>682.68949</td><td>190.13304</td><td>11919</td><td>4.3687648e+04</td><td>6.6459165e+00</td><td>1.6723815e+03</td><td>4.6764576e-01</td><td>5.2478277e+04</td><td>7.9992733e+00</td><td>0</td><td>682.60829</td><td>7.7993544e-05</td><td>190.36814</td><td>1.1756293e-04</td><td>682.68949</td><td>1.8641398e-04</td><td>190.13304</td><td>1.8308057e-04</td><td>9.8039381e-02</td><td>-1.7183834e-01</td></tr>
+<tr><td>352.4989240434661</td><td>5.2475855e+04</td><td>7.9986620e+00</td><td>0</td><td>-1.413077e-03</td><td>682.69036</td><td>190.13318</td><td>11920</td><td>4.3686480e+04</td><td>6.6458707e+00</td><td>1.6734375e+03</td><td>4.6817183e-01</td><td>5.2475855e+04</td><td>7.9986620e+00</td><td>0</td><td>682.60852</td><td>7.7998702e-05</td><td>190.36875</td><td>1.1761812e-04</td><td>682.69036</td><td>1.8637831e-04</td><td>190.13318</td><td>1.8304847e-04</td><td>9.8102726e-02</td><td>-1.7151666e-01</td></tr>
+<tr><td>352.5193572433491</td><td>5.2487070e+04</td><td>7.9990516e+00</td><td>0</td><td>-1.413477e-03</td><td>682.69073</td><td>190.13307</td><td>11921</td><td>4.3692590e+04</td><td>6.6460714e+00</td><td>1.6731461e+03</td><td>4.6760359e-01</td><td>5.2487070e+04</td><td>7.9990516e+00</td><td>0</td><td>682.60880</td><td>7.8005593e-05</td><td>190.36825</td><td>1.1757523e-04</td><td>682.69073</td><td>1.8636670e-04</td><td>190.13307</td><td>1.8304495e-04</td><td>9.8343305e-02</td><td>-1.7184900e-01</td></tr>
+<tr><td>352.53979034345684</td><td>5.2507734e+04</td><td>8.0051088e+00</td><td>10000000</td><td>-1.413877e-03</td><td>682.68909</td><td>190.13338</td><td>11922</td><td>4.3712012e+04</td><td>6.6500912e+00</td><td>1.6725844e+03</td><td>4.6755314e-01</td><td>5.2507734e+04</td><td>8.0051088e+00</td><td>10000000</td><td>682.60829</td><td>7.7979123e-05</td><td>190.36859</td><td>1.1755893e-04</td><td>682.68909</td><td>1.8644832e-04</td><td>190.13338</td><td>1.8299681e-04</td><td>9.8101854e-02</td><td>-1.7161448e-01</td></tr>
+<tr><td>352.56022364380624</td><td>5.2472902e+04</td><td>8.0007839e+00</td><td>0</td><td>-1.414276e-03</td><td>682.69022</td><td>190.13343</td><td>11923</td><td>4.3683984e+04</td><td>6.6457977e+00</td><td>1.6750397e+03</td><td>4.6755785e-01</td><td>5.2472902e+04</td><td>8.0007839e+00</td><td>0</td><td>682.60824</td><td>7.7997676e-05</td><td>190.36889</td><td>1.1760603e-04</td><td>682.69022</td><td>1.8638840e-04</td><td>190.13343</td><td>1.8307337e-04</td><td>9.7997010e-02</td><td>-1.7128757e-01</td></tr>
+<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>442.01959480413643</td><td>5.2471406e+04</td><td>7.9692073e+00</td><td>0</td><td>-3.409159e-04</td><td>682.49127</td><td>190.34491</td><td>16301</td><td>4.3153082e+04</td><td>6.6136584e+00</td><td>1.5008551e+03</td><td>4.6549889e-01</td><td>5.2471406e+04</td><td>7.9692073e+00</td><td>0</td><td>682.42285</td><td>7.3334042e-05</td><td>190.68535</td><td>9.3125935e-05</td><td>682.49127</td><td>1.8501784e-04</td><td>190.34491</td><td>1.8689032e-04</td><td>-7.9899147e-02</td><td>1.3902473e-01</td></tr>
+<tr><td>442.0400292694467</td><td>5.2484672e+04</td><td>7.9713697e+00</td><td>0</td><td>-3.401506e-04</td><td>682.49096</td><td>190.34401</td><td>16302</td><td>4.3162852e+04</td><td>6.6141791e+00</td><td>1.4984926e+03</td><td>4.6637267e-01</td><td>5.2484672e+04</td><td>7.9713697e+00</td><td>0</td><td>682.42309</td><td>7.3324874e-05</td><td>190.68494</td><td>9.3243980e-05</td><td>682.49096</td><td>1.8510064e-04</td><td>190.34401</td><td>1.8683969e-04</td><td>-7.9640254e-02</td><td>1.3871230e-01</td></tr>
+<tr><td>442.0604635348791</td><td>5.2490562e+04</td><td>7.9703860e+00</td><td>0</td><td>-3.393851e-04</td><td>682.49125</td><td>190.34495</td><td>16303</td><td>4.3167781e+04</td><td>6.6144958e+00</td><td>1.5003789e+03</td><td>4.6711573e-01</td><td>5.2490562e+04</td><td>7.9703860e+00</td><td>0</td><td>682.42306</td><td>7.3320742e-05</td><td>190.68526</td><td>9.3141578e-05</td><td>682.49125</td><td>1.8497938e-04</td><td>190.34495</td><td>1.8685836e-04</td><td>-7.9665780e-02</td><td>1.3868718e-01</td></tr>
+<tr><td>442.0808979004214</td><td>5.2474590e+04</td><td>7.9709330e+00</td><td>10000000</td><td>-3.386196e-04</td><td>682.49142</td><td>190.34449</td><td>16304</td><td>4.3156332e+04</td><td>6.6142426e+00</td><td>1.5022838e+03</td><td>4.6630958e-01</td><td>5.2474590e+04</td><td>7.9709330e+00</td><td>10000000</td><td>682.42296</td><td>7.3331044e-05</td><td>190.68509</td><td>9.3194321e-05</td><td>682.49142</td><td>1.8501014e-04</td><td>190.34449</td><td>1.8690975e-04</td><td>-7.9900064e-02</td><td>1.3900562e-01</td></tr>
+<tr><td>442.1013323661464</td><td>5.2484648e+04</td><td>7.9707704e+00</td><td>0</td><td>-3.378539e-04</td><td>682.49086</td><td>190.34446</td><td>16305</td><td>4.3164066e+04</td><td>6.6142449e+00</td><td>1.4996798e+03</td><td>4.6686992e-01</td><td>5.2484648e+04</td><td>7.9707704e+00</td><td>0</td><td>682.42295</td><td>7.3321760e-05</td><td>190.68497</td><td>9.3209848e-05</td><td>682.49086</td><td>1.8497877e-04</td><td>190.34446</td><td>1.8690305e-04</td><td>-7.9818368e-02</td><td>1.3874538e-01</td></tr>
+<tr><td>442.1217667319579</td><td>5.2479809e+04</td><td>7.9702587e+00</td><td>10000000000000</td><td>-3.370880e-04</td><td>682.49145</td><td>190.34413</td><td>16306</td><td>4.3160660e+04</td><td>6.6141462e+00</td><td>1.4999071e+03</td><td>4.6648329e-01</td><td>5.2479809e+04</td><td>7.9702587e+00</td><td>10000000000000</td><td>682.42312</td><td>7.3320341e-05</td><td>190.68516</td><td>9.3171802e-05</td><td>682.49145</td><td>1.8498853e-04</td><td>190.34413</td><td>1.8685416e-04</td><td>-7.9732254e-02</td><td>1.3886212e-01</td></tr>
+<tr><td>442.1422009979142</td><td>5.2475605e+04</td><td>7.9712372e+00</td><td>0</td><td>-3.363221e-04</td><td>682.49124</td><td>190.34487</td><td>16307</td><td>4.3157629e+04</td><td>6.6139336e+00</td><td>1.4981315e+03</td><td>4.6694338e-01</td><td>5.2475605e+04</td><td>7.9712372e+00</td><td>0</td><td>682.42282</td><td>7.3328265e-05</td><td>190.68556</td><td>9.3097420e-05</td><td>682.49124</td><td>1.8495553e-04</td><td>190.34487</td><td>1.8686226e-04</td><td>-7.9895072e-02</td><td>1.3914314e-01</td></tr>
+<tr><td>442.16263546398113</td><td>5.2475305e+04</td><td>7.9707313e+00</td><td>0</td><td>-3.355560e-04</td><td>682.49104</td><td>190.34460</td><td>16308</td><td>4.3155801e+04</td><td>6.6138582e+00</td><td>1.4982946e+03</td><td>4.6778497e-01</td><td>5.2475305e+04</td><td>7.9707313e+00</td><td>0</td><td>682.42288</td><td>7.3337091e-05</td><td>190.68500</td><td>9.3226627e-05</td><td>682.49104</td><td>1.8501762e-04</td><td>190.34460</td><td>1.8689682e-04</td><td>-7.9854071e-02</td><td>1.3877387e-01</td></tr>
+<tr><td>442.1830698302001</td><td>5.2465984e+04</td><td>7.9693055e+00</td><td>0</td><td>-3.347898e-04</td><td>682.49114</td><td>190.34490</td><td>16309</td><td>4.3148465e+04</td><td>6.6134605e+00</td><td>1.4987802e+03</td><td>4.6625513e-01</td><td>5.2465984e+04</td><td>7.9693055e+00</td><td>0</td><td>682.42267</td><td>7.3346317e-05</td><td>190.68542</td><td>9.3117917e-05</td><td>682.49114</td><td>1.8503764e-04</td><td>190.34490</td><td>1.8691395e-04</td><td>-7.9959184e-02</td><td>1.3906266e-01</td></tr>
+<tr><td>442.20350409652747</td><td>5.2471043e+04</td><td>7.9698005e+00</td><td>0</td><td>-3.340235e-04</td><td>682.49069</td><td>190.34464</td><td>16310</td><td>4.3151559e+04</td><td>6.6137042e+00</td><td>1.4977747e+03</td><td>4.6697757e-01</td><td>5.2471043e+04</td><td>7.9698005e+00</td><td>0</td><td>682.42272</td><td>7.3345473e-05</td><td>190.68528</td><td>9.3169489e-05</td><td>682.49069</td><td>1.8501126e-04</td><td>190.34464</td><td>1.8690964e-04</td><td>-7.9990946e-02</td><td>1.3905971e-01</td></tr>
+</table></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_Q4</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-1-combining-multiple-quarters_16_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-combining-multiple-quarters_16_1.png" />
+</div>
+</div>
+<div class="section" id="Note:">
+<h3>Note:<a class="headerlink" href="#Note:" title="Permalink to this headline">¶</a></h3>
+<p>The example given above also works for downloading target pixel files (TPFs). This will produce a <code class="docutils literal notranslate"><span class="pre">`TargetPixelFileCollection</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection">https://docs.lightkurve.org/api/lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection</a>&gt;`__ object instead.</p>
+</div>
+</div>
+<div class="section" id="3.-Investigating-the-Data">
+<h2>3. Investigating the Data<a class="headerlink" href="#3.-Investigating-the-Data" title="Permalink to this headline">¶</a></h2>
+<p>Let’s first have a look at how these observations differ from one another. We can plot the simple aperture photometry (SAP) flux of all of the observations in the <code class="docutils literal notranslate"><span class="pre">`LightCurveCollection</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection">https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection</a>&gt;`__ to see how they compare.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc_collection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">lc</span> <span class="ow">in</span> <span class="n">lc_collection</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+    <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-1-combining-multiple-quarters_20_0.png" src="../../_images/tutorials_2-creating-light-curves_2-1-combining-multiple-quarters_20_0.png" />
+</div>
+</div>
+<p>In the figure above, each quarter of data looks strikingly different, with global patterns repeating every four quarters as <em>Kepler</em> has made a full rotation.</p>
+<p>The change in flux within each quarter is in part driven by changes in the telescope focus, which are caused by changes in the temperature of <em>Kepler</em>’s components as the spacecraft orbits the Sun. The changes are also caused by an effect called <em>differential velocity aberration</em> (DVA), which causes stars to drift over the course of a quarter, depending on their distance from the center of <em>Kepler</em>’s field of view.</p>
+<p>While the figure above looks messy, all the systematic effects mentioned above are well understood, and have been detrended in the PDCSAP flux. For a more detailed overview, see the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, specifically: <em>Section 5. Ongoing Phenomena</em>.</p>
+</div>
+<div class="section" id="4.-Normalizing-a-Light-Curve">
+<h2>4. Normalizing a Light Curve<a class="headerlink" href="#4.-Normalizing-a-Light-Curve" title="Permalink to this headline">¶</a></h2>
+<p>If we want to see the actual variation of the targeted object over the course of these observations, the plot above isn’t very useful to us. It is also not useful to have flux expressed in physical units, because it is affected by the observing conditions such as telescope focus and pointing (see above).</p>
+<p>Instead, it is a common practice to normalize light curves by dividing by their median value. This means that the median of the newly normalized light curve will be equal to 1, and that the relative size of signals in the observation (such as transits) will be maintained.</p>
+<p>A normalization can be performed using the <code class="docutils literal notranslate"><span class="pre">`normalize()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.normalize">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.normalize</a>&gt;`__ method of a <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__, for example:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_collection</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-1-combining-multiple-quarters_24_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-combining-multiple-quarters_24_1.png" />
+</div>
+</div>
+<p>In the figure above, we have plotted the normalized PDCSAP flux for Quarter 4. The median normalized flux is at 1, and the transit depths lie around 0.991, indicating a 0.9% dip in brightness due to the planet transiting the star.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">`LightCurveCollection</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html">https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html</a>&gt;`__ also has a <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method. We can use it to plot the PDCSAP flux. The method automatically normalizes the flux in same way we did for a single quarter above.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_collection</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-1-combining-multiple-quarters_27_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-combining-multiple-quarters_27_1.png" />
+</div>
+</div>
+<p>As you can see above, because we have normalized the data, all of the observations form a single consistent light curve.</p>
+</div>
+<div class="section" id="5.-Combining-Multiple-Observations-into-a-Single-Light-Curve">
+<h2>5. Combining Multiple Observations into a Single Light Curve<a class="headerlink" href="#5.-Combining-Multiple-Observations-into-a-Single-Light-Curve" title="Permalink to this headline">¶</a></h2>
+<p>Finally, we can combine these different light curves into a single <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ object. This is done using the <code class="docutils literal notranslate"><span class="pre">`stitch()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection.stitch">https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection.stitch</a>&gt;`__ method. This method concatenates all quarters in our
+<code class="docutils literal notranslate"><span class="pre">`LightCurveCollection</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection">https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection</a>&gt;`__ together, and normalizes them at the same time, in the manner we saw above.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_stitched</span> <span class="o">=</span> <span class="n">lc_collection</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
+<span class="n">lc_stitched</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<i>KeplerLightCurve targetid=6922244 length=65504</i>
+<table id="table6443045360" class="table-striped table-bordered table-condensed">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>quality</th><th>timecorr</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>sap_flux</th><th>sap_flux_err</th><th>sap_bkg</th><th>sap_bkg_err</th><th>pdcsap_flux</th><th>pdcsap_flux_err</th><th>sap_quality</th><th>psf_centr1</th><th>psf_centr1_err</th><th>psf_centr2</th><th>psf_centr2_err</th><th>mom_centr1</th><th>mom_centr1_err</th><th>mom_centr2</th><th>mom_centr2_err</th><th>pos_corr1</th><th>pos_corr2</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th><th>d</th><th>pix</th><th>pix</th><th></th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th></tr></thead>
+<thead><tr><th>object</th><th>float32</th><th>float32</th><th>int32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>int32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
+<tr><td>120.53979406206781</td><td>1.0002389e+00</td><td>1.7835133e-04</td><td>0</td><td>1.641642e-03</td><td>676.76061</td><td>192.21102</td><td>568</td><td>4.0029211e+04</td><td>7.1942086e+00</td><td>1.3501000e+03</td><td>6.9019127e-01</td><td>4.9790078e+04</td><td>8.8780060e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>676.76061</td><td>2.4257520e-04</td><td>192.21102</td><td>2.8915040e-04</td><td>-6.1361594e-03</td><td>1.2139007e-02</td></tr>
+<tr><td>120.56022845695406</td><td>1.0000123e+00</td><td>1.7952095e-04</td><td>0</td><td>1.642437e-03</td><td>676.76010</td><td>192.21002</td><td>569</td><td>4.0014566e+04</td><td>7.1924801e+00</td><td>1.3488469e+03</td><td>6.8939346e-01</td><td>4.9778801e+04</td><td>8.9362278e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>676.76010</td><td>2.4263318e-04</td><td>192.21002</td><td>2.8926603e-04</td><td>-6.3053877e-03</td><td>1.1505429e-02</td></tr>
+<tr><td>120.58066275172314</td><td>9.9970073e-01</td><td>1.7981241e-04</td><td>0</td><td>1.643232e-03</td><td>676.76146</td><td>192.20988</td><td>570</td><td>4.0000406e+04</td><td>7.1918778e+00</td><td>1.3513733e+03</td><td>6.8988037e-01</td><td>4.9763289e+04</td><td>8.9507360e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>676.76146</td><td>2.4270279e-04</td><td>192.20988</td><td>2.8932444e-04</td><td>-5.5118860e-03</td><td>1.1369802e-02</td></tr>
+<tr><td>120.60109724637005</td><td>1.0002698e+00</td><td>1.7900635e-04</td><td>0</td><td>1.644026e-03</td><td>676.76139</td><td>192.20938</td><td>571</td><td>4.0018668e+04</td><td>7.1936789e+00</td><td>1.3461132e+03</td><td>6.8999070e-01</td><td>4.9791617e+04</td><td>8.9106121e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>676.76139</td><td>2.4260787e-04</td><td>192.20938</td><td>2.8922342e-04</td><td>-5.5788676e-03</td><td>1.0246177e-02</td></tr>
+<tr><td>120.62153164102347</td><td>1.0001223e+00</td><td>1.7974019e-04</td><td>0</td><td>1.644821e-03</td><td>676.76213</td><td>192.20898</td><td>572</td><td>4.0008617e+04</td><td>7.1923513e+00</td><td>1.3499850e+03</td><td>6.9054097e-01</td><td>4.9784277e+04</td><td>8.9471407e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>676.76213</td><td>2.4259168e-04</td><td>192.20898</td><td>2.8918759e-04</td><td>-4.6821944e-03</td><td>1.0072310e-02</td></tr>
+<tr><td>120.6419659354433</td><td>9.9984479e-01</td><td>1.7990815e-04</td><td>0</td><td>1.645615e-03</td><td>676.76170</td><td>192.20871</td><td>573</td><td>3.9994742e+04</td><td>7.1914024e+00</td><td>1.3490905e+03</td><td>6.8729931e-01</td><td>4.9770461e+04</td><td>8.9555016e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>676.76170</td><td>2.4268354e-04</td><td>192.20871</td><td>2.8930244e-04</td><td>-4.2848983e-03</td><td>9.4073853e-03</td></tr>
+<tr><td>120.66240032985661</td><td>9.9989384e-01</td><td>1.7951278e-04</td><td>0</td><td>1.646410e-03</td><td>676.76318</td><td>192.20914</td><td>574</td><td>3.9994105e+04</td><td>7.1914792e+00</td><td>1.3482495e+03</td><td>6.8812454e-01</td><td>4.9772902e+04</td><td>8.9358206e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>676.76318</td><td>2.4266902e-04</td><td>192.20914</td><td>2.8928166e-04</td><td>-4.3740734e-03</td><td>9.1674784e-03</td></tr>
+<tr><td>120.68283482416155</td><td>1.0001035e+00</td><td>1.7969948e-04</td><td>0</td><td>1.647204e-03</td><td>676.76312</td><td>192.20849</td><td>575</td><td>3.9999207e+04</td><td>7.1918936e+00</td><td>1.3490680e+03</td><td>6.8974006e-01</td><td>4.9783336e+04</td><td>8.9451141e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>676.76312</td><td>2.4268078e-04</td><td>192.20849</td><td>2.8929702e-04</td><td>-4.1775936e-03</td><td>9.0572909e-03</td></tr>
+<tr><td>120.70326911834854</td><td>1.0001053e+00</td><td>1.7944223e-04</td><td>0</td><td>1.647998e-03</td><td>676.76273</td><td>192.20788</td><td>576</td><td>3.9999398e+04</td><td>7.1918974e+00</td><td>1.3484713e+03</td><td>6.9063425e-01</td><td>4.9783430e+04</td><td>8.9323092e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>676.76273</td><td>2.4269335e-04</td><td>192.20788</td><td>2.8931847e-04</td><td>-4.2246603e-03</td><td>8.9526922e-03</td></tr>
+<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>1590.81826498</td><td>9.9976480e-01</td><td>1.8179227e-04</td><td>0</td><td>1.015260e-03</td><td>676.80111</td><td>192.10133</td><td>72522</td><td>3.7826906e+04</td><td>6.9083934e+00</td><td>1.2777081e+03</td><td>5.9248704e-01</td><td>4.8588645e+04</td><td>8.8351183e+00</td><td>0</td><td>676.75927</td><td>1.4917154e-04</td><td>192.31890</td><td>1.9156512e-04</td><td>676.80111</td><td>2.5241618e-04</td><td>192.10133</td><td>2.5272943e-04</td><td>-3.9865761e-03</td><td>1.4864406e-02</td></tr>
+<tr><td>1590.8386995243636</td><td>9.9977714e-01</td><td>1.8188541e-04</td><td>0</td><td>1.016104e-03</td><td>676.80109</td><td>192.10132</td><td>72523</td><td>3.7828023e+04</td><td>6.9085383e+00</td><td>1.2810897e+03</td><td>5.9335488e-01</td><td>4.8589242e+04</td><td>8.8396444e+00</td><td>0</td><td>676.75917</td><td>1.4919229e-04</td><td>192.31896</td><td>1.9155757e-04</td><td>676.80109</td><td>2.5239991e-04</td><td>192.10132</td><td>2.5271578e-04</td><td>-4.0576421e-03</td><td>1.4865786e-02</td></tr>
+<tr><td>1590.8591338688348</td><td>9.9998957e-01</td><td>1.8168797e-04</td><td>0</td><td>1.016949e-03</td><td>676.80133</td><td>192.10114</td><td>72524</td><td>3.7832582e+04</td><td>6.9087262e+00</td><td>1.2798925e+03</td><td>5.9355038e-01</td><td>4.8599566e+04</td><td>8.8300486e+00</td><td>0</td><td>676.75919</td><td>1.4914903e-04</td><td>192.31896</td><td>1.9151389e-04</td><td>676.80133</td><td>2.5240114e-04</td><td>192.10114</td><td>2.5271127e-04</td><td>-4.0520453e-03</td><td>1.4725811e-02</td></tr>
+<tr><td>1590.8795683131975</td><td>9.9989623e-01</td><td>1.8185582e-04</td><td>10000010000000</td><td>1.017793e-03</td><td>676.80167</td><td>192.10122</td><td>72525</td><td>3.7832602e+04</td><td>6.9091139e+00</td><td>1.2815891e+03</td><td>5.9373122e-01</td><td>4.8595031e+04</td><td>8.8382063e+00</td><td>10000010000000</td><td>676.75954</td><td>1.4915224e-04</td><td>192.31898</td><td>1.9158589e-04</td><td>676.80167</td><td>2.5239732e-04</td><td>192.10122</td><td>2.5277122e-04</td><td>-3.9305747e-03</td><td>1.5043449e-02</td></tr>
+<tr><td>1590.900002857561</td><td>9.9988633e-01</td><td>1.8179342e-04</td><td>0</td><td>1.018638e-03</td><td>676.80148</td><td>192.10108</td><td>72526</td><td>3.7831559e+04</td><td>6.9085450e+00</td><td>1.2787664e+03</td><td>5.9414190e-01</td><td>4.8594551e+04</td><td>8.8351736e+00</td><td>0</td><td>676.75930</td><td>1.4916631e-04</td><td>192.31896</td><td>1.9152595e-04</td><td>676.80148</td><td>2.5232948e-04</td><td>192.10108</td><td>2.5263420e-04</td><td>-4.0509203e-03</td><td>1.4821382e-02</td></tr>
+<tr><td>1590.9204372017994</td><td>9.9999821e-01</td><td>1.8173133e-04</td><td>0</td><td>1.019482e-03</td><td>676.80166</td><td>192.10131</td><td>72527</td><td>3.7836602e+04</td><td>6.9087906e+00</td><td>1.2786053e+03</td><td>5.9385866e-01</td><td>4.8599988e+04</td><td>8.8321562e+00</td><td>0</td><td>676.75946</td><td>1.4911903e-04</td><td>192.31899</td><td>1.9154462e-04</td><td>676.80166</td><td>2.5230341e-04</td><td>192.10131</td><td>2.5262410e-04</td><td>-4.0993756e-03</td><td>1.4611045e-02</td></tr>
+<tr><td>1590.9408717461629</td><td>9.9969560e-01</td><td>1.8179418e-04</td><td>0</td><td>1.020326e-03</td><td>676.80144</td><td>192.10146</td><td>72528</td><td>3.7825430e+04</td><td>6.9083652e+00</td><td>1.2797456e+03</td><td>5.9316140e-01</td><td>4.8585281e+04</td><td>8.8352108e+00</td><td>0</td><td>676.75953</td><td>1.4916577e-04</td><td>192.31908</td><td>1.9160371e-04</td><td>676.80144</td><td>2.5239564e-04</td><td>192.10146</td><td>2.5271456e-04</td><td>-3.9369571e-03</td><td>1.4928485e-02</td></tr>
+<tr><td>1590.9613061904092</td><td>9.9994302e-01</td><td>1.8176372e-04</td><td>0</td><td>1.021170e-03</td><td>676.80124</td><td>192.10091</td><td>72529</td><td>3.7834938e+04</td><td>6.9087672e+00</td><td>1.2764705e+03</td><td>5.9434044e-01</td><td>4.8597305e+04</td><td>8.8337307e+00</td><td>0</td><td>676.75914</td><td>1.4914536e-04</td><td>192.31884</td><td>1.9145805e-04</td><td>676.80124</td><td>2.5227590e-04</td><td>192.10091</td><td>2.5260207e-04</td><td>-4.1014180e-03</td><td>1.4680510e-02</td></tr>
+<tr><td>1590.9817405346475</td><td>1.0001228e+00</td><td>1.8151020e-04</td><td>0</td><td>1.022015e-03</td><td>676.80224</td><td>192.10165</td><td>72530</td><td>3.7828816e+04</td><td>6.9086733e+00</td><td>1.2774485e+03</td><td>5.9289569e-01</td><td>4.8606039e+04</td><td>8.8214092e+00</td><td>0</td><td>676.75981</td><td>1.4909096e-04</td><td>192.31980</td><td>1.9197758e-04</td><td>676.80224</td><td>2.5231845e-04</td><td>192.10165</td><td>2.5264811e-04</td><td>-3.6829417e-03</td><td>1.6025381e-02</td></tr>
+<tr><td>1591.0021750787782</td><td>9.9999636e-01</td><td>1.8174112e-04</td><td>0</td><td>1.022859e-03</td><td>676.80192</td><td>192.10123</td><td>72531</td><td>3.7825363e+04</td><td>6.9084020e+00</td><td>1.2774999e+03</td><td>5.9428430e-01</td><td>4.8599898e+04</td><td>8.8326321e+00</td><td>0</td><td>676.75964</td><td>1.4915710e-04</td><td>192.31887</td><td>1.9161010e-04</td><td>676.80192</td><td>2.5232456e-04</td><td>192.10123</td><td>2.5267553e-04</td><td>-3.9303382e-03</td><td>1.5094034e-02</td></tr>
+</table></div>
+</div>
+<p>This returns a single <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__! It is in all ways identical to <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ of a single quarter, just longer. We can plot it the usual way.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_stitched</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-1-combining-multiple-quarters_33_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-combining-multiple-quarters_33_1.png" />
+</div>
+</div>
+<p>In this final normalized light curve, the interesting observational features of the star are more clear. Specifically: repeating transits that can be used to <a class="reference external" href="https://docs.lightkurve.org/tutorials/02-recover-a-planet.html">characterize planets</a> and a noisy stellar flux that can be used to study brightness variability through <a class="reference external" href="http://docs.lightkurve.org/tutorials/02-asteroseismology.html">asteroseismology</a>.</p>
+<p>Normalizing individual <em>Kepler</em> Quarters before combining them to form a single light curve isn’t the only way to make sure different quarters are consistent with one another. For a breakdown of other available methods and their benefits, see <em>Section 6. Stitching Kepler Quarters Together</em> in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Kinemuchi et al. 2012</a>.</p>
+</div>
+<div class="section" id="About-this-Notebook">
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
+<p><strong>Authors:</strong> Oliver Hall (<a class="reference external" href="mailto:oliver&#46;hall&#37;&#52;&#48;esa&#46;int">oliver<span>&#46;</span>hall<span>&#64;</span>esa<span>&#46;</span>int</a>), Geert Barentsen</p>
+<p><strong>Updated On</strong>: 2020-09-15</p>
+</div>
+<div class="section" id="Citing-Lightkurve-and-Astropy">
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
+<p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+<style>
+    button {
+        border: 1px solid;
+        padding: 0.2em;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 0.8em;
+        margin: 0.2em;
+        cursor: pointer;
+    }
+
+    .citation-button-1 {background-color: #4CAF50;} /* Green */
+    .citation-button-2 {background-color: #008CBA;} /* Blue */
+</style>
+
+<script type="text/javascript">
+    function copyBibtex(package) {
+        var copyText = document.getElementById(package + "Text");
+        copyText.select();
+        document.execCommand("copy");
+        alert("BibTex has been copied to your clipboard")
+    }
+</script>
+</head>
+
+<body>
+    <textarea id="lightkurveText" style="position: absolute; left: -9999px; z-index: -9999;">
+@MISC{2018ascl.soft12013L,
+    author = {{Lightkurve Collaboration} and {Cardoso}, J.~V.~d.~M. and
+                {Hedges}, C. and {Gully-Santiago}, M. and {Saunders}, N. and
+                {Cody}, A.~M. and {Barclay}, T. and {Hall}, O. and
+                {Sagear}, S. and {Turtelboom}, E. and {Zhang}, J. and
+                {Tzanidakis}, A. and {Mighell}, K. and {Coughlin}, J. and
+                {Bell}, K. and {Berta-Thompson}, Z. and {Williams}, P. and
+                {Dotson}, J. and {Barentsen}, G.},
+    title = "{Lightkurve: Kepler and TESS time series analysis in Python}",
+    keywords = {Software, NASA},
+howpublished = {Astrophysics Source Code Library},
+        year = 2018,
+    month = dec,
+archivePrefix = "ascl",
+    eprint = {1812.013},
+    adsurl = {http://adsabs.harvard.edu/abs/2018ascl.soft12013L},
+}
+    </textarea>
+    <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
+@ARTICLE{2018AJ....156..123T,
+   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
+    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
+    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
+    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
+    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
+    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
+    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
+    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
+    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
+    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
+    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
+    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
+    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
+    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
+    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
+    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
+    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
+    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
+    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
+    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
+    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
+    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
+    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
+    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
+    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
+    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
+    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
+    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
+    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
+    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
+    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
+    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
+    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
+    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
+    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
+    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
+    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
+    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
+    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
+    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
+    {Zabalza}, V. and {Contributors}, (.},
+    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
+  journal = {\aj},
+archivePrefix = "arXiv",
+   eprint = {1801.02634},
+ primaryClass = "astro-ph.IM",
+ keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
+     year = 2018,
+    month = sep,
+   volume = 156,
+      eid = {123},
+    pages = {123},
+      doi = {10.3847/1538-3881/aabc4f},
+   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+
+    </textarea>
+    <textarea id="astroqueryText" style="position: absolute; left: -9999px; z-index: -9999;">
+@ARTICLE{2019AJ....157...98G,
+   author = {{Ginsburg}, A. and {Sip{\H o}cz}, B.~M. and {Brasseur}, C.~E. and
+    {Cowperthwaite}, P.~S. and {Craig}, M.~W. and {Deil}, C. and
+    {Guillochon}, J. and {Guzman}, G. and {Liedtke}, S. and {Lian Lim}, P. and
+    {Lockhart}, K.~E. and {Mommert}, M. and {Morris}, B.~M. and
+    {Norman}, H. and {Parikh}, M. and {Persson}, M.~V. and {Robitaille}, T.~P. and
+    {Segovia}, J.-C. and {Singer}, L.~P. and {Tollerud}, E.~J. and
+    {de Val-Borro}, M. and {Valtchanov}, I. and {Woillez}, J. and
+    {The Astroquery collaboration} and {a subset of the astropy collaboration}
+    },
+    title = "{astroquery: An Astronomical Web-querying Package in Python}",
+  journal = {\aj},
+archivePrefix = "arXiv",
+   eprint = {1901.04520},
+ primaryClass = "astro-ph.IM",
+ keywords = {astronomical databases: miscellaneous, virtual observatory tools},
+     year = 2019,
+    month = mar,
+   volume = 157,
+      eid = {98},
+    pages = {98},
+      doi = {10.3847/1538-3881/aafc33},
+   adsurl = {http://adsabs.harvard.edu/abs/2019AJ....157...98G},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+    </textarea>
+    <textarea id="tesscutText" style="position: absolute; left: -9999px; z-index: -9999;">
+@MISC{2019ascl.soft05007B,
+        author = {{Brasseur}, C.~E. and {Phillip}, Carlita and {Fleming}, Scott W. and
+          {Mullally}, S.~E. and {White}, Richard L.},
+         title = "{Astrocut: Tools for creating cutouts of TESS images}",
+      keywords = {Software},
+          year = 2019,
+         month = may,
+           eid = {ascl:1905.007},
+         pages = {ascl:1905.007},
+ archivePrefix = {ascl},
+        eprint = {1905.007},
+        adsurl = {https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B},
+       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+ }
+    </textarea>
+
+    <p>
+        When using Lightkurve, we kindly request that you cite the following packages:
+        <ul>
+            <li>
+                <a href="https://docs.lightkurve.org">lightkurve</a>
+                <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            </li>
+            <li>
+                <a href="https://astropy.org">astropy</a>
+                <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            </li>
+            <li>
+                <a href="https://astroquery.readthedocs.io">astroquery</a>
+                <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+                —  if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
+            </li>
+            <li>
+                <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
+                <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+                — if you are using <i>search_tesscut()</i>.
+            </li>
+        </ul>
+    </p>
+</body></div>
+</div>
+<p><img alt="Space Telescope Logo" class="no-scaled-link" src="https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png" style="width: 200px;" /></p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="2-1-custom-aperture-photometry.html" title="previous page">Creating your own light curves using custom aperture photometry</a>
+    <a class='right-next' id="next-link" href="2-1-cutting-out-tpfs.html" title="next page">How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

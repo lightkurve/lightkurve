@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.fill\_gaps
+================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.fill_gaps

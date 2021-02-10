@@ -1,0 +1,38 @@
+﻿lightkurve.Seismology
+=====================
+
+.. currentmodule:: lightkurve
+
+.. autoclass:: Seismology
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Seismology.__init__
+      ~Seismology.diagnose_deltanu
+      ~Seismology.diagnose_numax
+      ~Seismology.estimate_deltanu
+      ~Seismology.estimate_logg
+      ~Seismology.estimate_mass
+      ~Seismology.estimate_numax
+      ~Seismology.estimate_radius
+      ~Seismology.from_lightcurve
+      ~Seismology.interact_echelle
+      ~Seismology.plot_echelle
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Seismology.periodogram
+   
+   

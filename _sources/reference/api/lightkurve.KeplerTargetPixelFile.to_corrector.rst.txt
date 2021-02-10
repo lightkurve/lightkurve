@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.to\_corrector
+==============================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.to_corrector

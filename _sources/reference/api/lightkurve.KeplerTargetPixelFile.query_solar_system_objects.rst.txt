@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.query\_solar\_system\_objects
+==============================================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.query_solar_system_objects

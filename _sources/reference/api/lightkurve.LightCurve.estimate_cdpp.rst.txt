@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.estimate\_cdpp
+====================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.estimate_cdpp

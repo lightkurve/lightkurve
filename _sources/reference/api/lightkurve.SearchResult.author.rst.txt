@@ -1,0 +1,6 @@
+﻿lightkurve.SearchResult.author
+==============================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: SearchResult.author

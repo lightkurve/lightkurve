@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.meta
+==========================
+
+.. currentmodule:: lightkurve
+
+.. autoattribute:: LightCurve.meta

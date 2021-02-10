@@ -1,0 +1,470 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.KeplerTargetPixelFile.interact &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lightkurve.KeplerTargetPixelFile.interact_sky" href="lightkurve.KeplerTargetPixelFile.interact_sky.html" />
+    <link rel="prev" title="lightkurve.KeplerTargetPixelFile.to_fits" href="lightkurve.KeplerTargetPixelFile.to_fits.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../tutorials/index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../about/index.html">About</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+        
+        
+          
+            
+                <li class="">
+                    <a href="../search.html">Downloading data</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../lightcurve.html">LightCurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../foldedlightcurve.html">FoldedLightCurve</a>
+                </li>
+            
+          
+            
+  
+                <li class="active">
+                    <a href="../targetpixelfile.html">TargetPixelFile</a>
+                    <ul>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.html">lightkurve.KeplerTargetPixelFile</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.TessTargetPixelFile.html">lightkurve.TessTargetPixelFile</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.hdu.html">lightkurve.KeplerTargetPixelFile.hdu</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.ra.html">lightkurve.KeplerTargetPixelFile.ra</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.dec.html">lightkurve.KeplerTargetPixelFile.dec</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.column.html">lightkurve.KeplerTargetPixelFile.column</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.row.html">lightkurve.KeplerTargetPixelFile.row</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.pos_corr1.html">lightkurve.KeplerTargetPixelFile.pos_corr1</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.pos_corr2.html">lightkurve.KeplerTargetPixelFile.pos_corr2</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.pipeline_mask.html">lightkurve.KeplerTargetPixelFile.pipeline_mask</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.shape.html">lightkurve.KeplerTargetPixelFile.shape</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.time.html">lightkurve.KeplerTargetPixelFile.time</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.cadenceno.html">lightkurve.KeplerTargetPixelFile.cadenceno</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.nan_time_mask.html">lightkurve.KeplerTargetPixelFile.nan_time_mask</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.flux.html">lightkurve.KeplerTargetPixelFile.flux</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.flux_err.html">lightkurve.KeplerTargetPixelFile.flux_err</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.flux_bkg.html">lightkurve.KeplerTargetPixelFile.flux_bkg</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.flux_bkg_err.html">lightkurve.KeplerTargetPixelFile.flux_bkg_err</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.quality.html">lightkurve.KeplerTargetPixelFile.quality</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.wcs.html">lightkurve.KeplerTargetPixelFile.wcs</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.get_coordinates.html">lightkurve.KeplerTargetPixelFile.get_coordinates</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.to_lightcurve.html">lightkurve.KeplerTargetPixelFile.to_lightcurve</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.create_threshold_mask.html">lightkurve.KeplerTargetPixelFile.create_threshold_mask</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.estimate_background.html">lightkurve.KeplerTargetPixelFile.estimate_background</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.estimate_centroids.html">lightkurve.KeplerTargetPixelFile.estimate_centroids</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.query_solar_system_objects.html">lightkurve.KeplerTargetPixelFile.query_solar_system_objects</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.plot.html">lightkurve.KeplerTargetPixelFile.plot</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.to_fits.html">lightkurve.KeplerTargetPixelFile.to_fits</a>
+                        </li>
+                    
+                        <li class="active">
+                            <a href="">lightkurve.KeplerTargetPixelFile.interact</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.interact_sky.html">lightkurve.KeplerTargetPixelFile.interact_sky</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.to_corrector.html">lightkurve.KeplerTargetPixelFile.to_corrector</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.cutout.html">lightkurve.KeplerTargetPixelFile.cutout</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.from_fits_images.html">lightkurve.KeplerTargetPixelFile.from_fits_images</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.plot_pixels.html">lightkurve.KeplerTargetPixelFile.plot_pixels</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.get_header.html">lightkurve.KeplerTargetPixelFile.get_header</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.get_keyword.html">lightkurve.KeplerTargetPixelFile.get_keyword</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../periodogram.html">Periodogram</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../seismology.html">Seismology</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../correctors.html">Correcting systematics</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../misc.html">Miscellaneous utilities</a>
+                </li>
+            
+          
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="lightkurve-keplertargetpixelfile-interact">
+<h1>lightkurve.KeplerTargetPixelFile.interact<a class="headerlink" href="#lightkurve-keplertargetpixelfile-interact" title="Permalink to this headline">¶</a></h1>
+<dl class="py method">
+<dt id="lightkurve.KeplerTargetPixelFile.interact">
+<code class="sig-prename descclassname">KeplerTargetPixelFile.</code><code class="sig-name descname">interact</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">notebook_url</span><span class="o">=</span><span class="default_value">'localhost:8888'</span></em>, <em class="sig-param"><span class="n">max_cadences</span><span class="o">=</span><span class="default_value">200000</span></em>, <em class="sig-param"><span class="n">aperture_mask</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">exported_filename</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">transform_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ylim_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p>
+<p>The widget will show both the lightcurve and pixel data.  By default,
+the lightcurve shown is obtained by calling the <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.to_lightcurve.html#lightkurve.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve()</span></code></a> method,
+unless the user supplies a custom <a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object.
+This feature requires an optional dependency, bokeh (v0.12.15 or later).
+This dependency can be installed using e.g. <code class="xref py py-obj docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">bokeh</span></code>.</p>
+<p>At this time, this feature only works inside an active Jupyter
+Notebook, and tends to be too slow when more than ~30,000 cadences
+are contained in the TPF (e.g. short cadence data).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>notebook_url</strong><span class="classifier">str</span></dt><dd><p>Location of the Jupyter notebook page (default: “localhost:8888”)
+When showing Bokeh applications, the Bokeh server must be
+explicitly configured to allow connections originating from
+different URLs. This parameter defaults to the standard notebook
+host and port. If you are running on a different location, you
+will need to supply this value for the application to display
+properly. If no protocol is supplied in the URL, e.g. if it is
+of the form “localhost:8888”, then “http” will be used.</p>
+</dd>
+<dt><strong>max_cadences</strong><span class="classifier">int</span></dt><dd><p>Print an error message if the number of cadences shown is larger than
+this value. This limit helps keep browsers from becoming unresponsive.</p>
+</dd>
+<dt><strong>aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, ‘threshold’, ‘default’, or ‘all’</span></dt><dd><p>A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
+that the pixel will be used.
+If None or ‘all’ are passed, all pixels will be used.
+If ‘pipeline’ is passed, the mask suggested by the official pipeline
+will be returned.
+If ‘threshold’ is passed, all pixels brighter than 3-sigma above
+the median flux will be used.
+If ‘default’ is passed, ‘pipeline’ mask will be used when available,
+with ‘threshold’ as the fallback.</p>
+</dd>
+<dt><strong>exported_filename: str</strong></dt><dd><p>An optional filename to assign to exported fits files containing
+the custom aperture mask generated by clicking on pixels in interact.
+The default adds a suffix ‘-custom-aperture-mask.fits’ to the
+TargetPixelFile basename.</p>
+</dd>
+<dt><strong>transform_func: function</strong></dt><dd><p>A function that transforms the lightcurve.  The function takes in a
+LightCurve object as input and returns a LightCurve object as output.
+The function can be complex, such as detrending the lightcurve.  In this
+way, the interactive selection of aperture mask can be evaluated after
+inspection of the transformed lightcurve.  The transform_func is applied
+before saving a fits file.  Default: None (no transform is applied).</p>
+</dd>
+<dt><strong>ylim_func: function</strong></dt><dd><p>A function that returns ylimits (low, high) given a LightCurve object.
+The default is to return an expanded window around the 10-90th
+percentile of lightcurve flux values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>To select an aperture mask for V827 Tau:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;V827 Tau&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>  
+</pre></div>
+</div>
+<p>To see the full y-axis dynamic range of your lightcurve and normalize
+the lightcurve after each pixel selection:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ylim_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">ylim_func</span><span class="o">=</span><span class="n">ylim_func</span><span class="p">,</span> <span class="n">transform_func</span><span class="o">=</span><span class="n">transform_func</span><span class="p">)</span>  
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="lightkurve.KeplerTargetPixelFile.to_fits.html" title="previous page">lightkurve.KeplerTargetPixelFile.to_fits</a>
+    <a class='right-next' id="next-link" href="lightkurve.KeplerTargetPixelFile.interact_sky.html" title="next page">lightkurve.KeplerTargetPixelFile.interact_sky</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

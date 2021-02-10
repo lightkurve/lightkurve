@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.query\_solar\_system\_objects
+===================================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.query_solar_system_objects

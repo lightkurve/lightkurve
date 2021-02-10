@@ -1,0 +1,787 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (`CBVCorrector`)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Cotrending Basis Vectors (CBVs) are generated in the PDC component of the Kepler/K2/TESS pipeline and are used to remove systematic trends in light curves. They are built from the most common systematic trends observed in each PDC Unit of Work (Quarter for Kepler, Campaign for K2 and Sector for TESS). Each Kepler and K2 module output and each TESS CCD has its own set of CBVs. You can read an introduction to the CBVs in [Demystifying Kepler Data](https://arxiv.org/pdf/1207.3093.pdf) or to greater detail in the [Kepler Data Processing Handbook](https://archive.stsci.edu/kepler/manuals/KSCI-19081-003-KDPH.pdf). The same basic method to generate CBVs is used for all three missions.\n",
+    "\n",
+    "This tutorial provides examples of how to utilize the various CBVs to clean lightcurves of common trends experienced by all targets. The technique exploits two goodness metrics that characterize the performance of the fit. `CBVCorrector` inherits the `RegressionCorrector` class in LightKurve, you can find details of that class [here](../api/lightkurve.correctors.RegressionCorrector.html). It is recommend to first read the tutorial on [obtaining the CBVs](https://docs.lightkurve.org/tutorials/04-how-to-use-cbvs.html)  before reading this tutorial."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Cotrending Basis Vector Types"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "There are three basic types of CBVs: \n",
+    "- **Single-Scale** contains all systematic trends combined in a single set of basis vectors. \n",
+    "- **Multi-Scale** contains systematic trends in specific wavelet-based band passes. There are usually three sets of multi-scale basis vectors in three bands.\n",
+    "- **Spike** contains only short impulsive spike systematics.\n",
+    "\n",
+    "There are two different correction methods in PDC: Single-Scale and Multi-Scale. Single-Scale performs the correction in a single bandpass. Multi-Scale performs the correction in three separate wavelet-based bandpasses. Both corrections are performed in PDC but we can only export a single PDC light curve for each target. So, PDC must choose which of the two to export on a per-target basis. Generally speaking, single-scale performs better at preserving longer period signals. But at periods close to transiting planet durations multi-scale performs better at preserving signals. PDC therefore mostly chooses multi-scale for use within the planet finding pipeline and for the archive. You can find in the light curve FITS header which PDC method was chosen (keyword “PDCMETHD”). Additionally, a seperate correction is alway performed to remove short impulsive systematic spikes.\n",
+    "\n",
+    "For an individual's research needs, the mission supplied PDC lightcurves might not be ideal and so the CBVs are provided to the user to perform their own correction. All three CBV types are provided at MAST for TESS, however only Single-Scale is provided at MAST for Kepler and K2. Also for Kepler and K2, Cotrending Basis Vectors are supplied for only the 30-minute target cadence."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Obtaining the CBVs"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "One can directly obtain the CBVs with `download_tess_cbvs` and `downlaod_kepler_cbvs`. However when generating a `CBVCorrector` object the appropriate CBVs are automatically downloaded from MAST and aligned to the lightcurve. Let's generate this object for a particularily interesting TESS variable target. We first download the SAP lightcurve."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from lightkurve import search_lightcurve\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "lc = search_lightcurve('TIC 99180739', author='SPOC', sector=10).download(flux_column='sap_flux')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Next, we create a `CBVCorrector` object. This will download the CBVs appropriate for this target and store them in the `CBVCorrector` object. In the case of TESS, this means the CBVs associated with the CCD this target is on and for Sector 10."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from lightkurve.correctors import CBVCorrector\n",
+    "cbvCorrector = CBVCorrector(lc)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's look at the CBVs downloaded."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cbvCorrector.cbvs"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We see that there are a total of 5 sets of CBVs, all associated with TESS Sector 10, Camera 1 and CCD 1. The number of CBVs per type is also given. Let's plot the Single-Scale CBVs, which contain all systematics combined."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cbvCorrector.cbvs[0].plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The first several CBVs contain most of the systematics. The latter CBVs pose a greater risk of injecting more noise than helping. The default behavior in CBVCorrector is to use the first 8 CBVs."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Assessing Over- and Under-Fitting with the Goodness Metrics"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Two very common issues when fitting a model to a data set it over-fitting and under-fitting. \n",
+    "\n",
+    "Over-fitting occurs when the model has too many degrees of freedom and fits the data  _at all costs_, instead of just modelling the physical process it is attempting to model. This can exhibit itself in different ways, depending on the system and application. In the case of fitting systematic trend basis vectors to a time series, over-fitting can result in the basis vectors removing intrinsic signals in the times series instead of just the systematics. It can also result in introduced broad-band noise. This can be particularily prominant in an unconstrained least-squares fit. A least-squares fit only cares about minimizing it's loss function, which is the Root Mean Square error. In the course of minimizing the RMS, narrow-band power representing the systematic trends are exchanged for broad-band noise intrinsic in the basis vectors. This results in the overall RMS decreasing but the noise in the time series increasing, resulting in the obscuration of the signals under interest. A very common method to inhibit over-fitting is to introduce a regularization term in the loss function. This constrains the fit and effectively reduces the degrees of freedom.\n",
+    "\n",
+    "Under-fitting occurs when the model has too few degrees of freedom and fails to adequately model the physical process it is attempting to model. In the case of fitting systematic trend basis vectors to a time series, under-fitting can result in residual systematics. Under-fitting can either be the result of the basis vectors not adequately representing the systematics or, placing too great of a restriction on the model during fitting. The regularization technique used to inhibit over-fitting can therefore result in under-fitting. The ideal fit will balance the counter-acting phenomena of over- and under-fitting. To this end, a method can be developed to measure the degree to which these two phenomena occur.\n",
+    "\n",
+    "PDC has two **Goodness Metrics** to assess over- and under-fitting:\n",
+    "- **Over-fitting metric**: Measures the introduced noise in the light curve after the correction. It does so by measuring the broad-band power spectrum via a Lomb-Scargle Periodogram both before and after the correction. If power has increased after the correction then this is an indication the CBV fit has over-fitted and introduced noise. The metric treats all frequencies equally when measuring power increase; from one frequency separation to the Nyquist frequency. This metric is callibrated such that a metric value of 0.5 means the introduced noise due to over-fitting is at the same power level as the uncertainties in the light curve.\n",
+    "- **Under-fitting metric**: Measures the mean residual target to target Pearson correlation between the target under study and a selection of neighboring targets. This metric will find and download a selection of neighboring SPOC SAP targets in RA and Decl. until a minimum number is found. The metric is callibrated such that a value of 0.95 means the residual correlations in the target is equivalent to chance correlations of White Gaussian Noise.\n",
+    "\n",
+    "_The Goodness Metrics are not perfect!_ They are an estimate of over- and under-fitting and are to be used as a guideline along other other metrics to assess the quality of your light curve."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The Goodness Metrics are part of the `lightkurve.correctors.metrics` module and can be computed directly with calls to `overfit_metric_lombscargle` and `underfit_metric_neighbors`. The 'CBVCorrector' has convenience wrappers for the two metrics and so they do not need to be called directly, as we will show below."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Example Correction with CBVCorrector to Inhibit Over-Fitting"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "There are four correction methods within `CBVCorrector`:\n",
+    "- **correct**: Performs a numerical correction by optimizing the L2-Norm regularization penalty term using the goodness metrics as the Loss Function.\n",
+    "- **correct_gaussian_prior**: Performs an analytical correction using the LightKurve `RegressionCorrector.correct` method while setting the L2-Norm (Ridge Regression) regularization penalty term as the Gaussian prior.\n",
+    "- **correct_elasticnet**:  Performs the correction using Scikit-Learn's [ElasticNet](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html), which combines both an L1- and L2-Norm regularization.\n",
+    "- **correct_regressioncorrector**: Performs the standard `RegressionCorrector.correct` correction. RegressionCorrector is the superclass to CBVCorrector.\n",
+    "\n",
+    "If you are unfamilar with L1-Norm (LASSO) and L2-Norm (Ridge Regression) regularization then there are [severel](https://statlearning.com/ISLR%20Seventh%20Printing.pdf), [excellent](https://press.princeton.edu/books/hardcover/9780691198309/statistics-data-mining-and-machine-learning-in-astronomy), [introductions](https://en.wikipedia.org/wiki/Regularization_(mathematics)). You can read how a L2-norm relates to a Gaussian prior in a linear design matrix in [this reference](https://katbailey.github.io/post/from-both-sides-now-the-math-of-linear-regression/).\n",
+    "\n",
+    "The default method is `correct` and generally speaking, one can use just this method to obtain a good fit. The other methods are for advanced usage.\n",
+    "\n",
+    "We'll start with `correct_gaussian_prior` in order to introduce the concepts. Doing so will allow us to force a very weak regularization term (alpha=1e-4) as an illustration."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Select which CBVs to use in the correction\n",
+    "cbv_type = ['SingleScale', 'Spike']\n",
+    "# Select which CBV indices to use\n",
+    "# Use the first 8 SingleScale and all Spike CBVS\n",
+    "cbv_indices = [np.arange(1,9), 'ALL']\n",
+    "# Perform the correction\n",
+    "cbvCorrector.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices, alpha=1e-4)\n",
+    "cbvCorrector.diagnose();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "First note that CBVCorrector always fits a constant term in the model, but the constant is never subtracted in the resultant corrected flux. The median flux value of the light curve is always preserved.\n",
+    "\n",
+    "At first sight, this looks like a good correction. Both the Single-Scale and Spike basis vectors are being utilized to fit out as much of the signal as possible. The corrected light curve is indeed flatter. But this was essentially an unrestricted least-squares correction and we may have _over-fitted_. The very strong lips right at the beginning of each orbit is probably a chance correlation between the star's inherent stellar variability and the thermal settling systematic that is common in Kepler and TESS lightcurves. Let's look at the CBVCorrector goodness metrics to determine if this is the case."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Note: this cell will be slow to run\n",
+    "print('Over fitting Metric: {}'.format(cbvCorrector.over_fitting_metric()))\n",
+    "print('Under fitting Metric: {}'.format(cbvCorrector.under_fitting_metric()))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The first time you run the under-fitting goodness metric it will download the SPOC SAP light curves of targets in the neighborhood around the target under study in order to estimate the residual systematics (they are stored in the CBVCorrector object for subsequent computations). A goodness metric of 0.8 or above is generally considered good. In this case, it looks like we over-fitted (over-fitting metric = 0.71). Even though the corrected light curve looks better, our metric is telling us we probably injected signals into our lightcurve and we should not trust this really nice looking curve. Perhaps we can do better if we _regularize_ the fit."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Using the Goodness Metrics to Optimize the Fit"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We will start by performing a scan of the over- and under-fit goodness metrics as a function of the L2-Norm regularization term, alpha."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cbvCorrector.goodness_metric_scan_plot(cbv_type=cbv_type, cbv_indices=cbv_indices);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This scan also plots the last used alpha parameter as a vertical black line (alpha=1e-4 in our case). We are clearly not optimizing this fit for both over- and under-fitting. Let's use the `correct` numerical optimizer to try to optimize the fit."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cbvCorrector.correct(cbv_type=cbv_type, cbv_indices=cbv_indices);\n",
+    "cbvCorrector.diagnose();\n",
+    "cbvCorrector.goodness_metric_scan_plot(cbv_type=cbv_type, cbv_indices=cbv_indices);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Much better! We see the thermal settling systematic is still being removed, but the stellar variabity is better preserved. Note that the optimizer did not set the alpha parameter at exactly the red and blue curve intersection point. The default target goodness scores is 0.8 or above, which is fulfilled at alpha=1.45e-1. If we want to optimize the fit even more, by perhaps ensuring we are not over-fitting at all, then we can adjust the target over and under scores to emphasize which metric we are more interested in. Below we more greatly emphasize improving the over-fitting metric by setting the target to 0.9."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cbvCorrector.correct(cbv_type=cbv_type,\n",
+    "                     cbv_indices=cbv_indices, \n",
+    "                     target_over_score=0.9,\n",
+    "                     target_under_score=0.5)\n",
+    "cbvCorrector.diagnose();\n",
+    "cbvCorrector.goodness_metric_scan_plot(cbv_type=cbv_type, cbv_indices=cbv_indices);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We are now perhaps biasing too far towards under-fitting, but depending on your research interests, this might be best."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## No Single Best Answer Example"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's now look at another example, this time where there is no clear single best answer. Again, we will use the Single-Scale and Spike basis vectors for the correction and begin with low regularization."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc = search_lightcurve('TIC 38574307', author='SPOC', sector=2).download(flux_column='sap_flux')\n",
+    "cbvCorrector = CBVCorrector(lc)\n",
+    "cbv_type = ['SingleScale', 'Spike']\n",
+    "cbv_indices = [np.arange(1,9), 'ALL']\n",
+    "cbvCorrector.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices, alpha=1e-4)\n",
+    "cbvCorrector.diagnose();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "At first sight, this looks good. The long term trends have been removed and the periodic noisy bits have been removed with the spike basis vectors. But did we really do a good job?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print('Over fitting Metric: {}'.format(cbvCorrector.over_fitting_metric()))\n",
+    "print('Under fitting Metric: {}'.format(cbvCorrector.under_fitting_metric()))\n",
+    "cbvCorrector.goodness_metric_scan_plot(cbv_type=cbv_type, cbv_indices=cbv_indices);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Hmm... The over-fitting goodness metric says we are severely over-fitting. Not only that, there appears to not be an Alpha parameter that brings both goodness metrics above 0.8. And yet, the fit looks really good. What's going on here? Let's zoom in on the correction."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pltAxis = cbvCorrector.diagnose()\n",
+    "pltAxis[0].set_xlim(1360.5, 1361.1)\n",
+    "pltAxis[0].set_ylim(1.4314e7, 1.4326e7);\n",
+    "pltAxis[1].set_xlim(1360.5, 1361.1)\n",
+    "pltAxis[1].set_ylim(1.431e7, 1.4326e7);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We see in the top plot that the _SingleScale_ correction has comperable noise to the _original_ light curve. This means the correction is injecting high frequency noise at comperable amplitude to the original signal. We have indeed over-fitted! The goodness metrics perform a _broad-band_ analysis of over- and under-fitting. Even though our eyes did not see the high frequency noise injection, the goodness metrics did. So, what should be done? It depends on what you are trying to investigate. If you are only looking at the low frequency signals in the data then perhaps you don't care about the high frequency noise injection. If you really do care about the high frequency signals then you should increase the Alpha parameter, or set the target goodness scores as we do below (target_over_score=0.8, target_under_score=0.5). "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Optimize the fit but overemphasize the importance of not over-fitting.\n",
+    "cbvCorrector.correct(cbv_type=cbv_type,\n",
+    "                     cbv_indices=cbv_indices, \n",
+    "                     target_over_score=0.8,\n",
+    "                     target_under_score=0.5)\n",
+    "cbvCorrector.diagnose()\n",
+    "cbvCorrector.goodness_metric_scan_plot(cbv_type=cbv_type, cbv_indices=cbv_indices);"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Again, zoom in to see the detail\n",
+    "pltAxis = cbvCorrector.diagnose()\n",
+    "pltAxis[0].set_xlim(1360.5, 1361.1)\n",
+    "pltAxis[0].set_ylim(1.4314e7, 1.4326e7);\n",
+    "pltAxis[1].set_xlim(1360.5, 1361.1)\n",
+    "pltAxis[1].set_ylim(1.431e7, 1.4326e7);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We see now that the high frequency noise injection is small compared to the original amplitudes in the lightkurve. We barely removed any of the systematics and are now under-fitting, but that might be the best we can do if we want to ensure low noise injection."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## ...Or Can We Still Do Better?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Perhaps we are using the incorrect CBVs for this target. Below is a tuned multi-step fit where we first fit the multi-scale Band 2 CBVs then the Spike CBVs. The multi-scale band 2 CBVs contain intermediate frequency systematic signals. They should not inject high frequency noise. We also utilize the `correct_elasticnet` corrector, which allows us to add in a L1-Norm term (Lasso Regularization). L1-Norm helps snap some basis vector fit coefficients to zero and can result in a more stable, less noisy fit. The result is a much better compromise between over- and under-fitting. The spikes are not well removed but increasing the weight on the Spike CBV removal results in over-fitting. We can also try the multi-scale band 3 CBVs, which contain high frequency systematics, but the over-fitting metric indicates using them results in even greater over-fitting. The resultant is now much better than what we achieved above but more tuning and optimization could possibly get us even closer to an ideal fit."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Fit to the Multi-Scale Band 2 CBVs with ElasticNet to add in a L1-Norm (Lasso) term\n",
+    "cbvCorrector.correct_elasticnet(cbv_type=['MultiScale.2'], cbv_indices=[np.arange(1,9)], alpha=1.0e-7, l1_ratio=0.5)\n",
+    "ax = cbvCorrector.diagnose()\n",
+    "ax[0].set_title('Result of First Correction to MultiScale.2 CBVs');\n",
+    "\n",
+    "# Set the corrected LC as the initial LC in a new CBVCorrector object before moving to the next correction.\n",
+    "# You could instead just reassign to the first cbvCorrector object, if you do not wish to save the original.\n",
+    "cbvCorrectorIter2 = cbvCorrector.copy()\n",
+    "cbvCorrectorIter2.lc = cbvCorrectorIter2.corrected_lc.copy()\n",
+    "\n",
+    "# Fit to the Spike Basis Vectors, using an L1-Norm term.\n",
+    "cbvCorrectorIter2.correct_elasticnet(cbv_type=['Spike'], cbv_indices=['ALL'], alpha=2.0e-5, l1_ratio=0.7)\n",
+    "ax = cbvCorrectorIter2.diagnose()\n",
+    "ax[0].set_title('Result of Second Correction to Spike CBVs');"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute the final goodness metrics compared to the original lightcurve.\n",
+    "# This requires us to copy the original light curve into cbvCorrectorIter2.lc so that the goodness metrics compares the corrected_lc to the proper initial light curve.\n",
+    "cbvCorrectorIter2.lc = cbvCorrector.lc.copy()\n",
+    "print('Over-fitting Metric: {}'.format(cbvCorrectorIter2.over_fitting_metric()))\n",
+    "print('Under-fitting Metric: {}'.format(cbvCorrectorIter2.under_fitting_metric()))\n",
+    "\n",
+    "# Plot the final correction\n",
+    "_, ax = plt.subplots(1, figsize=(10, 6))\n",
+    "cbvCorrectorIter2.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')\n",
+    "cbvCorrectorIter2.corrected_lc[~cbvCorrectorIter2.cadence_mask].scatter(\n",
+    "                                            normalize=False, c='r', marker='x',\n",
+    "                                            s=10, label='Outliers', ax=ax)\n",
+    "cbvCorrectorIter2.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')\n",
+    "ax.set_title('Comparison between original and final corrected lightcurve');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "So, which CBVs are best to use? There is no one single answer, but generally speaking, the Multi-Scale Basis vectors are more versatile. The trade-off is there are also more of them, which means more degrees of freedom in your fit. More degrees of freedom can result in more over-fitting without proper regularization. It is recommened the user tries different combinations of CBVs and use objective metrics to decide which fit is the best for their particular needs."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Using the Goodness Metrics and CBVCorrector with other Design Matrices"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The Goodness Metrics and CBVCorrector can also be used in conjunction with other external design matrices. Let's work on a famous planet example to show how the CBVCorrector can be utilized to imporove the generated light curve. We will begin by using `search_tesscut` to extract an FFI light curve for HAT-P 11 and then create a DesignMatrix using the background pixels."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# HAT-P 11b\n",
+    "from lightkurve import search_tesscut\n",
+    "from lightkurve.correctors import DesignMatrix\n",
+    "search_result = search_tesscut('HAT-P-11', sector=14)\n",
+    "tpf = search_result.download(cutout_size=20)\n",
+    "# Create a simple thresholded aperture mask\n",
+    "aper = tpf.create_threshold_mask(threshold=15, reference_pixel='center')\n",
+    "# Generate a simple aperture photometry light curve\n",
+    "raw_lc = tpf.to_lightcurve(aperture_mask=aper)\n",
+    "# Create a design matrix using PCA components from the cutout background\n",
+    "dm = DesignMatrix(tpf.flux[:, ~aper], name='pixel regressors').pca(5).append_constant()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The DesignMatrix `dm` now contains the common trends in the background pixels in the data. We will first try to fit the pixel-based design matrix using an unrestricted least-squares fit (I.e. a very weak regularization by setting alpha to a small number). We tell CBVCorrector to only use the external design matrix with `ext_dm=`. When we generate the CBVCorrector object the CBVs will be downloaded, but the CBVs are for 2-minute cadence and not the 30-minute FFIs. We therefore use the `interpolate_cbvs=True` option to tell the CBVCorrector to interpolate the CBVs to the light curve cadence."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Generate the CBVCorrector object and interpolate the downloaded CBVs to the light curve cadence\n",
+    "cbvcorrector = CBVCorrector(raw_lc, interpolate_cbvs=True)\n",
+    "# Perform an unrestricted least-squares fit using only the pixel-derived design matrix.\n",
+    "cbvcorrector.correct_gaussian_prior(cbv_type=None, cbv_indices=None, ext_dm=dm, alpha=1e-4)\n",
+    "cbvcorrector.diagnose()\n",
+    "print('Over-fitting metric: {}'.format(cbvcorrector.over_fitting_metric()))\n",
+    "print('CDPP: {}'.format(cbvcorrector.corrected_lc.estimate_cdpp()))\n",
+    "corrected_lc_just_pixel_dm = cbvcorrector.corrected_lc"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The least-squares fit did remove the background flux trend and at first sight the resultant might look good, but the over-fitting goodness metric is `0.08`. That's not very good! It looks like we are dramatically over-fitting. We can see this in the bottom plot where the corrected curve has more high-frequency noise than the original. Let's now add in the multi-scale basis vectors and see if we can do better. Note that we are joint fitting the CBVs and the external pixel-derived design matrix."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cbv_type = ['MultiScale.1', 'MultiScale.2', 'MultiScale.3','Spike']\n",
+    "cbv_indices = [np.arange(1,9), np.arange(1,9), np.arange(1,9), 'ALL']\n",
+    "cbvcorrector.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices, ext_dm=dm, alpha=1e-4)\n",
+    "cbvcorrector.diagnose()\n",
+    "print('Over-fitting metric: {}'.format(cbvcorrector.over_fitting_metric()))\n",
+    "print('CDPP: {}'.format(cbvcorrector.corrected_lc.estimate_cdpp()))\n",
+    "corrected_lc_joint_fit = cbvcorrector.corrected_lc"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "That looks a lot better! Could we do a bit better by adding in a regualrization term? Let's do a goodness metric scan."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cbvcorrector.goodness_metric_scan_plot(cbv_type=cbv_type, cbv_indices=cbv_indices, ext_dm=dm);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "There are a couple observations to make here. \n",
+    "\n",
+    "First, the under-fitting metric has a very good score throughout the regularization scan. This is because the under-fitting metric compares the corrected light curve to neighboring targets in RA and Decl. that are archived as 2-minute SAP-flux targets. _The SAP flux already has the background removed_ so the neighoring targets do not contain the very large background trends. The under-fitting metric is therefore not very helpful. In the next run we will disable the under-fitting metric in the optimization (by setting target_under_score=-1).\n",
+    "\n",
+    "We see the over-fitting metric is not a simple function of the regularization factor _alpha_. This can happen due to the interaction of the various basis vectors during fitting when regularization is applied. We see a minima (most over-fitting) at about alpha=1e-1. Once alpha moves above this value we begin to over-constrain the fit which results in gradually less removal of systematics. The under-fitting metric should be an indicator that we are going too far constraining the fit, and indeed, we do see the under-fitting metric degrades slightly beginning at alpha=1e-1.\n",
+    "\n",
+    "We will now try to optimize the fit and account for these two issues by 1) setting the bounds on the alpha parameter (`alpha_bounds=[1e-6, 1e-2]`) and 2) disregarding the under-fitting metric (`target_under_score=-1`)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Optimize the fit but ignore the under-fitting metric and set bounds on the alpha parameter.\n",
+    "cbvcorrector.correct(cbv_type=cbv_type, cbv_indices=cbv_indices, ext_dm=dm, alpha_bounds=[1e-6, 1e-2], target_over_score=0.8, target_under_score=-1)\n",
+    "cbvcorrector.diagnose();\n",
+    "print('CDPP: {}'.format(cbvcorrector.corrected_lc.estimate_cdpp()))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This is looking like a pretty good light curve. However, the CDPP increased a little as we optimized the over-fitting metric. Which correction to use may depend on your application. Since we are interested in the transiting planet, we will choose the corrected light curve with the lowest CDPP. Below we compare the light curve between just using the pixel-derived design matrix to also adding in the CBVs as a joint, regularized  fit."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "_, ax = plt.subplots(3, figsize=(10, 6))\n",
+    "cbvcorrector.lc.plot(ax=ax[0], normalize=False, label='Uncorrected LC', c='k')\n",
+    "corrected_lc_just_pixel_dm.plot(normalize=False, label='Pixel-Level Corrected; CDPP={0:.1f}'.format(corrected_lc_just_pixel_dm.estimate_cdpp()), ax=ax[1], c='m')\n",
+    "corrected_lc_joint_fit.plot(normalize=False, label='Joint Fit Corrected; CDPP={0:.1f}'.format(corrected_lc_joint_fit.estimate_cdpp()), ax=ax[2], c='b')\n",
+    "ax[0].set_title('Comparison Between original and final corrected lightcurve');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The superiority of the bottom curve is blatantly obvious. We can clearly see HAT-P 11b on it's 4.9 day period orbit. Our over-fitting metric settled at about 0.35 indicating we might still be over-fitting and should keep that in mind. However the low CDPP indicates the over-fitting is probably not over transit time-scales. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Some final comments on CBVCorrector"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Application to Kepler vs K2 vs TESS"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "CBVCorrector works equally across Kepler, K2 and TESS. However the Multi-Scale and Spike basis vectors are only available for TESS[<sup>1</sup>](#fn1). \n",
+    "\n",
+    "If you want to just get the CBVs but not generate a CBVCorrector object then use the functions _download_kepler_cbvs_ and _download_tess_cbvs_ within the cbvcorrector module as explained [here](https://docs.lightkurve.org/tutorials/04-how-to-use-cbvs.html)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<sup>1</sup><span id=\"fn1\"> Unfortunately, the Multi-Scale and Spike CBVs are not archived at MAST for Kepler/K2.</span>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Applicability of the Over- and Under-fitting Goodness Metrics"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The under-fitting metric computes the correlation between the corrected light curve and a selection of neighboring SPOC SAP light curves. If the light curve you are trying to correct was not generated by the SPOC pipeline (I.e. not a SAP light curve), then the neighboring SAP light curves might not contain the same instrumental systematics and the under-fitting metric might not properly measure when under-fitting is occuring. \n",
+    "\n",
+    "The over-fitting metric examines the periodogram of the light curve before and after the correction and is therefore indifferent to how the light curve was generated. It simply looks to see if noise was injected into the light curve. The over-fitting metric is therefore much more generally applicable.\n",
+    "\n",
+    "The Goodness Metrics are part of the `lightkurve.correctors.metrics` module and can be computed directly with calls to `overfit_metric_lombscargle` and `underfit_metric_neighbors`. A savvy expert user can use these and other quality metrics to generate their own Loss Function for optimizing a fit."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Joint Fitting"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "By including the `ext_dm=` parameter in the `correct_*` methods we allow for joint fitting between the CBVs and other design matrices. Generally speaking, if fitting a collection of different models to a system, joint fitting is ideal. For example, if performing transit analysis one could add in a transit model to the joint fit to get the best transit recovery. The fit coefficient to the transit model is stored in the `CBVCorrector` object after fitting and can be recovered."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Hyperparameter Optimization"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Any model fitting should include a hyperparameter optimization step. The `correct_optimizer` is essentially a 1-dimensional optimizer and is very fast. More advanced hypterparameter optimization can be performed by tuning the `alpha` and `l1_ratio` parameters in `correct_elasticnet` plus the number and type of CBVs, along with an external design matrix. The optimization Loss Function can use a combination of the `under_fitting_metric`, `over_fitting_metric` and `lc.estimate_cdpp` methods. Writing such an optimzer is left as an exercise to the reader and to be tuned to the reader's particular application."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### More Generalized Design Matrix Priors"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The main `CBVCorrector.correct*` methods utilize a similar prior for all design matrix vectors as is typically used in L1-Norm and L2-Norm regularization. However you can perform fine tuning to the correction using more sophisticated priors. After performing a fit with one of the `CBVCorrector.correct*` methods, `CBVCorrector.design_matrix_collection` will have the priors set. One can then manually adjust the priors and use `CBVCorrector.correct_regressioncorrector` to perform the standard `RegressionCorrector.correct` correction. An illustration is below:"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {},
+   "source": [
+    "# Perform an initial optimization with a L2-Norm regularization\n",
+    "cbvCorrector.correct(cbv_type=cbv_type, cbv_indices=cbv_indices);\n",
+    "\n",
+    "# Examine the quality of the resultant lightcurve in cbvcorrector.corrected_lc\n",
+    "# Determine how to adjust the priors and make changes to the design matrix\n",
+    "cbvCorrector.design_matrix_collection[i].prior_sigma[j] = # ... adjust the priors\n",
+    "\n",
+    "# Call the superclass correct method with the adjusted design_matrix_collection\n",
+    "cbvCorrector.correct_regressioncorrector(cbvCorrector.design_matrix_collection, **kwargs)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The `cbvCorrector.corrected_lc` will now be the result of the fit using whatever `cbvCorrector.design_matrix_collection` you had just provided."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Units, NaN and Normalization"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "NaNs are removed from the light curve when used to generate the `CBVCorrector` object and is stored in `CBVCorrector.lc`. All loaded CBVS are also aligned to the light curve cadence numbers (`CBVCorrector.lc.cadenceno`). If the light curve cadences do not well overlap with the CBVs then you can set `interpolate_cbvs=True` when generating the `CBVCorrector` object. Doing so will generate interpolated CBV values for all cadences in the light curve. \n",
+    "\n",
+    "The CBVCorrector performs its corrections in absolute flux units (typically electrons per second). The returned corrected light curve `corrected_lc` is also in absolute units and the median flux of the light curve is preserved."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print('LC unit: {}'.format(cbvCorrector.lc.flux.unit))\n",
+    "print('Corrected LC unit: {}'.format(cbvCorrector.corrected_lc.flux.unit))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The goodness metrics are computed using median normalized units in order to properly calibrate the metric to be between 0.0 and 1.0 for all light curves. The normalization is as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "normalized_lc = cbvCorrector.lc.normalize()\n",
+    "normalized_lc -= 1.0\n",
+    "print('Normalized Light curve units: {} (i.e astropy.units.dimensionless_unscaled)'.format(normalized_lc.flux.unit))"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

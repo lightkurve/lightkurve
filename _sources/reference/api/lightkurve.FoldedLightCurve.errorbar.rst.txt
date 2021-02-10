@@ -1,0 +1,6 @@
+﻿lightkurve.FoldedLightCurve.errorbar
+====================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: FoldedLightCurve.errorbar

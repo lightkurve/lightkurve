@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.nan\_time\_mask
+================================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: KeplerTargetPixelFile.nan_time_mask

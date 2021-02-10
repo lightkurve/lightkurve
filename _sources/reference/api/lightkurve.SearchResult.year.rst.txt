@@ -1,0 +1,6 @@
+﻿lightkurve.SearchResult.year
+============================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: SearchResult.year

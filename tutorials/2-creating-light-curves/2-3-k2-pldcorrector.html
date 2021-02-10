@@ -1,0 +1,1236 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Removing noise from K2 and TESS light curves using Pixel Level Decorrelation (PLDCorrector) &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Removing noise from K2 light curves using Self Flat Fielding (SFFCorrector)" href="2-3-k2-sffcorrector.html" />
+    <link rel="prev" title="Removing scattered light from TESS light curves using linear regression (RegressionCorrector)" href="2-3-removing-scattered-light-using-regressioncorrector.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../reference/index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../about/index.html">About</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar">
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Learning-Goals" class="nav-link">Learning Goals</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Introduction" class="nav-link">Introduction</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Imports" class="nav-link">Imports</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#1.-Applying-PLD-to-a-K2-Light-Curve" class="nav-link">1. Applying PLD to a K2 Light Curve</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#2.-Diagnosing-the-Success-of-the-Correction" class="nav-link">2. Diagnosing the Success of the Correction</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#3.-How-to-Avoid-Overfitting-Exoplanet-Transits" class="nav-link">3. How to Avoid Overfitting Exoplanet Transits</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#3.1-Overfitting" class="nav-link">3.1 Overfitting</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#4.-Applying-PLD-to-a-TESS-Light-Curve" class="nav-link">4. Applying PLD to a TESS Light Curve</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#5.-Tuning-PLDCorrector-Using-Optional-Parameters" class="nav-link">5. Tuning PLDCorrector Using Optional Parameters</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#5.1-Definitions-of-all-additional-parameters" class="nav-link">5.1 Definitions of all additional parameters</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#6.-Frequently-Asked-Questions" class="nav-link">6. Frequently Asked Questions</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#About-this-Notebook" class="nav-link">About this Notebook</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Citing-Lightkurve-and-Astropy" class="nav-link">Citing Lightkurve and Astropy</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div style="float:right; margin-bottom:1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/2-creating-light-curves/2-3-k2-pldcorrector.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/2-creating-light-curves/2-3-k2-pldcorrector.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/2-creating-light-curves/2-3-k2-pldcorrector.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+</div>
+<br style="clear:both;"><div class="section" id="Removing-noise-from-K2-and-TESS-light-curves-using-Pixel-Level-Decorrelation-(PLDCorrector)">
+<h1>Removing noise from <em>K2</em> and <em>TESS</em> light curves using Pixel Level Decorrelation (<code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>)<a class="headerlink" href="#Removing-noise-from-K2-and-TESS-light-curves-using-Pixel-Level-Decorrelation-(PLDCorrector)" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Learning-Goals">
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
+<p>By the end of this tutorial, you will:</p>
+<ul class="simple">
+<li><p>Understand how to apply the <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> tool to remove instrumental noise from <em>K2</em> and <em>TESS</em> light curves.</p></li>
+<li><p>Be able to create an exoplanet transit mask and use it to improve PLD.</p></li>
+<li><p>Be aware of common issues, caveats, and potential biases associated with the use of PLD.</p></li>
+</ul>
+</div>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://archive.stsci.edu/k2">K2</a> and <a class="reference external" href="https://archive.stsci.edu/tess">TESS</a> missions both provide high-precision photometry for thousands of exoplanet candidates. However, observations by both telescopes can be muddled by instrumental systematic trends, making exoplanet detection or stellar characterization difficult.</p>
+<p>Pixel Level Decorrelation (PLD) is a method that has primarily been used to remove systematic trends introduced by small spacecraft motions during observations, and has been shown to be successful at improving the precision of data taken by the <em>Spitzer</em> space telescope (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2015ApJ...805..132D/abstract">Deming et al. 2015</a>) and the <em>K2</em> mission (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2016AJ....152..100L/abstract">Luger et al. 2016</a>;
+<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2018AJ....156...99L/abstract">2018</a>). PLD works by identifying a set of trends in the pixels surrounding the target star, and performing linear regression to create a combination of these trends that effectively models the systematic noise introduced by spacecraft motion. This noise model is then subtracted from the uncorrected light curve.</p>
+<p>This method has been shown to be very effective at removing the periodic systematic trends in <em>K2</em>, and can also help remove the scattered light background signal in <em>TESS</em> observations. This tutorial will demonstrate how to use the <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> for each mission, and will give advice on how to best implement PLD. The <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> is a special case of the <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>. For more information
+on how to use <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> to choose custom regressors and remove scattered light from <em>TESS</em>, please see the tutorial specifically on removing scattered light from <em>TESS</em> data using the Lightkurve <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>.</p>
+<p>Before reading this tutorial, it is recommended to first familiarize yourself with using target pixel file (TPF) products and light curve products with Lightkurve.</p>
+</div>
+<div class="section" id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<p>We only need to import the <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> package for this tutorial, which in turn uses <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="1.-Applying-PLD-to-a-K2-Light-Curve">
+<h2>1. Applying PLD to a <em>K2</em> Light Curve<a class="headerlink" href="#1.-Applying-PLD-to-a-K2-Light-Curve" title="Permalink to this headline">¶</a></h2>
+<p>The dominant source of noise in <em>K2</em> data is created by the motion of the <em>Kepler</em> spacecraft due to periodic thruster firings. This causes stars to drift across different pixels on the detector, which have varied sensitivity. There are two classes of sensitivity variation on a charge-couped device (CCD) detector — variation between pixels (inter-pixel) and variation within each pixel (intra-pixel). Both inter- and intra-pixel sensitivity variations are present on the <em>Kepler</em> detector, which
+ultimately causes different flux levels to be detected as the target’s Point Spread Function (PSF) drifts across the variations, introducing the systematic trends.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> uses information from nearby pixels to create a noise model, so we need to use the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> data product (for more information, see the tutorial on using <em>Kepler</em> target pixel file products). We can use the <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> method to identify available observations for the desired target, and the <code class="docutils literal notranslate"><span class="pre">download</span></code> method to access the data.</p>
+<p>In what follows below, we will demonstrate PLD on the exoplanet system K2-199, which was observed during <em>K2</em> Campaign 6. We can download the pixel data as follows:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;K2-199&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 212779596, Cadence: 111362&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_7_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_7_1.png" />
+</div>
+</div>
+<p>There are two ways to create a <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> object. The first is to create an instance of the class directly and pass in the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pld</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">PLDCorrector</span><span class="p">(</span><span class="n">tpf</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pld</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PLDCorrector (ID: EPIC 212779596)
+</pre></div></div>
+</div>
+<p>For convenience, you can also use the <code class="docutils literal notranslate"><span class="pre">to_corrector</span></code> method of the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> object, and pass in the string <code class="docutils literal notranslate"><span class="pre">'pld'</span></code> to specify the desired corrector type.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pld</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_corrector</span><span class="p">(</span><span class="s1">&#39;pld&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pld</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PLDCorrector (ID: EPIC 212779596)
+</pre></div></div>
+</div>
+<p>Both of these approaches return an identical <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> object. From here, getting a corrected light curve is possible: call the <code class="docutils literal notranslate"><span class="pre">correct</span></code> method.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">pld</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Now we can compare the output of PLD to an uncorrected light curve. To create the uncorrected light curve, we can use the <code class="docutils literal notranslate"><span class="pre">to_lightcurve</span></code> method of the <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> object, which performs simple aperture photometry (SAP) to create a light curve from the pixel data.</p>
+<p>Below, the uncorrected light curve is shown in red and the PLD-corrected light curve is plotted in black.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Create and plot an uncorrected light curve using Simple Aperture Photometry</span>
+<span class="n">uncorrected_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Uncorrected Light Curve&#39;</span><span class="p">);</span>
+<span class="c1"># Plot the PLD-corrected light curve in black on top</span>
+<span class="n">corrected_lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;PLD-corrected Light Curve&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_15_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_15_1.png" />
+</div>
+</div>
+<p>The uncorrected light curve is dominated by a short period (about six hours) sawtooth-shaped pattern caused by the <em>Kepler</em> spacecraft thruster firings. PLD captures this trend in the noise model and has subtracted it, leaving the much more accurate light curve in black.</p>
+<p>We can quantify the improvement by comparing the Combined Differential Photometric Precision (CDPP) values for each light curve.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">uncorrected_cdpp</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span>
+<span class="n">corrected_cdpp</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Uncorrected CDPP = </span><span class="si">{</span><span class="n">uncorrected_cdpp</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Corrected CDPP = </span><span class="si">{</span><span class="n">corrected_cdpp</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Uncorrected CDPP = 2928 ppm
+Corrected CDPP = 106 ppm
+</pre></div></div>
+</div>
+<p>By this metric, the photometric precision improved by more than a factor of 25 after applying PLD.</p>
+<p>Another important trait of PLD is that long-term variability trends in the light curve are preserved. In this example, we can see the stellar rotation of K2-199 as the sinusoidal signal left in the light curve after correction. This is done by fitting a polynomial spline model to the light curve while simultaneously fitting the noise model, because the uncorrected observation is a combination of the signals.</p>
+</div>
+<div class="section" id="2.-Diagnosing-the-Success-of-the-Correction">
+<h2>2. Diagnosing the Success of the Correction<a class="headerlink" href="#2.-Diagnosing-the-Success-of-the-Correction" title="Permalink to this headline">¶</a></h2>
+<p>The success of PLD depends on a number of factors including the brightness of the object, the choice of pixels used to create the light curve and the noise model, and whether or not there exists a correlation between the instrumental noise and the astrophysical signals. For these reasons, it is important to carefully review the correct operation of the algorithm each time you use it, and tune the optional parameters of the algorithm if necessary.</p>
+<p>The most convenient way to diagnose the performance of PLD is to use the <code class="docutils literal notranslate"><span class="pre">diagnose()</span></code> method, which generates a set of diagnostic plots which we will explain below the graph.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pld</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
+       &lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
+       &lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
+      dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_20_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_20_1.png" />
+</div>
+</div>
+<p>The diagnostic plot is composed of the following panels: - <strong>Top panel</strong>: The uncorrected light curve (<code class="docutils literal notranslate"><span class="pre">original</span></code>) is shown in black, with the Combined Differential Photometric Precision (CDPP), a measurement of the light curve’s scatter, noted in the legend. - <strong>Middle panel</strong>: The PLD-corrected light curve (<code class="docutils literal notranslate"><span class="pre">corrected</span></code>) is plotted in gray with the noise model created by the combination of pixel values (<code class="docutils literal notranslate"><span class="pre">pixel_series</span></code>) in blue, the estimated background trend (<code class="docutils literal notranslate"><span class="pre">background</span></code>) in red, and
+the polynomial spline fit to the stellar variability (<code class="docutils literal notranslate"><span class="pre">spline</span></code>) in yellow. For <em>K2</em>, the background signal is minimal compared to the systematic trends due to motion, but it is much more significant for <em>TESS</em> observations. Notice that the corrected light curve closely matches the spline, which is tracing the preserved stellar variability. - <strong>Bottom panel</strong>: A direct comparison between the uncorrected light curve (<code class="docutils literal notranslate"><span class="pre">original</span></code>) and the PLD-corrected light curve (<code class="docutils literal notranslate"><span class="pre">corrected</span></code>), again noting
+the CDPP of each light curve in the legend. This panel also indicates which cadences were flagged as outliers (<code class="docutils literal notranslate"><span class="pre">outlier_mask</span></code>), which lie greater than five standard deviations above or below the light curve, as well as which cadences are excluded from the spline fit (<code class="docutils literal notranslate"><span class="pre">~cadence_mask</span></code>). As we will see below, <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code> is a Boolean array with the same length as the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code>’s time array, where <code class="docutils literal notranslate"><span class="pre">True</span></code> is included in the spline fit and <code class="docutils literal notranslate"><span class="pre">False</span></code> is excluded. The tilde
+(<code class="docutils literal notranslate"><span class="pre">~</span></code>) indicates that the inverse of the mask is marked in this plot, that is, the excluded cadences will be crossed out in blue.</p>
+<p>The plot above makes it convenient to review the components of the noise removal algorithm. The performance of the algorithm is strongly affected by the choice of pixels which go into the model components. To diagnose this part of the algorithm, we can use the <code class="docutils literal notranslate"><span class="pre">diagnose_masks</span></code> method:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pld</span><span class="o">.</span><span class="n">diagnose_masks</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;,
+       &lt;AxesSubplot:title={&#39;center&#39;:&#39;pld_aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;,
+       &lt;AxesSubplot:title={&#39;center&#39;:&#39;background_aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;],
+      dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_23_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_23_1.png" />
+</div>
+</div>
+<p>The panels in the figure visualize the following pixel masks:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code>: Pixels used to create the SAP flux light curve from which the noise model is subtracted.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code>: Pixels used to create the correlated noise model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">background_aperture_mask</span></code>: Pixels used to create the background model.</p></li>
+</ul>
+<p>You can alter the <code class="docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code> and <code class="docutils literal notranslate"><span class="pre">background_aperture_mask</span></code> by passing them as optional arguments to the <code class="docutils literal notranslate"><span class="pre">correct()</span></code> method we used earlier. For more information about these masks, and how to use them effectively, please see the full list of optional parameters and FAQ at the end of this tutorial.</p>
+</div>
+<div class="section" id="3.-How-to-Avoid-Overfitting-Exoplanet-Transits">
+<h2>3. How to Avoid Overfitting Exoplanet Transits<a class="headerlink" href="#3.-How-to-Avoid-Overfitting-Exoplanet-Transits" title="Permalink to this headline">¶</a></h2>
+<p>In the example above, it looks like PLD did a great job of removing the instrumental noise introduced by the <em>K2</em> detector drift, but the bottom panel of the diagnostic plot seems to indicate that we’ve falsely labeled in-transit data points as outliers. To alleviate this, we can introduce the <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code>.</p>
+<div class="section" id="3.1-Overfitting">
+<h3>3.1 Overfitting<a class="headerlink" href="#3.1-Overfitting" title="Permalink to this headline">¶</a></h3>
+<p>It’s necessary to mask out transits and flares when fitting the spline. The spline term fits a polynomial to the long-term trend of the light curve, and the highest likelihood solution generally follows the median of the corrected light curve. The presence of transits or flares can pull the median of the light curve down or up, respectively, causing the spline to deviate from the underlying stellar trend.</p>
+<p>In practice, this causes transits to be partially “fit out” by the spline, reducing their depth and giving an incorrect estimate of the planet’s radius.</p>
+<p>You can use a custom <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code> by creating a Boolean array with one value per cadence, where <code class="docutils literal notranslate"><span class="pre">True</span></code> indicates a cadence you wish to include and <code class="docutils literal notranslate"><span class="pre">False</span></code> means that the cadence is masked out.</p>
+<p>For this example, we want to be sure that the in-transit cadences are not marked as outliers or used in the spline fit, as they can cause the spline to erroneously deviate from the stellar signal. To accomplish this, we can create a transit mask using the <code class="docutils literal notranslate"><span class="pre">create_transit_mask</span></code> method of the <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object, using the known parameters of the planet system:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">transit_mask</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">create_transit_mask</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="p">[</span><span class="mf">3.2277</span><span class="p">,</span> <span class="mf">7.3745</span><span class="p">],</span>
+                                                <span class="n">duration</span><span class="o">=</span><span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">],</span>
+                                                <span class="n">transit_time</span><span class="o">=</span><span class="p">[</span><span class="mf">2385.6635</span><span class="p">,</span> <span class="mf">2389.9635</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<p>We can double-check to make sure the transit mask looks good by plotting it on top of the corrected light curve in red:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Corrected Light Curve&#39;</span><span class="p">)</span>
+<span class="n">corrected_lc</span><span class="p">[</span><span class="n">transit_mask</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;transit_mask&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_28_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_28_1.png" />
+</div>
+</div>
+<p>The red points appear to match the in-transit cadences for both of the planets around K2-199.</p>
+<p>An additional option for the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> is the ability to remove the long-term trend. This is ideal for planet candidates, which can be more difficult to detect in the presence of stellar variability. Here, we can set the <code class="docutils literal notranslate"><span class="pre">restore_trend</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">False</span></code> in order to return a light curve with the long-period trend removed.</p>
+<p>Now, we can call the <code class="docutils literal notranslate"><span class="pre">correct</span></code> method of the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> again, this time passing in our <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">pld</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">cadence_mask</span><span class="o">=~</span><span class="n">transit_mask</span><span class="p">,</span> <span class="n">restore_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">pld</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
+       &lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
+       &lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
+      dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_30_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_30_1.png" />
+</div>
+</div>
+<p>Now, only points that are greater than five standard deviations above or below the light curve but not in-transit will be marked as outliers, and the in-transit points (marked in blue in the bottom panel) will not be used to fit the spline.</p>
+<p>If we examine the light curve and its cadence mask again, we will see that the long-period trend has been removed, and the transits are clearly visible by eye.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Corrected Light Curve&#39;</span><span class="p">)</span>
+<span class="n">corrected_lc</span><span class="p">[</span><span class="n">transit_mask</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;transit_mask&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_32_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_32_1.png" />
+</div>
+</div>
+<p>This correction looks great! We have demonstrated that PLD is effective at removing systematic trends in <em>K2</em> data. Now, let’s apply PLD to <em>TESS</em> observations.</p>
+</div>
+</div>
+<div class="section" id="4.-Applying-PLD-to-a-TESS-Light-Curve">
+<h2>4. Applying PLD to a <em>TESS</em> Light Curve<a class="headerlink" href="#4.-Applying-PLD-to-a-TESS-Light-Curve" title="Permalink to this headline">¶</a></h2>
+<p><em>TESS</em> has multiple observing modes. For example, there are two-minute cadence observations, which were retrieved for specific targeted objects, and there are 30-minute cadence Full Frame Images (FFIs), which capture the entire <em>TESS</em> field of view.</p>
+<p>In this example, we will examine a target using the FFI observation. The <em>TESS</em> FFIs are dominated by the scattered light background signal on the <em>TESS</em> detector, which creates high-amplitude, periodic variation. This background can make planet detection difficult, but it can be removed using PLD.</p>
+<p>To access FFI data, we will use the <a class="reference external" href="https://mast.stsci.edu/tesscut/">TESScut</a> tool on the Mikulski Archive for Space Telescopes (MAST), developed by <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract">Brasseur et al. 2019</a>. Lightkurve has a built-in search method for creating cutouts called <code class="docutils literal notranslate"><span class="pre">search_tesscut</span></code>, which uses the same syntax as the <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> method above. We will search for the Wolf-Rayet star WR 40, which was observed by <em>TESS</em> in Sector 10.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_tesscut</span><span class="p">(</span><span class="s1">&#39;WR40&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">search_result</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+SearchResult containing 1 data products.
+
+<table id="table6521432000">
+<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
+<tr><td>0</td><td>TESS Sector 10</td><td>2019</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>WR40</td><td>0.0</td></tr>
+</table></div>
+</div>
+<p>We can download the pixel data with the <code class="docutils literal notranslate"><span class="pre">download</span></code> method. When using TESScut, this method takes the additional parameter <code class="docutils literal notranslate"><span class="pre">cutout_size</span></code>, which determines how many pixels each side length of the cutout target pixel file should have.</p>
+<p>Here, we use seven pixels on each side, which strikes a good balance between downloading enough pixels to create a good background model, and not downloading too many pixels, which can result in the corrector running slowly or including neighboring stars in the noise model.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">cutout_size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: WR40, Cadence: 0&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_38_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_38_1.png" />
+</div>
+</div>
+<p>We can create an uncorrected SAP light curve from this target pixel file using a threshold mask.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">uncorrected_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;threshold&#39;</span><span class="p">)</span>
+<span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_40_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_40_1.png" />
+</div>
+</div>
+<p>The dominant trend in the SAP light curve above is the dramatic ramp up in flux due to the scattered light background on the <em>TESS</em> detector. The pulsation signal of WR 40 can also be seen clearly, with some additional long-period variability.</p>
+<p>We will create a <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> object, and use the default values for <code class="docutils literal notranslate"><span class="pre">PLDCorrector.correct</span></code> to remove this scattered light background.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pld</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">PLDCorrector</span><span class="p">(</span><span class="n">tpf</span><span class="p">)</span>
+<span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">pld</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span>
+<span class="n">pld</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
+       &lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
+       &lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
+      dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_42_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_42_1.png" />
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">background</span></code> component of the PLD model (shown in blue in the middle panel) has successfully isolated the large spikes without fitting out the pulsations of WR 40.</p>
+<p>We can also examine the apertures used to perform this correction. For <em>TESS</em>, the dominant source of noise is the scattered light background, so by default only those pixels will be used. In the third panel, we can see that the <code class="docutils literal notranslate"><span class="pre">background_aperture_mask</span></code> contains only background pixels, reducing the risk of contamination by neighboring stars.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pld</span><span class="o">.</span><span class="n">diagnose_masks</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;,
+       &lt;AxesSubplot:title={&#39;center&#39;:&#39;pld_aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;,
+       &lt;AxesSubplot:title={&#39;center&#39;:&#39;background_aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;],
+      dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_44_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_44_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="5.-Tuning-PLDCorrector-Using-Optional-Parameters">
+<h2>5. Tuning <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> Using Optional Parameters<a class="headerlink" href="#5.-Tuning-PLDCorrector-Using-Optional-Parameters" title="Permalink to this headline">¶</a></h2>
+<p>In this section, we explore the optional parameters available when using the PLD method.</p>
+<p>These keywords can be used to influence the performance of PLD. The PLD design matrix is constructed from three distinct submatrices, shown below with their corresponding keywords: * <strong>``background_model``</strong> * <code class="docutils literal notranslate"><span class="pre">background_aperture_mask</span></code> * <strong>``pixel_series``</strong> * <code class="docutils literal notranslate"><span class="pre">pld_order</span></code> * <code class="docutils literal notranslate"><span class="pre">pca_components</span></code> * <code class="docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code> * <strong>``spline``</strong> * <code class="docutils literal notranslate"><span class="pre">spline_n_knots</span></code> * <code class="docutils literal notranslate"><span class="pre">spline_degree</span></code> * <code class="docutils literal notranslate"><span class="pre">restore_trend</span></code></p>
+<div class="section" id="5.1-Definitions-of-all-additional-parameters">
+<h3>5.1 Definitions of all additional parameters<a class="headerlink" href="#5.1-Definitions-of-all-additional-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Full descriptions of each of these keywords can be found below.</p>
+<p><strong>``pld_order``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): * The order of Pixel Level Decorrelation to be performed. First order (<code class="docutils literal notranslate"><span class="pre">n=1</span></code>) uses only the pixel fluxes to construct the design matrix. Higher order populates the design matrix with columns constructed from the products of pixel fluxes. Default 3 for <em>K2</em> and 1 for <em>TESS</em>.</p>
+<p><strong>``pca_components``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code> or tuple of <code class="docutils literal notranslate"><span class="pre">int</span></code>): * Number of terms added to the design matrix for each order of PLD pixel fluxes. Increasing this value may provide higher precision at the expense of slower speed and/or overfitting. If performing PLD with <code class="docutils literal notranslate"><span class="pre">pld_order</span> <span class="pre">&gt;</span> <span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">pca_components</span></code> can be a tuple containing the number of terms for each order of PLD. If a single <code class="docutils literal notranslate"><span class="pre">int</span></code> is passed, the same number of terms will be used for each order. If zero is passed, Principle Component Analysis
+(PCA) will not be performed.</p>
+<p><strong>``background_aperture_mask``</strong> (<code class="docutils literal notranslate"><span class="pre">array-like</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>): * A Boolean array flagging the background pixels such that <code class="docutils literal notranslate"><span class="pre">True</span></code> means that the pixel will be used to generate the background systematics model. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all pixels which are fainter than 1-sigma above the median flux will be used.</p>
+<p><strong>``pld_aperture_mask``</strong> (<code class="docutils literal notranslate"><span class="pre">array-like</span></code>, <code class="docutils literal notranslate"><span class="pre">'pipeline'</span></code>, <code class="docutils literal notranslate"><span class="pre">'all'</span></code>, <code class="docutils literal notranslate"><span class="pre">'threshold'</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code>):</p>
+<ul class="simple">
+<li><p>A Boolean array describing the aperture such that <code class="docutils literal notranslate"><span class="pre">True</span></code> means that the pixel will be used when selecting the PLD basis vectors. If <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code> are passed in, all pixels will be used. If <code class="docutils literal notranslate"><span class="pre">'pipeline'</span></code> is passed, the mask suggested by the official pipeline will be returned. If <code class="docutils literal notranslate"><span class="pre">'threshold'</span></code> is passed, all pixels brighter than 3-sigma above the median flux will be used.</p></li>
+</ul>
+<p><strong>``spline_n_knots``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): * Number of knots in spline.</p>
+<p><strong>``spline_degree``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>) * Polynomial degree of spline.</p>
+<p><strong>``restore_trend``</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>): * Whether to restore the long-term spline trend to the light curve.</p>
+<p><strong>``sparse``</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>): * Whether to create <code class="docutils literal notranslate"><span class="pre">SparseDesignMatrix</span></code>.</p>
+<p><strong>``cadence_mask``</strong> (<code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> of <code class="docutils literal notranslate"><span class="pre">bool</span></code>) * (optional) Mask, where <code class="docutils literal notranslate"><span class="pre">True</span></code> indicates a cadence that should be used.</p>
+<p><strong>``sigma``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): * Standard deviation at which to remove outliers from fitting (default 5).</p>
+<p><strong>``niters``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>) * Number of iterations to fit and remove outliers (default 5).</p>
+<p><strong>``propagate_errors``</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>): * Whether to propagate the uncertainties from the regression. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>. Setting to <code class="docutils literal notranslate"><span class="pre">True</span></code> will increase run time, but will sample from multivariate normal distribution of weights.</p>
+</div>
+</div>
+<div class="section" id="6.-Frequently-Asked-Questions">
+<h2>6. Frequently Asked Questions<a class="headerlink" href="#6.-Frequently-Asked-Questions" title="Permalink to this headline">¶</a></h2>
+<p><strong>How should I select the pixels to use?</strong></p>
+<p>As shown earlier, there are three aperture masks used in the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code>: Used to create the SAP flux light curve from which the noise model is subtracted. For this aperture, you should select as many pixels as possible that only contain flux from the target star. This is done automatically using a threshold mask, but it is a good idea to examine that mask with the <code class="docutils literal notranslate"><span class="pre">diagnose_masks</span></code> method to ensure it does not include background targets.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">background_aperture_mask</span></code>: Pixels used to create the background model. These pixels should not contain flux from the target star whose light curve you are attempting to correct, nor should it contain flux from background targets.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code>: Pixels used to create the correlated noise model. This aperture mask is more difficult to define, and may change on a case-by-case basis. For <em>K2</em>, this mask should contain as many pixels as possible in order to best capture the persistent motion-generated noise. For <em>TESS</em>, this mask should have less of an impact than the background mask, but should include all pixels in the cutout that do not contain background stars.</p></li>
+</ul>
+<p><strong>How can I speed up the correction?</strong></p>
+<p>The spline <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> used in <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> can be substituted for a <code class="docutils literal notranslate"><span class="pre">SparseDesignMatrix</span></code>. These behave identically to traditional <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> objects, but use <code class="docutils literal notranslate"><span class="pre">scipy.sparse</span></code> to speed up calculation and reduce memory. This can be done by passing in <code class="docutils literal notranslate"><span class="pre">sparse=True</span></code> to the <code class="docutils literal notranslate"><span class="pre">correct</span></code> method.</p>
+<p><strong>What do I do if I get a singular matrix error?</strong></p>
+<p>A singular matrix error occurs when a matrix used in <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> cannot be inverted, a step necessary for optimizing the coefficients. The primary reason this occurs is that the input <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> has low rank relative to the number of column vectors. There are two suggested solutions to this issue: * Limit the number of input column vectors by performing Principle Component Analysis (PCA). This is done automatically in <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>, but the number of output PCA vectors can
+be reduced using the <code class="docutils literal notranslate"><span class="pre">pca_components</span></code> keyword in the <code class="docutils literal notranslate"><span class="pre">correct</span></code> method from its default value of 16. * Ensure you are not masking out too much of your data. For instance, if you are using the <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code>, make sure that the values you want to include in your detrending are labeled as <code class="docutils literal notranslate"><span class="pre">True</span></code>. Using the inverse <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code> will often raise a singular matrix error.</p>
+</div>
+<div class="section" id="About-this-Notebook">
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
+<p><strong>Authors</strong>: Nicholas Saunders (<a class="reference external" href="mailto:nksaun&#37;&#52;&#48;hawaii&#46;edu">nksaun<span>&#64;</span>hawaii<span>&#46;</span>edu</a>), Geert Barentsen</p>
+<p><strong>Updated</strong>: September 29, 2020</p>
+</div>
+<div class="section" id="Citing-Lightkurve-and-Astropy">
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
+<p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or its dependencies in your published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+<style>
+    button {
+        border: 1px solid;
+        padding: 0.2em;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 0.8em;
+        margin: 0.2em;
+        cursor: pointer;
+    }
+
+    .citation-button-1 {background-color: #4CAF50;} /* Green */
+    .citation-button-2 {background-color: #008CBA;} /* Blue */
+</style>
+
+<script type="text/javascript">
+    function copyBibtex(package) {
+        var copyText = document.getElementById(package + "Text");
+        copyText.select();
+        document.execCommand("copy");
+        alert("BibTex has been copied to your clipboard")
+    }
+</script>
+</head>
+
+<body>
+    <textarea id="lightkurveText" style="position: absolute; left: -9999px; z-index: -9999;">
+@MISC{2018ascl.soft12013L,
+    author = {{Lightkurve Collaboration} and {Cardoso}, J.~V.~d.~M. and
+                {Hedges}, C. and {Gully-Santiago}, M. and {Saunders}, N. and
+                {Cody}, A.~M. and {Barclay}, T. and {Hall}, O. and
+                {Sagear}, S. and {Turtelboom}, E. and {Zhang}, J. and
+                {Tzanidakis}, A. and {Mighell}, K. and {Coughlin}, J. and
+                {Bell}, K. and {Berta-Thompson}, Z. and {Williams}, P. and
+                {Dotson}, J. and {Barentsen}, G.},
+    title = "{Lightkurve: Kepler and TESS time series analysis in Python}",
+    keywords = {Software, NASA},
+howpublished = {Astrophysics Source Code Library},
+        year = 2018,
+    month = dec,
+archivePrefix = "ascl",
+    eprint = {1812.013},
+    adsurl = {http://adsabs.harvard.edu/abs/2018ascl.soft12013L},
+}
+    </textarea>
+    <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
+@ARTICLE{2018AJ....156..123T,
+   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
+    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
+    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
+    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
+    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
+    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
+    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
+    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
+    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
+    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
+    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
+    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
+    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
+    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
+    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
+    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
+    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
+    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
+    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
+    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
+    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
+    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
+    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
+    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
+    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
+    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
+    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
+    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
+    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
+    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
+    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
+    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
+    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
+    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
+    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
+    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
+    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
+    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
+    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
+    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
+    {Zabalza}, V. and {Contributors}, (.},
+    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
+  journal = {\aj},
+archivePrefix = "arXiv",
+   eprint = {1801.02634},
+ primaryClass = "astro-ph.IM",
+ keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
+     year = 2018,
+    month = sep,
+   volume = 156,
+      eid = {123},
+    pages = {123},
+      doi = {10.3847/1538-3881/aabc4f},
+   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+
+    </textarea>
+    <textarea id="astroqueryText" style="position: absolute; left: -9999px; z-index: -9999;">
+@ARTICLE{2019AJ....157...98G,
+   author = {{Ginsburg}, A. and {Sip{\H o}cz}, B.~M. and {Brasseur}, C.~E. and
+    {Cowperthwaite}, P.~S. and {Craig}, M.~W. and {Deil}, C. and
+    {Guillochon}, J. and {Guzman}, G. and {Liedtke}, S. and {Lian Lim}, P. and
+    {Lockhart}, K.~E. and {Mommert}, M. and {Morris}, B.~M. and
+    {Norman}, H. and {Parikh}, M. and {Persson}, M.~V. and {Robitaille}, T.~P. and
+    {Segovia}, J.-C. and {Singer}, L.~P. and {Tollerud}, E.~J. and
+    {de Val-Borro}, M. and {Valtchanov}, I. and {Woillez}, J. and
+    {The Astroquery collaboration} and {a subset of the astropy collaboration}
+    },
+    title = "{astroquery: An Astronomical Web-querying Package in Python}",
+  journal = {\aj},
+archivePrefix = "arXiv",
+   eprint = {1901.04520},
+ primaryClass = "astro-ph.IM",
+ keywords = {astronomical databases: miscellaneous, virtual observatory tools},
+     year = 2019,
+    month = mar,
+   volume = 157,
+      eid = {98},
+    pages = {98},
+      doi = {10.3847/1538-3881/aafc33},
+   adsurl = {http://adsabs.harvard.edu/abs/2019AJ....157...98G},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+    </textarea>
+    <textarea id="tesscutText" style="position: absolute; left: -9999px; z-index: -9999;">
+@MISC{2019ascl.soft05007B,
+        author = {{Brasseur}, C.~E. and {Phillip}, Carlita and {Fleming}, Scott W. and
+          {Mullally}, S.~E. and {White}, Richard L.},
+         title = "{Astrocut: Tools for creating cutouts of TESS images}",
+      keywords = {Software},
+          year = 2019,
+         month = may,
+           eid = {ascl:1905.007},
+         pages = {ascl:1905.007},
+ archivePrefix = {ascl},
+        eprint = {1905.007},
+        adsurl = {https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B},
+       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+ }
+    </textarea>
+
+    <p>
+        When using Lightkurve, we kindly request that you cite the following packages:
+        <ul>
+            <li>
+                <a href="https://docs.lightkurve.org">lightkurve</a>
+                <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            </li>
+            <li>
+                <a href="https://astropy.org">astropy</a>
+                <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            </li>
+            <li>
+                <a href="https://astroquery.readthedocs.io">astroquery</a>
+                <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+                —  if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
+            </li>
+            <li>
+                <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
+                <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+                — if you are using <i>search_tesscut()</i>.
+            </li>
+        </ul>
+    </p>
+</body></div>
+</div>
+<p><img alt="Space Telescope Logo" class="no-scaled-link" src="https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png" style="width: 200px;" /></p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="2-3-removing-scattered-light-using-regressioncorrector.html" title="previous page">Removing scattered light from <em>TESS</em> light curves using linear regression (<code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>)</a>
+    <a class='right-next' id="next-link" href="2-3-k2-sffcorrector.html" title="next page">Removing noise from K2 light curves using Self Flat Fielding (<code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code>)</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

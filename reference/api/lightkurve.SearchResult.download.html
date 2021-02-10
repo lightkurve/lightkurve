@@ -1,0 +1,368 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.SearchResult.download &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lightkurve.SearchResult.download_all" href="lightkurve.SearchResult.download_all.html" />
+    <link rel="prev" title="lightkurve.SearchResult" href="lightkurve.SearchResult.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../tutorials/index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../about/index.html">About</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+        
+        
+          
+            
+  
+                <li class="active">
+                    <a href="../search.html">Downloading data</a>
+                    <ul>
+                    
+                        <li class="">
+                            <a href="lightkurve.search_targetpixelfile.html">lightkurve.search_targetpixelfile</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.search_lightcurve.html">lightkurve.search_lightcurve</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.search_tesscut.html">lightkurve.search_tesscut</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SearchResult.html">lightkurve.SearchResult</a>
+                        </li>
+                    
+                        <li class="active">
+                            <a href="">lightkurve.SearchResult.download</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SearchResult.download_all.html">lightkurve.SearchResult.download_all</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SearchResult.mission.html">lightkurve.SearchResult.mission</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SearchResult.year.html">lightkurve.SearchResult.year</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SearchResult.author.html">lightkurve.SearchResult.author</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SearchResult.target_name.html">lightkurve.SearchResult.target_name</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SearchResult.exptime.html">lightkurve.SearchResult.exptime</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SearchResult.distance.html">lightkurve.SearchResult.distance</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SearchResult.ra.html">lightkurve.SearchResult.ra</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SearchResult.dec.html">lightkurve.SearchResult.dec</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SearchResult.table.html">lightkurve.SearchResult.table</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../lightcurve.html">LightCurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../foldedlightcurve.html">FoldedLightCurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../targetpixelfile.html">TargetPixelFile</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../periodogram.html">Periodogram</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../seismology.html">Seismology</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../correctors.html">Correcting systematics</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../misc.html">Miscellaneous utilities</a>
+                </li>
+            
+          
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="lightkurve-searchresult-download">
+<h1>lightkurve.SearchResult.download<a class="headerlink" href="#lightkurve-searchresult-download" title="Permalink to this headline">¶</a></h1>
+<dl class="py method">
+<dt id="lightkurve.SearchResult.download">
+<code class="sig-prename descclassname">SearchResult.</code><code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality_bitmask</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">download_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cutout_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.SearchResult.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download and open the first data product in the search result.</p>
+<p>If multiple files are present in <a class="reference internal" href="lightkurve.SearchResult.table.html#lightkurve.SearchResult.table" title="lightkurve.SearchResult.table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult.table</span></code></a>, only the first
+will be downloaded.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>quality_bitmask</strong><span class="classifier">str or int, optional</span></dt><dd><p>Bitmask (integer) which identifies the quality flag bitmask that should
+be used to mask out bad cadences. If a string is passed, it has the
+following meaning:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>“none”: no cadences will be ignored</p></li>
+<li><p>“default”: cadences with severe quality issues will be ignored</p></li>
+<li><p>“hard”: more conservative choice of flags to ignore
+This is known to remove good data.</p></li>
+<li><p>“hardest”: removes all data that has been flagged
+This mask is not recommended.</p></li>
+</ul>
+</div></blockquote>
+<p>See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">TessQualityFlags</span></code> class for details on the bitmasks.</p>
+</dd>
+<dt><strong>download_dir</strong><span class="classifier">str, optional</span></dt><dd><p>Location where the data files will be stored.
+Defaults to “~/.lightkurve-cache” if <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> is passed.</p>
+</dd>
+<dt><strong>cutout_size</strong><span class="classifier">int, float or tuple, optional</span></dt><dd><p>Side length of cutout in pixels. Tuples should have dimensions (y, x).
+Default size is (5, 5)</p>
+</dd>
+<dt><strong>flux_column</strong><span class="classifier">str, optional</span></dt><dd><p>The column in the FITS file to be read as <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code>. Defaults to ‘pdcsap_flux’.
+Typically ‘pdcsap_flux’ or ‘sap_flux’.</p>
+</dd>
+<dt><strong>kwargs</strong><span class="classifier">dict, optional</span></dt><dd><p>Extra keyword arguments passed on to the file format reader function.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>data</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> or <a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object</span></dt><dd><p>The first entry in the products table.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>HTTPError</dt><dd><p>If the TESSCut service times out (i.e. returns HTTP status 504).</p>
+</dd>
+<dt>SearchError</dt><dd><p>If any other error occurs.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="lightkurve.SearchResult.html" title="previous page">lightkurve.SearchResult</a>
+    <a class='right-next' id="next-link" href="lightkurve.SearchResult.download_all.html" title="next page">lightkurve.SearchResult.download_all</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

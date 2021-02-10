@@ -1,0 +1,599 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "pNIUAVk8br74"
+   },
+   "source": [
+    "# Measuring and removing a rotation period signal from a light curve"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "-70f3lJsbw3s"
+   },
+   "source": [
+    "## Learning Goals\n",
+    "By the end of this tutorial, you will:\n",
+    "\n",
+    "- Learn what the light curve and periodogram of a rotating star looks like.\n",
+    "- Be able to estimate a rotation period using a Lomb-Scargle periodogram.\n",
+    "- Be able to use the Lomb-Scargle method to model and remove the rotation signal.\n",
+    "- Understand how *iterative sine fitting* works.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "XupiXuB0cBie"
+   },
+   "source": [
+    "## Introduction\n",
+    "\n",
+    "A light curve from a star often has many oscillating signals. For some people, this is useful data, and for others this is annoying noise. In this tutorial, we will look at how a Lomb-Scargle periodogram can be used to extract models of sinusoidal variation from light curves, and how those can be used to detect and remove signals.\n",
+    "\n",
+    "If you find this tutorial difficult to follow, we recommend consulting the companion tutorials, which explain the basics of *Kepler* light curves and periodograms."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "67Amch10jaGL"
+   },
+   "source": [
+    "## Imports\n",
+    "This tutorial only requires **[Lightkurve](https://docs.lightkurve.org)** and **[NumPy](https://numpy.org/)**."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "opAaU2Lrjdjr"
+   },
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk\n",
+    "import numpy as np\n",
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "lhQtFl4Ujztc"
+   },
+   "source": [
+    "## 1. What are Rotation Signals?\n",
+    "\n",
+    "Many different types of stars exhibit oscillations in their brightnesses over time. By studying these changes in brightness, we can derive interesting properties from these stars. One example of such a property is a star's rotation rate.\n",
+    "\n",
+    "For stars like the Sun, magnetic activity on their surface will cause [star spots](https://en.wikipedia.org/wiki/Sunspot) to appear. These are areas of the star that are temporarily cooler, and therefore appear darker, than the surrounding regions. As these spots rotate in and out of our view, the star's brightness will increase and decrease. This is often referred to as a *rotation signal*.\n",
+    "\n",
+    "A periodogram will show this brightness oscillation as a peak in the frequency domain. In what follows, we will look at how to extract this periodic frequency from the periodogram using Lightkurve's tools."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "p1g3wvO8mEpL"
+   },
+   "source": [
+    "## 2. Plotting the Light Curve of a Rotating Star"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "gEILk6rcoicl"
+   },
+   "source": [
+    "In an accompanying tutorial, we looked at an eclipsing binary system, in which two stars eclipsed each other periodically. Now, let's look at a different kind of oscillator — a rotating star — and see how that signal appears in the time series brightness data.\n",
+    "\n",
+    "We're going to explore a star named KIC 2157356, which is part of the cohort of rotating stars that were studied by *Kepler* and analyzed in a research paper by [McQuillan et al. (2014)](https://arxiv.org/abs/1402.5694).\n",
+    "\n",
+    "Because rotation variability tends to happen on relatively long time scales (for instance, the Sun rotates every 25 days), we will start by downloading three ~90-day long quarters of *Kepler* data and then combine them using Lightkurve's [`stitch()`](https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection.stitch) feature."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 30096,
+     "status": "ok",
+     "timestamp": 1599678561993,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "I6uQgK0woikB",
+    "outputId": "c149b227-34ce-43ca-d29e-9ae8ee0af561"
+   },
+   "outputs": [],
+   "source": [
+    "# Search Kepler data for Quarters 6, 7, and 8.\n",
+    "search_result = lk.search_lightcurve('KIC 2157356', author='Kepler', quarter=(6, 7, 8))\n",
+    "# Download and stitch the data together\n",
+    "lc = search_result.download_all().stitch()\n",
+    "# Plot the resulting light curve\n",
+    "lc.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "B_ImrSKPExqG"
+   },
+   "source": [
+    "This looks quite different from the light curve we studied in the eclipsing binary tutorial. Here, the brightness modulation from the spots rotating in and out of view is significantly larger, with an overall $2\\%$ change in the brightness of the star! Compare this with asteroseismic oscillations (see the accompanying tutorials), which occur on the parts per million scale instead. (Note: 1 part per million equals 0.0001%)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "b1WRag79qi5L"
+   },
+   "source": [
+    "## 3. Plotting the Periodogram of a Rotating Star\n",
+    "\n",
+    "Next, we'll convert the light curve to the frequency domain. Based on the plot we created above, we expect to see a high-power peak associated with the rotation period. We may also expect to see some smaller peaks, such as alias harmonics.\n",
+    "\n",
+    "For clarity, we will truncate the periodogram to `maximum_period=100`, because we can infer from the light curve that the rotation period is much shorter than that. We also set `view=period` to make sure the x-axis uses period rather than frequency units. This is helpful because it is more natural to think about rotation rates in units of *days* rather than *Hertz* (1/s)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 390
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 30355,
+     "status": "ok",
+     "timestamp": 1599678562266,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "ynzMSY_Dq_A4",
+    "outputId": "cf7f3a79-2fd7-4f01-8e79-6d72c193b8f7"
+   },
+   "outputs": [],
+   "source": [
+    "pg = lc.to_periodogram(maximum_period=100)\n",
+    "pg.plot(view='period');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "SmklirpNsJr6"
+   },
+   "source": [
+    "Here we can see a strong peak near 13 days, which is consistent with the sinusoidal trend we saw in the time-domain plot earlier. The reason there are so few aliases in this periodogram is most likely because the star we've chosen has a variability that is very close to sinusoidal, which is not always the case.\n",
+    "\n",
+    "To obtain an estimate of the rotation period, we can now access the `period_at_max_power` property:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 37
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 30344,
+     "status": "ok",
+     "timestamp": 1599678562268,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "mAGTODbGEW6r",
+    "outputId": "4e38b306-fac3-4b44-b4d9-590ffed21e42"
+   },
+   "outputs": [],
+   "source": [
+    "pg.period_at_max_power"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "l6NWF-mEEy4r"
+   },
+   "source": [
+    "Success!  We established that the highest peak in the periodogram appears to align with the expected rotation signal in our time series, and we used a periodogram to obtain an estimate of the rotation period.\n",
+    "\n",
+    "Next, we will use additional features of the Lomb-Scargle periodogram to model the rotational signal in the time domain."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "42Mxx4EsmG0D"
+   },
+   "source": [
+    "## 4. Using the Lomb-Scargle Method to Model the Rotation Signal"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "T8LvQgp0sg_G"
+   },
+   "source": [
+    "Lightkurve uses the Lomb-Scargle method to make periodograms. For more information on Lomb-Scargle periodograms, read [Vanderplas (2017)](https://arxiv.org/pdf/1703.09824.pdf). Without delving into the fine details here, Lomb-Scargle works by fitting a sinusoidal curve at each of the frequencies in the periodogram, and uses this fit to determine the value of power each frequency has in the periodogram. These model fits are stored in the periodogram object and can be extracted.\n",
+    "\n",
+    "In the graph below, we visualize the Lomb-Scargle model associated with the highest peak by extracting it and then plotting it on top of our time series data. We need to pass in the `time` range we want the model for, as well as the specific `frequency` for which we want the model returned."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 458
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 31559,
+     "status": "ok",
+     "timestamp": 1599678563496,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "hN1QnOBVt9al",
+    "outputId": "b9ba9c04-bd1a-4574-b7ad-9cc765b92836"
+   },
+   "outputs": [],
+   "source": [
+    "# Create a model light curve for the highest peak in the periodogram\n",
+    "lc_model = pg.model(time=lc.time, frequency=pg.frequency_at_max_power)\n",
+    "# Plot the light curve\n",
+    "ax = lc.plot()\n",
+    "# Plot the model light curve on top\n",
+    "lc_model.plot(ax=ax, lw=3, ls='--', c='red');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "S925UvbjwyOC"
+   },
+   "source": [
+    "Looking at the plot above, we can see that the Lomb-Scargle model fits the rotation signal relatively well. This is expected; it corresponds to the highest peak in the periodogram, after all. It is not perfect, however. There are deviations in amplitude, and also in phase towards the right hand side of the graph.\n",
+    "\n",
+    "The periodogram will only ever be able to approximate the exact oscillation frequency, and there will always be some associated error (in fact if you look at the periodogram higher up, you'll see that the peak is relatively broad). This uncertainty reflects the fact that the rotation signal is *not* a perfect sinusoid, and that there is additional noise from the star to deal with on top of that. It's for this reason that studies of stellar rotation often use multiple independent methods to estimate a rotation period."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "izgFCQ27mVWs"
+   },
+   "source": [
+    "## 5. Removing Periodic Signals Using Iterative Sine Fitting\n",
+    "\n",
+    "We're not always interested in the rotation signal — sometimes, we want it removed! This is the case, for example, when studying the small signals of a transiting planet in a star which also shows a strong rotation signal. Using the tools we described above, we can model and remove the rotation signal from the time series to help us study the planet transits.\n",
+    "\n",
+    "This process, called *iterative sine fitting*, has a limited range of applications, but is useful to know for quick analysis. Let's apply it to KIC 8197761, a star known to host a planet embedded within stellar noise."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 392
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 44016,
+     "status": "ok",
+     "timestamp": 1599678575965,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "PDxhPCVE2CNr",
+    "outputId": "4adc81a0-10e7-47f5-d87c-071d95fce832"
+   },
+   "outputs": [],
+   "source": [
+    "# Download the light curve data\n",
+    "search = lk.search_lightcurve('KIC 8197761', author='Kepler', cadence=\"long\")\n",
+    "lc = search.download_all().stitch()\n",
+    "\n",
+    "# Fold the light curve at the known planet period\n",
+    "planet_period = 9.8686667\n",
+    "lc.fold(period=planet_period).plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "TfwuVwOp2ece"
+   },
+   "source": [
+    "Despite these data being folded on the period of a known planet, we are unable to see the planet transits within the noise. Let's have a look at the periodogram."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 409
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 45989,
+     "status": "ok",
+     "timestamp": 1599678577951,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "M9d07FUJ2r_k",
+    "outputId": "e6b66904-0f2d-42cd-c403-915a95b025f4"
+   },
+   "outputs": [],
+   "source": [
+    "pg = lc.to_periodogram()\n",
+    "pg.plot(scale='log');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "obNW4Rw_2sFZ"
+   },
+   "source": [
+    "As we can see in this periodogram, the star appears to include multiple high-amplitude oscillation signals. Using the Lomb-Scargle `model()` method we used earlier, we can remove these signals from the time series data. We'll do this as follows:\n",
+    "\n",
+    "1. Calculate a periodogram.\n",
+    "2. Calculate the Lomb-Scargle `model()` for the highest peak.\n",
+    "3. Divide the light curve by the model to remove the signal.\n",
+    "4. Repeat using the new light curve.\n",
+    "\n",
+    "In this example, we will apply this procedure 50 times, that is, we're going to remove the signals associated with the 50 highest peaks in the periodogram from the time series."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 446
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 73586,
+     "status": "ok",
+     "timestamp": 1599678605568,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "Re7jCy6u2sLI",
+    "outputId": "5efc8cef-625c-496e-957d-6fdf78e7163f"
+   },
+   "outputs": [],
+   "source": [
+    "# Remove the signals associated with the 50 highest peaks\n",
+    "newlc = lc.copy()\n",
+    "for i in range(50):\n",
+    "  pg = newlc.to_periodogram()\n",
+    "  model = pg.model(time=newlc.time, frequency=pg.frequency_at_max_power)\n",
+    "  newlc.flux = newlc.flux / model.flux\n",
+    "\n",
+    "# Plot the new light curve on top of the original one\n",
+    "ax = lc.plot(alpha=.5, label='Original');\n",
+    "newlc.plot(ax=ax, label='New'); "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "uWwFi0434cvu"
+   },
+   "source": [
+    "In the graph above, we can observe that the new light curve displays less variations. Let's go ahead and fold it to find out if we can see the planet transit this time around. We'll also plot a binned version of our reduced light curve on top, just to make things clearer."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 76849,
+     "status": "ok",
+     "timestamp": 1599678608905,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "bn48WdlP4rqG",
+    "outputId": "bde783bc-60f6-4f75-aed5-15d6b0e99bf9"
+   },
+   "outputs": [],
+   "source": [
+    "ax = newlc.fold(period=planet_period).plot(label='Unbinned')\n",
+    "newlc.fold(period=planet_period).bin(0.1).plot(ax=ax, lw=2, label='Binned');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "NNga4yVl5bom"
+   },
+   "source": [
+    "Now we can see that a \"dip\" consistent with a planet transit has appeared, which makes it clearer to study!\n",
+    "\n",
+    "It is important to note here that iterative sine fitting, as used in this tutorial, is a pragmatic method with a few drawbacks. The most important drawback is that the 50 signals we have attempted to remove were probably not perfectly sinusoidal in shape. This means that we have likely introduced complicated new residual patterns into the light curve, and introduced spurious new peaks in the periodogram. It is important to be very careful when using light curves to which complicated and imperfect data manipulation operations have been applied.\n",
+    "\n",
+    "For new developments on how to extract rotation using advanced methods such as Gaussian Processes or asteroseismology, read, for example, [Angus et al. (2017)](https://arxiv.org/abs/1706.05459) and [Davies et al. (2015)](https://arxiv.org/abs/1411.1359)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "qlGgYmoz8E4A"
+   },
+   "source": [
+    "## About this Notebook\n",
+    "\n",
+    "**Authors**: Oliver Hall (oliver.hall@esa.int), Geert Barentsen\n",
+    "\n",
+    "**Updated On**: 2020-09-15"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "c0wgdg5H4jPd"
+   },
+   "source": [
+    "## Citing Lightkurve and Astropy\n",
+    "\n",
+    "If you use `lightkurve` or `astropy` for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 85
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 29228,
+     "status": "ok",
+     "timestamp": 1597998185976,
+     "user": {
+      "displayName": "Oliver Hall",
+      "photoUrl": "",
+      "userId": "08831861496876617563"
+     },
+     "user_tz": -120
+    },
+    "id": "AmAGa51_9Vyo",
+    "outputId": "31cc61c5-ac3e-40c3-9aa8-2bb620dbe40f"
+   },
+   "outputs": [],
+   "source": [
+    "lk.show_citation_instructions()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "8WhoNdhY7gt_"
+   },
+   "source": [
+    "<img style=\"float: right;\" src=\"https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png\" alt=\"Space Telescope Logo\" width=\"200px\"/>"
+   ]
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "collapsed_sections": [],
+   "name": "how-to-measure-and-remove-a-rotation-period.ipynb",
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

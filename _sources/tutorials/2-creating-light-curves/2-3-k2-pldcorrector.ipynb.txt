@@ -1,0 +1,1003 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "bo0eLE4v4IYE"
+   },
+   "source": [
+    "# Removing noise from *K2* and *TESS* light curves using Pixel Level Decorrelation (`PLDCorrector`)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "A9eLo3kLAn9E"
+   },
+   "source": [
+    "## Learning Goals\n",
+    "\n",
+    "By the end of this tutorial, you will:\n",
+    "\n",
+    "* Understand how to apply the [Lightkurve](https://docs.lightkurve.org) `PLDCorrector` tool to remove instrumental noise from *K2* and *TESS* light curves.\n",
+    "* Be able to create an exoplanet transit mask and use it to improve PLD.\n",
+    "* Be aware of common issues, caveats, and potential biases associated with the use of PLD."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "wMnkYd8EA40B"
+   },
+   "source": [
+    "## Introduction\n",
+    "\n",
+    "The [*K2*](https://archive.stsci.edu/k2) and [*TESS*](https://archive.stsci.edu/tess) missions both provide high-precision photometry for thousands of exoplanet candidates. However, observations by both telescopes can be muddled by instrumental systematic trends, making exoplanet detection or stellar characterization difficult.\n",
+    "\n",
+    "Pixel Level Decorrelation (PLD) is a method that has primarily been used to remove systematic trends introduced by small spacecraft motions during observations, and has been shown to be successful at improving the precision of data taken by the *Spitzer* space telescope ([Deming et al. 2015](https://ui.adsabs.harvard.edu/abs/2015ApJ...805..132D/abstract)) and the *K2* mission ([Luger et al. 2016](https://ui.adsabs.harvard.edu/abs/2016AJ....152..100L/abstract); [2018](https://ui.adsabs.harvard.edu/abs/2018AJ....156...99L/abstract)). PLD works by identifying a set of trends in the pixels surrounding the target star, and performing linear regression to create a combination of these trends that effectively models the systematic noise introduced by spacecraft motion. This noise model is then subtracted from the uncorrected light curve.\n",
+    "\n",
+    "This method has been shown to be very effective at removing the periodic systematic trends in *K2*, and can also help remove the scattered light background signal in *TESS* observations. This tutorial will demonstrate how to use the [Lightkurve](https://docs.lightkurve.org) `PLDCorrector` for each mission, and will give advice on how to best implement PLD. The `PLDCorrector` is a special case of the [Lightkurve](https://docs.lightkurve.org) `RegressionCorrector`. For more information on how to use `RegressionCorrector` to choose custom regressors and remove scattered light from *TESS*, please see the tutorial specifically on removing scattered light from *TESS* data using the Lightkurve `RegressionCorrector`.\n",
+    "\n",
+    "Before reading this tutorial, it is recommended to first familiarize yourself with using target pixel file (TPF) products and light curve products with Lightkurve."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "5wOFCyG74-fA"
+   },
+   "source": [
+    "## Imports\n",
+    "\n",
+    "We only need to import the **[Lightkurve](https://docs.lightkurve.org)** package for this tutorial, which in turn uses **[Matplotlib](https://matplotlib.org/)** for plotting."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "d-idwZ_c5GJp"
+   },
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk\n",
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "O9KCiDg2sCmc"
+   },
+   "source": [
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "VqvB7m3c1wbF"
+   },
+   "source": [
+    "## 1. Applying PLD to a *K2* Light Curve\n",
+    "\n",
+    "The dominant source of noise in *K2* data is created by the motion of the *Kepler* spacecraft due to periodic thruster firings. This causes stars to drift across different pixels on the detector, which have varied sensitivity. There are two classes of sensitivity variation on a charge-couped device (CCD) detector — variation between pixels (inter-pixel) and variation within each pixel (intra-pixel). Both inter- and intra-pixel sensitivity variations are present on the *Kepler* detector, which ultimately causes different flux levels to be detected as the target's Point Spread Function (PSF) drifts across the variations, introducing the systematic trends.\n",
+    "\n",
+    "The `PLDCorrector` uses information from nearby pixels to create a noise model, so we need to use the `TargetPixelFile` data product (for more information, see the tutorial on using *Kepler* target pixel file products). We can use the `search_targetpixelfile` method to identify available observations for the desired target, and the `download` method to access the data.\n",
+    "\n",
+    "In what follows below, we will demonstrate PLD on the exoplanet system K2-199, which was observed during *K2* Campaign 6. We can download the pixel data as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 420
+    },
+    "executionInfo": {
+     "elapsed": 11452,
+     "status": "ok",
+     "timestamp": 1601325033072,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "hOFE_Ab19QXL",
+    "outputId": "1651145e-c9c3-4542-cb2d-2c6a99d56ea8"
+   },
+   "outputs": [],
+   "source": [
+    "tpf = lk.search_targetpixelfile('K2-199', author='K2', campaign=6).download()\n",
+    "tpf.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "Re-Wj1Bn6wuZ"
+   },
+   "source": [
+    "There are two ways to create a `PLDCorrector` object. The first is to create an instance of the class directly and pass in the `TargetPixelFile`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "executionInfo": {
+     "elapsed": 1246,
+     "status": "ok",
+     "timestamp": 1601325069125,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "0yOLHCKJ1qJc",
+    "outputId": "dcd72580-46bd-495b-b4cb-468a8c6c5bff"
+   },
+   "outputs": [],
+   "source": [
+    "pld = lk.PLDCorrector(tpf)\n",
+    "print(pld)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "4n_9tbJA7DsT"
+   },
+   "source": [
+    "For convenience, you can also use the `to_corrector` method of the `TargetPixelFile` object, and pass in the string `'pld'` to specify the desired corrector type."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "executionInfo": {
+     "elapsed": 952,
+     "status": "ok",
+     "timestamp": 1601325073513,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "9NcNvXn4AN-w",
+    "outputId": "72746534-8df3-4aa0-a6db-c28d5c3b5bcf"
+   },
+   "outputs": [],
+   "source": [
+    "pld = tpf.to_corrector('pld')\n",
+    "print(pld)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "IeiKtfNZ7f5G"
+   },
+   "source": [
+    "Both of these approaches return an identical `PLDCorrector` object. From here, getting a corrected light curve is possible: call the `correct` method."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "SI8OAsVn8Cg4"
+   },
+   "outputs": [],
+   "source": [
+    "corrected_lc = pld.correct()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "Elc6Dlyt8I_T"
+   },
+   "source": [
+    "Now we can compare the output of PLD to an uncorrected light curve. To create the uncorrected light curve, we can use the `to_lightcurve` method of the `KeplerTargetPixelFile` object, which performs simple aperture photometry (SAP) to create a light curve from the pixel data.\n",
+    "\n",
+    "Below, the uncorrected light curve is shown in red and the PLD-corrected light curve is plotted in black. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 389
+    },
+    "executionInfo": {
+     "elapsed": 1791,
+     "status": "ok",
+     "timestamp": 1601325094416,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "dlCmbjzF8OlH",
+    "outputId": "8e3e0893-9d39-4596-bf40-712a40de86b9"
+   },
+   "outputs": [],
+   "source": [
+    "# Create and plot an uncorrected light curve using Simple Aperture Photometry\n",
+    "uncorrected_lc = tpf.to_lightcurve()\n",
+    "ax = uncorrected_lc.normalize().scatter(color='red', label='Uncorrected Light Curve');\n",
+    "# Plot the PLD-corrected light curve in black on top\n",
+    "corrected_lc.normalize().remove_outliers().scatter(ax=ax, color='black', label='PLD-corrected Light Curve');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "aa_H_3yIpeub"
+   },
+   "source": [
+    "The uncorrected light curve is dominated by a short period (about six hours) sawtooth-shaped pattern caused by the *Kepler* spacecraft thruster firings. PLD captures this trend in the noise model and has subtracted it, leaving the much more accurate light curve in black.\n",
+    "\n",
+    "We can quantify the improvement by comparing the Combined Differential Photometric Precision (CDPP) values for each light curve."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 51
+    },
+    "executionInfo": {
+     "elapsed": 884,
+     "status": "ok",
+     "timestamp": 1601325115841,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "cCN34aicNkkS",
+    "outputId": "3dd21702-af7f-480a-ad4b-cec3749422ae"
+   },
+   "outputs": [],
+   "source": [
+    "uncorrected_cdpp = uncorrected_lc.estimate_cdpp()\n",
+    "corrected_cdpp = corrected_lc.estimate_cdpp()\n",
+    "print(f\"Uncorrected CDPP = {uncorrected_cdpp:.0f}\")\n",
+    "print(f\"Corrected CDPP = {corrected_cdpp:.0f}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "i6EwwaxuNk1b"
+   },
+   "source": [
+    "By this metric, the photometric precision improved by more than a factor of 25 after applying PLD. \n",
+    "\n",
+    "Another important trait of PLD is that long-term variability trends in the light curve are preserved. In this example, we can see the stellar rotation of K2-199 as the sinusoidal signal left in the light curve after correction. This is done by fitting a polynomial spline model to the light curve while simultaneously fitting the noise model, because the uncorrected observation is a combination of the signals. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "DjiRK0mHkEAS"
+   },
+   "source": [
+    "## 2. Diagnosing the Success of the Correction\n",
+    "\n",
+    "The success of PLD depends on a number of factors including the brightness of the object, the choice of pixels used to create the light curve and the noise model, and whether or not there exists a correlation between the instrumental noise and the astrophysical signals. For these reasons, it is important to carefully review the correct operation of the algorithm each time you use it, and tune the optional parameters of the algorithm if necessary.\n",
+    "\n",
+    "The most convenient way to diagnose the performance of PLD is to use the `diagnose()` method, which generates a set of diagnostic plots which we will explain below the graph."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 764
+    },
+    "executionInfo": {
+     "elapsed": 3724,
+     "status": "ok",
+     "timestamp": 1601325169792,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "RlPUcH_8pbpT",
+    "outputId": "16533b42-d387-4e4c-8b5d-f9343d045f54"
+   },
+   "outputs": [],
+   "source": [
+    "pld.diagnose();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "Jhe5lRIksuAs"
+   },
+   "source": [
+    "The diagnostic plot is composed of the following panels:\n",
+    "- **Top panel**: The uncorrected light curve (`original`) is shown in black, with the Combined Differential Photometric Precision (CDPP), a measurement of the light curve's scatter, noted in the legend. \n",
+    "- **Middle panel**: The PLD-corrected light curve (`corrected`) is plotted in gray with the noise model created by the combination of pixel values (`pixel_series`) in blue, the estimated background trend (`background`) in red, and the polynomial spline fit to the stellar variability (`spline`) in yellow. For *K2*, the background signal is minimal compared to the systematic trends due to motion, but it is much more significant for *TESS* observations. Notice that the corrected light curve closely matches the spline, which is tracing the preserved stellar variability.\n",
+    "- **Bottom panel**: A direct comparison between the uncorrected light curve (`original`) and the PLD-corrected light curve (`corrected`), again noting the CDPP of each light curve in the legend. This panel also indicates which cadences were flagged as outliers (`outlier_mask`), which lie greater than five standard deviations above or below the light curve, as well as which cadences are excluded from the spline fit (`~cadence_mask`). As we will see below, `cadence_mask` is a Boolean array with the same length as the `TargetPixelFile`'s time array, where `True` is included in the spline fit and `False` is excluded. The tilde (`~`) indicates that the inverse of the mask is marked in this plot, that is, the excluded cadences will be crossed out in blue. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "lo-1ipZkkPyD"
+   },
+   "source": [
+    "The plot above makes it convenient to review the components of the noise removal algorithm. The performance of the algorithm is strongly affected by the choice of pixels which go into the model components. To diagnose this part of the algorithm, we can use the `diagnose_masks` method:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 391
+    },
+    "executionInfo": {
+     "elapsed": 3398,
+     "status": "ok",
+     "timestamp": 1601325212709,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "Z9vnchy_kN3q",
+    "outputId": "5db05284-7563-4a27-a9e9-85221f801c64"
+   },
+   "outputs": [],
+   "source": [
+    "pld.diagnose_masks();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "eH2Lh5LswENV"
+   },
+   "source": [
+    "The panels in the figure visualize the following pixel masks:\n",
+    "\n",
+    "* `aperture_mask`: Pixels used to create the SAP flux light curve from which the noise model is subtracted. \n",
+    "\n",
+    "* `pld_aperture_mask`: Pixels used to create the correlated noise model. \n",
+    "\n",
+    "* `background_aperture_mask`: Pixels used to create the background model. \n",
+    "\n",
+    "\n",
+    "You can alter the `pld_aperture_mask` and `background_aperture_mask` by passing them as optional arguments to the `correct()` method we used earlier. For more information about these masks, and how to use them effectively, please see the full list of optional parameters and FAQ at the end of this tutorial."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "MrIdImCPp8OL"
+   },
+   "source": [
+    "## 3. How to Avoid Overfitting Exoplanet Transits\n",
+    "\n",
+    "In the example above, it looks like PLD did a great job of removing the instrumental noise introduced by the *K2* detector drift, but the bottom panel of the diagnostic plot seems to indicate that we've falsely labeled in-transit data points as outliers. To alleviate this, we can introduce the `cadence_mask`.\n",
+    "\n",
+    "### 3.1 Overfitting\n",
+    "\n",
+    "It's necessary to mask out transits and flares when fitting the spline. The spline term fits a polynomial to the long-term trend of the light curve, and the highest likelihood solution generally follows the median of the corrected light curve. The presence of transits or flares can pull the median of the light curve down or up, respectively, causing the spline to deviate from the underlying stellar trend. \n",
+    "\n",
+    "In practice, this causes transits to be partially \"fit out\" by the spline, reducing their depth and giving an incorrect estimate of the planet's radius.\n",
+    "\n",
+    "You can use a custom `cadence_mask` by creating a Boolean array with one value per cadence, where `True` indicates a cadence you wish to include and `False` means that the cadence is masked out.\n",
+    "\n",
+    "For this example, we want to be sure that the in-transit cadences are not marked as outliers or used in the spline fit, as they can cause the spline to erroneously deviate from the stellar signal. To accomplish this, we can create a transit mask using the `create_transit_mask` method of the `LightCurve` object, using the known parameters of the planet system:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "FXIoU0Qfp7oN"
+   },
+   "outputs": [],
+   "source": [
+    "transit_mask = corrected_lc.create_transit_mask(period=[3.2277, 7.3745],\n",
+    "                                                duration=[0.25, 0.25], \n",
+    "                                                transit_time=[2385.6635, 2389.9635]) "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "OxY7dgn1IgYK"
+   },
+   "source": [
+    "We can double-check to make sure the transit mask looks good by plotting it on top of the corrected light curve in red:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "executionInfo": {
+     "elapsed": 1610,
+     "status": "ok",
+     "timestamp": 1601325273989,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "Tm_ISx4PrAze",
+    "outputId": "17705db1-6bd7-49c9-b598-459982a57da4"
+   },
+   "outputs": [],
+   "source": [
+    "ax = corrected_lc.scatter(label='Corrected Light Curve')\n",
+    "corrected_lc[transit_mask].scatter(ax=ax, c='r', label='transit_mask');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "RdVcFjDZUMDh"
+   },
+   "source": [
+    "The red points appear to match the in-transit cadences for both of the planets around K2-199. \n",
+    "\n",
+    "An additional option for the `PLDCorrector` is the ability to remove the long-term trend. This is ideal for planet candidates, which can be more difficult to detect in the presence of stellar variability. Here, we can set the `restore_trend` parameter to `False` in order to return a light curve with the long-period trend removed.\n",
+    "\n",
+    "Now, we can call the `correct` method of the `PLDCorrector` again, this time passing in our `cadence_mask`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 764
+    },
+    "executionInfo": {
+     "elapsed": 5807,
+     "status": "ok",
+     "timestamp": 1601325293513,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "m52H3ZWIrCg7",
+    "outputId": "46de7312-77cb-432f-cfe6-4261b9c22b78"
+   },
+   "outputs": [],
+   "source": [
+    "corrected_lc = pld.correct(cadence_mask=~transit_mask, restore_trend=False)\n",
+    "pld.diagnose();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "irADOmNjb1G8"
+   },
+   "source": [
+    "Now, only points that are greater than five standard deviations above or below the light curve but not in-transit will be marked as outliers, and the in-transit points (marked in blue in the bottom panel) will not be used to fit the spline.\n",
+    "\n",
+    "If we examine the light curve and its cadence mask again, we will see that the long-period trend has been removed, and the transits are clearly visible by eye."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "executionInfo": {
+     "elapsed": 2127,
+     "status": "ok",
+     "timestamp": 1601325306335,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "abiEX8zWRLrx",
+    "outputId": "bf915a95-f692-4b0a-a70f-81e4fecc7c60"
+   },
+   "outputs": [],
+   "source": [
+    "ax = corrected_lc.scatter(label='Corrected Light Curve')\n",
+    "corrected_lc[transit_mask].scatter(ax=ax, c='r', label='transit_mask');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "i1GKgzCARaOA"
+   },
+   "source": [
+    "This correction looks great! We have demonstrated that PLD is effective at removing systematic trends in *K2* data. Now, let's apply PLD to *TESS* observations."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "ldY8hLjlKJ-r"
+   },
+   "source": [
+    "## 4. Applying PLD to a *TESS* Light Curve\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "ZwG6JkcnVG0a"
+   },
+   "source": [
+    "*TESS* has multiple observing modes. For example, there are two-minute cadence observations, which were retrieved for specific targeted objects, and there are 30-minute cadence Full Frame Images (FFIs), which capture the entire *TESS* field of view.\n",
+    "\n",
+    "In this example, we will examine a target using the FFI observation. The *TESS* FFIs are dominated by the scattered light background signal on the *TESS* detector, which creates high-amplitude, periodic variation. This background can make planet detection difficult, but it can be removed using PLD. \n",
+    "\n",
+    "To access FFI data, we will use the [TESScut](https://mast.stsci.edu/tesscut/) tool on the Mikulski Archive for Space Telescopes (MAST), developed by [Brasseur et al. 2019](https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract). Lightkurve has a built-in search method for creating cutouts called `search_tesscut`, which uses the same syntax as the `search_targetpixelfile` method above. We will search for the Wolf-Rayet star WR 40, which was observed by *TESS* in Sector 10."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 78
+    },
+    "executionInfo": {
+     "elapsed": 3522,
+     "status": "ok",
+     "timestamp": 1601325326993,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "m0Q4Pweqb2b3",
+    "outputId": "9964dbc9-65ab-44eb-9470-8706b7990ac8"
+   },
+   "outputs": [],
+   "source": [
+    "search_result = lk.search_tesscut('WR40', sector=10)\n",
+    "search_result"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "5YrXnxhnXRrH"
+   },
+   "source": [
+    "We can download the pixel data with the `download` method. When using TESScut, this method takes the additional parameter `cutout_size`, which determines how many pixels each side length of the cutout target pixel file should have.\n",
+    "\n",
+    "Here, we use seven pixels on each side, which strikes a good balance between downloading enough pixels to create a good background model, and not downloading too many pixels, which can result in the corrector running slowly or including neighboring stars in the noise model."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 420
+    },
+    "executionInfo": {
+     "elapsed": 14922,
+     "status": "ok",
+     "timestamp": 1601325388777,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "HzVkJdboxNbx",
+    "outputId": "3f214311-9196-4202-b9ba-73ef72eee8e3"
+   },
+   "outputs": [],
+   "source": [
+    "tpf = search_result.download(cutout_size=12)\n",
+    "tpf.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "XjbfbE46zVmW"
+   },
+   "source": [
+    "We can create an uncorrected SAP light curve from this target pixel file using a threshold mask."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "executionInfo": {
+     "elapsed": 1028,
+     "status": "ok",
+     "timestamp": 1601325429733,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "zxTuP09cdS0H",
+    "outputId": "d4550c45-0278-498b-86f5-0eaa4ab269dc"
+   },
+   "outputs": [],
+   "source": [
+    "uncorrected_lc = tpf.to_lightcurve(aperture_mask='threshold')\n",
+    "uncorrected_lc.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "zK7mRJkAzmc-"
+   },
+   "source": [
+    "The dominant trend in the SAP light curve above is the dramatic ramp up in flux due to the scattered light background on the *TESS* detector. The pulsation signal of WR 40 can also be seen clearly, with some additional long-period variability. \n",
+    "\n",
+    "We will create a `PLDCorrector` object, and use the default values for `PLDCorrector.correct` to remove this scattered light background."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 764
+    },
+    "executionInfo": {
+     "elapsed": 3206,
+     "status": "ok",
+     "timestamp": 1601325435795,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "x6q-cAPfDvUu",
+    "outputId": "bdd0c002-183a-4ce0-9393-18538d6ec6d4"
+   },
+   "outputs": [],
+   "source": [
+    "pld = lk.PLDCorrector(tpf)\n",
+    "corrected_lc = pld.correct()\n",
+    "pld.diagnose();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "ytZmzD0wRxAj"
+   },
+   "source": [
+    "The `background` component of the PLD model (shown in blue in the middle panel) has successfully isolated the large spikes without fitting out the pulsations of WR 40.\n",
+    "\n",
+    "We can also examine the apertures used to perform this correction. For *TESS*, the dominant source of noise is the scattered light background, so by default only those pixels will be used. In the third panel, we can see that the `background_aperture_mask` contains only background pixels, reducing the risk of contamination by neighboring stars."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 391
+    },
+    "executionInfo": {
+     "elapsed": 2450,
+     "status": "ok",
+     "timestamp": 1601325443065,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "GxDcg8Cew4TX",
+    "outputId": "bd03fe73-7553-4490-911a-84944652564f"
+   },
+   "outputs": [],
+   "source": [
+    "pld.diagnose_masks();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "SpV0VzDB3l4m"
+   },
+   "source": [
+    "## 5. Tuning `PLDCorrector` Using Optional Parameters"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "L82MTs7WHPXT"
+   },
+   "source": [
+    "In this section, we explore the optional parameters available when using the PLD method."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "Ym5J2kr0cPh9"
+   },
+   "source": [
+    "These keywords can be used to influence the performance of PLD. The PLD design matrix is constructed from three distinct submatrices, shown below with their corresponding keywords:\n",
+    "* **`background_model`**\n",
+    "  * `background_aperture_mask`\n",
+    "* **`pixel_series`**\n",
+    "  * `pld_order`\n",
+    "  * `pca_components`\n",
+    "  * `pld_aperture_mask`\n",
+    "* **`spline`**\n",
+    "  * `spline_n_knots`\n",
+    "  * `spline_degree`\n",
+    "  * `restore_trend`\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "bZXztmqDNHjn"
+   },
+   "source": [
+    "### 5.1 Definitions of all additional parameters\n",
+    "\n",
+    "Full descriptions of each of these keywords can be found below."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "LVwU0SR62xO5"
+   },
+   "source": [
+    "**`pld_order`** (`int`): \n",
+    "* The order of Pixel Level Decorrelation to be performed. First order (`n=1`) uses only the pixel fluxes to construct the design matrix. Higher order populates the design matrix with columns constructed from the products of pixel fluxes. Default 3 for *K2* and 1 for *TESS*.\n",
+    "    \n",
+    "**`pca_components`** (`int` or tuple of `int`):\n",
+    "* Number of terms added to the design matrix for each order of PLD\n",
+    "pixel fluxes. Increasing this value may provide higher precision\n",
+    "at the expense of slower speed and/or overfitting. If performing PLD with `pld_order > 1`, `pca_components` can be a tuple containing the number of terms for each order of PLD. If a single `int` is passed, the same number of terms will be used for each order.  If zero is passed, Principle Component Analysis (PCA) will not be performed.\n",
+    "    \n",
+    "**`background_aperture_mask`** (`array-like` or `None`):\n",
+    "* A Boolean array flagging the background pixels such that `True` means\n",
+    "that the pixel will be used to generate the background systematics model.\n",
+    "If `None`, all pixels which are fainter than 1-sigma above the median flux will be used.\n",
+    "    \n",
+    "**`pld_aperture_mask`** (`array-like`, `'pipeline'`, `'all'`, `'threshold'`, or `None`):\n",
+    "\n",
+    "* A Boolean array describing the aperture such that `True` means\n",
+    "that the pixel will be used when selecting the PLD basis vectors. If `None` or `all` are passed in, all pixels will be used. If `'pipeline'` is passed, the mask suggested by the official pipeline will be returned. If `'threshold'` is passed, all pixels brighter than 3-sigma above the median flux will be used.\n",
+    "    \n",
+    "**`spline_n_knots`** (`int`):\n",
+    "* Number of knots in spline.\n",
+    "    \n",
+    "**`spline_degree`** (`int`)\n",
+    "* Polynomial degree of spline.\n",
+    "\n",
+    "**`restore_trend`** (`bool`):\n",
+    "* Whether to restore the long-term spline trend to the light curve.\n",
+    "\n",
+    "**`sparse`** (`bool`):\n",
+    "* Whether to create `SparseDesignMatrix`.\n",
+    "\n",
+    "**`cadence_mask`** (`np.ndarray` of `bool`) \n",
+    "* (optional) Mask, where `True` indicates a cadence that should be used.\n",
+    "\n",
+    "**`sigma`** (`int`):\n",
+    "* Standard deviation at which to remove outliers from fitting (default 5).\n",
+    "\n",
+    "**`niters`** (`int`) \n",
+    "* Number of iterations to fit and remove outliers (default 5).\n",
+    "\n",
+    "**`propagate_errors`** (`bool`):\n",
+    "* Whether to propagate the uncertainties from the regression. Default is `False`. Setting to `True` will increase run time, but will sample from multivariate normal distribution of weights."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "3qBFe8TY_lp9"
+   },
+   "source": [
+    "## 6. Frequently Asked Questions\n",
+    "\n",
+    "**How should I select the pixels to use?**\n",
+    "\n",
+    "As shown earlier, there are three aperture masks used in the `PLDCorrector`. \n",
+    "\n",
+    "* `aperture_mask`: Used to create the SAP flux light curve from which the noise model is subtracted. For this aperture, you should select as many pixels as possible that only contain flux from the target star. This is done automatically using a threshold mask, but it is a good idea to examine that mask with the `diagnose_masks` method to ensure it does not include background targets.\n",
+    "\n",
+    "* `background_aperture_mask`: Pixels used to create the background model. These pixels should not contain flux from the target star whose light curve you are attempting to correct, nor should it contain flux from background targets. \n",
+    "\n",
+    "* `pld_aperture_mask`: Pixels used to create the correlated noise model. This aperture mask is more difficult to define, and may change on a case-by-case basis. For *K2*, this mask should contain as many pixels as possible in order to best capture the persistent motion-generated noise. For *TESS*, this mask should have less of an impact than the background mask, but should include all pixels in the cutout that do not contain background stars.\n",
+    "\n",
+    "**How can I speed up the correction?**\n",
+    "\n",
+    "The spline `DesignMatrix` used in `PLDCorrector` can be substituted for a `SparseDesignMatrix`. These behave identically to traditional `DesignMatrix` objects, but use `scipy.sparse` to speed up calculation and reduce memory. This can be done by passing in `sparse=True` to the `correct` method.\n",
+    "\n",
+    "**What do I do if I get a singular matrix error?**\n",
+    "\n",
+    "A singular matrix error occurs when a matrix used in `RegressionCorrector` cannot be inverted, a step necessary for optimizing the coefficients. The primary reason this occurs is that the input `DesignMatrix` has low rank relative to the number of column vectors. There are two suggested solutions to this issue:\n",
+    "*  Limit the number of input column vectors by performing Principle Component Analysis (PCA). This is done automatically in `PLDCorrector`, but the number of output PCA vectors can be reduced using the `pca_components` keyword in the `correct` method from its default value of 16.\n",
+    "* Ensure you are not masking out too much of your data. For instance, if you are using the `cadence_mask`, make sure that the values you want to include in your detrending are labeled as `True`. Using the inverse `cadence_mask` will often raise a singular matrix error."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "g6HorDwoUBQs"
+   },
+   "source": [
+    "## About this Notebook"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "0cJVL81oTcGn"
+   },
+   "source": [
+    "**Authors**: Nicholas Saunders (nksaun@hawaii.edu), Geert Barentsen\n",
+    "\n",
+    "**Updated**: September 29, 2020"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "iQdt2aj0eJG3"
+   },
+   "source": [
+    "## Citing Lightkurve and Astropy\n",
+    "\n",
+    "If you use `lightkurve` or its dependencies in your published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 144
+    },
+    "executionInfo": {
+     "elapsed": 845,
+     "status": "ok",
+     "timestamp": 1601325533294,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "UgxFosOkNgal",
+    "outputId": "1a9b03a7-ec62-4362-9409-888480ddb49a"
+   },
+   "outputs": [],
+   "source": [
+    "lk.show_citation_instructions()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "1i_uXbTNuYxF"
+   },
+   "source": [
+    "<img style=\"float: right;\" src=\"https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png\" alt=\"Space Telescope Logo\" width=\"200px\"/>\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "collapsed_sections": [],
+   "name": "Removing Instrumental Noise from K2 and TESS light curves using Pixel Level Decorrelation (PLD)",
+   "provenance": [
+    {
+     "file_id": "1Pd6YkGuqgPzS5helYNbwrJgpFMQzhTxA",
+     "timestamp": 1589325626782
+    }
+   ]
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

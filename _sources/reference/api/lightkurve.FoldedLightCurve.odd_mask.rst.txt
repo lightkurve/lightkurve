@@ -1,0 +1,6 @@
+﻿lightkurve.FoldedLightCurve.odd\_mask
+=====================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: FoldedLightCurve.odd_mask

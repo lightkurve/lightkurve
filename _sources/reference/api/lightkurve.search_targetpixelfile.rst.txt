@@ -1,0 +1,6 @@
+﻿lightkurve.search\_targetpixelfile
+==================================
+
+.. currentmodule:: lightkurve
+
+.. autofunction:: search_targetpixelfile

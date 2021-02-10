@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.to\_fits
+==============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.to_fits

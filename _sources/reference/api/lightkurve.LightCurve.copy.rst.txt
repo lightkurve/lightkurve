@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.copy
+==========================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.copy

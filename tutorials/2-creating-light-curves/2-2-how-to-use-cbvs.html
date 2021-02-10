@@ -1,0 +1,747 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (CBVCorrector)" href="2-3-how-to-use-cbvcorrector.html" />
+    <link rel="prev" title="How to identify time-variable background noise (“rolling bands”)?" href="2-2-identifying-rolling-band.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../reference/index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../about/index.html">About</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar">
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Cotrending-Basis-Vector-Types" class="nav-link">Cotrending Basis Vector Types</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Obtaining-the-CBVs" class="nav-link">Obtaining the CBVs</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Converting-the-CBVs-to-a-Lightkurve-DesignMatrix" class="nav-link">Converting the CBVs to a Lightkurve DesignMatrix</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Aligning-the-CBVs-with-your-light-curve" class="nav-link">Aligning the CBVs with your light curve</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Interpolating-the-CBVs-to-an-arbitrary-light-curve" class="nav-link">Interpolating the CBVs to an arbitrary light curve</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#Some-notes-about-interpolating-Cotrending-Basis-Vectors" class="nav-link">Some notes about interpolating Cotrending Basis Vectors</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div style="float:right; margin-bottom:1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+</div>
+<br style="clear:both;"><div class="section" id="How-to-load-and-use-Cotrending-Basis-Vectors-for-Kepler,-K2-and-TESS">
+<h1>How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS<a class="headerlink" href="#How-to-load-and-use-Cotrending-Basis-Vectors-for-Kepler,-K2-and-TESS" title="Permalink to this headline">¶</a></h1>
+<p>Cotrending Basis Vectors (CBVs) are generated in the PDC component of the Kepler/K2/TESS pipeline and are used to remove systematic trends in light curves. They are built from the most common systematic trends observed in each PDC Unit of Work (Quarter for Kepler, Campaign for K2 and Sector for TESS). Each Kepler and K2 module output and each CCD in TESS has its own set of CBVs. You can read an introduction to the CBVs in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Demystifying Kepler Data</a> or to
+greater detail in the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19081-003-KDPH.pdf">Kepler Data Processing Handbook</a>. The same basic method to generate CBVs is used for all three missions.</p>
+<p>This tutorial provides examples of how to load CBVs from MAST and set them up in a design matrix for use to remove systematic trends. Please consult the <a class="reference external" href="../api/lightkurve.correctors.DesignMatrix.html">DesignMatrix page</a> in the API docs for the full details on that class. A convenient tool has been created called <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> which will utilize the CBVs for the custom removal of systematic trends. See the <a class="reference external" href="https://docs.lightkurve.org/tutorials/04-how-to-use-cbvcorrector.html">CBVCorrector HOWTO
+page</a> for example usage.</p>
+<div class="section" id="Cotrending-Basis-Vector-Types">
+<h2>Cotrending Basis Vector Types<a class="headerlink" href="#Cotrending-Basis-Vector-Types" title="Permalink to this headline">¶</a></h2>
+<p>There are three basic types of CBVs: - <strong>Single-Scale</strong> contains all systematic trends combined in a single set of basis vectors. - <strong>Multi-Scale</strong> contains systematic trends in specific wavelet-based band passes. There are usually three sets of multi-scale basis vectors in three bands. - <strong>Spike</strong> contains only short impulsive spike systematics.</p>
+<p>There are two different correction methods in PDC: Single-Scale and Multi-Scale. Single-Scale performs the correction in a single bandpass. Multi-Scale performs the correction in three separate wavelet-based bandpasses. Both corrections are performed in PDC but we can only export a single PDC light curve for each target. So, PDC must choose which of the two on a per-target basis. Generally speaking, single-scale performs better at preserving longer period signals. But at periods close to
+transiting planet durations multi-scale performs better at preserving signals. PDC therefore mostly chooses multi-scale for use within the planet finding pipeline and for the archive. You can find in the light curve FITS header which PDC method was chosen (keyword “PDCMETHD”). Additionally, a seperate correction is alway performed to remove short impulsive systematic spikes.</p>
+<p>For an individual’s research needs, the mission supplied PDC lightcurves might not be ideal and so the CBVs are provided to the user to perform their own correction. All three CBV types are provided at MAST for TESS, however only Single-Scale is provided at MAST for Kepler and K2. For TESS, Cotrending Basis Vectors are currently only supplied at a 2-minute cadence. For Kepler/K2 only for the 30-minute target cadence.</p>
+</div>
+<div class="section" id="Obtaining-the-CBVs">
+<h2>Obtaining the CBVs<a class="headerlink" href="#Obtaining-the-CBVs" title="Permalink to this headline">¶</a></h2>
+<p>Two tools are available to automatically download the CBVs relevent to your target of study: <code class="docutils literal notranslate"><span class="pre">get_kepler_cbvs</span></code> and <code class="docutils literal notranslate"><span class="pre">get_tess_cbvs</span></code>. Here is an example loading in the TESS Multi-Scale Band 2 CBVs for TESS target TIC 99180739, which happens to be on camera 1 and CCD 1. Note that you do not need to have a lightcurve object already loaded. One can directly request whichever CBVs one desires.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_lightcurve</span><span class="p">,</span> <span class="n">download_tess_cbvs</span><span class="p">,</span> <span class="n">download_kepler_cbvs</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">lc</span> <span class="o">=</span> <span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;TIC 99180739&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;SPOC&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">flux_column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
+<span class="n">cbvs</span> <span class="o">=</span> <span class="n">download_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">ccd</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;MultiScale&#39;</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>This TessCotrendingBasisVectors object contains 8 Multi-Scale band 2 CBVs for Sector 10, Camera 1, CCD 1. A CBV object contains only one type of CBVs. To obtain all types you must request each seperately. The basis vectors themselves are containted in an astropy.timeseries.TimeSeries Table:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Show the head of the CBV table</span>
+<span class="n">cbvs</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<i>TessCotrendingBasisVectors length=3</i>
+<table id="table6507704384" class="table-striped table-bordered table-condensed">
+<thead><tr><th>time</th><th>CADENCENO</th><th>GAP</th><th>VECTOR_1</th><th>VECTOR_2</th><th>VECTOR_3</th><th>VECTOR_4</th><th>VECTOR_5</th><th>VECTOR_6</th><th>VECTOR_7</th><th>VECTOR_8</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr></thead>
+<thead><tr><th>object</th><th>int32</th><th>bool</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
+<tr><td>1569.43314028183</td><td>246224</td><td>False</td><td>-0.003580346703529358</td><td>-0.0025399853475391865</td><td>0.0003182471264153719</td><td>-0.005101832095533609</td><td>0.0019720413256436586</td><td>-0.002591928234323859</td><td>-0.00848366692662239</td><td>0.009498000144958496</td></tr>
+<tr><td>1569.4345291701247</td><td>246225</td><td>False</td><td>-0.003526911837980151</td><td>-0.0024424500297755003</td><td>0.00030286889523267746</td><td>-0.004837454296648502</td><td>0.002021507592871785</td><td>-0.0025524157099425793</td><td>-0.008463572710752487</td><td>0.009511380456387997</td></tr>
+<tr><td>1569.4359180584206</td><td>246226</td><td>False</td><td>-0.0034735281951725483</td><td>-0.002345119370147586</td><td>0.0002874816709663719</td><td>-0.004573645535856485</td><td>0.0020708078518509865</td><td>-0.0025129010900855064</td><td>-0.008443333208560944</td><td>0.009524472057819366</td></tr>
+</table></div>
+</div>
+<p>All data contained in the MAST CBV FITS files is downloaded. The <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code> and <code class="docutils literal notranslate"><span class="pre">GAP</span></code> columns can be used to select which cadences you desire. Extra information is in the <code class="docutils literal notranslate"><span class="pre">cbvs.meta</span></code> dict. The CBVS are interpolated accross the gaps and so should be used in gapped cadences with extreme caution. Below we will plot the first 4 CBVs. Note: <em>CBVs use 1-based indexing!</em></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cbvs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cbv_indices</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;TESS CBVs (Sector.Camera.CCD : 10.1.1, CBVType.Band : MultiScale.2)&#39;}, xlabel=&#39;Time [btjd]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_10_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_10_1.png" />
+</div>
+</div>
+<p>As further examples, below we will request both Kepler and K2 CBVs.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cbvsKepler</span> <span class="o">=</span> <span class="n">download_kepler_cbvs</span><span class="p">(</span><span class="n">mission</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">cbvsK2</span> <span class="o">=</span> <span class="n">download_kepler_cbvs</span><span class="p">(</span><span class="n">mission</span><span class="o">=</span><span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Converting-the-CBVs-to-a-Lightkurve-DesignMatrix">
+<h2>Converting the CBVs to a Lightkurve <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code><a class="headerlink" href="#Converting-the-CBVs-to-a-Lightkurve-DesignMatrix" title="Permalink to this headline">¶</a></h2>
+<p>You can access individual CBVs directly by referencing the column in the table (i.e. <code class="docutils literal notranslate"><span class="pre">cbvs['VECTOR_#']</span></code>) however a better way to use the CBVs for correcting your light curves is to convert the CBVs to a LightKurve DesignMatrix:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cbv_designmatrix</span> <span class="o">=</span> <span class="n">cbvs</span><span class="o">.</span><span class="n">to_designmatrix</span><span class="p">(</span><span class="n">cbv_indices</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;10.1.1.SingleScale&#39;</span><span class="p">)</span>
+<span class="n">cbv_designmatrix</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+10.1.1.SingleScale DesignMatrix (18900, 8)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cbv_designmatrix</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;10.1.1.SingleScale&#39;}, xlabel=&#39;Component&#39;, ylabel=&#39;X&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_16_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_16_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Aligning-the-CBVs-with-your-light-curve">
+<h2>Aligning the CBVs with your light curve<a class="headerlink" href="#Aligning-the-CBVs-with-your-light-curve" title="Permalink to this headline">¶</a></h2>
+<p>The CBVs obtained from MAST may not have the same cadences as the your target. A method called <code class="docutils literal notranslate"><span class="pre">align</span></code> will allow you to align your CBVs to the cadence numbers in your target lightcurve object. The method will use the cadence number (i.e. <code class="docutils literal notranslate"><span class="pre">lc.cadenceno</span></code>) to perform the alignment. Only cadence numbers that exist in both the CBVs and the light curve will have values in the returned CBVs. All cadence numbers that exist in the light curve but not in the CBVs will have NaNs returned for the CBVs
+on those cadences and the GAP set to True.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Take a cut of the LC loaded above</span>
+<span class="n">lc_short</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="mi">501</span><span class="p">:</span><span class="mi">1501</span><span class="p">]</span>
+<span class="c1"># Take a different cut of the CBVs</span>
+<span class="n">cbvs_short</span> <span class="o">=</span> <span class="n">cbvs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
+<span class="c1"># These cuts do not overlap</span>
+<span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">lc_short</span><span class="o">.</span><span class="n">cadenceno</span> <span class="o">==</span> <span class="n">cbvs_short</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+False
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Align the cuts</span>
+<span class="n">cbvs_aligned</span> <span class="o">=</span> <span class="n">cbvs_short</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">lc_short</span><span class="p">)</span>
+<span class="c1"># They now fully overlap</span>
+<span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">lc_short</span><span class="o">.</span><span class="n">cadenceno</span> <span class="o">==</span> <span class="n">cbvs_aligned</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+True
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Interpolating-the-CBVs-to-an-arbitrary-light-curve">
+<h2>Interpolating the CBVs to an arbitrary light curve<a class="headerlink" href="#Interpolating-the-CBVs-to-an-arbitrary-light-curve" title="Permalink to this headline">¶</a></h2>
+<p>The above <code class="docutils literal notranslate"><span class="pre">align</span></code> method will only keep cadences that line up exactly between the CBVs and the light curve based on the cadence numbers. What if you have a light curve with cadence times not exactly lining up with the CBV cadences? For example, what if you want to use the 2-minute CBVs for cotrending against the 30-minute FFIs? A more general method is <code class="docutils literal notranslate"><span class="pre">inteprolate</span></code>, which uses PCHIP interpolation to generate CBVs at the cadence times of an arbitrary light curve.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Get a light curve from a TESS FFI</span>
+<span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_tesscut</span>
+<span class="n">search_result</span> <span class="o">=</span> <span class="n">search_tesscut</span><span class="p">(</span><span class="s1">&#39;HAT-P-11&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">tpf</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">cutout_size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">target_mask</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">reference_pixel</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+<span class="n">ffi_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">target_mask</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Get the Single-Scale CBVs for this light curve</span>
+<span class="n">cbvs</span> <span class="o">=</span> <span class="n">download_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">ccd</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Interpolate the CBVs to the FFI cadence times</span>
+<span class="n">cbvs_interpolated</span> <span class="o">=</span> <span class="n">cbvs</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">ffi_lc</span><span class="p">,</span> <span class="n">extrapolate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># All cadence times agree</span>
+<span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">cbvs_interpolated</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+True
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># The CBVs are now interpolated to this FFI-derived light curve</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ffi_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;.b&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;HAT-P-11&#39;</span><span class="p">)</span>
+<span class="n">cbvs_interpolated</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cbv_indices</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;TESS CBVs (Sector.Camera.CCD : 14.2.4, CBVType : SingleScale)&#39;}, xlabel=&#39;Time [btjd]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_27_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_27_1.png" />
+</div>
+</div>
+<div class="section" id="Some-notes-about-interpolating-Cotrending-Basis-Vectors">
+<h3>Some notes about interpolating Cotrending Basis Vectors<a class="headerlink" href="#Some-notes-about-interpolating-Cotrending-Basis-Vectors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Currently, only TESS 2-minute and Kepler/K2 30-minute CBVs are archived on MAST</p></li>
+<li><p>20-second CBVs will be available for the TESS extended mission beginning with Sector 27. Each set of 20-second CBVs will be for the entire field of view.</p></li>
+<li><p>FFI CBVs are also being developed and will begin to be exported soon.</p></li>
+<li><p>The CBVs are generated to account for systematics at a specific cadence. They will not necessarily properly represent systematics at a different cadence, but in some cases can still be beneficial.</p></li>
+<li><p>Please remain conscious of the Nyquist frequency and aliasing when interpolating CBVs.</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="2-2-identifying-rolling-band.html" title="previous page">How to identify time-variable background noise (“rolling bands”)?</a>
+    <a class='right-next' id="next-link" href="2-3-how-to-use-cbvcorrector.html" title="next page">Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (<code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>)</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

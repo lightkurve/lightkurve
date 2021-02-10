@@ -1,0 +1,634 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "N5EAvbdlH-BG"
+   },
+   "source": [
+    "# Instrumental Noise in _Kepler_ and _K2_ #3: Seasonal and Detector Effects"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "L57_f2QscO85"
+   },
+   "source": [
+    "## Learning Goals\n",
+    "\n",
+    "By the end of this tutorial, you will:\n",
+    "\n",
+    "- Be able to identify changes in data collection and processing caused by the _Kepler_ mission's seasonal cycles.\n",
+    "- Understand instrumental noise caused by physical features of the _Kepler_ telescope.\n",
+    "- Be able to compare the impact of different seasonal and detector-based noise sources.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "D0ixWhW-cTfm"
+   },
+   "source": [
+    "## Introduction\n",
+    "\n",
+    "This notebook is the third part of a series on identifying instrumental and systematic sources of noise in _Kepler_ and _K2_ data. The first two tutorials in this series are suggested (but not necessary) reading for working through this one. Assumed knowledge for this tutorial is a working familiarity with _Kepler_ light curve files, target pixel files, and their associated metadata, as well as a basic understanding of the transit method for detecting exoplants."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "f0yfyjrD2ERM"
+   },
+   "source": [
+    "## Imports\n",
+    "\n",
+    "We'll use **[Lightkurve](https://docs.lightkurve.org/)** for downloading and handling _Kepler_ data throughout this tutorial. We'll also use **[NumPy](https://numpy.org/)** to handle arrays for aperture masks, and **[Matplotlib](https://matplotlib.org/)** to help with some plotting."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "LQ6s2Mlwc4l9"
+   },
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import matplotlib.gridspec as gs\n",
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "NDHPQkWhhgxv"
+   },
+   "source": [
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "pG12XB_YIlu4"
+   },
+   "source": [
+    "## 1. Background\n",
+    "\n",
+    "The _Kepler_ telescope observed the same area of sky for four years, rotating every three months and dividing the mission into 18 observing quarters. This meant that the same star would fall on four different modules — and different pixels — throughout the mission.\n",
+    "\n",
+    "In this tutorial, we'll explore three types of systematic effects caused by features of the detector, including those which are influenced by seasonal rotation. We will not cover any effects of the onboard electronics, nor the electronic response to external events, such as cosmic rays. These will be covered in the fourth and final tutorial in this series on instrumental noise."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "4GohdQohI2py"
+   },
+   "source": [
+    "## 2. Differential Velocity Aberration and Image Motion\n",
+    "\n",
+    "In this section, we'll look at the changes in a star's position on two different scales: between quarters, and within one quarter.\n",
+    "\n",
+    "Throughout the four-year nominal _Kepler_ mission, differential velocity aberration (DVA) was the main cause of changes in stellar positions ([_Kepler_ Instrument Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf), Section 3.9). To understand DVA, first imagine the _Kepler_ telescope travelling through space. We can draw a \"velocity vector\" in the direction of the telescope's motion. We can draw similar vectors from every point on the focal plane, which represent lines of sight. The angle between the velocity vector and any given line of sight varies across the detector. Because the velocity vector changed each quarter during the _Kepler_ mission, the effective diameter of _Kepler's_ field of view changed by 6 arcseconds every year of the mission. This effect is on order 100 times greater than the effects of pointing instability; it leads to low frequency noise, which can be removed by light curve corrections. Because it's dependent on the line of sight, the effects of DVA are more pronounced towards the edges of the _Kepler_ field of view; some targets can move as much as half a pixel over the course of a quarter.\n",
+    "\n",
+    "We can observe the effects of DVA by looking at how one star's position changes across four quarters. The following code plots Quarters 8–11 for KIC 2437394, with the right ascension and declination overlayed using the [World Coordinate System](https://docs.astropy.org/en/stable/wcs/index.html) (WCS), which is stored in the target pixel files (TPFs)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 632
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 72352,
+     "status": "ok",
+     "timestamp": 1600731753320,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "A76jlOQGJcyH",
+    "outputId": "bf25f632-3673-42ad-9b02-7cd712ab8b21"
+   },
+   "outputs": [],
+   "source": [
+    "fig = plt.figure(figsize=(12, 9))\n",
+    "grid = gs.GridSpec(2,2)\n",
+    "plt.rcParams.update({'font.size': 12})\n",
+    "\n",
+    "i = 0\n",
+    "for q in np.arange(8,12):\n",
+    "    x,y = np.unravel_index(i, (2,2))\n",
+    "    tpf = lk.search_targetpixelfile('KIC 2437394', author=\"Kepler\", cadence=\"long\", quarter=q).download()\n",
+    "    ax = plt.subplot(grid[x,y], projection=tpf.wcs)\n",
+    "    tpf.plot(ax=ax, title=f'Quarter {q}', xlabel=' ', ylabel=' ')\n",
+    "    i+=1\n",
+    "\n",
+    "fig.text(0, 0.5, 'Dec', ha='center', rotation='vertical', size=20)\n",
+    "fig.text(0.5, 0, 'RA', ha='center', size=20);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "oSCfcu-8uz2R"
+   },
+   "source": [
+    "In the above plots, you can see the changing pixel response function (PRF), (see [_Kepler_ Instrument Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf), Section 3.5) as the star changes modules; we'll look at the result of this in Section 3 of this tutorial. Also notice the very slight changes in position, on the scale of seconds, between quarters. The star's coordinates themselves are not changing, but rather the angle between this part of the detector's line of sight and the telescope's velocity vector is changing.\n",
+    "\n",
+    "DVA is one of the effects that contributed to image motion within quarters during the _Kepler_ mission ([_Kepler_ Data Characteristics Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf), Section 5.1). Additionally, target position was influenced by focus changes, as outlined in the second tutorial in this series, and other small pointing errors. These cumulative effects led to target motion on the detector by several 100ths of a pixel per quarter.\n",
+    "\n",
+    "Image motion is measured onboard, and included in light curve and target pixel file metadata in the columns `pos_corr1` and `pos_corr2`. We can use this data to visualize the image motion across one quarter:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 406
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 72345,
+     "status": "ok",
+     "timestamp": 1600731753322,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "OXz9LIarJVNz",
+    "outputId": "dab64924-4eb8-4403-e368-86d08b58f7d5"
+   },
+   "outputs": [],
+   "source": [
+    "example_tpf = lk.search_targetpixelfile('KIC 2437394', author=\"Kepler\", quarter=8).download()\n",
+    "\n",
+    "fig = plt.figure()\n",
+    "plt.rcParams.update({'font.size': 20})\n",
+    "\n",
+    "plt.scatter(example_tpf.pos_corr1, example_tpf.pos_corr2, c=example_tpf.time.value, s=2)\n",
+    "plt.xlabel('column motion (pixels)')\n",
+    "plt.ylabel('row motion (pixels)')\n",
+    "cbar = plt.colorbar()\n",
+    "cbar.set_label('time')\n",
+    "\n",
+    "fig.set_size_inches(9,6)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "G24UMNHfJE8F"
+   },
+   "source": [
+    "## 3. Quarter Boundary Discontinuities\n",
+    "\n",
+    "When a star was observed by new pixels in a new quarter, it was also subject to a different pixel response function (PRF). Because of this, the data processing pipeline also changed its optimal aperture, used to select pixels for aperture photometry. \n",
+    "\n",
+    "For most stars, these changes were not drastic. Additionally, incorrect optimal apertures in the early mission were corrected in later data releases ([_Kepler_ Data Characteristics Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf), Section 5.7, and [Smith et al., 2016](https://iopscience.iop.org/article/10.1088/1538-3873/128/970/124501/pdf)), reducing many disparities between quarters. However, some stars retain a degree of variation across their optimal apertures, particularly those in crowded fields.\n",
+    "\n",
+    "To observe this, let's take another look at our example star from before, KIC 2437394, and see how the optimal aperture changes between quarters:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 617
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 8927,
+     "status": "ok",
+     "timestamp": 1600732001627,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "knmpcU69HmYw",
+    "outputId": "2371ceb7-dc3b-4c26-ac05-fec2db80bd20"
+   },
+   "outputs": [],
+   "source": [
+    "fig = plt.figure(figsize=(12, 9))\n",
+    "grid = gs.GridSpec(2, 2)\n",
+    "\n",
+    "for idx, quarter in enumerate(range(8, 12)):\n",
+    "    x, y = np.unravel_index(idx, (2, 2))\n",
+    "    tpf = lk.search_targetpixelfile('KIC 2437394', author=\"Kepler\", quarter=quarter).download()\n",
+    "    ax = plt.subplot(grid[x, y])\n",
+    "    tpf.plot(aperture_mask='pipeline', ax=ax, title=f'Quarter {quarter}')\n",
+    "\n",
+    "plt.tight_layout();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "JNAuVZi8IQRR"
+   },
+   "source": [
+    "KIC 2437394 is in the field of open cluster NGC 6791, meaning that crowding is a major factor in determining the optimal aperture, alongside the PRF. The changing optimal aperture leads to each quarter contributing different amounts of photon flux to the aperture photometry process, which causes discontinuities at quarter boundaries. We can see this effect by looking at the full light curve for KIC 2437394.\n",
+    "\n",
+    "The following code downloads all 17 available quarters for KIC 2437394 and stitches them together, plotting them with dashed lines to indicate quarter boundaries:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 20669,
+     "status": "ok",
+     "timestamp": 1600732069828,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "xRAAd_TkJgCI",
+    "outputId": "45e48d00-c7f8-48f7-92f3-9844fbf5257d"
+   },
+   "outputs": [],
+   "source": [
+    "lc = lk.search_lightcurve('KIC 2437394', author=\"Kepler\", cadence='long').download_all().stitch().remove_outliers()\n",
+    "\n",
+    "ax = lc.plot()\n",
+    "quarterlines = [120, 131, 169, 259, 351, 442, 538, 629, 734, 808, 906, 1000, 1098, 1182, 1273, 1372, 1471, 1558]\n",
+    "for i, q in enumerate(quarterlines):\n",
+    "    ax.axvline(q, c='r', ls='--', alpha=0.5)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "YNzoqyDjKd1e"
+   },
+   "source": [
+    "Notice how the structure of the light curve appears to rise and fall: Quarters 3, 7, and 11 (as pictured above) all have larger apertures. A larger aperture collects more photons, meaning their contribution to noise levels is also greater, and the light curve shows a larger amount of scatter in those quarters.\n",
+    "\n",
+    "You can confirm this for yourself by running the code below, which prints out the standard deviation of the normalized flux in each quarter:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 306
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 30779,
+     "status": "ok",
+     "timestamp": 1600732157709,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "RJiiWZIYNq_W",
+    "outputId": "36bdc0f4-fb94-4ea8-c08b-e6767fa36695"
+   },
+   "outputs": [],
+   "source": [
+    "for q in range(1, 18):\n",
+    "  lc = lk.search_lightcurve('KIC 2437394', author=\"Kepler\", cadence='long', quarter=q).download().normalize().remove_outliers()\n",
+    "  print(f'Quarter {q} standard deviation: {np.std(lc.flux.value):.1e}')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "dTHHCCyWghr8"
+   },
+   "source": [
+    "In SAP and PDCSAP data, quarter boundary discontinuities are mostly present in stars in crowded fields. However, when performing custom aperture photometry, it's useful to be aware of this phenomenon and factor it into your choice of aperture and/or light curve corrections procedure."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "As3_k9okJJ82"
+   },
+   "source": [
+    "## 4. Ghosts and Scattered Light\n",
+    "\n",
+    "Moving away from seasonal effects now, the final phenomenon we'll look at in this tutorial is a natural consequence of the construction of the _Kepler_ telescope, as documented in the [_Kepler_ Instrument Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf), Section 3.10. Scattered light on the detector results from bright stars which lie near the aluminium masking at the edges of modules, or between charge-coupled device (CCD) chips. As this scattering occurs in the vicinity of these bright stars, it is less likely to affect photometry beyond regular contamination, and the more diffuse it is, the less impact it has.\n",
+    "\n",
+    "Ghost images are the result of reflections on the CCDs. One well-documented _Kepler_ ghost is the Schmidt Corrector Ghost, which causes stars to be reflected around the telescope's optical axis. However, these reflections are low magnitude. The type of ghost you're more likely to encounter is reflected light from very bright stars, bouncing off the field flattener lens and returning diffusely to the CCDs. The Schmidt Corrector and the field flattener are described in Sections 3.2.2 and 3.2.3 of the [_Kepler_ Instrument Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf).\n",
+    "\n",
+    "These ghosts can be a particular problem when dealing with exoplanet false positives; it is not immediately evident when one star is being contaminated by one that's far away from it.\n",
+    "\n",
+    "KIC 11911580 was flagged as a _Kepler_ Object of Interest — KOI-3900 — after Quarter 12 of the mission. Let's have a look at a periodogram of its time series, and a light curve folded on the highest amplitude peak:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 422
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 20078,
+     "status": "ok",
+     "timestamp": 1600732209601,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "t_y_E7jjJq9F",
+    "outputId": "35e7b732-a48a-4efb-837c-a764f947b33d"
+   },
+   "outputs": [],
+   "source": [
+    "koi = lk.search_lightcurve('KIC 11911580', author=\"Kepler\", cadence='long').download_all().stitch()\n",
+    "koi_pg = koi.remove_nans().to_periodogram()\n",
+    "ax = koi_pg.plot()\n",
+    "ax.set_xlim(0, 2.2);"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 405
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 3730,
+     "status": "ok",
+     "timestamp": 1600732219445,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "y6im423V2i9i",
+    "outputId": "461859a7-7055-4743-aec4-b43b13202b9b"
+   },
+   "outputs": [],
+   "source": [
+    "koi.fold(period=koi_pg.period_at_max_power).bin(time_bin_size=0.1).plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "TbJUwF-7rZ3K"
+   },
+   "source": [
+    "This does appear to be the signal of a transit, but the high noise levels in the periodogram suggest it's more likely to be the diluted signal of a nearby eclipsing binary. In the case of normal contamination, we'd use Lightkurve's `plot_pixels()` function to identify a nearby binary:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 548
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 6941,
+     "status": "ok",
+     "timestamp": 1600732245060,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "Tpf6E86vsfD3",
+    "outputId": "7f3bab46-7b02-43a5-f1a5-5b87c740d2e7"
+   },
+   "outputs": [],
+   "source": [
+    "koi_tpf = lk.search_targetpixelfile('KIC 11911580', author=\"Kepler\", cadence='long', quarter=10).download()\n",
+    "koi_tpf.plot_pixels(aperture_mask='pipeline', corrector_func=lambda x: x.flatten().remove_outliers());"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "iFJiqD8BtZFV"
+   },
+   "source": [
+    "There's nothing obvious here, which indicates this is a more complicated case of contamination. In fact, KOI-3900 is contaminated by KIC 3644542, an eclipsing binary 18 rows and 44 columns away from KOI-3900 on the detector. This is an example of a diffuse ghost on the detector causing a spurious variable signal to contaminate far away pixels.\n",
+    "\n",
+    "KOI-3900 was determined to be a false positive due to a ghost shortly after it was flagged as a KOI, by [Coughlin et al. 2014](https://iopscience.iop.org/article/10.1088/0004-6256/147/5/119/pdf), who used ephemeris matching to compare its period to that of known eclipsing binaries. In later work, [Thompson et al. (2018)](https://iopscience.iop.org/article/10.3847/1538-4365/aab4f9/pdf) flagged false positives due to ghosts by measuring the relative strength of the signal in the optimal aperture and in background pixels.\n",
+    "\n",
+    "Below, we show the periodogram and phased light curve of KIC 3644542 for comparison:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 401
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 20873,
+     "status": "ok",
+     "timestamp": 1600732298572,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "AXvNTkJrJsU1",
+    "outputId": "90cabd7e-202d-4b3c-d59c-03c88e4d8e12"
+   },
+   "outputs": [],
+   "source": [
+    "ghost = lk.search_lightcurve('KIC 3644542', author=\"Kepler\", cadence='long').download_all().stitch()\n",
+    "ghost_pg = ghost.remove_nans().to_periodogram()\n",
+    "ax = ghost_pg.plot()\n",
+    "ax.set_xlim(0, 2.2);"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 3504,
+     "status": "ok",
+     "timestamp": 1600732302101,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "_BjQY-7U4NEf",
+    "outputId": "8ea2aa89-1699-4cb4-c6bc-1187b2c820c1"
+   },
+   "outputs": [],
+   "source": [
+    "ghost.fold(period=ghost_pg.period_at_max_power).bin(time_bin_size=0.1).plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "vbge5j28DVeN"
+   },
+   "source": [
+    "## About this Notebook\n",
+    "\n",
+    "**Author:** [Isabel Colman](http://orcid.org/0000-0001-8196-516X) (`isabel.colman@sydney.edu.au`)\n",
+    "\n",
+    "**Updated on:** 2020-09-29"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "RODabQGSoQHX"
+   },
+   "source": [
+    "## Citing Lightkurve and Astropy\n",
+    "\n",
+    "If you use `lightkurve` or `astropy` for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 144
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 799,
+     "status": "ok",
+     "timestamp": 1600732302966,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "7vUtrWVjnlY7",
+    "outputId": "ce51a516-1596-40f7-de2d-4cf25b128960"
+   },
+   "outputs": [],
+   "source": [
+    "lk.show_citation_instructions()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "y1HbVfHwDVeN"
+   },
+   "source": [
+    "<img style=\"float: right;\" src=\"https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png\" alt=\"Space Telescope Logo\" width=\"200px\"/>"
+   ]
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "collapsed_sections": [],
+   "name": "Instrumental noise in Kepler and K2 #3: seasonal and detector effects.ipynb",
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

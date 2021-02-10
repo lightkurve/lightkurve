@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.fold
+==========================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.fold

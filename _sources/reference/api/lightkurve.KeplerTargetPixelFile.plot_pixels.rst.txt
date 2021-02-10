@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.plot\_pixels
+=============================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.plot_pixels

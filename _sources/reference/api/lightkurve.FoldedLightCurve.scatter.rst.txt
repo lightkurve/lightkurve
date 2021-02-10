@@ -1,0 +1,6 @@
+﻿lightkurve.FoldedLightCurve.scatter
+===================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: FoldedLightCurve.scatter

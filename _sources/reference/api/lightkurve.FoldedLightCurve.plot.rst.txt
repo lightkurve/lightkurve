@@ -1,0 +1,6 @@
+﻿lightkurve.FoldedLightCurve.plot
+================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: FoldedLightCurve.plot

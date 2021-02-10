@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.interact\_sky
+==============================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.interact_sky

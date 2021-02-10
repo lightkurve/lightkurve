@@ -1,0 +1,1007 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plotting Target Pixel Files with Lightkurve &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Interactively inspecting Target Pixel Files" href="interactively-inspecting-data.html" />
+    <link rel="prev" title="Using Target Pixel Files with Lightkurve" href="using-target-pixel-file-products.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../reference/index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../about/index.html">About</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar">
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Learning-Goals" class="nav-link">Learning Goals</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Introduction" class="nav-link">Introduction</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Imports" class="nav-link">Imports</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#1.-Downloading-a-TPF" class="nav-link">1. Downloading a TPF</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#2.-Flux-and-Background" class="nav-link">2. Flux and Background</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#3.-Apertures" class="nav-link">3. Apertures</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#4.-Simple-Aperture-Photometry" class="nav-link">4. Simple Aperture Photometry</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#Note" class="nav-link">Note</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Exercises" class="nav-link">Exercises</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#About-this-Notebook" class="nav-link">About this Notebook</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#Citing-Lightkurve-and-Astropy" class="nav-link">Citing Lightkurve and Astropy</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div style="float:right; margin-bottom:1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/1-getting-started/plotting-target-pixel-files.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/1-getting-started/plotting-target-pixel-files.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/1-getting-started/plotting-target-pixel-files.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+</div>
+<br style="clear:both;"><div class="section" id="Plotting-Target-Pixel-Files-with-Lightkurve">
+<h1>Plotting Target Pixel Files with Lightkurve<a class="headerlink" href="#Plotting-Target-Pixel-Files-with-Lightkurve" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Learning-Goals">
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
+<p>By the end of this tutorial, you will:</p>
+<ul class="simple">
+<li><p>Learn how to download and plot target pixel files from the data archive using <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a>.</p></li>
+<li><p>Be able to plot the target pixel file background.</p></li>
+<li><p>Be able to extract and plot flux from a target pixel file.</p></li>
+</ul>
+</div>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://www.nasa.gov/mission_pages/kepler/main/index.html">Kepler</a>, <a class="reference external" href="https://www.nasa.gov/mission_pages/kepler/main/index.html">K2</a>, and <a class="reference external" href="https://tess.mit.edu/">TESS</a> telescopes observe stars for long periods of time, from just under a month to four years. By doing so they observe how the brightnesses of stars change over time.</p>
+<p>Pixels around targeted stars are cut out and stored as <em>target pixel files</em> at each observing cadence. In this tutorial, we will learn how to use Lightkurve to download and understand the different photometric data stored in a target pixel file, and how to extract flux using basic aperture photometry.</p>
+<p>It is useful to read the accompanying tutorial discussing how to use target pixel file products with Lightkurve before starting this tutorial. It is recommended that you also read the tutorial on using <em>Kepler</em> light curve products with Lightkurve, which will introduce you to some specifics on how <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> make observations, and how these are displayed as light curves. It also introduces some important terms and concepts that are referred to in this tutorial.</p>
+<p><em>Kepler</em> observed a single field in the sky, although not all stars in this field were recorded. Instead, pixels were selected around certain targeted stars. These cutout images are called target pixel files, or TPFs. By combining the amount of flux in the pixels where the star appears, you can make a measurement of the amount of light from a star in that observation. The pixels chosen to include in this measurement are referred to as an <em>aperture</em>.</p>
+<p>TPFs are typically the first port of call when studying a star with <em>Kepler</em>, <em>K2</em>, or <em>TESS</em>. They allow us to see where our data is coming from, and identify potential sources of noise or systematic trends. In this tutorial, we will use the <em>Kepler</em> mission as the main example, but these tools equally apply to <em>TESS</em> and <em>K2</em> as well.</p>
+</div>
+<div class="section" id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial requires: - <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> to work with TPF files. - <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="1.-Downloading-a-TPF">
+<h2>1. Downloading a TPF<a class="headerlink" href="#1.-Downloading-a-TPF" title="Permalink to this headline">¶</a></h2>
+<p>A TPF contains the original imaging data from which a light curve is derived. Besides the brightness data measured by the charge-coupled device (CCD) camera, a TPF also includes post-processing information such as an estimate of the astronomical background, and a recommended pixel aperture for extracting a light curve.</p>
+<p>First, we download a target pixel file. We will use one quarter’s worth of <em>Kepler</em> data for the star named <a class="reference external" href="http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/">Kepler-8</a>, a star somewhat larger than the Sun, and the host of a <a class="reference external" href="https://en.wikipedia.org/wiki/Hot_Jupiter">hot Jupiter planet</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;Kepler-8&quot;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">&quot;long&quot;</span><span class="p">)</span>
+<span class="n">search_result</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+SearchResult containing 1 data products.
+
+<table id="table6476118288">
+<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
+<tr><td>0</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+</table></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>This TPF contains data for every cadence in the quarter we downloaded. Let’s focus on the first cadence for now, which we can select using zero-based indexing as follows:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">first_cadence</span> <span class="o">=</span> <span class="n">tpf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">first_cadence</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+KeplerTargetPixelFile Object (ID: 6922244)
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="2.-Flux-and-Background">
+<h2>2. Flux and Background<a class="headerlink" href="#2.-Flux-and-Background" title="Permalink to this headline">¶</a></h2>
+<p>At each cadence the TPF has a number of photometry data properties. These are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">flux_bkg</span></code>: the astronomical background of the image.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flux_bkg_err</span></code>: the statistical uncertainty on the background flux.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flux</span></code>: the stellar flux after the background is removed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flux_err</span></code>: the statistical uncertainty on the stellar flux after background removal.</p></li>
+</ul>
+<p>These properties can be accessed via a TPF object as follows:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">first_cadence</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">value</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[[          nan, 5.6079335e+00, 5.1491142e+01, 8.4241745e+01,
+         3.0221334e+01],
+        [4.4045620e+01, 7.6861229e+01, 1.1227759e+03, 3.2262029e+03,
+         4.5486777e+02],
+        [2.5911165e+01, 2.2907593e+02, 9.3626543e+03, 2.3606273e+04,
+         1.2087750e+03],
+        [4.0100830e+01, 8.8543927e+02, 1.7102118e+03, 2.6254871e+03,
+         7.0796606e+02],
+        [1.5719417e+02, 8.3713440e+02, 5.1021539e+02, 1.1501041e+03,
+         1.8313370e+02]]], dtype=float32)
+</pre></div></div>
+</div>
+<p>And you can plot the data as follows:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">first_cadence</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 6922244, Cadence: 11914&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_16_1.png" src="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_16_1.png" />
+</div>
+</div>
+<p>Alternatively, if you are working directly with a FITS file, you can access the data in extension 1 (for example, <code class="docutils literal notranslate"><span class="pre">first_cadence.hdu[1].data['FLUX']</span></code>). Note that you can find all of the details on the structure and contents of TPF files in Section 2.3.2 of the <a class="reference external" href="http://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/archive_manual.pdf">Kepler Archive Manual</a>.</p>
+<p>When plotting data using the <code class="docutils literal notranslate"><span class="pre">plot()</span></code> function, what you are seeing in the TPF is the flux <em>after</em> the background has been removed. This background flux typically consists of <a class="reference external" href="https://en.wikipedia.org/wiki/Zodiacal_light">zodiacal light</a> or earthshine (especially in <em>TESS</em> observations). The background is typically smooth and changes on scales much larger than a single TPF. In <em>Kepler</em>, the background is estimated for the CCD as a whole, before being extracted from each TPF in that CCD. You
+can learn more about background removal in Section 4.2 of the <a class="reference external" href="http://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-002-KDPH.pdf">Kepler Data Processing Handbook</a>.</p>
+<p>Now, let’s compare the background to the background-subtracted flux to get a sense of scale. We can do this using the <code class="docutils literal notranslate"><span class="pre">plot()</span></code> function’s <code class="docutils literal notranslate"><span class="pre">column</span></code> keyword. By default the function plots the flux, but we can change this to plot the background, as well as other data such as the error on each pixel’s flux.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">16</span><span class="p">))</span>
+<span class="n">first_cadence</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">column</span><span class="o">=</span><span class="s1">&#39;FLUX&#39;</span><span class="p">)</span>
+<span class="n">first_cadence</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">column</span><span class="o">=</span><span class="s1">&#39;FLUX_BKG&#39;</span><span class="p">)</span>
+<span class="n">first_cadence</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">column</span><span class="o">=</span><span class="s1">&#39;FLUX_ERR&#39;</span><span class="p">)</span>
+<span class="n">first_cadence</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">column</span><span class="o">=</span><span class="s1">&#39;FLUX_BKG_ERR&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 6922244, Cadence: 11914&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_20_1.png" src="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_20_1.png" />
+</div>
+</div>
+<p>From looking at the color scale on both plots, you may see that the background flux is very low compared to the total flux emitted by a star. This is expected — stars are bright! But these small background corrections become important when looking at the very small scale changes caused by planets or stellar oscillations. Understanding the background is an important part of astronomy with <em>Kepler</em>, <em>K2</em>, and <em>TESS</em>.</p>
+<p>If the background is particularly bright and you want to see what the TPF looks like with it included, passing the <code class="docutils literal notranslate"><span class="pre">bkg=True</span></code> argument to the <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method will show the TPF with the flux added on top of the background, representing the total flux recorded by the spacecraft.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">first_cadence</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">bkg</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 6922244, Cadence: 11914&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_23_1.png" src="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_23_1.png" />
+</div>
+</div>
+<p>In this case, the background is low and the star is bright, so it doesn’t appear to make much of a difference.</p>
+</div>
+<div class="section" id="3.-Apertures">
+<h2>3. Apertures<a class="headerlink" href="#3.-Apertures" title="Permalink to this headline">¶</a></h2>
+<p>As part of the data processing done by the <em>Kepler</em> pipeline, each TPF includes a recommended <em>optimal aperture mask</em>. This aperture mask is optimized to ensure that the stellar signal has a high signal-to-noise ratio, with minimal contamination from the background.</p>
+<p>The optimal aperture is stored in the TPF as the <code class="docutils literal notranslate"><span class="pre">pipeline_mask</span></code> property. We can have a look at it by calling it here:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">first_cadence</span><span class="o">.</span><span class="n">pipeline_mask</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[False, False, False, False, False],
+       [False, False,  True,  True, False],
+       [False, False,  True,  True, False],
+       [False,  True,  True,  True, False],
+       [False, False, False,  True, False]])
+</pre></div></div>
+</div>
+<p>As you can see, it is a Boolean array detailing which pixels are included. We can plot this aperture over the top of our TPF using the <code class="docutils literal notranslate"><span class="pre">plot()</span></code> function, and passing in the mask to the <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code> keyword. This will highlight the pixels included in the aperture mask using red hatched lines.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">first_cadence</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">first_cadence</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 6922244, Cadence: 11914&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_30_1.png" src="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_30_1.png" />
+</div>
+</div>
+<p>You don’t necessarily have to pass in the <code class="docutils literal notranslate"><span class="pre">pipeline_mask</span></code> to the <code class="docutils literal notranslate"><span class="pre">plot()</span></code> function; it can be any mask you create yourself, provided it is the right shape. An accompanying tutorial explains how to create such custom apertures, and goes into aperture photometry in more detail. For specifics on the selection of <em>Kepler</em>’s optimal apertures, read the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-002-KDPH.pdf">Kepler Data Processing
+Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
+</div>
+<div class="section" id="4.-Simple-Aperture-Photometry">
+<h2>4. Simple Aperture Photometry<a class="headerlink" href="#4.-Simple-Aperture-Photometry" title="Permalink to this headline">¶</a></h2>
+<p>Finally, let’s learn how to perform simple aperture photometry (SAP) using the provided optimal aperture in <code class="docutils literal notranslate"><span class="pre">pipeline_mask</span></code> and the TPF.</p>
+<p>Using the full TPF for all cadences in the quarter, we can perform aperture photometry using the <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code> method as follows:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>This method returns a <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object which details the flux and flux centroid position at each cadence:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<i>KeplerLightCurve targetid=6922244 length=4116</i>
+<table id="table6484902912" class="table-striped table-bordered table-condensed">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>quality</th></tr></thead>
+<thead><tr><th></th><th>electron / s</th><th>electron / s</th><th>pix</th><th>pix</th><th></th><th></th></tr></thead>
+<thead><tr><th>object</th><th>float32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>int32</th></tr></thead>
+<tr><td>352.37632485035283</td><td>43689.1484375</td><td>6.631562232971191</td><td>683.1803253801079</td><td>190.5726135863067</td><td>11914</td><td>0</td></tr>
+<tr><td>352.3967580484896</td><td>43698.078125</td><td>6.631830215454102</td><td>683.1799393446446</td><td>190.57243877622443</td><td>11915</td><td>8192</td></tr>
+<tr><td>352.4376244455707</td><td>43694.10546875</td><td>6.6317877769470215</td><td>683.1796254892746</td><td>190.57267573478472</td><td>11917</td><td>16</td></tr>
+<tr><td>352.45805764463876</td><td>43698.31640625</td><td>6.631948947906494</td><td>683.1797879898063</td><td>190.572495708295</td><td>11918</td><td>0</td></tr>
+<tr><td>352.4784908439324</td><td>43687.6484375</td><td>6.631504535675049</td><td>683.1792868369076</td><td>190.5724646436399</td><td>11919</td><td>0</td></tr>
+<tr><td>352.4989240434661</td><td>43686.4765625</td><td>6.6314263343811035</td><td>683.1797248407688</td><td>190.57284004406665</td><td>11920</td><td>0</td></tr>
+<tr><td>352.5193572433491</td><td>43692.59375</td><td>6.631662845611572</td><td>683.1797061300535</td><td>190.57275259977848</td><td>11921</td><td>0</td></tr>
+<tr><td>352.53979034345684</td><td>43712.01953125</td><td>6.6356940269470215</td><td>683.1787298941248</td><td>190.5731682394625</td><td>11922</td><td>128</td></tr>
+<tr><td>352.56022364380624</td><td>43683.98046875</td><td>6.631390571594238</td><td>683.1793654382498</td><td>190.57307253477993</td><td>11923</td><td>0</td></tr>
+<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>442.01959480413643</td><td>43153.08203125</td><td>6.599308490753174</td><td>683.002712235495</td><td>190.7815066390984</td><td>16301</td><td>0</td></tr>
+<tr><td>442.0400292694467</td><td>43162.8515625</td><td>6.5997772216796875</td><td>683.0029172184355</td><td>190.7811747235669</td><td>16302</td><td>0</td></tr>
+<tr><td>442.0604635348791</td><td>43167.78125</td><td>6.600048065185547</td><td>683.0028434958307</td><td>190.78150710808106</td><td>16303</td><td>0</td></tr>
+<tr><td>442.0808979004214</td><td>43156.33203125</td><td>6.599843978881836</td><td>683.0027064285711</td><td>190.78136953427565</td><td>16304</td><td>128</td></tr>
+<tr><td>442.1013323661464</td><td>43164.0703125</td><td>6.599811553955078</td><td>683.0025882793675</td><td>190.7811069549184</td><td>16305</td><td>0</td></tr>
+<tr><td>442.1217667319579</td><td>43160.6640625</td><td>6.599737167358398</td><td>683.0028467866362</td><td>190.78114511476244</td><td>16306</td><td>8192</td></tr>
+<tr><td>442.1422009979142</td><td>43157.625</td><td>6.5994954109191895</td><td>683.0026386252844</td><td>190.78167294557255</td><td>16307</td><td>0</td></tr>
+<tr><td>442.16263546398113</td><td>43155.80078125</td><td>6.599367618560791</td><td>683.002560918617</td><td>190.7812353959604</td><td>16308</td><td>0</td></tr>
+<tr><td>442.1830698302001</td><td>43148.46484375</td><td>6.599063873291016</td><td>683.0023621573163</td><td>190.78154300322052</td><td>16309</td><td>0</td></tr>
+<tr><td>442.20350409652747</td><td>43151.5625</td><td>6.599262714385986</td><td>683.0024686391082</td><td>190.7814194325506</td><td>16310</td><td>0</td></tr>
+</table></div>
+</div>
+<p>Note that this <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ object has fewer data columns than in light curves downloaded directly from MAST. This is because we are extracting our light curve directly from the TPF using minimal processing, whereas light curves created using the official pipeline include more processing and more columns.</p>
+<p>We can visualize the light curve as follows:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_39_1.png" src="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_39_1.png" />
+</div>
+</div>
+<p>This light curve is similar to the SAP light curve we previously encountered in the light curve tutorial.</p>
+<div class="section" id="Note">
+<h3>Note<a class="headerlink" href="#Note" title="Permalink to this headline">¶</a></h3>
+<p>The background flux can be plotted in a similar way, using the <code class="docutils literal notranslate"><span class="pre">`get_bkg_lightcurve()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve">https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve</a>&gt;`__ method. This does not require an aperture, but instead sums the flux in the TPF’s <code class="docutils literal notranslate"><span class="pre">FLUX_BKG</span></code> column at each timestamp.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bkg</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">get_bkg_lightcurve</span><span class="p">()</span>
+<span class="n">bkg</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_42_1.png" src="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_42_1.png" />
+</div>
+</div>
+<p>Inspecting the background in this way is useful to identify signals which appear to be present in the background rather than in the astronomical object under study.</p>
+<hr class="docutils" />
+</div>
+</div>
+<div class="section" id="Exercises">
+<h2>Exercises<a class="headerlink" href="#Exercises" title="Permalink to this headline">¶</a></h2>
+<p>Some stars, such as the planet-hosting star Kepler-10, have been observed both with <em>Kepler</em> and <em>TESS</em>. In this exercise, download and plot both the <em>TESS</em> and <em>Kepler</em> TPFs, along with the optimal apertures. You can do this by either selecting the TPFs from the list returned by <code class="docutils literal notranslate"><span class="pre">`search_targetpixelfile()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.search_targetpixelfile.html">https://docs.lightkurve.org/api/lightkurve.search.search_targetpixelfile.html</a>&gt;`__, or by using the <code class="docutils literal notranslate"><span class="pre">mission</span></code> keyword argument when searching.</p>
+<p>Both <em>Kepler</em> and <em>TESS</em> produce target pixel file data products, but these can look different across the two missions. <em>TESS</em> is focused on brighter stars and has larger pixels, so a star that might occupy many pixels in <em>Kepler</em> may only occupy a few in <em>TESS</em>.</p>
+<p>How do light curves extracted from both of them compare?</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#datalist = lk.search_targetpixelfile(...)</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#soln:</span>
+<span class="n">datalist</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">)</span>
+<span class="n">datalist</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+SearchResult containing 53 data products.
+
+<table id="table6480448240">
+<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
+<tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>1</td><td>Kepler Quarter 01</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>2</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>3</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>4</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>5</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>6</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>7</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>8</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>9</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>43</td><td>Kepler Quarter 15</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>44</td><td>Kepler Quarter 15</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>45</td><td>Kepler Quarter 15</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>46</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>47</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>48</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
+<tr><td>49</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>50</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>1800</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>51</td><td>TESS Sector 15</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>1800</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>52</td><td>TESS Sector 26</td><td>2020</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>1800</td><td>377780790</td><td>0.0</td></tr>
+</table>
+Length = 53 rows</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">kep</span> <span class="o">=</span> <span class="n">datalist</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="n">tes</span> <span class="o">=</span> <span class="n">datalist</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">kep</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="n">kep</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">tes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="n">tes</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_50_0.png" src="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_50_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc_kep</span> <span class="o">=</span> <span class="n">kep</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
+<span class="n">lc_tes</span> <span class="o">=</span> <span class="n">tes</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">lc_kep</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">lc_tes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_52_1.png" src="../../_images/tutorials_1-getting-started_plotting-target-pixel-files_52_1.png" />
+</div>
+</div>
+<p>If you plot the light curves for both missions side by side, you will see a stark difference. The <em>Kepler</em> data has a much smaller scatter, and repeating transits are visible. This is because <em>Kepler</em>’s pixels were smaller, and so could achieve a higher precision on fainter stars. <em>TESS</em> has larger pixels and therefore focuses on brighter stars. For stars like Kepler-10, it would be hard to detect a planet using <em>TESS</em> data alone.</p>
+</div>
+<div class="section" id="About-this-Notebook">
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
+<p><strong>Authors:</strong> Oliver Hall (<a class="reference external" href="mailto:oliver&#46;hall&#37;&#52;&#48;esa&#46;int">oliver<span>&#46;</span>hall<span>&#64;</span>esa<span>&#46;</span>int</a>), Geert Barentsen</p>
+<p><strong>Updated On</strong>: 2020-09-15</p>
+</div>
+<div class="section" id="Citing-Lightkurve-and-Astropy">
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
+<p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
+<p>lk.show_citation_instructions()</p>
+<p><img alt="Space Telescope Logo" class="no-scaled-link" src="https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png" style="width: 200px;" /></p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="using-target-pixel-file-products.html" title="previous page">Using Target Pixel Files with Lightkurve</a>
+    <a class='right-next' id="next-link" href="interactively-inspecting-data.html" title="next page">Interactively inspecting Target Pixel Files</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

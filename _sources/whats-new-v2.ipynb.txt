@@ -1,0 +1,448 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "initial-continent",
+   "metadata": {},
+   "source": [
+    "# What's new in Lightkurve 2?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "engaging-burton",
+   "metadata": {},
+   "source": [
+    "## Lightkurve 2 offers improved support for TESS\n",
+    "\n",
+    "Lightkurve v1 has been a tremendous success.  Owing to the efforts of [67 contributors](https://github.com/KeplerGO/lightkurve/blob/master/AUTHORS.rst), Lightkurve grew into a popular tool to analyze the data archive of NASA's Kepler space telescope.  The package has been cited by nearly [200 scientific publications](https://ui.adsabs.harvard.edu/search/q=full%3A\"Lightkurve\") to date.\n",
+    "\n",
+    "In recent years, the success revealed a shortcoming: Lightkurve 1 was too focused on supporting Kepler data products. Over the past two years, our community has evolved in important ways:\n",
+    "\n",
+    "* NASA successfully launched TESS, adding a significant new data set which requires Lightkurve-like tools.\n",
+    "* The TESS data archive started hosting numerous [community light curve databases](https://heasarc.gsfc.nasa.gov/docs/tess/community.html#high-level-science-products) created using specialized pipelines.\n",
+    "* Many new time domain missions are on the horizon, including NASA's Roman Space Telescope.\n",
+    "\n",
+    "In response to these changes, the [TESS GI Office](https://heasarc.gsfc.nasa.gov/docs/tess/) at NASA Goddard and the [TESS Data Archive](https://archive.stsci.edu/tess/) at STScI/MAST supported the modification of Lightkurve and its tutorials to better support TESS and other data sets in three important ways:\n",
+    "\n",
+    "\n",
+    "1. LightCurve objects are now specialized kinds of AstroPy Table objects, making it a more generic container for light curves from any telescope.\n",
+    "2. Data search and download functions now support all TESS and Kepler light curve available at MAST, including those created by community pipelines.\n",
+    "3. The noise removal tools now allow users to perform custom corrections in a way that is very similar to the official Kepler/TESS pipeline. \n",
+    "\n",
+    "The remainder of this page briefly demonstrates these new features.\n",
+    "They are explained in more detail in a new set of entry-level tutorials which are avaiable in the online documentation at [docs.lightkurve.org](https://docs.lightkurve.org).\n",
+    "\n",
+    "\n",
+    "## 1. LightCurve objects are now specialized kinds of AstroPy Tables\n",
+    "\n",
+    "The most important change in Lightkurve 2 is that light curves are now extensions of AstroPy [TimeSeries](https://docs.astropy.org/en/stable/timeseries/) objects, which in turn are a sub-class of AstroPy Table.\n",
+    "Compared to a generic table, the key difference is that each `LightCurve` object is guaranteed to have `time`, `flux`, and `flux_err` columns. This allows Lightkurve to extend AstroPy with tools that are specific to the analysis of TESS-like time series photometry.\n",
+    "\n",
+    "### ✨ New: LightCurve objects behave like tables\n",
+    "\n",
+    "Light curves can still be created as before, but now look and act like tables:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "informational-escape",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from lightkurve import LightCurve\n",
+    "lc = LightCurve(time=[2000.0, 2000.1, 2000.2],\n",
+    "                flux=[1.0, 1.0, 1.0],\n",
+    "                flux_err=[0.1, 0.1, 0.1],\n",
+    "                time_format=\"btjd\")\n",
+    "lc"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "acute-colony",
+   "metadata": {},
+   "source": [
+    "### ✨ New: Light curves support user-defined columns\n",
+    "\n",
+    "Because light curves are now tables, they can contain arbitrary user-defined columns:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "healthy-sleeping",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc['color'] = ['red', 'green', 'blue']\n",
+    "lc"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "stock-finger",
+   "metadata": {},
+   "source": [
+    "### ✨ New: Columns and rows can be accessed using index notation\n",
+    "\n",
+    "Just like Table objects, columns and rows can be accessed using index notation:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "likely-hometown",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc[1:3]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "limiting-gnome",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc['flux']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "catholic-incident",
+   "metadata": {},
+   "source": [
+    "### ✨ New: Times are stored as an AstroPy Time object\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "respected-carolina",
+   "metadata": {},
+   "source": [
+    "Lightkurve 2 extends [AstroPy Time](https://docs.astropy.org/en/stable/time/) by adding support for the TESS and Kepler time formats (\"BTJD\" and \"BKJD\").  As a result, the time column is now always a Time object, which enables user to leverage this standard AstroPy feature:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "classical-nickname",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.time"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "undefined-tourism",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.time.jd   # Easy conversion to Julian Days"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "together-supervisor",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.time.iso  # Easy conversion to ISO time stamps"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "liberal-adobe",
+   "metadata": {},
+   "source": [
+    "### ✨ New: Read and write light curves in many file formats\n",
+    "\n",
+    "Because light curves act like tables, they now have easy `read()` and `write()` methods which allow a [variety of data formats](https://docs.astropy.org/en/stable/io/unified.html#built-in-readers-writers) to be used.  For example, it is now much easier to store a light curve to a human-readable text file:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "duplicate-lyric",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.write(\"/tmp/lightcurve.txt\", format=\"ascii.fixed_width\", overwrite=True)\n",
+    "!cat /tmp/lightcurve.txt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "minor-future",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "LightCurve.read(\"/tmp/lightcurve.txt\", format=\"ascii.fixed_width\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "irish-picnic",
+   "metadata": {},
+   "source": [
+    "## 2. Search & download data from different pipelines"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "physical-humor",
+   "metadata": {},
+   "source": [
+    "Lightkurve 2 significantly expands the data sets that can be searched and downloaded from the TESS & Kepler data archives at MAST.\n",
+    "\n",
+    "### ✨ New: Search operations support different TESS pipelines\n",
+    "\n",
+    "The search operations now support all the Kepler & TESS light curves available from the data archive at MAST, including community-contributed light curves. A new `author` column in the search results identifies the pipeline (click on a pipeline name for details). As an added bonus, the search and download operations are now *much* faster owing to improved caching."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "governing-logan",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk\n",
+    "lk.search_lightcurve(\"Polaris\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cordless-negative",
+   "metadata": {},
+   "source": [
+    "### ✨ New: Download TESS fast cadence data\n",
+    "\n",
+    "The TESS mission recently introduced a new 20-second exposure time mode and decreased the exposure time of its Full Frame Images to 10 minutes.  In response, Lightkurve now allows user to specify the exact exposure time via the optional ``exptime`` argument and column."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "remarkable-breakfast",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lk.search_lightcurve(\"AU Mic\", exptime=20)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "nutritional-retirement",
+   "metadata": {},
+   "source": [
+    "You can also filter search results after the fact via attribute access, e.g. via `search.exptime`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "certified-baptist",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "search = lk.search_lightcurve(\"AU Mic\")\n",
+    "search[search.exptime.value == 20].download().plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "supported-coverage",
+   "metadata": {},
+   "source": [
+    "## 3. New noise removal tools"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "motivated-blame",
+   "metadata": {},
+   "source": [
+    "### ✨ New: Remove systematics using Cotrending Basis Vectors\n",
+    "\n",
+    "Lightkurve 2 adds a new `CotrendingBasisVectors` class to provide a convenient interface to work with the official TESS and Kepler basis vector data products. We also re-implemented the `CBVCorrector` class from scratch to perform the correction in a way that is more similar to the official Kepler/TESS pipeline. This work was led by one of the authors of the official pipeline, Jeff Smith."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "harmful-programmer",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Download a light curve and apply the new CBVCorrector\n",
+    "lc = lk.search_lightcurve(\"TIC 99180739\", author=\"SPOC\", sector=10).download(flux_column=\"sap_flux\")\n",
+    "cbvCorrector = lk.CBVCorrector(lc)\n",
+    "lc_corrected = cbvCorrector.correct()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "devoted-trinidad",
+   "metadata": {},
+   "source": [
+    "The corrector now produces detailed diagnostic plots showing the light curve before (grey) and after (black) the noise (blue) was removed:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "closed-lotus",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cbvCorrector.diagnose();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "rolled-plenty",
+   "metadata": {},
+   "source": [
+    "### ✨ New: Remove systematics by optimizing under- and over-fitting metrics\n",
+    "\n",
+    "A `lightkurve.correctors.metrics` module was added to provide functions which can estimate the degree of over- and under-fitting of a corrected light curve. The new `CBVCorrector` utilizes these metrics to find an appropriate, user-tuneable tradeoff. You can learn more about this new feature in the dedicated new CBVCorrector tutorial."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "superior-witch",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cbvCorrector.goodness_metric_scan_plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "hispanic-telephone",
+   "metadata": {},
+   "source": [
+    "### ✨ New: Inspect pixel-by-pixel light curves using *plot_pixels()*\n",
+    "\n",
+    "A new ``TargetPixelFile.plot_pixels()`` method has been added which enables the light curves and periodograms of individual pixels to be inspected within a pixel file. This is very useful for investigating the location of specific signals. A dedicated tutorial is available explaining this new feature."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "gothic-aviation",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pixelfile = lk.search_targetpixelfile(\"KIC 2435971\", mission=\"Kepler\", quarter=9).download()\n",
+    "pixelfile.plot_pixels();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "dominant-symphony",
+   "metadata": {},
+   "source": [
+    "## Other changes\n",
+    "\n",
+    "* Support for Python 2 has been removed.\n",
+    "* The [online documentation](https://docs.lightkurve.org) has been updated to provide numerous new tutorials and a more comprehensive API reference guide.\n",
+    "* Search and download operations are now cached in a more robust way, significantly speeding up accessing data from MAST. \n",
+    "* Added a column parameter to LightCurve's plot(), scatter(), and errorbar() methods to enable any column in a light curve object to be plotted. \n",
+    "* Added the `LightCurve.create_transit_mask(period, transit_time, duration)` method to conveniently mask planet or eclipsing binary transits. \n",
+    "* Added the `LightCurve.search_neighbors()` method to search for light curves around an existing one. \n",
+    "* Modified `TargetPixelFile.plot()` to use a more clear hatched style when visualizing the aperture mask on top of pixel data. \n",
+    "* Added `SparseDesignMatrix` and modified `RegressionCorrector` to enable systematics removal methods to benefit from scipy.sparse speed-ups. \n",
+    "\n",
+    "In addition, Lightkurve 2 contains numerous smaller improvements and bugfixes. To see a detailed list of all changes, please see the [Full Changelog](http://docs.lightkurve.org/about/changelog.html)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "meaningful-activity",
+   "metadata": {},
+   "source": [
+    "## FAQ\n",
+    "\n",
+    "### How do I install Lightkurve 2?\n",
+    "\n",
+    "You can upgrade Lightkurve using pip:\n",
+    "\n",
+    "```\n",
+    "python -m pip install --upgrade lightkurve\n",
+    "```\n",
+    "\n",
+    "### How do I keep using Lightkurve 1?\n",
+    "\n",
+    "You can continue to use Lightkurve 1 by pinning the version number using pip, for example:\n",
+    "\n",
+    "```\n",
+    "python -m pip install lightkurve==1.11\n",
+    "```\n",
+    "\n",
+    "### Will existing Lightkurve code break?\n",
+    "\n",
+    "While we tried to maximize backwards compatibility, Lightkurve 2 does contain a small number of changes that may break existing code for the following reasons:\n",
+    "\n",
+    "1. **lc.time is now always an Astropy Time object.**  Unfortunately, many NumPy and SciPy functions do not deal seamlessly with  yet know how to deal with `Time` objects. Existing code may have to be modified to pass `lc.time.value` to NumPy/SciPy functions where `lc.time` was passed before.\n",
+    "2. **Other numerical columns are now Astropy Quantity objects.**  While Quantity objects are largely compatible with NumPy/SciPy, situations do arise where users may wish to perform operations on `lc.flux.value` instead of `lc.flux`.\n",
+    "3. **All metadata is now stored in the lc.meta dictionary**.  This includes any header values of the FITS file from which a light curve was loaded.  For convenience, we continue to support attribute access, e.g. `lc.sector` is available as a shortcut for `lc.meta['sector']`.\n",
+    "4. **LightCurveFile classes have been deprecated.** Instead, light curve files can now be loaded using `LightCurve.read(filename, format=\"tess\")`.\n",
+    "5. **lc.time can no longer contain NaN values**.  This is because AstroPy Time objects do not currently support NaN values. As a result, light curve reading functions will tend to ignore rows with NaN time values. All other columns in a light curve continue to support NaNs values however.\n",
+    "6. **lc.bin() now takes time_bin_size and time_bin_start arguments.** This is for consistency with `astropy.timeseries.aggregate_downsample`. This significantly alters the behavior of binning, because bins are now defined in time instead of by number of data points.\n",
+    "7. **lc.fold() now returns un-normalized phase values by default.**  This is for consistency with `TimeSeries.fold()`. For the same reason, the `t0` argument has been deprecated in favor of `epoch_time`, and the method now accepts the extra `epoch_phase`, `wrap_phase`, and `normalize_phase` arguments.\n",
+    "8. **Several attributes and methods have been deprecated.**  They still work but will yield a warning and may be removed in the future:\n",
+    "  * `lc.astropy_time` => `lc.time`\n",
+    "  * `lc.time_format` => `lc.time.format`\n",
+    "  * `lc.time_scale` => `lc.time.scale`\n",
+    "  * `lc.flux_quantity` => `lc.flux`\n",
+    "  * `lc.flux_unit` => `lc.flux.unit`\n",
+    "  * `search_lightcurvefile()` => `search_lightcurve()`"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "opening-secondary",
+   "metadata": {},
+   "source": [
+    "## Contributors\n",
+    "\n",
+    "The people who contributed to Lightkurve 2 include:\n",
+    "\n",
+    "Thomas Barclay, Geert Barentsen, Keaton Bell, Zachory K. Berta-Thompson, Colin J. Burke, Nuno Ramos Carvalho, Ann Marie Cody, Isabel Coleman, Kaiming Cui, Guy Davies, Jessie Dotson, Stephanie Douglas, Scott Fleming, Daniel Foreman-Mackey, Michael Gully-Santiago, Oliver Hall, Christina Hedges, Daniel Hey, Michael Higgins, Derek Homeier, Rebekah Hounsell, Sam Lee, Jose A. Lerma III, Ken Mighell, Susan Mullally, Szabo Pal, Sheila Sagear, Nicholas Saunders, Jeff Smith, Anand Sundaram, Emma Turtelboom, Andrew Vanderburg, Brennan Vincello, José Vinícius de Miranda Cardoso, Peter Williams, Johnny Zhang."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

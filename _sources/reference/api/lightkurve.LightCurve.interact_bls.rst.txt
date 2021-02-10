@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.interact\_bls
+===================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.interact_bls

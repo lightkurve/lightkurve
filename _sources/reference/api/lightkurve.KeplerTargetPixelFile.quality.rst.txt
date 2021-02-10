@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.quality
+========================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: KeplerTargetPixelFile.quality

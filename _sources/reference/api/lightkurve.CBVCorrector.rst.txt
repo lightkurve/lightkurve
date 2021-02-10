@@ -1,0 +1,43 @@
+﻿lightkurve.CBVCorrector
+=======================
+
+.. currentmodule:: lightkurve
+
+.. autoclass:: CBVCorrector
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CBVCorrector.__init__
+      ~CBVCorrector.compute_overfit_metric
+      ~CBVCorrector.compute_underfit_metric
+      ~CBVCorrector.copy
+      ~CBVCorrector.correct
+      ~CBVCorrector.correct_elasticnet
+      ~CBVCorrector.correct_gaussian_prior
+      ~CBVCorrector.correct_regressioncorrector
+      ~CBVCorrector.diagnose
+      ~CBVCorrector.diagnose_priors
+      ~CBVCorrector.goodness_metric_scan_plot
+      ~CBVCorrector.over_fitting_metric
+      ~CBVCorrector.under_fitting_metric
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CBVCorrector.cadence_mask
+      ~CBVCorrector.corrected_lc
+      ~CBVCorrector.dmc
+      ~CBVCorrector.original_lc
+   
+   

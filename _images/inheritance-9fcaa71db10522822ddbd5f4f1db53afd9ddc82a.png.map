@@ -1,6 +1,0 @@
-<map id="inheritanceafb592e3be" name="inheritanceafb592e3be">
-<area shape="rect" id="node1" title="A `~astropy.units.Quantity` represents a number with some associated unit." alt="" coords="152,55,231,80"/>
-<area shape="rect" id="node4" title="Holds an asteroseismic value including its unit, error, and estimation method." alt="" coords="279,55,433,80"/>
-<area shape="rect" id="node2" title="ndarray(shape, dtype=float, buffer=None, offset=0," alt="" coords="19,55,91,80"/>
-<area shape="rect" id="node3" title="Enables astroseismic quantities to be estimated from periodograms." alt="" coords="5,5,104,31"/>
-</map>

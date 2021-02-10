@@ -1,0 +1,47 @@
+﻿lightkurve.TessQualityFlags
+===========================
+
+.. currentmodule:: lightkurve
+
+.. autoclass:: TessQualityFlags
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TessQualityFlags.__init__
+      ~TessQualityFlags.create_quality_mask
+      ~TessQualityFlags.decode
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TessQualityFlags.ApertureCosmic
+      ~TessQualityFlags.Argabrightening
+      ~TessQualityFlags.AttitudeTweak
+      ~TessQualityFlags.CoarsePoint
+      ~TessQualityFlags.CollateralCosmic
+      ~TessQualityFlags.DEFAULT_BITMASK
+      ~TessQualityFlags.Desat
+      ~TessQualityFlags.Discontinuity
+      ~TessQualityFlags.EarthPoint
+      ~TessQualityFlags.HARDEST_BITMASK
+      ~TessQualityFlags.HARD_BITMASK
+      ~TessQualityFlags.ImpulsiveOutlier
+      ~TessQualityFlags.ManualExclude
+      ~TessQualityFlags.OPTIONS
+      ~TessQualityFlags.STRINGS
+      ~TessQualityFlags.SafeMode
+      ~TessQualityFlags.Straylight
+      ~TessQualityFlags.Straylight2
+   
+   

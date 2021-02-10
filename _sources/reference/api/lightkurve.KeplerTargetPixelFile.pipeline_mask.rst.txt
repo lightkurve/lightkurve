@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.pipeline\_mask
+===============================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: KeplerTargetPixelFile.pipeline_mask

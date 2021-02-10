@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.search\_neighbors
+=======================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.search_neighbors

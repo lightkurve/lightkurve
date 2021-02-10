@@ -1,0 +1,125 @@
+﻿lightkurve.LightCurve
+=====================
+
+.. currentmodule:: lightkurve
+
+.. autoclass:: LightCurve
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LightCurve.__init__
+      ~LightCurve.add_column
+      ~LightCurve.add_columns
+      ~LightCurve.add_index
+      ~LightCurve.add_row
+      ~LightCurve.append
+      ~LightCurve.argsort
+      ~LightCurve.as_array
+      ~LightCurve.bin
+      ~LightCurve.convert_bytestring_to_unicode
+      ~LightCurve.convert_unicode_to_bytestring
+      ~LightCurve.copy
+      ~LightCurve.create_transit_mask
+      ~LightCurve.errorbar
+      ~LightCurve.estimate_cdpp
+      ~LightCurve.field
+      ~LightCurve.fill_gaps
+      ~LightCurve.filled
+      ~LightCurve.flatten
+      ~LightCurve.fold
+      ~LightCurve.from_pandas
+      ~LightCurve.from_stingray
+      ~LightCurve.from_timeseries
+      ~LightCurve.group_by
+      ~LightCurve.index_column
+      ~LightCurve.index_mode
+      ~LightCurve.insert_row
+      ~LightCurve.interact_bls
+      ~LightCurve.items
+      ~LightCurve.itercols
+      ~LightCurve.iterrows
+      ~LightCurve.keep_columns
+      ~LightCurve.keys
+      ~LightCurve.more
+      ~LightCurve.normalize
+      ~LightCurve.pformat
+      ~LightCurve.pformat_all
+      ~LightCurve.plot
+      ~LightCurve.plot_river
+      ~LightCurve.pprint
+      ~LightCurve.pprint_all
+      ~LightCurve.query_solar_system_objects
+      ~LightCurve.read
+      ~LightCurve.remove_column
+      ~LightCurve.remove_columns
+      ~LightCurve.remove_indices
+      ~LightCurve.remove_nans
+      ~LightCurve.remove_outliers
+      ~LightCurve.remove_row
+      ~LightCurve.remove_rows
+      ~LightCurve.rename_column
+      ~LightCurve.rename_columns
+      ~LightCurve.replace_column
+      ~LightCurve.reverse
+      ~LightCurve.round
+      ~LightCurve.scatter
+      ~LightCurve.search_neighbors
+      ~LightCurve.show_in_browser
+      ~LightCurve.show_in_notebook
+      ~LightCurve.show_properties
+      ~LightCurve.sort
+      ~LightCurve.to_corrector
+      ~LightCurve.to_csv
+      ~LightCurve.to_fits
+      ~LightCurve.to_pandas
+      ~LightCurve.to_periodogram
+      ~LightCurve.to_seismology
+      ~LightCurve.to_stingray
+      ~LightCurve.to_table
+      ~LightCurve.to_timeseries
+      ~LightCurve.values
+      ~LightCurve.values_equal
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LightCurve.ColumnClass
+      ~LightCurve.PDCSAP_FLUX
+      ~LightCurve.SAP_FLUX
+      ~LightCurve.astropy_time
+      ~LightCurve.colnames
+      ~LightCurve.dtype
+      ~LightCurve.flux
+      ~LightCurve.flux_err
+      ~LightCurve.flux_quantity
+      ~LightCurve.flux_unit
+      ~LightCurve.groups
+      ~LightCurve.has_masked_columns
+      ~LightCurve.has_masked_values
+      ~LightCurve.has_mixin_columns
+      ~LightCurve.hdu
+      ~LightCurve.iloc
+      ~LightCurve.indices
+      ~LightCurve.info
+      ~LightCurve.loc
+      ~LightCurve.loc_indices
+      ~LightCurve.mask
+      ~LightCurve.masked
+      ~LightCurve.meta
+      ~LightCurve.time
+      ~LightCurve.time_format
+      ~LightCurve.time_scale
+      ~LightCurve.write
+   
+   

@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.time
+=====================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: KeplerTargetPixelFile.time

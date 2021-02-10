@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.ra
+===================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: KeplerTargetPixelFile.ra

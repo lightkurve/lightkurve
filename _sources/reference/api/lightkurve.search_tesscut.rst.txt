@@ -1,0 +1,6 @@
+﻿lightkurve.search\_tesscut
+==========================
+
+.. currentmodule:: lightkurve
+
+.. autofunction:: search_tesscut

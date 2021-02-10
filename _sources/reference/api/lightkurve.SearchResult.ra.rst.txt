@@ -1,0 +1,6 @@
+﻿lightkurve.SearchResult.ra
+==========================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: SearchResult.ra

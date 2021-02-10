@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.to\_table
+===============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.to_table

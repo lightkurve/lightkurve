@@ -1,0 +1,433 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# How to improve the signal-to-noise of a periodogram?\n",
+    "\n",
+    "Asteroseismology is the study of stellar oscillations. To see them, we usually want to transfer from the *time domain* that light curves are in to the *frequency domain*. We can do that with methods such as Fourier Transforms or Lomb-Scargle Periodograms.\n",
+    "\n",
+    "*Lightkurve* has built in methods for working with data in the frequency domain in the `LombScarglePeriodogram` class.\n",
+    "\n",
+    "Below we demonstrate some of these functionalities.  In particular, we will demonstrate how one may optimize the signal-to-noise of a periodogram by varying the detrending, varying the aperture mask, or combining data from multiple observing periods."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk\n",
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "import astropy.units as u"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "As an example, we can use a red giant star from Campaign 5. You can read more about asteroseismology with giants in K2 in Stello et al 2015 [here](https://arxiv.org/pdf/1610.03060.pdf). \n",
+    "\n",
+    "First we'll use `search_targetpixelfile` to download the Target Pixel File for the target."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "TARGET = \"EPIC 211416749\"\n",
+    "tpf = lk.search_targetpixelfile(TARGET, author=\"K2\", campaign=5, cadence='short').download()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Be aware that this is a **short cadence** light curve, which means that this dataset is much larger than others we've used in previous tutorials. If you're rerunning this tutorial locally, it might take a few minutes to rerun the later steps."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's plot the target below to see if the aperture is centered. We're plotting in 'log' scale here so that we can see the wings of the PSF."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tpf.plot(scale='log', aperture_mask=tpf.pipeline_mask);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can now create a `KeplerLightCurve` using Simple Aperture Photometry with the `to_lightcurve` method. We can then normalize, remove NaN values and remove outliers in one easy line. We can also use the new `fill_gaps` method to fill in any gaps that are in our data using linear interpolation of the nearest neighbours. This creates an almost perfectly sampled time array with no gaps."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc = tpf.to_lightcurve()\n",
+    "lc = lc.normalize(unit='ppm').remove_nans().remove_outliers().fill_gaps()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can plot our light curve easily with the `plot` method."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's take a look at the periodogram for this light curve. You can create a `periodogram` object using `lc.periodogram()`. This can be passed any array of frequencies that the user wants, but by default will create an array of frequency for you. You can also change the frequency units, depending on the range of frequencies you're looking for. In asteroseismology we usually use $\\mu Hz$."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pg = lc.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=10)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "With this new periodogram object we can now plot the power spectrum of the data. Let's do that now!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ax = pg.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1. Varying the SFF Motion Correction"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Unfortunately there is some ringing going on...there is a periodicity in the data due to the K2 motion. We can see below when we plot the data in \"Period\" space instead of \"Frequency\" space there is a significant periodicity at ~ 6 hours."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ax = pg.plot(view='Period', unit=u.hour)\n",
+    "ax.text(6, 2000, '6 Hour Roll Motion');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can apply our own Self Flat Fielding (SFF) correction to the light curve to remove the K2 roll motion. Below we correct with SFF using the default `correct()` method, with `windows=10`. (You can read more about SFF in our other tutorials.) "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc = tpf.to_lightcurve().normalize().remove_nans().remove_outliers()\n",
+    "clc = lc.to_corrector(\"sff\").correct(windows=10).remove_outliers().fill_gaps()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clc.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Our new, corrected lightcurve looks much flatter and has a much smaller CDPP. Let's try plotting the periodogram again."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pg_clean = clc.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=100)\n",
+    "ax = pg_clean.plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now we can see the oscillation modes of the target! We can even find out what effect our detrending parameters have on our target. Below we change the detrending windows from $w=2\\; ... \\; 10$ and plot the periodogram in each case. We can see different detrending parameters alter the strength of each mode."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Loop over several windows\n",
+    "from tqdm import tqdm\n",
+    "for windows in tqdm([2, 4, 8]):\n",
+    "    # Create the light curve\n",
+    "    lc =  tpf.to_lightcurve().normalize().remove_nans().remove_outliers()\n",
+    "    clc = lc.to_corrector('sff').correct(windows=windows).remove_outliers().fill_gaps()\n",
+    "    # Create the periodogram\n",
+    "    p_clean = clc.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=100)\n",
+    "    # Plot the periodogram\n",
+    "    if windows == 2:\n",
+    "        ax = p_clean.plot(alpha=0.4, label='Windows: {}'.format(windows))\n",
+    "    else:\n",
+    "        p_clean.plot(ax=ax, alpha=0.4, label='Windows: {}'.format(windows))\n",
+    "ax.legend();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "It looks like there is a significant effect on the oscillation modes as we vary the window size. When using K2 data for detecting these oscillations it is important to understand and mitigate the effects of detrending to ensure the modes have the highest possible signal to noise ratio."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 2. Varying the aperture mask size\n",
+    "We can also easily change the aperture size. If the aperture is too small, increasing the aperture size should allow us to include more of the target flux. If there is a contaminant nearby, decreasing the aperture may increase our singal to noise.\n",
+    "\n",
+    "Below we create two alternative apertures for the target. In this case we'll create contiguous apertures where pixels have a value greater than 50 and 2$\\;\\sigma$ above the median, respectively."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "aperture_small = tpf.create_threshold_mask(threshold=50)\n",
+    "aperture_large = tpf.create_threshold_mask(threshold=2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can plot up our new aperture against the pipeline aperture for comparison."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Two subplots\n",
+    "fig, axs = plt.subplots(1, 2, figsize=(12, 4))\n",
+    "\n",
+    "# Plot pipeline aperture mask\n",
+    "tpf.plot(axs[0], scale='log', aperture_mask=aperture_small)\n",
+    "axs[0].set_title('Small aperture')\n",
+    "\n",
+    "# Plot larger aperture mask\n",
+    "tpf.plot(axs[1], scale='log', aperture_mask=aperture_large)\n",
+    "axs[1].set_title('Large aperture');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now let's create our two light curves, one with the pipeline aperture and one with the new aperture. \n",
+    "\n",
+    "`tpf.to_lightcurve()` creates our SAP flux with the pipeline aperture as a default. To use a new aperture we simple use `tpf.to_lightcurve(aperture_mask=NEW_APERTURE)`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Create the light curve with the pipelien aperture.\n",
+    "lc_small = tpf.to_lightcurve(aperture_mask=aperture_small).normalize().remove_nans().remove_outliers()\n",
+    "lc_small = lc_small.to_corrector('sff').correct().remove_outliers().fill_gaps()\n",
+    "\n",
+    "# Create a light curve with a slightly larger aperture \n",
+    "lc_large = tpf.to_lightcurve(aperture_mask=aperture_large).normalize().remove_nans().remove_outliers()\n",
+    "lc_large = lc_large.to_corrector('sff').correct().remove_outliers().fill_gaps()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "When we plot these two light curves we can see that the larger aperture is much less noisy."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Plot the pipeline and large aperture light curves\n",
+    "ax = lc_small.plot(label='Small aperture')\n",
+    "lc_large.plot(ax=ax, label='Large aperture');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Finally, when we plot the periodogram we can see we've increased the signal to noise ratio of our stellar oscillations."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Create the periodograms\n",
+    "pg_small = lc_small.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=100)\n",
+    "pg_large = lc_large.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=100)\n",
+    "\n",
+    "\n",
+    "# Plot the periodograms\n",
+    "ax = pg_small.plot(c='k', alpha=0.5, label='Small aperture')\n",
+    "pg_large.plot(ax=ax, c='C3', alpha=0.5, label='Large aperture')\n",
+    "\n",
+    "ax.legend();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "By increasing our aperture size and including more pixels here we have increased the signal to noise of the oscillation modes of this red giant."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 3. Using data from multiple campaigns\n",
+    "Finally, this target was actually observed twice by K2, once in April 2015 in Campaign 5 and once in December 2017 in Campaign 16. We can get both of these data sets and compare the results. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Download the C16 TPF\n",
+    "tpf_c16 = lk.search_targetpixelfile(TARGET, author=\"K2\", campaign=16, cadence='short').download()\n",
+    "\n",
+    "# Create a new light curve for C16\n",
+    "aperture_mask_c16 = tpf_c16.create_threshold_mask(threshold=2)\n",
+    "lc_c16 = tpf_c16.to_lightcurve(aperture_mask=aperture_mask_c16).normalize().remove_nans().remove_outliers()\n",
+    "lc_c16 = lc_c16.to_corrector('sff').correct(windows=10).remove_outliers().fill_gaps()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Create a periodogram for c16 data\n",
+    "pg_c16 = lc_c16.to_periodogram(freq_unit=u.microHertz, maximum_frequency=400, minimum_frequency=100)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Create subplots to plot into\n",
+    "ax = pg_large.plot(c='k', alpha=0.5, label='C5')\n",
+    "pg_c16.plot(ax=ax, c='C3', alpha=0.5, label='C16')\n",
+    "\n",
+    "ax.set_xlim(100, 400)\n",
+    "ax.legend();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "It looks like the two data sets provide similar modes, however the two campaigns have very different instrument systematics. To find the true answer, users should iterate over many different detrending parameters and aperture sizes, and combine datasets to increase signal to noise."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

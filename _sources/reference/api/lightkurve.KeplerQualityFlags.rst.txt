@@ -1,0 +1,54 @@
+﻿lightkurve.KeplerQualityFlags
+=============================
+
+.. currentmodule:: lightkurve
+
+.. autoclass:: KeplerQualityFlags
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~KeplerQualityFlags.__init__
+      ~KeplerQualityFlags.create_quality_mask
+      ~KeplerQualityFlags.decode
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~KeplerQualityFlags.ApertureCosmic
+      ~KeplerQualityFlags.Argabrightening
+      ~KeplerQualityFlags.ArgabrighteningOnCCD
+      ~KeplerQualityFlags.AttitudeTweak
+      ~KeplerQualityFlags.CoarsePoint
+      ~KeplerQualityFlags.CollateralCosmic
+      ~KeplerQualityFlags.DEFAULT_BITMASK
+      ~KeplerQualityFlags.Desat
+      ~KeplerQualityFlags.DetectorAnomaly
+      ~KeplerQualityFlags.EarthPoint
+      ~KeplerQualityFlags.HARDEST_BITMASK
+      ~KeplerQualityFlags.HARD_BITMASK
+      ~KeplerQualityFlags.ImpulsiveOutlier
+      ~KeplerQualityFlags.ManualExclude
+      ~KeplerQualityFlags.NoData
+      ~KeplerQualityFlags.NoFinePoint
+      ~KeplerQualityFlags.OPTIONS
+      ~KeplerQualityFlags.PossibleThrusterFiring
+      ~KeplerQualityFlags.RollingBandInAperture
+      ~KeplerQualityFlags.RollingBandInMask
+      ~KeplerQualityFlags.STRINGS
+      ~KeplerQualityFlags.SafeMode
+      ~KeplerQualityFlags.SensitivityDropout
+      ~KeplerQualityFlags.ThrusterFiring
+      ~KeplerQualityFlags.ZeroCrossing
+   
+   

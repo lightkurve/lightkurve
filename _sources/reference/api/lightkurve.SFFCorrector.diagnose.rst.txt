@@ -1,0 +1,6 @@
+﻿lightkurve.SFFCorrector.diagnose
+================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: SFFCorrector.diagnose

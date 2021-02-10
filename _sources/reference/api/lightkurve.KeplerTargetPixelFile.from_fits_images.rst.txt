@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.from\_fits\_images
+===================================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.from_fits_images

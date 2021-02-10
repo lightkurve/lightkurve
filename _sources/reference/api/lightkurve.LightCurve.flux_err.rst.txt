@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.flux\_err
+===============================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: LightCurve.flux_err

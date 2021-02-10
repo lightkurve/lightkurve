@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.cadenceno
+==========================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: KeplerTargetPixelFile.cadenceno

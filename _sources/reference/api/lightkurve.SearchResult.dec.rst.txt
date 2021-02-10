@@ -1,0 +1,6 @@
+﻿lightkurve.SearchResult.dec
+===========================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: SearchResult.dec

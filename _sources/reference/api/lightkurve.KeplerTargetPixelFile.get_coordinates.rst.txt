@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.get\_coordinates
+=================================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.get_coordinates

@@ -1,0 +1,6 @@
+﻿lightkurve.DesignMatrix.plot
+============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: DesignMatrix.plot

@@ -1,0 +1,633 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.KeplerTargetPixelFile &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lightkurve.TessTargetPixelFile" href="lightkurve.TessTargetPixelFile.html" />
+    <link rel="prev" title="TargetPixelFile" href="../targetpixelfile.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../tutorials/index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../about/index.html">About</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+        
+        
+          
+            
+                <li class="">
+                    <a href="../search.html">Downloading data</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../lightcurve.html">LightCurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../foldedlightcurve.html">FoldedLightCurve</a>
+                </li>
+            
+          
+            
+  
+                <li class="active">
+                    <a href="../targetpixelfile.html">TargetPixelFile</a>
+                    <ul>
+                    
+                        <li class="active">
+                            <a href="">lightkurve.KeplerTargetPixelFile</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.TessTargetPixelFile.html">lightkurve.TessTargetPixelFile</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.hdu.html">lightkurve.KeplerTargetPixelFile.hdu</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.ra.html">lightkurve.KeplerTargetPixelFile.ra</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.dec.html">lightkurve.KeplerTargetPixelFile.dec</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.column.html">lightkurve.KeplerTargetPixelFile.column</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.row.html">lightkurve.KeplerTargetPixelFile.row</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.pos_corr1.html">lightkurve.KeplerTargetPixelFile.pos_corr1</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.pos_corr2.html">lightkurve.KeplerTargetPixelFile.pos_corr2</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.pipeline_mask.html">lightkurve.KeplerTargetPixelFile.pipeline_mask</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.shape.html">lightkurve.KeplerTargetPixelFile.shape</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.time.html">lightkurve.KeplerTargetPixelFile.time</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.cadenceno.html">lightkurve.KeplerTargetPixelFile.cadenceno</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.nan_time_mask.html">lightkurve.KeplerTargetPixelFile.nan_time_mask</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.flux.html">lightkurve.KeplerTargetPixelFile.flux</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.flux_err.html">lightkurve.KeplerTargetPixelFile.flux_err</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.flux_bkg.html">lightkurve.KeplerTargetPixelFile.flux_bkg</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.flux_bkg_err.html">lightkurve.KeplerTargetPixelFile.flux_bkg_err</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.quality.html">lightkurve.KeplerTargetPixelFile.quality</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.wcs.html">lightkurve.KeplerTargetPixelFile.wcs</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.get_coordinates.html">lightkurve.KeplerTargetPixelFile.get_coordinates</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.to_lightcurve.html">lightkurve.KeplerTargetPixelFile.to_lightcurve</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.create_threshold_mask.html">lightkurve.KeplerTargetPixelFile.create_threshold_mask</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.estimate_background.html">lightkurve.KeplerTargetPixelFile.estimate_background</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.estimate_centroids.html">lightkurve.KeplerTargetPixelFile.estimate_centroids</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.query_solar_system_objects.html">lightkurve.KeplerTargetPixelFile.query_solar_system_objects</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.plot.html">lightkurve.KeplerTargetPixelFile.plot</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.to_fits.html">lightkurve.KeplerTargetPixelFile.to_fits</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.interact.html">lightkurve.KeplerTargetPixelFile.interact</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.interact_sky.html">lightkurve.KeplerTargetPixelFile.interact_sky</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.to_corrector.html">lightkurve.KeplerTargetPixelFile.to_corrector</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.cutout.html">lightkurve.KeplerTargetPixelFile.cutout</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.from_fits_images.html">lightkurve.KeplerTargetPixelFile.from_fits_images</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.plot_pixels.html">lightkurve.KeplerTargetPixelFile.plot_pixels</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.get_header.html">lightkurve.KeplerTargetPixelFile.get_header</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.KeplerTargetPixelFile.get_keyword.html">lightkurve.KeplerTargetPixelFile.get_keyword</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../periodogram.html">Periodogram</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../seismology.html">Seismology</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../correctors.html">Correcting systematics</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../misc.html">Miscellaneous utilities</a>
+                </li>
+            
+          
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="lightkurve-keplertargetpixelfile">
+<h1>lightkurve.KeplerTargetPixelFile<a class="headerlink" href="#lightkurve-keplertargetpixelfile" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="lightkurve.KeplerTargetPixelFile">
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.</code><code class="sig-name descname">KeplerTargetPixelFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">quality_bitmask</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to read and interact with the pixel data products
+(“Target Pixel Files”) created by NASA’s Kepler pipeline.</p>
+<p>This class offers a user-friendly way to open a Kepler Target Pixel File
+(TPF), access its meta data, visualize its contents, extract light curves
+with custom aperture masks, estimate centroid positions, and more.</p>
+<p>Please consult the <a class="reference external" href="https://docs.lightkurve.org/tutorials/01-target-pixel-files.html">TargetPixelFile tutorial</a>
+in the online documentation for examples on using this class.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a></span></dt><dd><p>Path to a Kepler Target Pixel file. Alternatively, you can pass a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code> object, which is the AstroPy object returned by
+the <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a> function.</p>
+</dd>
+<dt><strong>quality_bitmask</strong><span class="classifier">“none”, “default”, “hard”, “hardest”, or int</span></dt><dd><p>Bitmask that should be used to ignore bad-quality cadences.
+If a string is passed, it has the following meaning:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>“none”: no cadences will be ignored (equivalent to
+<code class="docutils literal notranslate"><span class="pre">quality_bitmask=0</span></code>).</p></li>
+<li><p>“default”: cadences with severe quality issues will be ignored
+(equivalent to <code class="docutils literal notranslate"><span class="pre">quality_bitmask=1130799</span></code>).</p></li>
+<li><p>“hard”: more conservative choice of flags to ignore
+(equivalent to <code class="docutils literal notranslate"><span class="pre">quality_bitmask=1664431</span></code>).
+This is known to remove good data.</p></li>
+<li><p>“hardest”: remove all cadences that have one or more flags raised
+(equivalent to <code class="docutils literal notranslate"><span class="pre">quality_bitmask=2096639</span></code>). This mask is not
+recommended because some quality flags can safely be ignored.</p></li>
+</ul>
+</div></blockquote>
+<p>If an integer is passed, it will be used as a bitmask, i.e. it will
+have the effect of removing cadences where
+<code class="docutils literal notranslate"><span class="pre">(tpf.hdu[1].data['QUALITY']</span> <span class="pre">&amp;</span> <span class="pre">quality_bitmask)</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.
+See the <a class="reference internal" href="lightkurve.KeplerQualityFlags.html#lightkurve.KeplerQualityFlags" title="lightkurve.KeplerQualityFlags"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code></a> class for details on the bitmasks.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Optional keyword arguments passed on to <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="r21767af6db99-1"><span class="brackets">1</span></dt>
+<dd><p>Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
+<a class="reference external" href="http://archive.stsci.edu/kepler/manuals/archive_manual.pdf">http://archive.stsci.edu/kepler/manuals/archive_manual.pdf</a></p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="lightkurve.KeplerTargetPixelFile.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">quality_bitmask</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.KeplerTargetPixelFile.__init__" title="lightkurve.KeplerTargetPixelFile.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(path[, quality_bitmask])</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.create_threshold_mask.html#lightkurve.KeplerTargetPixelFile.create_threshold_mask" title="lightkurve.KeplerTargetPixelFile.create_threshold_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_threshold_mask</span></code></a>([threshold, …])</p></td>
+<td><p>Returns an aperture mask creating using the thresholding method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.cutout.html#lightkurve.KeplerTargetPixelFile.cutout" title="lightkurve.KeplerTargetPixelFile.cutout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cutout</span></code></a>([center, size])</p></td>
+<td><p>Cut a rectangle out of the Target Pixel File.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.estimate_background.html#lightkurve.KeplerTargetPixelFile.estimate_background" title="lightkurve.KeplerTargetPixelFile.estimate_background"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_background</span></code></a>([aperture_mask])</p></td>
+<td><p>Returns an estimate of the median background level in the FLUX column.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.estimate_centroids.html#lightkurve.KeplerTargetPixelFile.estimate_centroids" title="lightkurve.KeplerTargetPixelFile.estimate_centroids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_centroids</span></code></a>([aperture_mask, method])</p></td>
+<td><p>Returns the flux center of an object inside <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_aperture_photometry</span></code>([aperture_mask, …])</p></td>
+<td><p>Returns a LightCurve obtained using aperture photometry.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_prf_photometry</span></code>([cadences, parallel])</p></td>
+<td><p>Returns the results of PRF photometry applied to the pixel file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.from_fits_images.html#lightkurve.KeplerTargetPixelFile.from_fits_images" title="lightkurve.KeplerTargetPixelFile.from_fits_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_fits_images</span></code></a>(images_flux, position[, …])</p></td>
+<td><p>Creates a new Target Pixel File from a set of images.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bkg_lightcurve</span></code>([aperture_mask])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.get_coordinates.html#lightkurve.KeplerTargetPixelFile.get_coordinates" title="lightkurve.KeplerTargetPixelFile.get_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_coordinates</span></code></a>([cadence])</p></td>
+<td><p>Returns two 3D arrays of RA and Dec values in decimal degrees.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.get_header.html#lightkurve.KeplerTargetPixelFile.get_header" title="lightkurve.KeplerTargetPixelFile.get_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_header</span></code></a>([ext])</p></td>
+<td><p>Returns the metadata embedded in the file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.get_keyword.html#lightkurve.KeplerTargetPixelFile.get_keyword" title="lightkurve.KeplerTargetPixelFile.get_keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code></a>(keyword[, hdu, default])</p></td>
+<td><p>Returns a header keyword value.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_model</span></code>([star_priors])</p></td>
+<td><p>Returns a default <code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModel</span></code> object for PRF fitting.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_prf_model</span></code>()</p></td>
+<td><p>Returns an object of KeplerPRF initialized using the necessary metadata in the tpf object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.interact.html#lightkurve.KeplerTargetPixelFile.interact" title="lightkurve.KeplerTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>([notebook_url, max_cadences, …])</p></td>
+<td><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.interact_sky.html#lightkurve.KeplerTargetPixelFile.interact_sky" title="lightkurve.KeplerTargetPixelFile.interact_sky"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_sky</span></code></a>([notebook_url, magnitude_limit])</p></td>
+<td><p>Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.plot.html#lightkurve.KeplerTargetPixelFile.plot" title="lightkurve.KeplerTargetPixelFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([ax, frame, cadenceno, bkg, column, …])</p></td>
+<td><p>Plot the pixel data for a single frame (i.e.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.plot_pixels.html#lightkurve.KeplerTargetPixelFile.plot_pixels" title="lightkurve.KeplerTargetPixelFile.plot_pixels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_pixels</span></code></a>([ax, periodogram, …])</p></td>
+<td><p>Show the light curve of each pixel in a single plot.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_lightcurve</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.query_solar_system_objects.html#lightkurve.KeplerTargetPixelFile.query_solar_system_objects" title="lightkurve.KeplerTargetPixelFile.query_solar_system_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_solar_system_objects</span></code></a>([cadence_mask, …])</p></td>
+<td><p>Returns a list of asteroids or comets which affected the target pixel files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code>()</p></td>
+<td><p>Prints a description of all non-callable attributes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.to_corrector.html#lightkurve.KeplerTargetPixelFile.to_corrector" title="lightkurve.KeplerTargetPixelFile.to_corrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector</span></code></a>([method])</p></td>
+<td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> instance to remove systematics.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.to_fits.html#lightkurve.KeplerTargetPixelFile.to_fits" title="lightkurve.KeplerTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>([output_fn, overwrite])</p></td>
+<td><p>Writes the TPF to a FITS file on disk.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.to_lightcurve.html#lightkurve.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve</span></code></a>([method])</p></td>
+<td><p>Performs photometry on the pixel data and returns a LightCurve object.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy_time</span></code></p></td>
+<td><p><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2.0.</span></p>
+</div>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.cadenceno.html#lightkurve.KeplerTargetPixelFile.cadenceno" title="lightkurve.KeplerTargetPixelFile.cadenceno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadenceno</span></code></a></p></td>
+<td><p>Return the cadence number for all good-quality cadences.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">campaign</span></code></p></td>
+<td><p>K2 Campaign number.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">channel</span></code></p></td>
+<td><p>Kepler CCD channel number.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.column.html#lightkurve.KeplerTargetPixelFile.column" title="lightkurve.KeplerTargetPixelFile.column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">column</span></code></a></p></td>
+<td><p>CCD pixel column number (‘1CRV5P’ header keyword).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.dec.html#lightkurve.KeplerTargetPixelFile.dec" title="lightkurve.KeplerTargetPixelFile.dec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code></a></p></td>
+<td><p>Declination of target (‘DEC_OBJ’ header keyword).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux.html#lightkurve.KeplerTargetPixelFile.flux" title="lightkurve.KeplerTargetPixelFile.flux"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code></a></p></td>
+<td><p>Returns the flux for all good-quality cadences.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux_bkg.html#lightkurve.KeplerTargetPixelFile.flux_bkg" title="lightkurve.KeplerTargetPixelFile.flux_bkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_bkg</span></code></a></p></td>
+<td><p>Returns the background flux for all good-quality cadences.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux_bkg_err.html#lightkurve.KeplerTargetPixelFile.flux_bkg_err" title="lightkurve.KeplerTargetPixelFile.flux_bkg_err"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_bkg_err</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux_err.html#lightkurve.KeplerTargetPixelFile.flux_err" title="lightkurve.KeplerTargetPixelFile.flux_err"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_err</span></code></a></p></td>
+<td><p>Returns the flux uncertainty for all good-quality cadences.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.hdu.html#lightkurve.KeplerTargetPixelFile.hdu" title="lightkurve.KeplerTargetPixelFile.hdu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hdu</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></p></td>
+<td><p><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2.0.</span></p>
+</div>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mission</span></code></p></td>
+<td><p>‘Kepler’ or ‘K2’.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">module</span></code></p></td>
+<td><p>Kepler CCD module number.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.nan_time_mask.html#lightkurve.KeplerTargetPixelFile.nan_time_mask" title="lightkurve.KeplerTargetPixelFile.nan_time_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nan_time_mask</span></code></a></p></td>
+<td><p>Returns a boolean mask flagging cadences whose time is <code class="xref py py-obj docutils literal notranslate"><span class="pre">nan</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">obsmode</span></code></p></td>
+<td><p>‘short cadence’ or ‘long cadence’.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">output</span></code></p></td>
+<td><p>Kepler CCD module output number.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.pipeline_mask.html#lightkurve.KeplerTargetPixelFile.pipeline_mask" title="lightkurve.KeplerTargetPixelFile.pipeline_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pipeline_mask</span></code></a></p></td>
+<td><p>Returns the optimal aperture mask used by the pipeline.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.pos_corr1.html#lightkurve.KeplerTargetPixelFile.pos_corr1" title="lightkurve.KeplerTargetPixelFile.pos_corr1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos_corr1</span></code></a></p></td>
+<td><p>Returns the column position correction.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.pos_corr2.html#lightkurve.KeplerTargetPixelFile.pos_corr2" title="lightkurve.KeplerTargetPixelFile.pos_corr2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos_corr2</span></code></a></p></td>
+<td><p>Returns the row position correction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.quality.html#lightkurve.KeplerTargetPixelFile.quality" title="lightkurve.KeplerTargetPixelFile.quality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quality</span></code></a></p></td>
+<td><p>Returns the quality flag integer of every good cadence.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quarter</span></code></p></td>
+<td><p>Kepler quarter number.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.ra.html#lightkurve.KeplerTargetPixelFile.ra" title="lightkurve.KeplerTargetPixelFile.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></p></td>
+<td><p>Right Ascension of target (‘RA_OBJ’ header keyword).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.row.html#lightkurve.KeplerTargetPixelFile.row" title="lightkurve.KeplerTargetPixelFile.row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">row</span></code></a></p></td>
+<td><p>CCD pixel row number (‘2CRV5P’ header keyword).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.shape.html#lightkurve.KeplerTargetPixelFile.shape" title="lightkurve.KeplerTargetPixelFile.shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code></a></p></td>
+<td><p>Return the cube dimension shape.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.time.html#lightkurve.KeplerTargetPixelFile.time" title="lightkurve.KeplerTargetPixelFile.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a></p></td>
+<td><p>Returns the time for all good-quality cadences.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.wcs.html#lightkurve.KeplerTargetPixelFile.wcs" title="lightkurve.KeplerTargetPixelFile.wcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wcs</span></code></a></p></td>
+<td><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System solution for the target pixel file.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="../targetpixelfile.html" title="previous page">TargetPixelFile</a>
+    <a class='right-next' id="next-link" href="lightkurve.TessTargetPixelFile.html" title="next page">lightkurve.TessTargetPixelFile</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+﻿lightkurve.PLDCorrector.correct
+===============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: PLDCorrector.correct

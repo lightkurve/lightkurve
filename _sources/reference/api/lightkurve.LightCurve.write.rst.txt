@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.write
+===========================
+
+.. currentmodule:: lightkurve
+
+.. autoattribute:: LightCurve.write

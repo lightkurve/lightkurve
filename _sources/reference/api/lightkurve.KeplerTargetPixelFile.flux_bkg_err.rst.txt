@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.flux\_bkg\_err
+===============================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: KeplerTargetPixelFile.flux_bkg_err

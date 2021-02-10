@@ -1,0 +1,540 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# How to recover the first TESS planet candidate with *Lightkurve*?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Data from the TESS mission are [available from the data archive at MAST](https://archive.stsci.edu/prepds/tess-data-alerts/). This tutorial demonstrates how the [Lightkurve Python package](http://lightkurve.keplerscience.org) can be used to read in these data and create your own TESS light curves with different aperture masks.\n",
+    "\n",
+    "Below is a quick tutorial on how to get started using *Lightkurve* and TESS data. We'll use the nearby, bright target Pi Mensae (ID 261136679), around which the mission team recently discovered a short period planet candidate on a 6.27 day orbit. See the [pre-print paper by Huang et al (2018)](https://arxiv.org/abs/1809.05967) for more details."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "TESS data is stored in a binary file format which is documented in the [TESS Science Data Products Description Document](https://archive.stsci.edu/missions/tess/doc/EXP-TESS-ARC-ICD-TM-0014.pdf). *Lightkurve* provides a `TessTargetPixelFile` class which allows you to interact with the data easily.\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "search_result = lk.search_targetpixelfile('Pi Mensae', mission='TESS', sector=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "search_result"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tpf = search_result.download(quality_bitmask='default')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tpf"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "`TessTargetPixelFile`'s have many helpful methods and attributes. For example, you can access basic meta data on the target easily:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tpf.mission"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tpf.targetid  # TESS Input Catalog (TIC) Identifier"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tpf.sector  # TESS Observation Sector"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tpf.camera  # TESS Camera Number"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tpf.ccd  # TESS CCD Number"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We might want to plot the data, we can do this with the `plot()` method. You can add the keyword `aperture_mask` to plot an aperture on top of the image. In this case we've used the `pipeline_mask` which is stored in the original .fits file, but you can use any aperture you like."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%matplotlib inline\n",
+    "tpf.plot(aperture_mask=tpf.pipeline_mask);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If you want to access the original fits file that generated the data you can use the `hdu` attribute of the tpf. This will return an `astropy.io.fits` object, for example"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tpf.hdu"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can access each extension and the data inside it in the same way you'd use `astropy.io.fits`. If you want to access data held in the TPF, such as the time of the observations, you can do that easily by using"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tpf.time"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This returns the time in units of days counted since [Julian Day](https://en.wikipedia.org/wiki/Julian_day) 2457000.  \n",
+    "\n",
+    "You can access the corresponding flux values using"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "tpf.flux"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Flux is a `numpy.ndarray` with a shape of (TIME x PIXELS x PIXELS). If you want to access just the first frame you can use"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "tpf.flux[0]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "These values are in units electrons per second."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Building Light Curves from TPFs\n",
+    "\n",
+    "We can use the `to_lightcurve()` method to turn this TPF into a light curve using *Simple Aperture Photometry*. This will put an aperture on the target, and sum up the flux in all the pixels inside the aperture. \n",
+    "\n",
+    "The default for `to_lightcurve()` is to use the mask generated by the TESS pipeline."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc = tpf.to_lightcurve()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now we can use the plot function to take a look at the data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.errorbar();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This looks pretty good, but maybe we can improve things by creating a new aperture."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "aperture_mask = tpf.create_threshold_mask(threshold=10)\n",
+    "\n",
+    "# Plot that aperture\n",
+    "tpf.plot(aperture_mask=aperture_mask);"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc = tpf.to_lightcurve(aperture_mask=aperture_mask)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc.errorbar();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "There's a long term trend in this dataset, which we can remove with a simple smoothing filter. You can use the `lc.flatten()` method to apply and divide the [Savitzky-Golay smoothing filter](https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter). Here we'll use a `window_length` of 1001 cadences, which is roughly a 5% of the full length of the light curve. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Number of cadences in the full light curve\n",
+    "print(lc.time.shape)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "flat_lc = lc.flatten(window_length=1001)\n",
+    "flat_lc.errorbar();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The light curve looks much flatter. Unfortunately there is a portion of the light curve that is very noisy, due to a jitter in the TESS spacecraft. We can remove this simply by masking the light curve. First we'll select the times that had the jitter."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Flag the times that are good quality\n",
+    "mask = (flat_lc.time.value < 1346) | (flat_lc.time.value > 1350)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Then we can just clip those times out."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "masked_lc = flat_lc[mask]\n",
+    "masked_lc.errorbar();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can use *Lightkurve* to plot these two light curves over each other to see the difference. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# First define the `matplotlib.pyplot.axes`\n",
+    "ax = flat_lc.errorbar()\n",
+    "\n",
+    "# Pass that axis to the next plot\n",
+    "masked_lc.errorbar(ax=ax, label='masked');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This looks much better. Now we might want to clip out some outliers from the light curve. We can do that with a simple lightkurve function `remove_outliers()`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clipped_lc = masked_lc.remove_outliers(sigma=6)\n",
+    "clipped_lc.errorbar();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "It's a little hard to see these data because of the plotting style. Let's use a scatter plot instead. We can do this with the `lc.scatter()` method. This method works in the same way that `matplotlib.pyplot.scatter` works, and takes in the same keyword arguments."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clipped_lc.scatter(s=0.1);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can also add errorbars using the `lc.errorbar()` method."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ax = clipped_lc.scatter(s=0.1)\n",
+    "clipped_lc.errorbar(ax=ax, alpha=0.2);  # alpha determines the transparency"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Finally let's use `lightkurve` to fold the data at the exoplanet orbital period and see if we can see the transit."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "folded_lc = clipped_lc.fold(period=6.27, epoch_time=1325.504)\n",
+    "folded_lc.errorbar();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "It looks like there's something there, but it's hard to see. Let's bin the light curve to reduce the number of points, but also reduce the uncertainty of those points."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import astropy.units as u\n",
+    "binned_lc = folded_lc.bin(time_bin_size=5*u.minute)\n",
+    "binned_lc.errorbar();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "And now we can see the transit of Pi Men c! \n",
+    "\n",
+    "Note that you can actually do all these steps in just a few lines:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lc = tpf.to_lightcurve(aperture_mask=aperture_mask).flatten(window_length=1001)\n",
+    "lc = lc[(lc.time.value < 1346) | (lc.time.value > 1350)]\n",
+    "lc.remove_outliers(sigma=6).fold(period=6.27, epoch_time=1325.504).bin(time_bin_size=5*u.minute).errorbar();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Comparing two apertures\n",
+    "\n",
+    "In the above tutorial we used our own aperture instead of the pipeline aperture. Let's compare the results from using these two different apertures."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Use the default\n",
+    "lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask).flatten(window_length=1001)\n",
+    "lc = lc[(lc.time.value < 1346) | (lc.time.value > 1350)].remove_outliers(6).fold(period=6.27, epoch_time=1325.504).bin(5*u.minute)\n",
+    "\n",
+    "# Use a custom aperture\n",
+    "custom_lc = tpf.to_lightcurve(aperture_mask=aperture_mask).flatten(window_length=1001)\n",
+    "custom_lc = custom_lc[(custom_lc.time.value < 1346) | (custom_lc.time.value > 1350)].remove_outliers(6).fold(period=6.27, epoch_time=1325.504).bin(5*u.minute)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ax = lc.errorbar(label='Default aperture')\n",
+    "custom_lc.errorbar(ax=ax, label='Custom aperture');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The importance of using different aperture masks is clearly visible in the figure above.  Note however that the data archive at MAST also contains lightcurve products which have more advanced systematics removal methods applied.  We will explore those in a future tutorial!"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

@@ -1,0 +1,77 @@
+﻿lightkurve.KeplerTargetPixelFile
+================================
+
+.. currentmodule:: lightkurve
+
+.. autoclass:: KeplerTargetPixelFile
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~KeplerTargetPixelFile.__init__
+      ~KeplerTargetPixelFile.create_threshold_mask
+      ~KeplerTargetPixelFile.cutout
+      ~KeplerTargetPixelFile.estimate_background
+      ~KeplerTargetPixelFile.estimate_centroids
+      ~KeplerTargetPixelFile.extract_aperture_photometry
+      ~KeplerTargetPixelFile.extract_prf_photometry
+      ~KeplerTargetPixelFile.from_fits_images
+      ~KeplerTargetPixelFile.get_bkg_lightcurve
+      ~KeplerTargetPixelFile.get_coordinates
+      ~KeplerTargetPixelFile.get_header
+      ~KeplerTargetPixelFile.get_keyword
+      ~KeplerTargetPixelFile.get_model
+      ~KeplerTargetPixelFile.get_prf_model
+      ~KeplerTargetPixelFile.interact
+      ~KeplerTargetPixelFile.interact_sky
+      ~KeplerTargetPixelFile.plot
+      ~KeplerTargetPixelFile.plot_pixels
+      ~KeplerTargetPixelFile.prf_lightcurve
+      ~KeplerTargetPixelFile.query_solar_system_objects
+      ~KeplerTargetPixelFile.show_properties
+      ~KeplerTargetPixelFile.to_corrector
+      ~KeplerTargetPixelFile.to_fits
+      ~KeplerTargetPixelFile.to_lightcurve
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~KeplerTargetPixelFile.astropy_time
+      ~KeplerTargetPixelFile.cadenceno
+      ~KeplerTargetPixelFile.campaign
+      ~KeplerTargetPixelFile.channel
+      ~KeplerTargetPixelFile.column
+      ~KeplerTargetPixelFile.dec
+      ~KeplerTargetPixelFile.flux
+      ~KeplerTargetPixelFile.flux_bkg
+      ~KeplerTargetPixelFile.flux_bkg_err
+      ~KeplerTargetPixelFile.flux_err
+      ~KeplerTargetPixelFile.hdu
+      ~KeplerTargetPixelFile.header
+      ~KeplerTargetPixelFile.mission
+      ~KeplerTargetPixelFile.module
+      ~KeplerTargetPixelFile.nan_time_mask
+      ~KeplerTargetPixelFile.obsmode
+      ~KeplerTargetPixelFile.output
+      ~KeplerTargetPixelFile.pipeline_mask
+      ~KeplerTargetPixelFile.pos_corr1
+      ~KeplerTargetPixelFile.pos_corr2
+      ~KeplerTargetPixelFile.quality
+      ~KeplerTargetPixelFile.quarter
+      ~KeplerTargetPixelFile.ra
+      ~KeplerTargetPixelFile.row
+      ~KeplerTargetPixelFile.shape
+      ~KeplerTargetPixelFile.time
+      ~KeplerTargetPixelFile.wcs
+   
+   

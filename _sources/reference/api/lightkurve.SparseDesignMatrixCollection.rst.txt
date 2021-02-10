@@ -1,0 +1,37 @@
+﻿lightkurve.SparseDesignMatrixCollection
+=======================================
+
+.. currentmodule:: lightkurve
+
+.. autoclass:: SparseDesignMatrixCollection
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SparseDesignMatrixCollection.__init__
+      ~SparseDesignMatrixCollection.plot
+      ~SparseDesignMatrixCollection.plot_priors
+      ~SparseDesignMatrixCollection.split
+      ~SparseDesignMatrixCollection.standardize
+      ~SparseDesignMatrixCollection.to_designmatrix
+      ~SparseDesignMatrixCollection.validate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SparseDesignMatrixCollection.columns
+      ~SparseDesignMatrixCollection.prior_mu
+      ~SparseDesignMatrixCollection.prior_sigma
+      ~SparseDesignMatrixCollection.values
+   
+   

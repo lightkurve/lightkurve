@@ -1,0 +1,6 @@
+﻿lightkurve.FoldedLightCurve.phase
+=================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: FoldedLightCurve.phase

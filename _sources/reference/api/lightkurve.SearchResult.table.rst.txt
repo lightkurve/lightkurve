@@ -1,0 +1,6 @@
+﻿lightkurve.SearchResult.table
+=============================
+
+.. currentmodule:: lightkurve
+
+.. autoattribute:: SearchResult.table

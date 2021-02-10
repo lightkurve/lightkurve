@@ -1,0 +1,602 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LightCurve &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="lightkurve.LightCurve" href="api/lightkurve.LightCurve.html" />
+    <link rel="prev" title="lightkurve.SearchResult.table" href="api/lightkurve.SearchResult.table.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../about/index.html">About</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+        
+        
+          
+            
+                <li class="">
+                    <a href="search.html">Downloading data</a>
+                </li>
+            
+          
+            
+  
+                <li class="active">
+                    <a href="">LightCurve</a>
+                    <ul>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.html">lightkurve.LightCurve</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.time.html">lightkurve.LightCurve.time</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.flux.html">lightkurve.LightCurve.flux</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.flux_err.html">lightkurve.LightCurve.flux_err</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.meta.html">lightkurve.LightCurve.meta</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.plot.html">lightkurve.LightCurve.plot</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.scatter.html">lightkurve.LightCurve.scatter</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.errorbar.html">lightkurve.LightCurve.errorbar</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.plot_river.html">lightkurve.LightCurve.plot_river</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.append.html">lightkurve.LightCurve.append</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.copy.html">lightkurve.LightCurve.copy</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.bin.html">lightkurve.LightCurve.bin</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.fill_gaps.html">lightkurve.LightCurve.fill_gaps</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.flatten.html">lightkurve.LightCurve.flatten</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.fold.html">lightkurve.LightCurve.fold</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.normalize.html">lightkurve.LightCurve.normalize</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.remove_nans.html">lightkurve.LightCurve.remove_nans</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.remove_outliers.html">lightkurve.LightCurve.remove_outliers</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.to_corrector.html">lightkurve.LightCurve.to_corrector</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.to_csv.html">lightkurve.LightCurve.to_csv</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.to_fits.html">lightkurve.LightCurve.to_fits</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.to_pandas.html">lightkurve.LightCurve.to_pandas</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.to_periodogram.html">lightkurve.LightCurve.to_periodogram</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.to_seismology.html">lightkurve.LightCurve.to_seismology</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.to_table.html">lightkurve.LightCurve.to_table</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.read.html">lightkurve.LightCurve.read</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.write.html">lightkurve.LightCurve.write</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.estimate_cdpp.html">lightkurve.LightCurve.estimate_cdpp</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.query_solar_system_objects.html">lightkurve.LightCurve.query_solar_system_objects</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.interact_bls.html">lightkurve.LightCurve.interact_bls</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.create_transit_mask.html">lightkurve.LightCurve.create_transit_mask</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="api/lightkurve.LightCurve.search_neighbors.html">lightkurve.LightCurve.search_neighbors</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="foldedlightcurve.html">FoldedLightCurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="targetpixelfile.html">TargetPixelFile</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="periodogram.html">Periodogram</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="seismology.html">Seismology</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="correctors.html">Correcting systematics</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="misc.html">Miscellaneous utilities</a>
+                </li>
+            
+          
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#constructor" class="nav-link">Constructor</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#attributes" class="nav-link">Attributes</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#metadata" class="nav-link">Metadata</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#plotting" class="nav-link">Plotting</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#data-manipulation" class="nav-link">Data manipulation</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#conversions" class="nav-link">Conversions</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#other-utility-methods" class="nav-link">Other Utility Methods</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="lightcurve">
+<span id="api-lightcurve"></span><h1>LightCurve<a class="headerlink" href="#lightcurve" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> class is an extension of AstroPy’s <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a>
+object, which itself extends AstroPy’s <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a>.
+Compared to a generic Table, LightCurve objects enforce the presence of three
+special data columns: <a class="reference internal" href="api/lightkurve.LightCurve.time.html#lightkurve.LightCurve.time" title="lightkurve.LightCurve.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>, <a class="reference internal" href="api/lightkurve.LightCurve.flux.html#lightkurve.LightCurve.flux" title="lightkurve.LightCurve.flux"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code></a>, and <a class="reference internal" href="api/lightkurve.LightCurve.flux_err.html#lightkurve.LightCurve.flux_err" title="lightkurve.LightCurve.flux_err"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_err</span></code></a>.
+This enables a LightCurve object to offer a range of methods which are specific to working
+with flux-based time series data.</p>
+<div class="section" id="constructor">
+<h2>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline">¶</a></h2>
+<p>Light curves can be instantiated by passing array-like values to the
+<code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">flux</span></code>, and <code class="docutils literal notranslate"><span class="pre">flux_err</span></code> parameters.
+Additional columns can be added by passing a table-like object to the <code class="docutils literal notranslate"><span class="pre">data</span></code> parameter.</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a>([data, time, flux, flux_err])</p></td>
+<td><p>Subclass of AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> guaranteed to have <em>time</em>, <em>flux</em>, and <em>flux_err</em> columns.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h2>
+<p>Another difference with AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> is that all columns can
+be accessed conveniently as attributes.  For example, <code class="docutils literal notranslate"><span class="pre">LightCurve.time</span></code> is
+offered as a shorthand for <code class="docutils literal notranslate"><span class="pre">LightCurve[&quot;time&quot;]</span></code>.</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.time.html#lightkurve.LightCurve.time" title="lightkurve.LightCurve.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.time</span></code></a></p></td>
+<td><p>Time values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.flux.html#lightkurve.LightCurve.flux" title="lightkurve.LightCurve.flux"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.flux</span></code></a></p></td>
+<td><p>Brightness values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.flux_err.html#lightkurve.LightCurve.flux_err" title="lightkurve.LightCurve.flux_err"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.flux_err</span></code></a></p></td>
+<td><p>Brightness uncertainties stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
+<p>All meta data are stored in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">meta</span></code> dictionary.
+For convenience, meta data can be accessed as object attributes,
+e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sector</span></code> is a short-hand for <code class="docutils literal notranslate"><span class="pre">LightCurve.meta[&quot;sector&quot;]</span></code>.</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.meta.html#lightkurve.LightCurve.meta" title="lightkurve.LightCurve.meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.meta</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.plot.html#lightkurve.LightCurve.plot" title="lightkurve.LightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.plot</span></code></a>(**kwargs)</p></td>
+<td><p>Plot the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.3.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.scatter.html#lightkurve.LightCurve.scatter" title="lightkurve.LightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.scatter</span></code></a>([colorbar_label, …])</p></td>
+<td><p>Plots the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.3.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.errorbar.html#lightkurve.LightCurve.errorbar" title="lightkurve.LightCurve.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.errorbar</span></code></a>([linestyle])</p></td>
+<td><p>Plots the light curve using Matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.3.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.plot_river.html#lightkurve.LightCurve.plot_river" title="lightkurve.LightCurve.plot_river"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.plot_river</span></code></a>(period[, epoch_time, …])</p></td>
+<td><p>Plot the light curve as a river plot.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="data-manipulation">
+<h2>Data manipulation<a class="headerlink" href="#data-manipulation" title="Permalink to this headline">¶</a></h2>
+<p>The following methods all return a new <a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object.</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.append.html#lightkurve.LightCurve.append" title="lightkurve.LightCurve.append"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.append</span></code></a>(others[, inplace])</p></td>
+<td><p>Append one or more other <a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object(s) to this one.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.copy.html#lightkurve.LightCurve.copy" title="lightkurve.LightCurve.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.copy</span></code></a>([copy_data])</p></td>
+<td><p>Return a copy of the table.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.bin.html#lightkurve.LightCurve.bin" title="lightkurve.LightCurve.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.bin</span></code></a>([time_bin_size, …])</p></td>
+<td><p>Bins a lightcurve in equally-spaced bins in time.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.fill_gaps.html#lightkurve.LightCurve.fill_gaps" title="lightkurve.LightCurve.fill_gaps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.fill_gaps</span></code></a>([method])</p></td>
+<td><p>Fill in gaps in time.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.flatten.html#lightkurve.LightCurve.flatten" title="lightkurve.LightCurve.flatten"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.flatten</span></code></a>([window_length, …])</p></td>
+<td><p>Removes the low frequency trend using scipy’s Savitzky-Golay filter.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.fold.html#lightkurve.LightCurve.fold" title="lightkurve.LightCurve.fold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.fold</span></code></a>([period, epoch_time, …])</p></td>
+<td><p>Returns a <a class="reference internal" href="api/lightkurve.FoldedLightCurve.html#lightkurve.FoldedLightCurve" title="lightkurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> object folded on a period and epoch.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.normalize.html#lightkurve.LightCurve.normalize" title="lightkurve.LightCurve.normalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.normalize</span></code></a>([unit])</p></td>
+<td><p>Returns a normalized version of the light curve.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.remove_nans.html#lightkurve.LightCurve.remove_nans" title="lightkurve.LightCurve.remove_nans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.remove_nans</span></code></a>([column])</p></td>
+<td><p>Removes cadences where <code class="docutils literal notranslate"><span class="pre">column</span></code> is a NaN.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.remove_outliers.html#lightkurve.LightCurve.remove_outliers" title="lightkurve.LightCurve.remove_outliers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.remove_outliers</span></code></a>([sigma, …])</p></td>
+<td><p>Removes outlier data points using sigma-clipping.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="conversions">
+<h2>Conversions<a class="headerlink" href="#conversions" title="Permalink to this headline">¶</a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_corrector.html#lightkurve.LightCurve.to_corrector" title="lightkurve.LightCurve.to_corrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_corrector</span></code></a>([method])</p></td>
+<td><p>Returns a corrector object to remove instrument systematics.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_csv.html#lightkurve.LightCurve.to_csv" title="lightkurve.LightCurve.to_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_csv</span></code></a>([path_or_buf])</p></td>
+<td><p>Writes the light curve to a CSV file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_fits.html#lightkurve.LightCurve.to_fits" title="lightkurve.LightCurve.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_fits</span></code></a>([path, overwrite, …])</p></td>
+<td><p>Converts the light curve to a FITS file in the Kepler/TESS file format.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_pandas.html#lightkurve.LightCurve.to_pandas" title="lightkurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_pandas</span></code></a>()</p></td>
+<td><p>Convert this <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> to a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> with a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> index.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_periodogram.html#lightkurve.LightCurve.to_periodogram" title="lightkurve.LightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_periodogram</span></code></a>([method])</p></td>
+<td><p>Converts the light curve to a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code> power spectrum object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_seismology.html#lightkurve.LightCurve.to_seismology" title="lightkurve.LightCurve.to_seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_seismology</span></code></a>(**kwargs)</p></td>
+<td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code> object for estimating quick-look asteroseismic quantities.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_table.html#lightkurve.LightCurve.to_table" title="lightkurve.LightCurve.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_table</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.read.html#lightkurve.LightCurve.read" title="lightkurve.LightCurve.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.read</span></code></a>(filename[, time_column, …])</p></td>
+<td><p>Read and parse a file and returns a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.write.html#lightkurve.LightCurve.write" title="lightkurve.LightCurve.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.write</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="other-utility-methods">
+<h2>Other Utility Methods<a class="headerlink" href="#other-utility-methods" title="Permalink to this headline">¶</a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.estimate_cdpp.html#lightkurve.LightCurve.estimate_cdpp" title="lightkurve.LightCurve.estimate_cdpp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.estimate_cdpp</span></code></a>([transit_duration, …])</p></td>
+<td><p>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.query_solar_system_objects.html#lightkurve.LightCurve.query_solar_system_objects" title="lightkurve.LightCurve.query_solar_system_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.query_solar_system_objects</span></code></a>([…])</p></td>
+<td><p>Returns a list of asteroids or comets which affected the light curve.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.interact_bls.html#lightkurve.LightCurve.interact_bls" title="lightkurve.LightCurve.interact_bls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.interact_bls</span></code></a>([notebook_url, …])</p></td>
+<td><p>Display an interactive Jupyter Notebook widget to find planets.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.create_transit_mask.html#lightkurve.LightCurve.create_transit_mask" title="lightkurve.LightCurve.create_transit_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.create_transit_mask</span></code></a>(period, …)</p></td>
+<td><p>Returns a boolean array that is <code class="docutils literal notranslate"><span class="pre">True</span></code> during transits and <code class="docutils literal notranslate"><span class="pre">False</span></code> elsewhere.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.search_neighbors.html#lightkurve.LightCurve.search_neighbors" title="lightkurve.LightCurve.search_neighbors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.search_neighbors</span></code></a>([limit, radius])</p></td>
+<td><p>Search the data archive at MAST for the most nearby light curves.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="api/lightkurve.SearchResult.table.html" title="previous page">lightkurve.SearchResult.table</a>
+    <a class='right-next' id="next-link" href="api/lightkurve.LightCurve.html" title="next page">lightkurve.LightCurve</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

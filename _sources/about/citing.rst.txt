@@ -47,9 +47,8 @@ We strongly encourage you to cite these packages as well.
 In particular, we request that all astronomy publications cite the relevant
 astronomy packages, which include:
 
-* `astropy <https://astropy.org>`_ (see `citation instructions <https://www.astropy.org/acknowledging.html>`_) enabled all features.
-* `astroquery <https://astroquery.readthedocs.io>`_ (see `citation instructions <https://github.com/astropy/astroquery#citing-astroquery>`_) enabled all `~lightkurve.search` functions.
-* `tesscut <https://mast.stsci.edu/tesscut/>`_ (see `citation instructions <https://ascl.net/code/v/2239>`_) enabled `~lightkurve.search.search_tesscut`.
-* `celerite <https://celerite.readthedocs.io>`_ (see `citation instructions <https://celerite.readthedocs.io/en/stable/#license-attribution>`_) enabled `~lightkurve.correctors.PLDCorrector`.
+* `astropy <https://astropy.org>`_ (see `astropy citation instructions <https://www.astropy.org/acknowledging.html>`_) enabled all features.
+* `astroquery <https://astroquery.readthedocs.io>`_ (see `astroquery citation instructions <https://github.com/astropy/astroquery#citing-astroquery>`_) enabled all `~lightkurve.search` functions.
+* `tesscut <https://mast.stsci.edu/tesscut/>`_ (see `tesscut citation instructions <https://ascl.net/code/v/2239>`_) enabled `~lightkurve.search.search_tesscut`.
 
 If your package is missing from the list above, please `open a pull request <https://github.com/KeplerGO/lightkurve>`_ to add it.

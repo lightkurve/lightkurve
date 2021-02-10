@@ -1,0 +1,6 @@
+﻿lightkurve.DesignMatrix.collect
+===============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: DesignMatrix.collect

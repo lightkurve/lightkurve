@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.scatter
+=============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.scatter

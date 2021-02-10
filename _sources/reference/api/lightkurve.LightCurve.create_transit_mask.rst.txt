@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.create\_transit\_mask
+===========================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.create_transit_mask

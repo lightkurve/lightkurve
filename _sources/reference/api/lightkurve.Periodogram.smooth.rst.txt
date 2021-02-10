@@ -1,0 +1,6 @@
+﻿lightkurve.Periodogram.smooth
+=============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: Periodogram.smooth

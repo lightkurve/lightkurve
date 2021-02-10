@@ -1,0 +1,535 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.CBVCorrector &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lightkurve.CBVCorrector.correct" href="lightkurve.CBVCorrector.correct.html" />
+    <link rel="prev" title="Correcting systematics" href="../correctors.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../tutorials/index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../about/index.html">About</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+        
+        
+          
+            
+                <li class="">
+                    <a href="../search.html">Downloading data</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../lightcurve.html">LightCurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../foldedlightcurve.html">FoldedLightCurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../targetpixelfile.html">TargetPixelFile</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../periodogram.html">Periodogram</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../seismology.html">Seismology</a>
+                </li>
+            
+          
+            
+  
+                <li class="active">
+                    <a href="../correctors.html">Correcting systematics</a>
+                    <ul>
+                    
+                        <li class="active">
+                            <a href="">lightkurve.CBVCorrector</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.CBVCorrector.correct.html">lightkurve.CBVCorrector.correct</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.CBVCorrector.diagnose.html">lightkurve.CBVCorrector.diagnose</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.PLDCorrector.html">lightkurve.PLDCorrector</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.PLDCorrector.correct.html">lightkurve.PLDCorrector.correct</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.PLDCorrector.diagnose.html">lightkurve.PLDCorrector.diagnose</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.PLDCorrector.diagnose_masks.html">lightkurve.PLDCorrector.diagnose_masks</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SFFCorrector.html">lightkurve.SFFCorrector</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SFFCorrector.correct.html">lightkurve.SFFCorrector.correct</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SFFCorrector.diagnose.html">lightkurve.SFFCorrector.diagnose</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SFFCorrector.diagnose_arclength.html">lightkurve.SFFCorrector.diagnose_arclength</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.RegressionCorrector.html">lightkurve.RegressionCorrector</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.RegressionCorrector.correct.html">lightkurve.RegressionCorrector.correct</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.RegressionCorrector.diagnose.html">lightkurve.RegressionCorrector.diagnose</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.html">lightkurve.DesignMatrix</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrixCollection.html">lightkurve.DesignMatrixCollection</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SparseDesignMatrix.html">lightkurve.SparseDesignMatrix</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.SparseDesignMatrixCollection.html">lightkurve.SparseDesignMatrixCollection</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.X.html">lightkurve.DesignMatrix.X</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.rank.html">lightkurve.DesignMatrix.rank</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.shape.html">lightkurve.DesignMatrix.shape</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.values.html">lightkurve.DesignMatrix.values</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.append_constant.html">lightkurve.DesignMatrix.append_constant</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.collect.html">lightkurve.DesignMatrix.collect</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.copy.html">lightkurve.DesignMatrix.copy</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.pca.html">lightkurve.DesignMatrix.pca</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.plot.html">lightkurve.DesignMatrix.plot</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.plot_priors.html">lightkurve.DesignMatrix.plot_priors</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.split.html">lightkurve.DesignMatrix.split</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.standardize.html">lightkurve.DesignMatrix.standardize</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.to_sparse.html">lightkurve.DesignMatrix.to_sparse</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.DesignMatrix.validate.html">lightkurve.DesignMatrix.validate</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.correctors.corrector.Corrector.html">lightkurve.correctors.corrector.Corrector</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../misc.html">Miscellaneous utilities</a>
+                </li>
+            
+          
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="lightkurve-cbvcorrector">
+<h1>lightkurve.CBVCorrector<a class="headerlink" href="#lightkurve-cbvcorrector" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="lightkurve.CBVCorrector">
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.</code><code class="sig-name descname">CBVCorrector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lc</span></em>, <em class="sig-param"><span class="n">interpolate_cbvs</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">do_not_load_cbvs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.CBVCorrector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for removing systematics using Cotrending Basis Vectors (CBVs)
+from Kepler/K2/TESS.</p>
+<p>On construction of this object, the relevent CBVs will be downloaded from
+MAST appropriate for the lightcurve object passed to the constructor.</p>
+<p>For TESS there are multiple CBV types. All are loaded and the user must
+specify which to use in the correction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>lc</strong><span class="classifier">LightCurve</span></dt><dd><p>The light curve loaded into CBVCorrector in electrons / second</p>
+</dd>
+<dt><strong>cbvs</strong><span class="classifier">CotrendingBasisVectors list</span></dt><dd><p>The retrieved CBVs, can contain multiple types of CBVs</p>
+</dd>
+<dt><strong>interpolated_cbvs</strong><span class="classifier">bool</span></dt><dd><p>If true then the CBVs have been interpolated to the lightcurve</p>
+</dd>
+<dt><strong>cbv_design_matrix</strong><span class="classifier">DesignMatrix</span></dt><dd><p>The retrieved CBVs ported into a DesignMatrix object</p>
+</dd>
+<dt><strong>extra_design_matrix</strong><span class="classifier">DesignMatrix</span></dt><dd><p>An extra design matrix to include in the fit with the CBVs</p>
+</dd>
+<dt><strong>design_matrix_collection</strong><span class="classifier">DesignMatrixCollection</span></dt><dd><p>The design matrix collection composed of cbv_design_matrix and extra_design_matrix</p>
+</dd>
+<dt><strong>corrected_lc</strong><span class="classifier">LightCurve</span></dt><dd><p>The returned light curve from correct() in electrons / second</p>
+</dd>
+<dt><strong>coefficients</strong><span class="classifier">float ndarray</span></dt><dd><p>The fit coefficients corresponding to the design_matrix_collection</p>
+</dd>
+<dt><strong>coefficients_err</strong><span class="classifier">float ndarray</span></dt><dd><p>The error estimates for the coefficients, see regressioncorrector</p>
+</dd>
+<dt><strong>model_lc</strong><span class="classifier">LightCurve</span></dt><dd><p>The model fit to the lightcurve ‘lc’</p>
+</dd>
+<dt><strong>diagnostic_lightcurves</strong><span class="classifier">dict</span></dt><dd><p>Model fits for each of the sub design matrices fit in model_lc</p>
+</dd>
+<dt><strong>lc_neighborhood</strong><span class="classifier">LightCurveCollection</span></dt><dd><p>SPOC SAP light curves of all targets within the defined neighborhood of the
+target under study for use with the under-fitting metric</p>
+</dd>
+<dt><strong>lc_neighborhood_flux</strong><span class="classifier">list of arrays</span></dt><dd><p>Neighboring target flux aligned or interpolated to the target under
+study cadence</p>
+</dd>
+<dt><strong>cadence_mask</strong><span class="classifier">np.ndarray of bool</span></dt><dd><p>Mask, where True indicates a cadence that was used in
+RegressionCorrector.correct.
+Note: The saved cadence_mask is overwritten for each call to correct().</p>
+</dd>
+<dt><strong>over_fitting_score</strong><span class="classifier">float</span></dt><dd><p>Over-fitting score from the most recent run of correct()</p>
+</dd>
+<dt><strong>under_fitting_score</strong><span class="classifier">float</span></dt><dd><p>Under-fitting score from the most recent run of correct()</p>
+</dd>
+<dt><strong>alpha</strong><span class="classifier">float</span></dt><dd><p>L2-norm regularization term used in most recent fit
+Equivalent to: designmatrix prior sigma = np.median(self.lc.flux_err) / np.sqrt(alpha)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="lightkurve.CBVCorrector.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lc</span></em>, <em class="sig-param"><span class="n">interpolate_cbvs</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">do_not_load_cbvs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.CBVCorrector.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor</p>
+<p>This constructor will retrieve all relevant CBVs from MAST and then
+align them with the passed-in light curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>lc</strong><span class="classifier">LightCurve</span></dt><dd><p>The light curve to correct</p>
+</dd>
+<dt><strong>interpolate_cbvs</strong><span class="classifier">bool</span></dt><dd><p>By default, the cbvs will be ‘aligned’ to the lightcurve. If you
+wish to interpolate the cbvs instead then set this to True.
+Uses Piecewise Cubic Hermite Interpolating Polynomial (PCHIP).</p>
+</dd>
+<dt><strong>do_not_load_cbvs</strong><span class="classifier">bool</span></dt><dd><p>If True then the CBVs will NOT be loaded from MAST. 
+Use this option if you wish to use the CBV corrector methods with only a 
+custom design matrix (via the ext_dm argument in the corrector methods)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.CBVCorrector.__init__" title="lightkurve.CBVCorrector.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(lc[, interpolate_cbvs, …])</p></td>
+<td><p>Constructor</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_overfit_metric</span></code>(**kwargs)</p></td>
+<td><p>Measures the degree of over-fitting in the correction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_underfit_metric</span></code>(**kwargs)</p></td>
+<td><p>Measures the degree of under-fitting the correction.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Returns a copy of this <code class="xref py py-obj docutils literal notranslate"><span class="pre">cbvCorrector</span></code> object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.CBVCorrector.correct.html#lightkurve.CBVCorrector.correct" title="lightkurve.CBVCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>([cbv_type, cbv_indices, ext_dm, …])</p></td>
+<td><p>Optimizes the correction by adjusting the L2-Norm (Ridge Regression) regularization penalty term, alpha, based on the introduced noise (over-fitting) and residual correlation (under-fitting) goodness metrics.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct_elasticnet</span></code>([cbv_type, cbv_indices, …])</p></td>
+<td><p>Performs the correction using scikit-learn’s ElasticNet which utilizes combined L1- and L2-Norm priors as a regularizer.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct_gaussian_prior</span></code>([cbv_type, …])</p></td>
+<td><p>Performs the correction using RegressionCorrector methods.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct_regressioncorrector</span></code>(…)</p></td>
+<td><p>Pass-through method to gain access to the superclass  RegressionCorrector.correct() method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.CBVCorrector.diagnose.html#lightkurve.CBVCorrector.diagnose" title="lightkurve.CBVCorrector.diagnose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose</span></code></a>()</p></td>
+<td><p>Returns diagnostic plots to assess the most recent correction.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose_priors</span></code>()</p></td>
+<td><p>Returns a diagnostic plot visualizing how the best-fit coefficients compare against the priors.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">goodness_metric_scan_plot</span></code>([cbv_type, …])</p></td>
+<td><p>Returns a diagnostic plot of the over and under goodness metrics as a function of the L2-Norm regularization term, alpha.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">over_fitting_metric</span></code>([n_samples])</p></td>
+<td><p>Computes the over-fitting metric using  metrics.overfit_metric_lombscargle</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">under_fitting_metric</span></code>([radius, min_targets, …])</p></td>
+<td><p>Computes the under-fitting metric using  metrics.underfit_metric_neighbors</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadence_mask</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">corrected_lc</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dmc</span></code></p></td>
+<td><p>Shorthand for self.design_matrix_collection.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">original_lc</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="../correctors.html" title="previous page">Correcting systematics</a>
+    <a class='right-next' id="next-link" href="lightkurve.CBVCorrector.correct.html" title="next page">lightkurve.CBVCorrector.correct</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

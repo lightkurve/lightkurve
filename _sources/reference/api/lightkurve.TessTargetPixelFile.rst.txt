@@ -1,0 +1,71 @@
+﻿lightkurve.TessTargetPixelFile
+==============================
+
+.. currentmodule:: lightkurve
+
+.. autoclass:: TessTargetPixelFile
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TessTargetPixelFile.__init__
+      ~TessTargetPixelFile.create_threshold_mask
+      ~TessTargetPixelFile.cutout
+      ~TessTargetPixelFile.estimate_background
+      ~TessTargetPixelFile.estimate_centroids
+      ~TessTargetPixelFile.extract_aperture_photometry
+      ~TessTargetPixelFile.from_fits_images
+      ~TessTargetPixelFile.get_bkg_lightcurve
+      ~TessTargetPixelFile.get_coordinates
+      ~TessTargetPixelFile.get_header
+      ~TessTargetPixelFile.get_keyword
+      ~TessTargetPixelFile.interact
+      ~TessTargetPixelFile.interact_sky
+      ~TessTargetPixelFile.plot
+      ~TessTargetPixelFile.plot_pixels
+      ~TessTargetPixelFile.query_solar_system_objects
+      ~TessTargetPixelFile.show_properties
+      ~TessTargetPixelFile.to_corrector
+      ~TessTargetPixelFile.to_fits
+      ~TessTargetPixelFile.to_lightcurve
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TessTargetPixelFile.astropy_time
+      ~TessTargetPixelFile.background_mask
+      ~TessTargetPixelFile.cadenceno
+      ~TessTargetPixelFile.camera
+      ~TessTargetPixelFile.ccd
+      ~TessTargetPixelFile.column
+      ~TessTargetPixelFile.dec
+      ~TessTargetPixelFile.flux
+      ~TessTargetPixelFile.flux_bkg
+      ~TessTargetPixelFile.flux_bkg_err
+      ~TessTargetPixelFile.flux_err
+      ~TessTargetPixelFile.hdu
+      ~TessTargetPixelFile.header
+      ~TessTargetPixelFile.mission
+      ~TessTargetPixelFile.nan_time_mask
+      ~TessTargetPixelFile.pipeline_mask
+      ~TessTargetPixelFile.pos_corr1
+      ~TessTargetPixelFile.pos_corr2
+      ~TessTargetPixelFile.quality
+      ~TessTargetPixelFile.ra
+      ~TessTargetPixelFile.row
+      ~TessTargetPixelFile.sector
+      ~TessTargetPixelFile.shape
+      ~TessTargetPixelFile.time
+      ~TessTargetPixelFile.wcs
+   
+   

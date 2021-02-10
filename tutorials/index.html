@@ -4,173 +4,306 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Tutorials &#8212; Lightkurve</title>
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutorials &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.3da636dd464baa7582d2.js">
+
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load Bootstrap viewport and Javascript (Javascript is needed for the navbar toggle) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
+    <link rel="next" title="What are LightCurve objects?" href="1-getting-started/what-are-lightcurve-objects.html" />
+    <link rel="prev" title="Quickstart" href="../quickstart.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
-      <!-- Google Analytics -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'UA-69171-9');
-      </script>
-    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
 
-  </head><body>
-<header>
-<nav class="navbar navbar-expand-lg navbar-light border-bottom">
-  <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.11</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <a class="navbar-brand" href="../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarsExample07">
-
-    
-      <!-- Custom navbar -->
-      <ul class="navbar-nav mr-auto">
-          
-          <li class="nav-item">
-          
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
             <a class="nav-link" href="../quickstart.html">Quickstart</a>
-          </li>
-          
-          <li class="nav-item active">
-          
-            <a class="nav-link" href="#">Tutorials</a>
-          </li>
-          
-          <li class="nav-item">
-          
-            <a class="nav-link" href="../api/index.html">API</a>
-          </li>
-          
-          <li class="nav-item">
-          
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="">Tutorials</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../reference/index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
             <a class="nav-link" href="../about/index.html">About</a>
-          </li>
+        </li>
+        
+        
       </ul>
-    
 
-        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
-            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
-        </form>
 
-        <!-- GitHub icon -->
+      <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
         
-          <a href="https://github.com/KeplerGO/Lightkurve">
-            <svg class="github-icon" viewBox="0 0 16 16" version="1.1" height="22" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-          </a>
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
         
+        
+      </ul>
     </div>
-  </div>
-</nav>
-</header>
-
-<div class="container"  role="main">
+</div>
+    </nav>
     
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar">
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#getting-started-with-lightkurve" class="nav-link">1. Getting started with Lightkurve</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#lightkurve-objects" class="nav-link">1.1. Lightkurve objects</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#working-with-kepler-tess-data-products" class="nav-link">1.2. Working with Kepler & TESS data products</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#creating-and-correcting-light-curves" class="nav-link">2. Creating and correcting light curves</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#creating-light-curves" class="nav-link">2.1. Creating light curves</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#identifying-instrumental-noise" class="nav-link">2.2. Identifying instrumental noise</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#removing-instrumental-noise" class="nav-link">2.3. Removing instrumental noise</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#science-examples" class="nav-link">3. Science examples</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#exoplanet-examples" class="nav-link">3.1. Exoplanet examples</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#rotation-rates-and-periodic-signals" class="nav-link">3.2. Rotation rates and periodic signals</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#asteroseismology-examples" class="nav-link">3.3. Asteroseismology examples</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#other-examples" class="nav-link">3.4. Other examples</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="section" id="tutorials">
 <span id="id1"></span><h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="the-lightkurve-api">
-<h2>1. The Lightkurve API<a class="headerlink" href="#the-lightkurve-api" title="Permalink to this headline">¶</a></h2>
-<p>The first set of tutorials cover the basics of using Lightkurve.
-This includes getting to grips with the file types and how to load and work
-with data from the Kepler, K2, and TESS missions. For a complete listing of
-all classes and methods, please consult the <a class="reference external" href="../api/index.html">API docs</a>.</p>
+<div class="section" id="getting-started-with-lightkurve">
+<h2>1. Getting started with Lightkurve<a class="headerlink" href="#getting-started-with-lightkurve" title="Permalink to this headline">¶</a></h2>
+<p>The first set of tutorials covers the basics of using Lightkurve.
+This includes getting to grips with the basic Lightkurve objects
+and how to load and work with data products from the Kepler, K2, and TESS missions.
+For a complete listing of all classes and methods, please consult the <a class="reference external" href="../reference/index.html">API docs</a>.</p>
+<div class="section" id="lightkurve-objects">
+<h3>1.1. Lightkurve objects<a class="headerlink" href="#lightkurve-objects" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="01-target-pixel-files.html">What are <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> objects?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="01-what-are-lightcurves.html">What are <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="01-lightcurve-files.html">What are <code class="docutils literal notranslate"><span class="pre">LightCurveFile</span></code> objects?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="01-using-the-periodogram-class.html">What are <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1-getting-started/what-are-lightcurve-objects.html">What are <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1-getting-started/what-are-targetpixelfile-objects.html">What are <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> objects?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1-getting-started/what-are-periodogram-objects.html">What are <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects?</a></li>
 </ul>
+</div>
+</div>
+<div class="section" id="working-with-kepler-tess-data-products">
+<h3>1.2. Working with Kepler &amp; TESS data products<a class="headerlink" href="#working-with-kepler-tess-data-products" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="1-getting-started/searching-for-data-products.html">Searching &amp; downloading <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1-getting-started/using-light-curve-file-products.html">Using Light Curve Files with Lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1-getting-started/using-target-pixel-file-products.html">Using Target Pixel Files with Lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1-getting-started/plotting-target-pixel-files.html">Plotting Target Pixel Files with Lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1-getting-started/interactively-inspecting-data.html">Interactively inspecting Target Pixel Files</a></li>
+</ul>
+</div>
 </div>
 </div>
 <div class="section" id="creating-and-correcting-light-curves">
 <h2>2. Creating and correcting light curves<a class="headerlink" href="#creating-and-correcting-light-curves" title="Permalink to this headline">¶</a></h2>
 <p>The second section focuses on the various ways in which light curves
 can be extracted from the pixel data, and on the removal of instrument noise
-(“systematics”) from those light curves.</p>
+(often referred to as <em>systematics</em>) from those light curves.</p>
 <div class="section" id="creating-light-curves">
 <h3>2.1. Creating light curves<a class="headerlink" href="#creating-light-curves" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="03-making-custom-apertures.html">How to perform aperture photometry with custom apertures?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="03-how-to-use-prf-photometry.html">How to perform PRF photometry?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="03-cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="03-making-fits-files.html">How to save a LightCurve in FITS format?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="03-using-river-plots.html">How to use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code>’s river plot function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-1-custom-aperture-photometry.html">Creating your own light curves using custom aperture photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-1-combining-multiple-quarters.html">Combining multiple quarters of <em>Kepler</em> data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-1-cutting-out-tpfs.html">How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-1-saving-a-light-curve.html">How to save a LightCurve in FITS format?</a></li>
 </ul>
 </div>
 </div>
-<div class="section" id="identifying-instrument-noise">
-<h3>2.2. Identifying instrument noise<a class="headerlink" href="#identifying-instrument-noise" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="identifying-instrumental-noise">
+<h3>2.2. Identifying instrumental noise<a class="headerlink" href="#identifying-instrumental-noise" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="04-interact-with-lightcurves-and-tpf.html">How to interactively inspect Target Pixel Files and Light Curves?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="04-identify-rolling-band.html">How to identify time-variable background noise (“rolling bands”)?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-2-kepler-noise-1-data-gaps-and-quality-flags.html">Instrumental Noise in <em>Kepler</em> and <em>K2</em> #1: Data Gaps and Quality Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects.html">Instrumental Noise in <em>Kepler</em> and <em>K2</em> #2: Spurious Signals and Time Sampling Effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-2-kepler-noise-3-seasonal-and-detector-effects.html">Instrumental Noise in <em>Kepler</em> and <em>K2</em> #3: Seasonal and Detector Effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-2-kepler-noise-4-electronic-noise.html">Instrumental Noise in <em>Kepler</em> and <em>K2</em> #4: Electronic Noise</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-2-identifying-rolling-band.html">How to identify time-variable background noise (“rolling bands”)?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-2-how-to-use-cbvs.html">How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS</a></li>
 </ul>
 </div>
 </div>
-<div class="section" id="removing-instrument-noise">
-<h3>2.3. Removing instrument noise<a class="headerlink" href="#removing-instrument-noise" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="removing-instrumental-noise">
+<h3>2.3. Removing instrumental noise<a class="headerlink" href="#removing-instrumental-noise" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="04-how-to-remove-tess-scattered-light-using-regressioncorrector.html">How to remove scattered light from TESS data using the <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="04-how-to-detrend.html">How to remove motion noise from K2 data using the <code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code>?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="04-removing-cbvs.html">How to remove common systematics from Kepler light curves using the <code class="docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-3-how-to-use-cbvcorrector.html">Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (<code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-3-removing-scattered-light-using-regressioncorrector.html">Removing scattered light from <em>TESS</em> light curves using linear regression (<code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-3-k2-pldcorrector.html">Removing noise from <em>K2</em> and <em>TESS</em> light curves using Pixel Level Decorrelation (<code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-3-k2-sffcorrector.html">Removing noise from K2 light curves using Self Flat Fielding (<code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code>)</a></li>
 </ul>
 </div>
 </div>
 </div>
 <div class="section" id="science-examples">
 <h2>3. Science examples<a class="headerlink" href="#science-examples" title="Permalink to this headline">¶</a></h2>
-<p>In the final section we cover some data analysis tasks that astronomers might
-commonly want to do with time series data.</p>
+<p>In the final section we demonstrate scientific data analysis tasks which astronomers
+commonly apply to time series data.</p>
 <div class="section" id="exoplanet-examples">
 <h3>3.1. Exoplanet examples<a class="headerlink" href="#exoplanet-examples" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="02-recover-a-planet.html">How to recover a known planet in Kepler data?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="02-how-to-recover-the-first-tess-candidate.html">How to recover the first TESS planet candidate with <em>Lightkurve</em>?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="05-advanced_patterns_binning.html">Machine learning style preprocessing with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/exoplanets-identifying-transiting-planet-signals.html">Identifying transiting exoplanet signals in a light curve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/exoplanets-recover-a-known-planet.html">How to recover a known planet in Kepler data?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/exoplanets-recover-first-tess-candidate.html">How to recover the first TESS planet candidate with <em>Lightkurve</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/exoplanets-machine-learning-preprocessing.html">Machine learning style preprocessing with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/exoplanets-visualizing-periodic-signals-using-a-river-plot.html">Visualizing periodic signals using a river plot</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="rotation-rates-and-periodic-signals">
+<h3>3.2. Rotation rates and periodic signals<a class="headerlink" href="#rotation-rates-and-periodic-signals" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/periodograms-creating-periodograms.html">Creating periodograms and identifying significant peaks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/periodograms-measuring-a-rotation-period.html">Measuring and removing a rotation period signal from a light curve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/periodograms-verifying-the-location-of-a-signal.html">Verifying the location of a periodic signal in the pixel data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/periodograms-optimizing-the-snr.html">How to improve the signal-to-noise of a periodogram?</a></li>
 </ul>
 </div>
 </div>
 <div class="section" id="asteroseismology-examples">
-<h3>3.2. Asteroseismology examples<a class="headerlink" href="#asteroseismology-examples" title="Permalink to this headline">¶</a></h3>
+<h3>3.3. Asteroseismology examples<a class="headerlink" href="#asteroseismology-examples" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="02-how-to-optimize-periodogram-snr.html">How to improve the signal-to-noise of Periodograms?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="02-asteroseismology.html">How to characterize a Sun-like star using asteroseismology?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/asteroseismology-estimating-mass-and-radius.html">How to estimate a star’s mass and radius using asteroseismology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/asteroseismology-oscillating-star-periodogram.html">How to understand and manipulate the periodogram of an oscillating star</a></li>
 </ul>
 </div>
 </div>
 <div class="section" id="other-examples">
-<h3>3.3. Other examples<a class="headerlink" href="#other-examples" title="Permalink to this headline">¶</a></h3>
+<h3>3.4. Other examples<a class="headerlink" href="#other-examples" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="02-how-to-make-a-supernova-lightcurve.html">How to make a supernova lightcurve?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3-science-examples/other-supernova-lightcurve.html">How to make a supernova lightcurve?</a></li>
 </ul>
 </div>
 </div>
@@ -178,16 +311,43 @@ commonly want to do with time series data.</p>
 </div>
 
 
-</div>
-<div class="container footer">
-    <hr>
-    <p class="text-center">
-      
-        Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="/about/citing.html">cite us</a> or
-                      <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
-      
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="../quickstart.html" title="previous page">Quickstart</a>
+    <a class='right-next' id="next-link" href="1-getting-started/what-are-lightcurve-objects.html" title="next page">What are <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects?</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
     </p>
-</div>
+  </div>
+</footer>
   </body>
 </html>

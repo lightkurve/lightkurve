@@ -1,0 +1,6 @@
+﻿lightkurve.Seismology.estimate\_deltanu
+=======================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: Seismology.estimate_deltanu

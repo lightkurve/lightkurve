@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.normalize
+===============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.normalize

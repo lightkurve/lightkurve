@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.plot
+==========================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.plot

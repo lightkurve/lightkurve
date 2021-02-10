@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.pos\_corr1
+===========================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: KeplerTargetPixelFile.pos_corr1

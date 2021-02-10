@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.time
+==========================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: LightCurve.time

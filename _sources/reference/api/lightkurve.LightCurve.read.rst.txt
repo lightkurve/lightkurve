@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.read
+==========================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.read

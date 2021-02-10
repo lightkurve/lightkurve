@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.get\_header
+============================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.get_header

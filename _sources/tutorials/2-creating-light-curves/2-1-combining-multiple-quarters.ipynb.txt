@@ -1,0 +1,677 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "pWS6oL4-dz6G"
+   },
+   "source": [
+    "# Combining multiple quarters of *Kepler* data"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "kvwmGwXod-ez"
+   },
+   "source": [
+    "## Learning Goals\n",
+    "\n",
+    "By the end of this tutorial, you will: \n",
+    "\n",
+    "- Understand a *Kepler* Quarter.\n",
+    "- Understand how to download multiple quarters of data at once.\n",
+    "- Learn how to normalize *Kepler* data.\n",
+    "- Understand how to combine multiple quarters of data.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "jbksIHc6ebWv"
+   },
+   "source": [
+    "## Introduction"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "PSZ_8PvYe9_L"
+   },
+   "source": [
+    "The [*Kepler*](https://archive.stsci.edu/kepler), [*K2*](https://archive.stsci.edu/k2), and [*TESS*](https://archive.stsci.edu/tess) telescopes observe stars for long periods of time. These long, time series observations are broken up into separate chunks, called quarters for the *Kepler* mission, campaigns for *K2*, and sectors for *TESS*.\n",
+    "\n",
+    "Building light curves with as much data as is available is useful when searching for small signals, such as planetary transits or stellar pulsations. In this tutorial, we will learn how to use Lightkurve's tools to download and stitch together multiple quarters of *Kepler* observations.\n",
+    "\n",
+    "It is recommended to first read the tutorial discussing how to use *Kepler* light curve products with Lightkurve. That tutorial will introduce you to some specifics of how *Kepler*, *K2*, and *TESS* make observations, and how these are displayed as light curves. It also introduces some important terms and concepts that are referred to in this tutorial.\n",
+    "\n",
+    "This tutorial demonstrates how to access and combine multiple quarters of data from the *Kepler* space telescope, using the Lightkurve package.\n",
+    "\n",
+    "When accessing *Kepler* data through MAST, it will be stored in three-month chunks, corresponding to a quarter of observations. By combining and normalizing these separate observations, you can form a single light curve that spans all observed quarters. Utilizing all of the data available is especially important when looking at repeating signals, such as planet transits and stellar oscillations.\n",
+    "\n",
+    "We will use the *Kepler* mission as an example, but these tools are extensible to *TESS* and *K2* as well."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "0wEdptxneRHW"
+   },
+   "source": [
+    "## Imports\n",
+    "This tutorial requires the [**Lightkurve**](http://docs.lightkurve.org/) package, which in turn uses `matplotlib` for plotting."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "2PSbUM__eZ2f"
+   },
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk\n",
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "UEQFmg6I0_ug"
+   },
+   "source": [
+    "## 1. What is a *Kepler* Quarter?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "xjaRMY6h5KUp"
+   },
+   "source": [
+    "In order to search for planets around other stars, the *Kepler* space telescope performed near-continuous monitoring of a single field of view, from an Earth-trailing orbit. However, this posed a challenge. If the space telescope is trailing Earth and maintaining steady pointing, its solar panels would slowly receive less and less sunlight.\n",
+    "\n",
+    "In order to make sure the solar panels remained oriented towards the Sun, *Kepler* performed quarterly rolls, one every 93 days. The infographic below helps visualize this, and shows the points in the orbit where the rolls took place.\n",
+    "\n",
+    "After each roll, *Kepler* retained its fine-pointing at the same field of view. Because the camera rotated by 90 degrees, all of the target stars fell on different parts of the charge-coupled device (CCD) camera. This had an effect on the amount of flux recorded for the same star, because different CCD pixels have different sensitivities. The way in which the flux from the same stars was distributed on the CCD (called the point spread function or PSF) also changed after each roll, due to focus changes and other instrumental effects. As a result, the aperture mask set for a star had to be recomputed after each roll, and may capture slightly different amounts of flux. \n",
+    "\n",
+    "The data obtained between rolls is referred to as a quarter. While there are changes to the flux *systematics*, not much else changes quarter to quarter, and the majority of the target list remains identical. This means that, after removing systematic trends (such as was done for the presearch data conditioning simple aperture photometry (PDCSAP) flux), multiple quarters together can form one continuous observation.\n",
+    "\n",
+    "<!-- ![](https://keplergo.arc.nasa.gov/images/program/Orbit_Mar5_09L.gif) -->\n",
+    "<img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Kepler_space_telescope_orbit.png/800px-Kepler_space_telescope_orbit.png\" width=\"800\">\n",
+    "\n",
+    "*Figure*: Infographic showcasing the necessity of *Kepler*'s quarterly rolls and its Earth-trailing orbit. Source: [Kepler Science Center](https://keplergo.arc.nasa.gov/ExtendedMissionOverview.shtml)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "iJ6UwtaVMkc9"
+   },
+   "source": [
+    "**Note**:\n",
+    "Observations by *K2* and *TESS* are also broken down into chunks of a month or more, called campaigns (for *K2*) and sectors (for *TESS*). While not discussed in this tutorial, the tools below work for these data products as well."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "P-YzWvbEgS-F"
+   },
+   "source": [
+    "## 2. Downloading Multiple `KeplerLightCurve` Objects at Once"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "wNT61D9ugYzF"
+   },
+   "source": [
+    "To start, we can use Lightkurve's [`search_lightcurve()`](https://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html) function to see what data are available for our target star on the [Mikulski Archive for Space Telescopes](https://archive.stsci.edu/kepler/) (MAST) archive. We will use the star [Kepler-8](http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/), a star somewhat larger than the Sun, and the host of a [hot Jupiter planet](https://en.wikipedia.org/wiki/Hot_Jupiter). "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 442
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 25325,
+     "status": "ok",
+     "timestamp": 1598466288814,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "DP80G4aVh011",
+    "outputId": "5ae20acd-16a3-4dc4-9f9e-3fb7fa527b6f"
+   },
+   "outputs": [],
+   "source": [
+    "search_result = lk.search_lightcurve(\"Kepler-8\", author=\"Kepler\", cadence=\"long\")\n",
+    "search_result"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "de-_j_QMh7JH"
+   },
+   "source": [
+    "In this list, each row represents a different observing quarter, for a total of 18 quarters across four years. The **observation** column lists the *Kepler* Quarter. The **target_name** represents the *Kepler* Input Catalogue (KIC) ID of the target, and the **productFilename** column is the name of the FITS files downloaded from MAST. The **distance** column shows the separation on the sky between the searched coordinates and the downloaded objects — this is only relevant when searching for specific coordinates in the sky, and not when looking for individual objects.\n",
+    "\n",
+    "Instead of downloading a single quarter using the [`download()`](https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html#lightkurve.search.SearchResult.download) function, we can use the [`download_all()`](https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html#lightkurve.search.SearchResult.download_all) function to access all 18 quarters at once (this might take a while)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 52
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 42502,
+     "status": "ok",
+     "timestamp": 1598466306008,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "dHkx6vNDiLzI",
+    "outputId": "2d34bd24-5ebe-444a-e231-680f4a9bf83b"
+   },
+   "outputs": [],
+   "source": [
+    "lc_collection = search_result.download_all()\n",
+    "lc_collection"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "S-RmBfXKiOaQ"
+   },
+   "source": [
+    "All of the downloaded data are stored in a [`LightCurveCollection`](https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection). This object acts as a wrapper for 18 separate [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html) objects, listed above. \n",
+    "\n",
+    "We can access the [`KeplerLightCurve`](http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html) objects and interact with them as usual through the [`LightCurveCollection`](https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 548
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 42488,
+     "status": "ok",
+     "timestamp": 1598466306014,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "pEZ1bh8OjNYg",
+    "outputId": "3d05fdd6-de96-469a-8ba5-66dadfc83bcb"
+   },
+   "outputs": [],
+   "source": [
+    "lc_Q4 = lc_collection[4] \n",
+    "lc_Q4"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 43310,
+     "status": "ok",
+     "timestamp": 1598466306853,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "w-KTcjk5jR3K",
+    "outputId": "0bd635f5-f033-426e-9226-c9ebeed01da2"
+   },
+   "outputs": [],
+   "source": [
+    "lc_Q4.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "xEQSm6E4kDRS"
+   },
+   "source": [
+    "#### Note:\n",
+    "The example given above also works for downloading target pixel files (TPFs). This will produce a [`TargetPixelFileCollection`](https://docs.lightkurve.org/api/lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection) object instead."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "jghJAa5ckPLW"
+   },
+   "source": [
+    "## 3. Investigating the Data"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "vf6NDWeqk-4g"
+   },
+   "source": [
+    "Let's first have a look at how these observations differ from one another. We can plot the simple aperture photometry (SAP) flux of all of the observations in the [`LightCurveCollection`](https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection) to see how they compare."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 43864,
+     "status": "ok",
+     "timestamp": 1598466307447,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "WB55sn5z7myH",
+    "outputId": "b8d1fcfc-be06-49fa-e41b-756bd7e44611"
+   },
+   "outputs": [],
+   "source": [
+    "ax = lc_collection[0].plot(column='sap_flux', label=None)\n",
+    "for lc in lc_collection[1:]:\n",
+    "    lc.plot(ax=ax, column='sap_flux', label=None)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "mzHYwsU1mEZN"
+   },
+   "source": [
+    "In the figure above, each quarter of data looks strikingly different, with global patterns repeating every four quarters as *Kepler* has made a full rotation.\n",
+    "\n",
+    "The change in flux within each quarter is in part driven by changes in the telescope focus, which are caused by changes in the temperature of *Kepler*'s components as the spacecraft orbits the Sun. The changes are also caused by an effect called *differential velocity aberration* (DVA), which causes stars to drift over the course of a quarter, depending on their distance from the center of *Kepler*'s field of view.\n",
+    "\n",
+    "While the figure above looks messy, all the systematic effects mentioned above are well understood, and have been detrended in the PDCSAP flux. For a more detailed overview, see the [*Kepler* Data Characteristics Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf), specifically: *Section 5. Ongoing Phenomena*."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "rghAhfNzqaR_"
+   },
+   "source": [
+    "## 4. Normalizing a Light Curve"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "cof4vrNiobH9"
+   },
+   "source": [
+    "If we want to see the actual variation of the targeted object over the course of these observations, the plot above isn't very useful to us. It is also not useful to have flux expressed in physical units, because it is affected by the observing conditions such as telescope focus and pointing (see above). \n",
+    "\n",
+    "Instead, it is a common practice to normalize light curves by dividing by their median value. This means that the median of the newly normalized light curve will be equal to 1, and that the relative size of signals in the observation (such as transits) will be maintained.\n",
+    "\n",
+    "A normalization can be performed using the [`normalize()`](https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.normalize) method of a [`KeplerLightCurve`](https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html), for example:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 44414,
+     "status": "ok",
+     "timestamp": 1598466308014,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "qN3F6nxilRVd",
+    "outputId": "3d72e3f5-6de2-4e90-cb58-46c348459975"
+   },
+   "outputs": [],
+   "source": [
+    "lc_collection[4].normalize().plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Nro9qhV3lT3f"
+   },
+   "source": [
+    "In the figure above, we have plotted the normalized PDCSAP flux for Quarter 4. The median normalized flux is at 1, and the transit depths lie around 0.991, indicating a 0.9% dip in brightness due to the planet transiting the star."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Zkip4rM8paC4"
+   },
+   "source": [
+    "The [`LightCurveCollection`](https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html) also has a `plot()` method. We can use it to plot the PDCSAP flux. The method automatically normalizes the flux in same way we did for a single quarter above."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 45362,
+     "status": "ok",
+     "timestamp": 1598466308978,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "7oyn8KpApjJf",
+    "outputId": "129b53d3-6172-44a1-8590-6c24aa7cb906"
+   },
+   "outputs": [],
+   "source": [
+    "lc_collection.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "ie7A1JRFpkEo"
+   },
+   "source": [
+    "As you can see above, because we have normalized the data, all of the observations form a single consistent light curve."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "oU4wvbg6pqTc"
+   },
+   "source": [
+    "## 5. Combining Multiple Observations into a Single Light Curve"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "28XuRx21qU21"
+   },
+   "source": [
+    "Finally, we can combine these different light curves into a single [`KeplerLightCurve`](https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html) object. This is done using the [`stitch()`](https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection.stitch) method. This method concatenates all quarters in our [`LightCurveCollection`](https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection) together, and normalizes them at the same time, in the manner we saw above."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 548
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 45353,
+     "status": "ok",
+     "timestamp": 1598466308986,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "tdt-OSTVrgVL",
+    "outputId": "a6aa34cc-eefe-4b35-d5b3-b8d4e62ff49f"
+   },
+   "outputs": [],
+   "source": [
+    "lc_stitched = lc_collection.stitch()\n",
+    "lc_stitched"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "2m4t5VsDriLk"
+   },
+   "source": [
+    "This returns a single [`KeplerLightCurve`](https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html)! It is in all ways identical to [`KeplerLightCurve`](https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html) of a single quarter, just longer. We can plot it the usual way."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 387
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 46378,
+     "status": "ok",
+     "timestamp": 1598466310026,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "tYzdKj-7r6N6",
+    "outputId": "9d2ce19e-0548-4d35-e3a8-0a86bcbe5f01"
+   },
+   "outputs": [],
+   "source": [
+    "lc_stitched.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "U7uOGZXJ62Qm"
+   },
+   "source": [
+    "In this final normalized light curve, the interesting observational features of the star are more clear. Specifically: repeating transits that can be used to [characterize planets](https://docs.lightkurve.org/tutorials/02-recover-a-planet.html) and a noisy stellar flux that can be used to study brightness variability through [asteroseismology](http://docs.lightkurve.org/tutorials/02-asteroseismology.html)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "oz2KOdF5LYJm"
+   },
+   "source": [
+    "Normalizing individual *Kepler* Quarters before combining them to form a single light curve isn't the only way to make sure different quarters are consistent with one another. For a breakdown of other available methods and their benefits, see *Section 6. Stitching Kepler Quarters Together* in [Kinemuchi et al. 2012](https://arxiv.org/pdf/1207.3093.pdf)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "lhbv9ZKRPmMY"
+   },
+   "source": [
+    "## About this Notebook"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "nU-5JtvpPmMZ"
+   },
+   "source": [
+    "**Authors:** Oliver Hall (oliver.hall@esa.int), Geert Barentsen\n",
+    "\n",
+    "**Updated On**: 2020-09-15"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "ZANsIso_B_si"
+   },
+   "source": [
+    "## Citing Lightkurve and Astropy\n",
+    "\n",
+    "If you use `lightkurve` or `astropy` for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 85
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 46365,
+     "status": "ok",
+     "timestamp": 1598466310031,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "7vUtrWVjnlY7",
+    "outputId": "05c053a6-5366-47d2-a2fd-2d0a92a11eb0"
+   },
+   "outputs": [],
+   "source": [
+    "lk.show_citation_instructions()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "CNf3nI0trtA-"
+   },
+   "source": [
+    "<img style=\"float: right;\" src=\"https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png\" alt=\"Space Telescope Logo\" width=\"200px\"/>\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "collapsed_sections": [],
+   "name": "How-to-combine-multiple-quarters-of-kepler-data-with-lightkurve.ipynb",
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

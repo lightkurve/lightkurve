@@ -1,0 +1,6 @@
+﻿lightkurve.SearchResult.download
+================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: SearchResult.download

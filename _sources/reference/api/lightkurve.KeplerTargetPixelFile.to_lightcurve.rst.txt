@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.to\_lightcurve
+===============================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.to_lightcurve

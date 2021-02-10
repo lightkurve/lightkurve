@@ -1,0 +1,6 @@
+﻿lightkurve.FoldedLightCurve.plot\_river
+=======================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: FoldedLightCurve.plot_river

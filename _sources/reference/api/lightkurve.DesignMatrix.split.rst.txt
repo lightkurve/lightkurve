@@ -1,0 +1,6 @@
+﻿lightkurve.DesignMatrix.split
+=============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: DesignMatrix.split

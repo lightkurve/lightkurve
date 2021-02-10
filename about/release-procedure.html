@@ -4,97 +4,211 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Releasing a new version &#8212; Lightkurve</title>
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Releasing a new version &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.3da636dd464baa7582d2.js">
+
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load Bootstrap viewport and Javascript (Javascript is needed for the navbar toggle) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
+    <link rel="prev" title="Building the documentation" href="documentation.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
-      <!-- Google Analytics -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'UA-69171-9');
-      </script>
-    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
 
-  </head><body>
-<header>
-<nav class="navbar navbar-expand-lg navbar-light border-bottom">
-  <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.11</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <a class="navbar-brand" href="../index.html">
+    
+      <p class="title">Lightkurve v2.0rc1</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarsExample07">
-
-    
-      <!-- Custom navbar -->
-      <ul class="navbar-nav mr-auto">
-          
-          <li class="nav-item">
-          
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
             <a class="nav-link" href="../quickstart.html">Quickstart</a>
-          </li>
-          
-          <li class="nav-item">
-          
+        </li>
+        
+        <li class="nav-item ">
             <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-          </li>
-          
-          <li class="nav-item">
-          
-            <a class="nav-link" href="../api/index.html">API</a>
-          </li>
-          
-          <li class="nav-item">
-          
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../reference/index.html">API</a>
+        </li>
+        
+        <li class="nav-item active">
             <a class="nav-link" href="index.html">About</a>
-          </li>
+        </li>
+        
+        
       </ul>
-    
 
-        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
-            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
-        </form>
 
-        <!-- GitHub icon -->
+      <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
         
-          <a href="https://github.com/KeplerGO/Lightkurve">
-            <svg class="github-icon" viewBox="0 0 16 16" version="1.1" height="22" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-          </a>
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
         
+        
+      </ul>
     </div>
-  </div>
-</nav>
-</header>
-
-<div class="container"  role="main">
+</div>
+    </nav>
     
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          
+            
+                <li class="">
+                    <a href="install.html">Installing Lightkurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="citing.html">Citing Lightkurve & its dependencies</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="changelog.html">Full changelog</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="other_software.html">Other software</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="contributing.html">Reporting issues and proposing changes</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="testing.html">Running the unit tests</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="documentation.html">Building the documentation</a>
+                </li>
+            
+          
+            
+                <li class="active">
+                    <a href="">Releasing a new version</a>
+                </li>
+            
+          
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="section" id="releasing-a-new-version">
 <span id="developer"></span><h1>Releasing a new version<a class="headerlink" href="#releasing-a-new-version" title="Permalink to this headline">¶</a></h1>
 <p>This page details the procedure package maintainers should follow to release a new version of Lightkurve.</p>
 <p>The procedure requires the following steps:</p>
 <ol class="arabic simple">
 <li><p>Add any new contributors to <code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTHORS.rst</span></code>.</p></li>
-<li><p>Remove the suffix <code class="xref py py-obj docutils literal notranslate"><span class="pre">dev</span></code> from the version number in <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve/version.py</span></code> and commit to master. Note that Lightkurve follows a <a class="reference external" href="https://semver.org">semantic versioning scheme</a>.</p></li>
+<li><p>Remove the suffix <code class="xref py py-obj docutils literal notranslate"><span class="pre">dev</span></code> from the version number in both <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve/version.py</span></code>, and commit this change to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code> branch. Note that Lightkurve follows a <a class="reference external" href="https://semver.org">semantic versioning scheme</a>.</p></li>
 <li><p>Verify that all unit tests pass:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pytest --remote-data
@@ -119,7 +233,8 @@ $ git commit -m <span class="s2">&quot;Finalizing changelog for v&lt;version&gt;
 <li><p>Make a new release branch in GitHub using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Draft</span> <span class="pre">a</span> <span class="pre">new</span> <span class="pre">release</span> <span class="pre">button</span></code> at <a class="reference external" href="https://github.com/KeplerGO/lightkurve/releases">https://github.com/KeplerGO/lightkurve/releases</a>.</p></li>
 <li><p>Create and upload the new package to PyPI:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python setup.py release
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ poetry build
+$ poetry publish
 </pre></div>
 </div>
 <p>8. Update the version number on the <a class="reference external" href="https://github.com/conda-forge/lightkurve-feedstock">Lightkurve conda feedstock</a>.
@@ -130,16 +245,42 @@ A friendly robot will tend to open a PR to make this change within 1-2 hours, so
 </div>
 
 
-</div>
-<div class="container footer">
-    <hr>
-    <p class="text-center">
-      
-        Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="/about/citing.html">cite us</a> or
-                      <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
-      
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="documentation.html" title="previous page">Building the documentation</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
     </p>
-</div>
+  </div>
+</footer>
   </body>
 </html>

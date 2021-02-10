@@ -1,0 +1,6 @@
+﻿lightkurve.CBVCorrector.correct
+===============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: CBVCorrector.correct

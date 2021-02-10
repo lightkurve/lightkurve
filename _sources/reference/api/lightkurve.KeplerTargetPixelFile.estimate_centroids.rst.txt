@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.estimate\_centroids
+====================================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.estimate_centroids

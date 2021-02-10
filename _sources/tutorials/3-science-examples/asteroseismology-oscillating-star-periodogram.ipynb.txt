@@ -1,0 +1,801 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "qAZbsGcIFimR"
+   },
+   "source": [
+    "# How to understand and manipulate the periodogram of an oscillating star"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Hzt4B1ZNFprf"
+   },
+   "source": [
+    "## Learning Goals\n",
+    "\n",
+    "By the end of this tutorial you will:\n",
+    "\n",
+    "- Understand the key features of periodograms of oscillating stars.\n",
+    "- Understand how these features change depending on the type of star being studied.\n",
+    "- Be able to manipulate the periodogram to focus in on areas you're interested in.\n",
+    "- Be able to smooth a periodogram.\n",
+    "- Be able to remove features such as the convective background in solar-like oscillators."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "X5FusNRmGSwu"
+   },
+   "source": [
+    "## Introduction\n",
+    "\n",
+    "The brightnesses of stars can oscillate — that is, vary over time — for many different reasons. For example, in the companion tutorials we explored light curves that oscillated due to an eclipsing binary pair transiting in front of one another, and we looked at a star that showed variability due to star spots on its surface rotating in and out of view.\n",
+    "\n",
+    "In this tutorial, we will focus on *intrinsic* oscillators: stars that exhibit variability due to processes inside the stars. For example, one of these internal processes is the presence of standing waves trapped in the interior. When the light curve of a star is transformed into the frequency domain, such waves can be observed as distinct peaks in the frequency spectrum of the star. The branch of astronomy that focuses on studying these signals is called [*asteroseismology*](https://en.wikipedia.org/wiki/Asteroseismology).\n",
+    "\n",
+    "Asteroseismology is an important tool because it allows intrinsic properties of a star, such as its mass and radius, to be estimated from the light curve alone. The only requirement is that the quality of the light curve — its duration, sampling, and precision — must be good enough to provide a high-resolution view of the star in the frequency domain. *Kepler* data is particularly well-suited for this purpose.\n",
+    "\n",
+    "In this tutorial, we will explore two types of intrinsic oscillators that are commonly studied by asteroseismologists: \n",
+    "1. **$\\delta$ Scuti stars**: a class of oscillating stars typically 1.5 to 2.5 times as massive as the Sun, which oscillate due to fluctuations in the opacity of the outer layers of the star.\n",
+    "2. **Solar-Like Oscillators**: a class that includes all stars that oscillate in the same manner as the Sun, namely due to turbulent motion in the convective outer layers of their atmospheres. This includes both main sequence stars as well as red giant stars.\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "xIVeKA87FwgX"
+   },
+   "source": [
+    "## Imports\n",
+    "This tutorial only requires **[Lightkurve](https://docs.lightkurve.org)**, which in turn uses **[Matplotlib](https://matplotlib.org/)** for plotting."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {},
+    "colab_type": "code",
+    "id": "Bb6VnXNWFyl4"
+   },
+   "outputs": [],
+   "source": [
+    "import lightkurve as lk\n",
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "pRDRo8S3Sa_Y"
+   },
+   "source": [
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "fOoYYUBIGg4x"
+   },
+   "source": [
+    "## 1. Exploring the Frequency Spectrum of a $\\delta$ Scuti Oscillator"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "adwNO24IKMSy"
+   },
+   "source": [
+    "[$\\delta$ Scuti stars](https://en.wikipedia.org/wiki/Delta_Scuti_variable) are stars roughly 1.5 to 2.5 as massive as the Sun, and oscillate due to fluctuations in the opacity of the outer layers of the star ([known as the Kappa mechanism](https://en.wikipedia.org/wiki/Kappa%E2%80%93mechanism)), alternately appearing brighter and fainter.\n",
+    "\n",
+    "An example star of this type is HD 42608, which was recently observed by the *TESS* space telescope. We can search for these data using Lightkurve:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 78
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 1668,
+     "status": "ok",
+     "timestamp": 1600488241133,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "L3g1lr0SKNgb",
+    "outputId": "841dce66-4e19-428e-8a82-841a2bb909f0"
+   },
+   "outputs": [],
+   "source": [
+    "lk.search_lightcurve('HD 42608', mission='TESS')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "DtrKUCiiMOSP"
+   },
+   "source": [
+    "Success! A light curve for the object appears to be available in the data archive. Let's go ahead and download the data and convert it straight to a [`periodogram`](https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html) using the [`to_periodogram()`](https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.to_periodogram) function."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 404
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 46268,
+     "status": "ok",
+     "timestamp": 1600488171049,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "BvnxPAgQMIDm",
+    "outputId": "23ff2f53-018b-4740-9f56-d9842c348e12"
+   },
+   "outputs": [],
+   "source": [
+    "lc = lk.search_lightcurve('HD 42608', mission='TESS', author='SPOC', sector=6).download()\n",
+    "pg = lc.normalize().to_periodogram()\n",
+    "pg.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "e2uG8e-OOkCn"
+   },
+   "source": [
+    "We can see that there is a strong power excess around 50 cycles per day. These indicate stellar oscillations.\n",
+    "\n",
+    "To study these peaks in more detail, we can zoom in by recreating the periodogram using the [`minimum_frequency`](https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve) and [`maximum_frequency`](https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve) keywords:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 403
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 46924,
+     "status": "ok",
+     "timestamp": 1600488171725,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "QwDbpGCUO3y2",
+    "outputId": "16f2d2d5-0aaa-403e-9dc7-7de18b63c76d"
+   },
+   "outputs": [],
+   "source": [
+    "pg = lc.normalize().to_periodogram(minimum_frequency=35,\n",
+    "                                   maximum_frequency=60)\n",
+    "pg.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "P7-1v-C1PwaF"
+   },
+   "source": [
+    "This is much clearer!\n",
+    "\n",
+    "Stars of this type are known to display multiple types of oscillation, including:\n",
+    "- **Radial Oscillations**: caused by the star shrinking and expanding radially. Also called a \"breathing mode.\"\n",
+    "- **Dipole Oscillations**: caused by the star's hemispheres shrinking and expanding alternately.\n",
+    "\n",
+    "Both types of oscillations are on display in the figure above. Identifying exactly what type of oscillation a given peak represents is challenging. Fortunately, this star (HD 42608) is part of a set of stars for which the oscillations have been analyzed in detail in a research paper by [Bedding et al. (2020)](https://arxiv.org/pdf/2005.06157.pdf), so you can consult that paper to learn more about the details.\n",
+    "\n",
+    "Note that the modes of oscillation are very \"sharp\" in the figure above. This is because $\\delta$ Scuti oscillations are *coherent*, which is a term astronomers in the field use for signals that have long lifetimes and are not heavily damped. Because of this, their exact oscillation frequencies can be observed in a fairly straightforward way. This sets $\\delta$ Scuti stars apart from solar-like oscillators, which are damped. Let's look at an example of such a star next."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Yht1JopOMh4w"
+   },
+   "source": [
+    "## 2. Exploring the Frequency Spectrum of a Solar-Like Oscillator\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "ur-BwspSTU_k"
+   },
+   "source": [
+    "Solar-like oscillators exhibit variability driven by a different mechanism than $\\delta$ Scuti stars. They encompass the class of stars that [oscillate in the same manner as the Sun](https://en.wikipedia.org/wiki/Helioseismology). Because they have lower masses than $\\delta$ Scuti stars, solar-like oscillators have convective outer envelopes. The turbulent motion of these envelopes excites standing waves inside the stars which cause brightness changes on the surface. Unlike $\\delta$ Scuti stars however, these waves are not coherent. Instead, these waves are stochastic and damped, which means that the lifetimes and amplitudes of the waves are limited and variable.\n",
+    "\n",
+    "While the name might imply that only stars like the Sun are solar-like oscillators, this is not true. All stars with convective outer layers can exhibit solar-like oscillations, including red giant stars!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "VRqwTgnjUPP9"
+   },
+   "source": [
+    "Let's have a look at the Sun-like star KIC 10963065 ([also known as Rudy](https://arxiv.org/pdf/1612.00436.pdf)), observed with *Kepler*. Because solar-like oscillation amplitudes are low, we will need to combine multiple quarters of data to improve our signal-to-noise.\n",
+    "\n",
+    "We can list the available data sets as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 372
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 47495,
+     "status": "ok",
+     "timestamp": 1600488172311,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "Zsw3tSKEUlzb",
+    "outputId": "6b1773b3-16a8-4fe2-d960-74652a2ff534"
+   },
+   "outputs": [],
+   "source": [
+    "search_result = lk.search_lightcurve('KIC 10963065', author='Kepler', cadence=\"long\")\n",
+    "search_result"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "6-1E6szeVLwt"
+   },
+   "source": [
+    "To create and plot this periodogram, we will apply a few common practices in the field:\n",
+    "- We will combine multiple quarters to improve the frequency resolution.\n",
+    "- We will [`normalize`](https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.normalize) the light curve to parts per million (`ppm`).\n",
+    "- We will use the `psd` normalization option when calling [`to_periodogram`](https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.to_periodogram), which sets the units of frequency to microhertz, and normalizes the power using the spacing between bins of frequency.\n",
+    "\n",
+    "We'll also plot the resulting figure in log-log space."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 447
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 55366,
+     "status": "ok",
+     "timestamp": 1600488180193,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "yyuOcEJRU3t7",
+    "outputId": "cd271b55-a15a-4c8d-f893-2aed959bb4e1"
+   },
+   "outputs": [],
+   "source": [
+    "lc = search_result[0:10].download_all().stitch()\n",
+    "pg = lc.normalize(unit='ppm').to_periodogram(normalization='psd')\n",
+    "pg.plot(scale='log');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "ae6PIa9_VwnZ"
+   },
+   "source": [
+    "This periodogram looks very different to that of the $\\delta$ Scuti star above. There is a lot of power excess at low frequencies: this is what we call the *convective background*, which is additional noise contributed by the convective surface of the star constantly changing. We do not see any clear peaks like we did for the $\\delta$ Scuti oscillator however.\n",
+    "\n",
+    "There is a good reason for this: this main sequence star oscillates at frequencies too large to be seen on this periodogram, lying above the periodogram's [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "tv7Xf7VwWLJF"
+   },
+   "source": [
+    "The Nyquist frequency is a property of a time series that describes the maximum frequency that can be reliably determined in a periodogram. It stems from the assumption that you need a minimum of two observations per oscillation period to observe a pattern (one observation on the \"up,\" and one on the \"down\" oscillation). It is defined as follows:\n",
+    "\n",
+    "$\\nu_{\\rm nyq} = \\frac{1}{2\\Delta t}$ ,\n",
+    "\n",
+    "where $\\Delta t$ is the observing cadence."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "askCRV-NWxVo"
+   },
+   "source": [
+    "The reason that we can't see Rudy's oscillations in the periodogram above is because we constructed this periodogram using the *Kepler* 30-minute Long Cadence data. Solar-like oscillators on the main sequence typically oscillate on the order of minutes (five minutes for the Sun), at frequencies much higher than will be visible on this periodogram. To see Rudy's oscillations, we will need to use the *Kepler* Short Cadence (SC) observations, which used a time sampling of one minute.  We can obtain these data as follows:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 447
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 94441,
+     "status": "ok",
+     "timestamp": 1600488219285,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "rxUH6IJ4XI4h",
+    "outputId": "a28c9ee0-b638-4507-d96d-d87d4dcd86d1"
+   },
+   "outputs": [],
+   "source": [
+    "search_result = lk.search_lightcurve('KIC 10963065',\n",
+    "                                     mission='Kepler',\n",
+    "                                     cadence='short')\n",
+    "lc = search_result[0:10].download_all().stitch()\n",
+    "pg = lc.normalize(unit='ppm').to_periodogram(normalization='psd')\n",
+    "pg.plot(scale='log');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "5rGMsCjOYHNe"
+   },
+   "source": [
+    "Now we can see a power excess near $2000\\, \\mu\\rm{Hz}$. This frequency is almost 10 times higher than we could view using the Long Cadence data alone. Let's zoom in on this region so we can look at the signals in more detail, like we did for the $\\delta$ Scuti star."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 445
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 96945,
+     "status": "ok",
+     "timestamp": 1600488221802,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "-lJgX3KdYTYw",
+    "outputId": "924b7080-6e5e-453b-d79e-241a2a645fd9"
+   },
+   "outputs": [],
+   "source": [
+    "zoom_pg = lc.normalize(unit='ppm').to_periodogram(normalization='psd',\n",
+    "                                                  minimum_frequency=1500,\n",
+    "                                                  maximum_frequency=2700)\n",
+    "zoom_pg.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "KkF828uuNJAQ"
+   },
+   "source": [
+    "Compared to the $\\delta$ Scuti, the modes of oscillation in the figure above are less sharp, even though we used much more data to create the periodogram. This is because the modes in solar-like oscillators are damped due to the turbulent motion of the convective envelope. This lowers their amplitudes and also causes the lifetimes of the oscillations to be short. The short lifetimes create some uncertainty around the exact oscillation frequency, and so the peaks that appear in the periodogram are a little broader (usually Lorentzian-like in shape). This may not be immediately apparant from these figures, but is much clearer if you zoom in on an individual mode."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "IrAifdt5MlKT"
+   },
+   "source": [
+    "## 3. How to Smooth and Detrend a Periodogram"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "gzP9O5umjpXD"
+   },
+   "source": [
+    "### 3.1. The box kernel filter\n",
+    "\n",
+    "To further explore the oscillation modes, we will demonstrate some of Lightkurve's smoothing tools. There are two types of smoothing functions we can call through the [`smooth()`](https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.smooth) function. Let's start with a basic \"moving median,\" also known as a 1D box kernel."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 391
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 98004,
+     "status": "ok",
+     "timestamp": 1600488222876,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "WmqyRfrFh8xq",
+    "outputId": "12a5058a-db22-4ea0-eadc-e0ce2b57452c"
+   },
+   "outputs": [],
+   "source": [
+    "smooth_pg = zoom_pg.smooth(method='boxkernel', filter_width=0.5)\n",
+    "ax = zoom_pg.plot(label='Original')\n",
+    "smooth_pg.plot(ax=ax, color='red', label='Smoothed');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "RGjW6wRch84H"
+   },
+   "source": [
+    "In the figure above, the smoothed periodogram is plotted over the top of the original periodogram. In this case we have used the [Astropy `Box1DKernel`](https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html) filter, with a filter width of $0.5\\, \\mu \\rm{Hz}$. The filter takes the median value of power in a region $0.5\\, \\mu \\rm{Hz}$ around a data point, and replaces that point with the median value. It then moves on to the next data point. This creates a smoothed periodogram of the same length as the original. Because the power values are now correlated, these smoothed periodograms usually aren't used for computational analysis, but they can aid visual explorations of the location of the oscillation modes."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "1WdETtxQiqlY"
+   },
+   "source": [
+    "### 3.2. The log median filter"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "LLzIXovvh9UP"
+   },
+   "source": [
+    "While the [`Box1DKernel`](https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html) filter can be used to help identify modes of oscillation in the presence of noise, it is mostly good for smoothing on small scales. For large scales, we can instead use Lightkurve's log median filter.\n",
+    "\n",
+    "As we saw above, solar-like oscillators exhibit a large power excess at low frequencies due to the turbulent convection visible near the stellar surface. When studying modes of oscillation, we typically aren't interested in the convective background, and prefer to remove it.\n",
+    "\n",
+    "The log median filter performs a similar operation to the  [`Box1DKernel`](https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html)  filter, but does so in log space. This means that at low frequencies the number of frequency bins of which the median is taken is small, and that at high frequencies many frequency bins are included in the median calculation. As a result, the log median filter smooths over the convection background but ignores the modes of oscillation at high frequencies.\n",
+    "\n",
+    "The result of applying a log median filter is demonstrated using the red line in the figure below:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 393
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 101162,
+     "status": "ok",
+     "timestamp": 1600488226050,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "VpYyVGzzh9cr",
+    "outputId": "24aa0787-9635-4ca5-ee97-2f7c7955264d"
+   },
+   "outputs": [],
+   "source": [
+    "smooth_pg = pg.smooth(method='logmedian', filter_width=0.1)\n",
+    "ax = pg.plot(label='Original')\n",
+    "smooth_pg.plot(ax=ax, linewidth=2,  color='red', label='Smoothed', scale='log');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "HBupThTbpZ2P"
+   },
+   "source": [
+    "### 3.3. Flattening"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "W0Tczntlpbm1"
+   },
+   "source": [
+    "When studying modes of oscillation, it is typically preferred to remove the convective background. In a detailed analysis this would involve fitting a model to the background. As can be seen in the figure above, however, Lightkurve's log median [`smooth()`](https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.smooth) method provides a useful first-order approximation of the background without the need for a model.\n",
+    "\n",
+    "To divide the power spectrum by the background, we can use Lightkurve's [`flatten()`](https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.flatten) method. This function uses the log median smoothing method to determine the background, and returns a new [`periodogram`](https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html) object in which the background has been divided out."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 34
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 113778,
+     "status": "ok",
+     "timestamp": 1600488238677,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "v8MrrPbup7fw",
+    "outputId": "ffed8cee-ab9b-4549-9315-d3e48c8e4465"
+   },
+   "outputs": [],
+   "source": [
+    "snrpg = pg.flatten()\n",
+    "snrpg"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "ASHfwxXAqCUc"
+   },
+   "source": [
+    "The periodogram obtained by dividing by the noise in this way is commonly called a Signal-to-Noise periodogram (`SNRPeriodogram`), because the noise, in the form of the convective background, has been removed. This is a little bit of a misnomer, because there is still noise present in the periodogram.\n",
+    "\n",
+    "We plot the `SNRPeriodogram` below, and see that the modes of oscillation stick out from the noise much more clearly now that the convective background has been removed."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "cellView": "both",
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 391
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 114510,
+     "status": "ok",
+     "timestamp": 1600488239419,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "elhNeMJuqSBM",
+    "outputId": "4aa26013-7c56-4e98-9042-fb29eaff2dca"
+   },
+   "outputs": [],
+   "source": [
+    "snrpg.plot();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "I0GKf9vMGdLI"
+   },
+   "source": [
+    "## 4. Closing Comments\n",
+    "\n",
+    "In this tutorial, we explored two common types of oscillating stars, and demonstrated how Lightkurve can be used to study their power specta. In the accompanying tutorials, you can learn how to use these tools to extract more detailed information from them, including the radius and mass of a star!\n",
+    "\n",
+    "For further reading on $\\delta$ Scuti stars, solar-like oscillators, and Fourier Transforms, we recommend you consult the following papers:\n",
+    "\n",
+    "- [Vanderplas (2017)](https://arxiv.org/pdf/1703.09824.pdf) – A detailed paper on Fourier Transforms and Lomb-Scargle Periodograms.\n",
+    "- [Bedding et al. (2020)](https://arxiv.org/pdf/2005.06157.pdf) – A demonstration of mode identification in $\\delta$ Scuti stars.\n",
+    "- [Chaplin & Miglio (2013)](https://arxiv.org/pdf/1303.1957.pdf) – A review paper on asteroseismology of solar-like oscillators with *Kepler*.\n",
+    "- [Aerts (2019)](https://arxiv.org/pdf/1912.12300.pdf) – A comprehensive review that covers asteroseismology of a wide range of oscillating stars, including solar-like oscillators and $\\delta$ Scutis.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "JMrH7qyC9G8x"
+   },
+   "source": [
+    "## About this Notebook\n",
+    "\n",
+    "**Authors**: Oliver Hall (oliver.hall@esa.int), Geert Barentsen\n",
+    "\n",
+    "**Updated On**: 2020-09-29"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "AQknrSCV9PuY"
+   },
+   "source": [
+    "## Citing Lightkurve and Astropy\n",
+    "\n",
+    "If you use `lightkurve` or `astropy` for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 144
+    },
+    "colab_type": "code",
+    "executionInfo": {
+     "elapsed": 114501,
+     "status": "ok",
+     "timestamp": 1600488239420,
+     "user": {
+      "displayName": "Geert Barentsen",
+      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gj8sjdnDeqdejfe7OoouYPIclAQV0KSTpsU469Jyeo=s64",
+      "userId": "05704237875861987058"
+     },
+     "user_tz": 420
+    },
+    "id": "AmAGa51_9Vyo",
+    "outputId": "7a7850c4-9e5c-4501-f2fe-ac5fac1ee0c0"
+   },
+   "outputs": [],
+   "source": [
+    "lk.show_citation_instructions()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "OOnhHhZR9bXo"
+   },
+   "source": [
+    "<img style=\"float: right;\" src=\"https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png\" alt=\"Space Telescope Logo\" width=\"200px\"/>\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "collapsed_sections": [
+    "Hzt4B1ZNFprf",
+    "I0GKf9vMGdLI",
+    "JMrH7qyC9G8x"
+   ],
+   "name": "How_to_understand_and_manipulate_the_periodogram_of_an_oscillating_star.ipynb",
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

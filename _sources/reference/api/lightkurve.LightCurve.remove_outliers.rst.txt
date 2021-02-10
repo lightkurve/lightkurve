@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.remove\_outliers
+======================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.remove_outliers

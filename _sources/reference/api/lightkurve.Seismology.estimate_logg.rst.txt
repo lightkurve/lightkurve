@@ -1,0 +1,6 @@
+﻿lightkurve.Seismology.estimate\_logg
+====================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: Seismology.estimate_logg

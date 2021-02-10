@@ -1,6 +1,0 @@
-open
-====
-
-.. currentmodule:: lightkurve.search
-
-.. autofunction:: open

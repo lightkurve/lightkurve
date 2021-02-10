@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.create\_threshold\_mask
+========================================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.create_threshold_mask

@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.flatten
+=============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.flatten

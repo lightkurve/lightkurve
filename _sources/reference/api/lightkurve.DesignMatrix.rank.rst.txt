@@ -1,0 +1,6 @@
+﻿lightkurve.DesignMatrix.rank
+============================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: DesignMatrix.rank
