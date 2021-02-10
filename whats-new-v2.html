@@ -514,9 +514,9 @@ div.rendered_html tbody tr:hover {
 <ol class="arabic simple">
 <li><p>LightCurve objects are now specialized kinds of AstroPy Table objects, making it a more generic container for light curves from any telescope.</p></li>
 <li><p>Data search and download functions now support all TESS and Kepler light curve available at MAST, including those created by community pipelines.</p></li>
-<li><p>The noise removal tools now allow users to perform custom corrections in a way that is very similar to the official Kepler/TESS pipeline.</p></li>
+<li><p>The noise removal tools now allow users to perform custom corrections in a way that is very similar to the official TESS pipeline.</p></li>
 </ol>
-<p>The remainder of this page briefly demonstrates these new features. They are explained in more detail in a new set of entry-level tutorials which are avaiable in the online documentation at <a class="reference external" href="https://docs.lightkurve.org">docs.lightkurve.org</a>.</p>
+<p>The remainder of this page briefly demonstrates these new features. They are explained in more detail in a new set of entry-level tutorials which are avaiable in the online documentation at <a class="reference external" href="https://docs.lightkurve.org/tutorials">docs.lightkurve.org/tutorials</a>.</p>
 </div>
 <div class="section" id="1.-LightCurve-objects-are-now-specialized-kinds-of-AstroPy-Tables">
 <h2>1. LightCurve objects are now specialized kinds of AstroPy Tables<a class="headerlink" href="#1.-LightCurve-objects-are-now-specialized-kinds-of-AstroPy-Tables" title="Permalink to this headline">¶</a></h2>
@@ -544,7 +544,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area rendered_html docutils container">
 <i>LightCurve length=3</i>
-<table id="table4490993376" class="table-striped table-bordered table-condensed">
+<table id="table4562317120" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
 <thead><tr><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>object</th><th>float64</th><th>float64</th></tr></thead>
@@ -573,7 +573,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area rendered_html docutils container">
 <i>LightCurve length=3</i>
-<table id="table4490993376" class="table-striped table-bordered table-condensed">
+<table id="table4562317120" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>object</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
@@ -601,7 +601,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area rendered_html docutils container">
 <i>LightCurve length=2</i>
-<table id="table4490991792" class="table-striped table-bordered table-condensed">
+<table id="table4562316928" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>object</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
@@ -725,7 +725,7 @@ array([&#39;2020-05-30 12:00:00.000&#39;, &#39;2020-05-30 14:24:00.000&#39;,
 </div>
 <div class="output_area rendered_html docutils container">
 <i>LightCurve length=3</i>
-<table id="table6438724176" class="table-striped table-bordered table-condensed">
+<table id="table6509977504" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>object</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
@@ -759,7 +759,7 @@ array([&#39;2020-05-30 12:00:00.000&#39;, &#39;2020-05-30 14:24:00.000&#39;,
 <div class="output_area rendered_html docutils container">
 SearchResult containing 6 data products.
 
-<table id="table6439517584">
+<table id="table6510337424">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 19</td><td>2019</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>303256075</td><td>0.0</td></tr>
@@ -790,7 +790,7 @@ SearchResult containing 6 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6439627744">
+<table id="table6511195952">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 27</td><td>2020</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>441420236</td><td>0.0</td></tr>
@@ -847,9 +847,9 @@ SearchResult containing 1 data products.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.8503712353819862
-Optimized Under-fitting metric: 0.9686529192732469
-Optimized Alpha: 3.223e-01
+Optimized Over-fitting metric: 0.8391673760431284
+Optimized Under-fitting metric: 0.977728641702995
+Optimized Alpha: 2.562e-01
 </pre></div></div>
 </div>
 <p>The corrector now produces detailed diagnostic plots showing the light curve before (grey) and after (black) the noise (blue) was removed:</p>
@@ -869,7 +869,7 @@ Optimized Alpha: 3.223e-01
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
-       &lt;AxesSubplot:title={&#39;center&#39;:&#39;Alpha = 3.223e-01&#39;}, xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
+       &lt;AxesSubplot:title={&#39;center&#39;:&#39;Alpha = 2.562e-01&#39;}, xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
       dtype=object)
 </pre></div></div>
 </div>
@@ -883,7 +883,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 </div>
 <div class="section" id="✨-New:-Remove-systematics-by-optimizing-under--and-over-fitting-metrics">
 <h3>✨ New: Remove systematics by optimizing under- and over-fitting metrics<a class="headerlink" href="#✨-New:-Remove-systematics-by-optimizing-under--and-over-fitting-metrics" title="Permalink to this headline">¶</a></h3>
-<p>A <code class="docutils literal notranslate"><span class="pre">lightkurve.correctors.metrics</span></code> module was added to provide functions which can estimate the degree of over- and under-fitting of a corrected light curve. The new <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> utilizes these metrics to find an appropriate, user-tuneable tradeoff. You can learn more about this new feature in the dedicated new CBVCorrector tutorial.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">lightkurve.correctors.metrics</span></code> module was added to provide functions which can estimate the degree of over- and under-fitting of a corrected light curve. The new <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> utilizes these metrics to find an appropriate, user-tuneable tradeoff. You can learn more about this new feature in the <a class="reference external" href="tutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector.html">new CBVCorrector tutorial</a>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
@@ -912,7 +912,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 </div>
 <div class="section" id="✨-New:-Inspect-pixel-by-pixel-light-curves-using-plot_pixels()">
 <h3>✨ New: Inspect pixel-by-pixel light curves using <em>plot_pixels()</em><a class="headerlink" href="#✨-New:-Inspect-pixel-by-pixel-light-curves-using-plot_pixels()" title="Permalink to this headline">¶</a></h3>
-<p>A new <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.plot_pixels()</span></code> method has been added which enables the light curves and periodograms of individual pixels to be inspected within a pixel file. This is very useful for investigating the location of specific signals. A dedicated tutorial is available explaining this new feature.</p>
+<p>A new <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.plot_pixels()</span></code> method has been added which enables the light curves and periodograms of individual pixels to be inspected within a pixel file. This is very useful for investigating the location of specific signals. A <a class="reference external" href="tutorials/3-science-examples/periodograms-verifying-the-location-of-a-signal.html">dedicated tutorial</a> explains this new feature in detail.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
@@ -975,7 +975,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <h3>Will existing Lightkurve code break?<a class="headerlink" href="#Will-existing-Lightkurve-code-break?" title="Permalink to this headline">¶</a></h3>
 <p>While we tried to maximize backwards compatibility, Lightkurve 2 does contain a small number of changes that may break existing code for the following reasons:</p>
 <ol class="arabic simple">
-<li><p><strong>lc.time is now always an Astropy Time object.</strong> Unfortunately, many NumPy and SciPy functions do not deal seamlessly with yet know how to deal with <code class="docutils literal notranslate"><span class="pre">Time</span></code> objects. Existing code may have to be modified to pass <code class="docutils literal notranslate"><span class="pre">lc.time.value</span></code> to NumPy/SciPy functions where <code class="docutils literal notranslate"><span class="pre">lc.time</span></code> was passed before.</p></li>
+<li><p><strong>lc.time is now always an Astropy Time object.</strong> Unfortunately, many NumPy and SciPy functions do not deal seamlessly with <code class="docutils literal notranslate"><span class="pre">Time</span></code> objects yet. Existing code may have to be modified to pass <code class="docutils literal notranslate"><span class="pre">lc.time.value</span></code> to NumPy/SciPy functions where <code class="docutils literal notranslate"><span class="pre">lc.time</span></code> was passed before.</p></li>
 <li><p><strong>Other numerical columns are now Astropy Quantity objects.</strong> While Quantity objects are largely compatible with NumPy/SciPy, situations do arise where users may wish to perform operations on <code class="docutils literal notranslate"><span class="pre">lc.flux.value</span></code> instead of <code class="docutils literal notranslate"><span class="pre">lc.flux</span></code>.</p></li>
 <li><p><strong>All metadata is now stored in the lc.meta dictionary</strong>. This includes any header values of the FITS file from which a light curve was loaded. For convenience, we continue to support attribute access, e.g. <code class="docutils literal notranslate"><span class="pre">lc.sector</span></code> is available as a shortcut for <code class="docutils literal notranslate"><span class="pre">lc.meta['sector']</span></code>.</p></li>
 <li><p><strong>LightCurveFile classes have been deprecated.</strong> Instead, light curve files can now be loaded using <code class="docutils literal notranslate"><span class="pre">LightCurve.read(filename,</span> <span class="pre">format=&quot;tess&quot;)</span></code>.</p></li>
