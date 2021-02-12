@@ -8,7 +8,6 @@ from functools import wraps
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import numpy as np
-import pandas as pd
 from tqdm import tqdm
 
 import astropy
@@ -636,6 +635,10 @@ def _query_solar_system_objects(ra, dec, times, radius=0.1, location='kepler',
         DataFrame containing the list of known solar system objects at the
         requested time and location.
     """
+    # We import pandas locally, because it takes quite a bit of time to import,
+    # and it is only required for this specific feature.
+    import pandas as pd
+
     if (location.lower() == 'kepler') or (location.lower() == 'k2'):
         location = 'C55'
     elif location.lower() == 'tess':
