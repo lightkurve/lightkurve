@@ -20,7 +20,7 @@ try:
     registry.register_reader('k2sff', LightCurve, k2sff.read_k2sff_lightcurve)
     registry.register_reader('everest', LightCurve, everest.read_everest_lightcurve)
     registry.register_reader('pathos', LightCurve, pathos.read_pathos_lightcurve)
-    registry.register_reader('cdips', LightCurve, pathos.read_cdips_lightcurve)
+    registry.register_reader('cdips', LightCurve, cdips.read_cdips_lightcurve)
     registry.register_reader('tasoc', LightCurve, tasoc.read_tasoc_lightcurve)
 except registry.IORegistryError:
     pass  # necessary to enable autoreload during debugging
