@@ -34,7 +34,7 @@ Documentation
     :maxdepth: 1
     :titlesonly:
 
-    What's new? <whats-new-v2.ipynb>
+    What's new in Lightkurve 2? <whats-new-v2.ipynb>
     quickstart
     tutorials/index
     reference/index

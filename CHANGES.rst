@@ -13,6 +13,9 @@ Major changes
 - Updated the online docs with a new template, added a dozen new tutorials, and
   extended the API reference guide. [#926]
 
+- Modified the structure of the source code repository to separate source files (``src/``)
+  from test files (``tests/``). [#947]
+
 Other changes
 -------------
 
