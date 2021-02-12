@@ -2,7 +2,7 @@
 from .detect import *
 from .read import *
 
-from . import kepler, tess, qlp, k2sff, everest, pathos, tasoc
+from . import kepler, tess, qlp, k2sff, everest, pathos, tasoc, cdips
 from .. import LightCurve
 
 from astropy.io import registry
