@@ -48,10 +48,10 @@ class DesignMatrix():
 
     Examples
     --------
-    >>> import lightkurve as lk
-    >>> lk.DesignMatrix(np.arange(100), name='slope')
+    >>> from lightkurve.correctors.designmatrix import DesignMatrix, create_spline_matrix
+    >>> DesignMatrix(np.arange(100), name='slope')
     slope DesignMatrix (100, 1)
-    >>> lk.designmatrix.create_spline_matrix(np.arange(100), n_knots=5, name='spline')
+    >>> create_spline_matrix(np.arange(100), n_knots=5, name='spline')
     spline DesignMatrix (100, 5)
     """
     def __init__(self, df, columns=None, name='unnamed_matrix', prior_mu=None,
@@ -355,10 +355,10 @@ class DesignMatrixCollection():
 
     Examples
     --------
-    >>> import lightkurve as lk
-    >>> dm1 = lk.designmatrix.create_spline_matrix(np.arange(100), n_knots=5, name='spline')
-    >>> dm2 = lk.DesignMatrix(np.arange(100), name='slope')
-    >>> dmc = lk.DesignMatrixCollection([dm1, dm2])
+    >>> from lightkurve.correctors.designmatrix import create_spline_matrix, DesignMatrix, DesignMatrixCollection
+    >>> dm1 = create_spline_matrix(np.arange(100), n_knots=5, name='spline')
+    >>> dm2 = DesignMatrix(np.arange(100), name='slope')
+    >>> dmc = DesignMatrixCollection([dm1, dm2])
     >>> dmc
     DesignMatrixCollection:
         spline DesignMatrix (100, 5)

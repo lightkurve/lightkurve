@@ -45,7 +45,7 @@ class KeplerPRF(object):
 
     >>> import math
     >>> import matplotlib.pyplot as plt
-    >>> from lightkurve import KeplerPRF
+    >>> from lightkurve.prf import KeplerPRF
     >>> kepprf = KeplerPRF(channel=44, shape=(10, 10), column=5, row=5) # doctest: +SKIP
     Downloading http://archive.stsci.edu/missions/kepler/fpc/prf/kplr13.4_2011265_prf.fits [Done]
     >>> prf = kepprf(flux=1000, center_col=10, center_row=10,
