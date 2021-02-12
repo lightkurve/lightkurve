@@ -32,7 +32,7 @@ The procedure requires the following steps:
     $ git add CHANGES.rst
     $ git commit -m "Finalizing changelog for v<version>"
 
-6. Make a new release branch in GitHub using the `Draft a new release button` at https://github.com/KeplerGO/lightkurve/releases.
+6. Make a new release branch in GitHub using the `Draft a new release button` at https://github.com/lightkurve/lightkurve/releases.
 
 7. Create and upload the new package to PyPI:
 

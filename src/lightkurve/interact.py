@@ -61,7 +61,7 @@ def prepare_lightcurve_datasource(lc):
     lc_source : bokeh.plotting.ColumnDataSource
     """
     # Convert time into human readable strings, breaks with NaN time
-    # See https://github.com/KeplerGO/lightkurve/issues/116
+    # See https://github.com/lightkurve/lightkurve/issues/116
     if (lc.time == lc.time).all():
         human_time = lc.time.isot
     else:

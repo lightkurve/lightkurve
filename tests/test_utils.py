@@ -66,7 +66,7 @@ def test_quality_flag_decoding_tess():
 def test_quality_flag_decoding_quantity_object():
     """Can a QUALITY flag that is a astropy quantity object be parsed correctly?
 
-    This is a regression test for https://github.com/KeplerGO/lightkurve/issues/804
+    This is a regression test for https://github.com/lightkurve/lightkurve/issues/804
     """
     from astropy.units.quantity import Quantity
     flags = list(TessQualityFlags.STRINGS.items())

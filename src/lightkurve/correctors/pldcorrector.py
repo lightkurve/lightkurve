@@ -269,7 +269,7 @@ class PLDCorrector(RegressionCorrector):
         value will be assigned based on the mission. K2 and TESS experience
         different dominant sources of noise, and require different defaults.
         For information about how the defaults were chosen, see PR #746 at
-        https://github.com/KeplerGO/lightkurve/pull/746#issuecomment-658458270
+        https://github.com/lightkurve/lightkurve/pull/746#issuecomment-658458270
 
         Parameters
         ----------

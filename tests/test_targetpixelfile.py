@@ -523,7 +523,7 @@ def test_tess_simulation():
     assert tpf.flux.shape == tpf.flux_err.shape
     tpf.wcs
     col, row = tpf.estimate_centroids()
-    # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
+    # Regression test for https://github.com/lightkurve/lightkurve/pull/236
     assert (tpf.time.value == 0).sum() == 0
 
 
@@ -592,7 +592,7 @@ def test_tpf_slicing(tpf_type):
 
 
 def test_endianness():
-    """Regression test for https://github.com/KeplerGO/lightkurve/issues/188"""
+    """Regression test for https://github.com/lightkurve/lightkurve/issues/188"""
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.to_lightcurve().to_pandas().describe()
 

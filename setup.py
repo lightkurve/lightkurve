@@ -27,7 +27,7 @@ setup(
     version='2.0b4',
     description='A friendly package for Kepler & TESS time series analysis in Python.',
     python_requires='==3.*,>=3.6.1',
-    project_urls={"homepage": "https://docs.lightkurve.org", "repository": "https://github.com/KeplerGO/lightkurve"},
+    project_urls={"homepage": "https://docs.lightkurve.org", "repository": "https://github.com/lightkurve/lightkurve"},
     author='Geert Barentsen',
     author_email='hello@geert.io',
     license='MIT',

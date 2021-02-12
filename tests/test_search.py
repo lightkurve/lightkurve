@@ -220,7 +220,7 @@ def test_source_confusion():
     # Regression test for issue #148.
     # When obtaining the TPF for target 6507433, @benmontet noticed that
     # a target 4 arcsec away was returned instead.
-    # See https://github.com/KeplerGO/lightkurve/issues/148
+    # See https://github.com/lightkurve/lightkurve/issues/148
     desired_target = "KIC 6507433"
     tpf = search_targetpixelfile(desired_target, quarter=8).download()
     assert tpf.targetid == 6507433
@@ -239,7 +239,7 @@ def test_empty_searchresult():
 
 @pytest.mark.remote_data
 def test_issue_472():
-    """Regression test for https://github.com/KeplerGO/lightkurve/issues/472"""
+    """Regression test for https://github.com/lightkurve/lightkurve/issues/472"""
     # The line below previously threw an exception because the target was not
     # observed in Sector 2; we're always expecting a SearchResult object (empty
     # or not) rather than an exception.
@@ -284,7 +284,7 @@ def test_indexerror_631():
 def test_name_resolving_regression_764():
     """Due to a bug, MAST resolved "EPIC250105131" to a different position than
     "EPIC 250105131". This regression test helps us verify that the bug does
-    not re-appear. Details: https://github.com/KeplerGO/lightkurve/issues/764
+    not re-appear. Details: https://github.com/lightkurve/lightkurve/issues/764
     """
     from astroquery.mast import MastClass
     c1 = MastClass().resolve_object(objectname="EPIC250105131")

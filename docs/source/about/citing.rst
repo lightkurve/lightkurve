@@ -51,4 +51,4 @@ astronomy packages, which include:
 * `astroquery <https://astroquery.readthedocs.io>`_ (see `astroquery citation instructions <https://github.com/astropy/astroquery#citing-astroquery>`_) enabled all `~lightkurve.search` functions.
 * `tesscut <https://mast.stsci.edu/tesscut/>`_ (see `tesscut citation instructions <https://ascl.net/code/v/2239>`_) enabled `~lightkurve.search.search_tesscut`.
 
-If your package is missing from the list above, please `open a pull request <https://github.com/KeplerGO/lightkurve>`_ to add it.
+If your package is missing from the list above, please `open a pull request <https://github.com/lightkurve/lightkurve>`_ to add it.

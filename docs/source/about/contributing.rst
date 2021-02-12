@@ -4,10 +4,10 @@
 Reporting issues and proposing changes
 ======================================
 
-Lightkurve is actively developed on its `GitHub repository <https://github.com/KeplerGO/lightkurve>`_.
+Lightkurve is actively developed on its `GitHub repository <https://github.com/lightkurve/lightkurve>`_.
 
 If you encounter a problem with Lightkurve, we encourage you to
-`open an issue on the GitHub repository <https://github.com/KeplerGO/lightkurve/issues>`_
+`open an issue on the GitHub repository <https://github.com/lightkurve/lightkurve/issues>`_
 or to e-mail the Kepler/K2 Guest Observer Office at keplergo@mail.arc.nasa.gov.
 
 If you would like to contribute a patch for a bugfix, please go ahead and open a pull request.
@@ -26,7 +26,7 @@ If in doubt on how to open a pull request, we recommend Astropy's
 In brief, the steps are as follows:
 
 1. Fork the main **lightkurve** repository by logging into GitHub, browsing to
-   ``https://github.com/KeplerGO/lightkurve`` and clicking on ``Fork`` in the top right corner.
+   ``https://github.com/lightkurve/lightkurve`` and clicking on ``Fork`` in the top right corner.
 
 2. Clone your fork to your computer:
 
@@ -46,7 +46,7 @@ In brief, the steps are as follows:
 
 .. code-block:: bash
 
-    $ git remote add upstream https://github.com/KeplerGO/lightkurve.git
+    $ git remote add upstream https://github.com/lightkurve/lightkurve.git
 
 5. Let's make sure everything is setup correctly. Execute:
 
@@ -60,8 +60,8 @@ You should see something like this:
 
     origin	https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git (fetch)
     origin	https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git (push)
-    upstream	https://github.com/KeplerGO/lightkurve.git (fetch)
-    upstream	https://github.com/KeplerGO/lightkurve.git (push)
+    upstream	https://github.com/lightkurve/lightkurve.git (fetch)
+    upstream	https://github.com/lightkurve/lightkurve.git (push)
 
 6. Now you are ready to start contributing; make a new branch with a name of your choice and checkout:
 
@@ -83,7 +83,7 @@ You should see something like this:
     $ git commit -m "description of changes"
     $ git push origin name-of-your-branch
 
-9. Head to https://github.com/KeplerGO/lightkurve and you should now see a button
+9. Head to https://github.com/lightkurve/lightkurve and you should now see a button
    "Compare and open a pull request".  Click the button and submit your pull request.
 
 

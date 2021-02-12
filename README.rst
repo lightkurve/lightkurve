@@ -13,8 +13,8 @@ Lightkurve
                 :target: https://pypi.python.org/pypi/lightkurve
 .. |pypi-downloads| image:: https://pepy.tech/badge/lightkurve/month
                 :target: https://pepy.tech/project/lightkurve/month
-.. |test-badge| image:: https://github.com/KeplerGO/lightkurve/workflows/Lightkurve-tests/badge.svg
-                 :target: https://github.com/KeplerGO/lightkurve/actions?query=branch%3Amaster
+.. |test-badge| image:: https://github.com/lightkurve/lightkurve/workflows/Lightkurve-tests/badge.svg
+                 :target: https://github.com/lightkurve/lightkurve/actions?query=branch%3Amaster
 .. |astropy-badge| image:: https://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
                    :target: http://www.astropy.org
 .. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1181928.svg
@@ -25,7 +25,7 @@ to analyze astronomical flux time series data,
 in particular the pixels and lightcurves obtained by
 **NASA's Kepler and TESS exoplanet missions**.
 
-.. image:: https://raw.githubusercontent.com/KeplerGO/lightkurve/master/docs/source/_static/images/lightkurve-teaser.gif
+.. image:: https://raw.githubusercontent.com/lightkurve/lightkurve/master/docs/source/_static/images/lightkurve-teaser.gif
 
 This package aims to lower the barrier for students, astronomers,
 and citizen scientists interested in analyzing Kepler and TESS space telescope data.
@@ -62,4 +62,5 @@ Please read the citation instructions at `https://docs.lightkurve.org/about/citi
 Contact
 -------
 Lightkurve is an open source community project created by `the authors <AUTHORS.rst>`_.
-The best way to contact us is to `open an issue <https://github.com/KeplerGO/lightkurve/issues/new>`_ or to e-mail  tesshelp@bigbang.gsfc.nasa.gov.
+The best way to contact us is to `open an issue <https://github.com/lightkurve/lightkurve/issues/new>`_ or to e-mail tesshelp@bigbang.gsfc.nasa.gov.
+Please include a self-contained example that fully demonstrates your problem or question.

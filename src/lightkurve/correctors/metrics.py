@@ -2,7 +2,7 @@
 
 This module provides two metrics, `overfit_metric_lombscargle` and `underfit_metric_neighbors`,
 which enable users to assess whether the noise in a systematics-corrected light curve has been
-under- or over-fitted.  These features were contributed by Jeff Smith (cf. https://github.com/KeplerGO/lightkurve/pull/855)
+under- or over-fitted.  These features were contributed by Jeff Smith (cf. https://github.com/lightkurve/lightkurve/pull/855)
 and are in turn inspired by similar metrics in use by the PDC module of the official Kepler/TESS pipeline.
 """
 import logging

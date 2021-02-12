@@ -161,7 +161,7 @@ def test_TessLightCurveFile(quality_bitmask):
     assert_array_equal(lc.time[0:10].value, hdu[1].data['TIME'][0:10])
     assert_array_equal(lc.flux[0:10].value, hdu[1].data['SAP_FLUX'][0:10])
 
-    # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
+    # Regression test for https://github.com/lightkurve/lightkurve/pull/236
     assert np.isnan(lc.time.value).sum() == 0
 
 
@@ -422,7 +422,7 @@ def test_cdpp_tabby():
     assert(np.abs(lc2.estimate_cdpp().value - lc.cdpp6_0) < 30)
 
 
-# TEMPORARILY SKIP, cf. https://github.com/KeplerGO/lightkurve/issues/663
+# TEMPORARILY SKIP, cf. https://github.com/lightkurve/lightkurve/issues/663
 @pytest.mark.xfail
 def test_bin():
     """Does binning work?"""
@@ -511,7 +511,7 @@ def test_bins_kwarg():
     #   - Bins = 310.0
 
 
-# TEMPORARILY SKIP, cf. https://github.com/KeplerGO/lightkurve/issues/663
+# TEMPORARILY SKIP, cf. https://github.com/lightkurve/lightkurve/issues/663
 @pytest.mark.xfail
 def test_bin_quality():
     """Binning must also revise the quality and centroid columns."""
@@ -804,7 +804,7 @@ def test_flatten_robustness():
 
 def test_flatten_returns_normalized():
     """Ensure returned lightcurves from flatten() can be normalized"""
-    # Test for https://github.com/KeplerGO/lightkurve/issues/838
+    # Test for https://github.com/lightkurve/lightkurve/issues/838
     lc_flux_unit = u.Unit("electron/second")
     lc = LightCurve(time=[1, 2, 3, 4, 5, 6],
                     flux=[10.1, 20.2, 30.3, 40.4, 50.5, 60.6] * lc_flux_unit,
@@ -858,7 +858,7 @@ def test_fill_gaps():
     assert(np.all(np.isfinite(nlc.flux)))
 
     # Because fill_gaps() uses pandas, check that it works regardless of endianness
-    # For details see https://github.com/KeplerGO/lightkurve/issues/188
+    # For details see https://github.com/lightkurve/lightkurve/issues/188
     lc = LightCurve(time=np.array([1, 2, 3, 4, 6, 7, 8], dtype='>f8'),
                     flux=np.array([1, 1, 1, np.nan, np.nan, 1, 1], dtype='>f8'))
     lc.fill_gaps()
@@ -886,7 +886,7 @@ def test_targetid():
 
 
 def test_regression_346():
-    """Regression test for https://github.com/KeplerGO/lightkurve/issues/346"""
+    """Regression test for https://github.com/lightkurve/lightkurve/issues/346"""
     # This previously triggered an IndexError:
     with warnings.catch_warnings():  # KeplerLightCurveFile is deprecated
         warnings.simplefilter("ignore", LightkurveDeprecationWarning)
@@ -998,7 +998,7 @@ def test_river():
         plt.close()
 
 
-# TEMPORARILY SKIP, cf. https://github.com/KeplerGO/lightkurve/issues/663
+# TEMPORARILY SKIP, cf. https://github.com/lightkurve/lightkurve/issues/663
 @pytest.mark.xfail
 def test_bin_issue705():
     """Regression test for #705: binning failed."""
