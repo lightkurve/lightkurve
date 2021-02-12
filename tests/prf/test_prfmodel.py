@@ -8,8 +8,8 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from ...prf import KeplerPRF, SimpleKeplerPRF
-from ...targetpixelfile import KeplerTargetPixelFile
+from lightkurve.prf import KeplerPRF, SimpleKeplerPRF
+from lightkurve.targetpixelfile import KeplerTargetPixelFile
 
 
 def test_prf_normalization():

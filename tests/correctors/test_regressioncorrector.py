@@ -6,8 +6,8 @@ from numpy.testing import assert_almost_equal
 import pandas as pd
 import pytest
 
-from ... import LightCurve, LightkurveWarning
-from .. import RegressionCorrector, DesignMatrix
+from lightkurve import LightCurve, LightkurveWarning
+from lightkurve.correctors import RegressionCorrector, DesignMatrix
 
 
 def test_regressioncorrector_priors():

@@ -4,9 +4,9 @@ from astropy.io import fits
 import numpy as np
 from numpy.testing import assert_array_equal
 
-from ... import search_lightcurve
-from ..tasoc import read_tasoc_lightcurve
-from ..detect import detect_filetype
+from lightkurve import search_lightcurve
+from lightkurve.io.tasoc import read_tasoc_lightcurve
+from lightkurve.io.detect import detect_filetype
 
 @pytest.mark.remote_data
 def test_detect_tasoc():

@@ -9,8 +9,8 @@ import numpy as np
 import pytest
 from scipy import stats
 
-from ..targetpixelfile import KeplerTargetPixelFile
-from ..correctors import SFFCorrector, PLDCorrector
+from lightkurve.targetpixelfile import KeplerTargetPixelFile
+from lightkurve.correctors import SFFCorrector, PLDCorrector
 
 # See `data/synthetic/README.md` for details about these synthetic test files
 filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sinusoid.targ.fits.gz")

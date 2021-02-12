@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import unit_impulse as deltafn
 
-from ...search import search_lightcurve
-from ...periodogram import Periodogram
-from ...periodogram import SNRPeriodogram
+from lightkurve.search import search_lightcurve
+from lightkurve.periodogram import Periodogram
+from lightkurve.periodogram import SNRPeriodogram
 
 
 @pytest.mark.remote_data

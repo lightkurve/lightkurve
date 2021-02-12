@@ -14,14 +14,14 @@ import pandas as pd
 from astropy.table import Table
 from astropy.time import Time
 
-from ... import TessLightCurve, KeplerLightCurve
-from ... import search_lightcurve
-from ... import LightkurveWarning
-from ..designmatrix import DesignMatrix
-from ..cbvcorrector import download_kepler_cbvs, download_tess_cbvs, \
+from lightkurve import TessLightCurve, KeplerLightCurve
+from lightkurve import search_lightcurve
+from lightkurve import LightkurveWarning
+from lightkurve.correctors.designmatrix import DesignMatrix
+from lightkurve.correctors.cbvcorrector import download_kepler_cbvs, download_tess_cbvs, \
     CotrendingBasisVectors, KeplerCotrendingBasisVectors, \
     TessCotrendingBasisVectors
-from ..cbvcorrector import CBVCorrector
+from lightkurve.correctors.cbvcorrector import CBVCorrector
 
 
 #*******************************************************************************

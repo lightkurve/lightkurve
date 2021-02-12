@@ -3,8 +3,8 @@ from __future__ import division, print_function
 import numpy as np
 from numpy.testing import assert_almost_equal
 
-from ..lightcurve import LightCurve
-from ..convenience import estimate_cdpp
+from lightkurve.lightcurve import LightCurve
+from lightkurve.convenience import estimate_cdpp
 
 
 def test_cdpp():

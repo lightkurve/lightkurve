@@ -16,10 +16,10 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astropy.table import Table
 
-from ..utils import LightkurveWarning, LightkurveError
-from ..search import search_lightcurve, search_targetpixelfile, \
+from lightkurve.utils import LightkurveWarning, LightkurveError
+from lightkurve.search import search_lightcurve, search_targetpixelfile, \
                      search_tesscut, SearchResult, SearchError, log
-from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
+from lightkurve import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
 
 @pytest.mark.remote_data

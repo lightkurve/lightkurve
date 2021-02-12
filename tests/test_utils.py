@@ -4,14 +4,14 @@ import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 
-from ..utils import KeplerQualityFlags, TessQualityFlags
-from ..utils import module_output_to_channel, channel_to_module_output
-from ..utils import LightkurveWarning
-from ..utils import running_mean, validate_method
-from ..utils import bkjd_to_astropy_time, btjd_to_astropy_time
-from ..utils import centroid_quadratic
-from ..utils import show_citation_instructions
-from ..lightcurve import LightCurve
+from lightkurve.utils import KeplerQualityFlags, TessQualityFlags
+from lightkurve.utils import module_output_to_channel, channel_to_module_output
+from lightkurve.utils import LightkurveWarning
+from lightkurve.utils import running_mean, validate_method
+from lightkurve.utils import bkjd_to_astropy_time, btjd_to_astropy_time
+from lightkurve.utils import centroid_quadratic
+from lightkurve.utils import show_citation_instructions
+from lightkurve.lightcurve import LightCurve
 
 
 def test_channel_to_module_output():
@@ -114,7 +114,7 @@ def test_validate_method():
 
 def test_import():
     """Regression test for #605; `lk.utils` resolved to `lk.seismology.utils`"""
-    from .. import utils
+    from lightkurve import utils
     assert hasattr(utils, "btjd_to_astropy_time")
 
 

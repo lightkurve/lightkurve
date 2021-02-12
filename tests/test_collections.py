@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
 
-from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
-from ..search import search_lightcurve
-from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from ..collections import LightCurveCollection, TargetPixelFileCollection
-from ..utils import LightkurveWarning
+from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
+from lightkurve.search import search_lightcurve
+from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
+from lightkurve.collections import LightCurveCollection, TargetPixelFileCollection
+from lightkurve.utils import LightkurveWarning
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")

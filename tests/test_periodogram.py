@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,10 +9,9 @@ from astropy import units as u
 from astropy.time import Time
 from astropy.stats.bls import BoxLeastSquares
 
-from ..lightcurve import LightCurve
-from ..periodogram import Periodogram
-from ..utils import LightkurveWarning
-import sys
+from lightkurve.lightcurve import LightCurve
+from lightkurve.periodogram import Periodogram
+from lightkurve.utils import LightkurveWarning
 
 
 def test_periodogram_basics():

@@ -4,8 +4,8 @@ from astropy.io import fits
 import numpy as np
 from numpy.testing import assert_array_equal
 
-from ..k2sff import read_k2sff_lightcurve
-from ... import search_lightcurve
+from lightkurve.io.k2sff import read_k2sff_lightcurve
+from lightkurve import search_lightcurve
 
 
 @pytest.mark.remote_data

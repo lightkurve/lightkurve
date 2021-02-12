@@ -1,5 +1,3 @@
-from __future__ import division, print_function
-
 import os
 import tempfile
 import warnings
@@ -18,12 +16,12 @@ from astropy.io.fits.card import UNDEFINED
 import astropy.units as u
 from astropy.utils.exceptions import AstropyWarning
 
-from ..targetpixelfile import KeplerTargetPixelFile, TargetPixelFileFactory
-from ..targetpixelfile import TessTargetPixelFile, TargetPixelFile
-from ..lightcurve import TessLightCurve
-from ..utils import LightkurveWarning, LightkurveDeprecationWarning
-from ..io import read
-from ..search import search_tesscut
+from lightkurve.targetpixelfile import KeplerTargetPixelFile, TargetPixelFileFactory
+from lightkurve.targetpixelfile import TessTargetPixelFile, TargetPixelFile
+from lightkurve.lightcurve import TessLightCurve
+from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning
+from lightkurve.io import read
+from lightkurve.search import search_tesscut
 
 from .test_synthetic_data import filename_synthetic_flat
 

@@ -1,6 +1,4 @@
 """Test the features of the lightkurve.prf.tpfmodels module."""
-from __future__ import division, print_function
-
 import os
 import pytest
 
@@ -9,11 +7,12 @@ import numpy as np
 from numpy.testing import assert_allclose
 from scipy.stats import mode
 
-from ... import PACKAGEDIR
-from ...prf import FixedValuePrior, GaussianPrior, UniformPrior
-from ...prf import StarPrior, BackgroundPrior, FocusPrior, MotionPrior
-from ...prf import TPFModel, PRFPhotometry
-from ...prf import SimpleKeplerPRF, KeplerPRF
+from lightkurve.prf import FixedValuePrior, GaussianPrior, UniformPrior
+from lightkurve.prf import StarPrior, BackgroundPrior, FocusPrior, MotionPrior
+from lightkurve.prf import TPFModel, PRFPhotometry
+from lightkurve.prf import SimpleKeplerPRF, KeplerPRF
+
+from .. import TESTDATA
 
 
 def test_fixedvalueprior():
@@ -94,7 +93,7 @@ def test_tpf_model():
 @pytest.mark.remote_data
 def test_tpf_model_fitting():
     # Is the PRF photometry result consistent with simple aperture photometry?
-    tpf_fn = os.path.join(PACKAGEDIR, "tests", "data", "ktwo201907706-c01-first-cadence.fits.gz")
+    tpf_fn = os.path.join(TESTDATA, "ktwo201907706-c01-first-cadence.fits.gz")
     tpf = fits.open(tpf_fn)
     col, row = 173, 526
     fluxsum = np.sum(tpf[1].data)

@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 from numpy.testing import (assert_allclose)
 
-from ... import LightCurve, search_lightcurve
-from ..metrics import overfit_metric_lombscargle, underfit_metric_neighbors, _compute_correlation
+from lightkurve import LightCurve, search_lightcurve
+from lightkurve.correctors.metrics import overfit_metric_lombscargle, underfit_metric_neighbors, _compute_correlation
 
 
 def test_overfit_metric_lombscargle():

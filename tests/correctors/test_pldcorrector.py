@@ -2,8 +2,8 @@ import pytest
 
 import matplotlib.pyplot as plt
 
-from ... import search_targetpixelfile, search_tesscut, KeplerLightCurve, TessLightCurve
-from .. import PLDCorrector
+from lightkurve import search_targetpixelfile, search_tesscut, KeplerLightCurve, TessLightCurve
+from lightkurve.correctors import PLDCorrector
 
 
 @pytest.mark.remote_data
@@ -79,8 +79,8 @@ def test_pld_corrector():
     # reduce using fewer principle components
     corrected_lc = pld.correct(pca_components=20)
     # try PLD on a TESS observation
-    from ... import TessTargetPixelFile
-    from ...tests.test_targetpixelfile import TESS_SIM
+    from lightkurve import TessTargetPixelFile
+    from ..test_targetpixelfile import TESS_SIM
     tess_tpf = TessTargetPixelFile(TESS_SIM)
     # instantiate PLD corrector object
     pld = PLDCorrector(tess_tpf[:500], aperture_mask='pipeline')

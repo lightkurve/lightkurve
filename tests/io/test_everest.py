@@ -1,6 +1,6 @@
 import pytest
 
-from ... import search_lightcurve
+from lightkurve import search_lightcurve
 
 
 @pytest.mark.remote_data

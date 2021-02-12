@@ -2,7 +2,7 @@ from astropy import units as u
 import numpy as np
 from uncertainties import ufloat
 
-from ..stellar_estimators import (NUMAX_SOL, DELTANU_SOL, TEFF_SOL, G_SOL,
+from lightkurve.seismology.stellar_estimators import (NUMAX_SOL, DELTANU_SOL, TEFF_SOL, G_SOL,
                                   estimate_radius, estimate_mass, estimate_logg)
 
 

@@ -4,15 +4,16 @@ import tempfile
 
 import pytest
 
-from ...utils import LightkurveDeprecationWarning, LightkurveError
-from ... import PACKAGEDIR, KeplerTargetPixelFile, TessTargetPixelFile, LightCurve
-from .. import read
+from lightkurve.utils import LightkurveDeprecationWarning, LightkurveError
+from lightkurve import PACKAGEDIR, KeplerTargetPixelFile, TessTargetPixelFile, LightCurve
+from lightkurve.io import read
 
+from .. import TESTDATA
 
 def test_read():
     # define paths to k2 and tess data
-    k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
-    tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
+    k2_path = os.path.join(TESTDATA, "test-tpf-star.fits")
+    tess_path = os.path.join(TESTDATA, "tess25155310-s01-first-cadences.fits.gz")
     # Ensure files are read in as the correct object
     k2tpf = read(k2_path)
     assert(isinstance(k2tpf, KeplerTargetPixelFile))
@@ -32,12 +33,12 @@ def test_read():
 
 def test_open():
     """Does the deprecated `open` function still work?"""
-    from .. import open
+    from lightkurve.io import open
     with warnings.catch_warnings():  # lk.open is deprecated
         warnings.simplefilter("ignore", LightkurveDeprecationWarning)
         # define paths to k2 and tess data
-        k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
-        tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
+        k2_path = os.path.join(TESTDATA, "test-tpf-star.fits")
+        tess_path = os.path.join(TESTDATA, "tess25155310-s01-first-cadences.fits.gz")
         # Ensure files are read in as the correct object
         k2tpf = open(k2_path)
         assert(isinstance(k2tpf, KeplerTargetPixelFile))

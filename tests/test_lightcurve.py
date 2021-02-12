@@ -15,13 +15,14 @@ import pytest
 import tempfile
 import warnings
 
-from ..io import read
-from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
-from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
-from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from ..utils import LightkurveWarning, LightkurveDeprecationWarning
-from ..search import search_lightcurve
-from ..collections import LightCurveCollection
+from lightkurve.io import read
+from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
+from lightkurve.lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
+from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
+from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning
+from lightkurve.search import search_lightcurve
+from lightkurve.collections import LightCurveCollection
+
 from .test_targetpixelfile import TABBY_TPF
 
 
@@ -889,7 +890,7 @@ def test_regression_346():
     # This previously triggered an IndexError:
     with warnings.catch_warnings():  # KeplerLightCurveFile is deprecated
         warnings.simplefilter("ignore", LightkurveDeprecationWarning)
-        from .. import KeplerLightCurveFile
+        from lightkurve import KeplerLightCurveFile
         KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.remove_nans().to_corrector().correct().estimate_cdpp()
 
 

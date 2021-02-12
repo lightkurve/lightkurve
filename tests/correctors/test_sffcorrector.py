@@ -6,10 +6,10 @@ import numpy as np
 from astropy.utils.data import get_pkg_data_filename
 from numpy.testing import assert_array_equal
 
-from ... import LightCurve, KeplerLightCurve, \
+from lightkurve import LightCurve, KeplerLightCurve, \
                 TessLightCurve, LightkurveWarning, \
                 search_lightcurve
-from .. import SFFCorrector
+from lightkurve.correctors import SFFCorrector
 
 
 K2_C08 = ("https://archive.stsci.edu/missions/k2/lightcurves/c8/"

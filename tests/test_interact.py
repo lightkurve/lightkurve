@@ -5,10 +5,10 @@ from astropy.utils.data import get_pkg_data_filename
 import numpy as np
 import pytest
 
-from .. import LightkurveWarning
-from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
+from lightkurve import LightkurveWarning
+from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from .test_targetpixelfile import TABBY_TPF
-from ..interact import get_lightcurve_y_limits
+from lightkurve.interact import get_lightcurve_y_limits
 
 
 bad_optional_imports = False
@@ -112,7 +112,7 @@ def test_transform_and_ylim_funcs():
 def test_interact_functions():
     """Do the helper functions in the interact module run without syntax error?"""
     import bokeh
-    from ..interact import (prepare_tpf_datasource, prepare_lightcurve_datasource,
+    from lightkurve.interact import (prepare_tpf_datasource, prepare_lightcurve_datasource,
                             get_lightcurve_y_limits, make_lightcurve_figure_elements,
                             make_tpf_figure_elements, show_interact_widget)
     tpf = TessTargetPixelFile(example_tpf)
@@ -139,7 +139,7 @@ def test_interact_functions():
 def test_interact_sky_functions():
     """Do the helper functions in the interact module run without syntax error?"""
     import bokeh
-    from ..interact import (prepare_tpf_datasource, make_tpf_figure_elements,
+    from lightkurve.interact import (prepare_tpf_datasource, make_tpf_figure_elements,
                             add_gaia_figure_elements)
     tpf = TessTargetPixelFile(example_tpf)
     mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]

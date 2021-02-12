@@ -5,7 +5,7 @@ from astropy.timeseries import BoxLeastSquares
 import astropy.units as u
 import numpy as np
 
-from ..lightcurve import KeplerLightCurve, TessLightCurve
+from lightkurve.lightcurve import KeplerLightCurve, TessLightCurve
 from .test_lightcurve import KEPLER10, TESS_SIM
 
 bad_optional_imports = False
@@ -44,12 +44,12 @@ def test_graceful_exit_outside_notebook():
                     reason="requires bokeh and astropy.stats.bls")
 def test_helper_functions():
     """Can we use all the functions in interact_bls?"""
-    from ..interact_bls import (prepare_bls_datasource,
+    from lightkurve.interact_bls import (prepare_bls_datasource,
                         prepare_folded_datasource, prepare_lightcurve_datasource)
-    from ..interact_bls import (make_bls_figure_elements,
+    from lightkurve.interact_bls import (make_bls_figure_elements,
                                         make_folded_figure_elements,
                                         make_lightcurve_figure_elements)
-    from ..interact_bls import (prepare_bls_help_source,
+    from lightkurve.interact_bls import (prepare_bls_help_source,
                                         prepare_f_help_source,
                                         prepare_lc_help_source)
     lc = KeplerLightCurve.read(KEPLER10)
@@ -72,7 +72,7 @@ def test_helper_functions():
 @pytest.mark.remote_data
 def test_preprocess_lc():
     '''Test to ensure the lightcurve is pre-processed before applying BLS for correctness and consistent output'''
-    from ..interact_bls import _preprocess_lc_for_bls
+    from lightkurve.interact_bls import _preprocess_lc_for_bls
     lc = KeplerLightCurve.read(KEPLER10)
     assert np.isnan(lc.flux).any()  # ensure the test data has nan in flux
 
