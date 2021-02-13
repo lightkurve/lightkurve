@@ -849,7 +849,8 @@ class LightCurve(QTimeSeries):
             ppt = u.def_unit(['ppt', 'parts per thousand'], u.Unit(1e-3))
             lc.flux = lc.flux.to(ppt)
         elif unit == 'ppm':  # parts per million
-            lc.flux = lc.flux.to(u.cds.ppm)
+            from astropy.units import cds
+            lc.flux = lc.flux.to(cds.ppm)
 
         lc.meta['NORMALIZED'] = True
         return lc

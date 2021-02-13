@@ -3,7 +3,7 @@
 ======================
 Correcting systematics
 ======================
-.. currentmodule:: lightkurve
+.. currentmodule:: lightkurve.correctors
 
 Telescope data is always affected by noise contributed by the instrument.
 The ``lightkurve.correctors`` sub-package provides classes which offer
@@ -104,4 +104,4 @@ A DesignMatrix supports the following operations:
 .. autosummary::
   :toctree: api/
 
-  correctors.corrector.Corrector
+  corrector.Corrector
