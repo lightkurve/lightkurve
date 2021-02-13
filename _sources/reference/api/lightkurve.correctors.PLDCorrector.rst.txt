@@ -1,0 +1,38 @@
+﻿lightkurve.correctors.PLDCorrector
+==================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. autoclass:: PLDCorrector
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PLDCorrector.__init__
+      ~PLDCorrector.compute_overfit_metric
+      ~PLDCorrector.compute_underfit_metric
+      ~PLDCorrector.correct
+      ~PLDCorrector.create_design_matrix
+      ~PLDCorrector.diagnose
+      ~PLDCorrector.diagnose_masks
+      ~PLDCorrector.diagnose_priors
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PLDCorrector.cadence_mask
+      ~PLDCorrector.corrected_lc
+      ~PLDCorrector.dmc
+      ~PLDCorrector.original_lc
+   
+   

@@ -1,0 +1,6 @@
+﻿lightkurve.periodogram.Periodogram.bin
+======================================
+
+.. currentmodule:: lightkurve.periodogram
+
+.. automethod:: Periodogram.bin

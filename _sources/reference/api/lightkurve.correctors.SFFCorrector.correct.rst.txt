@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.SFFCorrector.correct
+==========================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. automethod:: SFFCorrector.correct

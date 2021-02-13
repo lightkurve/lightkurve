@@ -1,0 +1,6 @@
+﻿lightkurve.seismology.Seismology.estimate\_radius
+=================================================
+
+.. currentmodule:: lightkurve.seismology
+
+.. automethod:: Seismology.estimate_radius

@@ -1,6 +1,0 @@
-﻿lightkurve.Seismology.estimate\_mass
-====================================
-
-.. currentmodule:: lightkurve
-
-.. automethod:: Seismology.estimate_mass

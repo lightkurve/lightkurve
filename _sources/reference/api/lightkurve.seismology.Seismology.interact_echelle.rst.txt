@@ -1,0 +1,6 @@
+﻿lightkurve.seismology.Seismology.interact\_echelle
+==================================================
+
+.. currentmodule:: lightkurve.seismology
+
+.. automethod:: Seismology.interact_echelle

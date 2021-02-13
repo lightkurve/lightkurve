@@ -1,6 +1,0 @@
-﻿lightkurve.RegressionCorrector.diagnose
-=======================================
-
-.. currentmodule:: lightkurve
-
-.. automethod:: RegressionCorrector.diagnose

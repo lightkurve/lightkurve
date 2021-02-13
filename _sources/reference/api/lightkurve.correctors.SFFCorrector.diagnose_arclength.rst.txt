@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.SFFCorrector.diagnose\_arclength
+======================================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. automethod:: SFFCorrector.diagnose_arclength

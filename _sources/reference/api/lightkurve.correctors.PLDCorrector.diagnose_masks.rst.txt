@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.PLDCorrector.diagnose\_masks
+==================================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. automethod:: PLDCorrector.diagnose_masks

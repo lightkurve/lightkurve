@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.DesignMatrix.copy
+=======================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. automethod:: DesignMatrix.copy

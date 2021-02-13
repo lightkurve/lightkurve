@@ -1,6 +1,0 @@
-﻿lightkurve.Seismology.plot\_echelle
-===================================
-
-.. currentmodule:: lightkurve
-
-.. automethod:: Seismology.plot_echelle

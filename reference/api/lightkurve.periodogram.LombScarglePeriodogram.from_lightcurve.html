@@ -1,0 +1,449 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve &#8212; Lightkurve </title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve.html" />
+    <link rel="prev" title="lightkurve.periodogram.Periodogram" href="lightkurve.periodogram.Periodogram.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Lightkurve v2.0rc2</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../tutorials/index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../about/index.html">About</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/lightkurve/lightkurve" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+        
+        
+          
+            
+                <li class="">
+                    <a href="../search.html">Downloading data</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../lightcurve.html">LightCurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../foldedlightcurve.html">FoldedLightCurve</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../targetpixelfile.html">TargetPixelFile</a>
+                </li>
+            
+          
+            
+  
+                <li class="active">
+                    <a href="../periodogram.html">Periodogram</a>
+                    <ul>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.html">lightkurve.periodogram.Periodogram</a>
+                        </li>
+                    
+                        <li class="active">
+                            <a href="">lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve.html">lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.frequency.html">lightkurve.periodogram.Periodogram.frequency</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.frequency_at_max_power.html">lightkurve.periodogram.Periodogram.frequency_at_max_power</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.period.html">lightkurve.periodogram.Periodogram.period</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.period_at_max_power.html">lightkurve.periodogram.Periodogram.period_at_max_power</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.power.html">lightkurve.periodogram.Periodogram.power</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.max_power.html">lightkurve.periodogram.Periodogram.max_power</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.bin.html">lightkurve.periodogram.Periodogram.bin</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.copy.html">lightkurve.periodogram.Periodogram.copy</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.flatten.html">lightkurve.periodogram.Periodogram.flatten</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.plot.html">lightkurve.periodogram.Periodogram.plot</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.show_properties.html">lightkurve.periodogram.Periodogram.show_properties</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.smooth.html">lightkurve.periodogram.Periodogram.smooth</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.to_seismology.html">lightkurve.periodogram.Periodogram.to_seismology</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="lightkurve.periodogram.Periodogram.to_table.html">lightkurve.periodogram.Periodogram.to_table</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../seismology.html">Seismology</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../correctors.html">Correcting systematics</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../misc.html">Miscellaneous utilities</a>
+                </li>
+            
+          
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="lightkurve-periodogram-lombscargleperiodogram-from-lightcurve">
+<h1>lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve<a class="headerlink" href="#lightkurve-periodogram-lombscargleperiodogram-from-lightcurve" title="Permalink to this headline">¶</a></h1>
+<dl class="py method">
+<dt id="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve">
+<em class="property">static </em><code class="sig-prename descclassname">LombScarglePeriodogram.</code><code class="sig-name descname">from_lightcurve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lc</span></em>, <em class="sig-param"><span class="n">minimum_frequency</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maximum_frequency</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">minimum_period</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maximum_period</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">frequency</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">period</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nterms</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">nyquist_factor</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">oversample_factor</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">normalization</span><span class="o">=</span><span class="default_value">'amplitude'</span></em>, <em class="sig-param"><span class="n">ls_method</span><span class="o">=</span><span class="default_value">'fast'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> from a LightCurve using the Lomb-Scargle method.</p>
+<p>By default, the periodogram will be created for a regular grid of
+frequencies from one frequency separation to the Nyquist frequency,
+where the frequency separation is determined as 1 / the time baseline.</p>
+<p>The min frequency and/or max frequency (or max period and/or min period)
+can be passed to set custom limits for the frequency grid. Alternatively,
+the user can provide a custom regular grid using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">frequency</span></code>
+parameter or a custom regular grid of periods using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">period</span></code>
+parameter.</p>
+<p>The sampling of the spectrum can be changed using the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">oversample_factor</span></code> parameter. An oversampled spectrum
+(oversample_factor &gt; 1) is useful for displaying the full details
+of the spectrum, allowing the frequencies and amplitudes to be
+measured directly from the plot itself, with no fitting required.
+This is recommended for most applications, with a value of 5 or
+10. On the other hand, an oversample_factor of 1 means the spectrum
+is critically sampled, where every point in the spectrum is
+independent of the others. This may be used when Lorentzians are to
+be fitted to modes in the power spectrum, in cases where the mode
+lifetimes are shorter than the time-base of the data (which is
+sometimes the case for solar-like oscillations). An
+oversample_factor of 1 is suitable for these stars because the
+modes are usually fully resolved. That is, the power from each mode
+is spread over a range of frequencies due to damping.  Hence, any
+small error from measuring mode frequencies by taking the maximum
+of the peak is negligible compared with the intrinsic linewidth of
+the modes.</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalization</span></code> parameter will normalize the spectrum to either
+power spectral density (“psd”) or amplitude (“amplitude”). Users
+doing asteroseismology on classical pulsators (e.g. delta Scutis)
+typically prefer <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalization=&quot;amplitude&quot;</span></code> because “amplitude”
+has higher dynamic range (high and low peaks visible
+simultaneously), and we often want to read off amplitudes from the
+plot. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalization=&quot;amplitude&quot;</span></code>, the default value for
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">oversample_factor</span></code> is set to 5 and <code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_unit</span></code> is 1/day.
+Alternatively, users doing asteroseismology on solar-like
+oscillators tend to prefer <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalization=&quot;psd&quot;</span></code> because power
+density has a scaled axis that depends on the length of the
+observing time, and is used when we are interested in noise levels
+(e.g. granulation) and are looking at damped oscillations. If
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">normalization=&quot;psd&quot;</span></code>, the default value for <code class="xref py py-obj docutils literal notranslate"><span class="pre">oversample_factor</span></code> is
+set to 1 and <code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_unit</span></code> is set to microHz.  Default values of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_unit</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">oversample_factor</span></code> can be overridden. See Appendix
+A of Kjeldsen &amp; Bedding, 1995 for a full discussion of
+normalization and measurement of oscillation amplitudes
+(<a class="reference external" href="http://adsabs.harvard.edu/abs/1995A%26A...293...87K">http://adsabs.harvard.edu/abs/1995A%26A…293…87K</a>).</p>
+<p>The parameter nterms controls how many Fourier terms are used in the
+model. Setting the Nyquist_factor to be greater than 1 will sample the
+space beyond the Nyquist frequency, which may introduce aliasing.</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_unit</span></code> parameter allows a request for alternative units in frequency
+space. By default frequency is in (1/day) and power in (amplitude).
+Asteroseismologists for example may want frequency in (microHz)
+in which case they would pass <code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_unit=u.microhertz</span></code>.</p>
+<p>By default this method uses the LombScargle ‘fast’ method, which assumes
+a regular grid. If a regular grid of periods (i.e. an irregular grid of
+frequencies) it will use the ‘slow’ method. If nterms &gt; 1 is passed, it
+will use the ‘fastchi2’ method for regular grids, and ‘chi2’ for
+irregular grids.</p>
+<p>Caution: this method assumes that the LightCurve’s time (lc.time)
+is given in units of days.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>lc</strong><span class="classifier">LightCurve object</span></dt><dd><p>The LightCurve from which to compute the Periodogram.</p>
+</dd>
+<dt><strong>minimum_frequency</strong><span class="classifier">float</span></dt><dd><p>If specified, use this minimum frequency rather than one over the
+time baseline.</p>
+</dd>
+<dt><strong>maximum_frequency</strong><span class="classifier">float</span></dt><dd><p>If specified, use this maximum frequency rather than nyquist_factor
+times the nyquist frequency.</p>
+</dd>
+<dt><strong>minimum_period</strong><span class="classifier">float</span></dt><dd><p>If specified, use 1./minium_period as the maximum frequency rather
+than nyquist_factor times the nyquist frequency.</p>
+</dd>
+<dt><strong>maximum_period</strong><span class="classifier">float</span></dt><dd><p>If specified, use 1./maximum_period as the minimum frequency rather
+than one over the time baseline.</p>
+</dd>
+<dt><strong>frequency</strong><span class="classifier">array-like</span></dt><dd><p>The grid of frequencies to use. If given a unit, it is converted to
+units of freq_unit. If not, it is assumed to be in units of
+freq_unit. This over rides any set frequency limits.</p>
+</dd>
+<dt><strong>period</strong><span class="classifier">array-like</span></dt><dd><p>The grid of periods to use (as 1/period). If given a unit, it is
+converted to units of freq_unit. If not, it is assumed to be in
+units of 1/freq_unit. This overrides any set period limits.</p>
+</dd>
+<dt><strong>nterms</strong><span class="classifier">int</span></dt><dd><p>Default 1. Number of terms to use in the Fourier fit.</p>
+</dd>
+<dt><strong>nyquist_factor</strong><span class="classifier">int</span></dt><dd><p>Default 1. The multiple of the average Nyquist frequency. Is
+overriden by maximum_frequency (or minimum period).</p>
+</dd>
+<dt><strong>oversample_factor</strong><span class="classifier">int</span></dt><dd><p>Default: None. The frequency spacing, determined by the time
+baseline of the lightcurve, is divided by this factor, oversampling
+the frequency space. This parameter is identical to the
+samples_per_peak parameter in astropy.LombScargle(). If
+normalization=’amplitude’, oversample_factor will be set to 5. If
+normalization=’psd’, it will be 1. These defaults can be
+overridden.</p>
+</dd>
+<dt><strong>freq_unit</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.core.CompositeUnit</span></code></span></dt><dd><p>Default: None. The desired frequency units for the Lomb Scargle
+periodogram. This implies that 1/freq_unit is the units for period.
+With default normalization (‘amplitude’), the freq_unit is set to
+1/day, which can be overridden. ‘psd’ normalization will set
+freq_unit to microhertz.</p>
+</dd>
+<dt><strong>normalization</strong><span class="classifier">‘psd’ or ‘amplitude’</span></dt><dd><p>Default: <code class="xref py py-obj docutils literal notranslate"><span class="pre">'amplitude'</span></code>. The desired normalization of the spectrum.
+Can be either power spectral density (<code class="xref py py-obj docutils literal notranslate"><span class="pre">'psd'</span></code>) or amplitude
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">'amplitude'</span></code>).</p>
+</dd>
+<dt><strong>ls_method</strong><span class="classifier">str</span></dt><dd><p>Default: <code class="xref py py-obj docutils literal notranslate"><span class="pre">'fast'</span></code>. Passed to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> keyword of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.LombScargle()</span></code>.</p>
+</dd>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Keyword arguments passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.LombScargle()</span></code></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>Periodogram</strong><span class="classifier"><a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt><dd><p>Returns a Periodogram object extracted from the lightcurve.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="lightkurve.periodogram.Periodogram.html" title="previous page">lightkurve.periodogram.Periodogram</a>
+    <a class='right-next' id="next-link" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve.html" title="next page">lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-69171-9', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright Lightkurve developers.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

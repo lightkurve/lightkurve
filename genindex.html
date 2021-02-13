@@ -49,7 +49,7 @@
 
     <a class="navbar-brand" href="index.html">
     
-      <p class="title">Lightkurve v2.0rc1</p>
+      <p class="title">Lightkurve v2.0rc2</p>
     
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,7 +93,7 @@
       <ul class="navbar-nav">
         
           <li class="nav-item">
-            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+            <a class="nav-link" href="https://github.com/lightkurve/lightkurve" target="_blank" rel="noopener">
               <span><i class="fab fa-github-square"></i></span>
             </a>
           </li>
@@ -184,14 +184,24 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.CBVCorrector.html#lightkurve.CBVCorrector.__init__">__init__() (lightkurve.CBVCorrector method)</a>
+      <li><a href="reference/api/lightkurve.correctors.CBVCorrector.html#lightkurve.correctors.CBVCorrector.__init__">__init__() (lightkurve.correctors.CBVCorrector method)</a>
 
       <ul>
         <li><a href="reference/api/lightkurve.correctors.corrector.Corrector.html#lightkurve.correctors.corrector.Corrector.__init__">(lightkurve.correctors.corrector.Corrector method)</a>
 </li>
-        <li><a href="reference/api/lightkurve.DesignMatrix.html#lightkurve.DesignMatrix.__init__">(lightkurve.DesignMatrix method)</a>
+        <li><a href="reference/api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix.__init__">(lightkurve.correctors.DesignMatrix method)</a>
 </li>
-        <li><a href="reference/api/lightkurve.DesignMatrixCollection.html#lightkurve.DesignMatrixCollection.__init__">(lightkurve.DesignMatrixCollection method)</a>
+        <li><a href="reference/api/lightkurve.correctors.DesignMatrixCollection.html#lightkurve.correctors.DesignMatrixCollection.__init__">(lightkurve.correctors.DesignMatrixCollection method)</a>
+</li>
+        <li><a href="reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector.__init__">(lightkurve.correctors.PLDCorrector method)</a>
+</li>
+        <li><a href="reference/api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector.__init__">(lightkurve.correctors.RegressionCorrector method)</a>
+</li>
+        <li><a href="reference/api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector.__init__">(lightkurve.correctors.SFFCorrector method)</a>
+</li>
+        <li><a href="reference/api/lightkurve.correctors.SparseDesignMatrix.html#lightkurve.correctors.SparseDesignMatrix.__init__">(lightkurve.correctors.SparseDesignMatrix method)</a>
+</li>
+        <li><a href="reference/api/lightkurve.correctors.SparseDesignMatrixCollection.html#lightkurve.correctors.SparseDesignMatrixCollection.__init__">(lightkurve.correctors.SparseDesignMatrixCollection method)</a>
 </li>
         <li><a href="reference/api/lightkurve.FoldedLightCurve.html#lightkurve.FoldedLightCurve.__init__">(lightkurve.FoldedLightCurve method)</a>
 </li>
@@ -201,21 +211,11 @@
 </li>
         <li><a href="reference/api/lightkurve.LightCurve.html#lightkurve.LightCurve.__init__">(lightkurve.LightCurve method)</a>
 </li>
-        <li><a href="reference/api/lightkurve.Periodogram.html#lightkurve.Periodogram.__init__">(lightkurve.Periodogram method)</a>
-</li>
-        <li><a href="reference/api/lightkurve.PLDCorrector.html#lightkurve.PLDCorrector.__init__">(lightkurve.PLDCorrector method)</a>
-</li>
-        <li><a href="reference/api/lightkurve.RegressionCorrector.html#lightkurve.RegressionCorrector.__init__">(lightkurve.RegressionCorrector method)</a>
+        <li><a href="reference/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.__init__">(lightkurve.periodogram.Periodogram method)</a>
 </li>
         <li><a href="reference/api/lightkurve.SearchResult.html#lightkurve.SearchResult.__init__">(lightkurve.SearchResult method)</a>
 </li>
-        <li><a href="reference/api/lightkurve.Seismology.html#lightkurve.Seismology.__init__">(lightkurve.Seismology method)</a>
-</li>
-        <li><a href="reference/api/lightkurve.SFFCorrector.html#lightkurve.SFFCorrector.__init__">(lightkurve.SFFCorrector method)</a>
-</li>
-        <li><a href="reference/api/lightkurve.SparseDesignMatrix.html#lightkurve.SparseDesignMatrix.__init__">(lightkurve.SparseDesignMatrix method)</a>
-</li>
-        <li><a href="reference/api/lightkurve.SparseDesignMatrixCollection.html#lightkurve.SparseDesignMatrixCollection.__init__">(lightkurve.SparseDesignMatrixCollection method)</a>
+        <li><a href="reference/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.__init__">(lightkurve.seismology.Seismology method)</a>
 </li>
         <li><a href="reference/api/lightkurve.TessQualityFlags.html#lightkurve.TessQualityFlags.__init__">(lightkurve.TessQualityFlags method)</a>
 </li>
@@ -232,7 +232,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.DesignMatrix.append_constant.html#lightkurve.DesignMatrix.append_constant">append_constant() (lightkurve.DesignMatrix method)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.append_constant.html#lightkurve.correctors.DesignMatrix.append_constant">append_constant() (lightkurve.correctors.DesignMatrix method)</a>
 </li>
       <li><a href="reference/api/lightkurve.SearchResult.author.html#lightkurve.SearchResult.author">author() (lightkurve.SearchResult property)</a>
 </li>
@@ -245,7 +245,7 @@
       <li><a href="reference/api/lightkurve.LightCurve.bin.html#lightkurve.LightCurve.bin">bin() (lightkurve.LightCurve method)</a>
 
       <ul>
-        <li><a href="reference/api/lightkurve.Periodogram.bin.html#lightkurve.Periodogram.bin">(lightkurve.Periodogram method)</a>
+        <li><a href="reference/api/lightkurve.periodogram.Periodogram.bin.html#lightkurve.periodogram.Periodogram.bin">(lightkurve.periodogram.Periodogram method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -256,30 +256,30 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/lightkurve.KeplerTargetPixelFile.cadenceno.html#lightkurve.KeplerTargetPixelFile.cadenceno">cadenceno() (lightkurve.KeplerTargetPixelFile property)</a>
 </li>
-      <li><a href="reference/api/lightkurve.CBVCorrector.html#lightkurve.CBVCorrector">CBVCorrector (class in lightkurve)</a>
+      <li><a href="reference/api/lightkurve.correctors.CBVCorrector.html#lightkurve.correctors.CBVCorrector">CBVCorrector (class in lightkurve.correctors)</a>
 </li>
-      <li><a href="reference/api/lightkurve.DesignMatrix.collect.html#lightkurve.DesignMatrix.collect">collect() (lightkurve.DesignMatrix method)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.collect.html#lightkurve.correctors.DesignMatrix.collect">collect() (lightkurve.correctors.DesignMatrix method)</a>
 </li>
       <li><a href="reference/api/lightkurve.KeplerTargetPixelFile.column.html#lightkurve.KeplerTargetPixelFile.column">column() (lightkurve.KeplerTargetPixelFile property)</a>
 </li>
-      <li><a href="reference/api/lightkurve.DesignMatrix.copy.html#lightkurve.DesignMatrix.copy">copy() (lightkurve.DesignMatrix method)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.copy.html#lightkurve.correctors.DesignMatrix.copy">copy() (lightkurve.correctors.DesignMatrix method)</a>
 
       <ul>
         <li><a href="reference/api/lightkurve.LightCurve.copy.html#lightkurve.LightCurve.copy">(lightkurve.LightCurve method)</a>
 </li>
-        <li><a href="reference/api/lightkurve.Periodogram.copy.html#lightkurve.Periodogram.copy">(lightkurve.Periodogram method)</a>
+        <li><a href="reference/api/lightkurve.periodogram.Periodogram.copy.html#lightkurve.periodogram.Periodogram.copy">(lightkurve.periodogram.Periodogram method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.CBVCorrector.correct.html#lightkurve.CBVCorrector.correct">correct() (lightkurve.CBVCorrector method)</a>
+      <li><a href="reference/api/lightkurve.correctors.CBVCorrector.correct.html#lightkurve.correctors.CBVCorrector.correct">correct() (lightkurve.correctors.CBVCorrector method)</a>
 
       <ul>
-        <li><a href="reference/api/lightkurve.PLDCorrector.correct.html#lightkurve.PLDCorrector.correct">(lightkurve.PLDCorrector method)</a>
+        <li><a href="reference/api/lightkurve.correctors.PLDCorrector.correct.html#lightkurve.correctors.PLDCorrector.correct">(lightkurve.correctors.PLDCorrector method)</a>
 </li>
-        <li><a href="reference/api/lightkurve.RegressionCorrector.correct.html#lightkurve.RegressionCorrector.correct">(lightkurve.RegressionCorrector method)</a>
+        <li><a href="reference/api/lightkurve.correctors.RegressionCorrector.correct.html#lightkurve.correctors.RegressionCorrector.correct">(lightkurve.correctors.RegressionCorrector method)</a>
 </li>
-        <li><a href="reference/api/lightkurve.SFFCorrector.correct.html#lightkurve.SFFCorrector.correct">(lightkurve.SFFCorrector method)</a>
+        <li><a href="reference/api/lightkurve.correctors.SFFCorrector.correct.html#lightkurve.correctors.SFFCorrector.correct">(lightkurve.correctors.SFFCorrector method)</a>
 </li>
       </ul></li>
       <li><a href="reference/api/lightkurve.correctors.corrector.Corrector.html#lightkurve.correctors.corrector.Corrector">Corrector (class in lightkurve.correctors.corrector)</a>
@@ -302,29 +302,29 @@
         <li><a href="reference/api/lightkurve.SearchResult.dec.html#lightkurve.SearchResult.dec">(lightkurve.SearchResult property)</a>
 </li>
       </ul></li>
-      <li><a href="reference/api/lightkurve.DesignMatrix.html#lightkurve.DesignMatrix">DesignMatrix (class in lightkurve)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix">DesignMatrix (class in lightkurve.correctors)</a>
 </li>
-      <li><a href="reference/api/lightkurve.DesignMatrixCollection.html#lightkurve.DesignMatrixCollection">DesignMatrixCollection (class in lightkurve)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrixCollection.html#lightkurve.correctors.DesignMatrixCollection">DesignMatrixCollection (class in lightkurve.correctors)</a>
 </li>
-      <li><a href="reference/api/lightkurve.CBVCorrector.diagnose.html#lightkurve.CBVCorrector.diagnose">diagnose() (lightkurve.CBVCorrector method)</a>
+      <li><a href="reference/api/lightkurve.correctors.CBVCorrector.diagnose.html#lightkurve.correctors.CBVCorrector.diagnose">diagnose() (lightkurve.correctors.CBVCorrector method)</a>
 
       <ul>
-        <li><a href="reference/api/lightkurve.PLDCorrector.diagnose.html#lightkurve.PLDCorrector.diagnose">(lightkurve.PLDCorrector method)</a>
+        <li><a href="reference/api/lightkurve.correctors.PLDCorrector.diagnose.html#lightkurve.correctors.PLDCorrector.diagnose">(lightkurve.correctors.PLDCorrector method)</a>
 </li>
-        <li><a href="reference/api/lightkurve.RegressionCorrector.diagnose.html#lightkurve.RegressionCorrector.diagnose">(lightkurve.RegressionCorrector method)</a>
+        <li><a href="reference/api/lightkurve.correctors.RegressionCorrector.diagnose.html#lightkurve.correctors.RegressionCorrector.diagnose">(lightkurve.correctors.RegressionCorrector method)</a>
 </li>
-        <li><a href="reference/api/lightkurve.SFFCorrector.diagnose.html#lightkurve.SFFCorrector.diagnose">(lightkurve.SFFCorrector method)</a>
+        <li><a href="reference/api/lightkurve.correctors.SFFCorrector.diagnose.html#lightkurve.correctors.SFFCorrector.diagnose">(lightkurve.correctors.SFFCorrector method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.SFFCorrector.diagnose_arclength.html#lightkurve.SFFCorrector.diagnose_arclength">diagnose_arclength() (lightkurve.SFFCorrector method)</a>
+      <li><a href="reference/api/lightkurve.correctors.SFFCorrector.diagnose_arclength.html#lightkurve.correctors.SFFCorrector.diagnose_arclength">diagnose_arclength() (lightkurve.correctors.SFFCorrector method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Seismology.diagnose_deltanu.html#lightkurve.Seismology.diagnose_deltanu">diagnose_deltanu() (lightkurve.Seismology method)</a>
+      <li><a href="reference/api/lightkurve.seismology.Seismology.diagnose_deltanu.html#lightkurve.seismology.Seismology.diagnose_deltanu">diagnose_deltanu() (lightkurve.seismology.Seismology method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.PLDCorrector.diagnose_masks.html#lightkurve.PLDCorrector.diagnose_masks">diagnose_masks() (lightkurve.PLDCorrector method)</a>
+      <li><a href="reference/api/lightkurve.correctors.PLDCorrector.diagnose_masks.html#lightkurve.correctors.PLDCorrector.diagnose_masks">diagnose_masks() (lightkurve.correctors.PLDCorrector method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Seismology.diagnose_numax.html#lightkurve.Seismology.diagnose_numax">diagnose_numax() (lightkurve.Seismology method)</a>
+      <li><a href="reference/api/lightkurve.seismology.Seismology.diagnose_numax.html#lightkurve.seismology.Seismology.diagnose_numax">diagnose_numax() (lightkurve.seismology.Seismology method)</a>
 </li>
       <li><a href="reference/api/lightkurve.SearchResult.distance.html#lightkurve.SearchResult.distance">distance() (lightkurve.SearchResult property)</a>
 </li>
@@ -350,17 +350,17 @@
 </li>
       <li><a href="reference/api/lightkurve.KeplerTargetPixelFile.estimate_centroids.html#lightkurve.KeplerTargetPixelFile.estimate_centroids">estimate_centroids() (lightkurve.KeplerTargetPixelFile method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Seismology.estimate_deltanu.html#lightkurve.Seismology.estimate_deltanu">estimate_deltanu() (lightkurve.Seismology method)</a>
+      <li><a href="reference/api/lightkurve.seismology.Seismology.estimate_deltanu.html#lightkurve.seismology.Seismology.estimate_deltanu">estimate_deltanu() (lightkurve.seismology.Seismology method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.Seismology.estimate_logg.html#lightkurve.Seismology.estimate_logg">estimate_logg() (lightkurve.Seismology method)</a>
+      <li><a href="reference/api/lightkurve.seismology.Seismology.estimate_logg.html#lightkurve.seismology.Seismology.estimate_logg">estimate_logg() (lightkurve.seismology.Seismology method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Seismology.estimate_mass.html#lightkurve.Seismology.estimate_mass">estimate_mass() (lightkurve.Seismology method)</a>
+      <li><a href="reference/api/lightkurve.seismology.Seismology.estimate_mass.html#lightkurve.seismology.Seismology.estimate_mass">estimate_mass() (lightkurve.seismology.Seismology method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Seismology.estimate_numax.html#lightkurve.Seismology.estimate_numax">estimate_numax() (lightkurve.Seismology method)</a>
+      <li><a href="reference/api/lightkurve.seismology.Seismology.estimate_numax.html#lightkurve.seismology.Seismology.estimate_numax">estimate_numax() (lightkurve.seismology.Seismology method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Seismology.estimate_radius.html#lightkurve.Seismology.estimate_radius">estimate_radius() (lightkurve.Seismology method)</a>
+      <li><a href="reference/api/lightkurve.seismology.Seismology.estimate_radius.html#lightkurve.seismology.Seismology.estimate_radius">estimate_radius() (lightkurve.seismology.Seismology method)</a>
 </li>
       <li><a href="reference/api/lightkurve.FoldedLightCurve.even_mask.html#lightkurve.FoldedLightCurve.even_mask">even_mask() (lightkurve.FoldedLightCurve property)</a>
 </li>
@@ -377,7 +377,7 @@
       <li><a href="reference/api/lightkurve.LightCurve.flatten.html#lightkurve.LightCurve.flatten">flatten() (lightkurve.LightCurve method)</a>
 
       <ul>
-        <li><a href="reference/api/lightkurve.Periodogram.flatten.html#lightkurve.Periodogram.flatten">(lightkurve.Periodogram method)</a>
+        <li><a href="reference/api/lightkurve.periodogram.Periodogram.flatten.html#lightkurve.periodogram.Periodogram.flatten">(lightkurve.periodogram.Periodogram method)</a>
 </li>
       </ul></li>
       <li><a href="reference/api/lightkurve.KeplerTargetPixelFile.flux.html#lightkurve.KeplerTargetPixelFile.flux">flux() (lightkurve.KeplerTargetPixelFile property)</a>
@@ -402,18 +402,18 @@
 </li>
       <li><a href="reference/api/lightkurve.FoldedLightCurve.html#lightkurve.FoldedLightCurve">FoldedLightCurve (class in lightkurve)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Periodogram.frequency.html#lightkurve.Periodogram.frequency">frequency (lightkurve.Periodogram attribute)</a>
+      <li><a href="reference/api/lightkurve.periodogram.Periodogram.frequency.html#lightkurve.periodogram.Periodogram.frequency">frequency (lightkurve.periodogram.Periodogram attribute)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Periodogram.frequency_at_max_power.html#lightkurve.Periodogram.frequency_at_max_power">frequency_at_max_power() (lightkurve.Periodogram property)</a>
+      <li><a href="reference/api/lightkurve.periodogram.Periodogram.frequency_at_max_power.html#lightkurve.periodogram.Periodogram.frequency_at_max_power">frequency_at_max_power() (lightkurve.periodogram.Periodogram property)</a>
 </li>
       <li><a href="reference/api/lightkurve.KeplerTargetPixelFile.from_fits_images.html#lightkurve.KeplerTargetPixelFile.from_fits_images">from_fits_images() (lightkurve.KeplerTargetPixelFile static method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.BoxLeastSquaresPeriodogram.from_lightcurve.html#lightkurve.BoxLeastSquaresPeriodogram.from_lightcurve">from_lightcurve() (lightkurve.BoxLeastSquaresPeriodogram static method)</a>
+      <li><a href="reference/api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve">from_lightcurve() (lightkurve.periodogram.BoxLeastSquaresPeriodogram static method)</a>
 
       <ul>
-        <li><a href="reference/api/lightkurve.LombScarglePeriodogram.from_lightcurve.html#lightkurve.LombScarglePeriodogram.from_lightcurve">(lightkurve.LombScarglePeriodogram static method)</a>
+        <li><a href="reference/api/lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve">(lightkurve.periodogram.LombScarglePeriodogram static method)</a>
 </li>
-        <li><a href="reference/api/lightkurve.Seismology.from_lightcurve.html#lightkurve.Seismology.from_lightcurve">(lightkurve.Seismology static method)</a>
+        <li><a href="reference/api/lightkurve.seismology.Seismology.from_lightcurve.html#lightkurve.seismology.Seismology.from_lightcurve">(lightkurve.seismology.Seismology static method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -450,7 +450,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.Seismology.interact_echelle.html#lightkurve.Seismology.interact_echelle">interact_echelle() (lightkurve.Seismology method)</a>
+      <li><a href="reference/api/lightkurve.seismology.Seismology.interact_echelle.html#lightkurve.seismology.Seismology.interact_echelle">interact_echelle() (lightkurve.seismology.Seismology method)</a>
 </li>
       <li><a href="reference/api/lightkurve.KeplerTargetPixelFile.interact_sky.html#lightkurve.KeplerTargetPixelFile.interact_sky">interact_sky() (lightkurve.KeplerTargetPixelFile method)</a>
 </li>
@@ -480,7 +480,7 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.Periodogram.max_power.html#lightkurve.Periodogram.max_power">max_power() (lightkurve.Periodogram property)</a>
+      <li><a href="reference/api/lightkurve.periodogram.Periodogram.max_power.html#lightkurve.periodogram.Periodogram.max_power">max_power() (lightkurve.periodogram.Periodogram property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -514,23 +514,23 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.DesignMatrix.pca.html#lightkurve.DesignMatrix.pca">pca() (lightkurve.DesignMatrix method)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.pca.html#lightkurve.correctors.DesignMatrix.pca">pca() (lightkurve.correctors.DesignMatrix method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Periodogram.period.html#lightkurve.Periodogram.period">period() (lightkurve.Periodogram property)</a>
+      <li><a href="reference/api/lightkurve.periodogram.Periodogram.period.html#lightkurve.periodogram.Periodogram.period">period() (lightkurve.periodogram.Periodogram property)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Periodogram.period_at_max_power.html#lightkurve.Periodogram.period_at_max_power">period_at_max_power() (lightkurve.Periodogram property)</a>
+      <li><a href="reference/api/lightkurve.periodogram.Periodogram.period_at_max_power.html#lightkurve.periodogram.Periodogram.period_at_max_power">period_at_max_power() (lightkurve.periodogram.Periodogram property)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Periodogram.html#lightkurve.Periodogram">Periodogram (class in lightkurve)</a>
+      <li><a href="reference/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram">Periodogram (class in lightkurve.periodogram)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Seismology.periodogram.html#lightkurve.Seismology.periodogram">periodogram (lightkurve.Seismology attribute)</a>
+      <li><a href="reference/api/lightkurve.seismology.Seismology.periodogram.html#lightkurve.seismology.Seismology.periodogram">periodogram (lightkurve.seismology.Seismology attribute)</a>
 </li>
       <li><a href="reference/api/lightkurve.FoldedLightCurve.phase.html#lightkurve.FoldedLightCurve.phase">phase() (lightkurve.FoldedLightCurve property)</a>
 </li>
       <li><a href="reference/api/lightkurve.KeplerTargetPixelFile.pipeline_mask.html#lightkurve.KeplerTargetPixelFile.pipeline_mask">pipeline_mask() (lightkurve.KeplerTargetPixelFile property)</a>
 </li>
-      <li><a href="reference/api/lightkurve.PLDCorrector.html#lightkurve.PLDCorrector">PLDCorrector (class in lightkurve)</a>
+      <li><a href="reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">PLDCorrector (class in lightkurve.correctors)</a>
 </li>
-      <li><a href="reference/api/lightkurve.DesignMatrix.plot.html#lightkurve.DesignMatrix.plot">plot() (lightkurve.DesignMatrix method)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.plot.html#lightkurve.correctors.DesignMatrix.plot">plot() (lightkurve.correctors.DesignMatrix method)</a>
 
       <ul>
         <li><a href="reference/api/lightkurve.FoldedLightCurve.plot.html#lightkurve.FoldedLightCurve.plot">(lightkurve.FoldedLightCurve method)</a>
@@ -539,16 +539,16 @@
 </li>
         <li><a href="reference/api/lightkurve.LightCurve.plot.html#lightkurve.LightCurve.plot">(lightkurve.LightCurve method)</a>
 </li>
-        <li><a href="reference/api/lightkurve.Periodogram.plot.html#lightkurve.Periodogram.plot">(lightkurve.Periodogram method)</a>
+        <li><a href="reference/api/lightkurve.periodogram.Periodogram.plot.html#lightkurve.periodogram.Periodogram.plot">(lightkurve.periodogram.Periodogram method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.Seismology.plot_echelle.html#lightkurve.Seismology.plot_echelle">plot_echelle() (lightkurve.Seismology method)</a>
+      <li><a href="reference/api/lightkurve.seismology.Seismology.plot_echelle.html#lightkurve.seismology.Seismology.plot_echelle">plot_echelle() (lightkurve.seismology.Seismology method)</a>
 </li>
       <li><a href="reference/api/lightkurve.KeplerTargetPixelFile.plot_pixels.html#lightkurve.KeplerTargetPixelFile.plot_pixels">plot_pixels() (lightkurve.KeplerTargetPixelFile method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.DesignMatrix.plot_priors.html#lightkurve.DesignMatrix.plot_priors">plot_priors() (lightkurve.DesignMatrix method)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.plot_priors.html#lightkurve.correctors.DesignMatrix.plot_priors">plot_priors() (lightkurve.correctors.DesignMatrix method)</a>
 </li>
       <li><a href="reference/api/lightkurve.FoldedLightCurve.plot_river.html#lightkurve.FoldedLightCurve.plot_river">plot_river() (lightkurve.FoldedLightCurve method)</a>
 
@@ -560,7 +560,7 @@
 </li>
       <li><a href="reference/api/lightkurve.KeplerTargetPixelFile.pos_corr2.html#lightkurve.KeplerTargetPixelFile.pos_corr2">pos_corr2() (lightkurve.KeplerTargetPixelFile property)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Periodogram.power.html#lightkurve.Periodogram.power">power (lightkurve.Periodogram attribute)</a>
+      <li><a href="reference/api/lightkurve.periodogram.Periodogram.power.html#lightkurve.periodogram.Periodogram.power">power (lightkurve.periodogram.Periodogram attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -590,13 +590,13 @@
         <li><a href="reference/api/lightkurve.SearchResult.ra.html#lightkurve.SearchResult.ra">(lightkurve.SearchResult property)</a>
 </li>
       </ul></li>
-      <li><a href="reference/api/lightkurve.DesignMatrix.rank.html#lightkurve.DesignMatrix.rank">rank() (lightkurve.DesignMatrix property)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.rank.html#lightkurve.correctors.DesignMatrix.rank">rank() (lightkurve.correctors.DesignMatrix property)</a>
 </li>
       <li><a href="reference/api/lightkurve.LightCurve.read.html#lightkurve.LightCurve.read">read() (lightkurve.LightCurve class method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.RegressionCorrector.html#lightkurve.RegressionCorrector">RegressionCorrector (class in lightkurve)</a>
+      <li><a href="reference/api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector">RegressionCorrector (class in lightkurve.correctors)</a>
 </li>
       <li><a href="reference/api/lightkurve.LightCurve.remove_nans.html#lightkurve.LightCurve.remove_nans">remove_nans() (lightkurve.LightCurve method)</a>
 </li>
@@ -626,29 +626,29 @@
 </li>
       <li><a href="reference/api/lightkurve.SearchResult.html#lightkurve.SearchResult">SearchResult (class in lightkurve)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Seismology.html#lightkurve.Seismology">Seismology (class in lightkurve)</a>
+      <li><a href="reference/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology">Seismology (class in lightkurve.seismology)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.SFFCorrector.html#lightkurve.SFFCorrector">SFFCorrector (class in lightkurve)</a>
+      <li><a href="reference/api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector">SFFCorrector (class in lightkurve.correctors)</a>
 </li>
-      <li><a href="reference/api/lightkurve.DesignMatrix.shape.html#lightkurve.DesignMatrix.shape">shape() (lightkurve.DesignMatrix property)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.shape.html#lightkurve.correctors.DesignMatrix.shape">shape() (lightkurve.correctors.DesignMatrix property)</a>
 
       <ul>
         <li><a href="reference/api/lightkurve.KeplerTargetPixelFile.shape.html#lightkurve.KeplerTargetPixelFile.shape">(lightkurve.KeplerTargetPixelFile property)</a>
 </li>
       </ul></li>
-      <li><a href="reference/api/lightkurve.Periodogram.show_properties.html#lightkurve.Periodogram.show_properties">show_properties() (lightkurve.Periodogram method)</a>
+      <li><a href="reference/api/lightkurve.periodogram.Periodogram.show_properties.html#lightkurve.periodogram.Periodogram.show_properties">show_properties() (lightkurve.periodogram.Periodogram method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.Periodogram.smooth.html#lightkurve.Periodogram.smooth">smooth() (lightkurve.Periodogram method)</a>
+      <li><a href="reference/api/lightkurve.periodogram.Periodogram.smooth.html#lightkurve.periodogram.Periodogram.smooth">smooth() (lightkurve.periodogram.Periodogram method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.SparseDesignMatrix.html#lightkurve.SparseDesignMatrix">SparseDesignMatrix (class in lightkurve)</a>
+      <li><a href="reference/api/lightkurve.correctors.SparseDesignMatrix.html#lightkurve.correctors.SparseDesignMatrix">SparseDesignMatrix (class in lightkurve.correctors)</a>
 </li>
-      <li><a href="reference/api/lightkurve.SparseDesignMatrixCollection.html#lightkurve.SparseDesignMatrixCollection">SparseDesignMatrixCollection (class in lightkurve)</a>
+      <li><a href="reference/api/lightkurve.correctors.SparseDesignMatrixCollection.html#lightkurve.correctors.SparseDesignMatrixCollection">SparseDesignMatrixCollection (class in lightkurve.correctors)</a>
 </li>
-      <li><a href="reference/api/lightkurve.DesignMatrix.split.html#lightkurve.DesignMatrix.split">split() (lightkurve.DesignMatrix method)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.split.html#lightkurve.correctors.DesignMatrix.split">split() (lightkurve.correctors.DesignMatrix method)</a>
 </li>
-      <li><a href="reference/api/lightkurve.DesignMatrix.standardize.html#lightkurve.DesignMatrix.standardize">standardize() (lightkurve.DesignMatrix method)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.standardize.html#lightkurve.correctors.DesignMatrix.standardize">standardize() (lightkurve.correctors.DesignMatrix method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -695,15 +695,15 @@
       <li><a href="reference/api/lightkurve.LightCurve.to_seismology.html#lightkurve.LightCurve.to_seismology">to_seismology() (lightkurve.LightCurve method)</a>
 
       <ul>
-        <li><a href="reference/api/lightkurve.Periodogram.to_seismology.html#lightkurve.Periodogram.to_seismology">(lightkurve.Periodogram method)</a>
+        <li><a href="reference/api/lightkurve.periodogram.Periodogram.to_seismology.html#lightkurve.periodogram.Periodogram.to_seismology">(lightkurve.periodogram.Periodogram method)</a>
 </li>
       </ul></li>
-      <li><a href="reference/api/lightkurve.DesignMatrix.to_sparse.html#lightkurve.DesignMatrix.to_sparse">to_sparse() (lightkurve.DesignMatrix method)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.to_sparse.html#lightkurve.correctors.DesignMatrix.to_sparse">to_sparse() (lightkurve.correctors.DesignMatrix method)</a>
 </li>
       <li><a href="reference/api/lightkurve.LightCurve.to_table.html#lightkurve.LightCurve.to_table">to_table() (lightkurve.LightCurve method)</a>
 
       <ul>
-        <li><a href="reference/api/lightkurve.Periodogram.to_table.html#lightkurve.Periodogram.to_table">(lightkurve.Periodogram method)</a>
+        <li><a href="reference/api/lightkurve.periodogram.Periodogram.to_table.html#lightkurve.periodogram.Periodogram.to_table">(lightkurve.periodogram.Periodogram method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -712,11 +712,11 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.DesignMatrix.validate.html#lightkurve.DesignMatrix.validate">validate() (lightkurve.DesignMatrix method)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.validate.html#lightkurve.correctors.DesignMatrix.validate">validate() (lightkurve.correctors.DesignMatrix method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.DesignMatrix.values.html#lightkurve.DesignMatrix.values">values() (lightkurve.DesignMatrix property)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.values.html#lightkurve.correctors.DesignMatrix.values">values() (lightkurve.correctors.DesignMatrix property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -736,7 +736,7 @@
 <h2 id="X">X</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/lightkurve.DesignMatrix.X.html#lightkurve.DesignMatrix.X">X() (lightkurve.DesignMatrix property)</a>
+      <li><a href="reference/api/lightkurve.correctors.DesignMatrix.X.html#lightkurve.correctors.DesignMatrix.X">X() (lightkurve.correctors.DesignMatrix property)</a>
 </li>
   </ul></td>
 </tr></table>

@@ -1,0 +1,37 @@
+﻿lightkurve.correctors.DesignMatrixCollection
+============================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. autoclass:: DesignMatrixCollection
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DesignMatrixCollection.__init__
+      ~DesignMatrixCollection.plot
+      ~DesignMatrixCollection.plot_priors
+      ~DesignMatrixCollection.split
+      ~DesignMatrixCollection.standardize
+      ~DesignMatrixCollection.to_designmatrix
+      ~DesignMatrixCollection.validate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DesignMatrixCollection.columns
+      ~DesignMatrixCollection.prior_mu
+      ~DesignMatrixCollection.prior_sigma
+      ~DesignMatrixCollection.values
+   
+   

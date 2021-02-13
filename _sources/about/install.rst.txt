@@ -61,7 +61,7 @@ Installing the development version
 If you want to experiment with the latest development version of
 *Lightkurve*, you can install it straight from the master branch on GitHub::
 
-    $ git clone https://github.com/KeplerGO/lightkurve.git
+    $ git clone https://github.com/lightkurve/lightkurve.git
     $ cd lightkurve
     $ python -m pip install .
 

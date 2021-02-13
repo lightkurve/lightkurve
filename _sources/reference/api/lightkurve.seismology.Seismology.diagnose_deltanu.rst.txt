@@ -1,0 +1,6 @@
+﻿lightkurve.seismology.Seismology.diagnose\_deltanu
+==================================================
+
+.. currentmodule:: lightkurve.seismology
+
+.. automethod:: Seismology.diagnose_deltanu

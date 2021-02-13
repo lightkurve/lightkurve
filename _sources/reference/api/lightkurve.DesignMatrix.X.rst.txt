@@ -1,6 +1,0 @@
-﻿lightkurve.DesignMatrix.X
-=========================
-
-.. currentmodule:: lightkurve
-
-.. autoproperty:: DesignMatrix.X

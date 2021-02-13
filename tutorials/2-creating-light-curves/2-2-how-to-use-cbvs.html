@@ -51,7 +51,7 @@
 
     <a class="navbar-brand" href="../../index.html">
     
-      <p class="title">Lightkurve v2.0rc1</p>
+      <p class="title">Lightkurve v2.0rc2</p>
     
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,7 +95,7 @@
       <ul class="navbar-nav">
         
           <li class="nav-item">
-            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+            <a class="nav-link" href="https://github.com/lightkurve/lightkurve" target="_blank" rel="noopener">
               <span><i class="fab fa-github-square"></i></span>
             </a>
           </li>
@@ -412,9 +412,9 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <div style="float:right; margin-bottom:1em;">
-    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
-    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
-    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+    <a href="https://github.com/lightkurve/lightkurve/tree/master/docs/source/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/master/docs/source/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/master?filepath=docs/source/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
 <br style="clear:both;"><div class="section" id="How-to-load-and-use-Cotrending-Basis-Vectors-for-Kepler,-K2-and-TESS">
 <h1>How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS<a class="headerlink" href="#How-to-load-and-use-Cotrending-Basis-Vectors-for-Kepler,-K2-and-TESS" title="Permalink to this headline">¶</a></h1>
@@ -437,7 +437,8 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_lightcurve</span><span class="p">,</span> <span class="n">download_tess_cbvs</span><span class="p">,</span> <span class="n">download_kepler_cbvs</span>
+<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_lightcurve</span>
+<span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">download_tess_cbvs</span><span class="p">,</span> <span class="n">download_kepler_cbvs</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;TIC 99180739&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;SPOC&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">flux_column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
 <span class="n">cbvs</span> <span class="o">=</span> <span class="n">download_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">ccd</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;MultiScale&#39;</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -461,7 +462,7 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </div>
 <div class="output_area rendered_html docutils container">
 <i>TessCotrendingBasisVectors length=3</i>
-<table id="table6507704384" class="table-striped table-bordered table-condensed">
+<table id="table4524096336" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>CADENCENO</th><th>GAP</th><th>VECTOR_1</th><th>VECTOR_2</th><th>VECTOR_3</th><th>VECTOR_4</th><th>VECTOR_5</th><th>VECTOR_6</th><th>VECTOR_7</th><th>VECTOR_8</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>object</th><th>int32</th><th>bool</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>

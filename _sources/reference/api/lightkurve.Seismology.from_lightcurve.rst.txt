@@ -1,6 +1,0 @@
-﻿lightkurve.Seismology.from\_lightcurve
-======================================
-
-.. currentmodule:: lightkurve
-
-.. automethod:: Seismology.from_lightcurve

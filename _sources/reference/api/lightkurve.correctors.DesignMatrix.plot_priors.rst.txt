@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.DesignMatrix.plot\_priors
+===============================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. automethod:: DesignMatrix.plot_priors

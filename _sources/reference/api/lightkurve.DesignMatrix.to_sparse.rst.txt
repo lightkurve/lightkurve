@@ -1,6 +1,0 @@
-﻿lightkurve.DesignMatrix.to\_sparse
-==================================
-
-.. currentmodule:: lightkurve
-
-.. automethod:: DesignMatrix.to_sparse

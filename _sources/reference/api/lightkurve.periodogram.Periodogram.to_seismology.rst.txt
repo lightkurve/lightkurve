@@ -1,0 +1,6 @@
+﻿lightkurve.periodogram.Periodogram.to\_seismology
+=================================================
+
+.. currentmodule:: lightkurve.periodogram
+
+.. automethod:: Periodogram.to_seismology

@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.DesignMatrix.values
+=========================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. autoproperty:: DesignMatrix.values

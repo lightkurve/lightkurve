@@ -1,6 +1,0 @@
-﻿lightkurve.Periodogram.flatten
-==============================
-
-.. currentmodule:: lightkurve
-
-.. automethod:: Periodogram.flatten

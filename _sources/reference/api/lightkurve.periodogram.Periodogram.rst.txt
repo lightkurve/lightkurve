@@ -1,0 +1,41 @@
+﻿lightkurve.periodogram.Periodogram
+==================================
+
+.. currentmodule:: lightkurve.periodogram
+
+.. autoclass:: Periodogram
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Periodogram.__init__
+      ~Periodogram.bin
+      ~Periodogram.copy
+      ~Periodogram.flatten
+      ~Periodogram.plot
+      ~Periodogram.show_properties
+      ~Periodogram.smooth
+      ~Periodogram.to_seismology
+      ~Periodogram.to_table
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Periodogram.frequency
+      ~Periodogram.frequency_at_max_power
+      ~Periodogram.max_power
+      ~Periodogram.period
+      ~Periodogram.period_at_max_power
+      ~Periodogram.power
+   
+   

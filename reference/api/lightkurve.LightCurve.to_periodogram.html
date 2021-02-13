@@ -51,7 +51,7 @@
 
     <a class="navbar-brand" href="../../index.html">
     
-      <p class="title">Lightkurve v2.0rc1</p>
+      <p class="title">Lightkurve v2.0rc2</p>
     
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,7 +95,7 @@
       <ul class="navbar-nav">
         
           <li class="nav-item">
-            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+            <a class="nav-link" href="https://github.com/lightkurve/lightkurve" target="_blank" rel="noopener">
               <span><i class="fab fa-github-square"></i></span>
             </a>
           </li>
@@ -340,11 +340,11 @@
 <dl class="py method">
 <dt id="lightkurve.LightCurve.to_periodogram">
 <code class="sig-prename descclassname">LightCurve.</code><code class="sig-name descname">to_periodogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'lombscargle'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.LightCurve.to_periodogram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts the light curve to a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code>
+<dd><p>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a>
 power spectrum object.</p>
 <p>This method will call either
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram.from_lightcurve()</span></code> or
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram.from_lightcurve()</span></code>,
+<a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram.from_lightcurve()</span></code></a> or
+<a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram.from_lightcurve()</span></code></a>,
 which in turn wrap <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy</span></code>’s <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.LombScargle.html#astropy.timeseries.LombScargle" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScargle</span></code></a> and <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.BoxLeastSquares.html#astropy.timeseries.BoxLeastSquares" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquares</span></code></a>.</p>
 <p>Optional keywords accepted if <code class="docutils literal notranslate"><span class="pre">method='lombscargle'</span></code> are:
 <code class="docutils literal notranslate"><span class="pre">minimum_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">maximum_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">mininum_period</span></code>,
@@ -363,14 +363,14 @@ extract the power spectrum. Defaults to <code class="docutils literal notranslat
 and <code class="docutils literal notranslate"><span class="pre">'boxleastsquares'</span></code>.</p>
 </dd>
 <dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Keyword arguments passed to either
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> or
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code>.</p>
+<a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code></a> or
+<a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>Periodogram</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code> object</span></dt><dd><p>The power spectrum object extracted from the light curve.</p>
+<dt><strong>Periodogram</strong><span class="classifier"><a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt><dd><p>The power spectrum object extracted from the light curve.</p>
 </dd>
 </dl>
 </dd>

@@ -61,6 +61,7 @@
    "outputs": [],
    "source": [
     "import lightkurve as lk\n",
+    "from lightkurve.correctors import PLDCorrector\n",
     "%matplotlib inline"
    ]
   },
@@ -149,7 +150,7 @@
    },
    "outputs": [],
    "source": [
-    "pld = lk.PLDCorrector(tpf)\n",
+    "pld = PLDCorrector(tpf)\n",
     "print(pld)"
    ]
   },
@@ -732,7 +733,7 @@
    },
    "outputs": [],
    "source": [
-    "pld = lk.PLDCorrector(tpf)\n",
+    "pld = PLDCorrector(tpf)\n",
     "corrected_lc = pld.correct()\n",
     "pld.diagnose();"
    ]

@@ -1,6 +1,0 @@
-﻿lightkurve.Periodogram.period\_at\_max\_power
-=============================================
-
-.. currentmodule:: lightkurve
-
-.. autoproperty:: Periodogram.period_at_max_power

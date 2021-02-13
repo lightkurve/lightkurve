@@ -1,0 +1,37 @@
+﻿lightkurve.correctors.SFFCorrector
+==================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. autoclass:: SFFCorrector
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SFFCorrector.__init__
+      ~SFFCorrector.compute_overfit_metric
+      ~SFFCorrector.compute_underfit_metric
+      ~SFFCorrector.correct
+      ~SFFCorrector.diagnose
+      ~SFFCorrector.diagnose_arclength
+      ~SFFCorrector.diagnose_priors
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SFFCorrector.cadence_mask
+      ~SFFCorrector.corrected_lc
+      ~SFFCorrector.dmc
+      ~SFFCorrector.original_lc
+   
+   

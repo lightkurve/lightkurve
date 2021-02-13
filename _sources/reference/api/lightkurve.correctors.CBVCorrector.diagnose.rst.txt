@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.CBVCorrector.diagnose
+===========================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. automethod:: CBVCorrector.diagnose

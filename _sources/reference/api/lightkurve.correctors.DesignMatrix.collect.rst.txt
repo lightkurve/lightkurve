@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.DesignMatrix.collect
+==========================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. automethod:: DesignMatrix.collect

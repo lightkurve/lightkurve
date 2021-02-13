@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.PLDCorrector.diagnose
+===========================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. automethod:: PLDCorrector.diagnose

@@ -103,7 +103,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "from lightkurve import SFFCorrector\n",
+    "from lightkurve.correctors import SFFCorrector\n",
     "corr_lc = SFFCorrector(lc).correct(windows=20)"
    ]
   },

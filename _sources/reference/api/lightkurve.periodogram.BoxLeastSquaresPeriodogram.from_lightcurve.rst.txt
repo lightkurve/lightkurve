@@ -1,0 +1,6 @@
+﻿lightkurve.periodogram.BoxLeastSquaresPeriodogram.from\_lightcurve
+==================================================================
+
+.. currentmodule:: lightkurve.periodogram
+
+.. automethod:: BoxLeastSquaresPeriodogram.from_lightcurve

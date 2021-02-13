@@ -3,7 +3,7 @@
 ===========
 Periodogram 
 ===========
-.. currentmodule:: lightkurve
+.. currentmodule:: lightkurve.periodogram
 
 
 Constructor

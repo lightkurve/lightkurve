@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "interim-copying",
+   "id": "reverse-ghost",
    "metadata": {},
    "source": [
     "# What's new in Lightkurve 2?"
@@ -10,7 +10,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "third-mountain",
+   "id": "racial-dispute",
    "metadata": {},
    "source": [
     "## Lightkurve 2 offers improved support for TESS\n",
@@ -47,7 +47,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "mechanical-lesson",
+   "id": "quiet-heading",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -61,7 +61,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "handed-clock",
+   "id": "tutorial-program",
    "metadata": {},
    "source": [
     "### ✨ New: Light curves support user-defined columns\n",
@@ -72,7 +72,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "dimensional-treatment",
+   "id": "premium-conversion",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -82,7 +82,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "urban-secret",
+   "id": "adjustable-christianity",
    "metadata": {},
    "source": [
     "### ✨ New: Columns and rows can be accessed using index notation\n",
@@ -93,7 +93,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "premier-spelling",
+   "id": "planned-separation",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -103,7 +103,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "viral-samba",
+   "id": "known-literacy",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -112,7 +112,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "painted-minister",
+   "id": "endless-trout",
    "metadata": {},
    "source": [
     "### ✨ New: Times are stored as an AstroPy Time object\n",
@@ -122,7 +122,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "related-examination",
+   "id": "parental-rwanda",
    "metadata": {},
    "source": [
     "Lightkurve 2 extends [AstroPy Time](https://docs.astropy.org/en/stable/time/) by adding support for the TESS and Kepler time formats (\"BTJD\" and \"BKJD\").  As a result, the time column is now always a Time object, which enables user to leverage this standard AstroPy feature:"
@@ -131,7 +131,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "unnecessary-exposure",
+   "id": "gothic-consumer",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -141,7 +141,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "paperback-services",
+   "id": "herbal-cyprus",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -151,7 +151,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "quick-alabama",
+   "id": "ruled-isaac",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -160,7 +160,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "fitted-phone",
+   "id": "valid-shooting",
    "metadata": {},
    "source": [
     "### ✨ New: Read and write light curves in many file formats\n",
@@ -171,7 +171,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "white-football",
+   "id": "false-sculpture",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -182,7 +182,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "ordinary-grant",
+   "id": "continued-street",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -191,7 +191,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "increased-tennessee",
+   "id": "dirty-milwaukee",
    "metadata": {},
    "source": [
     "## 2. Search & download data from different pipelines"
@@ -199,7 +199,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "plastic-private",
+   "id": "brave-walnut",
    "metadata": {},
    "source": [
     "Lightkurve 2 significantly expands the data sets that can be searched and downloaded from the TESS & Kepler data archives at MAST.\n",
@@ -212,7 +212,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "broken-graduation",
+   "id": "nutritional-round",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -222,7 +222,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "aboriginal-spider",
+   "id": "utility-reply",
    "metadata": {},
    "source": [
     "### ✨ New: Download TESS fast cadence data\n",
@@ -233,7 +233,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "banned-leather",
+   "id": "awful-hygiene",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -242,7 +242,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "noted-glance",
+   "id": "verified-michael",
    "metadata": {},
    "source": [
     "You can also filter search results after the fact via attribute access, e.g. via `search.exptime`:"
@@ -251,7 +251,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "horizontal-alcohol",
+   "id": "canadian-afghanistan",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -261,7 +261,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "satellite-legislature",
+   "id": "satisfied-knock",
    "metadata": {},
    "source": [
     "## 3. New noise removal tools"
@@ -269,7 +269,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "aware-playback",
+   "id": "important-landing",
    "metadata": {},
    "source": [
     "### ✨ New: Remove systematics using Cotrending Basis Vectors\n",
@@ -280,19 +280,20 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "acknowledged-staff",
+   "id": "charming-canyon",
    "metadata": {},
    "outputs": [],
    "source": [
     "# Download a light curve and apply the new CBVCorrector\n",
+    "from lightkurve.correctors import CBVCorrector\n",
     "lc = lk.search_lightcurve(\"TIC 99180739\", author=\"SPOC\", sector=10).download(flux_column=\"sap_flux\")\n",
-    "cbvCorrector = lk.CBVCorrector(lc)\n",
+    "cbvCorrector = CBVCorrector(lc)\n",
     "lc_corrected = cbvCorrector.correct()"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "faced-smooth",
+   "id": "inside-national",
    "metadata": {},
    "source": [
     "The corrector now produces detailed diagnostic plots showing the light curve before (grey) and after (black) the noise (blue) was removed:"
@@ -301,7 +302,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "continuing-syracuse",
+   "id": "designing-possession",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -310,7 +311,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "historical-tracker",
+   "id": "terminal-packing",
    "metadata": {},
    "source": [
     "### ✨ New: Remove systematics by optimizing under- and over-fitting metrics\n",
@@ -321,7 +322,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "successful-authentication",
+   "id": "close-colon",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -330,7 +331,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "disabled-international",
+   "id": "superior-practitioner",
    "metadata": {},
    "source": [
     "### ✨ New: Inspect pixel-by-pixel light curves using *plot_pixels()*\n",
@@ -341,7 +342,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "balanced-purpose",
+   "id": "adjusted-venezuela",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -351,7 +352,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "searching-winter",
+   "id": "nutritional-masters",
    "metadata": {},
    "source": [
     "## Other changes\n",
@@ -370,7 +371,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "secret-clear",
+   "id": "dominant-springfield",
    "metadata": {},
    "source": [
     "## FAQ\n",
@@ -413,7 +414,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "endangered-rally",
+   "id": "breathing-rainbow",
    "metadata": {},
    "source": [
     "## Contributors\n",

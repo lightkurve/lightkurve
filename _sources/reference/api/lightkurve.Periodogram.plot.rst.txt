@@ -1,6 +1,0 @@
-﻿lightkurve.Periodogram.plot
-===========================
-
-.. currentmodule:: lightkurve
-
-.. automethod:: Periodogram.plot

@@ -57,7 +57,8 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "from lightkurve import search_lightcurve, download_tess_cbvs, download_kepler_cbvs\n",
+    "from lightkurve import search_lightcurve\n",
+    "from lightkurve.correctors import download_tess_cbvs, download_kepler_cbvs\n",
     "import numpy as np\n",
     "lc = search_lightcurve('TIC 99180739', author='SPOC', sector=10).download(flux_column='sap_flux')\n",
     "cbvs = download_tess_cbvs(sector=lc.sector, camera=lc.camera, ccd=lc.ccd, cbv_type='MultiScale', band=2)"

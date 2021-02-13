@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.DesignMatrix.pca
+======================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. automethod:: DesignMatrix.pca

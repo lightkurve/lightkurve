@@ -51,7 +51,7 @@
 
     <a class="navbar-brand" href="../../index.html">
     
-      <p class="title">Lightkurve v2.0rc1</p>
+      <p class="title">Lightkurve v2.0rc2</p>
     
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,7 +95,7 @@
       <ul class="navbar-nav">
         
           <li class="nav-item">
-            <a class="nav-link" href="https://github.com/KeplerGO/Lightkurve" target="_blank" rel="noopener">
+            <a class="nav-link" href="https://github.com/lightkurve/lightkurve" target="_blank" rel="noopener">
               <span><i class="fab fa-github-square"></i></span>
             </a>
           </li>
@@ -436,9 +436,9 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <div style="float:right; margin-bottom:1em;">
-    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
-    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
-    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+    <a href="https://github.com/lightkurve/lightkurve/tree/master/docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/master/docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/master?filepath=docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
 <br style="clear:both;"><div class="section" id="How-to-understand-and-manipulate-the-periodogram-of-an-oscillating-star">
 <h1>How to understand and manipulate the periodogram of an oscillating star<a class="headerlink" href="#How-to-understand-and-manipulate-the-periodogram-of-an-oscillating-star" title="Permalink to this headline">¶</a></h1>
@@ -497,7 +497,7 @@ atmospheres. This includes both main sequence stars as well as red giant stars.<
 <div class="output_area rendered_html docutils container">
 SearchResult containing 4 data products.
 
-<table id="table6467702304">
+<table id="table6296474480">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 06</td><td>2018</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>37498433</td><td>0.0</td></tr>
@@ -592,7 +592,7 @@ SearchResult containing 4 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 15 data products.
 
-<table id="table6473874928">
+<table id="table6308798576">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
@@ -631,7 +631,7 @@ SearchResult containing 15 data products.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/Users/gb/dev/lightkurve/lightkurve/lightcurve.py:829: LightkurveWarning: The light curve already appears to be in relative units; `normalize()` will convert the light curve into relative units for a second time, which is probably not what you want.
+/Users/gb/dev/lightkurve/src/lightkurve/lightcurve.py:828: LightkurveWarning: The light curve already appears to be in relative units; `normalize()` will convert the light curve into relative units for a second time, which is probably not what you want.
   warnings.warn(&#34;The light curve already appears to be in relative &#34;
 </pre></div></div>
 </div>
@@ -677,7 +677,7 @@ these data as follows:</p>
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/Users/gb/dev/lightkurve/lightkurve/lightcurve.py:829: LightkurveWarning: The light curve already appears to be in relative units; `normalize()` will convert the light curve into relative units for a second time, which is probably not what you want.
+/Users/gb/dev/lightkurve/src/lightkurve/lightcurve.py:828: LightkurveWarning: The light curve already appears to be in relative units; `normalize()` will convert the light curve into relative units for a second time, which is probably not what you want.
   warnings.warn(&#34;The light curve already appears to be in relative &#34;
 </pre></div></div>
 </div>
@@ -715,7 +715,7 @@ these data as follows:</p>
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/Users/gb/dev/lightkurve/lightkurve/lightcurve.py:829: LightkurveWarning: The light curve already appears to be in relative units; `normalize()` will convert the light curve into relative units for a second time, which is probably not what you want.
+/Users/gb/dev/lightkurve/src/lightkurve/lightcurve.py:828: LightkurveWarning: The light curve already appears to be in relative units; `normalize()` will convert the light curve into relative units for a second time, which is probably not what you want.
   warnings.warn(&#34;The light curve already appears to be in relative &#34;
 </pre></div></div>
 </div>

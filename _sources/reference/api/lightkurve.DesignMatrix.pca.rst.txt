@@ -1,6 +1,0 @@
-﻿lightkurve.DesignMatrix.pca
-===========================
-
-.. currentmodule:: lightkurve
-
-.. automethod:: DesignMatrix.pca

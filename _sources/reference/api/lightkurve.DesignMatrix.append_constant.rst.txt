@@ -1,6 +1,0 @@
-﻿lightkurve.DesignMatrix.append\_constant
-========================================
-
-.. currentmodule:: lightkurve
-
-.. automethod:: DesignMatrix.append_constant

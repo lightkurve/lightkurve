@@ -1,0 +1,6 @@
+﻿lightkurve.periodogram.Periodogram.show\_properties
+===================================================
+
+.. currentmodule:: lightkurve.periodogram
+
+.. automethod:: Periodogram.show_properties

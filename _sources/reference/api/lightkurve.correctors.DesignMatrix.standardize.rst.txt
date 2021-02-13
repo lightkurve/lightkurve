@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.DesignMatrix.standardize
+==============================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. automethod:: DesignMatrix.standardize

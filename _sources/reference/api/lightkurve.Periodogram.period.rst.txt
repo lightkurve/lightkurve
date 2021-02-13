@@ -1,6 +1,0 @@
-﻿lightkurve.Periodogram.period
-=============================
-
-.. currentmodule:: lightkurve
-
-.. autoproperty:: Periodogram.period

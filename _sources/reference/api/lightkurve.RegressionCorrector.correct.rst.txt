@@ -1,6 +1,0 @@
-﻿lightkurve.RegressionCorrector.correct
-======================================
-
-.. currentmodule:: lightkurve
-
-.. automethod:: RegressionCorrector.correct

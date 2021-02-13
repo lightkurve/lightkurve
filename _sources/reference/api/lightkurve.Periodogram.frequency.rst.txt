@@ -1,6 +1,0 @@
-﻿lightkurve.Periodogram.frequency
-================================
-
-.. currentmodule:: lightkurve
-
-.. autoattribute:: Periodogram.frequency

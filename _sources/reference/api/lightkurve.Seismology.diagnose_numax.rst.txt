@@ -1,6 +1,0 @@
-﻿lightkurve.Seismology.diagnose\_numax
-=====================================
-
-.. currentmodule:: lightkurve
-
-.. automethod:: Seismology.diagnose_numax

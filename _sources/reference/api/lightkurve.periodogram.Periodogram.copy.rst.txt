@@ -1,0 +1,6 @@
+﻿lightkurve.periodogram.Periodogram.copy
+=======================================
+
+.. currentmodule:: lightkurve.periodogram
+
+.. automethod:: Periodogram.copy

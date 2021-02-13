@@ -1,0 +1,42 @@
+﻿lightkurve.correctors.SparseDesignMatrix
+========================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. autoclass:: SparseDesignMatrix
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SparseDesignMatrix.__init__
+      ~SparseDesignMatrix.append_constant
+      ~SparseDesignMatrix.collect
+      ~SparseDesignMatrix.copy
+      ~SparseDesignMatrix.pca
+      ~SparseDesignMatrix.plot
+      ~SparseDesignMatrix.plot_priors
+      ~SparseDesignMatrix.split
+      ~SparseDesignMatrix.standardize
+      ~SparseDesignMatrix.to_dense
+      ~SparseDesignMatrix.to_sparse
+      ~SparseDesignMatrix.validate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SparseDesignMatrix.X
+      ~SparseDesignMatrix.rank
+      ~SparseDesignMatrix.shape
+      ~SparseDesignMatrix.values
+   
+   

@@ -1,0 +1,6 @@
+﻿lightkurve.periodogram.LombScarglePeriodogram.from\_lightcurve
+==============================================================
+
+.. currentmodule:: lightkurve.periodogram
+
+.. automethod:: LombScarglePeriodogram.from_lightcurve

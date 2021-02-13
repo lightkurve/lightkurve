@@ -1,6 +1,0 @@
-﻿lightkurve.Periodogram.power
-============================
-
-.. currentmodule:: lightkurve
-
-.. autoattribute:: Periodogram.power
