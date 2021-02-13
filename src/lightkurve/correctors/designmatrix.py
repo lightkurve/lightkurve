@@ -17,11 +17,15 @@ from .. import MPLSTYLE
 from ..utils import LightkurveWarning, plot_image
 
 
-__all__ = ['DesignMatrix', 'SparseDesignMatrix',
-           'DesignMatrixCollection', 'SparseDesignMatrixCollection']
+__all__ = [
+    "DesignMatrix",
+    "SparseDesignMatrix",
+    "DesignMatrixCollection",
+    "SparseDesignMatrixCollection",
+]
 
 
-class DesignMatrix():
+class DesignMatrix:
     """A matrix of column vectors for use in linear regression.
 
     The purpose of this class is to provide a convenient method to interact
@@ -54,8 +58,10 @@ class DesignMatrix():
     >>> create_spline_matrix(np.arange(100), n_knots=5, name='spline')
     spline DesignMatrix (100, 5)
     """
-    def __init__(self, df, columns=None, name='unnamed_matrix', prior_mu=None,
-                 prior_sigma=None):
+
+    def __init__(
+        self, df, columns=None, name="unnamed_matrix", prior_mu=None, prior_sigma=None
+    ):
         if not isinstance(df, pd.DataFrame):
             df = pd.DataFrame(df)
         self.df = df
@@ -99,14 +105,22 @@ class DesignMatrix():
             The matplotlib axes object.
         """
         with plt.style.context(MPLSTYLE):
-            ax = plot_image(self.values, ax=ax, xlabel='Component', ylabel='X',
-                            clabel='Component Value', title=self.name,
-                            interpolation='nearest', **kwargs)
-            ax.set_aspect(self.shape[1]/(1.6*self.shape[0]))
+            ax = plot_image(
+                self.values,
+                ax=ax,
+                xlabel="Component",
+                ylabel="X",
+                clabel="Component Value",
+                title=self.name,
+                interpolation="nearest",
+                **kwargs
+            )
+            ax.set_aspect(self.shape[1] / (1.6 * self.shape[0]))
             if self.shape[1] <= 40:
                 ax.set_xticks(np.arange(self.shape[1]))
-                ax.set_xticklabels([r'${}$'.format(i) for i in self.columns],
-                                   rotation=90, fontsize=8)
+                ax.set_xticklabels(
+                    [r"${}$".format(i) for i in self.columns], rotation=90, fontsize=8
+                )
         return ax
 
     def plot_priors(self, ax=None):
@@ -123,19 +137,21 @@ class DesignMatrix():
         `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
+
         def gauss(x, mu=0, sigma=1):
-            return np.exp(-(x - mu)**2/(2*sigma**2))
+            return np.exp(-((x - mu) ** 2) / (2 * sigma ** 2))
+
         with plt.style.context(MPLSTYLE):
             if ax is None:
                 _, ax = plt.subplots()
             for m, s in zip(self.prior_mu, self.prior_sigma):
                 if ~np.isfinite(s):
-                    ax.axhline(1, color='k')
+                    ax.axhline(1, color="k")
                 else:
-                    x = np.linspace(m - 5*s, m + 5*s, 1000)
-                    ax.plot(x, gauss(x, m, s), c='k')
-            ax.set_xlabel('Value')
-            ax.set_title('{} Priors'.format(self.name))
+                    x = np.linspace(m - 5 * s, m + 5 * s, 1000)
+                    ax.plot(x, gauss(x, m, s), c="k")
+            ax.set_xlabel("Value")
+            ax.set_title("{} Priors".format(self.name))
         return ax
 
     def _get_prior_sample(self):
@@ -173,8 +189,9 @@ class DesignMatrix():
         dfs = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
             new_columns = dict(
-                ('{}'.format(val), '{}'.format(val) + ' {}'.format(idx + 1))
-                for val in list(self.df.columns))
+                ("{}".format(val), "{}".format(val) + " {}".format(idx + 1))
+                for val in list(self.df.columns)
+            )
             dfs.append(self.df[a:b].rename(columns=new_columns))
 
         prior_mu = np.hstack([self.prior_mu for idx in range(len(dfs))])
@@ -250,6 +267,7 @@ class DesignMatrix():
         # we find this to be too few, and that n_iter=10 is still fast but
         # produces more stable results.
         from fbpca import pca  # local import because not used elsewhere
+
         new_values, _, _ = pca(self.values, nterms, n_iter=10)
         return DesignMatrix(new_values, name=self.name)
 
@@ -266,7 +284,9 @@ class DesignMatrix():
             dm = self
         else:
             dm = self.copy()
-        extra_df = pd.DataFrame(np.atleast_2d(np.ones(self.shape[0])).T, columns=['offset'])
+        extra_df = pd.DataFrame(
+            np.atleast_2d(np.ones(self.shape[0])).T, columns=["offset"]
+        )
         dm.df = pd.concat([self.df, extra_df], axis=1)
         dm.columns = list(dm.df.columns)
         dm.prior_mu = np.append(self.prior_mu, prior_mu)
@@ -277,25 +297,30 @@ class DesignMatrix():
         """Helper function for validating."""
         # Matrix rank shouldn't be significantly smaller than the # of columns
         if rank:
-            if self.rank < (0.5*self.shape[1]):
-                warnings.warn("The design matrix has low rank ({}) compared to the "
-                              "number of columns ({}), which suggests that the "
-                              "matrix contains duplicate or correlated columns. "
-                              "This may prevent the regression from succeeding. "
-                              "Consider reducing the dimensionality by calling the "
-                              "`pca()` method.".format(self.rank, self.shape[1]),
-                              LightkurveWarning)
+            if self.rank < (0.5 * self.shape[1]):
+                warnings.warn(
+                    "The design matrix has low rank ({}) compared to the "
+                    "number of columns ({}), which suggests that the "
+                    "matrix contains duplicate or correlated columns. "
+                    "This may prevent the regression from succeeding. "
+                    "Consider reducing the dimensionality by calling the "
+                    "`pca()` method.".format(self.rank, self.shape[1]),
+                    LightkurveWarning,
+                )
         if self.prior_mu is not None:
             if len(self.prior_mu) != self.shape[1]:
-                raise ValueError('`prior_mu` must have shape {}'
-                                 ''.format(self.shape[1]))
+                raise ValueError(
+                    "`prior_mu` must have shape {}" "".format(self.shape[1])
+                )
         if self.prior_sigma is not None:
             if len(self.prior_sigma) != self.shape[1]:
-                raise ValueError('`prior_sigma` must have shape {}'
-                                 ''.format(self.shape[1]))
+                raise ValueError(
+                    "`prior_sigma` must have shape {}" "".format(self.shape[1])
+                )
             if np.any(np.asarray(self.prior_sigma) <= 0):
-                raise ValueError('`prior_sigma` values cannot be smaller than '
-                                 'or equal to zero')
+                raise ValueError(
+                    "`prior_sigma` values cannot be smaller than " "or equal to zero"
+                )
 
     def validate(self, rank=True):
         """Emits `LightkurveWarning` if matrix has low rank or priors have incorrect shape.
@@ -327,7 +352,7 @@ class DesignMatrix():
         return self.df[key].values
 
     def __repr__(self):
-        return '{} DesignMatrix {}'.format(self.name, self.shape)
+        return "{} DesignMatrix {}".format(self.name, self.shape)
 
     def to_sparse(self):
         """Convert this dense matrix object to a `SparseDesignMatrix`.
@@ -336,18 +361,20 @@ class DesignMatrix():
         `scipy.sparse.csr_matrix`, which stores the values in a
         lower memory matrix. This is not recommended for dense matrices.
         """
-        return SparseDesignMatrix(csr_matrix(self.values),
-                                  name=self.name,
-                                  columns=self.columns,
-                                  prior_mu=self.prior_mu,
-                                  prior_sigma=self.prior_sigma)
+        return SparseDesignMatrix(
+            csr_matrix(self.values),
+            name=self.name,
+            columns=self.columns,
+            prior_mu=self.prior_mu,
+            prior_sigma=self.prior_sigma,
+        )
 
     def collect(self, matrix):
         """ Join two designmatrices, return a design matrix collection """
         return DesignMatrixCollection([self, matrix])
 
 
-class DesignMatrixCollection():
+class DesignMatrixCollection:
     """Object which stores multiple design matrices.
 
     DesignMatrixCollection objects are useful when users want to regress against
@@ -366,13 +393,18 @@ class DesignMatrixCollection():
     >>> dmc.matrices
     [spline DesignMatrix (100, 5), slope DesignMatrix (100, 1)]
     """
+
     def __init__(self, matrices):
         if np.any([issparse(m.X) for m in matrices]):
             # This collection is designed for dense matrices, so we warn if a
             # SparseDesignMatrix is passed
-            warnings.warn(('Some matrices are `SparseDesignMatrix` objects. '
-                           'Sparse matrices will be converted to dense matrices.'),
-                          LightkurveWarning)
+            warnings.warn(
+                (
+                    "Some matrices are `SparseDesignMatrix` objects. "
+                    "Sparse matrices will be converted to dense matrices."
+                ),
+                LightkurveWarning,
+            )
             dense_matrices = []
             for m in matrices:
                 if isinstance(m, SparseDesignMatrix):
@@ -494,18 +526,21 @@ class DesignMatrixCollection():
         [d.validate() for d in self]
 
     def __repr__(self):
-        return 'DesignMatrixCollection:\n' + \
-                    ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
+        return "DesignMatrixCollection:\n" + "".join(
+            ["\t{}\n".format(i.__repr__()) for i in self]
+        )
 
     def to_designmatrix(self, name=None):
         """Flatten a `DesignMatrixCollection` into a `DesignMatrix`."""
         if name is None:
             name = self.matrices[0].name
-        return self._child_class(self.X,
-                                 columns=self.columns,
-                                 prior_mu=self.prior_mu,
-                                 prior_sigma=self.prior_sigma,
-                                 name=name)
+        return self._child_class(
+            self.X,
+            columns=self.columns,
+            prior_mu=self.prior_mu,
+            prior_sigma=self.prior_sigma,
+            name=name,
+        )
 
 
 class SparseDesignMatrix(DesignMatrix):
@@ -535,10 +570,14 @@ class SparseDesignMatrix(DesignMatrix):
         Prior standard deviations of the coefficients associated with each
         column in a linear regression problem.
     """
-    def __init__(self, X, columns=None, name='unnamed_matrix', prior_mu=None,
-                 prior_sigma=None):
+
+    def __init__(
+        self, X, columns=None, name="unnamed_matrix", prior_mu=None, prior_sigma=None
+    ):
         if not issparse(X):
-            raise ValueError('Must pass a `scipy.sparse` matrix (e.g. `scipy.sparse.csr_matrix`)')
+            raise ValueError(
+                "Must pass a `scipy.sparse` matrix (e.g. `scipy.sparse.csr_matrix`)"
+            )
         if columns is None:
             columns = np.arange(X.shape[1])
         self.columns = columns
@@ -590,11 +629,13 @@ class SparseDesignMatrix(DesignMatrix):
             A new design matrix with shape (n_rows, len(row_indices)*n_columns).
         """
 
-        if not hasattr(row_indices, '__iter__'):
+        if not hasattr(row_indices, "__iter__"):
             row_indices = [row_indices]
 
         # You can't split on the first or last index
-        row_indices = list(np.asarray(row_indices)[~np.in1d(row_indices, [0, self.shape[0]])])
+        row_indices = list(
+            np.asarray(row_indices)[~np.in1d(row_indices, [0, self.shape[0]])]
+        )
         if len(row_indices) == 0:
             return self
         if inplace:
@@ -603,13 +644,28 @@ class SparseDesignMatrix(DesignMatrix):
             dm = self.copy()
         x = np.arange(dm.shape[0])
         dm.prior_mu = np.concatenate([list(self.prior_mu) * (len(row_indices) + 1)])
-        dm.prior_sigma = np.concatenate([list(self.prior_sigma) * (len(row_indices) + 1)])
-        dm._X = hstack([dm.X.multiply(lil_matrix(np.in1d(x, idx).astype(int)).T) for idx in np.array_split(x, row_indices)], format='lil')
+        dm.prior_sigma = np.concatenate(
+            [list(self.prior_sigma) * (len(row_indices) + 1)]
+        )
+        dm._X = hstack(
+            [
+                dm.X.multiply(lil_matrix(np.in1d(x, idx).astype(int)).T)
+                for idx in np.array_split(x, row_indices)
+            ],
+            format="lil",
+        )
         non_zero = dm.X.sum(axis=0) != 0
         non_zero = np.asarray(non_zero).ravel()
         dm._X = dm.X[:, non_zero]
         if dm.columns is not None:
-            dm.columns = list(np.asarray([['{}_{}'.format(c, idx) for c in dm.columns] for idx in range(len(row_indices) + 1)]).ravel())
+            dm.columns = list(
+                np.asarray(
+                    [
+                        ["{}_{}".format(c, idx) for c in dm.columns]
+                        for idx in range(len(row_indices) + 1)
+                    ]
+                ).ravel()
+            )
         dm.prior_mu = dm.prior_mu[non_zero]
         dm.prior_sigma = dm.prior_sigma[non_zero]
         return dm
@@ -643,11 +699,19 @@ class SparseDesignMatrix(DesignMatrix):
         idx, jdx, v = find(dm.X)
         weights = dm.X.copy()
         weights[dm.X != 0] = 1
-        mean = np.bincount(jdx, weights=v)/np.bincount(jdx)
-        std = np.asarray([((np.sum((v[jdx == i] - mean[i])**2) * (1/((jdx == i).sum() - 1))))**0.5 for i in np.unique(jdx)])
+        mean = np.bincount(jdx, weights=v) / np.bincount(jdx)
+        std = np.asarray(
+            [
+                ((np.sum((v[jdx == i] - mean[i]) ** 2) * (1 / ((jdx == i).sum() - 1))))
+                ** 0.5
+                for i in np.unique(jdx)
+            ]
+        )
         mean[std == 0] = 0
         std[std == 0] = 1
-        white = (dm.X - vstack([lil_matrix(mean)] * dm.shape[0])).multiply(vstack([lil_matrix(1/std)] * dm.shape[0]))
+        white = (dm.X - vstack([lil_matrix(mean)] * dm.shape[0])).multiply(
+            vstack([lil_matrix(1 / std)] * dm.shape[0])
+        )
         dm._X = white.multiply(weights)
         return dm
 
@@ -682,7 +746,7 @@ class SparseDesignMatrix(DesignMatrix):
             dm = self
         else:
             dm = self.copy()
-        dm._X = hstack([dm.X, lil_matrix(np.ones(dm.shape[0])).T], format='lil')
+        dm._X = hstack([dm.X, lil_matrix(np.ones(dm.shape[0])).T], format="lil")
         dm.prior_mu = np.append(dm.prior_mu, prior_mu)
         dm.prior_sigma = np.append(dm.prior_sigma, prior_sigma)
         return dm
@@ -690,35 +754,45 @@ class SparseDesignMatrix(DesignMatrix):
     def __getitem__(self, key):
         loc = np.where(np.asarray(self.columns) == key)[0]
         if len(loc) == 0:
-            raise ValueError('No such column as `{}`.'.format(key))
+            raise ValueError("No such column as `{}`.".format(key))
         return self.X[:, loc].toarray()
 
     def __repr__(self):
-        return '{} SparseDesignMatrix {}'.format(self.name, self.shape)
+        return "{} SparseDesignMatrix {}".format(self.name, self.shape)
 
     def collect(self, matrix):
         """ Join two designmatrices, return a design matrix collection """
         return SparseDesignMatrixCollection([self, matrix])
 
     def to_dense(self):
-        """ Convert a SparseDesignMatrix object to a dense DesignMatrix
+        """Convert a SparseDesignMatrix object to a dense DesignMatrix
 
         The values of this design matrix will be converted to a
         `numpy.ndarray`. This is not recommended for sparse matrices containing
         mostly zeros.
         """
-        return DesignMatrix(self.values, name=self.name,
-                            columns=self.columns, prior_mu=self.prior_mu,
-                            prior_sigma=self.prior_sigma)
+        return DesignMatrix(
+            self.values,
+            name=self.name,
+            columns=self.columns,
+            prior_mu=self.prior_mu,
+            prior_sigma=self.prior_sigma,
+        )
 
 
 class SparseDesignMatrixCollection(DesignMatrixCollection):
     """A set of design matrices."""
+
     def __init__(self, matrices):
         if not np.all([issparse(m.X) for m in matrices]):
             # This collection is designed for sparse matrices, so we raise a warning if a dense DesignMatrix is passed
-            warnings.warn(('Not all matrices are `SparseDesignMatrix` objects. '
-                            'Dense matrices will be converted to sparse matrices.'), LightkurveWarning)
+            warnings.warn(
+                (
+                    "Not all matrices are `SparseDesignMatrix` objects. "
+                    "Dense matrices will be converted to sparse matrices."
+                ),
+                LightkurveWarning,
+            )
             sparse_matrices = []
             for m in matrices:
                 if isinstance(m, DesignMatrix):
@@ -728,7 +802,7 @@ class SparseDesignMatrixCollection(DesignMatrixCollection):
             self.matrices = sparse_matrices
         else:
             self.matrices = matrices
-        self.X = hstack([m.X for m in self.matrices], format='csr')
+        self.X = hstack([m.X for m in self.matrices], format="csr")
         self._child_class = SparseDesignMatrix
         self.validate()
 
@@ -757,14 +831,15 @@ class SparseDesignMatrixCollection(DesignMatrixCollection):
         return ax
 
     def __repr__(self):
-        return 'SparseDesignMatrixCollection:\n' + \
-                    ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
-
+        return "SparseDesignMatrixCollection:\n" + "".join(
+            ["\t{}\n".format(i.__repr__()) for i in self]
+        )
 
 
 ####################################################
 # Functions to create commonly-used design matrices.
 ####################################################
+
 
 @jit(nopython=True)
 def _spline_basis_vector(x, degree, i, knots):
@@ -792,23 +867,25 @@ def _spline_basis_vector(x, degree, i, knots):
     """
     if degree == 0:
         B = np.zeros(len(x))
-        B[(x >= knots[i]) & (x <= knots[i+1])] = 1
+        B[(x >= knots[i]) & (x <= knots[i + 1])] = 1
     else:
-        da = (knots[degree + i] - knots[i])
-        db = (knots[i + degree + 1] - knots[i + 1])
-        if ((knots[degree + i] - knots[i]) != 0):
-            alpha1 = ((x - knots[i])/da)
+        da = knots[degree + i] - knots[i]
+        db = knots[i + degree + 1] - knots[i + 1]
+        if (knots[degree + i] - knots[i]) != 0:
+            alpha1 = (x - knots[i]) / da
         else:
             alpha1 = np.zeros(len(x))
-        if ((knots[i+degree+1] - knots[i+1]) != 0):
-            alpha2 = ((knots[i + degree + 1] - x)/db)
+        if (knots[i + degree + 1] - knots[i + 1]) != 0:
+            alpha2 = (knots[i + degree + 1] - x) / db
         else:
             alpha2 = np.zeros(len(x))
-        B = (_spline_basis_vector(x, (degree-1), i, knots)) * (alpha1) + (_spline_basis_vector(x, (degree-1), (i+1), knots)) * (alpha2)
+        B = (_spline_basis_vector(x, (degree - 1), i, knots)) * (alpha1) + (
+            _spline_basis_vector(x, (degree - 1), (i + 1), knots)
+        ) * (alpha2)
     return B
 
 
-def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline'):
+def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name="spline"):
     """Creates a piecewise polynomial function, creating a continuous, smooth function in x
 
     See https://en.wikipedia.org/wiki/B-spline for the definitions of Basis Splines
@@ -840,25 +917,33 @@ def create_sparse_spline_matrix(x, n_knots=20, knots=None, degree=3, name='splin
     x = np.asarray(x, np.float64)
 
     if not isinstance(n_knots, int):
-        raise ValueError('`n_knots` must be an integer.')
+        raise ValueError("`n_knots` must be an integer.")
     if n_knots - degree <= 0:
-        raise ValueError('n_knots must be greater than degree.')
-    if (knots is None)  and (n_knots is not None):
-        knots = np.asarray([s[-1] for s in np.array_split(np.argsort(x), n_knots - degree)[:-1]])
+        raise ValueError("n_knots must be greater than degree.")
+    if (knots is None) and (n_knots is not None):
+        knots = np.asarray(
+            [s[-1] for s in np.array_split(np.argsort(x), n_knots - degree)[:-1]]
+        )
         knots = [np.mean([x[k], x[k + 1]]) for k in knots]
-    elif (knots is None)  and (n_knots is None):
-        raise ValueError('Pass either `n_knots` or `knots`.')
+    elif (knots is None) and (n_knots is None):
+        raise ValueError("Pass either `n_knots` or `knots`.")
     knots = np.append(np.append(x.min(), knots), x.max())
     knots = np.unique(knots)
-    knots_wbounds = np.append(np.append([x.min()] * (degree - 1), knots), [x.max()] * (degree))
+    knots_wbounds = np.append(
+        np.append([x.min()] * (degree - 1), knots), [x.max()] * (degree)
+    )
 
-    matrices = [csr_matrix(_spline_basis_vector(x, degree, idx, knots_wbounds)) for idx in np.arange(-1, len(knots_wbounds) - degree - 1)]
-    spline_dm = vstack([m for m in matrices if (m.sum() != 0) ], format='csr').T
+    matrices = [
+        csr_matrix(_spline_basis_vector(x, degree, idx, knots_wbounds))
+        for idx in np.arange(-1, len(knots_wbounds) - degree - 1)
+    ]
+    spline_dm = vstack([m for m in matrices if (m.sum() != 0)], format="csr").T
     return SparseDesignMatrix(spline_dm, name=name)
 
 
-def create_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline',
-                         include_intercept=True):
+def create_spline_matrix(
+    x, n_knots=20, knots=None, degree=3, name="spline", include_intercept=True
+):
     """Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.
     Parameters
     ----------
@@ -878,16 +963,22 @@ def create_spline_matrix(x, n_knots=20, knots=None, degree=3, name='spline',
         Design matrix object with shape (len(x), n_knots*degree).
     """
     from patsy import dmatrix  # local import because it's rarely-used
+
     if knots is not None:
-        dm_formula = "bs(x, knots={}, degree={}, include_intercept={}) - 1" \
-                     "".format(knots, degree, include_intercept)
+        dm_formula = "bs(x, knots={}, degree={}, include_intercept={}) - 1" "".format(
+            knots, degree, include_intercept
+        )
         spline_dm = np.asarray(dmatrix(dm_formula, {"x": x}))
-        df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
-                                              for idx in range(spline_dm.shape[1])])
+        df = pd.DataFrame(
+            spline_dm,
+            columns=["knot{}".format(idx + 1) for idx in range(spline_dm.shape[1])],
+        )
     else:
-        dm_formula = "bs(x, df={}, degree={}, include_intercept={}) - 1" \
-                 "".format(n_knots, degree, include_intercept)
+        dm_formula = "bs(x, df={}, degree={}, include_intercept={}) - 1" "".format(
+            n_knots, degree, include_intercept
+        )
         spline_dm = np.asarray(dmatrix(dm_formula, {"x": x}))
-        df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
-                                              for idx in range(n_knots)])
+        df = pd.DataFrame(
+            spline_dm, columns=["knot{}".format(idx + 1) for idx in range(n_knots)]
+        )
     return DesignMatrix(df, name=name)

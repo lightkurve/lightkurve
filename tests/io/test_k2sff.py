@@ -19,11 +19,11 @@ def test_read_k2sff():
         lc = read_k2sff_lightcurve(url, ext=ext)
         assert type(lc).__name__ == "KeplerLightCurve"
         # Are `time` and `flux` consistent with the FITS file?
-        assert_array_equal(f[ext].data['T'], lc.time.value)
-        assert_array_equal(f[ext].data['FCOR'], lc.flux.value)
+        assert_array_equal(f[ext].data["T"], lc.time.value)
+        assert_array_equal(f[ext].data["FCOR"], lc.flux.value)
         fluxes.append(lc.flux)
     # Different extensions should show different fluxes
-    assert not np.array_equal(fluxes[0] , fluxes[1])
+    assert not np.array_equal(fluxes[0], fluxes[1])
 
 
 @pytest.mark.remote_data

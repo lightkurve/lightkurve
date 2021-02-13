@@ -9,9 +9,9 @@ from ..utils import TessQualityFlags
 from .generic import read_generic_lightcurve
 
 
-def read_pathos_lightcurve(filename,
-                            flux_column="PSF_FLUX_COR",
-                            quality_bitmask="default"):
+def read_pathos_lightcurve(
+    filename, flux_column="PSF_FLUX_COR", quality_bitmask="default"
+):
     """Returns a `TessLightCurve`.
 
     Parameters
@@ -36,25 +36,27 @@ def read_pathos_lightcurve(filename,
 
         See the :class:`TessQualityFlags` class for details on the bitmasks.
     """
-    lc = read_generic_lightcurve(filename,
-                                 flux_column=flux_column.lower(),
-                                 time_format='btjd',
-                                 quality_column="DQUALITY")
+    lc = read_generic_lightcurve(
+        filename,
+        flux_column=flux_column.lower(),
+        time_format="btjd",
+        quality_column="DQUALITY",
+    )
 
     # Filter out poor-quality data
     # NOTE: Unfortunately Astropy Table masking does not yet work for columns
     # that are Quantity objects, so for now we remove poor-quality data instead
     # of masking. Details: https://github.com/astropy/astropy/issues/10119
     quality_mask = TessQualityFlags.create_quality_mask(
-                                quality_array=lc['dquality'],
-                                bitmask=quality_bitmask)
+        quality_array=lc["dquality"], bitmask=quality_bitmask
+    )
     lc = lc[quality_mask]
 
-    lc.meta['TARGETID'] = lc.meta.get('TICID')
-    lc.meta['QUALITY_BITMASK'] = quality_bitmask
-    lc.meta['QUALITY_MASK'] = quality_mask
+    lc.meta["TARGETID"] = lc.meta.get("TICID")
+    lc.meta["QUALITY_BITMASK"] = quality_bitmask
+    lc.meta["QUALITY_MASK"] = quality_mask
 
     # QLP light curves are normalized by default
-    lc.meta['NORMALIZED'] = True
+    lc.meta["NORMALIZED"] = True
 
     return TessLightCurve(data=lc)

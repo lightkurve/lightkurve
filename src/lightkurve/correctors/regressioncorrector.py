@@ -11,12 +11,16 @@ import numpy as np
 from scipy.sparse import issparse, csr_matrix
 
 from .corrector import Corrector
-from .designmatrix import DesignMatrix, DesignMatrixCollection, \
-                          SparseDesignMatrix, SparseDesignMatrixCollection
+from .designmatrix import (
+    DesignMatrix,
+    DesignMatrixCollection,
+    SparseDesignMatrix,
+    SparseDesignMatrixCollection,
+)
 from ..lightcurve import LightCurve, MPLSTYLE
 
 
-__all__ = ['RegressionCorrector']
+__all__ = ["RegressionCorrector"]
 
 
 log = logging.getLogger(__name__)
@@ -78,21 +82,28 @@ class RegressionCorrector(Corrector):
     lc : `.LightCurve`
         The light curve that needs to be corrected.
     """
+
     def __init__(self, lc):
         # We don't accept NaN in time or flux.
         if np.any([~np.isfinite(lc.time.value), ~np.isfinite(lc.flux)]):
-            raise ValueError('Input light curve has NaNs in time or flux. '
-                             'Please remove NaNs before correction '
-                             '(e.g. using `lc = lc.remove_nans()`).')
+            raise ValueError(
+                "Input light curve has NaNs in time or flux. "
+                "Please remove NaNs before correction "
+                "(e.g. using `lc = lc.remove_nans()`)."
+            )
         # We don't accept NaN in flux_err, unless all values are NaN.
         if np.any(~np.isfinite(lc.flux_err)) and not np.all(~np.isfinite(lc.flux_err)):
-            raise ValueError('Input light curve has NaNs in `flux_err`. '
-                             'Please remove NaNs before correction '
-                             '(e.g. using `lc = lc.remove_nans()`).')
+            raise ValueError(
+                "Input light curve has NaNs in `flux_err`. "
+                "Please remove NaNs before correction "
+                "(e.g. using `lc = lc.remove_nans()`)."
+            )
         if np.any(lc.flux_err[np.isfinite(lc.flux_err)] <= 0):
-            raise ValueError('Input light curve contains flux uncertainties '
-                             'smaller than or equal to zero. Please remove '
-                             'these (e.g. using `lc = lc[lc.flux_err > 0]`).')
+            raise ValueError(
+                "Input light curve contains flux uncertainties "
+                "smaller than or equal to zero. Please remove "
+                "these (e.g. using `lc = lc[lc.flux_err > 0]`)."
+            )
         self.lc = lc
 
         # The following properties will be set when correct() is called.
@@ -104,15 +115,16 @@ class RegressionCorrector(Corrector):
         self.diagnostic_lightcurves = None
 
     def __repr__(self):
-        return 'RegressionCorrector (ID: {})'.format(self.lc.targetid)
+        return "RegressionCorrector (ID: {})".format(self.lc.targetid)
 
     @property
     def dmc(self):
         """Shorthand for self.design_matrix_collection."""
         return self.design_matrix_collection
 
-    def _fit_coefficients(self, cadence_mask=None, prior_mu=None,
-                          prior_sigma=None, propagate_errors=False):
+    def _fit_coefficients(
+        self, cadence_mask=None, prior_mu=None, prior_sigma=None, propagate_errors=False
+    ):
         """Fit the linear regression coefficients.
 
         This function will solve a linear regression with Gaussian priors
@@ -130,8 +142,9 @@ class RegressionCorrector(Corrector):
         """
 
         # If prior_mu is specified, prior_sigma must be specified
-        if not ((prior_mu is None) & (prior_sigma is None)) | \
-                    ((prior_mu is not None) & (prior_sigma is not None)):
+        if not ((prior_mu is None) & (prior_sigma is None)) | (
+            (prior_mu is not None) & (prior_sigma is not None)
+        ):
             raise ValueError("Please specify both `prior_mu` and `prior_sigma`")
 
         # Default cadence mask
@@ -148,22 +161,22 @@ class RegressionCorrector(Corrector):
         X = self.dmc.X[cadence_mask]
         if isinstance(X, np.ndarray):
             # Compute `X^T cov^-1 X + 1/prior_sigma^2`
-            sigma_w_inv = X.T.dot(X / flux_err[:, None]**2)
+            sigma_w_inv = X.T.dot(X / flux_err[:, None] ** 2)
             # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
-            B = np.dot(X.T, self.lc.flux.value[cadence_mask] / flux_err**2)
+            B = np.dot(X.T, self.lc.flux.value[cadence_mask] / flux_err ** 2)
 
         elif issparse(X):
-            sigma_f_inv = csr_matrix(1/flux_err[:, None]**2)
+            sigma_f_inv = csr_matrix(1 / flux_err[:, None] ** 2)
             # Compute `X^T cov^-1 X + 1/prior_sigma^2`
             sigma_w_inv = X.T.dot(X.multiply(sigma_f_inv))
             # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
-            B = X.T.dot((self.lc.flux[cadence_mask]/flux_err**2))
+            B = X.T.dot((self.lc.flux[cadence_mask] / flux_err ** 2))
             sigma_w_inv = sigma_w_inv.toarray()
 
         if prior_sigma is not None:
-            sigma_w_inv = sigma_w_inv + np.diag(1. / prior_sigma**2)
+            sigma_w_inv = sigma_w_inv + np.diag(1.0 / prior_sigma ** 2)
         if prior_sigma is not None:
-            B = B + (prior_mu / prior_sigma**2)
+            B = B + (prior_mu / prior_sigma ** 2)
 
         # Solve for weights w
         w = np.linalg.solve(sigma_w_inv, B).T
@@ -174,8 +187,14 @@ class RegressionCorrector(Corrector):
 
         return w, w_err
 
-    def correct(self, design_matrix_collection, cadence_mask=None, sigma=5,
-                niters=5, propagate_errors=False):
+    def correct(
+        self,
+        design_matrix_collection,
+        cadence_mask=None,
+        sigma=5,
+        niters=5,
+        propagate_errors=False,
+    ):
         """Find the best fit correction for the light curve.
 
         Parameters
@@ -203,9 +222,13 @@ class RegressionCorrector(Corrector):
         """
         if not isinstance(design_matrix_collection, DesignMatrixCollection):
             if isinstance(design_matrix_collection, SparseDesignMatrix):
-                design_matrix_collection = SparseDesignMatrixCollection([design_matrix_collection])
+                design_matrix_collection = SparseDesignMatrixCollection(
+                    [design_matrix_collection]
+                )
             elif isinstance(design_matrix_collection, DesignMatrix):
-                design_matrix_collection = DesignMatrixCollection([design_matrix_collection])
+                design_matrix_collection = DesignMatrixCollection(
+                    [design_matrix_collection]
+                )
 
         # Validate the design matrix. Emits a warning if the matrix has low rank.
         design_matrix_collection.validate()
@@ -220,18 +243,22 @@ class RegressionCorrector(Corrector):
         self.outlier_mask = np.zeros_like(self.cadence_mask)
         for count in range(niters):
             tmp_cadence_mask = self.cadence_mask & ~self.outlier_mask
-            coefficients, coefficients_err = \
-                self._fit_coefficients(cadence_mask=tmp_cadence_mask,
-                                       prior_mu=self.dmc.prior_mu,
-                                       prior_sigma=self.dmc.prior_sigma,
-                                       propagate_errors=propagate_errors)
-            model = np.ma.masked_array(data=self.dmc.X.dot(coefficients),
-                                       mask=~tmp_cadence_mask)
+            coefficients, coefficients_err = self._fit_coefficients(
+                cadence_mask=tmp_cadence_mask,
+                prior_mu=self.dmc.prior_mu,
+                prior_sigma=self.dmc.prior_sigma,
+                propagate_errors=propagate_errors,
+            )
+            model = np.ma.masked_array(
+                data=self.dmc.X.dot(coefficients), mask=~tmp_cadence_mask
+            )
             model = u.Quantity(model, unit=self.lc.flux.unit)
             residuals = self.lc.flux - model
             self.outlier_mask |= sigma_clip(residuals, sigma=sigma).mask
-            log.debug("correct(): iteration {}: clipped {} cadences"
-                      "".format(count, self.outlier_mask.sum()))
+            log.debug(
+                "correct(): iteration {}: clipped {} cadences"
+                "".format(count, self.outlier_mask.sum())
+            )
 
         self.coefficients = coefficients
         self.coefficients_err = coefficients_err
@@ -243,17 +270,29 @@ class RegressionCorrector(Corrector):
                 # ignore "RuntimeWarning: covariance is not symmetric positive-semidefinite."
                 warnings.simplefilter("ignore", RuntimeWarning)
                 samples = np.asarray(
-                    [self.dmc.X.dot(np.random.multivariate_normal(coefficients, coefficients_err))
-                     for idx in range(100)]).T
-            model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
+                    [
+                        self.dmc.X.dot(
+                            np.random.multivariate_normal(
+                                coefficients, coefficients_err
+                            )
+                        )
+                        for idx in range(100)
+                    ]
+                ).T
+            model_err = np.abs(
+                np.percentile(samples, [16, 84], axis=1)
+                - np.median(samples, axis=1)[:, None].T
+            ).mean(axis=0)
         else:
             model_err = np.zeros(len(model_flux))
-        self.model_lc = LightCurve(time=self.lc.time,
-                                   flux=u.Quantity(model_flux, unit=self.lc.flux.unit),
-                                   flux_err=u.Quantity(model_err, unit=self.lc.flux.unit))
+        self.model_lc = LightCurve(
+            time=self.lc.time,
+            flux=u.Quantity(model_flux, unit=self.lc.flux.unit),
+            flux_err=u.Quantity(model_err, unit=self.lc.flux.unit),
+        )
         self.corrected_lc = self.lc.copy()
         self.corrected_lc.flux = self.lc.flux - self.model_lc.flux
-        self.corrected_lc.flux_err = (self.lc.flux_err**2 + model_err**2)**0.5
+        self.corrected_lc.flux_err = (self.lc.flux_err ** 2 + model_err ** 2) ** 0.5
         self.diagnostic_lightcurves = self._create_diagnostic_lightcurves()
         return self.corrected_lc
 
@@ -270,14 +309,24 @@ class RegressionCorrector(Corrector):
         for idx, submatrix in enumerate(self.dmc.matrices):
             # What is the index of the first column for the submatrix?
             firstcol_idx = sum([m.shape[1] for m in self.dmc.matrices[:idx]])
-            submatrix_coefficients = self.coefficients[firstcol_idx:firstcol_idx+submatrix.shape[1]]
+            submatrix_coefficients = self.coefficients[
+                firstcol_idx : firstcol_idx + submatrix.shape[1]
+            ]
             # submatrix_coefficients_err = self.coefficients_err[firstcol_idx:firstcol_idx+submatrix.shape[1], firstcol_idx:firstcol_idx+submatrix.shape[1]]
             # samples = np.asarray([np.dot(submatrix.values, np.random.multivariate_normal(submatrix_coefficients, submatrix_coefficients_err)) for idx in range(100)]).T
             # model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
-            model_flux = u.Quantity(submatrix.X.dot(submatrix_coefficients), unit=self.lc.flux.unit)
-            model_flux_err = u.Quantity(np.zeros(len(model_flux)), unit=self.lc.flux.unit)
-            lcs[submatrix.name] = LightCurve(time=self.lc.time, flux=model_flux,
-                                             flux_err=model_flux_err, label=submatrix.name)
+            model_flux = u.Quantity(
+                submatrix.X.dot(submatrix_coefficients), unit=self.lc.flux.unit
+            )
+            model_flux_err = u.Quantity(
+                np.zeros(len(model_flux)), unit=self.lc.flux.unit
+            )
+            lcs[submatrix.name] = LightCurve(
+                time=self.lc.time,
+                flux=model_flux,
+                flux_err=model_flux_err,
+                label=submatrix.name,
+            )
         return lcs
 
     def _diagnostic_plot(self):
@@ -285,26 +334,36 @@ class RegressionCorrector(Corrector):
 
         Note: We need a hidden function so that other correctors can alter the plot.
         """
-        if not hasattr(self, 'corrected_lc'):
-            raise ValueError('Please call the `correct()` method before trying to diagnose.')
+        if not hasattr(self, "corrected_lc"):
+            raise ValueError(
+                "Please call the `correct()` method before trying to diagnose."
+            )
 
         with plt.style.context(MPLSTYLE):
             _, axs = plt.subplots(2, figsize=(10, 6), sharex=True)
             ax = axs[0]
-            self.lc.plot(ax=ax, normalize=False, label='original', alpha=0.4)
+            self.lc.plot(ax=ax, normalize=False, label="original", alpha=0.4)
             for key in self.diagnostic_lightcurves.keys():
-                (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
-            ax.set_xlabel('')
+                (
+                    self.diagnostic_lightcurves[key]
+                    - np.median(self.diagnostic_lightcurves[key].flux)
+                    + np.median(self.lc.flux)
+                ).plot(ax=ax)
+            ax.set_xlabel("")
             ax = axs[1]
-            self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='original')
+            self.lc.plot(ax=ax, normalize=False, alpha=0.2, label="original")
             self.corrected_lc[self.outlier_mask].scatter(
-                                            normalize=False, c='r', marker='x',
-                                            s=10, label='outlier_mask', ax=ax)
+                normalize=False, c="r", marker="x", s=10, label="outlier_mask", ax=ax
+            )
             self.corrected_lc[~self.cadence_mask].scatter(
-                                            normalize=False, c='dodgerblue',
-                                            marker='x', s=10, label='~cadence_mask',
-                                            ax=ax)
-            self.corrected_lc.plot(normalize=False, label='corrected', ax=ax, c='k')
+                normalize=False,
+                c="dodgerblue",
+                marker="x",
+                s=10,
+                label="~cadence_mask",
+                ax=ax,
+            )
+            self.corrected_lc.plot(normalize=False, label="corrected", ax=ax, c="k")
         return axs
 
     def diagnose(self):
@@ -332,18 +391,23 @@ class RegressionCorrector(Corrector):
         `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        if not hasattr(self, 'corrected_lc'):
-            raise ValueError('Please call the `correct()` method before trying to diagnose.')
+        if not hasattr(self, "corrected_lc"):
+            raise ValueError(
+                "Please call the `correct()` method before trying to diagnose."
+            )
 
         names = [dm.name for dm in self.dmc]
         with plt.style.context(MPLSTYLE):
-            _, axs = plt.subplots(1, len(names), figsize=(len(names)*4, 4),
-                                  sharey=True)
-            if not hasattr(axs, '__iter__'):
+            _, axs = plt.subplots(
+                1, len(names), figsize=(len(names) * 4, 4), sharey=True
+            )
+            if not hasattr(axs, "__iter__"):
                 axs = [axs]
             for idx, ax, X in zip(range(len(names)), axs, self.dmc):
                 X.plot_priors(ax=ax)
                 firstcol_idx = sum([m.shape[1] for m in self.dmc.matrices[:idx]])
-                submatrix_coefficients = self.coefficients[firstcol_idx:firstcol_idx+X.shape[1]]
-                [ax.axvline(s, color='red', zorder=-1) for s in submatrix_coefficients]
+                submatrix_coefficients = self.coefficients[
+                    firstcol_idx : firstcol_idx + X.shape[1]
+                ]
+                [ax.axvline(s, color="red", zorder=-1) for s in submatrix_coefficients]
         return axs

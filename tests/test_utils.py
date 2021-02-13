@@ -47,9 +47,15 @@ def test_quality_flag_decoding_kepler():
     for key, value in flags:
         assert KeplerQualityFlags.decode(key)[0] == value
     # Can we recover combinations of flags?
-    assert KeplerQualityFlags.decode(flags[5][0] + flags[7][0]) == [flags[5][1], flags[7][1]]
-    assert KeplerQualityFlags.decode(flags[3][0] + flags[4][0] + flags[5][0]) \
-        == [flags[3][1], flags[4][1], flags[5][1]]
+    assert KeplerQualityFlags.decode(flags[5][0] + flags[7][0]) == [
+        flags[5][1],
+        flags[7][1],
+    ]
+    assert KeplerQualityFlags.decode(flags[3][0] + flags[4][0] + flags[5][0]) == [
+        flags[3][1],
+        flags[4][1],
+        flags[5][1],
+    ]
 
 
 def test_quality_flag_decoding_tess():
@@ -58,9 +64,15 @@ def test_quality_flag_decoding_tess():
     for key, value in flags:
         assert TessQualityFlags.decode(key)[0] == value
     # Can we recover combinations of flags?
-    assert TessQualityFlags.decode(flags[5][0] + flags[7][0]) == [flags[5][1], flags[7][1]]
-    assert TessQualityFlags.decode(flags[3][0] + flags[4][0] + flags[5][0]) \
-        == [flags[3][1], flags[4][1], flags[5][1]]
+    assert TessQualityFlags.decode(flags[5][0] + flags[7][0]) == [
+        flags[5][1],
+        flags[7][1],
+    ]
+    assert TessQualityFlags.decode(flags[3][0] + flags[4][0] + flags[5][0]) == [
+        flags[3][1],
+        flags[4][1],
+        flags[5][1],
+    ]
 
 
 def test_quality_flag_decoding_quantity_object():
@@ -69,15 +81,19 @@ def test_quality_flag_decoding_quantity_object():
     This is a regression test for https://github.com/lightkurve/lightkurve/issues/804
     """
     from astropy.units.quantity import Quantity
+
     flags = list(TessQualityFlags.STRINGS.items())
     for key, value in flags:
-        assert TessQualityFlags.decode(Quantity(key, dtype='int32'))[0] == value
+        assert TessQualityFlags.decode(Quantity(key, dtype="int32"))[0] == value
     # Can we recover combinations of flags?
-    assert TessQualityFlags.decode(Quantity(flags[5][0], dtype='int32') + \
-        Quantity(flags[7][0], dtype='int32')) == [flags[5][1], flags[7][1]]
-    assert TessQualityFlags.decode(Quantity(flags[3][0], dtype='int32') + \
-        Quantity(flags[4][0], dtype='int32') + Quantity(flags[5][0], dtype='int32')) \
-        == [flags[3][1], flags[4][1], flags[5][1]]
+    assert TessQualityFlags.decode(
+        Quantity(flags[5][0], dtype="int32") + Quantity(flags[7][0], dtype="int32")
+    ) == [flags[5][1], flags[7][1]]
+    assert TessQualityFlags.decode(
+        Quantity(flags[3][0], dtype="int32")
+        + Quantity(flags[4][0], dtype="int32")
+        + Quantity(flags[5][0], dtype="int32")
+    ) == [flags[3][1], flags[4][1], flags[5][1]]
 
 
 def test_quality_mask():
@@ -85,12 +101,14 @@ def test_quality_mask():
     quality = np.array([0, 0, 1])
     assert np.all(KeplerQualityFlags.create_quality_mask(quality, bitmask=0))
     assert np.all(KeplerQualityFlags.create_quality_mask(quality, bitmask=None))
-    assert np.all(KeplerQualityFlags.create_quality_mask(quality, bitmask='none'))
+    assert np.all(KeplerQualityFlags.create_quality_mask(quality, bitmask="none"))
     assert (KeplerQualityFlags.create_quality_mask(quality, bitmask=1)).sum() == 2
-    assert (KeplerQualityFlags.create_quality_mask(quality, bitmask='hardest')).sum() == 2
+    assert (
+        KeplerQualityFlags.create_quality_mask(quality, bitmask="hardest")
+    ).sum() == 2
     # Do we see a ValueError if an invalid bitmask is passed?
     with pytest.raises(ValueError) as err:
-        KeplerQualityFlags.create_quality_mask(quality, bitmask='invalidoption')
+        KeplerQualityFlags.create_quality_mask(quality, bitmask="invalidoption")
     assert "not supported" in err.value.args[0]
 
 
@@ -98,7 +116,7 @@ def test_quality_mask():
 def test_lightkurve_warning():
     """Can we ignore Lightkurve warnings?"""
     with warnings.catch_warnings(record=True) as warns:
-        warnings.simplefilter('ignore', LightkurveWarning)
+        warnings.simplefilter("ignore", LightkurveWarning)
         time = np.array([1, 2, 3, np.nan])
         flux = np.array([1, 2, 3, 4])
         lc = LightCurve(time=time, flux=flux)
@@ -109,25 +127,26 @@ def test_validate_method():
     assert validate_method("foo", ["foo", "bar"]) == "foo"
     assert validate_method("FOO", ["foo", "bar"]) == "foo"
     with pytest.raises(ValueError):
-          validate_method("foo", ["bar"])
+        validate_method("foo", ["bar"])
 
 
 def test_import():
     """Regression test for #605; `lk.utils` resolved to `lk.seismology.utils`"""
     from lightkurve import utils
+
     assert hasattr(utils, "btjd_to_astropy_time")
 
 
 def test_btjd_bkjd_input():
     """Regression test for #607: are the bkjd/btjd functions tolerant?"""
     # Kepler
-    assert bkjd_to_astropy_time(0).jd[0] == 2454833.
+    assert bkjd_to_astropy_time(0).jd[0] == 2454833.0
     for user_input in [[0], np.array([0])]:
-        assert_array_equal(bkjd_to_astropy_time(user_input).jd, np.array([2454833.]))
+        assert_array_equal(bkjd_to_astropy_time(user_input).jd, np.array([2454833.0]))
     # TESS
-    assert btjd_to_astropy_time(0).jd[0] == 2457000.
+    assert btjd_to_astropy_time(0).jd[0] == 2457000.0
     for user_input in [[0], np.array([0])]:
-        assert_array_equal(btjd_to_astropy_time(user_input).jd, np.array([2457000.]))
+        assert_array_equal(btjd_to_astropy_time(user_input).jd, np.array([2457000.0]))
 
 
 def test_centroid_quadratic():

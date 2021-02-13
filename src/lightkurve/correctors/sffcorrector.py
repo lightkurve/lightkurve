@@ -22,7 +22,7 @@ from ..utils import LightkurveWarning
 
 log = logging.getLogger(__name__)
 
-__all__ = ['SFFCorrector']
+__all__ = ["SFFCorrector"]
 
 
 class SFFCorrector(RegressionCorrector):
@@ -37,15 +37,18 @@ class SFFCorrector(RegressionCorrector):
     lc : `.LightCurve`
         The light curve that needs to be corrected.
     """
+
     def __init__(self, lc):
-        if getattr(lc, 'mission', '') == 'TESS':
-            warnings.warn("The SFF correction method is not suitable for use "
-                          "with TESS data, because the spacecraft motion does "
-                          "not proceed along a consistent arc.",
-                          LightkurveWarning)
+        if getattr(lc, "mission", "") == "TESS":
+            warnings.warn(
+                "The SFF correction method is not suitable for use "
+                "with TESS data, because the spacecraft motion does "
+                "not proceed along a consistent arc.",
+                LightkurveWarning,
+            )
 
         self.raw_lc = lc
-        if lc.flux.unit.to_string() == '':
+        if lc.flux.unit.to_string() == "":
             lc = lc.copy()
         else:
             lc = lc.copy().normalize()
@@ -62,11 +65,23 @@ class SFFCorrector(RegressionCorrector):
         super(SFFCorrector, self).__init__(lc=lc)
 
     def __repr__(self):
-        return 'SFFCorrector (LC: {})'.format(self.lc.targetid)
+        return "SFFCorrector (LC: {})".format(self.lc.targetid)
 
-    def correct(self, centroid_col=None, centroid_row=None, windows=20, bins=5,
-                timescale=1.5, breakindex=None, degree=3, restore_trend=False,
-                additional_design_matrix=None, polyorder=None, sparse=False, **kwargs):
+    def correct(
+        self,
+        centroid_col=None,
+        centroid_row=None,
+        windows=20,
+        bins=5,
+        timescale=1.5,
+        breakindex=None,
+        degree=3,
+        restore_trend=False,
+        additional_design_matrix=None,
+        polyorder=None,
+        sparse=False,
+        **kwargs
+    ):
         """Find the best fit correction for the light curve.
 
         Parameters
@@ -120,22 +135,25 @@ class SFFCorrector(RegressionCorrector):
             DMC, spline = SparseDesignMatrixCollection, create_sparse_spline_matrix
 
         if polyorder is not None:
-            warnings.warn("`polyorder` is deprecated and no longer used, "
-                          "please use the `degree` keyword instead.",
-                          LightkurveWarning)
+            warnings.warn(
+                "`polyorder` is deprecated and no longer used, "
+                "please use the `degree` keyword instead.",
+                LightkurveWarning,
+            )
 
         if centroid_col is None:
-            self.lc = self.lc.remove_nans(column='centroid_col')
+            self.lc = self.lc.remove_nans(column="centroid_col")
             centroid_col = self.lc.centroid_col
         if centroid_row is None:
-            self.lc = self.lc.remove_nans(column='centroid_row')
+            self.lc = self.lc.remove_nans(column="centroid_row")
             centroid_row = self.lc.centroid_row
 
         if np.any([~np.isfinite(centroid_row), ~np.isfinite(centroid_col)]):
-            raise ValueError('Centroids contain NaN values.')
+            raise ValueError("Centroids contain NaN values.")
 
-        self.window_points = _get_window_points(centroid_col, centroid_row,
-                                                windows, breakindex=breakindex)
+        self.window_points = _get_window_points(
+            centroid_col, centroid_row, windows, breakindex=breakindex
+        )
         self.windows = windows
         self.bins = bins
         self.timescale = timescale
@@ -151,12 +169,13 @@ class SFFCorrector(RegressionCorrector):
                 ar = np.copy(self.arclength.value)
             else:
                 ar = np.copy(self.arclength)
-            knots = list(np.percentile(ar[a:b], np.linspace(0, 100, bins+1)[1:-1]))
+            knots = list(np.percentile(ar[a:b], np.linspace(0, 100, bins + 1)[1:-1]))
             ar[~np.in1d(ar, ar[a:b])] = 0
 
             dm = spline(ar, knots=knots, degree=degree).copy()
-            dm.columns = ['window{}_bin{}'.format(idx+1, jdx+1)
-                                        for jdx in range(dm.shape[1])]
+            dm.columns = [
+                "window{}_bin{}".format(idx + 1, jdx + 1) for jdx in range(dm.shape[1])
+            ]
 
             # I'm putting VERY weak priors on the SFF motion vectors
             # (1e-6 is being added to prevent sigma from being zero)
@@ -164,29 +183,29 @@ class SFFCorrector(RegressionCorrector):
             dm.prior_sigma = ps
             dms.append(dm)
 
-        sff_dm = DMC(dms).to_designmatrix(name='sff')#.standardize()
-
-
+        sff_dm = DMC(dms).to_designmatrix(name="sff")  # .standardize()
 
         # long term
-        n_knots = int((self.lc.time.value[-1] - self.lc.time.value[0])/timescale)
+        n_knots = int((self.lc.time.value[-1] - self.lc.time.value[0]) / timescale)
 
-        s_dm = spline(self.lc.time.value, n_knots=n_knots, name='spline')
+        s_dm = spline(self.lc.time.value, n_knots=n_knots, name="spline")
         means = [np.average(chunk) for chunk in np.array_split(self.lc.flux, n_knots)]
-#        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
+        #        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
         s_dm.prior_mu = np.asarray(means)
 
         # I'm putting WEAK priors on the spline that it must be around 1
-        s_dm.prior_sigma = np.ones(len(s_dm.prior_mu)) * 1000 * self.lc.flux.std() + 1e-6
+        s_dm.prior_sigma = (
+            np.ones(len(s_dm.prior_mu)) * 1000 * self.lc.flux.std() + 1e-6
+        )
 
         # additional
         if additional_design_matrix is not None:
             if not isinstance(additional_design_matrix, DesignMatrix):
-                raise ValueError('`additional_design_matrix` must be a DesignMatrix object.')
+                raise ValueError(
+                    "`additional_design_matrix` must be a DesignMatrix object."
+                )
             self.additional_design_matrix = additional_design_matrix
-            dm = DMC([s_dm,
-                                         sff_dm,
-                                         additional_design_matrix])
+            dm = DMC([s_dm, sff_dm, additional_design_matrix])
         else:
             dm = DMC([s_dm, sff_dm])
 
@@ -195,7 +214,7 @@ class SFFCorrector(RegressionCorrector):
 
         # clean
         if restore_trend:
-            trend = self.diagnostic_lightcurves['spline'].flux
+            trend = self.diagnostic_lightcurves["spline"].flux
             clc += trend - np.nanmedian(trend)
         clc *= self.raw_lc.flux.mean()
 
@@ -206,7 +225,7 @@ class SFFCorrector(RegressionCorrector):
         most recent call to `correct()`."""
         axs = self._diagnostic_plot()
         for t in self.window_points:
-            axs[0].axvline(self.lc.time.value[t], color='r', ls='--', alpha=0.3)
+            axs[0].axvline(self.lc.time.value[t], color="r", ls="--", alpha=0.3)
 
     def diagnose_arclength(self):
         """Returns a diagnostic plot which visualizes arclength vs flux
@@ -214,39 +233,57 @@ class SFFCorrector(RegressionCorrector):
 
         max_plot = 5
         with plt.style.context(MPLSTYLE):
-            _, axs = plt.subplots(int(np.ceil(self.windows/max_plot)), max_plot,
-                                  figsize=(10, int(np.ceil(self.windows/max_plot)*2)),
-                                  sharex=True, sharey=True)
+            _, axs = plt.subplots(
+                int(np.ceil(self.windows / max_plot)),
+                max_plot,
+                figsize=(10, int(np.ceil(self.windows / max_plot) * 2)),
+                sharex=True,
+                sharey=True,
+            )
             axs = np.atleast_2d(axs)
-            axs[0, 2].set_title('Arclength Plot/Window')
+            axs[0, 2].set_title("Arclength Plot/Window")
             plt.subplots_adjust(hspace=0, wspace=0)
 
             lower_idx = np.asarray(np.append(0, self.window_points), int)
-            upper_idx = np.asarray(np.append(self.window_points, len(self.lc.time)), int)
-            if hasattr(self, 'additional_design_matrix'):
+            upper_idx = np.asarray(
+                np.append(self.window_points, len(self.lc.time)), int
+            )
+            if hasattr(self, "additional_design_matrix"):
                 name = self.additional_design_matrix.name
-                f = (self.lc.flux - self.diagnostic_lightcurves['spline'].flux
-                            - self.diagnostic_lightcurves[name].flux)
+                f = (
+                    self.lc.flux
+                    - self.diagnostic_lightcurves["spline"].flux
+                    - self.diagnostic_lightcurves[name].flux
+                )
             else:
-                f = (self.lc.flux - self.diagnostic_lightcurves['spline'].flux)
+                f = self.lc.flux - self.diagnostic_lightcurves["spline"].flux
 
-            m = self.diagnostic_lightcurves['sff'].flux
+            m = self.diagnostic_lightcurves["sff"].flux
 
             idx, jdx = 0, 0
             for a, b in zip(lower_idx, upper_idx):
                 ax = axs[idx, jdx]
                 if jdx == 0:
-                    ax.set_ylabel('Flux')
+                    ax.set_ylabel("Flux")
 
-                ax.scatter(self.arclength[a:b], f[a:b], s=1, label='Data')
-                ax.scatter(self.arclength[a:b][~self.cadence_mask[a:b]],
-                           f[a:b][~self.cadence_mask[a:b]],
-                           s=10, marker='x', c='r', label='Outliers')
+                ax.scatter(self.arclength[a:b], f[a:b], s=1, label="Data")
+                ax.scatter(
+                    self.arclength[a:b][~self.cadence_mask[a:b]],
+                    f[a:b][~self.cadence_mask[a:b]],
+                    s=10,
+                    marker="x",
+                    c="r",
+                    label="Outliers",
+                )
 
                 s = np.argsort(self.arclength[a:b])
-                ax.scatter(self.arclength[a:b][s],
-                           (m[a:b] - np.median(m[a:b]) + np.median(f[a:b]))[s],
-                           c='C2', s=0.5, label='Model')
+                ax.scatter(
+                    self.arclength[a:b][s],
+                    (m[a:b] - np.median(m[a:b]) + np.median(f[a:b]))[s],
+                    c="C2",
+                    s=0.5,
+                    label="Model",
+                )
                 jdx += 1
                 if jdx >= max_plot:
                     jdx = 0
@@ -259,7 +296,8 @@ class SFFCorrector(RegressionCorrector):
 #  Helper functions  #
 ######################
 
-def _get_centroid_dm(col, row, name='centroids'):
+
+def _get_centroid_dm(col, row, name="centroids"):
     """Returns a `.DesignMatrix` containing (col, row) centroid positions
     and transformations thereof.
 
@@ -277,18 +315,30 @@ def _get_centroid_dm(col, row, name='centroids'):
     dm: np.ndarray
         Design matrix with shape len(c) x 10
     """
-    data = [col, row,
-            col**2, row**2,
-            col**3, row**3,
-            col*row,
-            col**2 * row, col * row**2,
-            col**2 * row**2]
-    names = [r'col', r'row',
-             r'col^2', r'row^2',
-             r'col^3', r'row^3',
-             r'col \times row',
-             r'col^2 \times row', r'col \times row^2',
-             r'col^2 \times row^2']
+    data = [
+        col,
+        row,
+        col ** 2,
+        row ** 2,
+        col ** 3,
+        row ** 3,
+        col * row,
+        col ** 2 * row,
+        col * row ** 2,
+        col ** 2 * row ** 2,
+    ]
+    names = [
+        r"col",
+        r"row",
+        r"col^2",
+        r"row^2",
+        r"col^3",
+        r"row^3",
+        r"col \times row",
+        r"col^2 \times row",
+        r"col \times row^2",
+        r"col^2 \times row^2",
+    ]
     df = pd.DataFrame(np.asarray(data).T, columns=names)
     return DesignMatrix(df, name=name)
 
@@ -311,38 +361,50 @@ def _get_thruster_firings(arclength):
     else:
         arc = np.copy(arclength)
     # Rate of change of rate of change of arclength wrt time
-    d2adt2 = (np.gradient(np.gradient(arc)))
+    d2adt2 = np.gradient(np.gradient(arc))
     # Fit a Gaussian, most points lie in a tight region, thruster firings are outliers
     g = models.Gaussian1D(amplitude=100, mean=0, stddev=0.01)
     fitter = fitting.LevMarLSQFitter()
-    h = np.histogram(d2adt2[np.isfinite(d2adt2)], np.arange(-0.5, 0.5, 0.0001), density=True)
+    h = np.histogram(
+        d2adt2[np.isfinite(d2adt2)], np.arange(-0.5, 0.5, 0.0001), density=True
+    )
     xbins = h[1][1:] - np.median(np.diff(h[1]))
-    g = fitter(g, xbins, h[0], weights=h[0]**0.5)
+    g = fitter(g, xbins, h[0], weights=h[0] ** 0.5)
 
     # Depending on the orientation of the roll, it is hard to return
     # the point before the firing or the point after the firing.
     # This makes sure we always return the same value, no matter the roll orientation.
     def _start_and_end(start_or_end):
         """Find points at the start or end of a roll."""
-        if start_or_end == 'start':
+        if start_or_end == "start":
             thrusters = (d2adt2 < (g.stddev * -5)) & np.isfinite(d2adt2)
-        if start_or_end == 'end':
+        if start_or_end == "end":
             thrusters = (d2adt2 > (g.stddev * 5)) & np.isfinite(d2adt2)
         # Pick the best thruster in each cluster
-        idx = np.array_split(np.arange(len(thrusters)),
-                             np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
-        m = np.array_split(thrusters, np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
+        idx = np.array_split(
+            np.arange(len(thrusters)),
+            np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0],
+        )
+        m = np.array_split(
+            thrusters, np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0]
+        )
         th = []
         for jdx, _ in enumerate(idx):
             if m[jdx].sum() == 0:
                 th.append(m[jdx])
             else:
-                th.append((np.abs(np.gradient(arc)[idx[jdx]]) == np.abs(np.gradient(arc)[idx[jdx]][m[jdx]]).max()) & m[jdx])
+                th.append(
+                    (
+                        np.abs(np.gradient(arc)[idx[jdx]])
+                        == np.abs(np.gradient(arc)[idx[jdx]][m[jdx]]).max()
+                    )
+                    & m[jdx]
+                )
         thrusters = np.hstack(th)
         return thrusters
 
     # Get the start and end points
-    thrusters = np.asarray([_start_and_end('start'), _start_and_end('end')])
+    thrusters = np.asarray([_start_and_end("start"), _start_and_end("end")])
     thrusters = thrusters.any(axis=0)
 
     # Take just the first point.
@@ -350,7 +412,9 @@ def _get_thruster_firings(arclength):
     return thrusters
 
 
-def _get_window_points(centroid_col, centroid_row, windows, arclength=None, breakindex=None):
+def _get_window_points(
+    centroid_col, centroid_row, windows, arclength=None, breakindex=None
+):
     """Returns indices where thrusters are fired.
 
     Parameters
@@ -379,7 +443,7 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
         breakindexes = breakindex
 
     if not isinstance(breakindexes, list):
-        raise ValueError('`breakindex` must be an int or a list')
+        raise ValueError("`breakindex` must be an int or a list")
 
     # If the user asks for break indices we should still return them,
     # even if there is only 1 window.
@@ -390,8 +454,9 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
     dt = len(centroid_col) / windows
     lower_idx = np.append(0, breakindexes)
     upper_idx = np.append(breakindexes, len(centroid_col))
-    window_points = np.hstack([np.asarray(np.arange(a, b, dt), int)
-                              for a, b in zip(lower_idx, upper_idx)])
+    window_points = np.hstack(
+        [np.asarray(np.arange(a, b, dt), int) for a, b in zip(lower_idx, upper_idx)]
+    )
 
     # Get thruster firings
     thrusters = _get_thruster_firings(arclength)
@@ -401,18 +466,20 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
 
     # Find the nearest point to each thruster firing, unless it's a user supplied break point
     if len(thrusters) > 0:
-        window_points = [thrusters[np.argmin(np.abs(thrusters - wp))] + 1
-                             for wp in window_points
-                             if wp not in breakindexes]
+        window_points = [
+            thrusters[np.argmin(np.abs(thrusters - wp))] + 1
+            for wp in window_points
+            if wp not in breakindexes
+        ]
     window_points = np.unique(np.hstack([window_points, breakindexes]))
 
     # If the first or last windows are very short (<40% median window length),
     # then we add them to the second or penultimate window, respectively,
     # by removing their break points.
     median_length = np.median(np.diff(window_points))
-    if window_points[0] < 0.4*median_length:
+    if window_points[0] < 0.4 * median_length:
         window_points = window_points[1:]
-    if window_points[-1] > (len(centroid_col) - 0.4*median_length):
+    if window_points[-1] > (len(centroid_col) - 0.4 * median_length):
         window_points = window_points[:-1]
 
     return np.asarray(window_points, dtype=int)
@@ -428,8 +495,8 @@ def _estimate_arclength(centroid_col, centroid_row):
     For this to work, row and column must be correlated not anticorrelated.
     """
     col = centroid_col - np.nanmin(centroid_col)
-    row = centroid_row  - np.nanmin(centroid_row)
+    row = centroid_row - np.nanmin(centroid_row)
     # Force c to be correlated not anticorrelated
     if np.polyfit(col.data, row.data, 1)[0] < 0:
         col = np.nanmax(col) - col
-    return (col**2 + row**2)**0.5
+    return (col ** 2 + row ** 2) ** 0.5

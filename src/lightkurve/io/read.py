@@ -11,7 +11,7 @@ from ..utils import LightkurveDeprecationWarning, LightkurveError
 log = logging.getLogger(__name__)
 
 
-__all__ = ['open', 'read']
+__all__ = ["open", "read"]
 
 
 @deprecated("2.0", alternative="read()", warning_type=LightkurveDeprecationWarning)
@@ -83,35 +83,38 @@ def read(path_or_url, **kwargs):
     except OSError as e:
         filetype = None
         # Raise an explicit FileNotFoundError if file not found
-        if 'No such file' in str(e):
+        if "No such file" in str(e):
             raise e
 
     if filetype == "KeplerLightCurve":
-        return KeplerLightCurve.read(path_or_url, format='kepler', **kwargs)
+        return KeplerLightCurve.read(path_or_url, format="kepler", **kwargs)
     elif filetype == "TessLightCurve":
-        return TessLightCurve.read(path_or_url, format='tess', **kwargs)
+        return TessLightCurve.read(path_or_url, format="tess", **kwargs)
     elif filetype == "QLP":
-        return TessLightCurve.read(path_or_url, format='qlp', **kwargs)
+        return TessLightCurve.read(path_or_url, format="qlp", **kwargs)
     elif filetype == "PATHOS":
-        return TessLightCurve.read(path_or_url, format='pathos', **kwargs)
+        return TessLightCurve.read(path_or_url, format="pathos", **kwargs)
     elif filetype == "TASOC":
-        return TessLightCurve.read(path_or_url, format='tasoc', **kwargs)
+        return TessLightCurve.read(path_or_url, format="tasoc", **kwargs)
     elif filetype == "K2SFF":
-        return KeplerLightCurve.read(path_or_url, format='k2sff', **kwargs)
+        return KeplerLightCurve.read(path_or_url, format="k2sff", **kwargs)
     elif filetype == "EVEREST":
-        return KeplerLightCurve.read(path_or_url, format='everest', **kwargs)
+        return KeplerLightCurve.read(path_or_url, format="everest", **kwargs)
 
     # Official data products;
     # if the filetype is recognized, instantiate a class of that name
     if filetype is not None:
         try:
-            return getattr(__import__('lightkurve'), filetype)(path_or_url, **kwargs)
+            return getattr(__import__("lightkurve"), filetype)(path_or_url, **kwargs)
         except AttributeError as exc:
-            raise LightkurveError(f"{filetype} files are not supported "
-                                   "in this version of Lightkurve.") from exc
+            raise LightkurveError(
+                f"{filetype} files are not supported " "in this version of Lightkurve."
+            ) from exc
     else:
         # if these keywords don't exist, raise `ValueError`
-        raise LightkurveError("Not recognized as a supported data product:\n"
-                              f"{path_or_url}\n"
-                              "This file may be corrupt due to an interrupted download. "
-                              "Please remove it from your disk and try again.")
+        raise LightkurveError(
+            "Not recognized as a supported data product:\n"
+            f"{path_or_url}\n"
+            "This file may be corrupt due to an interrupted download. "
+            "Please remove it from your disk and try again."
+        )
