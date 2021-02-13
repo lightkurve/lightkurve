@@ -24,9 +24,13 @@ from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['search_targetpixelfile', 'search_lightcurve',
-           'search_lightcurvefile', 'search_tesscut',
-           'SearchResult']
+__all__ = [
+    "search_targetpixelfile",
+    "search_lightcurve",
+    "search_lightcurvefile",
+    "search_tesscut",
+    "SearchResult",
+]
 
 
 # Which external links should we display in the SearchResult repr?
@@ -41,7 +45,7 @@ AUTHOR_LINKS = {
     "CDIPS": "https://archive.stsci.edu/hlsp/cdips",
     "K2SFF": "https://archive.stsci.edu/hlsp/k2sff",
     "EVEREST": "https://archive.stsci.edu/hlsp/everest",
-    "TESScut": "https://mast.stsci.edu/tesscut/"
+    "TESScut": "https://mast.stsci.edu/tesscut/",
 }
 
 
@@ -62,7 +66,7 @@ class SearchResult(object):
         Astropy table returned by a join of the astroquery `Observations.query_criteria()`
         and `Observations.get_product_list()` methods.
     """
-    
+
     table = None
     """`~astropy.table.Table` containing the full search results returned by the MAST API."""
 
@@ -86,38 +90,46 @@ class SearchResult(object):
         This ordering is not a judgement on the quality of one product vs another,
         because we love all pipelines!
         """
-        sort_priority = {"Kepler": 1,
-                         "K2": 1,
-                         "SPOC": 1,
-                         "TESS-SPOC": 2,
-                         "QLP": 3}
-        self.table["sort_order"] = [sort_priority.get(author, 9) for author in self.table["author"]]
-        self.table.sort(['distance', 'year', 'mission', 'sort_order', 'exptime'])
+        sort_priority = {"Kepler": 1, "K2": 1, "SPOC": 1, "TESS-SPOC": 2, "QLP": 3}
+        self.table["sort_order"] = [
+            sort_priority.get(author, 9) for author in self.table["author"]
+        ]
+        self.table.sort(["distance", "year", "mission", "sort_order", "exptime"])
 
     def _add_columns(self):
         """Adds a user-friendly index (``#``) column and adds column unit
         and display format information.
         """
-        if '#' not in self.table.columns:
-            self.table['#'] = None
-        self.table['exptime'].unit = "s"
-        self.table['exptime'].format = ".0f"
-        self.table['distance'].unit = "arcsec"
+        if "#" not in self.table.columns:
+            self.table["#"] = None
+        self.table["exptime"].unit = "s"
+        self.table["exptime"].format = ".0f"
+        self.table["distance"].unit = "arcsec"
 
         # Add the year column from `t_min` or `productFilename`
         year = np.floor(Time(self.table["t_min"], format="mjd").decimalyear)
         self.table["year"] = year.astype(int)
         # `t_min` is incorrect for Kepler products, so we extract year from the filename for those =(
         for idx in np.where(self.table["author"] == "Kepler")[0]:
-            self.table["year"][idx] = re.findall(r"\d+.(\d{4})\d+", self.table["productFilename"][idx])[0]
+            self.table["year"][idx] = re.findall(
+                r"\d+.(\d{4})\d+", self.table["productFilename"][idx]
+            )[0]
 
     def __repr__(self, html=False):
-        out = 'SearchResult containing {} data products.'.format(len(self.table))
+        out = "SearchResult containing {} data products.".format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = ['#', 'mission', 'year', 'author', 'exptime', 'target_name', 'distance']
+        columns = [
+            "#",
+            "mission",
+            "year",
+            "author",
+            "exptime",
+            "target_name",
+            "distance",
+        ]
         self.table["#"] = [idx for idx in range(len(self.table))]
-        out += '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300, html=html))
+        out += "\n\n" + "\n".join(self.table[columns].pformat(max_width=300, html=html))
         # Make sure author names show up as clickable links
         if html:
             for author, url in AUTHOR_LINKS.items():
@@ -142,96 +154,114 @@ class SearchResult(object):
     @property
     def unique_targets(self):
         """Returns a table of targets and their RA & dec values produced by search"""
-        mask = ['target_name', 's_ra', 's_dec']
-        return Table.from_pandas(self.table[mask].to_pandas().drop_duplicates('target_name').reset_index(drop=True))
+        mask = ["target_name", "s_ra", "s_dec"]
+        return Table.from_pandas(
+            self.table[mask]
+            .to_pandas()
+            .drop_duplicates("target_name")
+            .reset_index(drop=True)
+        )
 
     @property
     def obsid(self):
         """MAST observation ID for each data product found."""
-        return np.asarray(np.unique(self.table['obsid']), dtype='int64')
+        return np.asarray(np.unique(self.table["obsid"]), dtype="int64")
 
     @property
     def ra(self):
         """Right Ascension coordinate for each data product found."""
-        return self.table['s_ra'].data.data
+        return self.table["s_ra"].data.data
 
     @property
     def dec(self):
         """Declination coordinate for each data product found."""
-        return self.table['s_dec'].data.data
+        return self.table["s_dec"].data.data
 
     @property
     def mission(self):
         """Kepler quarter or TESS sector names for each data product found."""
-        return self.table['mission'].data
+        return self.table["mission"].data
 
     @property
     def year(self):
         """Year the observation was made."""
-        return self.table['year'].data
+        return self.table["year"].data
 
     @property
     def author(self):
         """Pipeline name for each data product found."""
-        return self.table['author'].data
+        return self.table["author"].data
 
     @property
     def target_name(self):
         """Target name for each data product found."""
-        return self.table['target_name'].data
+        return self.table["target_name"].data
 
     @property
     def exptime(self):
         """Exposure time for each data product found."""
-        return self.table['exptime'].quantity
+        return self.table["exptime"].quantity
 
     @property
     def distance(self):
         """Distance from the search position for each data product found."""
-        return self.table['distance'].quantity
+        return self.table["distance"].quantity
 
-    def _download_one(self, table, quality_bitmask, download_dir, cutout_size, **kwargs):
+    def _download_one(
+        self, table, quality_bitmask, download_dir, cutout_size, **kwargs
+    ):
         """Private method used by `download()` and `download_all()` to download
         exactly one file from the MAST archive.
 
         Always returns a `TargetPixelFile` or `LightCurve` object.
         """
         # Make sure astroquery uses the same level of verbosity
-        logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
+        logging.getLogger("astropy").setLevel(log.getEffectiveLevel())
 
         if download_dir is None:
             download_dir = self._default_download_dir()
 
         # if the SearchResult row is a TESScut entry, then download cutout
-        if 'FFI Cutout' in table[0]['description']:
+        if "FFI Cutout" in table[0]["description"]:
             try:
-                log.debug("Started downloading TESSCut for '{}' sector {}."
-                          "".format(table[0]['target_name'], table[0]['sequence_number']))
-                path = self._fetch_tesscut_path(table[0]['target_name'],
-                                                table[0]['sequence_number'],
-                                                download_dir,
-                                                cutout_size)
+                log.debug(
+                    "Started downloading TESSCut for '{}' sector {}."
+                    "".format(table[0]["target_name"], table[0]["sequence_number"])
+                )
+                path = self._fetch_tesscut_path(
+                    table[0]["target_name"],
+                    table[0]["sequence_number"],
+                    download_dir,
+                    cutout_size,
+                )
             except Exception as exc:
                 msg = str(exc)
                 if "504" in msg:
                     # TESSCut will occasionally return a "504 Gateway Timeout
                     # error" when it is overloaded.
-                    raise HTTPError('The TESS FFI cutout service at MAST appears '
-                                    'to be temporarily unavailable. It returned '
-                                    'the following error: {}'.format(exc))
+                    raise HTTPError(
+                        "The TESS FFI cutout service at MAST appears "
+                        "to be temporarily unavailable. It returned "
+                        "the following error: {}".format(exc)
+                    )
                 else:
-                    raise SearchError('Unable to download FFI cutout. Desired target '
-                                    'coordinates may be too near the edge of the FFI.'
-                                    'Error: {}'.format(exc))
+                    raise SearchError(
+                        "Unable to download FFI cutout. Desired target "
+                        "coordinates may be too near the edge of the FFI."
+                        "Error: {}".format(exc)
+                    )
 
-            return read(path,
-                        quality_bitmask=quality_bitmask,
-                        targetid=table[0]['targetid'])
+            return read(
+                path, quality_bitmask=quality_bitmask, targetid=table[0]["targetid"]
+            )
 
         else:
             if cutout_size is not None:
-                warnings.warn('`cutout_size` can only be specified for TESS '
-                              'Full Frame Image cutouts.', LightkurveWarning)
+                warnings.warn(
+                    "`cutout_size` can only be specified for TESS "
+                    "Full Frame Image cutouts.",
+                    LightkurveWarning,
+                )
             # Whenever `astroquery.mast.Observations.download_products` is called,
             # a HTTP request will be sent to determine the length of the file
             # prior to checking if the file already exists in the local cache.
@@ -240,23 +270,29 @@ class SearchResult(object):
             # with the one hard-coded inside `astroquery.mast.Observations._download_files()`
             # in Astroquery v0.4.1.  It would be good to submit a PR to astroquery
             # so we can avoid having to use this hard-coded hack.
-            path = os.path.join(download_dir.rstrip('/'),
-                                "mastDownload",
-                                table['obs_collection'][0],
-                                table['obs_id'][0],
-                                table['productFilename'][0])
+            path = os.path.join(
+                download_dir.rstrip("/"),
+                "mastDownload",
+                table["obs_collection"][0],
+                table["obs_id"][0],
+                table["productFilename"][0],
+            )
             if os.path.exists(path):
                 log.debug("File found in local cache.")
             else:
                 from astroquery.mast import Observations
-                log.debug("Started downloading {}.".format(table[:1]['dataURL'][0]))
-                path = Observations.download_products(table[:1], mrp_only=False,
-                                                      download_dir=download_dir)['Local Path'][0]
+
+                log.debug("Started downloading {}.".format(table[:1]["dataURL"][0]))
+                path = Observations.download_products(
+                    table[:1], mrp_only=False, download_dir=download_dir
+                )["Local Path"][0]
                 log.debug("Finished downloading.")
             return read(path, quality_bitmask=quality_bitmask, **kwargs)
 
     @suppress_stdout
-    def download(self, quality_bitmask='default', download_dir=None, cutout_size=None, **kwargs):
+    def download(
+        self, quality_bitmask="default", download_dir=None, cutout_size=None, **kwargs
+    ):
         """Download and open the first data product in the search result.
 
         If multiple files are present in `SearchResult.table`, only the first
@@ -302,25 +338,32 @@ class SearchResult(object):
             If any other error occurs.
         """
         if len(self.table) == 0:
-            warnings.warn("Cannot download from an empty search result.",
-                          LightkurveWarning)
+            warnings.warn(
+                "Cannot download from an empty search result.", LightkurveWarning
+            )
             return None
         if len(self.table) != 1:
-            warnings.warn('Warning: {} files available to download. '
-                          'Only the first file has been downloaded. '
-                          'Please use `download_all()` or specify additional '
-                          'criteria (e.g. quarter, campaign, or sector) '
-                          'to limit your search.'.format(len(self.table)),
-                          LightkurveWarning)
+            warnings.warn(
+                "Warning: {} files available to download. "
+                "Only the first file has been downloaded. "
+                "Please use `download_all()` or specify additional "
+                "criteria (e.g. quarter, campaign, or sector) "
+                "to limit your search.".format(len(self.table)),
+                LightkurveWarning,
+            )
 
-        return self._download_one(table=self.table[:1],
-                                  quality_bitmask=quality_bitmask,
-                                  download_dir=download_dir,
-                                  cutout_size=cutout_size,
-                                  **kwargs)
+        return self._download_one(
+            table=self.table[:1],
+            quality_bitmask=quality_bitmask,
+            download_dir=download_dir,
+            cutout_size=cutout_size,
+            **kwargs,
+        )
 
     @suppress_stdout
-    def download_all(self, quality_bitmask='default', download_dir=None, cutout_size=None, **kwargs):
+    def download_all(
+        self, quality_bitmask="default", download_dir=None, cutout_size=None, **kwargs
+    ):
         """Download and open all data products in the search result.
 
         This method will returns a `~lightkurve.collections.TargetPixelFileCollection` or
@@ -368,18 +411,23 @@ class SearchResult(object):
             If any other error occurs.
         """
         if len(self.table) == 0:
-            warnings.warn("Cannot download from an empty search result.",
-                          LightkurveWarning)
+            warnings.warn(
+                "Cannot download from an empty search result.", LightkurveWarning
+            )
             return None
         log.debug("{} files will be downloaded.".format(len(self.table)))
 
         products = []
         for idx in range(len(self.table)):
-            products.append(self._download_one(table=self.table[idx:idx+1],
-                                               quality_bitmask=quality_bitmask,
-                                               download_dir=download_dir,
-                                               cutout_size=cutout_size,
-                                               **kwargs))
+            products.append(
+                self._download_one(
+                    table=self.table[idx : idx + 1],
+                    quality_bitmask=quality_bitmask,
+                    download_dir=download_dir,
+                    cutout_size=cutout_size,
+                    **kwargs,
+                )
+            )
         if isinstance(products[0], TargetPixelFile):
             return TargetPixelFileCollection(products)
         else:
@@ -397,7 +445,7 @@ class SearchResult(object):
         download_dir : str
             Path to location of `mastDownload` folder where data downloaded from MAST are stored
         """
-        download_dir = os.path.join(os.path.expanduser('~'), '.lightkurve-cache')
+        download_dir = os.path.join(os.path.expanduser("~"), ".lightkurve-cache")
         if os.path.isdir(download_dir):
             return download_dir
         else:
@@ -406,10 +454,12 @@ class SearchResult(object):
                 os.mkdir(download_dir)
             # downloads locally if OS error occurs
             except OSError:
-                log.warning('Warning: unable to create {}. '
-                            'Downloading MAST files to the current '
-                            'working directory instead.'.format(download_dir))
-                download_dir = '.'
+                log.warning(
+                    "Warning: unable to create {}. "
+                    "Downloading MAST files to the current "
+                    "working directory instead.".format(download_dir)
+                )
+                download_dir = "."
 
         return download_dir
 
@@ -431,6 +481,7 @@ class SearchResult(object):
             Path to locally downloaded cutout file
         """
         from astroquery.mast import TesscutClass
+
         coords = _resolve_object(target)
 
         # Set cutout_size defaults
@@ -438,7 +489,7 @@ class SearchResult(object):
             cutout_size = 5
 
         # Check existence of `~/.lightkurve-cache/tesscut`
-        tesscut_dir = os.path.join(download_dir, 'tesscut')
+        tesscut_dir = os.path.join(download_dir, "tesscut")
         if not os.path.isdir(tesscut_dir):
             # if it doesn't exist, make a new cache directory
             try:
@@ -453,20 +504,22 @@ class SearchResult(object):
         # build path string name and check if it exists
         # this is necessary to ensure cutouts are not downloaded multiple times
         sec = TesscutClass().get_sectors(coords)
-        sector_name = sec[sec['sector'] == sector]['sectorName'][0]
+        sector_name = sec[sec["sector"] == sector]["sectorName"][0]
         if isinstance(cutout_size, int):
-            size_str = str(int(cutout_size)) + 'x' + str(int(cutout_size))
+            size_str = str(int(cutout_size)) + "x" + str(int(cutout_size))
         elif isinstance(cutout_size, tuple) or isinstance(cutout_size, list):
-            size_str = str(int(cutout_size[1])) + 'x' + str(int(cutout_size[0]))
+            size_str = str(int(cutout_size[1])) + "x" + str(int(cutout_size[0]))
 
         # search cache for file with matching ra, dec, and cutout size
         # ra and dec are searched within 0.001 degrees of input target
         ra_string = str(coords.ra.value)
         dec_string = str(coords.dec.value)
-        matchstring = r"{}_{}*_{}*_{}_astrocut.fits".format(sector_name,
-                                                            ra_string[:ra_string.find('.')+4],
-                                                            dec_string[:dec_string.find('.')+4],
-                                                            size_str)
+        matchstring = r"{}_{}*_{}*_{}_astrocut.fits".format(
+            sector_name,
+            ra_string[: ra_string.find(".") + 4],
+            dec_string[: dec_string.find(".") + 4],
+            size_str,
+        )
         cached_files = glob.glob(os.path.join(tesscut_dir, matchstring))
 
         # if any files exist, return the path to them instead of downloading
@@ -475,18 +528,28 @@ class SearchResult(object):
             log.debug("Cached file found.")
         # otherwise the file will be downloaded
         else:
-            cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
-                                                          sector=sector, path=tesscut_dir)
+            cutout_path = TesscutClass().download_cutouts(
+                coords, size=cutout_size, sector=sector, path=tesscut_dir
+            )
             path = os.path.join(download_dir, cutout_path[0][0])
             log.debug("Finished downloading.")
         return path
 
+
 @cached
-def search_targetpixelfile(target, radius=None, exptime=None, cadence=None,
-                           mission=('Kepler', 'K2', 'TESS'),
-                           author=None,
-                           quarter=None, month=None, campaign=None, sector=None,
-                           limit=None):
+def search_targetpixelfile(
+    target,
+    radius=None,
+    exptime=None,
+    cadence=None,
+    mission=("Kepler", "K2", "TESS"),
+    author=None,
+    quarter=None,
+    month=None,
+    campaign=None,
+    sector=None,
+    limit=None,
+):
     """Search the `MAST data archive <https://archive.stsci.edu>`_ for target pixel files.
 
     This function fetches a data table that lists the Target Pixel Files (TPFs)
@@ -577,28 +640,45 @@ def search_targetpixelfile(target, radius=None, exptime=None, cadence=None,
         >>> search_targetpixelfile('Kepler-10', radius=100, quarter=4).download_all()  # doctest: +SKIP
     """
     try:
-        return _search_products(target, radius=radius, filetype="Target Pixel",
-                                exptime=exptime or cadence, mission=mission,
-                                provenance_name=author,
-                                quarter=quarter, month=month,
-                                campaign=campaign, sector=sector,
-                                limit=limit)
+        return _search_products(
+            target,
+            radius=radius,
+            filetype="Target Pixel",
+            exptime=exptime or cadence,
+            mission=mission,
+            provenance_name=author,
+            quarter=quarter,
+            month=month,
+            campaign=campaign,
+            sector=sector,
+            limit=limit,
+        )
     except SearchError as exc:
         log.error(exc)
         return SearchResult(None)
 
 
-@deprecated("2.0", alternative="search_lightcurve()", warning_type=LightkurveDeprecationWarning)
+@deprecated(
+    "2.0", alternative="search_lightcurve()", warning_type=LightkurveDeprecationWarning
+)
 def search_lightcurvefile(*args, **kwargs):
     return search_lightcurve(*args, **kwargs)
 
 
 @cached
-def search_lightcurve(target, radius=None, exptime=None, cadence=None,
-                      mission=('Kepler', 'K2', 'TESS'),
-                      author=None,
-                      quarter=None, month=None, campaign=None, sector=None,
-                      limit=None):
+def search_lightcurve(
+    target,
+    radius=None,
+    exptime=None,
+    cadence=None,
+    mission=("Kepler", "K2", "TESS"),
+    author=None,
+    quarter=None,
+    month=None,
+    campaign=None,
+    sector=None,
+    limit=None,
+):
     """Search the `MAST data archive <https://archive.stsci.edu>`_ for light curves.
 
     This function fetches a data table that lists the Light Curve Files
@@ -691,11 +771,19 @@ def search_lightcurve(target, radius=None, exptime=None, cadence=None,
         >>> search_lightcurvefile('kepler-10', radius=100, quarter=4).download_all()  # doctest: +SKIP
     """
     try:
-        return _search_products(target, radius=radius, filetype="Lightcurve",
-                                exptime=exptime or cadence, mission=mission,
-                                provenance_name=author,
-                                quarter=quarter, month=month,
-                                campaign=campaign, sector=sector, limit=limit)
+        return _search_products(
+            target,
+            radius=radius,
+            filetype="Lightcurve",
+            exptime=exptime or cadence,
+            mission=mission,
+            provenance_name=author,
+            quarter=quarter,
+            month=month,
+            campaign=campaign,
+            sector=sector,
+            limit=limit,
+        )
     except SearchError as exc:
         log.error(exc)
         return SearchResult(None)
@@ -731,18 +819,26 @@ def search_tesscut(target, sector=None):
         Object detailing the data products found.
     """
     try:
-        return _search_products(target, filetype="ffi", mission='TESS', sector=sector)
+        return _search_products(target, filetype="ffi", mission="TESS", sector=sector)
     except SearchError as exc:
         log.error(exc)
         return SearchResult(None)
 
 
-def _search_products(target, radius=None, filetype="Lightcurve",
-                     mission=('Kepler', 'K2', 'TESS'),
-                     provenance_name=None,
-                     exptime=(0, 9999), quarter=None, month=None,
-                     campaign=None, sector=None, limit=None,
-                     **extra_query_criteria):
+def _search_products(
+    target,
+    radius=None,
+    filetype="Lightcurve",
+    mission=("Kepler", "K2", "TESS"),
+    provenance_name=None,
+    exptime=(0, 9999),
+    quarter=None,
+    month=None,
+    campaign=None,
+    sector=None,
+    limit=None,
+    **extra_query_criteria,
+):
     """Helper function which returns a SearchResult object containing MAST
     products that match several criteria.
 
@@ -785,13 +881,17 @@ def _search_products(target, radius=None, filetype="Lightcurve",
     """
     if isinstance(target, int):
         if (0 < target) and (target < 13161030):
-            log.warning("Warning: {} may refer to a different Kepler or TESS target. "
-                        "Please add the prefix 'KIC' or 'TIC' to disambiguate."
-                        "".format(target))
+            log.warning(
+                "Warning: {} may refer to a different Kepler or TESS target. "
+                "Please add the prefix 'KIC' or 'TIC' to disambiguate."
+                "".format(target)
+            )
         elif (0 < 200000000) and (target < 251813739):
-            log.warning("Warning: {} may refer to a different K2 or TESS target. "
-                        "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
-                        "".format(target))
+            log.warning(
+                "Warning: {} may refer to a different K2 or TESS target. "
+                "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
+                "".format(target)
+            )
 
     # Specifying quarter, campaign, or quarter should constrain the mission
     if quarter:
@@ -811,104 +911,129 @@ def _search_products(target, radius=None, filetype="Lightcurve",
 
     # Speed up by restricting the MAST query if we don't want FFI image data
     extra_query_criteria = {}
-    if filetype in ['Lightcurve', 'Target Pixel']:
+    if filetype in ["Lightcurve", "Target Pixel"]:
         # At MAST, non-FFI Kepler pipeline products are known as "cube" products,
         # and non-FFI TESS pipeline products are listed as "timeseries".
-        extra_query_criteria['dataproduct_type'] = ['cube', 'timeseries']
+        extra_query_criteria["dataproduct_type"] = ["cube", "timeseries"]
     # Make sure `search_tesscut` always performs a cone search (i.e. always
     # passed a radius value), because strict target name search does not apply.
-    if filetype.lower() == 'ffi' and radius is None:
-        radius = .0001 * u.arcsec
-    observations = _query_mast(target, radius=radius,
-                               project=mission,
-                               provenance_name=provenance_name,
-                               exptime=exptime,
-                               sequence_number=campaign or sector,
-                               **extra_query_criteria)
-    log.debug("MAST found {} observations. "
-              "Now querying MAST for the corresponding data products."
-              "".format(len(observations)))
+    if filetype.lower() == "ffi" and radius is None:
+        radius = 0.0001 * u.arcsec
+    observations = _query_mast(
+        target,
+        radius=radius,
+        project=mission,
+        provenance_name=provenance_name,
+        exptime=exptime,
+        sequence_number=campaign or sector,
+        **extra_query_criteria,
+    )
+    log.debug(
+        "MAST found {} observations. "
+        "Now querying MAST for the corresponding data products."
+        "".format(len(observations))
+    )
     if len(observations) == 0:
         raise SearchError('No data found for target "{}".'.format(target))
 
     # Light curves and target pixel files
-    if filetype.lower() != 'ffi':
+    if filetype.lower() != "ffi":
         from astroquery.mast import Observations
+
         products = Observations.get_product_list(observations)
-        result = join(observations, products, keys="obs_id", join_type='right',
-                      uniq_col_name='{col_name}{table_name}', table_names=['', '_products'])
-        result.sort(['distance', 'obs_id'])
+        result = join(
+            observations,
+            products,
+            keys="obs_id",
+            join_type="right",
+            uniq_col_name="{col_name}{table_name}",
+            table_names=["", "_products"],
+        )
+        result.sort(["distance", "obs_id"])
 
         # Add the user-friendly 'author' column (synonym for 'provenance_name')
-        result['author'] = result['provenance_name']
+        result["author"] = result["provenance_name"]
         # Add the user-friendly 'mission' column
-        result['mission'] = None
-        obs_prefix = {'Kepler': 'Quarter', 'K2': 'Campaign', 'TESS': 'Sector'}
+        result["mission"] = None
+        obs_prefix = {"Kepler": "Quarter", "K2": "Campaign", "TESS": "Sector"}
         for idx in range(len(result)):
-            obs_project = result['project'][idx]
-            tmp_seqno = result['sequence_number'][idx]
+            obs_project = result["project"][idx]
+            tmp_seqno = result["sequence_number"][idx]
             obs_seqno = f"{tmp_seqno:02d}" if tmp_seqno else ""
             # Kepler sequence_number values were not populated at the time of
             # writing this code, so we parse them from the description field.
-            if obs_project == 'Kepler' and result['sequence_number'].mask[idx]:
+            if obs_project == "Kepler" and result["sequence_number"].mask[idx]:
                 try:
-                    tmp_seqno = re.findall(r".*Q(\d+)", result['description'][idx])[0]
+                    tmp_seqno = re.findall(r".*Q(\d+)", result["description"][idx])[0]
                     obs_seqno = f"{int(tmp_seqno):02d}"
                 except IndexError:
                     obs_seqno = ""
-            result['mission'][idx] = "{} {} {}".format(obs_project,
-                                                           obs_prefix.get(obs_project, ""),
-                                                           obs_seqno)
+            result["mission"][idx] = "{} {} {}".format(
+                obs_project, obs_prefix.get(obs_project, ""), obs_seqno
+            )
 
-        masked_result = _filter_products(result, filetype=filetype,
-                                         campaign=campaign, quarter=quarter,
-                                         exptime=exptime, project=mission,
-                                         provenance_name=provenance_name,
-                                         month=month, sector=sector, limit=limit)
+        masked_result = _filter_products(
+            result,
+            filetype=filetype,
+            campaign=campaign,
+            quarter=quarter,
+            exptime=exptime,
+            project=mission,
+            provenance_name=provenance_name,
+            month=month,
+            sector=sector,
+            limit=limit,
+        )
         log.debug("MAST found {} matching data products.".format(len(masked_result)))
-        masked_result['distance'].info.format = '.1f'  # display <0.1 arcsec
+        masked_result["distance"].info.format = ".1f"  # display <0.1 arcsec
         return SearchResult(masked_result)
 
     # Full Frame Images
     else:
         cutouts = []
-        for idx in np.where(['TESS FFI' in t for t in observations['target_name']])[0]:
+        for idx in np.where(["TESS FFI" in t for t in observations["target_name"]])[0]:
             # if target passed in is a SkyCoord object, convert to RA, dec pair
             if isinstance(target, SkyCoord):
-                target = '{}, {}'.format(target.ra.deg, target.dec.deg)
+                target = "{}, {}".format(target.ra.deg, target.dec.deg)
             # pull sector numbers
-            s = observations['sequence_number'][idx]
+            s = observations["sequence_number"][idx]
             # if the desired sector is available, add a row
             if s in np.atleast_1d(sector) or sector is None:
-                cutouts.append({'description': f'TESS FFI Cutout (sector {s})',
-                                'mission': f'TESS Sector {s:02d}',
-                                'target_name': str(target),
-                                'targetid': str(target),
-                                't_min': observations['t_min'][idx],
-                                'exptime': observations['exptime'][idx],
-                                'productFilename': 'TESScut',
-                                'provenance_name': 'TESScut',
-                                'author': 'TESScut',
-                                'distance': 0.0,
-                                'sequence_number': s,
-                                'project': 'TESS',
-                                'obs_collection': 'TESS'}
-                               )
+                cutouts.append(
+                    {
+                        "description": f"TESS FFI Cutout (sector {s})",
+                        "mission": f"TESS Sector {s:02d}",
+                        "target_name": str(target),
+                        "targetid": str(target),
+                        "t_min": observations["t_min"][idx],
+                        "exptime": observations["exptime"][idx],
+                        "productFilename": "TESScut",
+                        "provenance_name": "TESScut",
+                        "author": "TESScut",
+                        "distance": 0.0,
+                        "sequence_number": s,
+                        "project": "TESS",
+                        "obs_collection": "TESS",
+                    }
+                )
         if len(cutouts) > 0:
             log.debug("Found {} matching cutouts.".format(len(cutouts)))
             masked_result = Table(cutouts)
-            masked_result.sort(['distance', 'sequence_number'])
+            masked_result.sort(["distance", "sequence_number"])
         else:
             masked_result = None
         return SearchResult(masked_result)
 
 
-def _query_mast(target, radius=None,
-                project=('Kepler', 'K2', 'TESS'),
-                provenance_name=None,
-                exptime=(0, 9999),
-                sequence_number=None,
-                **extra_query_criteria):
+def _query_mast(
+    target,
+    radius=None,
+    project=("Kepler", "K2", "TESS"),
+    provenance_name=None,
+    exptime=(0, 9999),
+    sequence_number=None,
+    **extra_query_criteria,
+):
     """Helper function which wraps `astroquery.mast.Observations.query_criteria()`
     to return a table of all Kepler/K2/TESS observations of a given target.
 
@@ -948,20 +1073,17 @@ def _query_mast(target, radius=None,
 
     # If passed a SkyCoord, convert it to an "ra, dec" string for MAST
     if isinstance(target, SkyCoord):
-        target = '{}, {}'.format(target.ra.deg, target.dec.deg)
+        target = "{}, {}".format(target.ra.deg, target.dec.deg)
 
     # We pass the following `query_criteria` to MAST regardless of whether
     # we search by position or target name:
-    query_criteria = {
-        'project': project,
-        **extra_query_criteria
-        }
+    query_criteria = {"project": project, **extra_query_criteria}
     if provenance_name is not None:
-        query_criteria['provenance_name'] = provenance_name
+        query_criteria["provenance_name"] = provenance_name
     if sequence_number is not None:
-        query_criteria['sequence_number'] = sequence_number
+        query_criteria["sequence_number"] = sequence_number
     if exptime is not None:
-        query_criteria['t_exptime'] = exptime
+        query_criteria["t_exptime"] = exptime
 
     # If an exact KIC ID is passed, we will search by the exact `target_name`
     # under which MAST will know the object to prevent source confusion.
@@ -982,19 +1104,22 @@ def _query_mast(target, radius=None,
         exact_target_name = f"{tess_match.group(2).zfill(9)}"
 
     if exact_target_name and radius is None:
-        log.debug("Started querying MAST for observations with the exact "
-                  f"target_name='{exact_target_name}'.")
+        log.debug(
+            "Started querying MAST for observations with the exact "
+            f"target_name='{exact_target_name}'."
+        )
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=NoResultsWarning)
             warnings.filterwarnings("ignore", message="t_exptime is continuous")
-            obs = Observations.query_criteria(target_name=exact_target_name,
-                                              **query_criteria)
+            obs = Observations.query_criteria(
+                target_name=exact_target_name, **query_criteria
+            )
         if len(obs) > 0:
             # We use `exptime` as an alias for `t_exptime`
-            obs['exptime'] = obs['t_exptime']
+            obs["exptime"] = obs["t_exptime"]
             # astroquery does not report distance when querying by `target_name`;
             # we add it here so that the table returned always has this column.
-            obs['distance'] = 0.
+            obs["distance"] = 0.0
             return obs
         else:
             log.debug(f"No observations found. Now performing a cone search instead.")
@@ -1002,33 +1127,41 @@ def _query_mast(target, radius=None,
     # If the above did not return a result, then do a cone search using the MAST name resolver
     # `radius` defaults to 0.0001 and unit arcsecond
     if radius is None:
-        radius = .0001 * u.arcsec
+        radius = 0.0001 * u.arcsec
     elif not isinstance(radius, u.quantity.Quantity):
         radius = radius * u.arcsec
-    query_criteria['radius'] = str(radius.to(u.deg))
+    query_criteria["radius"] = str(radius.to(u.deg))
 
     try:
-        log.debug("Started querying MAST for observations within "
-                  f"{radius.to(u.arcsec)} arcsec of objectname='{target}'.")
+        log.debug(
+            "Started querying MAST for observations within "
+            f"{radius.to(u.arcsec)} arcsec of objectname='{target}'."
+        )
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=NoResultsWarning)
             warnings.filterwarnings("ignore", message="t_exptime is continuous")
-            obs = Observations.query_criteria(objectname=target,
-                                              **query_criteria)
-        obs.sort('distance')
+            obs = Observations.query_criteria(objectname=target, **query_criteria)
+        obs.sort("distance")
         # We use `exptime` as an alias for `t_exptime`
-        obs['exptime'] = obs['t_exptime']
+        obs["exptime"] = obs["t_exptime"]
         return obs
     except ResolverError as exc:
         # MAST failed to resolve the object name to sky coordinates
         raise SearchError(exc) from exc
 
 
-def _filter_products(products, campaign=None, quarter=None, month=None,
-                     sector=None, exptime=None, limit=None,
-                     project=('Kepler', 'K2', 'TESS'),
-                     provenance_name=None,
-                     filetype='Target Pixel'):
+def _filter_products(
+    products,
+    campaign=None,
+    quarter=None,
+    month=None,
+    sector=None,
+    exptime=None,
+    limit=None,
+    project=("Kepler", "K2", "TESS"),
+    provenance_name=None,
+    filetype="Target Pixel",
+):
     """Helper function which filters a SearchResult's products table by one or
     more criteria.
 
@@ -1058,15 +1191,17 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         Masked astropy table containing desired data products
     """
     if provenance_name is None:  # apply all filters
-        provenance_lower = ('kepler', 'k2', 'spoc')
+        provenance_lower = ("kepler", "k2", "spoc")
     else:
         provenance_lower = [p.lower() for p in np.atleast_1d(provenance_name)]
 
     mask = np.ones(len(products), dtype=bool)
 
     # Kepler data needs a special filter for quarter and month
-    mask &= ~np.array([prov.lower() == 'kepler' for prov in products['provenance_name']])
-    if 'kepler' in provenance_lower and campaign is None and sector is None:
+    mask &= ~np.array(
+        [prov.lower() == "kepler" for prov in products["provenance_name"]]
+    )
+    if "kepler" in provenance_lower and campaign is None and sector is None:
         mask |= _mask_kepler_products(products, quarter=quarter, month=month)
 
     # HLSP products need to be filtered by extension
@@ -1076,22 +1211,28 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         )
     elif filetype.lower() == "target pixel":
         mask &= np.array(
-            [uri.lower().endswith(("tp.fits", "targ.fits.gz")) for uri in products["productFilename"]]
+            [
+                uri.lower().endswith(("tp.fits", "targ.fits.gz"))
+                for uri in products["productFilename"]
+            ]
         )
     elif filetype.lower() == "ffi":
-        mask &= np.array(['TESScut' in desc for desc in products['description']])
+        mask &= np.array(["TESScut" in desc for desc in products["description"]])
 
     # Allow only fits files
-    mask &= np.array([uri.lower().endswith('fits') or
-                      uri.lower().endswith('fits.gz')
-                      for uri in products['productFilename']])
+    mask &= np.array(
+        [
+            uri.lower().endswith("fits") or uri.lower().endswith("fits.gz")
+            for uri in products["productFilename"]
+        ]
+    )
 
     # Filter by cadence
     mask &= _mask_by_exptime(products, exptime)
 
     products = products[mask]
 
-    products.sort(['distance', 'productFilename'])
+    products.sort(["distance", "productFilename"])
     if limit is not None:
         return products[0:limit]
     return products
@@ -1099,7 +1240,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
 
 def _mask_kepler_products(products, quarter=None, month=None):
     """Returns a mask flagging the Kepler products that match the criteria."""
-    mask = np.array([proj.lower() == 'kepler' for proj in products['provenance_name']])
+    mask = np.array([proj.lower() == "kepler" for proj in products["provenance_name"]])
     if mask.sum() == 0:
         return mask
 
@@ -1109,31 +1250,45 @@ def _mask_kepler_products(products, quarter=None, month=None):
     if quarter is not None:
         quarter_mask = np.zeros(len(products), dtype=bool)
         for q in np.atleast_1d(quarter):
-            quarter_mask |= np.array([desc.lower().replace('-', '').endswith('q{}'.format(q))
-                                      for desc in products['description']])
+            quarter_mask |= np.array(
+                [
+                    desc.lower().replace("-", "").endswith("q{}".format(q))
+                    for desc in products["description"]
+                ]
+            )
         mask &= quarter_mask
 
     # For Kepler short cadence data the month can be specified
     if month is not None:
         month = np.atleast_1d(month)
         # Get the short cadence date lookup table.
-        table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
+        table = ascii.read(
+            os.path.join(PACKAGEDIR, "data", "short_cadence_month_lookup.csv")
+        )
         # The following line is needed for systems where the default integer type
         # is int32 (e.g. Windows/Appveyor), the column will then be interpreted
         # as string which makes the test fail.
-        table['StartTime'] = table['StartTime'].astype(str)
+        table["StartTime"] = table["StartTime"].astype(str)
         # Grab the dates of each of the short cadence files.
         # Make sure every entry has the correct month
-        is_shortcadence = mask & np.asarray(['Short' in desc for desc in products['description']])
+        is_shortcadence = mask & np.asarray(
+            ["Short" in desc for desc in products["description"]]
+        )
         for idx in np.where(is_shortcadence)[0]:
-            quarter = int(products['description'][idx].split(' - ')[-1][1:].replace('-', ''))
-            date = products['dataURI'][idx].split('/')[-1].split('-')[1].split('_')[0]
+            quarter = int(
+                products["description"][idx].split(" - ")[-1][1:].replace("-", "")
+            )
+            date = products["dataURI"][idx].split("/")[-1].split("-")[1].split("_")[0]
             permitted_dates = []
             for m in month:
                 try:
-                    permitted_dates.append(table['StartTime'][
-                        np.where((table['Month'] == m) & (table['Quarter'] == quarter))[0][0]
-                                    ])
+                    permitted_dates.append(
+                        table["StartTime"][
+                            np.where(
+                                (table["Month"] == m) & (table["Quarter"] == quarter)
+                            )[0][0]
+                        ]
+                    )
                 except IndexError:
                     pass
             if not (date in permitted_dates):
@@ -1146,18 +1301,19 @@ def _mask_by_exptime(products, exptime):
     """Helper function to filter by exposure time."""
     mask = np.ones(len(products), dtype=bool)
     if isinstance(exptime, (int, float)):
-        mask &= products['exptime'] == exptime
-    elif exptime in ['fast']:
-        mask &= products['exptime'] < 60
-    elif exptime in ['short']:
-        mask &= (products['exptime'] >= 60) & (products['exptime'] < 300)
-    elif exptime in ['long', 'ffi']:
-        mask &= products['exptime'] >= 300
+        mask &= products["exptime"] == exptime
+    elif exptime in ["fast"]:
+        mask &= products["exptime"] < 60
+    elif exptime in ["short"]:
+        mask &= (products["exptime"] >= 60) & (products["exptime"] < 300)
+    elif exptime in ["long", "ffi"]:
+        mask &= products["exptime"] >= 300
     return mask
 
 
 def _resolve_object(target):
     """Ask MAST to resolve an object string to a set of coordinates."""
     from astroquery.mast import MastClass
+
     # Note: `_resolve_object` was renamed `resolve_object` in astroquery 0.3.10 (2019)
     return MastClass().resolve_object(target)

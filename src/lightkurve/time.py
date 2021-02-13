@@ -7,9 +7,10 @@ class TimeBKJD(TimeNumeric):
     Barycentric Kepler Julian Date time format.
     This represents the number of days since January 1, 2009 12:00:00 UTC.
     BKJD is the format in which times are recorded in Kepler data products.
-    See Section 2.3.2 in the Kepler Archive Manual for details. 
+    See Section 2.3.2 in the Kepler Archive Manual for details.
     """
-    name = 'bkjd'
+
+    name = "bkjd"
     BKJDREF = 2454833  # Barycentric Kepler Julian Date offset
 
     def set_jds(self, val1, val2):
@@ -32,7 +33,8 @@ class TimeBTJD(TimeNumeric):
     This represents the number of days since JD 2457000.0.
     BTJD is the format in which times are recorded in TESS data products.
     """
-    name = 'btjd'
+
+    name = "btjd"
     BTJDREF = 2457000  # Barycentric TESS Julian Date offset
 
     def set_jds(self, val1, val2):

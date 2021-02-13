@@ -9,7 +9,7 @@ from .. import MPLSTYLE
 from . import utils
 from .utils import SeismologyQuantity
 
-__all__ = ['estimate_numax_acf2d', 'diagnose_numax_acf2d']
+__all__ = ["estimate_numax_acf2d", "diagnose_numax_acf2d"]
 
 
 def estimate_numax_acf2d(periodogram, numaxs=None, window_width=None, spacing=None):
@@ -91,67 +91,95 @@ def estimate_numax_acf2d(periodogram, numaxs=None, window_width=None, spacing=No
     """
     # Detect whether the frequency grid is evenly-spaced
     if not periodogram._is_evenly_spaced():
-        raise ValueError("the ACF 2D method requires that the periodogram "
-                         "has a grid of uniformly spaced frequencies.")
+        raise ValueError(
+            "the ACF 2D method requires that the periodogram "
+            "has a grid of uniformly spaced frequencies."
+        )
 
     # Calculate the window_width size
 
-    #C: What is this doing? Why have these values been picked? This function is slow.
+    # C: What is this doing? Why have these values been picked? This function is slow.
     if window_width is None:
-        if u.Quantity(periodogram.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
-            window_width = u.Quantity(250., u.microhertz).to(periodogram.frequency.unit).value
+        if u.Quantity(periodogram.frequency[-1], u.microhertz) > u.Quantity(
+            500.0, u.microhertz
+        ):
+            window_width = (
+                u.Quantity(250.0, u.microhertz).to(periodogram.frequency.unit).value
+            )
         else:
-            window_width = u.Quantity(25., u.microhertz).to(periodogram.frequency.unit).value
+            window_width = (
+                u.Quantity(25.0, u.microhertz).to(periodogram.frequency.unit).value
+            )
 
     # Calculate the spacing size
     if spacing is None:
-        if u.Quantity(periodogram.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
-            spacing = u.Quantity(10., u.microhertz).to(periodogram.frequency.unit).value
+        if u.Quantity(periodogram.frequency[-1], u.microhertz) > u.Quantity(
+            500.0, u.microhertz
+        ):
+            spacing = (
+                u.Quantity(10.0, u.microhertz).to(periodogram.frequency.unit).value
+            )
         else:
-            spacing = u.Quantity(1., u.microhertz).to(periodogram.frequency.unit).value
+            spacing = u.Quantity(1.0, u.microhertz).to(periodogram.frequency.unit).value
 
     # Run some checks on the inputs
     window_width = u.Quantity(window_width, periodogram.frequency.unit).value
     spacing = u.Quantity(spacing, periodogram.frequency.unit).value
     if numaxs is None:
-        numaxs = np.arange(np.ceil(np.nanmin(periodogram.frequency.value)) + window_width/2,
-                    np.floor(np.nanmax(periodogram.frequency.value)) - window_width/2,
-                    spacing)
+        numaxs = np.arange(
+            np.ceil(np.nanmin(periodogram.frequency.value)) + window_width / 2,
+            np.floor(np.nanmax(periodogram.frequency.value)) - window_width / 2,
+            spacing,
+        )
     numaxs = u.Quantity(numaxs, periodogram.frequency.unit).value
-    if not hasattr(numaxs, '__iter__'):
+    if not hasattr(numaxs, "__iter__"):
         numaxs = np.asarray([numaxs])
 
     fs = np.median(np.diff(periodogram.frequency.value))
     # Perform checks on spacing and window_width
-    for var, label in zip([np.asarray(window_width), np.asarray(spacing)],
-                          ['window_width', 'spacing']):
+    for var, label in zip(
+        [np.asarray(window_width), np.asarray(spacing)], ["window_width", "spacing"]
+    ):
         if (var < fs).any():
-            raise ValueError("You can't have {} smaller than the "
-                            "frequency separation!".format(label))
-        if (var > (periodogram.frequency[-1].value - periodogram.frequency[0].value)).any():
-            raise ValueError("You can't have {} wider than the entire "
-                            "power spectrum!".format(label))
+            raise ValueError(
+                "You can't have {} smaller than the "
+                "frequency separation!".format(label)
+            )
+        if (
+            var > (periodogram.frequency[-1].value - periodogram.frequency[0].value)
+        ).any():
+            raise ValueError(
+                "You can't have {} wider than the entire "
+                "power spectrum!".format(label)
+            )
         if (var < 0).any():
             raise ValueError("Please pass an entirely positive {}.".format(label))
 
     # Perform checks on numaxs
     if any(numaxs < fs):
-        raise ValueError("A custom range of numaxs can not extend below "
-                        "a single frequency bin.")
+        raise ValueError(
+            "A custom range of numaxs can not extend below " "a single frequency bin."
+        )
     if any(numaxs > np.nanmax(periodogram.frequency.value)):
-        raise ValueError("A custom range of numaxs can not extend above "
-                        "the highest frequency value in the periodogram.")
+        raise ValueError(
+            "A custom range of numaxs can not extend above "
+            "the highest frequency value in the periodogram."
+        )
 
     # We want to find the numax which returns in the highest autocorrelation
     # power, rescaled based on filter width
     fs = np.median(np.diff(periodogram.frequency.value))
 
     metric = np.zeros(len(numaxs))
-    acf2d = np.zeros([int(window_width/2/fs)*2,len(numaxs)])
+    acf2d = np.zeros([int(window_width / 2 / fs) * 2, len(numaxs)])
     for idx, numax in enumerate(numaxs):
-        acf = utils.autocorrelate(periodogram, numax, window_width=window_width, frequency_spacing=fs)      #Return the acf at this numax
-        acf2d[:, idx] = acf                                     #Store the 2D acf
-        metric[idx] = (np.sum(np.abs(acf)) - 1 ) / len(acf)  #Store the max acf power normalised by the length
+        acf = utils.autocorrelate(
+            periodogram, numax, window_width=window_width, frequency_spacing=fs
+        )  # Return the acf at this numax
+        acf2d[:, idx] = acf  # Store the 2D acf
+        metric[idx] = (np.sum(np.abs(acf)) - 1) / len(
+            acf
+        )  # Store the max acf power normalised by the length
 
     # Smooth the data to find the peak
     # Gaussian1D kernel takes a standard deviation in unitless indices. A stddev
@@ -159,7 +187,7 @@ def estimate_numax_acf2d(periodogram, numaxs=None, window_width=None, spacing=No
     # resolutions of numax.
     if len(numaxs) > 10:
         g = Gaussian1DKernel(stddev=np.sqrt(len(numaxs)))
-        metric_smooth = convolve(metric, g, boundary='extend')
+        metric_smooth = convolve(metric, g, boundary="extend")
     else:
         metric_smooth = metric
 
@@ -168,13 +196,20 @@ def estimate_numax_acf2d(periodogram, numaxs=None, window_width=None, spacing=No
     best_numax = u.Quantity(best_numax, periodogram.frequency.unit)
 
     # Create and return the object containing the result and diagnostics
-    diagnostics = {'numaxs':numaxs, 'acf2d':acf2d, 'window_width':window_width,
-                   'metric':metric, 'metric_smooth': metric_smooth}
-    result = SeismologyQuantity(best_numax,
-                                name="numax",
-                                method="ACF2D",
-                                diagnostics=diagnostics,
-                                diagnostics_plot_method=diagnose_numax_acf2d)
+    diagnostics = {
+        "numaxs": numaxs,
+        "acf2d": acf2d,
+        "window_width": window_width,
+        "metric": metric,
+        "metric_smooth": metric_smooth,
+    }
+    result = SeismologyQuantity(
+        best_numax,
+        name="numax",
+        method="ACF2D",
+        diagnostics=diagnostics,
+        diagnostics_plot_method=diagnose_numax_acf2d,
+    )
     return result
 
 
@@ -211,41 +246,79 @@ def diagnose_numax_acf2d(numax, periodogram):
     """
     with plt.style.context(MPLSTYLE):
         fig, ax = plt.subplots(3, sharex=True, figsize=(8.485, 12))
-        periodogram.plot(ax=ax[0], label='')
-        ax[0].axvline(numax.value, c='r', linewidth=2, alpha=.4,
-                label='{} = {:7.5} {}'.format(r'$\nu_{\rm max}$', numax.value, periodogram.frequency.unit.to_string('latex')))
-        ax[0].legend(loc='upper right')
-        ax[0].set_xlabel('')
-        ax[0].text(.05, .9, 'Input Power Spectrum',
-                    horizontalalignment='left',
-                    transform=ax[0].transAxes, fontsize=15)
+        periodogram.plot(ax=ax[0], label="")
+        ax[0].axvline(
+            numax.value,
+            c="r",
+            linewidth=2,
+            alpha=0.4,
+            label="{} = {:7.5} {}".format(
+                r"$\nu_{\rm max}$",
+                numax.value,
+                periodogram.frequency.unit.to_string("latex"),
+            ),
+        )
+        ax[0].legend(loc="upper right")
+        ax[0].set_xlabel("")
+        ax[0].text(
+            0.05,
+            0.9,
+            "Input Power Spectrum",
+            horizontalalignment="left",
+            transform=ax[0].transAxes,
+            fontsize=15,
+        )
 
-        vmin = np.nanpercentile(numax.diagnostics['acf2d'], 5)
-        vmax = np.nanpercentile(numax.diagnostics['acf2d'], 95)
-        ax[1].pcolormesh(numax.diagnostics['numaxs'],
-                         np.linspace(0, numax.diagnostics['window_width'],
-                         num=numax.diagnostics['acf2d'].shape[0]),
-                         numax.diagnostics['acf2d'],
-                         cmap='Blues',
-                         vmin=vmin,
-                         vmax=vmax)
-        ax[1].set_ylabel(r'Frequency lag [{}]'.format(periodogram.frequency.unit.to_string('latex')))
-        ax[1].axvline(numax.value, c='r', linewidth=2, alpha=.4)
-        ax[1].text(.05, .9, '2D AutoCorrelation',
-                    horizontalalignment='left',
-                    transform=ax[1].transAxes, fontsize=13)
+        vmin = np.nanpercentile(numax.diagnostics["acf2d"], 5)
+        vmax = np.nanpercentile(numax.diagnostics["acf2d"], 95)
+        ax[1].pcolormesh(
+            numax.diagnostics["numaxs"],
+            np.linspace(
+                0,
+                numax.diagnostics["window_width"],
+                num=numax.diagnostics["acf2d"].shape[0],
+            ),
+            numax.diagnostics["acf2d"],
+            cmap="Blues",
+            vmin=vmin,
+            vmax=vmax,
+        )
+        ax[1].set_ylabel(
+            r"Frequency lag [{}]".format(periodogram.frequency.unit.to_string("latex"))
+        )
+        ax[1].axvline(numax.value, c="r", linewidth=2, alpha=0.4)
+        ax[1].text(
+            0.05,
+            0.9,
+            "2D AutoCorrelation",
+            horizontalalignment="left",
+            transform=ax[1].transAxes,
+            fontsize=13,
+        )
 
-        ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric'])
-        ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric_smooth'],
-                   lw=2, alpha=0.7, label='Smoothed Metric')
-        ax[2].set_xlabel("Frequency [{}]".format(periodogram.frequency.unit.to_string('latex')))
-        ax[2].set_ylabel(r'Correlation Metric')
+        ax[2].plot(numax.diagnostics["numaxs"], numax.diagnostics["metric"])
+        ax[2].plot(
+            numax.diagnostics["numaxs"],
+            numax.diagnostics["metric_smooth"],
+            lw=2,
+            alpha=0.7,
+            label="Smoothed Metric",
+        )
+        ax[2].set_xlabel(
+            "Frequency [{}]".format(periodogram.frequency.unit.to_string("latex"))
+        )
+        ax[2].set_ylabel(r"Correlation Metric")
 
-        ax[2].axvline(numax.value, c='r', linewidth=2, alpha=.4)
-        ax[2].text(.05, .9, 'Correlation Metric',
-                            horizontalalignment='left',
-                            transform=ax[2].transAxes, fontsize=13)
-        ax[2].legend(loc='upper right')
-        ax[2].set_xlim(numax.diagnostics['numaxs'][0], numax.diagnostics['numaxs'][-1])
+        ax[2].axvline(numax.value, c="r", linewidth=2, alpha=0.4)
+        ax[2].text(
+            0.05,
+            0.9,
+            "Correlation Metric",
+            horizontalalignment="left",
+            transform=ax[2].transAxes,
+            fontsize=13,
+        )
+        ax[2].legend(loc="upper right")
+        ax[2].set_xlim(numax.diagnostics["numaxs"][0], numax.diagnostics["numaxs"][-1])
         plt.subplots_adjust(hspace=0, wspace=0)
     return ax

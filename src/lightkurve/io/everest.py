@@ -5,10 +5,9 @@ from ..utils import KeplerQualityFlags
 from .generic import read_generic_lightcurve
 
 
-def read_everest_lightcurve(filename,
-                            flux_column="flux",
-                            quality_bitmask="default",
-                            **kwargs):
+def read_everest_lightcurve(
+    filename, flux_column="flux", quality_bitmask="default", **kwargs
+):
     """Read an EVEREST light curve file.
 
     More information: https://archive.stsci.edu/hlsp/everest
@@ -39,24 +38,26 @@ def read_everest_lightcurve(filename,
     lc : `KeplerLightCurve`
         A populated light curve object.
     """
-    lc = read_generic_lightcurve(filename,
-                                 flux_column=flux_column,
-                                 quality_column='quality',
-                                 cadenceno_column='cadn',
-                                 time_format='bkjd')
+    lc = read_generic_lightcurve(
+        filename,
+        flux_column=flux_column,
+        quality_column="quality",
+        cadenceno_column="cadn",
+        time_format="bkjd",
+    )
 
     # Filter out poor-quality data
     # NOTE: Unfortunately Astropy Table masking does not yet work for columns
     # that are Quantity objects, so for now we remove poor-quality data instead
     # of masking. Details: https://github.com/astropy/astropy/issues/10119
     quality_mask = KeplerQualityFlags.create_quality_mask(
-                                quality_array=lc['quality'],
-                                bitmask=quality_bitmask)
+        quality_array=lc["quality"], bitmask=quality_bitmask
+    )
     lc = lc[quality_mask]
 
-    lc.meta['LABEL'] = '{} (EVEREST)'.format(lc.meta.get('OBJECT'))
-    lc.meta['TARGETID'] = lc.meta.get('KEPLERID')
-    lc.meta['QUALITY_BITMASK'] = quality_bitmask
-    lc.meta['QUALITY_MASK'] = quality_mask
+    lc.meta["LABEL"] = "{} (EVEREST)".format(lc.meta.get("OBJECT"))
+    lc.meta["TARGETID"] = lc.meta.get("KEPLERID")
+    lc.meta["QUALITY_BITMASK"] = quality_bitmask
+    lc.meta["QUALITY_MASK"] = quality_mask
 
     return KeplerLightCurve(data=lc, **kwargs)

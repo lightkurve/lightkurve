@@ -15,7 +15,7 @@ from .utils import LightkurveDeprecationWarning
 
 log = logging.getLogger(__name__)
 
-__all__ = ['LightCurveCollection', 'TargetPixelFileCollection']
+__all__ = ["LightCurveCollection", "TargetPixelFileCollection"]
 
 
 class Collection(object):
@@ -40,6 +40,7 @@ class Collection(object):
 
         >>>  lcc_filtered = lcc[0, 2]  # doctest: +SKIP
     """
+
     def __init__(self, data):
         if data is not None:
             # ensure we have our own container
@@ -51,24 +52,28 @@ class Collection(object):
         return len(self.data)
 
     def __getitem__(self, index_or_mask):
-        if (isinstance(index_or_mask, (int, np.integer, slice))):
+        if isinstance(index_or_mask, (int, np.integer, slice)):
             return self.data[index_or_mask]
-        elif (all([isinstance(i, (bool, np.bool_)) for i in index_or_mask])):
+        elif all([isinstance(i, (bool, np.bool_)) for i in index_or_mask]):
             # case indexOrMask is bool array like, e.g., np.ndarray, collections.abc.Sequence, etc.
 
             # note: filter using nd.array is very slow
             #   np.array(self.data)[np.nonzero(indexOrMask)]
             # specifically, nd.array(self.data) is very slow, as it deep copies the data
             # so we create the filtered list on our own
-            if (len(index_or_mask) != len(self.data)):
-                raise IndexError(f'boolean index did not match indexed array; dimension is {len(self.data)} '
-                                 f'but corresponding boolean dimension is {len(index_or_mask)}')
+            if len(index_or_mask) != len(self.data):
+                raise IndexError(
+                    f"boolean index did not match indexed array; dimension is {len(self.data)} "
+                    f"but corresponding boolean dimension is {len(index_or_mask)}"
+                )
             return type(self)([self.data[i] for i in np.nonzero(index_or_mask)[0]])
-        elif (all([isinstance(i, (int, np.integer)) for i in index_or_mask])):
+        elif all([isinstance(i, (int, np.integer)) for i in index_or_mask]):
             # case int array like, follow ndarray behavior
             return type(self)([self.data[i] for i in index_or_mask])
         else:
-            raise IndexError('only integers, slices (`:`) and integer or boolean arrays are valid indices')
+            raise IndexError(
+                "only integers, slices (`:`) and integer or boolean arrays are valid indices"
+            )
 
     def __setitem__(self, index, obj):
         self.data[index] = obj
@@ -85,10 +90,10 @@ class Collection(object):
 
     def __repr__(self):
         result = "{} of {} objects:\n".format(self.__class__.__name__, len(self.data))
-        if (isinstance(self[0], TargetPixelFile)):
+        if isinstance(self[0], TargetPixelFile):
             labels = np.asarray([tpf.targetid for tpf in self])
         else:
-            labels = np.asarray([lc.meta.get('LABEL') for lc in self])
+            labels = np.asarray([lc.meta.get("LABEL") for lc in self])
 
         try:
             unique_labels = np.sort(np.unique(labels))
@@ -97,29 +102,34 @@ class Collection(object):
 
         for idx, targetid in enumerate(unique_labels):
             jdxs = np.where(labels == targetid)[0]
-            if not hasattr(jdxs, '__iter__'):
+            if not hasattr(jdxs, "__iter__"):
                 jdxs = [jdxs]
 
-            if hasattr(self[jdxs[0]], 'mission'):
+            if hasattr(self[jdxs[0]], "mission"):
                 mission = self[jdxs[0]].mission
-                if mission == 'Kepler':
-                    subtype = 'Quarters'
-                elif mission == 'K2':
-                    subtype = 'Campaigns'
-                elif mission == 'TESS':
-                    subtype = 'Sectors'
+                if mission == "Kepler":
+                    subtype = "Quarters"
+                elif mission == "K2":
+                    subtype = "Campaigns"
+                elif mission == "TESS":
+                    subtype = "Sectors"
                 else:
                     subtype = None
             else:
                 subtype = None
-            objstr = str(type(self[0]))[8:-2].split('.')[-1]
-            title = '\t{} ({} {}s) {}: '.format(targetid, len(jdxs), objstr, subtype)
+            objstr = str(type(self[0]))[8:-2].split(".")[-1]
+            title = "\t{} ({} {}s) {}: ".format(targetid, len(jdxs), objstr, subtype)
             result += title
             if subtype is not None:
-                result += ','.join(['{}'.format(getattr(self[jdx], subtype[:-1].lower())) for jdx in jdxs])
+                result += ",".join(
+                    [
+                        "{}".format(getattr(self[jdx], subtype[:-1].lower()))
+                        for jdx in jdxs
+                    ]
+                )
             else:
-                result += ','.join(['{}'.format(i) for i in np.arange(len(jdxs))])
-            result += '\n'
+                result += ",".join(["{}".format(i) for i in np.arange(len(jdxs))])
+            result += "\n"
         return result
 
     def _safeGetScalarAttr(self, attrName):
@@ -145,7 +155,7 @@ class Collection(object):
             >>> lcc[lcc.sector == 22][0].plot()  # doctest: +SKIP
 
         """
-        return self._safeGetScalarAttr('sector')
+        return self._safeGetScalarAttr("sector")
 
     @property
     def quarter(self):
@@ -153,7 +163,7 @@ class Collection(object):
 
         The Kepler quarters of the lightcurves / target pixel files; `numpy.nan` for those with none.
         """
-        return self._safeGetScalarAttr('quarter')
+        return self._safeGetScalarAttr("quarter")
 
     @property
     def campaign(self):
@@ -161,7 +171,7 @@ class Collection(object):
 
         The K2 campaigns of the lightcurves / target pixel files; `numpy.nan` for those with none.
         """
-        return self._safeGetScalarAttr('campaign')
+        return self._safeGetScalarAttr("campaign")
 
 
 class LightCurveCollection(Collection):
@@ -172,6 +182,7 @@ class LightCurveCollection(Collection):
     lightcurves : array-like
         List of LightCurve objects.
     """
+
     def __init__(self, lightcurves):
         super(LightCurveCollection, self).__init__(lightcurves)
 
@@ -192,7 +203,7 @@ class LightCurveCollection(Collection):
         return LightCurveCollection([lc.SAP_FLUX for lc in self])
 
     def stitch(self, corrector_func=lambda x: x.normalize()):
-        """ Stitch all light curves in the collection into a single lk.LightCurve
+        """Stitch all light curves in the collection into a single lk.LightCurve
 
         Any function passed to `corrector_func` will be applied to each light curve
         before stitching. For example, passing "lambda x: x.normalize().flatten()"
@@ -214,9 +225,9 @@ class LightCurveCollection(Collection):
             corrector_func = lambda x: x  # noqa: E731
         lcs = [corrector_func(lc) for lc in self]
         # Need `join_type='inner'` until AstroPy supports masked Quantities
-        return vstack(lcs, join_type='inner', metadata_conflicts='silent')
+        return vstack(lcs, join_type="inner", metadata_conflicts="silent")
 
-    def plot(self, ax=None, offset=0., **kwargs) -> matplotlib.axes.Axes:
+    def plot(self, ax=None, offset=0.0, **kwargs) -> matplotlib.axes.Axes:
         """Plots all light curves in the collection on a single plot.
 
         Parameters
@@ -242,11 +253,11 @@ class LightCurveCollection(Collection):
         with plt.style.context(MPLSTYLE):
             if ax is None:
                 _, ax = plt.subplots()
-            for kwarg in ['c', 'color', 'label']:
+            for kwarg in ["c", "color", "label"]:
                 if kwarg in kwargs:
                     kwargs.pop(kwarg)
 
-            labels = np.asarray([lc.meta.get('LABEL') for lc in self])
+            labels = np.asarray([lc.meta.get("LABEL") for lc in self])
             try:
                 unique_labels = np.sort(np.unique(labels))
             except TypeError:  # sorting will fail if labels includes None
@@ -256,8 +267,8 @@ class LightCurveCollection(Collection):
                 jdxs = np.where(labels == targetid)[0]
                 for jdx in np.atleast_1d(jdxs):
                     if jdx != jdxs[0]:  # Avoid multiple labels for same object
-                        kwargs['label'] = ''
-                    self[jdx].plot(ax=ax, c=f'C{idx}', offset=idx*offset, **kwargs)
+                        kwargs["label"] = ""
+                    self[jdx].plot(ax=ax, c=f"C{idx}", offset=idx * offset, **kwargs)
         return ax
 
 
@@ -269,6 +280,7 @@ class TargetPixelFileCollection(Collection):
     tpfs : list or iterable
         List of `~lightkurve.targetpixelfile.TargetPixelFile` objects.
     """
+
     def __init__(self, tpfs):
         super(TargetPixelFileCollection, self).__init__(tpfs)
 
@@ -288,8 +300,7 @@ class TargetPixelFileCollection(Collection):
             The matplotlib axes object.
         """
         if ax is None:
-            _, ax = plt.subplots(len(self.data), 1,
-                                 figsize=(7, (7*len(self.data))))
+            _, ax = plt.subplots(len(self.data), 1, figsize=(7, (7 * len(self.data))))
         if len(self.data) == 1:
             self.data[0].plot(ax=ax)
         else:

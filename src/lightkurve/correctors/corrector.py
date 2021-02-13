@@ -118,7 +118,7 @@ class Corrector(ABC):
         pass
 
     def compute_overfit_metric(self, **kwargs) -> float:
-        """ Measures the degree of over-fitting in the correction.
+        """Measures the degree of over-fitting in the correction.
 
         See the docstring of `lightkurve.correctors.metrics.overfit_metric_lombscargle`
         for details.

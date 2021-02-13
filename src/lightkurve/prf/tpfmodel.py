@@ -51,11 +51,22 @@ from .prfmodel import KeplerPRF
 from ..utils import plot_image
 
 
-__all__ = ['GaussianPrior', 'UniformPrior', 'FixedValuePrior',
-           'StarPrior', 'BackgroundPrior', 'FocusPrior', 'MotionPrior',
-           'StarParameters', 'BackgroundParameters', 'FocusParameters',
-           'MotionParameters', 'TPFModelParameters',
-           'TPFModel', 'PRFPhotometry']
+__all__ = [
+    "GaussianPrior",
+    "UniformPrior",
+    "FixedValuePrior",
+    "StarPrior",
+    "BackgroundPrior",
+    "FocusPrior",
+    "MotionPrior",
+    "StarParameters",
+    "BackgroundParameters",
+    "FocusParameters",
+    "MotionParameters",
+    "TPFModelParameters",
+    "TPFModel",
+    "PRFPhotometry",
+]
 
 
 log = logging.getLogger(__name__)
@@ -81,6 +92,7 @@ class FixedValuePrior(Prior):
     >>> fp(0.5)
     inf
     """
+
     def __init__(self, value, name=None):
         self.value = np.asarray([value]).reshape(-1)
         self.name = name
@@ -110,6 +122,7 @@ class FixedValuePrior(Prior):
 
 class PriorContainer(object):
     """Container object to hold parameter priors for PRF photometry."""
+
     def _parse_prior(self, prior):
         if isinstance(prior, Prior):
             return prior
@@ -129,6 +142,7 @@ class StarPrior(PriorContainer):
               row=GaussianPrior(mean=row, var=err_row**2),
               flux=GaussianPrior(mean=flux, var=err_flux**2))
     """
+
     def __init__(self, col, row, flux=UniformPrior(lb=0, ub=1e10), targetid=None):
         self.col = self._parse_prior(col)
         self.row = self._parse_prior(row)
@@ -136,16 +150,17 @@ class StarPrior(PriorContainer):
         self.targetid = targetid
 
     def __repr__(self):
-        return ('<StarPrior(\n  col={}\n  row={}\n  flux={}\n  targetid={})>'
-                ''.format(self.col, self.row, self.flux, self.targetid))
+        return "<StarPrior(\n  col={}\n  row={}\n  flux={}\n  targetid={})>" "".format(
+            self.col, self.row, self.flux, self.targetid
+        )
 
     def evaluate(self, col, row, flux):
         """Evaluate the prior probability of a star of a given flux being at
         a given row and col.
         """
-        logp = (self.col.evaluate(col) +
-                self.row.evaluate(row) +
-                self.flux.evaluate(flux))
+        logp = (
+            self.col.evaluate(col) + self.row.evaluate(row) + self.flux.evaluate(flux)
+        )
         return logp
 
 
@@ -157,11 +172,12 @@ class BackgroundPrior(PriorContainer):
     flux : oktopus ``Prior`` object
         Prior on the background flux in electrons/second per pixel.
     """
+
     def __init__(self, flux=FixedValuePrior(value=0)):
         self.flux = self._parse_prior(flux)
 
     def __repr__(self):
-        return ('<BackgroundPrior(\n  flux={})>'.format(self.flux))
+        return "<BackgroundPrior(\n  flux={})>".format(self.flux)
 
     def evaluate(self, flux):
         """Returns the prior probability for a given background flux value."""
@@ -178,50 +194,61 @@ class FocusPrior(PriorContainer):
     rotation_angle : oktopus ``Prior`` object
         Rotation angle in radians. Typically zero.
     """
-    def __init__(self,
-                 scale_col=GaussianPrior(mean=1, var=0.0001),
-                 scale_row=GaussianPrior(mean=1, var=0.0001),
-                 rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)):
+
+    def __init__(
+        self,
+        scale_col=GaussianPrior(mean=1, var=0.0001),
+        scale_row=GaussianPrior(mean=1, var=0.0001),
+        rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415),
+    ):
         self.scale_col = self._parse_prior(scale_col)
         self.scale_row = self._parse_prior(scale_row)
         self.rotation_angle = self._parse_prior(rotation_angle)
 
     def __repr__(self):
-        return ('<FocusPrior(\n  scale_col={}\n  scale_row={}\n  rotation_angle={})>'
-                ''.format(self.scale_col, self.scale_row, self.rotation_angle))
+        return (
+            "<FocusPrior(\n  scale_col={}\n  scale_row={}\n  rotation_angle={})>"
+            "".format(self.scale_col, self.scale_row, self.rotation_angle)
+        )
 
     def evaluate(self, scale_col, scale_row, rotation_angle):
         """Returns the prior probability for a gien set of focus parameters."""
-        logp = (self.scale_col.evaluate(scale_col) +
-                self.scale_row.evaluate(scale_row) +
-                self.rotation_angle.evaluate(rotation_angle))
+        logp = (
+            self.scale_col.evaluate(scale_col)
+            + self.scale_row.evaluate(scale_row)
+            + self.rotation_angle.evaluate(rotation_angle)
+        )
         return logp
 
 
 class MotionPrior(PriorContainer):
-    """Container class to capture a user's beliefs about the telescope motion.
-    """
-    def __init__(self, shift_col=GaussianPrior(mean=0, var=1.**2),
-                 shift_row=GaussianPrior(mean=0, var=1.**2)):
+    """Container class to capture a user's beliefs about the telescope motion."""
+
+    def __init__(
+        self,
+        shift_col=GaussianPrior(mean=0, var=1.0 ** 2),
+        shift_row=GaussianPrior(mean=0, var=1.0 ** 2),
+    ):
         self.shift_col = self._parse_prior(shift_col)
         self.shift_row = self._parse_prior(shift_row)
 
     def __repr__(self):
-        return ('<MotionPrior(\n  shift_col={}\n  shift_row={})>'
-                ''.format(self.shift_col, self.shift_row))
+        return "<MotionPrior(\n  shift_col={}\n  shift_row={})>" "".format(
+            self.shift_col, self.shift_row
+        )
 
     def evaluate(self, shift_col, shift_row):
         """Returns the prior probability for a gien set of motion parameters."""
-        logp = (self.shift_col.evaluate(shift_col) +
-                self.shift_row.evaluate(shift_row))
+        logp = self.shift_col.evaluate(shift_col) + self.shift_row.evaluate(shift_row)
         return logp
 
 
 class StarParameters(object):
-    """Container class to hold the parameters of a star in a ``TPFModel``.
-    """
-    def __init__(self, col, row, flux, err_col=None, err_row=None, err_flux=None,
-                 targetid=None):
+    """Container class to hold the parameters of a star in a ``TPFModel``."""
+
+    def __init__(
+        self, col, row, flux, err_col=None, err_row=None, err_flux=None, targetid=None
+    ):
         self.col = col
         self.row = row
         self.flux = flux
@@ -229,51 +256,57 @@ class StarParameters(object):
 
     def __repr__(self):
         r = "<StarParameters(\n  col={}\n  row={}\n  flux={}\n  targetid={})>".format(
-                    self.col, self.row, self.flux, self.targetid)
+            self.col, self.row, self.flux, self.targetid
+        )
         return r
 
 
 class BackgroundParameters(object):
-    """Container class to hold the parameters of the background in a ``TPFModel``.
-    """
-    def __init__(self, flux=0., err_flux=None, fitted=True):
+    """Container class to hold the parameters of the background in a ``TPFModel``."""
+
+    def __init__(self, flux=0.0, err_flux=None, fitted=True):
         self.flux = flux
         self.err_flux = err_flux
         self.fitted = fitted
 
     def __repr__(self):
         r = "<BackgroundParameters(\n  flux={}\n  fitted={})>".format(
-                    self.flux, self.fitted)
+            self.flux, self.fitted
+        )
         return r
 
 
 class FocusParameters(object):
-    """Container class to hold the parameters of the telescope focus in a ``TPFModel``.
-    """
-    def __init__(self, scale_col=1., scale_row=1., rotation_angle=0., fitted=False):
+    """Container class to hold the parameters of the telescope focus in a ``TPFModel``."""
+
+    def __init__(self, scale_col=1.0, scale_row=1.0, rotation_angle=0.0, fitted=False):
         self.scale_col = scale_col
         self.scale_row = scale_row
         self.rotation_angle = rotation_angle
         self.fitted = fitted
 
     def __repr__(self):
-        return ("<FocusParameters(\n  scale_col={}\n  scale_row={}\n  "
-                "rotation_angle={}\n  fitted={})>"
-                "".format(self.scale_col, self.scale_row,
-                          self.rotation_angle, self.fitted))
+        return (
+            "<FocusParameters(\n  scale_col={}\n  scale_row={}\n  "
+            "rotation_angle={}\n  fitted={})>"
+            "".format(self.scale_col, self.scale_row, self.rotation_angle, self.fitted)
+        )
 
 
 class MotionParameters(object):
-    """Container class to hold the parameters of the telescope motion in a ``TPFModel``.
-    """
-    def __init__(self, shift_col=0., shift_row=0., fitted=False):
+    """Container class to hold the parameters of the telescope motion in a ``TPFModel``."""
+
+    def __init__(self, shift_col=0.0, shift_row=0.0, fitted=False):
         self.shift_col = shift_col
         self.shift_row = shift_row
         self.fitted = fitted
 
     def __repr__(self):
-        return "<MotionParameters(\n  shift_col={}\n  shift_row={}\n  fitted={})>".format(
-                    self.shift_col, self.shift_row, self.fitted)
+        return (
+            "<MotionParameters(\n  shift_col={}\n  shift_row={}\n  fitted={})>".format(
+                self.shift_col, self.shift_row, self.fitted
+            )
+        )
 
 
 class TPFModelParameters(object):
@@ -290,8 +323,14 @@ class TPFModelParameters(object):
     motion : ``MotionParameters`` object
         Parameters related to the telescope motion.
     """
-    def __init__(self, stars=None, background=BackgroundParameters(),
-                 focus=FocusParameters(), motion=MotionParameters()):
+
+    def __init__(
+        self,
+        stars=None,
+        background=BackgroundParameters(),
+        focus=FocusParameters(),
+        motion=MotionParameters(),
+    ):
         if stars is None:
             stars = []
         self.stars = stars
@@ -300,18 +339,21 @@ class TPFModelParameters(object):
         self.motion = motion
 
     def __repr__(self):
-        out = super(TPFModelParameters, self).__repr__() + '\n'
-        out += ''.join(['  {}\n'.format(str(star).replace('\n', '\n  '))
-                        for star in self.stars])
-        out += '  ' + str(self.background).replace('\n', '\n  ') + '\n'
-        out += '  ' + str(self.focus).replace('\n', '\n  ') + '\n'
-        out += '  ' + str(self.motion).replace('\n', '\n  ') + '\n'
-        if 'residual_image' in vars(self):
-            out += '  residual_image:\n    {}'.format(self.residual_image[0][0:4])[:-1]
-            out += '...\n'
-        if 'predicted_image' in vars(self):
-            out += '  predicted_image:\n    {}'.format(self.predicted_image[0][0:4])[:-1]
-            out += '...\n'
+        out = super(TPFModelParameters, self).__repr__() + "\n"
+        out += "".join(
+            ["  {}\n".format(str(star).replace("\n", "\n  ")) for star in self.stars]
+        )
+        out += "  " + str(self.background).replace("\n", "\n  ") + "\n"
+        out += "  " + str(self.focus).replace("\n", "\n  ") + "\n"
+        out += "  " + str(self.motion).replace("\n", "\n  ") + "\n"
+        if "residual_image" in vars(self):
+            out += "  residual_image:\n    {}".format(self.residual_image[0][0:4])[:-1]
+            out += "...\n"
+        if "predicted_image" in vars(self):
+            out += "  predicted_image:\n    {}".format(self.predicted_image[0][0:4])[
+                :-1
+            ]
+            out += "...\n"
         return out
 
     def to_array(self):
@@ -350,9 +392,9 @@ class TPFModelParameters(object):
         next_idx = 0
         stars = []
         for staridx in range(len(self.stars)):
-            star = StarParameters(col=array[next_idx],
-                                  row=array[next_idx + 1],
-                                  flux=array[next_idx + 2])
+            star = StarParameters(
+                col=array[next_idx], row=array[next_idx + 1], flux=array[next_idx + 2]
+            )
             stars.append(star)
             next_idx += 3
 
@@ -365,21 +407,24 @@ class TPFModelParameters(object):
         if not self.focus.fitted:
             focus = self.focus
         else:
-            focus = FocusParameters(scale_col=array[next_idx],
-                                    scale_row=array[next_idx + 1],
-                                    rotation_angle=array[next_idx + 2],
-                                    fitted=True)
+            focus = FocusParameters(
+                scale_col=array[next_idx],
+                scale_row=array[next_idx + 1],
+                rotation_angle=array[next_idx + 2],
+                fitted=True,
+            )
             next_idx += 3
 
         if not self.motion.fitted:
             motion = self.motion
         else:
-            motion = MotionParameters(shift_col=array[next_idx],
-                                      shift_row=array[next_idx + 1],
-                                      fitted=True)
+            motion = MotionParameters(
+                shift_col=array[next_idx], shift_row=array[next_idx + 1], fitted=True
+            )
 
-        return TPFModelParameters(stars=stars, background=background,
-                                  focus=focus, motion=motion)
+        return TPFModelParameters(
+            stars=stars, background=background, focus=focus, motion=motion
+        )
 
 
 class TPFModel(object):
@@ -404,12 +449,18 @@ class TPFModel(object):
     fit_motion : bool
         If False, the telescope motion parameters will be kept fixed.
     """
-    def __init__(self, star_priors=None,
-                 background_prior=BackgroundPrior(),
-                 focus_prior=FocusPrior(),
-                 motion_prior=MotionPrior(),
-                 prfmodel=None,
-                 fit_background=True, fit_focus=False, fit_motion=False):
+
+    def __init__(
+        self,
+        star_priors=None,
+        background_prior=BackgroundPrior(),
+        focus_prior=FocusPrior(),
+        motion_prior=MotionPrior(),
+        prfmodel=None,
+        fit_background=True,
+        fit_focus=False,
+        fit_motion=False,
+    ):
         if star_priors is None:
             star_priors = []
         if prfmodel is None:
@@ -425,15 +476,20 @@ class TPFModel(object):
         self._params = self.get_initial_guesses()
 
     def __repr__(self):
-        out = super(TPFModel, self).__repr__() + '\n'
-        out += ''.join(['  {}\n'.format(str(star).replace('\n', '\n  '))
-                        for star in self.star_priors])
-        out += '  ' + str(self.background_prior).replace('\n', '\n  ') + '\n'
-        out += '  ' + str(self.focus_prior).replace('\n', '\n  ') + '\n'
-        out += '  ' + str(self.motion_prior).replace('\n', '\n  ') + '\n'
-        out += '  ' + str(self.prfmodel).replace('\n', '\n  ') + '\n'
-        out += '  fit_background={}\n  fit_focus={}\n  fit_motion={}\n'.format(
-                        self.fit_background, self.fit_focus, self.fit_motion)
+        out = super(TPFModel, self).__repr__() + "\n"
+        out += "".join(
+            [
+                "  {}\n".format(str(star).replace("\n", "\n  "))
+                for star in self.star_priors
+            ]
+        )
+        out += "  " + str(self.background_prior).replace("\n", "\n  ") + "\n"
+        out += "  " + str(self.focus_prior).replace("\n", "\n  ") + "\n"
+        out += "  " + str(self.motion_prior).replace("\n", "\n  ") + "\n"
+        out += "  " + str(self.prfmodel).replace("\n", "\n  ") + "\n"
+        out += "  fit_background={}\n  fit_focus={}\n  fit_motion={}\n".format(
+            self.fit_background, self.fit_focus, self.fit_motion
+        )
         return out
 
     def get_initial_guesses(self):
@@ -443,22 +499,31 @@ class TPFModel(object):
         """
         initial_star_guesses = []
         for star in self.star_priors:
-            initial_star_guesses.append(StarParameters(col=star.col.mean,
-                                                       row=star.row.mean,
-                                                       flux=star.flux.mean))
-        background = BackgroundParameters(flux=self.background_prior.flux.mean,
-                                          fitted=self.fit_background)
-        focus = FocusParameters(scale_col=self.focus_prior.scale_col.mean,
-                                scale_row=self.focus_prior.scale_row.mean,
-                                rotation_angle=self.focus_prior.rotation_angle.mean,
-                                fitted=self.fit_focus)
-        motion = MotionParameters(shift_col=self.motion_prior.shift_col.mean,
-                                  shift_row=self.motion_prior.shift_row.mean,
-                                  fitted=self.fit_motion)
-        initial_params = TPFModelParameters(stars=initial_star_guesses,
-                                            background=background,
-                                            focus=focus,
-                                            motion=motion)
+            initial_star_guesses.append(
+                StarParameters(
+                    col=star.col.mean, row=star.row.mean, flux=star.flux.mean
+                )
+            )
+        background = BackgroundParameters(
+            flux=self.background_prior.flux.mean, fitted=self.fit_background
+        )
+        focus = FocusParameters(
+            scale_col=self.focus_prior.scale_col.mean,
+            scale_row=self.focus_prior.scale_row.mean,
+            rotation_angle=self.focus_prior.rotation_angle.mean,
+            fitted=self.fit_focus,
+        )
+        motion = MotionParameters(
+            shift_col=self.motion_prior.shift_col.mean,
+            shift_row=self.motion_prior.shift_row.mean,
+            fitted=self.fit_motion,
+        )
+        initial_params = TPFModelParameters(
+            stars=initial_star_guesses,
+            background=background,
+            focus=focus,
+            motion=motion,
+        )
         return initial_params
 
     def predict(self, params=None):
@@ -478,12 +543,16 @@ class TPFModel(object):
             params = self.get_initial_guesses()
         star_images = []
         for star in params.stars:
-            star_images.append(self.prfmodel(center_col=star.col + params.motion.shift_col,
-                                             center_row=star.row + params.motion.shift_row,
-                                             flux=star.flux,
-                                             scale_col=params.focus.scale_col,
-                                             scale_row=params.focus.scale_row,
-                                             rotation_angle=params.focus.rotation_angle))
+            star_images.append(
+                self.prfmodel(
+                    center_col=star.col + params.motion.shift_col,
+                    center_row=star.row + params.motion.shift_row,
+                    flux=star.flux,
+                    scale_col=params.focus.scale_col,
+                    scale_row=params.focus.scale_row,
+                    rotation_angle=params.focus.rotation_angle,
+                )
+            )
         synthetic_image = np.sum(star_images, axis=0) + params.background.flux
         return synthetic_image
 
@@ -504,9 +573,11 @@ class TPFModel(object):
         params = self._params.from_array(params_array)
         grad = []
         for star in params.stars:
-            grad.append(self.prfmodel.gradient(center_col=star.col,
-                                               center_row=star.row,
-                                               flux=star.flux))
+            grad.append(
+                self.prfmodel.gradient(
+                    center_col=star.col, center_row=star.row, flux=star.flux
+                )
+            )
         # We assume the background gradient is proportional to one
         grad.append([np.ones(self.prfmodel.shape)])
         # We assume the gradient of other parameters is one
@@ -528,12 +599,15 @@ class TPFModel(object):
         if self.fit_background:
             logp += self.background_prior.evaluate(params.background.flux)
         if self.fit_focus:
-            logp += self.focus_prior.evaluate(params.focus.scale_col,
-                                              params.focus.scale_row,
-                                              params.focus.rotation_angle)
+            logp += self.focus_prior.evaluate(
+                params.focus.scale_col,
+                params.focus.scale_row,
+                params.focus.rotation_angle,
+            )
         if self.fit_motion:
-            logp += self.motion_prior.evaluate(params.motion.shift_col,
-                                               params.motion.shift_row)
+            logp += self.motion_prior.evaluate(
+                params.motion.shift_col, params.motion.shift_row
+            )
         return logp
 
     def _logp_prior(self, params_array):
@@ -545,8 +619,15 @@ class TPFModel(object):
         params = self._params.from_array(params_array)
         return self.logp_prior(params)
 
-    def fit(self, data, loss_function=PoissonPosterior, method='powell',
-            pos_corr1=None, pos_corr2=None, **kwargs):
+    def fit(
+        self,
+        data,
+        loss_function=PoissonPosterior,
+        method="powell",
+        pos_corr1=None,
+        pos_corr2=None,
+        **kwargs
+    ):
         """Fits the model to the data.
 
         Parameters
@@ -575,7 +656,9 @@ class TPFModel(object):
         with warnings.catch_warnings():
             # Ignore RuntimeWarnings trigged by invalid values
             warnings.simplefilter("ignore", RuntimeWarning)
-            fit = loss.fit(x0=self.get_initial_guesses().to_array(), method=method, **kwargs)
+            fit = loss.fit(
+                x0=self.get_initial_guesses().to_array(), method=method, **kwargs
+            )
         result = self._params.from_array(fit.x)
         # NOTE: uncertainties are not available for now because `self.gradient` is unfinished;
         # hence, the line below is commented out for now:
@@ -589,27 +672,49 @@ class TPFModel(object):
     def plot(self, *params, **kwargs):
         """Plots an image of the model for a given point in the parameter space."""
         img = self.predict(*params)
-        plot_image(img,
-                   title='TPF Model',
-                   extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
-                           self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
-                   **kwargs)
+        plot_image(
+            img,
+            title="TPF Model",
+            extent=(
+                self.prfmodel.column,
+                self.prfmodel.column + self.prfmodel.shape[1],
+                self.prfmodel.row,
+                self.prfmodel.row + self.prfmodel.shape[0],
+            ),
+            **kwargs
+        )
 
     def plot_diagnostics(self, data, figsize=(12, 4), *params, **kwargs):
         """Plots an image of the model for a given point in the parameter space."""
         fig, ax = plt.subplots(nrows=1, ncols=3, figsize=figsize)
         fit = self.fit(data)
-        extent = (self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
-                  self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0])
-        plot_image(data, ax=ax[0],
-                   title='Observed Data, Channel: {}'.format(self.prfmodel.channel),
-                   extent=extent, **kwargs)
-        plot_image(fit.predicted_image, ax=ax[1],
-                   title='Predicted Image, Channel: {}'.format(self.prfmodel.channel),
-                   extent=extent, **kwargs)
-        plot_image(fit.residual_image, ax=ax[2],
-                   title='Residual Image, Channel: {}'.format(self.prfmodel.channel),
-                   extent=extent, **kwargs)
+        extent = (
+            self.prfmodel.column,
+            self.prfmodel.column + self.prfmodel.shape[1],
+            self.prfmodel.row,
+            self.prfmodel.row + self.prfmodel.shape[0],
+        )
+        plot_image(
+            data,
+            ax=ax[0],
+            title="Observed Data, Channel: {}".format(self.prfmodel.channel),
+            extent=extent,
+            **kwargs
+        )
+        plot_image(
+            fit.predicted_image,
+            ax=ax[1],
+            title="Predicted Image, Channel: {}".format(self.prfmodel.channel),
+            extent=extent,
+            **kwargs
+        )
+        plot_image(
+            fit.residual_image,
+            ax=ax[2],
+            title="Residual Image, Channel: {}".format(self.prfmodel.channel),
+            extent=extent,
+            **kwargs
+        )
         return fit
 
 
@@ -625,11 +730,14 @@ class PRFPhotometry(object):
     model : instance of TPFModel
         Model which will be fit to the data
     """
+
     def __init__(self, model):
         self.model = model
         self.results = []
 
-    def run(self, tpf_flux, cadences=None, pos_corr1=None, pos_corr2=None, parallel=True):
+    def run(
+        self, tpf_flux, cadences=None, pos_corr1=None, pos_corr2=None, parallel=True
+    ):
         """Fits the model to the flux data.
 
         Parameters
@@ -653,34 +761,42 @@ class PRFPhotometry(object):
         # needed to fit a single cadence.  This will enable parallel processing below.
         tpf_flux = np.asarray(tpf_flux)  # Ensure the flux data can be indexed
         if pos_corr1 is None or pos_corr2 is None:
-            args = zip([self.model]*len(cadences),
-                      tpf_flux[cadences])
+            args = zip([self.model] * len(cadences), tpf_flux[cadences])
         else:
-            args = zip([self.model]*len(cadences),
-                      tpf_flux[cadences],
-                       pos_corr1[cadences],
-                       pos_corr2[cadences])
+            args = zip(
+                [self.model] * len(cadences),
+                tpf_flux[cadences],
+                pos_corr1[cadences],
+                pos_corr2[cadences],
+            )
         # Set up a mapping function
         if parallel:
             import multiprocessing
+
             pool = multiprocessing.Pool()
             mymap = pool.imap
         else:
             import itertools
+
             mymap = itertools.imap
         # Now fit all cadences using the mapping function and the list of arguments
         self.results = []
-        for result in tqdm(mymap(fit_one_cadence, args), desc='Fitting cadences', total=len(cadences)):
+        for result in tqdm(
+            mymap(fit_one_cadence, args), desc="Fitting cadences", total=len(cadences)
+        ):
             self.results.append(result)
         if parallel:
             pool.close()
         # Parse results
-        self.lightcurves = [self._parse_lightcurve(star_idx)
-                            for star_idx in range(len(self.model.star_priors))]
+        self.lightcurves = [
+            self._parse_lightcurve(star_idx)
+            for star_idx in range(len(self.model.star_priors))
+        ]
 
     def _parse_lightcurve(self, star_idx):
         # Create a lightcurve
         from .. import LightCurve
+
         flux = []
         for cadence in range(len(self.results)):
             flux.append(self.results[cadence].stars[star_idx].flux)
@@ -689,6 +805,7 @@ class PRFPhotometry(object):
     def _parse_background(self):
         # Create a lightcurve
         from .. import LightCurve
+
         bgflux = []
         for cadence in range(len(self.results)):
             bgflux.append(self.results[cadence].background.flux)
@@ -699,25 +816,25 @@ class PRFPhotometry(object):
         fig, ax = plt.subplots(10, sharex=True, figsize=(6, 12))
         x = range(len(self.results))
         ax[0].plot(x, [r.stars[star_idx].flux for r in self.results])
-        ax[0].set_ylabel('Flux')
+        ax[0].set_ylabel("Flux")
         ax[1].plot(x, [r.stars[star_idx].col for r in self.results])
-        ax[1].set_ylabel('Col')
+        ax[1].set_ylabel("Col")
         ax[2].plot(x, [r.stars[star_idx].row for r in self.results])
-        ax[2].set_ylabel('Row')
+        ax[2].set_ylabel("Row")
         ax[3].plot(x, [r.motion.shift_col for r in self.results])
-        ax[3].set_ylabel('Shift col')
+        ax[3].set_ylabel("Shift col")
         ax[4].plot(x, [r.motion.shift_row for r in self.results])
-        ax[4].set_ylabel('Shift row')
+        ax[4].set_ylabel("Shift row")
         ax[5].plot(x, [r.background.flux for r in self.results])
-        ax[5].set_ylabel('Background')
+        ax[5].set_ylabel("Background")
         ax[6].plot(x, [r.focus.scale_col for r in self.results])
-        ax[6].set_ylabel('Focus col')
+        ax[6].set_ylabel("Focus col")
         ax[7].plot(x, [r.focus.scale_row for r in self.results])
-        ax[7].set_ylabel('Focus row')
+        ax[7].set_ylabel("Focus row")
         ax[8].plot(x, [r.focus.rotation_angle for r in self.results])
-        ax[8].set_ylabel('Focus angle')
+        ax[8].set_ylabel("Focus angle")
         ax[9].plot(x, [r.loss_value for r in self.results])
-        ax[9].set_ylabel('Loss')
+        ax[9].set_ylabel("Loss")
 
 
 def fit_one_cadence(arg):

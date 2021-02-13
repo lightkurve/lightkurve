@@ -8,17 +8,19 @@ from astropy import constants as const
 
 from .utils import SeismologyQuantity
 
-__all__ = ['estimate_radius', 'estimate_mass', 'estimate_logg']
+__all__ = ["estimate_radius", "estimate_mass", "estimate_logg"]
 
 
 """Global parameters for the sun"""
-NUMAX_SOL = ufloat(3090, 30) # microhertz | Huber et al. 2011
-DELTANU_SOL = ufloat(135.1, 0.1) # microhertz | Huber et al. 2011
-TEFF_SOL = ufloat(5772., 0.8) # Kelvin    | Prsa et al. 2016
-G_SOL = ((const.G * const.M_sun)/(const.R_sun)**2).to(u.cm/u.second**2) #cms^2
+NUMAX_SOL = ufloat(3090, 30)  # microhertz | Huber et al. 2011
+DELTANU_SOL = ufloat(135.1, 0.1)  # microhertz | Huber et al. 2011
+TEFF_SOL = ufloat(5772.0, 0.8)  # Kelvin    | Prsa et al. 2016
+G_SOL = ((const.G * const.M_sun) / (const.R_sun) ** 2).to(u.cm / u.second ** 2)  # cms^2
 
 
-def estimate_radius(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_err=None):
+def estimate_radius(
+    numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_err=None
+):
     """Returns a stellar radius estimate based on the scaling relations.
 
     The two global observable seismic parameters, numax and deltanu, along with
@@ -36,10 +38,10 @@ def estimate_radius(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff
     This code structure borrows from work done in Bellinger et al. (2019), which
     also functions as an accessible explanation of seismic scaling relations.
 
-    If no value of effective temperature is given, this function will check the 
+    If no value of effective temperature is given, this function will check the
     meta data of the `Periodogram` object used to create the `Seismology` object.
-    These data will often contain an effective tempearture from the Kepler Input 
-    Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+    These data will often contain an effective tempearture from the Kepler Input
+    Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract),
     or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
     catalogues are estimated using photometry, and so have large associated uncertainties
     (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
@@ -73,7 +75,7 @@ def estimate_radius(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff
     """
     numax = u.Quantity(numax, u.microhertz).value
     deltanu = u.Quantity(deltanu, u.microhertz).value
-    teff = u.Quantity(teff, u. Kelvin).value
+    teff = u.Quantity(teff, u.Kelvin).value
 
     if all(b is not None for b in [numax_err, deltanu_err, teff_err]):
         numax_err = u.Quantity(numax_err, u.microhertz).value
@@ -87,15 +89,23 @@ def estimate_radius(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff
         udeltanu = ufloat(deltanu, 0)
         uteff = ufloat(teff, 0)
 
-    uR = (unumax / NUMAX_SOL) * (udeltanu / DELTANU_SOL)**(-2.) * (uteff / TEFF_SOL)**(0.5)
-    result = SeismologyQuantity(uR.n * u.solRad,
-                                error=uR.s * u.solRad,
-                                name="radius",
-                                method="Uncorrected Scaling Relations")
+    uR = (
+        (unumax / NUMAX_SOL)
+        * (udeltanu / DELTANU_SOL) ** (-2.0)
+        * (uteff / TEFF_SOL) ** (0.5)
+    )
+    result = SeismologyQuantity(
+        uR.n * u.solRad,
+        error=uR.s * u.solRad,
+        name="radius",
+        method="Uncorrected Scaling Relations",
+    )
     return result
 
 
-def estimate_mass(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_err=None):
+def estimate_mass(
+    numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_err=None
+):
     """Calculates mass using the asteroseismic scaling relations.
 
     The two global observable seismic parameters, numax and deltanu, along with
@@ -113,10 +123,10 @@ def estimate_mass(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_e
     This code structure borrows from work done in Bellinger et al. (2019), which
     also functions as an accessible explanation of seismic scaling relations.
 
-    If no value of effective temperature is given, this function will check the 
+    If no value of effective temperature is given, this function will check the
     meta data of the `Periodogram` object used to create the `Seismology` object.
-    These data will often contain an effective tempearture from the Kepler Input 
-    Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+    These data will often contain an effective tempearture from the Kepler Input
+    Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract),
     or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
     catalogues are estimated using photometry, and so have large associated uncertainties
     (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
@@ -135,7 +145,7 @@ def estimate_mass(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_e
         degree. If not given an astropy unit, assumed to be in units of
         microhertz.
     teff : float
-        The effective temperature of the star. In units of Kelvin. 
+        The effective temperature of the star. In units of Kelvin.
     numax_err : float
         Error on numax. Assumed to be same units as numax
     deltanu_err : float
@@ -165,11 +175,17 @@ def estimate_mass(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_e
         udeltanu = ufloat(deltanu, 0)
         uteff = ufloat(teff, 0)
 
-    uM = (unumax / NUMAX_SOL)**3. * (udeltanu / DELTANU_SOL)**(-4.) * (uteff / TEFF_SOL)**(1.5)
-    result = SeismologyQuantity(uM.n * u.solMass,
-                                error=uM.s * u.solMass,
-                                name="mass",
-                                method="Uncorrected Scaling Relations")
+    uM = (
+        (unumax / NUMAX_SOL) ** 3.0
+        * (udeltanu / DELTANU_SOL) ** (-4.0)
+        * (uteff / TEFF_SOL) ** (1.5)
+    )
+    result = SeismologyQuantity(
+        uM.n * u.solMass,
+        error=uM.s * u.solMass,
+        name="mass",
+        method="Uncorrected Scaling Relations",
+    )
     return result
 
 
@@ -196,10 +212,10 @@ def estimate_logg(numax, teff, numax_err=None, teff_err=None):
     This code structure borrows from work done in Bellinger et al. (2019), which
     also functions as an accessible explanation of seismic scaling relations.
 
-    If no value of effective temperature is given, this function will check the 
+    If no value of effective temperature is given, this function will check the
     meta data of the `Periodogram` object used to create the `Seismology` object.
-    These data will often contain an effective tempearture from the Kepler Input 
-    Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract), 
+    These data will often contain an effective tempearture from the Kepler Input
+    Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract),
     or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these
     catalogues are estimated using photometry, and so have large associated uncertainties
     (roughly 200 K, see KIC). For more better results, spectroscopic measurements of
@@ -237,11 +253,13 @@ def estimate_logg(numax, teff, numax_err=None, teff_err=None):
         unumax = ufloat(numax, 0)
         uteff = ufloat(teff, 0)
 
-    ug = G_SOL.value * (unumax / NUMAX_SOL) * (uteff / TEFF_SOL)**0.5
+    ug = G_SOL.value * (unumax / NUMAX_SOL) * (uteff / TEFF_SOL) ** 0.5
     ulogg = umath.log(ug, 10)
 
-    result = SeismologyQuantity(ulogg.n * u.dex,
-                                error=ulogg.s * u.dex,
-                                name="logg",
-                                method="Uncorrected Scaling Relations")
+    result = SeismologyQuantity(
+        ulogg.n * u.dex,
+        error=ulogg.s * u.dex,
+        name="logg",
+        method="Uncorrected Scaling Relations",
+    )
     return result

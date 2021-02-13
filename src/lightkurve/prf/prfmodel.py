@@ -11,7 +11,7 @@ import scipy.interpolate
 from ..utils import channel_to_module_output, plot_image
 
 
-__all__ = ['KeplerPRF', 'SimpleKeplerPRF']
+__all__ = ["KeplerPRF", "SimpleKeplerPRF"]
 
 
 class KeplerPRF(object):
@@ -63,15 +63,29 @@ class KeplerPRF(object):
         self.shape = shape
         self.column = column
         self.row = row
-        self.col_coord, self.row_coord, self.interpolate, self.supersampled_prf = self._prepare_prf()
+        (
+            self.col_coord,
+            self.row_coord,
+            self.interpolate,
+            self.supersampled_prf,
+        ) = self._prepare_prf()
 
-    def __call__(self, center_col, center_row, flux, scale_col, scale_row,
-                 rotation_angle):
-        return self.evaluate(center_col, center_row, flux,
-                             scale_col, scale_row, rotation_angle)
+    def __call__(
+        self, center_col, center_row, flux, scale_col, scale_row, rotation_angle
+    ):
+        return self.evaluate(
+            center_col, center_row, flux, scale_col, scale_row, rotation_angle
+        )
 
-    def evaluate(self, center_col, center_row, flux=1., scale_col=1., scale_row=1.,
-                 rotation_angle=0.):
+    def evaluate(
+        self,
+        center_col,
+        center_row,
+        flux=1.0,
+        scale_col=1.0,
+        scale_row=1.0,
+        rotation_angle=0.0,
+    ):
         """
         Interpolates the PRF model onto detector coordinates.
 
@@ -104,13 +118,20 @@ class KeplerPRF(object):
         rot_row = delta_row * cosa - delta_col * sina
         rot_col = delta_row * sina + delta_col * cosa
 
-        self.prf_model = flux * self.interpolate(rot_row.flatten() * scale_row,
-                                                 rot_col.flatten() * scale_col,
-                                                 grid=False).reshape(self.shape)
+        self.prf_model = flux * self.interpolate(
+            rot_row.flatten() * scale_row, rot_col.flatten() * scale_col, grid=False
+        ).reshape(self.shape)
         return self.prf_model
 
-    def gradient(self, center_col, center_row, flux=1., scale_col=1., scale_row=1.,
-                 rotation_angle=0.):
+    def gradient(
+        self,
+        center_col,
+        center_row,
+        flux=1.0,
+        scale_col=1.0,
+        scale_row=1.0,
+        rotation_angle=0.0,
+    ):
         """
         This function returns the gradient of the KeplerPRF model with
         respect to center_col, center_row, flux, scale_col, scale_row,
@@ -148,39 +169,57 @@ class KeplerPRF(object):
 
         # for a proof of the maths that follow, see the pdf attached
         # on pull request #198 in lightkurve GitHub repo.
-        deriv_flux = self.interpolate(rot_row.flatten() * scale_row,
-                                      rot_col.flatten() * scale_col,
-                                      grid=False).reshape(self.shape)
+        deriv_flux = self.interpolate(
+            rot_row.flatten() * scale_row, rot_col.flatten() * scale_col, grid=False
+        ).reshape(self.shape)
 
-        interp_dy = self.interpolate(rot_row.flatten() * scale_row,
-                                     rot_col.flatten() * scale_col,
-                                     grid=False, dy=1).reshape(self.shape)
+        interp_dy = self.interpolate(
+            rot_row.flatten() * scale_row,
+            rot_col.flatten() * scale_col,
+            grid=False,
+            dy=1,
+        ).reshape(self.shape)
 
-        interp_dx = self.interpolate(rot_row.flatten() * scale_row,
-                                     rot_col.flatten() * scale_col,
-                                     grid=False, dx=1).reshape(self.shape)
+        interp_dx = self.interpolate(
+            rot_row.flatten() * scale_row,
+            rot_col.flatten() * scale_col,
+            grid=False,
+            dx=1,
+        ).reshape(self.shape)
 
         scale_row_times_interp_dx = scale_row * interp_dx
         scale_col_times_interp_dy = scale_col * interp_dy
 
-        deriv_center_col = - flux * (cosa * scale_col_times_interp_dy - sina * scale_row_times_interp_dx)
-        deriv_center_row = - flux * (sina * scale_col_times_interp_dy + cosa * scale_row_times_interp_dx)
+        deriv_center_col = -flux * (
+            cosa * scale_col_times_interp_dy - sina * scale_row_times_interp_dx
+        )
+        deriv_center_row = -flux * (
+            sina * scale_col_times_interp_dy + cosa * scale_row_times_interp_dx
+        )
         deriv_scale_row = flux * interp_dx * rot_row
         deriv_scale_col = flux * interp_dy * rot_col
-        deriv_rotation_angle = flux * (interp_dy * scale_col * (delta_row * cosa - delta_col * sina)
-                                       - interp_dx * scale_row * (delta_row * sina + delta_col * cosa))
+        deriv_rotation_angle = flux * (
+            interp_dy * scale_col * (delta_row * cosa - delta_col * sina)
+            - interp_dx * scale_row * (delta_row * sina + delta_col * cosa)
+        )
 
-        return [deriv_center_col, deriv_center_row, deriv_flux,
-                deriv_scale_col, deriv_scale_row, deriv_rotation_angle]
+        return [
+            deriv_center_col,
+            deriv_center_row,
+            deriv_flux,
+            deriv_scale_col,
+            deriv_scale_row,
+            deriv_rotation_angle,
+        ]
 
     def _read_prf_calibration_file(self, path, ext):
         prf_cal_file = pyfits.open(path)
         data = prf_cal_file[ext].data
         # looks like these data below are the same for all prf calibration files
-        crval1p = prf_cal_file[ext].header['CRVAL1P']
-        crval2p = prf_cal_file[ext].header['CRVAL2P']
-        cdelt1p = prf_cal_file[ext].header['CDELT1P']
-        cdelt2p = prf_cal_file[ext].header['CDELT2P']
+        crval1p = prf_cal_file[ext].header["CRVAL1P"]
+        crval2p = prf_cal_file[ext].header["CRVAL2P"]
+        cdelt1p = prf_cal_file[ext].header["CDELT1P"]
+        cdelt2p = prf_cal_file[ext].header["CDELT2P"]
         prf_cal_file.close()
 
         return data, crval1p, crval2p, cdelt1p, cdelt2p
@@ -191,22 +230,34 @@ class KeplerPRF(object):
         module, output = channel_to_module_output(self.channel)
         # determine suitable PRF calibration file
         if module < 10:
-            prefix = 'kplr0'
+            prefix = "kplr0"
         else:
-            prefix = 'kplr'
+            prefix = "kplr"
         prfs_url_path = "http://archive.stsci.edu/missions/kepler/fpc/prf/"
-        prffile = prfs_url_path + prefix + str(module) + '.' + str(output) + '_2011265_prf.fits'
+        prffile = (
+            prfs_url_path
+            + prefix
+            + str(module)
+            + "."
+            + str(output)
+            + "_2011265_prf.fits"
+        )
 
         # read PRF images
         prfn = [0] * n_hdu
-        crval1p = np.zeros(n_hdu, dtype='float32')
-        crval2p = np.zeros(n_hdu, dtype='float32')
-        cdelt1p = np.zeros(n_hdu, dtype='float32')
-        cdelt2p = np.zeros(n_hdu, dtype='float32')
+        crval1p = np.zeros(n_hdu, dtype="float32")
+        crval2p = np.zeros(n_hdu, dtype="float32")
+        cdelt1p = np.zeros(n_hdu, dtype="float32")
+        cdelt2p = np.zeros(n_hdu, dtype="float32")
 
         for i in range(n_hdu):
-            prfn[i], crval1p[i], crval2p[i], cdelt1p[i], cdelt2p[i] = self._read_prf_calibration_file(
-                prffile, i+1)
+            (
+                prfn[i],
+                crval1p[i],
+                crval2p[i],
+                cdelt1p[i],
+                cdelt2p[i],
+            ) = self._read_prf_calibration_file(prffile, i + 1)
 
         prfn = np.array(prfn)
         PRFcol = np.arange(0.5, np.shape(prfn[0])[1] + 0.5)
@@ -216,22 +267,23 @@ class KeplerPRF(object):
 
         # interpolate the calibrated PRF shape to the target position
         rowdim, coldim = self.shape[0], self.shape[1]
-        prf = np.zeros(np.shape(prfn[0]), dtype='float32')
-        ref_column = self.column + .5 * coldim
-        ref_row = self.row + .5 * rowdim
+        prf = np.zeros(np.shape(prfn[0]), dtype="float32")
+        ref_column = self.column + 0.5 * coldim
+        ref_row = self.row + 0.5 * rowdim
 
         for i in range(n_hdu):
-            prf_weight = math.sqrt((ref_column - crval1p[i]) ** 2
-                                   + (ref_row - crval2p[i]) ** 2)
+            prf_weight = math.sqrt(
+                (ref_column - crval1p[i]) ** 2 + (ref_row - crval2p[i]) ** 2
+            )
             if prf_weight < min_prf_weight:
                 prf_weight = min_prf_weight
             prf += prfn[i] / prf_weight
 
-        prf /= (np.nansum(prf) * cdelt1p[0] * cdelt2p[0])
+        prf /= np.nansum(prf) * cdelt1p[0] * cdelt2p[0]
 
         # location of the data image centered on the PRF image (in PRF pixel units)
-        col_coord = np.arange(self.column + .5, self.column + coldim + .5)
-        row_coord = np.arange(self.row + .5, self.row + rowdim + .5)
+        col_coord = np.arange(self.column + 0.5, self.column + coldim + 0.5)
+        row_coord = np.arange(self.row + 0.5, self.row + rowdim + 0.5)
         # x-axis correspond to row-axis in scipy.RectBivariate
         # not to be confused with our convention, in which the
         # x-axis correspond to the column-axis
@@ -241,9 +293,17 @@ class KeplerPRF(object):
 
     def plot(self, *params, **kwargs):
         pflux = self.evaluate(*params)
-        plot_image(pflux, title='Kepler PRF Model, Channel: {}'.format(self.channel),
-                   extent=(self.column, self.column + self.shape[1],
-                           self.row, self.row + self.shape[0]), **kwargs)
+        plot_image(
+            pflux,
+            title="Kepler PRF Model, Channel: {}".format(self.channel),
+            extent=(
+                self.column,
+                self.column + self.shape[1],
+                self.row,
+                self.row + self.shape[0],
+            ),
+            **kwargs
+        )
 
 
 class SimpleKeplerPRF(KeplerPRF):
@@ -255,10 +315,10 @@ class SimpleKeplerPRF(KeplerPRF):
     and angle are fixed to 1.0 and 0, respectivelly.
     """
 
-    def __call__(self, center_col, center_row, flux=1.):
+    def __call__(self, center_col, center_row, flux=1.0):
         return self.evaluate(center_col, center_row, flux)
 
-    def evaluate(self, center_col, center_row, flux=1.):
+    def evaluate(self, center_col, center_row, flux=1.0):
         """
         Interpolates the PRF model onto detector coordinates.
 
@@ -304,7 +364,7 @@ class SimpleKeplerPRF(KeplerPRF):
         delta_row = self.row_coord - center_row
 
         deriv_flux = self.interpolate(delta_row, delta_col)
-        deriv_center_col = - flux * self.interpolate(delta_row, delta_col, dy=1)
-        deriv_center_row = - flux * self.interpolate(delta_row, delta_col, dx=1)
+        deriv_center_col = -flux * self.interpolate(delta_row, delta_col, dy=1)
+        deriv_center_row = -flux * self.interpolate(delta_row, delta_col, dx=1)
 
         return [deriv_center_col, deriv_center_row, deriv_flux]

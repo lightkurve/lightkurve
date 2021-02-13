@@ -23,12 +23,11 @@ def read_k2sff_lightcurve(filename, ext="BESTAPER", **kwargs):
     lc : `KeplerLightCurve`
         A populated light curve object.
     """
-    lc = read_generic_lightcurve(filename,
-                                 flux_column="fcor",
-                                 time_format='bkjd',
-                                 ext=ext)
+    lc = read_generic_lightcurve(
+        filename, flux_column="fcor", time_format="bkjd", ext=ext
+    )
 
-    lc.meta['LABEL'] = '{} (K2SFF)'.format(lc.meta.get('OBJECT'))
-    lc.meta['TARGETID'] = lc.meta.get('KEPLERID')
+    lc.meta["LABEL"] = "{} (K2SFF)".format(lc.meta.get("OBJECT"))
+    lc.meta["TARGETID"] = lc.meta.get("KEPLERID")
 
     return KeplerLightCurve(data=lc, **kwargs)

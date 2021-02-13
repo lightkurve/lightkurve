@@ -97,8 +97,10 @@ def overfit_metric_lombscargle(
             # We want the goodness to begin to degrade when the introduced
             # noise is greater than the uncertainties.
             # So, when Sigmoid > 0.5 (given twiceSigmoidInv defn.)
-            denominator = (len(np.nonzero(pgChange > 0.0)[0])) * meanCorrectedUncertPower
-            if (denominator == 0):
+            denominator = (
+                len(np.nonzero(pgChange > 0.0)[0])
+            ) * meanCorrectedUncertPower
+            if denominator == 0:
                 # Suppress divide by zero warning
                 result = np.inf
             else:
@@ -130,8 +132,8 @@ def underfit_metric_neighbors(
     target Pearson correlation between the target under study and a selection of
     neighboring SPOC SAP target light curves.
 
-    This function will search within the given radiu in arceseconds and find the 
-    min_targets nearest targets up until max_targets is reached. If less than 
+    This function will search within the given radiu in arceseconds and find the
+    min_targets nearest targets up until max_targets is reached. If less than
     min_targets is found a MinTargetsError Exception is raised.
 
     The downloaded neighboring targets will normally be "aligned" to the
@@ -245,8 +247,11 @@ def underfit_metric_neighbors(
 
     return metric
 
+
 # Custom exception to track when minimum targets is not reached
-class MinTargetsError(Exception): pass
+class MinTargetsError(Exception):
+    pass
+
 
 def _unique_key_for_processing_neighbors(
     corrected_lc: LightCurve,
@@ -302,7 +307,9 @@ def _download_and_preprocess_neighbors(
         List containing the flux arrays of the neighboring light curves,
         interpolated and aligned with `corrected_lc` if requested.
     """
-    search = corrected_lc.search_neighbors(limit=max_targets, radius=radius, author=author)
+    search = corrected_lc.search_neighbors(
+        limit=max_targets, radius=radius, author=author
+    )
     if len(search) < min_targets:
         raise MinTargetsError(
             f"Unable to find at least {min_targets} neighbors within {radius} arcseconds radius."

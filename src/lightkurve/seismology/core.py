@@ -13,7 +13,7 @@ from .. import MPLSTYLE
 from . import utils, stellar_estimators
 from ..periodogram import SNRPeriodogram
 from ..utils import LightkurveWarning, validate_method
-from .utils import  SeismologyQuantity
+from .utils import SeismologyQuantity
 
 # Import the optional Bokeh dependency required by ``interact_echelle```,
 # or print a friendly error otherwise.
@@ -29,7 +29,7 @@ except:
 
 log = logging.getLogger(__name__)
 
-__all__ = ['Seismology']
+__all__ = ["Seismology"]
 
 
 class Seismology(object):
@@ -72,28 +72,40 @@ class Seismology(object):
 
     def __init__(self, periodogram):
         if not isinstance(periodogram, SNRPeriodogram):
-            warnings.warn("Seismology received a periodogram which does not appear "
-                          "to have been background-corrected. Please consider calling "
-                          "`periodogram.flatten()` prior to extracting seismological parameters.",
-                          LightkurveWarning)
+            warnings.warn(
+                "Seismology received a periodogram which does not appear "
+                "to have been background-corrected. Please consider calling "
+                "`periodogram.flatten()` prior to extracting seismological parameters.",
+                LightkurveWarning,
+            )
         self.periodogram = periodogram
 
     def __repr__(self):
-        attrs = np.asarray(['numax', 'deltanu', 'mass', 'radius', 'logg'])
+        attrs = np.asarray(["numax", "deltanu", "mass", "radius", "logg"])
         tray = np.asarray([hasattr(self, attr) for attr in attrs])
         if tray.sum() == 0:
             tray_str = " - no values have been computed so far."
         else:
-            tray_str = " - computed values:\n * " + "\n * ".join([getattr(self, attr).__repr__() for attr in attrs[tray]])
-        return 'Seismology(ID: {}){}'.format(self.periodogram.label, tray_str)
+            tray_str = " - computed values:\n * " + "\n * ".join(
+                [getattr(self, attr).__repr__() for attr in attrs[tray]]
+            )
+        return "Seismology(ID: {}){}".format(self.periodogram.label, tray_str)
 
     @staticmethod
     def from_lightcurve(lc, **kwargs):
         """Returns a `Seismology` object given a `LightCurve`."""
-        log.info("Building a Seismology object directly from a light curve "
-                 "uses default periodogram parameters. For further tuneability, "
-                 "create a periodogram object first, using `to_periodogram`.")
-        return Seismology(periodogram=lc.normalize().remove_nans().fill_gaps().to_periodogram(**kwargs).flatten())
+        log.info(
+            "Building a Seismology object directly from a light curve "
+            "uses default periodogram parameters. For further tuneability, "
+            "create a periodogram object first, using `to_periodogram`."
+        )
+        return Seismology(
+            periodogram=lc.normalize()
+            .remove_nans()
+            .fill_gaps()
+            .to_periodogram(**kwargs)
+            .flatten()
+        )
 
     def _validate_numax(self, numax):
         """Raises exception if `numax` is None and `self.numax` is not set."""
@@ -101,7 +113,9 @@ class Seismology(object):
             try:
                 return self.numax
             except AttributeError:
-                raise AttributeError("You need to call `Seismology.estimate_numax()` first.")
+                raise AttributeError(
+                    "You need to call `Seismology.estimate_numax()` first."
+                )
         return numax
 
     def _validate_deltanu(self, deltanu):
@@ -110,13 +124,20 @@ class Seismology(object):
             try:
                 return self.deltanu
             except AttributeError:
-                raise AttributeError("You need to call `Seismology.estimate_deltanu()` first.")
+                raise AttributeError(
+                    "You need to call `Seismology.estimate_deltanu()` first."
+                )
         return deltanu
 
-
-    def _clean_echelle(self, deltanu=None, numax=None,
-                         minimum_frequency=None, maximum_frequency=None,
-                         smooth_filter_width=.1, scale='linear'):
+    def _clean_echelle(
+        self,
+        deltanu=None,
+        numax=None,
+        minimum_frequency=None,
+        maximum_frequency=None,
+        smooth_filter_width=0.1,
+        scale="linear",
+    ):
         """Takes input seismology object and creates the necessary arrays for an echelle
         diagram. Validates all the inputs.
 
@@ -163,75 +184,85 @@ class Seismology(object):
             numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
 
-        if (not hasattr(numax, 'unit')) & (numax is not None):
+        if (not hasattr(numax, "unit")) & (numax is not None):
             numax = numax * self.periodogram.frequency.unit
-        if (not hasattr(deltanu, 'unit')) & (deltanu is not None):
+        if (not hasattr(deltanu, "unit")) & (deltanu is not None):
             deltanu = deltanu * self.periodogram.frequency.unit
 
         if smooth_filter_width:
             pgsmooth = self.periodogram.smooth(filter_width=smooth_filter_width)
             freq = pgsmooth.frequency  # Makes code below more readable below
-            power = pgsmooth.power     # Makes code below more readable below
+            power = pgsmooth.power  # Makes code below more readable below
         else:
             freq = self.periodogram.frequency  # Makes code below more readable
-            power = self.periodogram.power     # Makes code below more readable
+            power = self.periodogram.power  # Makes code below more readable
 
         fmin = freq[0]
         fmax = freq[-1]
 
         # Check for any superfluous input
-        if (numax is not None) & (any([a is not None for a in [minimum_frequency, maximum_frequency]])):
-            warnings.warn("You have passed both a numax and a frequency limit. "
-                          "The frequency limit will override the numax input.",
-                          LightkurveWarning)
+        if (numax is not None) & (
+            any([a is not None for a in [minimum_frequency, maximum_frequency]])
+        ):
+            warnings.warn(
+                "You have passed both a numax and a frequency limit. "
+                "The frequency limit will override the numax input.",
+                LightkurveWarning,
+            )
 
         # Ensure input numax is in the correct units (if there is one)
         if numax is not None:
             numax = u.Quantity(numax, freq.unit).value
             if numax > freq[-1].value:
-                raise ValueError("You can't pass in a numax outside the"
-                                "frequency range of the periodogram.")
+                raise ValueError(
+                    "You can't pass in a numax outside the"
+                    "frequency range of the periodogram."
+                )
 
             fwhm = utils.get_fwhm(self.periodogram, numax)
 
-            fmin = numax - 2*fwhm
+            fmin = numax - 2 * fwhm
             if fmin < freq[0].value:
                 fmin = freq[0].value
 
-            fmax = numax + 2*fwhm
+            fmax = numax + 2 * fwhm
             if fmax > freq[-1].value:
                 fmax = freq[-1].value
 
         # Set limits and set them in the right units
         if minimum_frequency is not None:
-            fmin =  u.Quantity(minimum_frequency, freq.unit).value
+            fmin = u.Quantity(minimum_frequency, freq.unit).value
             if fmin > freq[-1].value:
-                raise ValueError("You can't pass in a limit outside the "
-                                 "frequency range of the periodogram.")
+                raise ValueError(
+                    "You can't pass in a limit outside the "
+                    "frequency range of the periodogram."
+                )
 
         if maximum_frequency is not None:
             fmax = u.Quantity(maximum_frequency, freq.unit).value
             if fmax > freq[-1].value:
-                raise ValueError("You can't pass in a limit outside the "
-                                 "frequency range of the periodogram.")
+                raise ValueError(
+                    "You can't pass in a limit outside the "
+                    "frequency range of the periodogram."
+                )
 
         # Make sure fmin and fmax are Quantities or code below will break
         fmin = u.Quantity(fmin, freq.unit)
         fmax = u.Quantity(fmax, freq.unit)
 
         # Add on 1x deltanu so we don't miss off any important range due to rounding
-        if fmax < freq[-1] - 1.5*deltanu:
+        if fmax < freq[-1] - 1.5 * deltanu:
             fmax += deltanu
 
         fs = np.median(np.diff(freq))
         x0 = int(freq[0] / fs)
 
-        ff = freq[int(fmin/fs)-x0:int(fmax/fs)-x0] # Selected frequency range
-        pp = power[int(fmin/fs)-x0:int(fmax/fs)-x0] # Power range
+        ff = freq[int(fmin / fs) - x0 : int(fmax / fs) - x0]  # Selected frequency range
+        pp = power[int(fmin / fs) - x0 : int(fmax / fs) - x0]  # Power range
 
         # Reshape the power into n_rows of n_columns
         #  When modulus ~ zero, deltanu divides into frequency without remainder
-        mod_zeros = find_peaks( -1.0*(ff % deltanu) )[0]
+        mod_zeros = find_peaks(-1.0 * (ff % deltanu))[0]
 
         # The bottom left corner of the plot is the lowest frequency that
         # divides into deltanu with almost zero remainder
@@ -249,25 +280,33 @@ class Seismology(object):
 
         # The number of columns is the total number of frequency points divided
         #  by the number of rows, floor divided to the nearest integer value
-        n_columns =  int( (approx_end - start) / n_rows )
+        n_columns = int((approx_end - start) / n_rows)
 
         # The exact end point is therefore the ncolumns*nrows away from the start
-        end = start + n_columns*n_rows
+        end = start + n_columns * n_rows
 
-        ep = np.reshape(pp[start : end], (n_rows, n_columns))
+        ep = np.reshape(pp[start:end], (n_rows, n_columns))
 
-        if scale=='log':
+        if scale == "log":
             ep = np.log10(ep)
 
         # Reshape the freq into n_rowss of n_columnss & create arays
-        ef = np.reshape(ff[start : end], (n_rows, n_columns))
-        x_f = ((ef[0,:]-ef[0,0]) % deltanu)
-        y_f = (ef[:,0])
+        ef = np.reshape(ff[start:end], (n_rows, n_columns))
+        x_f = (ef[0, :] - ef[0, 0]) % deltanu
+        y_f = ef[:, 0]
         return ep, x_f, y_f
 
-    def plot_echelle(self, deltanu=None, numax=None, minimum_frequency=None,
-                     maximum_frequency=None, smooth_filter_width=.1,
-                     scale='linear', ax=None, cmap='Blues'):
+    def plot_echelle(
+        self,
+        deltanu=None,
+        numax=None,
+        minimum_frequency=None,
+        maximum_frequency=None,
+        smooth_filter_width=0.1,
+        scale="linear",
+        ax=None,
+        cmap="Blues",
+    ):
         """Plots an echelle diagram of the periodogram by stacking the
         periodogram in slices of deltanu.
 
@@ -315,55 +354,81 @@ class Seismology(object):
             numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
 
-        if (not hasattr(numax, 'unit')) & (numax is not None):
+        if (not hasattr(numax, "unit")) & (numax is not None):
             numax = numax * self.periodogram.frequency.unit
-        if (not hasattr(deltanu, 'unit')) & (deltanu is not None):
+        if (not hasattr(deltanu, "unit")) & (deltanu is not None):
             deltanu = deltanu * self.periodogram.frequency.unit
 
-        ep, x_f, y_f = self._clean_echelle(numax=numax, deltanu=deltanu,
-                                           minimum_frequency=minimum_frequency,
-                                           maximum_frequency=maximum_frequency,
-                                           smooth_filter_width=smooth_filter_width)
+        ep, x_f, y_f = self._clean_echelle(
+            numax=numax,
+            deltanu=deltanu,
+            minimum_frequency=minimum_frequency,
+            maximum_frequency=maximum_frequency,
+            smooth_filter_width=smooth_filter_width,
+        )
 
         # Plot the echelle diagram
         with plt.style.context(MPLSTYLE):
             if ax is None:
                 _, ax = plt.subplots()
             extent = (x_f[0].value, x_f[-1].value, y_f[0].value, y_f[-1].value)
-            figsize = plt.rcParams['figure.figsize']
+            figsize = plt.rcParams["figure.figsize"]
             a = figsize[1] / figsize[0]
             b = (extent[3] - extent[2]) / (extent[1] - extent[0])
             vmin = np.nanpercentile(ep.value, 1)
             vmax = np.nanpercentile(ep.value, 99)
 
-            im = ax.imshow(ep.value, cmap=cmap, aspect=a/b, origin='lower',
-                           extent=extent, vmin=vmin, vmax=vmax)
+            im = ax.imshow(
+                ep.value,
+                cmap=cmap,
+                aspect=a / b,
+                origin="lower",
+                extent=extent,
+                vmin=vmin,
+                vmax=vmax,
+            )
 
-            cbar = plt.colorbar(im, ax=ax, extend='both', pad=.01)
+            cbar = plt.colorbar(im, ax=ax, extend="both", pad=0.01)
 
             if isinstance(self.periodogram, SNRPeriodogram):
-                ylabel = 'Signal to Noise Ratio (SNR)'
+                ylabel = "Signal to Noise Ratio (SNR)"
             elif self.periodogram.power.unit == cds.ppm:
-                ylabel = "Amplitude [{}]".format(self.periodogram.power.unit.to_string('latex'))
+                ylabel = "Amplitude [{}]".format(
+                    self.periodogram.power.unit.to_string("latex")
+                )
             else:
-                ylabel = "Power Spectral Density [{}]".format(self.periodogram.power.unit.to_string('latex'))
+                ylabel = "Power Spectral Density [{}]".format(
+                    self.periodogram.power.unit.to_string("latex")
+                )
 
-            if scale == 'log':
-                ylabel = 'log10('+ylabel+')'
+            if scale == "log":
+                ylabel = "log10(" + ylabel + ")"
 
             cbar.set_label(ylabel)
-            ax.set_xlabel(r'Frequency mod. {:.2f}'.format(deltanu))
-            ax.set_ylabel(r'Frequency [{}]'.format(self.periodogram.frequency.unit.to_string('latex')))
-            ax.set_title('Echelle diagram for {}'.format(self.periodogram.label))
+            ax.set_xlabel(r"Frequency mod. {:.2f}".format(deltanu))
+            ax.set_ylabel(
+                r"Frequency [{}]".format(
+                    self.periodogram.frequency.unit.to_string("latex")
+                )
+            )
+            ax.set_title("Echelle diagram for {}".format(self.periodogram.label))
 
         return ax
 
-    def _make_echelle_elements(self, deltanu, cmap='viridis',
-        minimum_frequency=None, maximum_frequency=None, smooth_filter_width=.1,
-        scale='linear', plot_width=490, plot_height=340, title='Echelle'):
-        """Helper function to make the elements of the echelle diagram for bokeh plotting.
-        """
-        if not hasattr(deltanu, 'unit'):
+    def _make_echelle_elements(
+        self,
+        deltanu,
+        cmap="viridis",
+        minimum_frequency=None,
+        maximum_frequency=None,
+        smooth_filter_width=0.1,
+        scale="linear",
+        plot_width=490,
+        plot_height=340,
+        title="Echelle",
+    ):
+        """Helper function to make the elements of the echelle diagram for bokeh plotting."""
+        if not hasattr(deltanu, "unit"):
             deltanu = deltanu * self.periodogram.frequency.unit
 
         if smooth_filter_width:
@@ -372,51 +437,65 @@ class Seismology(object):
         else:
             freq = self.periodogram.frequency  # Makes code below more readable
 
-        ep, x_f, y_f = self._clean_echelle(deltanu=deltanu,
-                                           minimum_frequency=minimum_frequency,
-                                           maximum_frequency=maximum_frequency,
-                                           smooth_filter_width=smooth_filter_width,
-                                           scale=scale)
+        ep, x_f, y_f = self._clean_echelle(
+            deltanu=deltanu,
+            minimum_frequency=minimum_frequency,
+            maximum_frequency=maximum_frequency,
+            smooth_filter_width=smooth_filter_width,
+            scale=scale,
+        )
 
-        fig = figure(plot_width=plot_width, plot_height=plot_height,
-                     x_range=(0, 1), y_range=(y_f[0].value, y_f[-1].value),
-                     title=title, tools='pan,box_zoom,reset',
-                     toolbar_location="above",
-                     border_fill_color="white")
+        fig = figure(
+            plot_width=plot_width,
+            plot_height=plot_height,
+            x_range=(0, 1),
+            y_range=(y_f[0].value, y_f[-1].value),
+            title=title,
+            tools="pan,box_zoom,reset",
+            toolbar_location="above",
+            border_fill_color="white",
+        )
 
-        fig.yaxis.axis_label = r'Frequency [{}]'.format(freq.unit.to_string())
-        fig.xaxis.axis_label = r'Frequency / {:.3f} Mod. 1'.format(deltanu)
+        fig.yaxis.axis_label = r"Frequency [{}]".format(freq.unit.to_string())
+        fig.xaxis.axis_label = r"Frequency / {:.3f} Mod. 1".format(deltanu)
 
         lo, hi = np.nanpercentile(ep.value, [0.1, 99.9])
         vlo, vhi = 0.3 * lo, 1.7 * hi
-        vstep = (lo - hi)/500
+        vstep = (lo - hi) / 500
         color_mapper = LogColorMapper(palette="RdYlGn10", low=lo, high=hi)
 
-        fig.image(image=[ep.value], x=0, y=y_f[0].value,
-                  dw=1, dh=y_f[-1].value,
-                  color_mapper=color_mapper, name='img')
+        fig.image(
+            image=[ep.value],
+            x=0,
+            y=y_f[0].value,
+            dw=1,
+            dh=y_f[-1].value,
+            color_mapper=color_mapper,
+            name="img",
+        )
 
-        stretch_slider = RangeSlider(start=vlo,
-                                     end=vhi,
-                                     step=vstep,
-                                     title='',
-                                     value=(lo, hi),
-                                     orientation='vertical',
-                                     width=10,
-                                     height=230,
-                                     direction='rtl',
-                                     show_value=False,
-                                     sizing_mode='fixed',
-                                     name='stretch')
+        stretch_slider = RangeSlider(
+            start=vlo,
+            end=vhi,
+            step=vstep,
+            title="",
+            value=(lo, hi),
+            orientation="vertical",
+            width=10,
+            height=230,
+            direction="rtl",
+            show_value=False,
+            sizing_mode="fixed",
+            name="stretch",
+        )
 
         def stretch_change_callback(attr, old, new):
             """TPF stretch slider callback."""
-            fig.select('img')[0].glyph.color_mapper.high = new[1]
-            fig.select('img')[0].glyph.color_mapper.low = new[0]
+            fig.select("img")[0].glyph.color_mapper.high = new[1]
+            fig.select("img")[0].glyph.color_mapper.low = new[0]
 
-        stretch_slider.on_change('value', stretch_change_callback)
+        stretch_slider.on_change("value", stretch_change_callback)
         return fig, stretch_slider
-
 
     def interact_echelle(self, notebook_url="localhost:8888", **kwargs):
         """Display an interactive Jupyter notebook widget showing an Echelle diagram.
@@ -439,35 +518,51 @@ class Seismology(object):
         """
         try:
             import bokeh
-            if bokeh.__version__[0] == '0':
-                warnings.warn("interact() requires Bokeh version 1.0 or later", LightkurveWarning)
+
+            if bokeh.__version__[0] == "0":
+                warnings.warn(
+                    "interact() requires Bokeh version 1.0 or later", LightkurveWarning
+                )
         except ImportError:
-            log.error("The interact() tool requires the `bokeh` Python package; "
-                      "you can install bokeh using e.g. `conda install bokeh`.")
+            log.error(
+                "The interact() tool requires the `bokeh` Python package; "
+                "you can install bokeh using e.g. `conda install bokeh`."
+            )
             return None
 
-        maximum_frequency = kwargs.pop('maximum_frequency', self.periodogram.frequency.max().value)
-        minimum_frequency = kwargs.pop('minimum_frequency', self.periodogram.frequency. min().value)
+        maximum_frequency = kwargs.pop(
+            "maximum_frequency", self.periodogram.frequency.max().value
+        )
+        minimum_frequency = kwargs.pop(
+            "minimum_frequency", self.periodogram.frequency.min().value
+        )
 
-        if not hasattr(self, 'deltanu'):
-            dnu = SeismologyQuantity(quantity=self.periodogram.frequency.max()/30,
-                                     name='deltanu', method='echelle')
+        if not hasattr(self, "deltanu"):
+            dnu = SeismologyQuantity(
+                quantity=self.periodogram.frequency.max() / 30,
+                name="deltanu",
+                method="echelle",
+            )
         else:
             dnu = self.deltanu
 
         def create_interact_ui(doc):
-            fig_tpf, stretch_slider = self._make_echelle_elements(dnu,
-                                              maximum_frequency=maximum_frequency,
-                                              minimum_frequency=minimum_frequency,
-                                              **kwargs)
-            maxdnu = self.periodogram.frequency.max().value/5
+            fig_tpf, stretch_slider = self._make_echelle_elements(
+                dnu,
+                maximum_frequency=maximum_frequency,
+                minimum_frequency=minimum_frequency,
+                **kwargs
+            )
+            maxdnu = self.periodogram.frequency.max().value / 5
             # Interactive slider widgets
-            dnu_slider = Slider(start=0.01,
-                                end=maxdnu,
-                                value=dnu.value,
-                                step=0.01,
-                                title="Delta Nu",
-                                width=290)
+            dnu_slider = Slider(
+                start=0.01,
+                end=maxdnu,
+                value=dnu.value,
+                step=0.01,
+                title="Delta Nu",
+                width=290,
+            )
             r_button = Button(label=">", button_type="default", width=30)
             l_button = Button(label="<", button_type="default", width=30)
             rr_button = Button(label=">>", button_type="default", width=30)
@@ -475,14 +570,19 @@ class Seismology(object):
 
             def update(attr, old, new):
                 """Callback to take action when dnu slider changes"""
-                dnu = SeismologyQuantity(quantity=dnu_slider.value*u.microhertz,
-                                         name='deltanu', method='echelle')
-                ep, _, _ = self._clean_echelle(deltanu=dnu,
-                                               minimum_frequency=minimum_frequency,
-                                               maximum_frequency=maximum_frequency,
-                                               **kwargs)
-                fig_tpf.select('img')[0].data_source.data['image'] = [ep.value]
-                fig_tpf.xaxis.axis_label = r'Frequency / {:.3f} Mod. 1'.format(dnu)
+                dnu = SeismologyQuantity(
+                    quantity=dnu_slider.value * u.microhertz,
+                    name="deltanu",
+                    method="echelle",
+                )
+                ep, _, _ = self._clean_echelle(
+                    deltanu=dnu,
+                    minimum_frequency=minimum_frequency,
+                    maximum_frequency=maximum_frequency,
+                    **kwargs
+                )
+                fig_tpf.select("img")[0].data_source.data["image"] = [ep.value]
+                fig_tpf.xaxis.axis_label = r"Frequency / {:.3f} Mod. 1".format(dnu)
 
             def go_right_by_one_small():
                 """Step forward in time by a single cadence"""
@@ -508,16 +608,26 @@ class Seismology(object):
                 if existing_value > 0:
                     dnu_slider.value = existing_value - 0.01
 
-            dnu_slider.on_change('value', update)
+            dnu_slider.on_change("value", update)
             r_button.on_click(go_right_by_one_small)
             l_button.on_click(go_left_by_one_small)
             rr_button.on_click(go_right_by_one)
             ll_button.on_click(go_left_by_one)
 
-            widgets_and_figures = layout([fig_tpf, [Spacer(height=20), stretch_slider]],
-                                         [ll_button, Spacer(width=30), l_button,
-                                          Spacer(width=25), dnu_slider, Spacer(width=30),
-                                          r_button, Spacer(width=23), rr_button])
+            widgets_and_figures = layout(
+                [fig_tpf, [Spacer(height=20), stretch_slider]],
+                [
+                    ll_button,
+                    Spacer(width=30),
+                    l_button,
+                    Spacer(width=25),
+                    dnu_slider,
+                    Spacer(width=30),
+                    r_button,
+                    Spacer(width=23),
+                    rr_button,
+                ],
+            )
             doc.add_root(widgets_and_figures)
 
         output_notebook(verbose=False, hide_banner=True)
@@ -547,6 +657,7 @@ class Seismology(object):
         method = validate_method(method, supported_methods=["acf2d"])
         if method == "acf2d":
             from .numax_estimators import estimate_numax_acf2d
+
             result = estimate_numax_acf2d(self.periodogram, **kwargs)
         self.numax = result
         return result
@@ -556,7 +667,7 @@ class Seismology(object):
         numax = self._validate_numax(numax)
         return numax.diagnostics_plot_method(numax, self.periodogram)
 
-    def estimate_deltanu(self, method='acf2d', numax=None):
+    def estimate_deltanu(self, method="acf2d", numax=None):
         """Returns the average value of the large frequency spacing, DeltaNu,
         of the seismic oscillations of the target.
 
@@ -581,6 +692,7 @@ class Seismology(object):
         numax = self._validate_numax(numax)
         if method == "acf2d":
             from .deltanu_estimators import estimate_deltanu_acf2d
+
             result = estimate_deltanu_acf2d(self.periodogram, numax=numax)
         self.deltanu = result
         return result
@@ -646,13 +758,17 @@ class Seismology(object):
         numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
         if teff is None:
-            teff = self.periodogram.meta.get('TEFF')
+            teff = self.periodogram.meta.get("TEFF")
             if teff is None:
-                raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
-                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['TEFF']` is missing")
+                raise ValueError(
+                    "You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
+                    "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['TEFF']` is missing"
+                )
             else:
-                log.info("Using value for effective temperature from the Kepler Input Catalogue."
-                        "These temperatue values may sometimes differ significantly from modern estimates.")
+                log.info(
+                    "Using value for effective temperature from the Kepler Input Catalogue."
+                    "These temperatue values may sometimes differ significantly from modern estimates."
+                )
                 pass
         else:
             pass
@@ -717,13 +833,17 @@ class Seismology(object):
         numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
         if teff is None:
-            teff = self.periodogram.meta.get('TEFF')
+            teff = self.periodogram.meta.get("TEFF")
             if teff is None:
-                raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
-                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['TEFF']` is missing")
+                raise ValueError(
+                    "You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
+                    "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['TEFF']` is missing"
+                )
             else:
-                log.info("Using value for effective temperature from the Kepler Input Catalogue."
-                        "These temperatue values may sometimes differ significantly from modern estimates.")
+                log.info(
+                    "Using value for effective temperature from the Kepler Input Catalogue."
+                    "These temperatue values may sometimes differ significantly from modern estimates."
+                )
                 pass
         else:
             pass
@@ -786,13 +906,17 @@ class Seismology(object):
         """
         numax = self._validate_numax(numax)
         if teff is None:
-            teff = self.periodogram.meta.get('TEFF')
+            teff = self.periodogram.meta.get("TEFF")
             if teff is None:
-                raise ValueError("You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
-                        "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['TEFF']` is missing")
+                raise ValueError(
+                    "You must provide an effective temperature argument (`teff`) to `estimate_radius`,"
+                    "because the Periodogram object does not contain it in its meta data (i.e. `pg.meta['TEFF']` is missing"
+                )
             else:
-                log.info("Using value for effective temperature from the Kepler Input Catalogue."
-                        "These temperatue values may sometimes differ significantly from modern estimates.")
+                log.info(
+                    "Using value for effective temperature from the Kepler Input Catalogue."
+                    "These temperatue values may sometimes differ significantly from modern estimates."
+                )
                 pass
         else:
             pass
