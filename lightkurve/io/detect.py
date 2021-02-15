@@ -23,6 +23,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'K2VARCAT'`
         * `'QLP'`
         * `'PATHOS'`
+        * `'CDIPS'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -55,8 +56,7 @@ def detect_filetype(hdulist: HDUList) -> str:
     # cf. http://archive.stsci.edu/hlsp/cdips
     # The 'cdips' name doesn't stay in the filename when we use fits.open
     # to download a file, so we have to check for the origin in the header
-    if (("ORIGIN" in list(hdulist[0].header.keys())) and
-        ("CDIPS" in hdulist[0]["ORIGIN"])):
+    if "cdips" in hdulist[0].header.get("ORIGIN","").lower():
         return "CDIPS"
 
     # Is it a K2VARCAT file?
