@@ -1,20 +1,28 @@
-2.0.0 (unreleased)
+2.0.0 (2020-02-15)
 ==================
-
 
 Major changes
 -------------
 
 - Removed support for Python 2. [#733]
 
-- ``LightCurve`` is now a sub-class of ``astropy.time.TimeSeries`` to enable it
-  to have arbitrary columns and to enable closer integration with AstroPy. [#744]
+- ``LightCurve`` is now a sub-class of ``astropy.time.TimeSeries``. This enables
+  the use of custom data columns and enables a closer integration with AstroPy.
+  As a result, light curve objects now behave just like tables. [#744]
 
-- Updated the online docs with a new template, added a dozen new tutorials, and
-  extended the API reference guide. [#926]
+- The data search features have been modified to support and display
+  community-contributed data products by default, and to support the new TESS
+  exposure time modes (e.g. 20-second cadence).
 
-- Modified the structure of the source code repository to separate source files (``src/``)
-  from test files (``tests/``). [#947]
+- The ``CBVCorrector`` class has been re-implemented to enable users to remove
+  instrumental noise from light curves in a way that is nearly identical to
+  the method used by the official Kepler/TESS pipeline.
+
+- The online documentation has been updated to include a dozen new tutorials,
+  a new layout, and an extended API reference guide. [#926]
+
+- The structure of the source code repository has been modified to separate
+  source files (``src/``) from test files (``tests/``). [#947]
 
 Other changes
 -------------
