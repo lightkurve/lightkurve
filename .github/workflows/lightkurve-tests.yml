@@ -1,12 +1,13 @@
 # GitHub Actions workflow for Lightkurve's continuous integration.
 #
-# This file configures six different jobs:
+# This file configures seven different jobs:
 # 1) pytest on Linux, Python 3.7.
-# 2) pytest on Linux, Python 3.8, with --remote-data enabled (i.e. get data from MAST).
-# 3) pytest on Linux, Python 3.8, without installing optional dependencies.
-# 4) pytest on Windows, Python 3.8, with --remote-data enabled.
-# 5) pytest on OSX, Python 3.8.
-# 6) flake8 syntax check.
+# 2) pytest on Linux, Python 3.7.
+# 3) pytest on Linux, Python 3.8, with --remote-data enabled (i.e. get data from MAST).
+# 4) pytest on Linux, Python 3.9.
+# 5) pytest on Windows, Python 3.8.
+# 6) pytest on OSX, Python 3.8.
+# 7) flake8 syntax check.
 
 name: Lightkurve-tests
 
@@ -19,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: [3.6, 3.7, 3.8-remote-data]
+        name: [3.6, 3.7, 3.8-remote-data, 3.9]
         include:
           - name: 3.6
             python-version: 3.6
@@ -30,6 +31,9 @@ jobs:
           - name: 3.8-remote-data
             python-version: 3.8
             pytest-command: poetry run pytest --remote-data --doctest-modules
+          - name: 3.9
+            python-version: 3.9
+            pytest-command: poetry run pytest
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}

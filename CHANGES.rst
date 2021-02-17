@@ -1,3 +1,10 @@
+2.0.1 (2020-02-16)
+==================
+
+- Fixed an issue which caused the installation of Lightkurve 2.0 to fail
+  under Python 3.9. [#951]
+
+
 2.0.0 (2020-02-15)
 ==================
 
