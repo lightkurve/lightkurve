@@ -508,6 +508,15 @@ def test_bin():
         assert np.round(lc.bin(2000).flux_err[0], 2) == 0.01
 
 
+def test_bin_folded():
+    # bin folded light curves issue #927
+    lc = LightCurve(
+        time=np.arange(2000), flux=np.random.normal(loc=42, scale=0.01, size=2000)
+    )
+    binned_folded_lc = lc.fold(period=100).bin(time_bin_size=100)
+    assert np.round(binned_folded_lc.flux_err[0], 2) == 0.01
+
+
 @pytest.mark.xfail
 def test_bins_kwarg():
     """Does binning work with user-defined bin placement?"""

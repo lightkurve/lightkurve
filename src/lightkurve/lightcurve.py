@@ -1278,10 +1278,15 @@ class LightCurve(QTimeSeries):
             time_bin_size *= u.day
         if time_bin_start is None:
             time_bin_start = self.time[0]
-        if not isinstance(time_bin_start, Time):
-            time_bin_start = Time(
-                time_bin_start, format=self.time.format, scale=self.time.scale
-            )
+        if not isinstance(time_bin_start, (Time, TimeDelta)):
+            if isinstance(self.time, TimeDelta):
+                time_bin_start = TimeDelta(
+                    time_bin_start, format=self.time.format, scale=self.time.scale
+                )
+            else:
+                time_bin_start = Time(
+                    time_bin_start, format=self.time.format, scale=self.time.scale
+                )
 
         # Call AstroPy's aggregate_downsample
         with warnings.catch_warnings():
