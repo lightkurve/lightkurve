@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reporting issues and proposing changes &#8212; Lightkurve </title>
     
-  <link rel="stylesheet" href="../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
     
   <link rel="stylesheet"
@@ -29,14 +29,12 @@
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.3da636dd464baa7582d2.js">
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
 
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Running the unit tests" href="testing.html" />
@@ -194,7 +192,37 @@
     <ul class="nav section-nav flex-column">
     
         <li class="nav-item toc-entry toc-h2">
-            <a href="#proposing-changes-to-lightkurve-using-github-pull-requests" class="nav-link">Proposing changes to lightkurve using GitHub pull requests</a>
+            <a href="#proposing-changes-to-lightkurve-using-github-pull-requests" class="nav-link">Proposing changes to Lightkurve using GitHub Pull Requests</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#fork-lightkurve-s-github-repository" class="nav-link">1. Fork Lightkurve’s GitHub repository</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#clone-the-fork-to-your-computer" class="nav-link">2. Clone the fork to your computer</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#install-the-development-environment" class="nav-link">3. Install the development environment</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#add-a-link-to-the-main-repository-to-your-git-enviroment" class="nav-link">4. Add a link to the main repository to your git enviroment</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#create-a-new-branch" class="nav-link">5. Create a new branch</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#make-changes-and-add-them-to-the-repository" class="nav-link">6. Make changes and add them to the repository</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#push-your-changes-to-github-and-open-a-pull-request" class="nav-link">7. Push your changes to GitHub and open a Pull Request</a>
+        </li>
+    
+            </ul>
         </li>
     
     </ul>
@@ -214,42 +242,84 @@
 <span id="contributing"></span><h1>Reporting issues and proposing changes<a class="headerlink" href="#reporting-issues-and-proposing-changes" title="Permalink to this headline">¶</a></h1>
 <p>Lightkurve is actively developed on its <a class="reference external" href="https://github.com/lightkurve/lightkurve">GitHub repository</a>.</p>
 <p>If you encounter a problem with Lightkurve, we encourage you to
-<a class="reference external" href="https://github.com/lightkurve/lightkurve/issues">open an issue on the GitHub repository</a>
-or to e-mail the Kepler/K2 Guest Observer Office at <a class="reference external" href="mailto:keplergo&#37;&#52;&#48;mail&#46;arc&#46;nasa&#46;gov">keplergo<span>&#64;</span>mail<span>&#46;</span>arc<span>&#46;</span>nasa<span>&#46;</span>gov</a>.</p>
-<p>If you would like to contribute a patch for a bugfix, please go ahead and open a pull request.</p>
+<a class="reference external" href="https://github.com/lightkurve/lightkurve/issues">open an issue on the GitHub repository</a>.</p>
+<p>If you would like to propose a change or bug fix to Lightkurve, please go ahead and open a pull request
+using the steps explained below.</p>
 <div class="section" id="proposing-changes-to-lightkurve-using-github-pull-requests">
-<h2>Proposing changes to lightkurve using GitHub pull requests<a class="headerlink" href="#proposing-changes-to-lightkurve-using-github-pull-requests" title="Permalink to this headline">¶</a></h2>
+<h2>Proposing changes to Lightkurve using GitHub Pull Requests<a class="headerlink" href="#proposing-changes-to-lightkurve-using-github-pull-requests" title="Permalink to this headline">¶</a></h2>
 <p>We welcome suggestions for enhancements or new features to Lightkurve via GitHub.</p>
-<p>If you want to make a significant change such as adding a new feature, we recommend opening a GitHub issue to discuss the changes.
+<p>If you want to make a significant change such as adding a new feature,
+we recommend opening a GitHub issue to discuss the changes first.
 Once you are ready to propose the changes, please go ahead and open a pull request.</p>
 <p>If in doubt on how to open a pull request, we recommend Astropy’s
 “<a class="reference external" href="http://docs.astropy.org/en/stable/development/workflow/development_workflow.html">How to make a code contribution</a>” tutorial.
 In brief, the steps are as follows:</p>
-<ol class="arabic simple">
-<li><p>Fork the main <strong>lightkurve</strong> repository by logging into GitHub, browsing to
-<code class="docutils literal notranslate"><span class="pre">https://github.com/lightkurve/lightkurve</span></code> and clicking on <code class="docutils literal notranslate"><span class="pre">Fork</span></code> in the top right corner.</p></li>
-<li><p>Clone your fork to your computer:</p></li>
-</ol>
+<div class="section" id="fork-lightkurve-s-github-repository">
+<h3>1. Fork Lightkurve’s GitHub repository<a class="headerlink" href="#fork-lightkurve-s-github-repository" title="Permalink to this headline">¶</a></h3>
+<p>The first step is to create a copy of Lightkurve’s GitHub repository by logging into GitHub, browsing to
+<a class="reference external" href="https://github.com/lightkurve/lightkurve">https://github.com/lightkurve/lightkurve</a>,
+and clicking the <code class="docutils literal notranslate"><span class="pre">Fork</span></code> button in the top right corner.</p>
+</div>
+<div class="section" id="clone-the-fork-to-your-computer">
+<h3>2. Clone the fork to your computer<a class="headerlink" href="#clone-the-fork-to-your-computer" title="Permalink to this headline">¶</a></h3>
+<p>Head to a local directory of your choice and download your fork:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git
 </pre></div>
 </div>
-<ol class="arabic simple" start="3">
-<li><p>Install the development version of lightkurve:</p></li>
-</ol>
+</div>
+<div class="section" id="install-the-development-environment">
+<h3>3. Install the development environment<a class="headerlink" href="#install-the-development-environment" title="Permalink to this headline">¶</a></h3>
+<p>Lightkurve uses the <a class="reference external" href="https://python-poetry.org/">poetry</a> package to create an isolated development
+environment which you can use to modify and test changes to the source code without interfering with
+your existing Python environment.</p>
+<p>You can set up the environment as follows:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> lightkurve
-$ python -m pip install .
-$ python shim-setup.py develop
+$ python -m pip install poetry
+$ poetry install
 </pre></div>
 </div>
-<ol class="arabic simple" start="4">
-<li><p>Add the KeplerGO remote to your GitHub enviroment:</p></li>
-</ol>
+<p>A key advantage of the development environment is that any changes you make to the Lightkurve source
+code will be reflected right away, i.e., there is no need to re-install Lightkurve or the environment
+after every change.</p>
+<p>To run code in the development environment, you will need to prefix ever Python command with
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">run</span></code>. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ poetry run python YOUR-SCRIPT.py
+$ poetry run jupyter notebook
+$ poetry run pytest  <span class="c1"># runs all the unit tests</span>
+</pre></div>
+</div>
+<p>You can find more details on the <a class="reference external" href="https://python-poetry.org/">poetry website</a>,
+and you can find additional examples of tasks developers commonly execute in the development
+environment in Lightkurve’s <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/main/Makefile">Makefile</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The use of <code class="xref py py-obj docutils literal notranslate"><span class="pre">poetry</span></code> is not required to prepare and propose modifications to Lightkurve.
+If you wish to do so, you can install the development version in your current
+Python environment as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> lightkurve
+$ python -m pip install .
+</pre></div>
+</div>
+<p>In this scenario, you will have to re-run <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code> every time you make changes
+to the source code.  To avoid this extra step, you have the option of creating a symbolic
+link from your environment’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">site-packages</span></code> directory to the lightkurve source code tree
+as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python -m pip uninstall lightkurve
+$ python shim-setup.py develop  <span class="c1"># creates the symbolic link</span>
+</pre></div>
+</div>
+<p>While this method of installing Lightkurve is not usually recommended, it can be useful
+when you wish to modify and test multiple different packages in a single environment.</p>
+</div>
+</div>
+<div class="section" id="add-a-link-to-the-main-repository-to-your-git-enviroment">
+<h3>4. Add a link to the main repository to your git enviroment<a class="headerlink" href="#add-a-link-to-the-main-repository-to-your-git-enviroment" title="Permalink to this headline">¶</a></h3>
+<p>To be able to pull in any recent changes, we need to tell your copy of lightkurve
+where the upstream repository is located:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git remote add upstream https://github.com/lightkurve/lightkurve.git
 </pre></div>
 </div>
-<ol class="arabic simple" start="5">
-<li><p>Let’s make sure everything is setup correctly. Execute:</p></li>
-</ol>
+<p>To verify that everything is setup correctly, execute:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git remote -v
 </pre></div>
 </div>
@@ -260,31 +330,42 @@ upstream    https://github.com/lightkurve/lightkurve.git <span class="o">(</span
 upstream    https://github.com/lightkurve/lightkurve.git <span class="o">(</span>push<span class="o">)</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="6">
-<li><p>Now you are ready to start contributing; make a new branch with a name of your choice and checkout:</p></li>
-</ol>
+</div>
+<div class="section" id="create-a-new-branch">
+<h3>5. Create a new branch<a class="headerlink" href="#create-a-new-branch" title="Permalink to this headline">¶</a></h3>
+<p>You are now ready to start contributing changes.
+Before making new changes, always make sure to retrieve the latest version
+of the source code as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git checkout main
+$ pull upstream main
+</pre></div>
+</div>
+<p>You are now ready to create your own branch with a name of your choice:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git branch name-of-your-branch
 $ git checkout name-of-your-branch
 </pre></div>
 </div>
-<ol class="arabic simple" start="7">
-<li><p>Do the changes you want and add them:</p></li>
-</ol>
+</div>
+<div class="section" id="make-changes-and-add-them-to-the-repository">
+<h3>6. Make changes and add them to the repository<a class="headerlink" href="#make-changes-and-add-them-to-the-repository" title="Permalink to this headline">¶</a></h3>
+<p>You can now go ahead and modify source files.
+When you are happy about a change, you can commit it
+to your local version of the repository as follows:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git add FILE-YOU-ADDED-OR-MODIFIED
+$ git commit -m <span class="s2">&quot;description of changes&quot;</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="8">
-<li><p>Commit and push your changes:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git commit -m <span class="s2">&quot;description of changes&quot;</span>
-$ git push origin name-of-your-branch
+</div>
+<div class="section" id="push-your-changes-to-github-and-open-a-pull-request">
+<h3>7. Push your changes to GitHub and open a Pull Request<a class="headerlink" href="#push-your-changes-to-github-and-open-a-pull-request" title="Permalink to this headline">¶</a></h3>
+<p>Finally, send the changes to the fork of Lightkurve that resides in your GitHub account:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git push origin name-of-your-branch
 </pre></div>
 </div>
-<ol class="arabic simple" start="9">
-<li><p>Head to <a class="reference external" href="https://github.com/lightkurve/lightkurve">https://github.com/lightkurve/lightkurve</a> and you should now see a button
-“Compare and open a pull request”.  Click the button and submit your pull request.</p></li>
-<li><p>That’s it! :)</p></li>
-</ol>
+<p>Head to <a class="reference external" href="https://github.com/lightkurve/lightkurve">https://github.com/lightkurve/lightkurve</a> after issuing the <code class="xref py py-obj docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code>
+command above. You should automatically see a button that say “Compare and open a pull request”.
+Click the button and submit your pull request!</p>
+</div>
 </div>
 </div>
 
@@ -306,7 +387,7 @@ $ git push origin name-of-your-branch
     </div>
 
     
-  <script src="../_static/js/index.3da636dd464baa7582d2.js"></script>
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
 
 
     
@@ -323,7 +404,7 @@ $ git push origin name-of-your-branch
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
     </p>
   </div>
 </footer>

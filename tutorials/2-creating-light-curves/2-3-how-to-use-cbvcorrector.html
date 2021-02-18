@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (CBVCorrector) &#8212; Lightkurve </title>
     
-  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
     
   <link rel="stylesheet"
@@ -29,14 +29,12 @@
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
 
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Removing scattered light from TESS light curves using linear regression (RegressionCorrector)" href="2-3-removing-scattered-light-using-regressioncorrector.html" />
@@ -617,7 +615,7 @@ Kepler and TESS lightcurves. Let’s look at the CBVCorrector goodness metrics t
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.7074625764185221
+Over fitting Metric: 0.7074637760128358
 Under fitting Metric: 0.9987918538259687
 </pre></div></div>
 </div>
@@ -669,9 +667,9 @@ probably injected signals into our lightcurve and we should not trust this reall
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.8486995702360629
-Optimized Under-fitting metric: 0.9710451103602528
-Optimized Alpha: 3.085e-01
+Optimized Over-fitting metric: 0.8489279407520847
+Optimized Under-fitting metric: 0.9712306275425842
+Optimized Alpha: 3.072e-01
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -718,9 +716,9 @@ more interested in. Below we more greatly emphasize improving the over-fitting m
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9008506255312211
-Optimized Under-fitting metric: 0.8828350805973959
-Optimized Alpha: 8.874e-01
+Optimized Over-fitting metric: 0.9000941944230063
+Optimized Under-fitting metric: 0.8840393535820332
+Optimized Alpha: 8.789e-01
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -800,7 +798,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.22888076018147063
+Over fitting Metric: 0.22905944917972476
 Under fitting Metric: 0.9998060810118128
 </pre></div></div>
 </div>
@@ -872,9 +870,9 @@ you are only looking at the low frequency signals in the data then perhaps you d
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.8050806790510582
-Optimized Under-fitting metric: 0.4534701252946666
-Optimized Alpha: 4.141e+00
+Optimized Over-fitting metric: 0.800750819982569
+Optimized Under-fitting metric: 0.4552642653116383
+Optimized Alpha: 4.014e+00
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1009,7 +1007,7 @@ Text(0.5, 1.0, &#39;Result of Second Correction to Spike CBVs&#39;)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting Metric: 0.606525466564811
+Over-fitting Metric: 0.607001749078667
 Under-fitting Metric: 0.8332339309919962
 </pre></div></div>
 </div>
@@ -1076,8 +1074,8 @@ Text(0.5, 1.0, &#39;Comparison between original and final corrected lightcurve&#
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting metric: 0.07848384285526841
-CDPP: 230.75800251187732 ppm
+Over-fitting metric: 0.07928294064326208
+CDPP: 230.75800306274934 ppm
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1108,8 +1106,8 @@ CDPP: 230.75800251187732 ppm
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting metric: 0.3171679650632035
-CDPP: 55.837426434696425 ppm
+Over-fitting metric: 0.3192969160455788
+CDPP: 55.83742643984254 ppm
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1168,9 +1166,9 @@ we do see the under-fitting metric degrades slightly beginning at alpha=1e-1.</p
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.3472780841071859
-Optimized Alpha: 5.614e-04
-CDPP: 63.19280323727034 ppm
+Optimized Over-fitting metric: 0.3492282312595214
+Optimized Alpha: 4.769e-04
+CDPP: 61.79212902661941 ppm
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1314,7 +1312,7 @@ Normalized Light curve units:  (i.e astropy.units.dimensionless_unscaled)
     </div>
 
     
-  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
 
 
     
@@ -1331,7 +1329,7 @@ Normalized Light curve units:  (i.e astropy.units.dimensionless_unscaled)
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
     </p>
   </div>
 </footer>

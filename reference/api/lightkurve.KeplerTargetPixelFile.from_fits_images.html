@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lightkurve.KeplerTargetPixelFile.from_fits_images &#8212; Lightkurve </title>
     
-  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
     
   <link rel="stylesheet"
@@ -29,14 +29,12 @@
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
 
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.KeplerTargetPixelFile.plot_pixels" href="lightkurve.KeplerTargetPixelFile.plot_pixels.html" />
@@ -355,7 +353,7 @@
 <h1>lightkurve.KeplerTargetPixelFile.from_fits_images<a class="headerlink" href="#lightkurve-keplertargetpixelfile-from-fits-images" title="Permalink to this headline">¶</a></h1>
 <dl class="py method">
 <dt id="lightkurve.KeplerTargetPixelFile.from_fits_images">
-<em class="property">static </em><code class="sig-prename descclassname">KeplerTargetPixelFile.</code><code class="sig-name descname">from_fits_images</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">images_flux</span></em>, <em class="sig-param"><span class="n">position</span></em>, <em class="sig-param"><span class="n">images_raw_cnts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">images_flux_err</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">images_flux_bkg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">images_flux_bkg_err</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">images_cosmic_rays</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">(11, 11)</span></em>, <em class="sig-param"><span class="n">extension</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">target_id</span><span class="o">=</span><span class="default_value">'unnamed-target'</span></em>, <em class="sig-param"><span class="n">hdu0_keywords</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span> </em><code class="sig-prename descclassname"><span class="pre">KeplerTargetPixelFile.</span></code><code class="sig-name descname"><span class="pre">from_fits_images</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">images_raw_cnts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">images_flux_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">images_flux_bkg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">images_flux_bkg_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">images_cosmic_rays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(11,</span> <span class="pre">11)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unnamed-target'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hdu0_keywords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new Target Pixel File from a set of images.</p>
 <p>This method is intended to make it easy to cut out targets from
 Kepler/K2 “superstamp” regions or TESS FFI images.</p>
@@ -425,7 +423,7 @@ provided. Default: 1.</p>
     </div>
 
     
-  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
 
 
     
@@ -442,7 +440,7 @@ provided. Default: 1.</p>
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
     </p>
   </div>
 </footer>

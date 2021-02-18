@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lightkurve.correctors.CBVCorrector.correct &#8212; Lightkurve </title>
     
-  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
     
   <link rel="stylesheet"
@@ -29,14 +29,12 @@
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
 
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.correctors.CBVCorrector.diagnose" href="lightkurve.correctors.CBVCorrector.diagnose.html" />
@@ -343,7 +341,7 @@
 <h1>lightkurve.correctors.CBVCorrector.correct<a class="headerlink" href="#lightkurve-correctors-cbvcorrector-correct" title="Permalink to this headline">¶</a></h1>
 <dl class="py method">
 <dt id="lightkurve.correctors.CBVCorrector.correct">
-<code class="sig-prename descclassname">CBVCorrector.</code><code class="sig-name descname">correct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cbv_type</span><span class="o">=</span><span class="default_value">['SingleScale']</span></em>, <em class="sig-param"><span class="n">cbv_indices</span><span class="o">=</span><span class="default_value">[array([1, 2, 3, 4, 5, 6, 7, 8])]</span></em>, <em class="sig-param"><span class="n">ext_dm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cadence_mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">alpha_bounds</span><span class="o">=</span><span class="default_value">[0.0001, 10000.0]</span></em>, <em class="sig-param"><span class="n">target_over_score</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">target_under_score</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.CBVCorrector.correct" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">CBVCorrector.</span></code><code class="sig-name descname"><span class="pre">correct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cbv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['SingleScale']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbv_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[array([1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6,</span> <span class="pre">7,</span> <span class="pre">8])]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_dm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cadence_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.0001,</span> <span class="pre">10000.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_over_score</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_under_score</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.CBVCorrector.correct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the correction by adjusting the L2-Norm (Ridge Regression)
 regularization penalty term, alpha, based on the introduced noise
 (over-fitting) and residual correlation (under-fitting) goodness
@@ -422,7 +420,7 @@ under-fitting score is 0.8.</p>
     </div>
 
     
-  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
 
 
     
@@ -439,7 +437,7 @@ under-fitting score is 0.8.</p>
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
     </p>
   </div>
 </footer>

@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Combining multiple quarters of Kepler data &#8212; Lightkurve </title>
     
-  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
     
   <link rel="stylesheet"
@@ -29,14 +29,12 @@
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
 
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?" href="2-1-cutting-out-tpfs.html" />
@@ -478,7 +476,7 @@ div.rendered_html tbody tr:hover {
 <p>After each roll, <em>Kepler</em> retained its fine-pointing at the same field of view. Because the camera rotated by 90 degrees, all of the target stars fell on different parts of the charge-coupled device (CCD) camera. This had an effect on the amount of flux recorded for the same star, because different CCD pixels have different sensitivities. The way in which the flux from the same stars was distributed on the CCD (called the point spread function or PSF) also changed after each roll, due to focus
 changes and other instrumental effects. As a result, the aperture mask set for a star had to be recomputed after each roll, and may capture slightly different amounts of flux.</p>
 <p>The data obtained between rolls is referred to as a quarter. While there are changes to the flux <em>systematics</em>, not much else changes quarter to quarter, and the majority of the target list remains identical. This means that, after removing systematic trends (such as was done for the presearch data conditioning simple aperture photometry (PDCSAP) flux), multiple quarters together can form one continuous observation.</p>
-<!-- ![](https://keplergo.arc.nasa.gov/images/program/Orbit_Mar5_09L.gif) --><p><img alt="d4ad8d9844d3482dbb62df6201c115b6" class="no-scaled-link" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Kepler_space_telescope_orbit.png/800px-Kepler_space_telescope_orbit.png" style="width: 800px;" /></p>
+<!-- ![](https://keplergo.arc.nasa.gov/images/program/Orbit_Mar5_09L.gif) --><p><img alt="306b4391e855401ba5cf6d52da2c0f89" class="no-scaled-link" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Kepler_space_telescope_orbit.png/800px-Kepler_space_telescope_orbit.png" style="width: 800px;" /></p>
 <p><em>Figure</em>: Infographic showcasing the necessity of <em>Kepler</em>’s quarterly rolls and its Earth-trailing orbit. Source: <a class="reference external" href="https://keplergo.arc.nasa.gov/ExtendedMissionOverview.shtml">Kepler Science Center</a>.</p>
 <p><strong>Note</strong>: Observations by <em>K2</em> and <em>TESS</em> are also broken down into chunks of a month or more, called campaigns (for <em>K2</em>) and sectors (for <em>TESS</em>). While not discussed in this tutorial, the tools below work for these data products as well.</p>
 </div>
@@ -503,7 +501,7 @@ planet</a>.</p>
 <div class="output_area rendered_html docutils container">
 SearchResult containing 18 data products.
 
-<table id="table6225649616">
+<table id="table6295254976">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -567,7 +565,7 @@ LightCurveCollection of 18 objects:
 </div>
 <div class="output_area rendered_html docutils container">
 <i>KeplerLightCurve targetid=6922244 length=4116</i>
-<table id="table6227246960" class="table-striped table-bordered table-condensed">
+<table id="table4558432480" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>quality</th><th>timecorr</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>sap_flux</th><th>sap_flux_err</th><th>sap_bkg</th><th>sap_bkg_err</th><th>pdcsap_flux</th><th>pdcsap_flux_err</th><th>sap_quality</th><th>psf_centr1</th><th>psf_centr1_err</th><th>psf_centr2</th><th>psf_centr2_err</th><th>mom_centr1</th><th>mom_centr1_err</th><th>mom_centr2</th><th>mom_centr2_err</th><th>pos_corr1</th><th>pos_corr2</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th><th></th><th>d</th><th>pix</th><th>pix</th><th></th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th></tr></thead>
 <thead><tr><th>object</th><th>float32</th><th>float32</th><th>int32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>int32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
@@ -727,7 +725,7 @@ LightCurveCollection of 18 objects:
 </div>
 <div class="output_area rendered_html docutils container">
 <i>KeplerLightCurve targetid=6922244 length=65504</i>
-<table id="table6233704240" class="table-striped table-bordered table-condensed">
+<table id="table6303567104" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>quality</th><th>timecorr</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>sap_flux</th><th>sap_flux_err</th><th>sap_bkg</th><th>sap_bkg_err</th><th>pdcsap_flux</th><th>pdcsap_flux_err</th><th>sap_quality</th><th>psf_centr1</th><th>psf_centr1_err</th><th>psf_centr2</th><th>psf_centr2_err</th><th>mom_centr1</th><th>mom_centr1_err</th><th>mom_centr2</th><th>mom_centr2_err</th><th>pos_corr1</th><th>pos_corr2</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>d</th><th>pix</th><th>pix</th><th></th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th></tr></thead>
 <thead><tr><th>object</th><th>float32</th><th>float32</th><th>int32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>int32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
@@ -1006,7 +1004,7 @@ archivePrefix = "arXiv",
     </div>
 
     
-  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
 
 
     
@@ -1023,7 +1021,7 @@ archivePrefix = "arXiv",
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
     </p>
   </div>
 </footer>
