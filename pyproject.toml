@@ -71,3 +71,9 @@ build-backend = "poetry.core.masonry.api"
 [tool.dephell.main]  # config for `dephell deps convert`
 from = {format = "poetry", path = "pyproject.toml"}
 to = {format = "setuppy", path = "shim-setup.py"}
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+    "src",
+]
