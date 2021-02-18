@@ -49,6 +49,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Derek Homeier <https://github.com/dhomeier>`_
 - `Scott Fleming <https://github.com/scfleming>`_
 - `Susan Mullally <https://github.com/mustaric>`_
+- `Jorge Martínez-Palomera <https://github.com/jorgemarpa>`_
 
 
 Community

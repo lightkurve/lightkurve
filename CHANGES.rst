@@ -1,3 +1,9 @@
+2.0.2 (unreleased)
+==================
+
+- Fixed a bug which made it impossible to use ``bin()`` after ``fold()``. [#953]
+
+
 2.0.1 (2020-02-16)
 ==================
 
