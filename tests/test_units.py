@@ -13,6 +13,6 @@ def test_custom_units():
 
 @pytest.mark.remote_data
 def test_tasoc_ppm_units():
-    """Regression test"""
+    """Regression test for #956."""
     lc = lk.search_lightcurve('HV 2112', author='TASOC', sector=1, exptime=1800).download()
     assert "Unrecognized" not in lc['flux_corr'].unit.__repr__()
