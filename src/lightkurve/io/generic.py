@@ -52,6 +52,9 @@ def read_generic_lightcurve(
             tab[colname].unit = "electron/s"
         elif unitstr == "pixels":
             tab[colname].unit = "pixel"
+        elif unitstr == "ppm" and repr(tab[colname].unit).startswith("Unrecognized"):
+            # Workaround for issue #956
+            tab[colname].unit = "pixel"
 
         # Rename columns to lowercase
         tab.rename_column(colname, colname.lower())
