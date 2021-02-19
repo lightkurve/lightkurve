@@ -15,4 +15,5 @@ def test_custom_units():
 def test_tasoc_ppm_units():
     """Regression test for #956."""
     lc = lk.search_lightcurve('HV 2112', author='TASOC', sector=1, exptime=1800).download()
-    assert "Unrecognized" not in lc['flux_corr'].unit.__repr__()
+    assert lc['flux_corr'].unit == "ppm"
+    assert "Unrecognized" not in repr(lc['flux_corr'].unit)

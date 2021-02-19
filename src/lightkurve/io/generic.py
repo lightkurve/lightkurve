@@ -8,6 +8,7 @@ import numpy as np
 
 from ..utils import validate_method
 from ..lightcurve import LightCurve
+from ..units import ppm
 
 
 log = logging.getLogger(__name__)
@@ -54,7 +55,7 @@ def read_generic_lightcurve(
             tab[colname].unit = "pixel"
         elif unitstr == "ppm" and repr(tab[colname].unit).startswith("Unrecognized"):
             # Workaround for issue #956
-            tab[colname].unit = "pixel"
+            tab[colname].unit = ppm
 
         # Rename columns to lowercase
         tab.rename_column(colname, colname.lower())
