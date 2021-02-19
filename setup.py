@@ -3,7 +3,7 @@
 
 # This is a shim setup.py file which only serves the purpose of allowing us
 # to use setuptools to create an editable install during development,
-# i.e. it allows us to run `python shim-setup.py develop` which will
+# i.e. it allows us to run `pip install --editable .` which will
 # create a symbolic link from your environment's `site-packages` directory
 # to the Lightkurve source code tree. Note that this is NOT the recommended
 # way to develop lightkurve; we recommend using the `poetry` build tool instead.
