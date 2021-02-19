@@ -47,7 +47,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "This light curve looks like it has some structure in it! Let's use the periodogram class to find the rotation period. You can create a periodogram from the `KeplerLightCurve` object by using the `to_periodogram` method."
+    "This light curve looks like it has some structure in it! Let's use the periodogram class to find the rotation period. You can create a periodogram from the `KeplerLightCurve` object by using the [to_periodogram](https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.to_periodogram.html?highlight=to_periodogram) method."
    ]
   },
   {
@@ -95,7 +95,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "This looks like a very fast period. We can access the full period and power data as follows:"
+    "This looks like a very fast period. We can access the full [period](https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.period.html?highlight=period#lightkurve.periodogram.Periodogram.period) and [power](https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.power.html?highlight=power#lightkurve.periodogram.Periodogram.power) data as follows:"
    ]
   },
   {
@@ -120,7 +120,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "In this case we simply want to know the period that corresponds to the highest peak in the periodogram.  We can directly access this value using the convenient `period_at_max_power` property:"
+    "In this case we simply want to know the period that corresponds to the highest peak in the periodogram.  We can directly access this value using the convenient [period_at_max_power](https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.period_at_max_power.html?highlight=period_at_max_power) property:"
    ]
   },
   {
@@ -219,7 +219,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.6"
+   "version": "3.6.10"
   }
  },
  "nbformat": 4,

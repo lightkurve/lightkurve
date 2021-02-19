@@ -95,7 +95,7 @@ environment in Lightkurve's `Makefile <https://github.com/lightkurve/lightkurve/
     .. code-block:: bash
 
         $ python -m pip uninstall lightkurve
-        $ python shim-setup.py develop  # creates the symbolic link
+        $ python -m pip install --editable .  # creates the symbolic link
 
     While this method of installing Lightkurve is not usually recommended, it can be useful
     when you wish to modify and test multiple different packages in a single environment.

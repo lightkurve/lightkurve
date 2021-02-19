@@ -409,7 +409,8 @@ the specific signal you are trying to measure relative to the background.</p>
 </pre></div>
 </div>
 </div>
-<p>We’ve built a new <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object called <code class="docutils literal notranslate"><span class="pre">lc</span></code>. Note in this case we’ve passed an <strong>aperture_mask</strong> to the <code class="docutils literal notranslate"><span class="pre">to_lightcurve</span></code> method. The default is to use the <em>Kepler</em> pipeline aperture. (You can pass your own aperture, which is a boolean <code class="docutils literal notranslate"><span class="pre">numpy</span></code> array.) By summing all the pixels in the aperture we have created a Simple Aperture Photometry (SAP) lightcurve.</p>
+<p>We’ve built a new <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object called <code class="docutils literal notranslate"><span class="pre">lc</span></code>. Note in this case we’ve passed an <strong>aperture_mask</strong> to the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve#lightkurve.KeplerTargetPixelFile.to_lightcurve">to_lightcurve</a> method. The default is to use the <em>Kepler</em> pipeline aperture. (You can pass your own aperture, which is a boolean <code class="docutils literal notranslate"><span class="pre">numpy</span></code> array.) By summing all the pixels in the aperture we have created a
+Simple Aperture Photometry (SAP) lightcurve.</p>
 <p><code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> has many useful functions that you can use. As with Target Pixel Files you can access the meta data very simply:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -484,7 +485,7 @@ the specific signal you are trying to measure relative to the background.</p>
 <div class="math notranslate nohighlight">
 $[43689.148,~43698.078,~43694.105,~\dots,~43155.801,~43148.465,~43151.562] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
 </div>
-<p>You can also check the “CDPP” noise metric of the lightcurve using the built in method:</p>
+<p>You can also check the Combined Differential Photometric Precision (“CDPP”) noise metric of the lightcurve using the built in method <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.estimate_cdpp.html?highlight=estimate_cdpp#lightkurve.LightCurve.estimate_cdpp">estimate_cdpp()</a>:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -502,7 +503,7 @@ $[43689.148,~43698.078,~43694.105,~\dots,~43155.801,~43148.465,~43151.562] \; \m
 <div class="math notranslate nohighlight">
 $75.298766 \; \mathrm{ppm}$</div></div>
 </div>
-<p>Now we can use the built in <code class="docutils literal notranslate"><span class="pre">plot</span></code> function on the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object to plot the time series. You can pass <code class="docutils literal notranslate"><span class="pre">plot</span></code> any keywords you would normally pass to <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code>.</p>
+<p>Now we can use the built in <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.plot.html?highlight=plot#lightkurve.LightCurve.plot">plot</a> function on the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object to plot the time series. You can pass <code class="docutils literal notranslate"><span class="pre">plot</span></code> any keywords you would normally pass to <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -529,8 +530,14 @@ $75.298766 \; \mathrm{ppm}$</div></div>
 <img alt="../../_images/tutorials_1-getting-started_what-are-lightcurve-objects_12_1.png" src="../../_images/tutorials_1-getting-started_what-are-lightcurve-objects_12_1.png" />
 </div>
 </div>
-<p>There are a set of useful functions in <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects which you can use to work with the data. These include: * <code class="docutils literal notranslate"><span class="pre">flatten()</span></code>: Remove long term trends using a <a class="reference external" href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky–Golay filter</a> * <code class="docutils literal notranslate"><span class="pre">remove_outliers()</span></code>: Remove outliers using simple sigma clipping * <code class="docutils literal notranslate"><span class="pre">remove_nans()</span></code>: Remove infinite or NaN values (these can occur during thruster firings) * <code class="docutils literal notranslate"><span class="pre">fold()</span></code>: Fold the data at a particular period * <code class="docutils literal notranslate"><span class="pre">bin()</span></code>: Reduce the
-time resolution of the array, taking the average value in each bin.</p>
+<p>There are a set of useful functions in <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects which you can use to work with the data. These include:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.flatten.html?highlight=flatten#lightkurve.LightCurve.flatten">flatten()</a>: Remove long term trends using a <a class="reference external" href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky–Golay filter</a></p></li>
+<li><p><a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.remove_outliers.html?highlight=remove_outliers#lightkurve.LightCurve.remove_outliers">remove_outliers()</a>: Remove outliers using simple sigma clipping</p></li>
+<li><p><a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.remove_nans.html?highlight=remove_nans#lightkurve.LightCurve.remove_nans">remove_nans()</a>: Remove infinite or NaN values (these can occur during thruster firings)</p></li>
+<li><p><a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.fold.html?highlight=fold#lightkurve.LightCurve.fold">fold()</a>: Fold the data at a particular period</p></li>
+<li><p><a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.bin.html?highlight=bin#lightkurve.LightCurve.bin">bin()</a>: Reduce the time resolution of the array, taking the average value in each bin.</p></li>
+</ul>
 <p>We can use these simply on a light curve object</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:

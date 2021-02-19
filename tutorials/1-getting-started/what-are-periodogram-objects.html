@@ -428,7 +428,7 @@ div.rendered_html tbody tr:hover {
 <img alt="../../_images/tutorials_1-getting-started_what-are-periodogram-objects_4_1.png" src="../../_images/tutorials_1-getting-started_what-are-periodogram-objects_4_1.png" />
 </div>
 </div>
-<p>This light curve looks like it has some structure in it! Let’s use the periodogram class to find the rotation period. You can create a periodogram from the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object by using the <code class="docutils literal notranslate"><span class="pre">to_periodogram</span></code> method.</p>
+<p>This light curve looks like it has some structure in it! Let’s use the periodogram class to find the rotation period. You can create a periodogram from the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object by using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.to_periodogram.html?highlight=to_periodogram">to_periodogram</a> method.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -490,7 +490,7 @@ div.rendered_html tbody tr:hover {
 <img alt="../../_images/tutorials_1-getting-started_what-are-periodogram-objects_10_1.png" src="../../_images/tutorials_1-getting-started_what-are-periodogram-objects_10_1.png" />
 </div>
 </div>
-<p>This looks like a very fast period. We can access the full period and power data as follows:</p>
+<p>This looks like a very fast period. We can access the full <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.period.html?highlight=period#lightkurve.periodogram.Periodogram.period">period</a> and <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.power.html?highlight=power#lightkurve.periodogram.Periodogram.power">power</a> data as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -525,7 +525,7 @@ $[93.401949,~46.700974,~31.133983,~\dots,~0.040911936,~0.040894023,~0.040876126]
 <div class="math notranslate nohighlight">
 $[3.0812345,~4.0491002,~1.1168632,~\dots,~0.38587616,~0.17210997,~0.42668004] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
 </div>
-<p>In this case we simply want to know the period that corresponds to the highest peak in the periodogram. We can directly access this value using the convenient <code class="docutils literal notranslate"><span class="pre">period_at_max_power</span></code> property:</p>
+<p>In this case we simply want to know the period that corresponds to the highest peak in the periodogram. We can directly access this value using the convenient <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.period_at_max_power.html?highlight=period_at_max_power">period_at_max_power</a> property:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>

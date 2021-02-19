@@ -393,7 +393,7 @@ div.rendered_html tbody tr:hover {
 <p>TPFs can be thought of as stacks of images, with one image for every timestamp the telescope took data. Each timestamp is referred to as a <strong>cadence</strong>. These images are cut out ‘postage stamps’ of the full observation to make them easier to work with.</p>
 <p>TPFs are given in FITS files, which you can read more about <a class="reference external" href="https://fits.gsfc.nasa.gov/fits_primer.html">here</a>. <em>Lightkurve</em> includes tools for you to work directly with these files easily and intuitively.</p>
 <p>In this tutorial we’ll cover the basics of working with TPFs. In <em>lightkurve</em> there are classes to work with each mission. For example <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> deals with data from the Kepler (and K2) mission. <code class="docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code> deals with data from the TESS mission. We’ll use a Kepler TPF as an example.</p>
-<p>To load a <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> from a local path or remote url, simply call Lightkurve’s <code class="docutils literal notranslate"><span class="pre">read</span></code> function using the location of the file as the parameter:</p>
+<p>To load a <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> from a local path or remote url, simply call Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.read.html?highlight=read#lightkurve.LightCurve.read">read</a> function using the location of the file as the parameter:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -404,7 +404,7 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>You can also search for the url automatically using the <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> function. This will search for the right file in the <a class="reference external" href="https://archive.stsci.edu/kepler/">MAST data archive</a> which holds all of the Kepler and K2 data. In this case we want the Target Pixel File with Kepler ID 6922244 for Quarter 4 (Kepler’s observations were split into quarters of a year):</p>
+<p>You can also search for the url automatically using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile()</a> function. This will search for the right file in the <a class="reference external" href="https://archive.stsci.edu/kepler/">MAST data archive</a> which holds all of the Kepler and K2 data. In this case we want the Target Pixel File with Kepler ID 6922244 for Quarter 4 (Kepler’s observations were split into quarters of a year):</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -608,7 +608,7 @@ $[[{\rm NaN},~5.6079335,~51.491142,~84.241745,~30.221334],~
 <p>We can now turn this Target Pixel File into a light curve, with a single flux value for every time value. Each of the pixels are 4 arcseconds across. The point spread function (PSF) of the telescope causes the light from the star fall onto several different pixels, which can be seen in the image above. Because of this spreading, we have to sum up many pixels to collect all the light from the source. To do this we sum up all the pixels in an <strong>aperture</strong>. An aperture is a pixel mask, where we
 take only the pixels related to the target.</p>
 <p>The <em>Kepler</em> pipeline adds an aperture mask to each target pixel file. This aperture determines which pixels are summed to create a 1-D light curve of the target. There are some science cases where you might want to create a different aperture. For example, there may be a nearby contaminant or you may want to measure the background.</p>
-<p>The standard pipeline aperture is easily accessed in a <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> object using <code class="docutils literal notranslate"><span class="pre">tpf.pipeline_mask</span></code>, which is a boolean array:</p>
+<p>The standard pipeline aperture is easily accessed in a <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> object using <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.pipeline_mask.html?highlight=pipeline_mask">tpf.pipeline_mask</a>, which is a boolean array:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
@@ -716,15 +716,6 @@ TTYPE11 = &#39;POS_CORR1&#39;          / column title: column position correctio
 TTYPE12 = &#39;POS_CORR2&#39;          / column title: row position correction
 TTYPE13 = &#39;RB_LEVEL&#39;           / column title: rolling band level
 </pre></div></div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>
-</pre></div>
-</div>
 </div>
 </div>
 
