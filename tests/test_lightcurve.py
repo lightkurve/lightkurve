@@ -1452,8 +1452,9 @@ def test_fill_gaps_after_normalization():
     lc2 = lc.fill_gaps()
     assert lc2.time[2].value == 3.0
     assert lc2.flux[2].value == 1e6
-    assert lc2.flux[2].unit == u.cds.ppm
-    assert lc2.flux_err[2] == 0.1
+    assert lc2.flux[2].unit == "ppm"
+    assert lc2.flux_err[2].value == 1e5
+    assert lc2.flux_err[2].unit == "ppm"
 
 
 @pytest.mark.parametrize(

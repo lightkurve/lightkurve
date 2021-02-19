@@ -983,14 +983,9 @@ class LightCurve(QTimeSeries):
         if unit == "percent":
             lc.flux = lc.flux.to(u.percent)
             lc.flux_err = lc.flux_err.to(u.percent)
-        elif unit == "ppt":  # parts per thousand
-            # ppt is not included in astropy, so we define it here
-            ppt = u.def_unit(["ppt", "parts per thousand"], u.Unit(1e-3))
-            lc.flux = lc.flux.to(ppt)
-        elif unit == "ppm":  # parts per million
-            from astropy.units import cds
-
-            lc.flux = lc.flux.to(cds.ppm)
+        elif unit in ("ppt", "ppm"):
+            lc.flux = lc.flux.to(unit)
+            lc.flux_err = lc.flux_err.to(unit)
 
         lc.meta["NORMALIZED"] = True
         return lc

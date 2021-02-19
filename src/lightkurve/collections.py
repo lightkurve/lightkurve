@@ -1,5 +1,6 @@
 """Defines collections of data products."""
 import logging
+import warnings
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -223,7 +224,9 @@ class LightCurveCollection(Collection):
         """
         if corrector_func is None:
             corrector_func = lambda x: x  # noqa: E731
-        lcs = [corrector_func(lc) for lc in self]
+        with warnings.catch_warnings():  # ignore "already normalized" message
+            warnings.filterwarnings("ignore", message=".*already.*")
+            lcs = [corrector_func(lc) for lc in self]
         # Need `join_type='inner'` until AstroPy supports masked Quantities
         return vstack(lcs, join_type="inner", metadata_conflicts="silent")
 
