@@ -3,6 +3,8 @@
 
 - Fixed a bug which made it impossible to use ``bin()`` after ``fold()``. [#953]
 
+- Fixed a bug which caused "ppt" and "ppm" not to be enabled as AstroPy units.
+
 
 2.0.1 (2020-02-16)
 ==================
