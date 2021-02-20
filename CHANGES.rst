@@ -1,4 +1,4 @@
-2.0.2 (unreleased)
+2.0.2 (2020-02-19)
 ==================
 
 - Added the ``lightkurve.units`` module to ensure "ppt" and "ppm" are enabled
