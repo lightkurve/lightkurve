@@ -1,10 +1,13 @@
 2.0.2 (unreleased)
 ==================
 
-- Fixed a bug which made it impossible to use ``bin()`` after ``fold()``. [#953]
-
 - Added the ``lightkurve.units`` module to ensure "ppt" and "ppm" are enabled
   AstroPy units when Lightkurve is imported. [#959]
+
+- Fixed a bug which made it impossible to use ``bin()`` after ``fold()``. [#953]
+
+- Fixed a bug which caused ``LightCurve.plot(offset=N)`` to permanently increase
+  a light curve's flux by N. [#961]
 
 
 2.0.1 (2020-02-16)

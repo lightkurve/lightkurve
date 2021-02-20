@@ -1515,3 +1515,11 @@ def test_search_neighbors():
     assert len(search) == 1
     assert search.distance.value < 300
     assert search.target_name[0] == "388852407"
+
+
+def test_plot_with_offset():
+    """Regression test for #961: `lc.plot(offset=N)` increased `lc.flux` by N."""
+    lc = LightCurve(flux=[1.0])
+    ax = lc.plot(offset=1)
+    plt.close(ax.figure)
+    assert lc.flux[0].value == 1.0
