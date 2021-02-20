@@ -1580,7 +1580,7 @@ class LightCurve(QTimeSeries):
         offset : float
             Offset value to apply to the Y axis values before plotting. Use this
             to avoid light curves from overlapping on the same plot. By default,
-            no offset is applies.
+            no offset is applied.
         clip_outliers : bool
             If ``True``, clip the y axis limit to the 95%-percentile range.
         kwargs : dict
@@ -1642,7 +1642,7 @@ class LightCurve(QTimeSeries):
 
         # Apply offset if requested
         if offset:
-            flux += offset * flux.unit
+            flux = flux.copy() + offset * flux.unit
 
         # Make the plot
         with plt.style.context(style):
@@ -1714,7 +1714,7 @@ class LightCurve(QTimeSeries):
         offset : float
             Offset value to apply to the Y axis values before plotting. Use this
             to avoid light curves from overlapping on the same plot. By default,
-            no offset is applies.
+            no offset is applied.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
@@ -1756,7 +1756,7 @@ class LightCurve(QTimeSeries):
         offset : float
             Offset value to apply to the Y axis values before plotting. Use this
             to avoid light curves from overlapping on the same plot. By default,
-            no offset is applies.
+            no offset is applied.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.scatter`.
 
@@ -1803,7 +1803,7 @@ class LightCurve(QTimeSeries):
         offset : float
             Offset value to apply to the Y axis values before plotting. Use this
             to avoid light curves from overlapping on the same plot. By default,
-            no offset is applies.
+            no offset is applied.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.errorbar`.
 
