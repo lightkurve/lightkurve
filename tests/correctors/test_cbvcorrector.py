@@ -187,6 +187,7 @@ def test_CotrendingBasisVectors_nonretrieval():
             ]
         )
     )
+    # extrapolate
     cbv_interpolated = cbvs.interpolate(sample_lc, extrapolate=True)
     assert np.all(
         np.logical_not(
@@ -295,7 +296,7 @@ def test_CBVCorrector():
     dm = DesignMatrix(pd.DataFrame({"a": np.ones(4), "b": [1, 2, 4, 5]}))
 
     # ***
-    # RegressioNCorrector.correct passthrough method
+    # RegressionCorrector.correct passthrough method
     lc = cbvCorrector.correct_regressioncorrector(dm)
     # Check that returned lc is in absolute flux units
     assert isinstance(lc, TessLightCurve)
@@ -469,3 +470,20 @@ def test_CBVCorrector_retrieval():
         lc = cbvCorrector.correct_gaussian_prior(
             cbv_type=["SingleScale"], cbv_indices="all", alpha=1e-2
         )
+
+    #***
+    # Test the need for extrapolation with Kepler data
+    lc = search_lightcurve("KIC 2437317", mission="Kepler", author="kepler", cadence='long', 
+            quarter=6).download(flux_column="sap_flux")
+    cbv_type = ['SingleScale']
+    cbv_indices = [np.arange(1,9)]
+    # This will generate an warning about the need for extrapolation
+    cbvCorrector = CBVCorrector(lc, interpolate_cbvs=True, extrapolate_cbvs=False)
+    # This will generate a light curve with all NaNs
+    cbvCorrector.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices, alpha=1e-4)
+    with pytest.raises(AssertionError):
+        assert np.logical_not(np.all(np.isnan(cbvCorrector.corrected_lc.flux)))
+    # This will NOT generate all NaNs
+    cbvCorrector = CBVCorrector(lc, interpolate_cbvs=True, extrapolate_cbvs=True)
+    cbvCorrector.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices, alpha=1e-4)
+    assert np.logical_not(np.all(np.isnan(cbvCorrector.corrected_lc.flux)))

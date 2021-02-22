@@ -126,6 +126,7 @@ def underfit_metric_neighbors(
     min_targets: int = 30,
     max_targets: int = 50,
     interpolate: bool = False,
+    extrapolate: bool = False,
 ):
     """This goodness metric measures the degree of under-fitting of the
     CBVs to the light curve. It does so by measuring the mean residual target to
@@ -139,7 +140,8 @@ def underfit_metric_neighbors(
     The downloaded neighboring targets will normally be "aligned" to the
     corrected_lc, meaning the cadence numbers are used to align the targets
     to the corrected_lc. However, if interpolate=True then the targets will be
-    interpolated to the corrected_lc cadence times.
+    interpolated to the corrected_lc cadence times. extrapolate=True will 
+    further extrapolate the targets to the corrected_lc cadence times.
 
     The returned under-fitting goodness metric is callibrated such that a
     value of 0.95 means the residual correlations in the target is
@@ -175,30 +177,33 @@ def underfit_metric_neighbors(
         min_targets=min_targets,
         max_targets=max_targets,
         interpolate=interpolate,
+        extrapolate=extrapolate,
         flux_column="sap_flux",
     )
 
     # If there happens to be any cadences in the corrected_lc
     # that are not in the neighboring targets then those need to
-    # be NaNed.
+    # be removed.
     # If we interpolated the CBVs then this should not occur
-    corrected_lc = corrected_lc.copy().remove_nans()
-    if not interpolate:
-        corrected_lc_trim_mask = np.logical_not(
-            np.in1d(corrected_lc.cadenceno, lc_neighborhood[0].cadenceno)
-        )
-        corrected_lc.flux.value[corrected_lc_trim_mask] = np.nan
+    # Also normalize
+    corrected_lc = corrected_lc.copy().remove_nans().normalize()
+    corrected_lc -= 1.0
+    if interpolate:
+        corrected_lc_flux_trimmed = corrected_lc.flux.value
+    else:
+        corrected_lc_trim_mask = np.in1d(corrected_lc.cadenceno, 
+                lc_neighborhood[0].cadenceno)
+        corrected_lc_flux_trimmed = corrected_lc.flux.value[corrected_lc_trim_mask]
 
     # Create fluxMatrix. The last entry is the target under study
     fluxMatrix = np.zeros((len(lc_neighborhood_flux[0]), len(lc_neighborhood_flux) + 1))
     for idx in np.arange(len(fluxMatrix[0, :]) - 1):
         fluxMatrix[:, idx] = lc_neighborhood_flux[idx]
-    # Add in target under study, and median normalize it
-    fluxMatrix[:, -1] = corrected_lc.normalize().flux
-    fluxMatrix[:, -1] -= 1.0
+    # Add in the trimmed target under study
+    fluxMatrix[:, -1] = corrected_lc_flux_trimmed
 
     # Ignore NaNs
-    mask = ~np.isnan(corrected_lc.flux)
+    mask = ~np.isnan(corrected_lc_flux_trimmed)
     fluxMatrix = fluxMatrix[mask, :]
 
     # Determine the target-target correlation between target and
@@ -259,6 +264,7 @@ def _unique_key_for_processing_neighbors(
     min_targets: int = 30,
     max_targets: int = 50,
     interpolate: bool = False,
+    extrapolate: bool = False,
     author: tuple = ("Kepler", "K2", "SPOC"),
     flux_column: str = "sap_flux",
 ):
@@ -274,6 +280,7 @@ def _download_and_preprocess_neighbors(
     min_targets: int = 30,
     max_targets: int = 50,
     interpolate: bool = False,
+    extrapolate: bool = False,
     author: tuple = ("Kepler", "K2", "SPOC"),
     flux_column: str = "sap_flux",
 ):
@@ -298,6 +305,9 @@ def _download_and_preprocess_neighbors(
         If `True`, the flux values of the neighboring light curves will be
         interpolated to match the times of the `corrected_lc`.
         If `False`, the flux values will simply be aligned by time where possible.
+    extrapolate : bool
+        If `True`, the  flux values of the neighboring light curves will be
+        also be extrapolated. Note: extrapolated values can be unstable.
 
     Returns
     -------
@@ -305,8 +315,11 @@ def _download_and_preprocess_neighbors(
         Collection of all neighboring light curves used.
     lc_neighborhood_flux : list
         List containing the flux arrays of the neighboring light curves,
-        interpolated and aligned with `corrected_lc` if requested.
+        interpolated or aligned with `corrected_lc` if requested.
     """
+    if extrapolate and (extrapolate != interpolate):
+        raise Exception('interpolate must be True if extrapolate is True')
+
     search = corrected_lc.search_neighbors(
         limit=max_targets, radius=radius, author=author
     )
@@ -327,24 +340,31 @@ def _download_and_preprocess_neighbors(
     for lc in lcfCol:
         lcSAP = lc.remove_nans().normalize()
         lcSAP.flux -= 1.0
-        lc_neighborhood.append(lcSAP)
         # Align or interpolate the neighboring target with the target under study
         if interpolate:
             # Interpolate to corrected_lc cadence times
             fInterp = PchipInterpolator(
-                lc_neighborhood[-1].time.value,
-                lc_neighborhood[-1].flux.value,
-                extrapolate=False,
+                lcSAP.time.value,
+                lcSAP.flux.value,
+                extrapolate=extrapolate,
             )
             lc_neighborhood_flux.append(fInterp(corrected_lc.time.value))
         else:
             # The CBVs were aligned so also align the neighboring
             # lightcurves
             lc_trim_mask = np.in1d(
-                lc_neighborhood[-1].cadenceno, corrected_lc.cadenceno
+                lcSAP.cadenceno, corrected_lc.cadenceno
             )
-            lc_neighborhood_flux.append(lc_neighborhood[-1][lc_trim_mask].flux.value)
+            # If there are no non-trimmed cadences then nothing to add
+            if (np.all(np.logical_not(lc_trim_mask))):
+                continue
+            lc_neighborhood_flux.append(lcSAP[lc_trim_mask].flux.value)
+        lc_neighborhood.append(lcSAP)
 
+    if len(lc_neighborhood) < min_targets:
+        raise MinTargetsError(
+            f"Unable to find at least {min_targets} neighbors within {radius} arcseconds radius."
+        )
     # Store the unmolested lightcurve neighborhood but also save the
     # aligned or interpolated neighborhood flux
     from .. import LightCurveCollection  # local import to avoid circular import
