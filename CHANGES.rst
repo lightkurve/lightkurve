@@ -1,3 +1,9 @@
+2.0.3 (unreleased)
+==================
+
+- Fixed a bug affecting the alignment of vectors in ``CBVCorrector``. [#964]
+
+
 2.0.2 (2020-02-19)
 ==================
 
