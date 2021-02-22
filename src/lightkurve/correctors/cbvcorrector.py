@@ -89,11 +89,11 @@ class CBVCorrector(RegressionCorrector):
         Equivalent to: designmatrix prior sigma = np.median(self.lc.flux_err) / np.sqrt(alpha)
     """
 
-    def __init__(self, lc, interpolate_cbvs=False, do_not_load_cbvs=False):
+    def __init__(self, lc, interpolate_cbvs=False, extrapolate_cbvs=False, do_not_load_cbvs=False):
         """Constructor
 
         This constructor will retrieve all relevant CBVs from MAST and then
-        align them with the passed-in light curve.
+        align or interpolate them with the passed-in light curve.
 
         Parameters
         ----------
@@ -103,6 +103,9 @@ class CBVCorrector(RegressionCorrector):
             By default, the cbvs will be 'aligned' to the lightcurve. If you
             wish to interpolate the cbvs instead then set this to True.
             Uses Piecewise Cubic Hermite Interpolating Polynomial (PCHIP). 
+        extrapolate_cbvs : bool
+            Set to True if the CBVs also have to be extrapolated outside their time 
+            stamp range. (If False then those cadences are filled with NaNs.)
         do_not_load_cbvs : bool
             If True then the CBVs will NOT be loaded from MAST. 
             Use this option if you wish to use the CBV corrector methods with only a 
@@ -113,6 +116,9 @@ class CBVCorrector(RegressionCorrector):
 
         assert  lc.flux.unit==Unit('electron / second'), \
             'cbvCorrector expects light curve to be passed in e-/s units.'        
+
+        if extrapolate_cbvs and (extrapolate_cbvs != interpolate_cbvs):
+            raise Exception('interpolate_cbvs must be True if extrapolate_cbvs is True')
 
         # We do not want any NaNs
         lc = lc.remove_nans()
@@ -162,16 +168,22 @@ class CBVCorrector(RegressionCorrector):
             for idx in np.arange(len(cbvs)):
                 if (not isinstance(cbvs[idx], CotrendingBasisVectors)):
                     raise Exception('CBVs could not be loaded. CBVCorrector must exit')
+
+            # Set the CBV time format units to the lightcurve time format units
+            for idx in np.arange(len(cbvs)):
+                # astropy.time.Time makes this easy!
+                cbvs[idx].time.format = lc.time.format
             
             # Align or interpolate the CBVs with the lightcurve flux using the cadence numbers
             for idx in np.arange(len(cbvs)):
                 if interpolate_cbvs:
-                    cbvs[idx] = cbvs[idx].interpolate(self.lc)
+                    cbvs[idx] = cbvs[idx].interpolate(self.lc, extrapolate=extrapolate_cbvs)
                 else:
                     cbvs[idx] = cbvs[idx].align(self.lc)
 
         self.cbvs = cbvs
         self.interpolated_cbvs = interpolate_cbvs
+        self.extrapolated_cbvs = extrapolate_cbvs
 
         # Initialize all extra attributes to None
         self.cbv_design_matrix = None
@@ -566,10 +578,8 @@ class CBVCorrector(RegressionCorrector):
             else:
                 radius = 1000
 
-        if self.interpolated_cbvs:
-            interpolate = True
-        else:
-            interpolate = False
+        interpolate = self.interpolated_cbvs
+        extrapolate = self.extrapolated_cbvs
 
         # Make a copy of radius because it changes locally
         dynamic_search_radius = radius
@@ -595,7 +605,7 @@ class CBVCorrector(RegressionCorrector):
             try:
                 metric = underfit_metric_neighbors (corrected_lc, 
                             dynamic_search_radius, min_targets, max_targets, 
-                            interpolate)
+                            interpolate, extrapolate)
             except MinTargetsError:
                 # Too few targets found, try increasing search radius
                 if (dynamic_search_radius > max_search_radius):
@@ -727,7 +737,6 @@ class CBVCorrector(RegressionCorrector):
             columns=['Constant'], name='Constant'))
 
         self.design_matrix_collection = DesignMatrixCollection(flattened_dm_list)
-        self.design_matrix_collection.validate()
 
 
     def _set_prior_width(self, sigma):
@@ -1186,6 +1195,8 @@ class CotrendingBasisVectors(TimeSeries):
         have NaNs returned for the CBVs on those cadences and the GAP set to
         True.
 
+        Any cadences in the CBVs not in the light curve will be removed from the CBVs.
+
         The returned cbvs object is sorted by cadenceno.
 
         If you wish to interpolate the CBVs to arbitrary light curve cadence
@@ -1278,6 +1289,16 @@ class CotrendingBasisVectors(TimeSeries):
         if not isinstance(lc, LightCurve):
             raise Exception('<lc> must be a LightCurve class')
 
+        # If not extrapolating then check if extrapolation is necessary.
+        # If so, throw a warning
+        if extrapolate==False:
+            gapRemovedCBVtime = self.time.value[np.logical_not(self.gap_indicators.value)]
+            if (np.min(lc.time.value) < np.min(gapRemovedCBVtime) or
+                np.max(lc.time.value) > np.max(gapRemovedCBVtime)   ):
+                log.warning('Extrapolation of CBVs appears to be necessary. '
+                            'Extrapolated values will be filled with NaNs. '
+                            'Recommend setting extrapolate=True')
+
         # Create the new cbv object with no basis vectors, yet...
         cbvNewTime = lc.time.copy()
         # Gaps are all false
@@ -1285,10 +1306,18 @@ class CotrendingBasisVectors(TimeSeries):
         dataTbl = Table([lc.cadenceno, gaps], names=('CADENCENO', 'GAP'))
 
         # We are PCHIP interpolating each CBV independently.
+        # Do not include gaps when interpolating
+        warning_posted = False
         for idx in self.cbv_indices:
-            fInterp = PchipInterpolator(self.time.value,
-                    self['VECTOR_{}'.format(idx)], extrapolate=extrapolate)
+            fInterp = PchipInterpolator(
+                    self.time.value[np.logical_not(self.gap_indicators.value)],
+                    self['VECTOR_{}'.format(idx)][np.logical_not(self.gap_indicators.value)], 
+                    extrapolate=extrapolate)
             dataTbl['VECTOR_{}'.format(idx)] = fInterp(lc.time.value)
+            # Only post this warnign once
+            if (not warning_posted and  np.any(np.isnan(dataTbl['VECTOR_{}'.format(idx)]))):
+                log.warning('Some interpolated (or extrapolated) CBV values have been set to NaN')
+                warning_posted = True
 
         dataTbl.meta = self.meta.copy()
 
@@ -1385,7 +1414,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
             nanHere = np.nonzero(np.isnan(dataTbl['TIME_MJD'].data))[0]
             timeData = dataTbl['TIME_MJD'].data
             timeData[nanHere] = Time(['2000-01-01'], scale='utc').mjd
-            cbvTime = Time(timeData, format='mjd')
+            cbvTime = Time(timeData, format='mjd', scale='utc')
             dataTbl.remove_column('TIME_MJD')
 
             # Gaps are labelled as 'GAPFLAG' so rename!
@@ -1562,8 +1591,8 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
             # astropy.time.Time complains
             nanHere = np.nonzero(np.isnan(dataTbl['TIME'].data))[0]
             timeData = dataTbl['TIME'].data
-            timeData[nanHere] = Time(['2000-01-01'], scale='utc').mjd
-            cbvTime = Time(timeData, format='btjd')
+            timeData[nanHere] = Time(['2000-01-01'], scale='tdb').mjd
+            cbvTime = Time(timeData, format='btjd', scale='tdb')
             dataTbl.remove_column('TIME')
 
             dataTbl.meta['MISSION'] = 'TESS'
