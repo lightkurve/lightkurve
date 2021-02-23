@@ -2,7 +2,7 @@
 from .detect import *
 from .read import *
 
-from . import kepler, tess, qlp, k2sff, everest, pathos, tasoc
+from . import kepler, tess, qlp, k2sff, everest, pathos, tasoc, kepseismic
 from .. import LightCurve
 
 from astropy.io import registry
@@ -21,5 +21,6 @@ try:
     registry.register_reader("everest", LightCurve, everest.read_everest_lightcurve)
     registry.register_reader("pathos", LightCurve, pathos.read_pathos_lightcurve)
     registry.register_reader("tasoc", LightCurve, tasoc.read_tasoc_lightcurve)
+    registry.register_reader("kepseismic", LightCurve, kepseismic.read_kepseismic_lightcurve)
 except registry.IORegistryError:
     pass  # necessary to enable autoreload during debugging
