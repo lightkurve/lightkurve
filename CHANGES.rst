@@ -5,6 +5,10 @@
 
 - Fixed a bug affecting the alignment of vectors in ``CBVCorrector``. [#964]
 
+- Modified the lightkurve namespace to include the contents of `lightkurve.correctors`.
+  These were removed to speed up `import lightkurve` in 2.0.0, but the change appears
+  to affect too much existing code. [#977]
+
 
 2.0.2 (2020-02-19)
 ==================
