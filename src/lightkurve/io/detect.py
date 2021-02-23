@@ -25,6 +25,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'QLP'`
         * `'PATHOS'`
         * `'TASOC'`
+        * `'KEPSEISMIC'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -94,6 +95,10 @@ def detect_filetype(hdulist: HDUList) -> str:
             return "EVEREST"
     except Exception:
         pass
+
+    # Is it a KEPSEISMIC file?
+    if hdulist[0].header.get("ORIGIN") == "CEA & SSI":
+        return "KEPSEISMIC"
 
     # Is it an official data product?
     header = hdulist[0].header

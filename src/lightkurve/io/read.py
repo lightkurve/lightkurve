@@ -100,6 +100,8 @@ def read(path_or_url, **kwargs):
         return KeplerLightCurve.read(path_or_url, format="k2sff", **kwargs)
     elif filetype == "EVEREST":
         return KeplerLightCurve.read(path_or_url, format="everest", **kwargs)
+    elif filetype == "KEPSEISMIC":
+        return KeplerLightCurve.read(path_or_url, format="kepseismic", **kwargs)
 
     # Official data products;
     # if the filetype is recognized, instantiate a class of that name
