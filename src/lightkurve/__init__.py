@@ -38,6 +38,7 @@ from . import units  # enable ppt and ppm as units
 from .time import *
 from .lightcurve import *
 from .lightcurvefile import *
+from .correctors import *
 from .targetpixelfile import *
 from .utils import *
 from .convenience import *
