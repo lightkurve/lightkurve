@@ -50,6 +50,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Scott Fleming <https://github.com/scfleming>`_
 - `Susan Mullally <https://github.com/mustaric>`_
 - `Jorge Martínez-Palomera <https://github.com/jorgemarpa>`_
+- `Warrick Ball <https://github.com/warrickball>`_
 
 
 Community
@@ -90,6 +91,5 @@ We are grateful to the following community members for sharing corrections & sug
 - Joshua Pepper
 - `Joel Ong <https://github.com/darthoctopus>`_
 - `Ben Rackham <https://github.com/brackham>`_
-- `Warrick Ball <https://github.com/warrickball>`_
 
 This list is incomplete. Please open an issue if your name is missing!

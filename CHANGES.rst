@@ -1,6 +1,8 @@
 2.0.3 (unreleased)
 ==================
 
+- Added support for reading KEPSEISMIC light curves. [#972]
+
 - Fixed a bug affecting the alignment of vectors in ``CBVCorrector``. [#964]
 
 
