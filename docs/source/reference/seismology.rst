@@ -3,7 +3,7 @@
 ==========
 Seismology 
 ==========
-.. currentmodule:: lightkurve
+.. currentmodule:: lightkurve.seismology
 
 
 Constructor

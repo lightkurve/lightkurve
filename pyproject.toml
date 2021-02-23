@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "lightkurve"
-version = "2.0b5"
+version = "2.0.3.dev"
 description = "A friendly package for Kepler & TESS time series analysis in Python."
 license = "MIT"
 authors = ["Geert Barentsen <hello@geert.io>"]
 readme = "README.rst"
 homepage = "https://docs.lightkurve.org"
-repository = "https://github.com/KeplerGO/lightkurve"
+repository = "https://github.com/lightkurve/lightkurve"
 keywords = ["NASA", "Kepler", "TESS", "Astronomy"]
 classifiers = [
     "Intended Audience :: Science/Research",
@@ -17,6 +17,10 @@ classifiers = [
     "Programming Language :: Python",
 ]
 include = ["AUTHORS.rst", "CHANGES.rst", "CONTRIBUTING.rst", "CITATION"]
+
+[tool.poetry.urls]
+"Documentation" = "https://docs.lightkurve.org"
+"Bug Tracker" = "https://github.com/lightkurve/lightkurve/issues"
 
 [tool.poetry.dependencies]
 python = "^3.6.1"
@@ -33,7 +37,7 @@ pandas = "^1.1.4"
 uncertainties = "^3.1.4"
 patsy = ">=0.5.0"
 fbpca = ">=1.0"
-numba = ">=0.39.0"
+numba = { version = ">=0.53.0rc1.post1", python = ">=3.6,<3.10" }  # numba does not allow >=3.10
 bokeh = ">=1.0"
 ipython = ">=6.0.0"
 memoization = ">=0.3.1"
@@ -58,7 +62,18 @@ sphinx-automodapi = "^0.13"
 sphinxcontrib-rawfiles = "^0.1.1"
 pydata-sphinx-theme = "^0.4.1"
 pylint = "^2.6.0"
+ghp-import = "^1.0.1"
 
 [build-system]
 requires = ["setuptools", "poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.dephell.main]  # config for `dephell deps convert`
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "setuppy", path = "setup.py"}
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+    "src",
+]

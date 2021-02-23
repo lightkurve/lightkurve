@@ -40,16 +40,16 @@ Filtering search results
 The `SearchResult` object provides convenient access to the essential metadata,
 which enables the search results to be filtered.
 For example, a search result can be filtered by exposure time using
-``result = result[result.t_exptime < 100]``.
+``result = result[result.exptime.value < 100]``.
 
 .. autosummary::
   :toctree: api/
 
-  SearchResult.observation
+  SearchResult.mission
+  SearchResult.year
   SearchResult.author
   SearchResult.target_name
-  SearchResult.t_exptime
-  SearchResult.productFilename
+  SearchResult.exptime
   SearchResult.distance
   SearchResult.ra
   SearchResult.dec
