@@ -1,16 +1,16 @@
-2.0.3 (unreleased)
+2.0.3 (2021-02-23)
 ==================
 
 - Added support for reading KEPSEISMIC light curves. [#972]
 
+- Modified the top-level namespace of lightkurve to include the contents of
+  `lightkurve.correctors` again.  This was removed in 2.0.0 to speed up
+  `import lightkurve`, but the change affects too many existing packages. [#977]
+
 - Fixed a bug affecting the alignment of vectors in ``CBVCorrector``. [#964]
 
-- Modified the lightkurve namespace to include the contents of `lightkurve.correctors`.
-  These were removed to speed up `import lightkurve` in 2.0.0, but the change appears
-  to affect too much existing code. [#977]
 
-
-2.0.2 (2020-02-19)
+2.0.2 (2021-02-19)
 ==================
 
 - Added the ``lightkurve.units`` module to ensure "ppt" and "ppm" are enabled
@@ -22,14 +22,14 @@
   a light curve's flux by N. [#961]
 
 
-2.0.1 (2020-02-16)
+2.0.1 (2021-02-16)
 ==================
 
 - Fixed an issue which caused the installation of Lightkurve 2.0 to fail
   under Python 3.9. [#951]
 
 
-2.0.0 (2020-02-15)
+2.0.0 (2021-02-15)
 ==================
 
 Major changes
