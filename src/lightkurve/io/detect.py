@@ -26,6 +26,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'PATHOS'`
         * `'TASOC'`
         * `'KEPSEISMIC'`
+        * `'CDIPS'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -67,6 +68,11 @@ def detect_filetype(hdulist: HDUList) -> str:
     # cf. https://tasoc.dk and https://archive.stsci.edu/hlsp/tasoc
     if hdulist[0].header.get("ORIGIN") == "TASOC/Aarhus":
         return "TASOC"
+
+    # Is it a CDIPS TESS light curve?
+    # cf. http://archive.stsci.edu/hlsp/cdips
+    if "cdips" in hdulist[0].header.get("ORIGIN","").lower():
+        return "CDIPS"
 
     # Is it a K2VARCAT file?
     # There are no self-identifying keywords in the header, so go by filename.

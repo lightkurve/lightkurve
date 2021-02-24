@@ -20,6 +20,7 @@ try:
     registry.register_reader("k2sff", LightCurve, k2sff.read_k2sff_lightcurve)
     registry.register_reader("everest", LightCurve, everest.read_everest_lightcurve)
     registry.register_reader("pathos", LightCurve, pathos.read_pathos_lightcurve)
+    registry.register_reader('cdips', LightCurve, cdips.read_cdips_lightcurve)
     registry.register_reader("tasoc", LightCurve, tasoc.read_tasoc_lightcurve)
     registry.register_reader("kepseismic", LightCurve, kepseismic.read_kepseismic_lightcurve)
 except registry.IORegistryError:
