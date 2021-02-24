@@ -596,8 +596,8 @@ are hundreds of thousands of stars in the <em>TESS</em> field of view that weren
 <div class="section" id="1.4-Choosing-an-aperture">
 <h3>1.4 Choosing an aperture<a class="headerlink" href="#1.4-Choosing-an-aperture" title="Permalink to this headline">¶</a></h3>
 <p>In NASA’s <em>Kepler</em> and <em>K2</em> pipelines, the process of determining apertures is automated (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf">Kepler Data Processing Handbook</a>, Part II). Here, we’ll manually create our own apertures.</p>
-<p>Without any knowledge of which pixels contain light from our target, the most basic approach is to look at individual pixels and manually determine which pixels to work with. Working offline, we can use Lightkurve’s TPF <code class="docutils literal notranslate"><span class="pre">interact()</span></code> function, which is a convenient way to inspect one or more pixels at a time. Another recommended way to define an aperture is by defining a median flux value and only selecting pixels at a certain sigma above that threshold. In the tutorial, we’ll look at using
-Lightkurve’s built-in functionality to perform this.</p>
+<p>Without any knowledge of which pixels contain light from our target, the most basic approach is to look at individual pixels and manually determine which pixels to work with. Working offline, we can use Lightkurve’s TPF <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact.html?highlight=interact#lightkurve.KeplerTargetPixelFile.interact">interact()</a> function, which is a convenient way to inspect one or more pixels at a time. Another recommended way to define an
+aperture is by defining a median flux value and only selecting pixels at a certain sigma above that threshold. In the tutorial, we’ll look at using Lightkurve’s built-in functionality to perform this.</p>
 <p>In most situations, a threshold mask will be the best choice for custom aperture photometry, as it doesn’t involve trial and error beyond finding the best sigma value. However, if you’re dealing with multiple bright objects in one TPF, a manual mask may be the better option.</p>
 <p>Both of these methods are most useful when dealing with small amounts of data, such as looking at a handful of individual objects. When working with large datasets, it’s advisable to use the pipeline aperture, as this will be sufficient in the majority of cases with <em>Kepler</em> and <em>K2</em>. However, if you’re processing a large amount of stars which were not targeted during either mission — such as FFI or superstamp data — a good approach would be to experiment with multiple threshold apertures for
 each target and see which one produces the best results.</p>
@@ -607,7 +607,7 @@ each target and see which one produces the best results.</p>
 <h2>2. Getting Started<a class="headerlink" href="#2.-Getting-Started" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="2.1-Doing-photometry-with-the-pipeline-aperture">
 <h3>2.1 Doing photometry with the pipeline aperture<a class="headerlink" href="#2.1-Doing-photometry-with-the-pipeline-aperture" title="Permalink to this headline">¶</a></h3>
-<p>We’re going to use the built-in functions in Lightkurve for aperture photometry. You may have encountered <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code> in other tutorials in this series. In this section, we’ll explore a number of ways to use this function for custom aperture photometry — but first, let’s do a quick review of the function at its most basic.</p>
+<p>We’re going to use the built-in functions in Lightkurve for aperture photometry. You may have encountered <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve()</a> in other tutorials in this series. In this section, we’ll explore a number of ways to use this function for custom aperture photometry — but first, let’s do a quick review of the function at its most basic.</p>
 <p>We’ll start by downloading a target pixel file. We’re going to use <em>Kepler</em> long cadence data to look at KIC 2437317, a star which shows brightness variations due to rotation (<a class="reference external" href="https://www.aanda.org/articles/aa/pdf/2015/11/aa26216-15.pdf">Reinhold &amp; Gizon, 2015</a>). We’re downloading Quarter 10, as there was minimal data loss during this quarter (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics
 Manual</a>, Section 4.1).</p>
 <div class="nbinput nblast docutils container">
@@ -705,7 +705,7 @@ only focused on performing photometry, we won’t do any light curve corrections
 </div>
 <div class="section" id="2.2-Adjusting-the-aperture">
 <h3>2.2 Adjusting the aperture<a class="headerlink" href="#2.2-Adjusting-the-aperture" title="Permalink to this headline">¶</a></h3>
-<p>Lightkurve’s <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code> function has an <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code> keyword, which changes the aperture used to perform photometry. Later we’ll look at creating our own apertures, but first, let’s look at the three standard arguments this keyword takes:</p>
+<p>Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve()</a> function has an <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code> keyword, which changes the aperture used to perform photometry. Later we’ll look at creating our own apertures, but first, let’s look at the three standard arguments this keyword takes:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">'pipeline'</span></code>: this is the default option, which will return the same as above.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">'threshold'</span></code>: select all pixels which have a flux higher than 3 standard deviations above a median brightness.</p></li>
@@ -763,7 +763,7 @@ array([[False, False, False, False, False],
 </pre></div></div>
 </div>
 <p>This is Lightkurve’s default 3 standard deviations threshold mask, and for this TPF there’s only one pixel with flux above that cutoff. Note how Lightkurve apertures work: pixels marked <code class="docutils literal notranslate"><span class="pre">True</span></code> in the aperture mask array are the ones that are used for photometry.</p>
-<p>We’ll make our own Boolean masks like this later. First, let’s play around with the <code class="docutils literal notranslate"><span class="pre">create_threshold_mask()</span></code> function and try to reproduce the pipeline mask. Keeping in mind that the TPF we looked at above has many more bright pixels than faint ones, we can expect a bright median, so let’s try using a lower threshold:</p>
+<p>We’ll make our own Boolean masks like this later. First, let’s play around with the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.create_threshold_mask.html?highlight=create_threshold_mask">create_threshold_mask()</a> function and try to reproduce the pipeline mask. Keeping in mind that the TPF we looked at above has many more bright pixels than faint ones, we can expect a bright median, so let’s try using a lower threshold:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -908,8 +908,8 @@ array([[False, False, False, False, False, False, False, False],
 <img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_40_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_40_1.png" />
 </div>
 </div>
-<p>No luck. Our custom aperture still selects the bright star in the center. When the thresholding method yields multiple contiguous regions, the default behavior of the <code class="docutils literal notranslate"><span class="pre">create_threshold_mask</span></code> method is to return the region closest to the center. We can modify this behavior by passing a <code class="docutils literal notranslate"><span class="pre">reference_pixel</span></code> argument to specify the region we are most interested in. The argument is defined such that <code class="docutils literal notranslate"><span class="pre">reference_pixel=(0,0)</span></code> refers to the lower left corner. Hence, we can select the region in the
-upper right corner as follows:</p>
+<p>No luck. Our custom aperture still selects the bright star in the center. When the thresholding method yields multiple contiguous regions, the default behavior of the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.create_threshold_mask.html?highlight=create_threshold_mask">create_threshold_mask</a> method is to return the region closest to the center. We can modify this behavior by passing a <code class="docutils literal notranslate"><span class="pre">reference_pixel</span></code> argument to specify the region we are most interested
+in. The argument is defined such that <code class="docutils literal notranslate"><span class="pre">reference_pixel=(0,0)</span></code> refers to the lower left corner. Hence, we can select the region in the upper right corner as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
@@ -1025,7 +1025,7 @@ array([[False, False, False, False, False, False, False, False],
 </div>
 <div class="section" id="3.3-“Cutting-out”-a-background-star">
 <h3>3.3 “Cutting out” a background star<a class="headerlink" href="#3.3-“Cutting-out”-a-background-star" title="Permalink to this headline">¶</a></h3>
-<p>Using Lightkurve’s <code class="docutils literal notranslate"><span class="pre">cutout()</span></code> function, we can emulate the process of creating a threshold mask on only the pixels we’re interested in. This method is only suitable for large TPFs with a clearly separated background star, like the case of KIC 2437901 and KIC 2437948.</p>
+<p>Using Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.cutout.html?highlight=cutout">cutout()</a> function, we can emulate the process of creating a threshold mask on only the pixels we’re interested in. This method is only suitable for large TPFs with a clearly separated background star, like the case of KIC 2437901 and KIC 2437948.</p>
 <p>Let’s start by cutting out those 3x3 pixels we just used as an aperture mask:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
@@ -1086,7 +1086,7 @@ array([[False, False, False, False, False, False, False, False],
 <img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_53_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_53_1.png" />
 </div>
 </div>
-<p>This is still a <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> object, so we can use all of the same functions:</p>
+<p>This is still a <a class="reference external" href="https://docs.lightkurve.org/reference/targetpixelfile.html?highlight=targetpixelfile">TargetPixelFile</a> object, so we can use all of the same functions:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
@@ -1187,8 +1187,8 @@ array([[False,  True, False],
 </div>
 <div class="section" id="3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool">
 <h3>3.4 Creating a custom aperture using the <code class="docutils literal notranslate"><span class="pre">tpf.interact</span></code> tool<a class="headerlink" href="#3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool" title="Permalink to this headline">¶</a></h3>
-<p>Finally, it is good to know that there is interactive functionality in Lightkurve to create a mask. We cannot demonstrate it in this static tutorial, but you can try it yourself in a local notebook by running <code class="docutils literal notranslate"><span class="pre">tpf.interact()</span></code>. This will bring up an interactive panel which allows you to select the pixels you want using mouse clicks. Next, press “Save Lightcurve” in the bottom left of the panel. This will export your custom aperture light curve to a FITS file in your working directory. The file
-name follows a similar convention to official <em>Kepler</em> data products. For example, the file name for the example above is <code class="docutils literal notranslate"><span class="pre">kplr002437901-2011271113734_lpd-targ-custom-lc.fits</span></code>.</p>
+<p>Finally, it is good to know that there is interactive functionality in Lightkurve to create a mask. We cannot demonstrate it in this static tutorial, but you can try it yourself in a local notebook by running tpf<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact.html?highlight=interact#lightkurve.KeplerTargetPixelFile.interact">.interact()</a>. This will bring up an interactive panel which allows you to select the pixels you want using mouse clicks. Next,
+press “Save Lightcurve” in the bottom left of the panel. This will export your custom aperture light curve to a FITS file in your working directory. The file name follows a similar convention to official <em>Kepler</em> data products. For example, the file name for the example above is <code class="docutils literal notranslate"><span class="pre">kplr002437901-2011271113734_lpd-targ-custom-lc.fits</span></code>.</p>
 </div>
 </div>
 <div class="section" id="About-this-Notebook">

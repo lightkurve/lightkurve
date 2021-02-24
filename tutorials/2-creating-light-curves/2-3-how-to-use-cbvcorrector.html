@@ -166,6 +166,10 @@
         </li>
     
         <li class="nav-item toc-entry toc-h3">
+            <a href="#Aligning-versus-Interpolating-CBVs" class="nav-link">Aligning versus Interpolating CBVs</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
             <a href="#Joint-Fitting" class="nav-link">Joint Fitting</a>
         </li>
     
@@ -178,7 +182,7 @@
         </li>
     
         <li class="nav-item toc-entry toc-h3">
-            <a href="#Units,-NaN-and-Normalization" class="nav-link">Units, NaN and Normalization</a>
+            <a href="#NaNs,-Units-and-Normalization" class="nav-link">NaNs, Units and Normalization</a>
         </li>
     
             </ul>
@@ -458,7 +462,12 @@ greater detail in the <a class="reference external" href="https://archive.stsci.
 CBVs</a> before reading this tutorial.</p>
 <div class="section" id="Cotrending-Basis-Vector-Types">
 <h2>Cotrending Basis Vector Types<a class="headerlink" href="#Cotrending-Basis-Vector-Types" title="Permalink to this headline">¶</a></h2>
-<p>There are three basic types of CBVs: - <strong>Single-Scale</strong> contains all systematic trends combined in a single set of basis vectors. - <strong>Multi-Scale</strong> contains systematic trends in specific wavelet-based band passes. There are usually three sets of multi-scale basis vectors in three bands. - <strong>Spike</strong> contains only short impulsive spike systematics.</p>
+<p>There are three basic types of CBVs:</p>
+<ul class="simple">
+<li><p><strong>Single-Scale</strong> contains all systematic trends combined in a single set of basis vectors.</p></li>
+<li><p><strong>Multi-Scale</strong> contains systematic trends in specific wavelet-based band passes. There are usually three sets of multi-scale basis vectors in three bands.</p></li>
+<li><p><strong>Spike</strong> contains only short impulsive spike systematics.</p></li>
+</ul>
 <p>There are two different correction methods in PDC: Single-Scale and Multi-Scale. Single-Scale performs the correction in a single bandpass. Multi-Scale performs the correction in three separate wavelet-based bandpasses. Both corrections are performed in PDC but we can only export a single PDC light curve for each target. So, PDC must choose which of the two to export on a per-target basis. Generally speaking, single-scale performs better at preserving longer period signals. But at periods close
 to transiting planet durations multi-scale performs better at preserving signals. PDC therefore mostly chooses multi-scale for use within the planet finding pipeline and for the archive. You can find in the light curve FITS header which PDC method was chosen (keyword “PDCMETHD”). Additionally, a seperate correction is alway performed to remove short impulsive systematic spikes.</p>
 <p>For an individual’s research needs, the mission supplied PDC lightcurves might not be ideal and so the CBVs are provided to the user to perform their own correction. All three CBV types are provided at MAST for TESS, however only Single-Scale is provided at MAST for Kepler and K2. Also for Kepler and K2, Cotrending Basis Vectors are supplied for only the 30-minute target cadence.</p>
@@ -548,16 +557,24 @@ noise. This can be particularily prominant in an unconstrained least-squares fit
 common method to inhibit over-fitting is to introduce a regularization term in the loss function. This constrains the fit and effectively reduces the degrees of freedom.</p>
 <p>Under-fitting occurs when the model has too few degrees of freedom and fails to adequately model the physical process it is attempting to model. In the case of fitting systematic trend basis vectors to a time series, under-fitting can result in residual systematics. Under-fitting can either be the result of the basis vectors not adequately representing the systematics or, placing too great of a restriction on the model during fitting. The regularization technique used to inhibit over-fitting can
 therefore result in under-fitting. The ideal fit will balance the counter-acting phenomena of over- and under-fitting. To this end, a method can be developed to measure the degree to which these two phenomena occur.</p>
-<p>PDC has two <strong>Goodness Metrics</strong> to assess over- and under-fitting: - <strong>Over-fitting metric</strong>: Measures the introduced noise in the light curve after the correction. It does so by measuring the broad-band power spectrum via a Lomb-Scargle Periodogram both before and after the correction. If power has increased after the correction then this is an indication the CBV fit has over-fitted and introduced noise. The metric treats all frequencies equally when measuring power increase; from one
-frequency separation to the Nyquist frequency. This metric is callibrated such that a metric value of 0.5 means the introduced noise due to over-fitting is at the same power level as the uncertainties in the light curve. - <strong>Under-fitting metric</strong>: Measures the mean residual target to target Pearson correlation between the target under study and a selection of neighboring targets. This metric will find and download a selection of neighboring SPOC SAP targets in RA and Decl. until a minimum
-number is found. The metric is callibrated such that a value of 0.95 means the residual correlations in the target is equivalent to chance correlations of White Gaussian Noise.</p>
+<p>PDC has two <strong>Goodness Metrics</strong> to assess over- and under-fitting:</p>
+<ul class="simple">
+<li><p><strong>Over-fitting metric</strong>: Measures the introduced noise in the light curve after the correction. It does so by measuring the broad-band power spectrum via a Lomb-Scargle Periodogram both before and after the correction. If power has increased after the correction then this is an indication the CBV fit has over-fitted and introduced noise. The metric treats all frequencies equally when measuring power increase; from one frequency separation to the Nyquist frequency. This metric is callibrated
+such that a metric value of 0.5 means the introduced noise due to over-fitting is at the same power level as the uncertainties in the light curve.</p></li>
+<li><p><strong>Under-fitting metric</strong>: Measures the mean residual target to target Pearson correlation between the target under study and a selection of neighboring targets. This metric will find and download a selection of neighboring SPOC SAP targets in RA and Decl. until a minimum number is found. The metric is callibrated such that a value of 0.95 means the residual correlations in the target is equivalent to chance correlations of White Gaussian Noise.</p></li>
+</ul>
 <p><em>The Goodness Metrics are not perfect!</em> They are an estimate of over- and under-fitting and are to be used as a guideline along other other metrics to assess the quality of your light curve.</p>
 <p>The Goodness Metrics are part of the <code class="docutils literal notranslate"><span class="pre">lightkurve.correctors.metrics</span></code> module and can be computed directly with calls to <code class="docutils literal notranslate"><span class="pre">overfit_metric_lombscargle</span></code> and <code class="docutils literal notranslate"><span class="pre">underfit_metric_neighbors</span></code>. The ‘CBVCorrector’ has convenience wrappers for the two metrics and so they do not need to be called directly, as we will show below.</p>
 </div>
 <div class="section" id="Example-Correction-with-CBVCorrector-to-Inhibit-Over-Fitting">
 <h2>Example Correction with CBVCorrector to Inhibit Over-Fitting<a class="headerlink" href="#Example-Correction-with-CBVCorrector-to-Inhibit-Over-Fitting" title="Permalink to this headline">¶</a></h2>
-<p>There are four correction methods within <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>: - <strong>correct</strong>: Performs a numerical correction by optimizing the L2-Norm regularization penalty term using the goodness metrics as the Loss Function. - <strong>correct_gaussian_prior</strong>: Performs an analytical correction using the LightKurve <code class="docutils literal notranslate"><span class="pre">RegressionCorrector.correct</span></code> method while setting the L2-Norm (Ridge Regression) regularization penalty term as the Gaussian prior. - <strong>correct_elasticnet</strong>: Performs the correction using Scikit-Learn’s
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html">ElasticNet</a>, which combines both an L1- and L2-Norm regularization. - <strong>correct_regressioncorrector</strong>: Performs the standard <code class="docutils literal notranslate"><span class="pre">RegressionCorrector.correct</span></code> correction. RegressionCorrector is the superclass to CBVCorrector.</p>
+<p>There are four correction methods within <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>:</p>
+<ul class="simple">
+<li><p><strong>correct</strong>: Performs a numerical correction by optimizing the L2-Norm regularization penalty term using the goodness metrics as the Loss Function.</p></li>
+<li><p><strong>correct_gaussian_prior</strong>: Performs an analytical correction using the LightKurve <code class="docutils literal notranslate"><span class="pre">RegressionCorrector.correct</span></code> method while setting the L2-Norm (Ridge Regression) regularization penalty term as the Gaussian prior.</p></li>
+<li><p><strong>correct_elasticnet</strong>: Performs the correction using Scikit-Learn’s <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html">ElasticNet</a>, which combines both an L1- and L2-Norm regularization.</p></li>
+<li><p><strong>correct_regressioncorrector</strong>: Performs the standard <code class="docutils literal notranslate"><span class="pre">RegressionCorrector.correct</span></code> correction. RegressionCorrector is the superclass to CBVCorrector.</p></li>
+</ul>
 <p>If you are unfamilar with L1-Norm (LASSO) and L2-Norm (Ridge Regression) regularization then there are <a class="reference external" href="https://statlearning.com/ISLR%20Seventh%20Printing.pdf">severel</a>, <a class="reference external" href="https://press.princeton.edu/books/hardcover/9780691198309/statistics-data-mining-and-machine-learning-in-astronomy">excellent</a>, <a class="reference external" href="https://en.wikipedia.org/wiki/Regularization_(mathematics)">introductions</a>. You can read how a L2-norm relates to a Gaussian prior in a linear design matrix in <a class="reference external" href="https://katbailey.github.io/post/from-both-sides-now-the-math-of-linear-regression/">this
 reference</a>.</p>
 <p>The default method is <code class="docutils literal notranslate"><span class="pre">correct</span></code> and generally speaking, one can use just this method to obtain a good fit. The other methods are for advanced usage.</p>
@@ -615,7 +632,7 @@ Kepler and TESS lightcurves. Let’s look at the CBVCorrector goodness metrics t
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.7077337346412885
+Over fitting Metric: 0.7078955416462267
 Under fitting Metric: 0.9987918538259687
 </pre></div></div>
 </div>
@@ -667,9 +684,9 @@ probably injected signals into our lightcurve and we should not trust this reall
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.8549419101233325
-Optimized Under-fitting metric: 0.9645416074596808
-Optimized Alpha: 3.533e-01
+Optimized Over-fitting metric: 0.8538762782395779
+Optimized Under-fitting metric: 0.965537542897129
+Optimized Alpha: 3.467e-01
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -716,9 +733,9 @@ more interested in. Below we more greatly emphasize improving the over-fitting m
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.8994890583558944
-Optimized Under-fitting metric: 0.8858590871165637
-Optimized Alpha: 8.661e-01
+Optimized Over-fitting metric: 0.9009378390549461
+Optimized Under-fitting metric: 0.8823136611287389
+Optimized Alpha: 8.911e-01
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -798,7 +815,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.22858382556373347
+Over fitting Metric: 0.2286285355885176
 Under fitting Metric: 0.9998060810118128
 </pre></div></div>
 </div>
@@ -870,9 +887,9 @@ you are only looking at the low frequency signals in the data then perhaps you d
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.800739375888689
-Optimized Under-fitting metric: 0.4550122046847235
-Optimized Alpha: 4.033e+00
+Optimized Over-fitting metric: 0.7996105364183677
+Optimized Under-fitting metric: 0.45542578553866564
+Optimized Alpha: 4.003e+00
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1007,7 +1024,7 @@ Text(0.5, 1.0, &#39;Result of Second Correction to Spike CBVs&#39;)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting Metric: 0.6059939571847331
+Over-fitting Metric: 0.6064976346225531
 Under-fitting Metric: 0.8332339309919962
 </pre></div></div>
 </div>
@@ -1074,8 +1091,8 @@ Text(0.5, 1.0, &#39;Comparison between original and final corrected lightcurve&#
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting metric: 0.07886767263478336
-CDPP: 230.75800254408887 ppm
+Over-fitting metric: 0.07828547889578674
+CDPP: 230.75800249451126 ppm
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1106,8 +1123,8 @@ CDPP: 230.75800254408887 ppm
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting metric: 0.31918670068453725
-CDPP: 55.83742643012625 ppm
+Over-fitting metric: 0.31432145161265984
+CDPP: 55.837426433439745 ppm
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1166,9 +1183,9 @@ we do see the under-fitting metric degrades slightly beginning at alpha=1e-1.</p
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.3475679004783809
-Optimized Alpha: 5.622e-04
-CDPP: 63.20600497823727 ppm
+Optimized Over-fitting metric: 0.3167598929446598
+Optimized Alpha: 2.361e-03
+CDPP: 86.05639093117256 ppm
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1224,6 +1241,13 @@ Text(0.5, 1.0, &#39;Comparison Between original and final corrected lightcurve&#
 <p>The over-fitting metric examines the periodogram of the light curve before and after the correction and is therefore indifferent to how the light curve was generated. It simply looks to see if noise was injected into the light curve. The over-fitting metric is therefore much more generally applicable.</p>
 <p>The Goodness Metrics are part of the <code class="docutils literal notranslate"><span class="pre">lightkurve.correctors.metrics</span></code> module and can be computed directly with calls to <code class="docutils literal notranslate"><span class="pre">overfit_metric_lombscargle</span></code> and <code class="docutils literal notranslate"><span class="pre">underfit_metric_neighbors</span></code>. A savvy expert user can use these and other quality metrics to generate their own Loss Function for optimizing a fit.</p>
 </div>
+<div class="section" id="Aligning-versus-Interpolating-CBVs">
+<h3>Aligning versus Interpolating CBVs<a class="headerlink" href="#Aligning-versus-Interpolating-CBVs" title="Permalink to this headline">¶</a></h3>
+<p>By default, all loaded CBVS in <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> are “aligned” to the light curve cadence numbers (<code class="docutils literal notranslate"><span class="pre">CBVCorrector.lc.cadenceno</span></code>). This means only cadence numbers that exist in both the CBVs and the light curve will have values in the returned CBVs. All cadence numbers that exist in the light curve but not in the CBVs will have NaNs returned for the CBVs on those cadences and the Gap Indicator set to True. Any cadences in the CBVs not in the light curve will be removed from the CBVs.</p>
+<p>If the light curve cadences do not overlap well with the CBVs then you can set <code class="docutils literal notranslate"><span class="pre">interpolate_cbvs=True</span></code> when generating the <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> object. Doing so will generate interpolated CBV values for all cadences in the light curve. If the light curve has cadences past either end of the cadences in the CBVs then one must extrapolate. A second argument, <code class="docutils literal notranslate"><span class="pre">extrapolate_cbvs</span></code>, can be used to also extrapolate the CBV values to the light curve cadences. If <code class="docutils literal notranslate"><span class="pre">extrapolate_cbvs=False</span></code> then the
+exterior values are set to NaNs, which will probably result is a very poor fit.</p>
+<p><strong>Warning</strong>: <em>The safest method is to align</em>. This will not generate any new values for the CBVs. Interpolation can be potentially dangerous. Interpolation uses Piecewise Cubic Hermite Interpolating Polynomial (PCHIP), which can be more stable than a simple spline, but no interpolation method works in all situations. Extrapolation is even more dangerious, which is why an extra parameter must be set if one desires to extrapolate. <em>Be sure to manually examine the extrapolated CBVs before use!</em></p>
+</div>
 <div class="section" id="Joint-Fitting">
 <h3>Joint Fitting<a class="headerlink" href="#Joint-Fitting" title="Permalink to this headline">¶</a></h3>
 <p>By including the <code class="docutils literal notranslate"><span class="pre">ext_dm=</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">correct_*</span></code> methods we allow for joint fitting between the CBVs and other design matrices. Generally speaking, if fitting a collection of different models to a system, joint fitting is ideal. For example, if performing transit analysis one could add in a transit model to the joint fit to get the best transit recovery. The fit coefficient to the transit model is stored in the <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> object after fitting and can be recovered.</p>
@@ -1247,9 +1271,9 @@ cbvCorrector.design_matrix_collection[i].prior_sigma[j] = # ... adjust the prior
 # Call the superclass correct method with the adjusted design_matrix_collection
 cbvCorrector.correct_regressioncorrector(cbvCorrector.design_matrix_collection, **kwargs)<p>The <code class="docutils literal notranslate"><span class="pre">cbvCorrector.corrected_lc</span></code> will now be the result of the fit using whatever <code class="docutils literal notranslate"><span class="pre">cbvCorrector.design_matrix_collection</span></code> you had just provided.</p>
 </div>
-<div class="section" id="Units,-NaN-and-Normalization">
-<h3>Units, NaN and Normalization<a class="headerlink" href="#Units,-NaN-and-Normalization" title="Permalink to this headline">¶</a></h3>
-<p>NaNs are removed from the light curve when used to generate the <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> object and is stored in <code class="docutils literal notranslate"><span class="pre">CBVCorrector.lc</span></code>. All loaded CBVS are also aligned to the light curve cadence numbers (<code class="docutils literal notranslate"><span class="pre">CBVCorrector.lc.cadenceno</span></code>). If the light curve cadences do not well overlap with the CBVs then you can set <code class="docutils literal notranslate"><span class="pre">interpolate_cbvs=True</span></code> when generating the <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> object. Doing so will generate interpolated CBV values for all cadences in the light curve.</p>
+<div class="section" id="NaNs,-Units-and-Normalization">
+<h3>NaNs, Units and Normalization<a class="headerlink" href="#NaNs,-Units-and-Normalization" title="Permalink to this headline">¶</a></h3>
+<p>NaNs are removed from the light curve when used to generate the <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> object and is stored in <code class="docutils literal notranslate"><span class="pre">CBVCorrector.lc</span></code>.</p>
 <p>The CBVCorrector performs its corrections in absolute flux units (typically electrons per second). The returned corrected light curve <code class="docutils literal notranslate"><span class="pre">corrected_lc</span></code> is also in absolute units and the median flux of the light curve is preserved.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:

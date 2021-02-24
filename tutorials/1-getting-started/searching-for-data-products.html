@@ -508,7 +508,7 @@ archive.</p></li>
 <li><p>An <code class="docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code> object.</p></li>
 </ul>
 <p>You can also specify which mission you would like to retrieve data from using the <code class="docutils literal notranslate"><span class="pre">mission</span></code> keyword, which takes “Kepler,” “K2,” or “TESS.” By default, all available missions will be returned.</p>
-<p>We will start with the case of searching for a <em>Kepler</em> target using its Kepler Input Catalog (KIC) ID number. Below, we search for KIC 3733346, an RR Lyrae star, using the <code class="docutils literal notranslate"><span class="pre">search_lightcurve</span></code> function.</p>
+<p>We will start with the case of searching for a <em>Kepler</em> target using its Kepler Input Catalog (KIC) ID number. Below, we search for <a class="reference external" href="https://arxiv.org/pdf/1001.0417.pdf">KIC 3733346</a>, an <a class="reference external" href="https://en.wikipedia.org/wiki/RR_Lyrae_variable">RR Lyrae star</a>, using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve">search_lightcurve</a> function.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -526,7 +526,7 @@ archive.</p></li>
 <div class="output_area rendered_html docutils container">
 SearchResult containing 18 data products.
 
-<table id="table6260484944">
+<table id="table6500853840">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 01</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
@@ -567,13 +567,13 @@ SearchResult containing 18 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6260483888">
+<table id="table6500853840">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 01</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
 </table></div>
 </div>
-<p>For more information about the available data products, the <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> has a full table accessible by calling <code class="docutils literal notranslate"><span class="pre">.table</span></code>. This full table contains the columns listed below. Definitions of each of these terms can be found <a class="reference external" href="https://mast.stsci.edu/api/v0/_c_a_o_mfields.html">here</a>.</p>
+<p>For more information about the available data products, the <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> has a full table accessible by calling <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.SearchResult.table.html?highlight=table">.table</a>. This full table contains the columns listed below. Definitions of each of these terms can be found <a class="reference external" href="https://mast.stsci.edu/api/v0/_c_a_o_mfields.html">here</a>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -669,7 +669,7 @@ sort_order
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6260485280">
+<table id="table6500986016">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
@@ -694,7 +694,7 @@ SearchResult containing 1 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6260485568">
+<table id="table6500854560">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
@@ -702,7 +702,7 @@ SearchResult containing 1 data products.
 </div>
 <div class="section" id="2.1-Downloading-a-single-light-curve">
 <h3>2.1 Downloading a single light curve<a class="headerlink" href="#2.1-Downloading-a-single-light-curve" title="Permalink to this headline">¶</a></h3>
-<p>A light curve can be downloaded by calling <code class="docutils literal notranslate"><span class="pre">.download()</span></code>.</p>
+<p>A light curve can be downloaded by calling <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.SearchResult.download.html?highlight=download#lightkurve.SearchResult.download">.download()</a>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -719,7 +719,7 @@ SearchResult containing 1 data products.
 </div>
 <div class="output_area rendered_html docutils container">
 <i>KeplerLightCurve targetid=3733346 length=4075</i>
-<table id="table5795044656" class="table-striped table-bordered table-condensed">
+<table id="table6502797264" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>quality</th><th>timecorr</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>sap_flux</th><th>sap_flux_err</th><th>sap_bkg</th><th>sap_bkg_err</th><th>pdcsap_flux</th><th>pdcsap_flux_err</th><th>sap_quality</th><th>psf_centr1</th><th>psf_centr1_err</th><th>psf_centr2</th><th>psf_centr2_err</th><th>mom_centr1</th><th>mom_centr1_err</th><th>mom_centr2</th><th>mom_centr2_err</th><th>pos_corr1</th><th>pos_corr2</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th><th></th><th>d</th><th>pix</th><th>pix</th><th></th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th></tr></thead>
 <thead><tr><th>object</th><th>float32</th><th>float32</th><th>int32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>int32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
@@ -774,7 +774,7 @@ SearchResult containing 1 data products.
 </div>
 <div class="section" id="2.2-Downloading-a-collection-of-light-curves">
 <h3>2.2 Downloading a collection of light curves<a class="headerlink" href="#2.2-Downloading-a-collection-of-light-curves" title="Permalink to this headline">¶</a></h3>
-<p>The <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> object also has a <code class="docutils literal notranslate"><span class="pre">download_all</span></code> method, allowing you to download multiple light curves. This returns a <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code>, a convenient container for <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> object also has a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.SearchResult.download_all.html?highlight=download_all">download_all</a> method, allowing you to download multiple light curves. This returns a <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code>, a convenient container for <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -848,8 +848,8 @@ LightCurveCollection of 5 objects:
 </div>
 <div class="section" id="3.-Searching-for-Target-Pixel-Files">
 <h2>3. Searching for Target Pixel Files<a class="headerlink" href="#3.-Searching-for-Target-Pixel-Files" title="Permalink to this headline">¶</a></h2>
-<p>The other primary data product used by Lightkurve is the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code>, or TPF. A TPF is a stack of images containing the flux in each pixel at each cadence.</p>
-<p>Similar to the approach above, we can use the <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> method to identify available observations.</p>
+<p>The other primary data product used by Lightkurve is the <a class="reference external" href="https://heasarc.gsfc.nasa.gov/docs/tess/data-products.html#target-pixel-files-tpfs">TargetPixelFile</a>, or TPF. A TPF is a stack of images containing the flux in each pixel at each cadence.</p>
+<p>Similar to the approach above, we can use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile</a> method to identify available observations.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
@@ -867,7 +867,7 @@ LightCurveCollection of 5 objects:
 <div class="output_area rendered_html docutils container">
 SearchResult containing 2 data products.
 
-<table id="table6265210624">
+<table id="table6507337376">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>K2 Campaign 06</td><td>2015</td><td><a href='https://archive.stsci.edu/k2/data_products.html'>K2</a></td><td>1800</td><td>ktwo212779596</td><td>0.0</td></tr>
@@ -922,7 +922,7 @@ SearchResult containing 2 data products.
 <img alt="../../_images/tutorials_1-getting-started_searching-for-data-products_38_1.png" src="../../_images/tutorials_1-getting-started_searching-for-data-products_38_1.png" />
 </div>
 </div>
-<p>If we want to turn the TPF into a light curve, there is a <code class="docutils literal notranslate"><span class="pre">to_lightcurve</span></code> method.</p>
+<p>If we want to turn the TPF into a light curve, there is a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve</a> method.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
@@ -1006,7 +1006,7 @@ array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 212779596, Cadenc
 </div>
 <div class="section" id="4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts">
 <h2>4. Searching for <em>TESS</em> Full Frame Image (FFI) Cutouts<a class="headerlink" href="#4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts" title="Permalink to this headline">¶</a></h2>
-<p>It is also possible to download targets observed in the <em>TESS</em> Full Frame Images (FFIs) using Lightkurve. This is done using <code class="docutils literal notranslate"><span class="pre">search_tesscut</span></code>, which utilizes the <a class="reference external" href="https://mast.stsci.edu/tesscut/">TESSCut</a> tool (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract">Brasseur et. al 2019</a>).</p>
+<p>It is also possible to download targets observed in the <em>TESS</em> Full Frame Images (FFIs) using Lightkurve. This is done using <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_tesscut.html?highlight=search_tesscut">search_tesscut</a>, which utilizes the <a class="reference external" href="https://mast.stsci.edu/tesscut/">TESSCut</a> tool (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract">Brasseur et. al 2019</a>).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
@@ -1024,7 +1024,7 @@ array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 212779596, Cadenc
 <div class="output_area rendered_html docutils container">
 SearchResult containing 9 data products.
 
-<table id="table6268788992">
+<table id="table6505489216">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 01</td><td>2018</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>Pi Men</td><td>0.0</td></tr>
@@ -1068,7 +1068,7 @@ SearchResult containing 9 data products.
 </div>
 <div class="section" id="5.-Performing-a-Cone-Search">
 <h2>5. Performing a Cone Search<a class="headerlink" href="#5.-Performing-a-Cone-Search" title="Permalink to this headline">¶</a></h2>
-<p>If you are interested in identifying a number of nearby targets, you can perform a cone search, which will return all available targets within a cone of a specfied radius on the sky. The radius can be either a <code class="docutils literal notranslate"><span class="pre">float</span></code> or an <code class="docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code> object. If a float is given, it will be assumed to be in units of arcseconds. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then we default to 0.0001 arcsec.</p>
+<p>If you are interested in identifying a number of nearby targets, you can perform a cone search, which will return all available targets within a cone of a specfied radius on the sky. The radius can be either a <code class="docutils literal notranslate"><span class="pre">float</span></code> or an <a class="reference external" href="https://docs.astropy.org/en/stable/units/">astropy.units.Quantity</a> object. If a float is given, it will be assumed to be in units of arcseconds. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then we default to 0.0001 arcsec.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>

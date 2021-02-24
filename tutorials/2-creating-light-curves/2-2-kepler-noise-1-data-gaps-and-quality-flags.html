@@ -504,8 +504,8 @@ div.rendered_html tbody tr:hover {
 <p>In this tutorial, we’ll explore some quality issues that arose during both the <em>Kepler</em> and <em>K2</em> missions, and learn how to identify and mitigate them. It’s important to note that many of these issues only appear in the calibrated pixels or simple aperture photometry (SAP) data, and more still are removed by a quality masking process which we’ll discuss in the next section. If you’re working with presearch data conditioning SAP (PDCSAP) light curves, you won’t run into many of these issues.</p>
 <div class="section" id="1.1-Quality-flags">
 <h3>1.1 Quality flags<a class="headerlink" href="#1.1-Quality-flags" title="Permalink to this headline">¶</a></h3>
-<p>Before we look at some practical examples in time series data, let’s familiarize ourselves with how data gaps and single-cadence quality events are identified in <em>Kepler</em> data files. Every <em>Kepler</em> FITS file has a <code class="docutils literal notranslate"><span class="pre">QUALITY</span></code> column, which contains a quality flag for each individual data cadence. These flags comprise of one or more binary bits, which are expressed as an integer. A handy reference document for <em>Kepler</em>’s quality flags is Table 2-3 in the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf">MAST Kepler Archive
-Manual</a>.</p>
+<p>Before we look at some practical examples in time series data, let’s familiarize ourselves with how data gaps and single-cadence quality events are identified in <em>Kepler</em> data files. Every <em>Kepler</em> FITS file has a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.quality.html?highlight=quality#lightkurve.KeplerTargetPixelFile.quality">QUALITY</a> column, which contains a quality flag for each individual data cadence. These flags comprise of one or more binary bits,
+which are expressed as an integer. A handy reference document for <em>Kepler</em>’s quality flags is Table 2-3 in the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf">MAST Kepler Archive Manual</a>.</p>
 <p>Let’s start by downloading the data we’ll work with throughout this tutorial:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -517,7 +517,7 @@ Manual</a>.</p>
 </div>
 </div>
 <p>By default, Lightkurve downloads quality-masked data. This means that a variety of cadences with a non-zero quality flag will already be removed from the light curves or TPFs you download using the instruction above.</p>
-<p>For this tutorial, we are also going to download some TPF data with no quality mask applied. We can do this by passing the optional <code class="docutils literal notranslate"><span class="pre">quality_bitmask=0</span></code> argument to the <code class="docutils literal notranslate"><span class="pre">download()</span></code> method as follows:</p>
+<p>For this tutorial, we are also going to download some TPF data with no quality mask applied. We can do this by passing the optional <code class="docutils literal notranslate"><span class="pre">quality_bitmask=0</span></code> argument to the <a class="reference external" href="https://docs.lightkurve.org/reference/search.html?highlight=download">download()</a> method as follows:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -552,7 +552,7 @@ array([     0,      1,     16,     64,    128,    144,    256,   4160,
 </pre></div></div>
 </div>
 <p>You’ll notice that some of these appear to be integers that correspond to bits — that is, powers of two — but others are additive. This indicates that multiple quality issues are present in a particular cadence.</p>
-<p>We can use Lightkurve’s <code class="docutils literal notranslate"><span class="pre">`decode()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags.decode">https://docs.lightkurve.org/api/lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags.decode</a>&gt;`__ function for accessing the information stored in each quality flag:</p>
+<p>We can use Lightkurve’s <code class="docutils literal notranslate"><span class="pre">decode()</span></code> function for accessing the information stored in each quality flag:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -649,7 +649,7 @@ Handbook</a>, Section 5.5.)</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x1751f49a0&gt;
+&lt;matplotlib.collections.PolyCollection at 0x1835aa850&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -682,7 +682,7 @@ Handbook</a>, Section 5.5.)</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x17546b940&gt;
+&lt;matplotlib.collections.PolyCollection at 0x1838f0e80&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -717,7 +717,7 @@ with NaNs.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x1755f58b0&gt;
+&lt;matplotlib.collections.PolyCollection at 0x183a48af0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -794,7 +794,7 @@ short-term events.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x175294940&gt;
+&lt;matplotlib.collections.PolyCollection at 0x183c55250&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -809,7 +809,7 @@ short-term events.</p>
 <h3>3.2 Argabrightening<a class="headerlink" href="#3.2-Argabrightening" title="Permalink to this headline">¶</a></h3>
 <p>Argabrightening (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.8) is a single-cadence quality issue that looks similar to a cosmic ray on the detector. In fact, Argabrightening is thought to be caused by debris hitting the instrument, causing a brief increase in flux. This is distinct from the electronic event caused by a cosmic ray corrupting the pixel readout:
 Argabrightening is the result of physical illumination.</p>
-<p>Using Lightkurve’s <code class="docutils literal notranslate"><span class="pre">`KeplerQualityFlags.decode()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.utils.KeplerQualityFlags.html?highlight=decode#lightkurve.utils.KeplerQualityFlags.decode">https://docs.lightkurve.org/api/lightkurve.utils.KeplerQualityFlags.html?highlight=decode#lightkurve.utils.KeplerQualityFlags.decode</a>&gt;`__ function in <a class="reference external" href="#1.1-Quality-flags">Section 1.1</a>, we saw that a quality flag of 4160 indicates an Argabrightening event on the charge-coupled device (CCD) and in the optimal aperture used for photometry. Let’s see where that shows up in our data:</p>
+<p>Using Lightkurve’s <code class="docutils literal notranslate"><span class="pre">KeplerQualityFlags.decode()</span></code> function in <a class="reference external" href="#1.1-Quality-flags">Section 1.1</a>, we saw that a quality flag of 4160 indicates an Argabrightening event on the charge-coupled device (CCD) and in the optimal aperture used for photometry. Let’s see where that shows up in our data:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
@@ -848,7 +848,7 @@ array([191.8960099 , 226.77612309, 240.36418455, 247.80180137,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x1752764c0&gt;
+&lt;matplotlib.collections.PolyCollection at 0x183d05af0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -882,7 +882,7 @@ Guidance Sensor (FGS) system (see the <a class="reference external" href="https:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x175927ac0&gt;
+&lt;matplotlib.collections.PolyCollection at 0x183e2e130&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -926,7 +926,7 @@ Notes</a>, Section 12.2). Further solar flares and coronal mass ejections led to
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x1751b20a0&gt;
+&lt;matplotlib.collections.PolyCollection at 0x183f848e0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">

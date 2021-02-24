@@ -6,7 +6,7 @@
    "source": [
     "# How to save a LightCurve in FITS format?\n",
     "\n",
-    "Once you have detrended or altered a lightcurve in some way, you may want to save it as a FITS file. This allows you to easily share the file with your collaborators or submit your lightcurves as a [MAST High Level Science Product](https://archive.stsci.edu/hlsp/hlsp_guidelines.html) (HLSP). Lightkurve provides a `to_fits()` method which will easily convert your `LightCurve` object into a fits file.\n",
+    "Once you have detrended or altered a lightcurve in some way, you may want to save it as a FITS file. This allows you to easily share the file with your collaborators or submit your lightcurves as a [MAST High Level Science Product](https://archive.stsci.edu/hlsp/hlsp_guidelines.html) (HLSP). Lightkurve provides a [to_fits()](https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.to_fits.html?highlight=to_fits#lightkurve.LightCurve.to_fits) method which will easily convert your [LightCurve](https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.html?highlight=lightcurve#lightkurve.LightCurve) object into a fits file.\n",
     "\n",
     "Below is a brief demostration showing how `to_fits()` works.\n",
     "\n",
@@ -36,7 +36,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Now we'll make some edits to the lightcurve. Below we use the PDCSAP flux from MAST, remove NaN values and clip out any outliers."
+    "Now we'll make some edits to the lightcurve. Below we use the PDCSAP flux from MAST, remove NaN values using the [.remove_nans()](https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.remove_nans.html?highlight=remove_nans) function, and clip out any outliers using the [.remove_outliers()](https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.remove_outliers.html?highlight=remove_outliers)."
    ]
   },
   {
@@ -235,7 +235,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.6"
+   "version": "3.6.10"
   }
  },
  "nbformat": 4,

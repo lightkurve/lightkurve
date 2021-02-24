@@ -478,7 +478,7 @@ div.rendered_html tbody tr:hover {
 <p>Light curves of stars observed by the <em>Kepler</em>, <em>K2</em>, or <em>TESS</em> missions are created from the raw images collected by these telescopes using software built for this purpose by the mission teams. In this tutorial, we will learn how to use the Lightkurve package to download these preprocessed light curves from <em>Kepler</em>’s data archive, plot them, and understand their properties and units.</p>
 <p>Much of the explanation below is inspired by <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Kinemuchi et al. (2012)</a>, an excellent paper introducing and explaining the terminology surrounding the <em>Kepler</em> mission and its data. You can find detailed information on the mission and its data products in the official <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a> and the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf">Kepler Data Processing
 Handbook</a>.</p>
-<p>We will use the <em>Kepler</em> mission as the main example, but these tools are extensible to <em>TESS</em> and <em>K2</em> as well. For example, while in this tutorial we will learn to work with Lightkurve’s <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ objects, there are also <code class="docutils literal notranslate"><span class="pre">`TessLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.TessLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.TessLightCurve.html</a>&gt;`__ objects that work in the same way.</p>
+<p>We will use the <em>Kepler</em> mission as the main example, but these tools are extensible to <em>TESS</em> and <em>K2</em> as well. For example, while in this tutorial we will learn to work with Lightkurve’s <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> objects, there are also <code class="docutils literal notranslate"><span class="pre">TessLightCurve</span></code> objects that work in the same way.</p>
 </div>
 <div class="section" id="Imports">
 <h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
@@ -505,7 +505,7 @@ star may be observed in multiple quarters, it may fall on a different CCD channe
 at different times, you obtain a light curve.</p>
 <p><em>Kepler</em> recorded the brightness measurements at two different cadences: a Short Cadence (SC, 58.85 seconds) and a Long Cadence (LC, 29.4 minutes). For more details, read: <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, Section 2.1. <em>Mission Overview</em> and 2.6. <em>Pixels of Interest</em>, and the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf">Kepler Archive
 Manual</a> Chapter 2: <em>Kepler</em> Data Products.</p>
-<p><img alt="14c4062398ec47e4af72da7e39a966a7" src="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/active-missions/tess/_images/Keplerfieldofviewstarchart.gif?t=tn2400" /></p>
+<p><img alt="7ee8e99ef1b9460a86d38c9255247708" src="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/active-missions/tess/_images/Keplerfieldofviewstarchart.gif?t=tn2400" /></p>
 <p><em>Figure:</em> The field of view of the <em>Kepler</em> mission. The rectangles represent the CCD modules described above.</p>
 </div>
 <div class="section" id="1.2.-K2">
@@ -526,7 +526,7 @@ different cadence modes, including 20 seconds, 120 seconds, 10 minutes, and 30 m
 <h2>2. Downloading a Light Curve File<a class="headerlink" href="#2.-Downloading-a-Light-Curve-File" title="Permalink to this headline">¶</a></h2>
 <p>The light curves of stars created by the <em>Kepler</em> mission are stored at the <a class="reference external" href="https://archive.stsci.edu/kepler/">Mikulksi Archive for Space Telescopes</a> (MAST) archive, along with metadata about the observations, such as which CCD channel was used at each time.</p>
 <p>Lightkurve’s built-in tools allow us to search for light curve files in the archive, and download them and their metadata. In this example, we will start by downloading one quarter of <em>Kepler</em> data for a star named <a class="reference external" href="http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/">Kepler-8</a>, a star somewhat larger than the Sun, and the host of a <a class="reference external" href="https://en.wikipedia.org/wiki/Hot_Jupiter">hot Jupiter planet</a>.</p>
-<p>Using Lightkurve’s <code class="docutils literal notranslate"><span class="pre">`search_lightcurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html">http://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html</a>&gt;`__ function, we can find an itemized list of different light curve file products available for Kepler-8:</p>
+<p>Using Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve">search_lightcurve</a> function, we can find an itemized list of different light curve file products available for Kepler-8:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -544,7 +544,7 @@ different cadence modes, including 20 seconds, 120 seconds, 10 minutes, and 30 m
 <div class="output_area rendered_html docutils container">
 SearchResult containing 18 data products.
 
-<table id="table6230402048">
+<table id="table6504672320">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -568,9 +568,9 @@ SearchResult containing 18 data products.
 </table></div>
 </div>
 <p>In this list, each row represents a different observing period. We find that <em>Kepler</em> recorded the maxmimum of 18 quarters of data for this target across four years. The <strong>observation</strong> column lists the <em>Kepler</em> Quarter. The <strong>target_name</strong> represents the <em>Kepler</em> Input Catalogue (KIC) ID of the target, and the <strong>productFilename</strong> column is the name of the FITS files downloaded from MAST. The <strong>distance</strong> column shows the separation on the sky between the searched coordinates and the downloaded
-objects — this is only relevant when you pass a <code class="docutils literal notranslate"><span class="pre">radius</span></code> argument to the <code class="docutils literal notranslate"><span class="pre">search_lightcurve</span></code> function to search for targets within a given search radius around a set of coordinates.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">`search_lightcurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html">http://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html</a>&gt;`__ function takes several additional arguments, such as the <code class="docutils literal notranslate"><span class="pre">quarter</span></code> number or the <code class="docutils literal notranslate"><span class="pre">mission</span></code> name. You can find examples of its use in the <a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html">online documentation</a> for this function.</p>
-<p>The search function returns a <code class="docutils literal notranslate"><span class="pre">`SearchResult</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html">https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html</a>&gt;`__ object which has several convenient operations. For example, we can select the fourth data product in the list as follows:</p>
+objects — this is only relevant when you pass a <code class="docutils literal notranslate"><span class="pre">radius</span></code> argument to the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve">search_lightcurve</a> function to search for targets within a given search radius around a set of coordinates.</p>
+<p>The <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve">search_lightcurve</a> function takes several additional arguments, such as the <code class="docutils literal notranslate"><span class="pre">quarter</span></code> number or the <code class="docutils literal notranslate"><span class="pre">mission</span></code> name.</p>
+<p>The search function returns a <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> object which has several convenient operations. For example, we can select the fourth data product in the list as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -587,7 +587,7 @@ objects — this is only relevant when you pass a <code class="docutils literal 
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6230384752">
+<table id="table6504669584">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -614,7 +614,7 @@ SearchResult containing 1 data products.
 </pre></div>
 </div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">klc</span></code> variable we have obtained in this way is a <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ object. This object contains time, flux, and flux error information, as well as a whole lot of data about spacecraft systematics. We can view all of them by calling the object by itself:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">klc</span></code> variable we have obtained in this way is a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object. This object contains time, flux, and flux error information, as well as a whole lot of data about spacecraft systematics. We can view all of them by calling the object by itself:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -630,7 +630,7 @@ SearchResult containing 1 data products.
 </div>
 <div class="output_area rendered_html docutils container">
 <i>KeplerLightCurve targetid=6922244 length=4116</i>
-<table id="table6231722400" class="table-striped table-bordered table-condensed">
+<table id="table6507567232" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>quality</th><th>timecorr</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>sap_flux</th><th>sap_flux_err</th><th>sap_bkg</th><th>sap_bkg_err</th><th>pdcsap_flux</th><th>pdcsap_flux_err</th><th>sap_quality</th><th>psf_centr1</th><th>psf_centr1_err</th><th>psf_centr2</th><th>psf_centr2_err</th><th>mom_centr1</th><th>mom_centr1_err</th><th>mom_centr2</th><th>mom_centr2_err</th><th>pos_corr1</th><th>pos_corr2</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th><th></th><th>d</th><th>pix</th><th>pix</th><th></th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th></tr></thead>
 <thead><tr><th>object</th><th>float32</th><th>float32</th><th>int32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>int32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
@@ -688,7 +688,7 @@ SearchResult containing 1 data products.
 between us and the star.</p>
 <div class="section" id="Note">
 <h3>Note<a class="headerlink" href="#Note" title="Permalink to this headline">¶</a></h3>
-<p>You can also download light curve FITS files from the archive by hand, store them on your local disk, and open them using the <code class="docutils literal notranslate"><span class="pre">lk.read(&lt;filename&gt;)</span></code> function. This function will return a <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ object just as in the above example. You can find out where Lightkurve stored a light curve file using the <code class="docutils literal notranslate"><span class="pre">filename</span></code> attribute:</p>
+<p>You can also download light curve FITS files from the archive by hand, store them on your local disk, and open them using the <code class="docutils literal notranslate"><span class="pre">lk.read(&lt;filename&gt;)</span></code> function. This function will return a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object just as in the above example. You can find out where Lightkurve stored a light curve file using the <code class="docutils literal notranslate"><span class="pre">filename</span></code> attribute:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
@@ -711,8 +711,8 @@ between us and the star.</p>
 </div>
 <div class="section" id="3.-The-SAP-and-PDCSAP-Light-Curves">
 <h2>3. The SAP and PDCSAP Light Curves<a class="headerlink" href="#3.-The-SAP-and-PDCSAP-Light-Curves" title="Permalink to this headline">¶</a></h2>
-<p>As you can see in the Table above, there are two different types of flux stored in the <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ object. These correspond to different levels of data treatment performed for this star by NASA’s <a class="reference external" href="https://github.com/nasa/kepler-pipeline/">Kepler Data Processing Pipeline</a>: the simple aperture photometry (SAP) flux, and the presearch data conditioning SAP (PDCSAP) flux.</p>
-<p>By default, a <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ will set the PDCSAP flux to its <code class="docutils literal notranslate"><span class="pre">.flux</span></code> property.</p>
+<p>As you can see in the Table above, there are two different types of flux stored in the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object. These correspond to different levels of data treatment performed for this star by NASA’s <a class="reference external" href="https://github.com/nasa/kepler-pipeline/">Kepler Data Processing Pipeline</a>: the simple aperture photometry (SAP) flux, and the presearch data conditioning SAP (PDCSAP) flux.</p>
+<p>By default, a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> will set the PDCSAP flux to its <code class="docutils literal notranslate"><span class="pre">.flux</span></code> property.</p>
 <p>To compare the PDCSAP and the SAP flux, we can use the <code class="docutils literal notranslate"><span class="pre">column</span></code> keyword while plotting.</p>
 <p><strong>Note</strong>: alternatively, you can replace the <code class="docutils literal notranslate"><span class="pre">flux</span></code> column with the <code class="docutils literal notranslate"><span class="pre">sap_flux</span></code> column by using <code class="docutils literal notranslate"><span class="pre">klc.flux</span> <span class="pre">=</span> <span class="pre">klc['sap_flux']</span></code>.</p>
 <div class="nbinput docutils container">
@@ -791,7 +791,7 @@ Text(0.5, 1.0, &#39;PDCSAP light curve of Kepler-8&#39;)
 </div>
 <div class="section" id="4.-Accessing-the-Metadata">
 <h2>4. Accessing the Metadata<a class="headerlink" href="#4.-Accessing-the-Metadata" title="Permalink to this headline">¶</a></h2>
-<p>When downloading data from MAST, that data usually comes in the format of a FITS file. These FITS files carry a wealth of metadata about the observation. When these are loaded in to Lightkurve to create a <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__, all of the metadata are stored in the <code class="docutils literal notranslate"><span class="pre">.meta</span></code> property of the object.</p>
+<p>When downloading data from MAST, that data usually comes in the format of a FITS file. These FITS files carry a wealth of metadata about the observation. When these are loaded in to Lightkurve to create a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code>, all of the metadata are stored in the <code class="docutils literal notranslate"><span class="pre">.meta</span></code> property of the object.</p>
 <p>We can view these metadata by calling this property, as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
@@ -835,7 +835,7 @@ Text(0.5, 1.0, &#39;PDCSAP light curve of Kepler-8&#39;)
  &#39;DEADC&#39;: 0.92063492,
  &#39;TIMEPIXR&#39;: 0.5,
  &#39;TIERRELA&#39;: 5.78e-07,
- &#39;TIERABSO&#39;: &lt;astropy.io.fits.card.Undefined at 0x1736b42b0&gt;,
+ &#39;TIERABSO&#39;: &lt;astropy.io.fits.card.Undefined at 0x183dc8d90&gt;,
  &#39;INT_TIME&#39;: 6.01980290327,
  &#39;READTIME&#39;: 0.518948526144,
  &#39;FRAMETIM&#39;: 6.538751429414,
@@ -978,7 +978,7 @@ Text(0.5, 1.0, &#39;PDCSAP light curve of Kepler-8&#39;)
 &#39;Kepler&#39;
 </pre></div></div>
 </div>
-<p>A feature of the <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html</a>&gt;`__ object is that the metadata can also be accessed via user-friendly object properties for convenience. For example, the <em>Kepler</em> Quarter number is directly accessible via the <code class="docutils literal notranslate"><span class="pre">quarter</span></code> property:</p>
+<p>A feature of the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object is that the metadata can also be accessed via user-friendly object properties for convenience. For example, the <em>Kepler</em> Quarter number is directly accessible via the <code class="docutils literal notranslate"><span class="pre">quarter</span></code> property:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
@@ -1000,8 +1000,8 @@ Text(0.5, 1.0, &#39;PDCSAP light curve of Kepler-8&#39;)
 </div>
 <div class="section" id="5.-Understanding-the-Data-Arrays-and-Units">
 <h2>5. Understanding the Data Arrays and Units<a class="headerlink" href="#5.-Understanding-the-Data-Arrays-and-Units" title="Permalink to this headline">¶</a></h2>
-<p>As we saw above, the <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html</a>&gt;`__ object is a table that contains many arrays other than the PDCSAP and SAP fluxes. Detailed information on each of these can be found in the <a class="reference external" href="http://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/archive_manual.pdf">Kepler Archive Manual</a>, <em>Section 2.3.1. Light Curve Files</em>.</p>
-<p>The first six columns appear in all <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html</a>&gt;`__ objects, and contain the most commonly used information. These are:</p>
+<p>As we saw above, the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object is a table that contains many arrays other than the PDCSAP and SAP fluxes. Detailed information on each of these can be found in the <a class="reference external" href="http://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/archive_manual.pdf">Kepler Archive Manual</a>, <em>Section 2.3.1. Light Curve Files</em>.</p>
+<p>The first six columns appear in all <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> objects, and contain the most commonly used information. These are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">time</span></code>: the time measurements at each cadence.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">flux</span></code>: the flux of the target star at each time measurement. This is populated with PDCSAP flux by default.</p></li>
@@ -1021,7 +1021,7 @@ Text(0.5, 1.0, &#39;PDCSAP light curve of Kepler-8&#39;)
 <li><p><code class="docutils literal notranslate"><span class="pre">mom_centr1</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">mom_centr2</span></code> (and errors): the column and row centroid positions of the target star, weighted by flux. Duplicated in <code class="docutils literal notranslate"><span class="pre">centroid_col</span></code> and <code class="docutils literal notranslate"><span class="pre">centroid_row</span></code> respectively.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pos_corr1</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">pos_corr2</span></code>: the column and row components of the calculated image motion.</p></li>
 </ul>
-<p>These columns can be accessed as properties of the <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html</a>&gt;`__ , for example, as follows:</p>
+<p>These columns can be accessed as properties of the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> , for example, as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
@@ -1079,7 +1079,7 @@ array([682.69124789, 682.69084371, 682.6903808 , ..., 682.49103683,
        682.49113696, 682.49069432])
 </pre></div></div>
 </div>
-<p>We can also plot the data using the <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html</a>&gt;`__’s <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method by passing a <code class="docutils literal notranslate"><span class="pre">column</span></code> keyword argument:</p>
+<p>We can also plot the data using the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code>’s <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method by passing a <code class="docutils literal notranslate"><span class="pre">column</span></code> keyword argument:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
@@ -1149,16 +1149,13 @@ Time format: bkjd
 </div>
 <div class="section" id="Exercises">
 <h2>Exercises<a class="headerlink" href="#Exercises" title="Permalink to this headline">¶</a></h2>
-<p>Some stars, such as Kepler-10, have been observed both with <em>Kepler</em> and <em>TESS</em>. In this exercise, download and plot the <em>TESS</em> PDCSAP flux only. You can do this by either selecting it from the <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> returned by <code class="docutils literal notranslate"><span class="pre">`search_lightcurve()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html">https://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html</a>&gt;`__ or by using the <code class="docutils literal notranslate"><span class="pre">mission</span></code> keyword argument when searching.</p>
+<p>Some stars, such as Kepler-10, have been observed both with <em>Kepler</em> and <em>TESS</em>. In this exercise, download and plot the <em>TESS</em> PDCSAP flux only. You can do this by either selecting it from the <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> returned by <code class="docutils literal notranslate"><span class="pre">`search_lightcurve()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve">https://docs.lightkurve.org/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve</a>&gt;`__ or by using the <code class="docutils literal notranslate"><span class="pre">mission</span></code> keyword argument when searching.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1">#search_result = lk.search_lightcurvefile(...)</span>
-
-
-
 </pre></div>
 </div>
 </div>
@@ -1180,7 +1177,7 @@ Time format: bkjd
 <div class="output_area rendered_html docutils container">
 SearchResult containing 7 data products.
 
-<table id="table6236699568">
+<table id="table6512882160">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>

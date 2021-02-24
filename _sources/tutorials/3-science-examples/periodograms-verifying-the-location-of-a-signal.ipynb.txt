@@ -22,7 +22,7 @@
     "By the end of this tutorial, you will:\n",
     "\n",
     "* Understand the causes of signal blending and aperture contamination in _Kepler_ and _K2_ data.\n",
-    "* Be able to use Lightkurve's `plot_pixels()` function to visually identify the pixel source of a signal.\n",
+    "* Be able to use Lightkurve's [plot_pixels()](https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.plot_pixels.html?highlight=plot_pixels) function to visually identify the pixel source of a signal.\n",
     "* Be able to implement difference imaging to find the pixel source of a sinusoidal signal.\n"
    ]
   },
@@ -277,7 +277,7 @@
     "id": "56bUogh_Dump"
    },
    "source": [
-    "These are the light curves in every pixel of this TPF, for Quarter 9. We can't tell much just by looking at this, but we can give `plot_pixels()` a corrector function to flatten these light curves. To create the corrector function, we use a Python construction called a [lambda function](https://docs.python.org/3/howto/functional.html#small-functions-and-the-lambda-expression). This kind of function is known as an \"anonymous\" function, as it has no name. Lambda functions are just one line of code, so they're very useful for when we want a function to take another function as an argument. Here, we take a variable `x` and, assuming it's a `LightCurve` object, we can apply methods like `.remove_outliers()` as normal.\n",
+    "These are the light curves in every pixel of this TPF, for Quarter 9. We can't tell much just by looking at this, but we can give [plot_pixels()](https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.plot_pixels.html?highlight=plot_pixels) a corrector function to flatten these light curves. To create the corrector function, we use a Python construction called a [lambda function](https://docs.python.org/3/howto/functional.html#small-functions-and-the-lambda-expression). This kind of function is known as an \"anonymous\" function, as it has no name. Lambda functions are just one line of code, so they're very useful for when we want a function to take another function as an argument. Here, we take a variable `x` and, assuming it's a `LightCurve` object, we can apply methods like [.remove_outliers()](https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.remove_outliers.html?highlight=remove_outliers) as normal.\n",
     "\n",
     "We can also overlay the TPF colors to remind us of the stars we're looking at:"
    ]
@@ -451,7 +451,7 @@
     "\n",
     "We can double-check this by using Lightkurve's [cone search](https://docs.lightkurve.org/api/lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile) to look for the eclipsing binary in question. So long as there's a light curve for this contaminant — and we can reasonably expect one, for such a star — we'll be able to find it with Lightkurve's search function.\n",
     "\n",
-    "(As an aside, if you run this notebook yourself, you can use the `interact_sky()` function, which returns an interactive TPF widget with targets labelled by _Gaia_ ID. This includes many targets which were not collected by _Kepler_ or _K2_.)\n",
+    "(As an aside, if you run this notebook yourself, you can use the [interact_sky()](https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact_sky.html?highlight=interact_sky#lightkurve.KeplerTargetPixelFile.interact_sky) function, which returns an interactive TPF widget with targets labelled by _Gaia_ ID. This includes many targets which were not collected by _Kepler_ or _K2_.)\n",
     "\n",
     "Making a rough guess from the size of the TPF above, we set a search radius of 20 arcseconds. And we're only going to search Quarter 11, as otherwise the function will return an entry for every available quarter."
    ]
@@ -605,7 +605,7 @@
     "id": "nPVQSqedNO47"
    },
    "source": [
-    "From this, we can extract the period of the highest amplitude signal; you will have seen the `period_at_max_power` argument in one of the periodogram tutorials."
+    "From this, we can extract the period of the highest amplitude signal; you will have seen the [period_at_max_power](https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.period_at_max_power.html?highlight=period_at_max_power) argument in one of the periodogram tutorials."
    ]
   },
   {
@@ -928,7 +928,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.6"
+   "version": "3.6.10"
   }
  },
  "nbformat": 4,

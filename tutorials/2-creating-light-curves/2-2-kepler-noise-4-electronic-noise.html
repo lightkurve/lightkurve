@@ -528,7 +528,7 @@ Warning: 25% (854/3384) of the cadences will be ignored due to the quality mask 
 <img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-4-electronic-noise_10_2.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-4-electronic-noise_10_2.png" />
 </div>
 </div>
-<p>You can also check for yourself that the crosstalk source is unrelated to the galaxy by using Lightkurve’s <code class="docutils literal notranslate"><span class="pre">`interact()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact">https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact</a>&gt;`__ function offline and noting that the spreads of the two sources on the detector differ independently.</p>
+<p>You can also check for yourself that the crosstalk source is unrelated to the galaxy by using Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact.html?highlight=interact#lightkurve.KeplerTargetPixelFile.interact">interact()</a> function offline and noting that the spreads of the two sources on the detector differ independently.</p>
 </div>
 <div class="section" id="3.-Rolling-Bands">
 <h2>3. Rolling Bands<a class="headerlink" href="#3.-Rolling-Bands" title="Permalink to this headline">¶</a></h2>
@@ -572,7 +572,7 @@ scale, so we can make a fair comparison.</p>
 <img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-4-electronic-noise_14_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-4-electronic-noise_14_1.png" />
 </div>
 </div>
-<p>There’s nothing obvious here; the background is a little darker during the rolling band event, but not noticeably so on this scale. To get a better look at this, you can use Lightkurve’s <code class="docutils literal notranslate"><span class="pre">`interact()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/tutorials/04-interact-with-lightcurves-and-tpf.html">https://docs.lightkurve.org/tutorials/04-interact-with-lightcurves-and-tpf.html</a>&gt;`__ function in an offline notebook. However, it’s also possible to observe the rolling band by looking at some light curves.</p>
+<p>There’s nothing obvious here; the background is a little darker during the rolling band event, but not noticeably so on this scale. To get a better look at this, you can use Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact.html?highlight=interact#lightkurve.KeplerTargetPixelFile.interact">interact()</a> function in an offline notebook. However, it’s also possible to observe the rolling band by looking at some light curves.</p>
 <p>We’ll extract two single-pixel light curves for two pixels in this target pixel file (TPF): the brightest pixel where the target lies, and the bottom left pixel as representative of the background flux. First, we’ll make an aperture mask for each; you can read more about this process in the custom aperture photometry tutorial.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -604,7 +604,7 @@ scale, so we can make a fair comparison.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x173594520&gt;
+&lt;matplotlib.collections.PolyCollection at 0x17f3baac0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -633,7 +633,7 @@ scale, so we can make a fair comparison.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x173166130&gt;
+&lt;matplotlib.collections.PolyCollection at 0x17fb3d7f0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -699,7 +699,7 @@ to permanent damage. Pixels affected by long-term or permanent damage retained t
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.lines.Line2D at 0x173192a60&gt;
+&lt;matplotlib.lines.Line2D at 0x17fd2f400&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">

@@ -536,7 +536,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <p>Here we can see a strong peak near 13 days, which is consistent with the sinusoidal trend we saw in the time-domain plot earlier. The reason there are so few aliases in this periodogram is most likely because the star we’ve chosen has a variability that is very close to sinusoidal, which is not always the case.</p>
-<p>To obtain an estimate of the rotation period, we can now access the <code class="docutils literal notranslate"><span class="pre">period_at_max_power</span></code> property:</p>
+<p>To obtain an estimate of the rotation period, we can now access the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.period_at_max_power.html?highlight=period_at_max_power">period_at_max_power</a> property:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -559,7 +559,8 @@ $13.670865 \; \mathrm{d}$</div></div>
 </div>
 <div class="section" id="4.-Using-the-Lomb-Scargle-Method-to-Model-the-Rotation-Signal">
 <h2>4. Using the Lomb-Scargle Method to Model the Rotation Signal<a class="headerlink" href="#4.-Using-the-Lomb-Scargle-Method-to-Model-the-Rotation-Signal" title="Permalink to this headline">¶</a></h2>
-<p>Lightkurve uses the Lomb-Scargle method to make periodograms. For more information on Lomb-Scargle periodograms, read <a class="reference external" href="https://arxiv.org/pdf/1703.09824.pdf">Vanderplas (2017)</a>. Without delving into the fine details here, Lomb-Scargle works by fitting a sinusoidal curve at each of the frequencies in the periodogram, and uses this fit to determine the value of power each frequency has in the periodogram. These model fits are stored in the periodogram object and can be extracted.</p>
+<p>Lightkurve uses the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve.html?highlight=lombscargle">Lomb-Scargle</a> method to make periodograms. For more information on Lomb-Scargle periodograms, read <a class="reference external" href="https://arxiv.org/pdf/1703.09824.pdf">Vanderplas (2017)</a>. Without delving into the fine details here, Lomb-Scargle works by fitting a sinusoidal curve at each of the frequencies in the periodogram, and uses this fit to determine the value of
+power each frequency has in the periodogram. These model fits are stored in the periodogram object and can be extracted.</p>
 <p>In the graph below, we visualize the Lomb-Scargle model associated with the highest peak by extracting it and then plotting it on top of our time series data. We need to pass in the <code class="docutils literal notranslate"><span class="pre">time</span></code> range we want the model for, as well as the specific <code class="docutils literal notranslate"><span class="pre">frequency</span></code> for which we want the model returned.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:

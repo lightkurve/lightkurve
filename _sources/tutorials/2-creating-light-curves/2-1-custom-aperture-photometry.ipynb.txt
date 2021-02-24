@@ -199,7 +199,7 @@
     "id": "rjEZinaP10N2"
    },
    "source": [
-    "You might not expect the star's aperture to be this shape — stars are point sources, after all. In many cases, stars in _Kepler_ will look circular, as we'd expect. However, at the edge of the focal plane, some targets may appear smeared in one direction. And even for a star with circular spread, the aperture may be a different shape. The way the spread of light interacts with the detector is defined by something called the point spread function (PSF), or pixel response function (PRF). _Kepler_'s PSF/PRF is described in detail in Section 3.5 of the [_Kepler_ Instrument Handbook](https://archive.stsci.edu/kepler/manuals/KSCI-19033-001.pdf).\n",
+    "You might not expect the star's aperture to be this shape — stars are point sources, after all. In many cases, stars in _Kepler_ will look circular, as we'd expect. However, at the edge of the focal plane, some targets may appear smeared in one direction. And even for a star with circular spread, the aperture may be a different shape. The way the spread of light interacts with the detector is defined by something called the point spread function (PSF), or pixel response function (PRF). _Kepler_'s PSF/PRF is described in detail in Section 3.5 of the [Kepler Instrument Handbook](https://archive.stsci.edu/kepler/manuals/KSCI-19033-001.pdf).\n",
     "\n",
     "We've looked at a basic example in this section, but as we'll see later in this tutorial, it can be hard to determine the best aperture for a given target by eye. Choosing the best aperture for your target can be something of a balancing act: using a larger aperture will minimize the effects of PSF changes and spacecraft motion, but conversely it increases the presence of shot noise. This is why _Kepler_ and _K2_ data were processed with an \"optimal aperture.\" Brightness, PSF, shot noise, crowding, and many other factors went into predicting the optimal aperture for producing a SAP or PDCSAP light curve with NASA's _Kepler_ and _K2_ pipelines. You can read more about the process of creating these apertures in [Smith et al., 2016](https://ui.adsabs.harvard.edu/abs/2016PASP..128l4501S/abstract), which is equivalent to Chapter 7 of the [_Kepler_ Data Processing Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf)."
    ]
@@ -229,9 +229,9 @@
    "source": [
     "### 1.4 Choosing an aperture\n",
     "\n",
-    "In NASA's _Kepler_ and _K2_ pipelines, the process of determining apertures is automated ([_Kepler_ Data Processing Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf), Part II). Here, we'll manually create our own apertures.\n",
+    "In NASA's _Kepler_ and _K2_ pipelines, the process of determining apertures is automated ([Kepler Data Processing Handbook](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf), Part II). Here, we'll manually create our own apertures.\n",
     "\n",
-    "Without any knowledge of which pixels contain light from our target, the most basic approach is to look at individual pixels and manually determine which pixels to work with. Working offline, we can use Lightkurve's TPF `interact()` function, which is a convenient way to inspect one or more pixels at a time. Another recommended way to define an aperture is by defining a median flux value and only selecting pixels at a certain sigma above that threshold. In the tutorial, we'll look at using Lightkurve's built-in functionality to perform this.\n",
+    "Without any knowledge of which pixels contain light from our target, the most basic approach is to look at individual pixels and manually determine which pixels to work with. Working offline, we can use Lightkurve's TPF [interact()](https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact.html?highlight=interact#lightkurve.KeplerTargetPixelFile.interact) function, which is a convenient way to inspect one or more pixels at a time. Another recommended way to define an aperture is by defining a median flux value and only selecting pixels at a certain sigma above that threshold. In the tutorial, we'll look at using Lightkurve's built-in functionality to perform this.\n",
     "\n",
     "In most situations, a threshold mask will be the best choice for custom aperture photometry, as it doesn't involve trial and error beyond finding the best sigma value. However, if you're dealing with multiple bright objects in one TPF, a manual mask may be the better option.\n",
     "\n",
@@ -257,7 +257,7 @@
    "source": [
     "### 2.1 Doing photometry with the pipeline aperture\n",
     "\n",
-    "We're going to use the built-in functions in Lightkurve for aperture photometry. You may have encountered `to_lightcurve()` in other tutorials in this series. In this section, we'll explore a number of ways to use this function for custom aperture photometry — but first, let's do a quick review of the function at its most basic.\n",
+    "We're going to use the built-in functions in Lightkurve for aperture photometry. You may have encountered [to_lightcurve()](https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve) in other tutorials in this series. In this section, we'll explore a number of ways to use this function for custom aperture photometry — but first, let's do a quick review of the function at its most basic.\n",
     "\n",
     "We'll start by downloading a target pixel file. We're going to use _Kepler_ long cadence data to look at KIC 2437317, a star which shows brightness variations due to rotation ([Reinhold & Gizon, 2015](https://www.aanda.org/articles/aa/pdf/2015/11/aa26216-15.pdf)). We're downloading Quarter 10, as there was minimal data loss during this quarter ([_Kepler_ Data Characteristics Manual](https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf), Section 4.1)."
    ]
@@ -414,7 +414,7 @@
    "source": [
     "### 2.2 Adjusting the aperture\n",
     "\n",
-    "Lightkurve's `to_lightcurve()` function has an `aperture_mask` keyword, which changes the aperture used to perform photometry. Later we'll look at creating our own apertures, but first, let's look at the three standard arguments this keyword takes:\n",
+    "Lightkurve's [to_lightcurve()](https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve) function has an `aperture_mask` keyword, which changes the aperture used to perform photometry. Later we'll look at creating our own apertures, but first, let's look at the three standard arguments this keyword takes:\n",
     "\n",
     "* `'pipeline'`: this is the default option, which will return the same as above.\n",
     "* `'threshold'`: select all pixels which have a flux higher than 3 standard deviations above a median brightness.\n",
@@ -502,7 +502,7 @@
    "source": [
     "This is Lightkurve's default 3 standard deviations threshold mask, and for this TPF there's only one pixel with flux above that cutoff. Note how Lightkurve apertures work: pixels marked `True` in the aperture mask array are the ones that are used for photometry.\n",
     "\n",
-    "We'll make our own Boolean masks like this later. First, let's play around with the `create_threshold_mask()` function and try to reproduce the pipeline mask. Keeping in mind that the TPF we looked at above has many more bright pixels than faint ones, we can expect a bright median, so let's try using a lower threshold:"
+    "We'll make our own Boolean masks like this later. First, let's play around with the [create_threshold_mask()](https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.create_threshold_mask.html?highlight=create_threshold_mask) function and try to reproduce the pipeline mask. Keeping in mind that the TPF we looked at above has many more bright pixels than faint ones, we can expect a bright median, so let's try using a lower threshold:"
    ]
   },
   {
@@ -723,7 +723,7 @@
     "id": "DKsPJq8PGCka"
    },
    "source": [
-    "No luck.  Our custom aperture still selects the bright star in the center.  When the thresholding method yields multiple contiguous regions, the default behavior of the `create_threshold_mask` method is to return the region closest to the center.  We can modify this behavior by passing a `reference_pixel` argument to specify the region we are most interested in. The argument is defined such that `reference_pixel=(0,0)` refers to the lower left corner. Hence, we can select the region in the upper right corner as follows:"
+    "No luck.  Our custom aperture still selects the bright star in the center.  When the thresholding method yields multiple contiguous regions, the default behavior of the [create_threshold_mask](https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.create_threshold_mask.html?highlight=create_threshold_mask) method is to return the region closest to the center.  We can modify this behavior by passing a `reference_pixel` argument to specify the region we are most interested in. The argument is defined such that `reference_pixel=(0,0)` refers to the lower left corner. Hence, we can select the region in the upper right corner as follows:"
    ]
   },
   {
@@ -898,7 +898,7 @@
    "source": [
     "### 3.3 \"Cutting out\" a background star\n",
     "\n",
-    "Using Lightkurve's `cutout()` function, we can emulate the process of creating a threshold mask on only the pixels we're interested in. This method is only suitable for large TPFs with a clearly separated background star, like the case of KIC 2437901 and KIC 2437948.\n",
+    "Using Lightkurve's [cutout()](https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.cutout.html?highlight=cutout) function, we can emulate the process of creating a threshold mask on only the pixels we're interested in. This method is only suitable for large TPFs with a clearly separated background star, like the case of KIC 2437901 and KIC 2437948.\n",
     "\n",
     "Let's start by cutting out those 3x3 pixels we just used as an aperture mask:"
    ]
@@ -982,7 +982,7 @@
     "id": "l6-zEFP0DVd4"
    },
    "source": [
-    "This is still a `TargetPixelFile` object, so we can use all of the same functions:"
+    "This is still a [TargetPixelFile](https://docs.lightkurve.org/reference/targetpixelfile.html?highlight=targetpixelfile) object, so we can use all of the same functions:"
    ]
   },
   {
@@ -1135,7 +1135,7 @@
    "source": [
     "### 3.4 Creating a custom aperture using the `tpf.interact` tool\n",
     "\n",
-    "Finally, it is good to know that there is interactive functionality in Lightkurve to create a mask.  We cannot demonstrate it in this static tutorial, but you can try it yourself in a local notebook by running `tpf.interact()`. This will bring up an interactive panel which allows you to select the pixels you want using mouse clicks. Next, press \"Save Lightcurve\" in the bottom left of the panel. This will export your custom aperture light curve to a FITS file in your working directory. The file name follows a similar convention to official _Kepler_ data products. For example, the file name for the example above is `kplr002437901-2011271113734_lpd-targ-custom-lc.fits`."
+    "Finally, it is good to know that there is interactive functionality in Lightkurve to create a mask.  We cannot demonstrate it in this static tutorial, but you can try it yourself in a local notebook by running tpf[.interact()](https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact.html?highlight=interact#lightkurve.KeplerTargetPixelFile.interact). This will bring up an interactive panel which allows you to select the pixels you want using mouse clicks. Next, press \"Save Lightcurve\" in the bottom left of the panel. This will export your custom aperture light curve to a FITS file in your working directory. The file name follows a similar convention to official _Kepler_ data products. For example, the file name for the example above is `kplr002437901-2011271113734_lpd-targ-custom-lc.fits`."
    ]
   },
   {
@@ -1230,7 +1230,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.6"
+   "version": "3.6.10"
   }
  },
  "nbformat": 4,

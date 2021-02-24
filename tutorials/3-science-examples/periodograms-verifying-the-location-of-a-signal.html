@@ -455,7 +455,7 @@ div.rendered_html tbody tr:hover {
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Understand the causes of signal blending and aperture contamination in <em>Kepler</em> and <em>K2</em> data.</p></li>
-<li><p>Be able to use Lightkurve’s <code class="docutils literal notranslate"><span class="pre">plot_pixels()</span></code> function to visually identify the pixel source of a signal.</p></li>
+<li><p>Be able to use Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.plot_pixels.html?highlight=plot_pixels">plot_pixels()</a> function to visually identify the pixel source of a signal.</p></li>
 <li><p>Be able to implement difference imaging to find the pixel source of a sinusoidal signal.</p></li>
 </ul>
 </div>
@@ -597,8 +597,8 @@ exercise. Let’s begin by downloading a light curve; then we can produce a Lomb
 <img alt="../../_images/tutorials_3-science-examples_periodograms-verifying-the-location-of-a-signal_17_1.png" src="../../_images/tutorials_3-science-examples_periodograms-verifying-the-location-of-a-signal_17_1.png" />
 </div>
 </div>
-<p>These are the light curves in every pixel of this TPF, for Quarter 9. We can’t tell much just by looking at this, but we can give <code class="docutils literal notranslate"><span class="pre">plot_pixels()</span></code> a corrector function to flatten these light curves. To create the corrector function, we use a Python construction called a <a class="reference external" href="https://docs.python.org/3/howto/functional.html#small-functions-and-the-lambda-expression">lambda function</a>. This kind of function is known as an “anonymous” function, as it has no name. Lambda functions are just one line of
-code, so they’re very useful for when we want a function to take another function as an argument. Here, we take a variable <code class="docutils literal notranslate"><span class="pre">x</span></code> and, assuming it’s a <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object, we can apply methods like <code class="docutils literal notranslate"><span class="pre">.remove_outliers()</span></code> as normal.</p>
+<p>These are the light curves in every pixel of this TPF, for Quarter 9. We can’t tell much just by looking at this, but we can give <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.plot_pixels.html?highlight=plot_pixels">plot_pixels()</a> a corrector function to flatten these light curves. To create the corrector function, we use a Python construction called a <a class="reference external" href="https://docs.python.org/3/howto/functional.html#small-functions-and-the-lambda-expression">lambda function</a>.
+This kind of function is known as an “anonymous” function, as it has no name. Lambda functions are just one line of code, so they’re very useful for when we want a function to take another function as an argument. Here, we take a variable <code class="docutils literal notranslate"><span class="pre">x</span></code> and, assuming it’s a <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object, we can apply methods like <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.remove_outliers.html?highlight=remove_outliers">.remove_outliers()</a> as normal.</p>
 <p>We can also overlay the TPF colors to remind us of the stars we’re looking at:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
@@ -716,7 +716,7 @@ decrease. We can look at the TPF using <code class="docutils literal notranslate
 </div>
 <p>In this case, we can clearly see an eclipse to the left of our target. The eclipsing binary is outside of the pipeline aperture, but the signal is strong enough to have contaminated it. And sure enough, if we check on the <a class="reference external" href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname=K00311.01&amp;type=KEPLER_CANDIDATE">NASA Exoplanet Archive</a>, KOI 311 was designated a false positive in the first data release it was included in.</p>
 <p>We can double-check this by using Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile">cone search</a> to look for the eclipsing binary in question. So long as there’s a light curve for this contaminant — and we can reasonably expect one, for such a star — we’ll be able to find it with Lightkurve’s search function.</p>
-<p>(As an aside, if you run this notebook yourself, you can use the <code class="docutils literal notranslate"><span class="pre">interact_sky()</span></code> function, which returns an interactive TPF widget with targets labelled by <em>Gaia</em> ID. This includes many targets which were not collected by <em>Kepler</em> or <em>K2</em>.)</p>
+<p>(As an aside, if you run this notebook yourself, you can use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact_sky.html?highlight=interact_sky#lightkurve.KeplerTargetPixelFile.interact_sky">interact_sky()</a> function, which returns an interactive TPF widget with targets labelled by <em>Gaia</em> ID. This includes many targets which were not collected by <em>Kepler</em> or <em>K2</em>.)</p>
 <p>Making a rough guess from the size of the TPF above, we set a search radius of 20 arcseconds. And we’re only going to search Quarter 11, as otherwise the function will return an entry for every available quarter.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
@@ -734,7 +734,7 @@ decrease. We can look at the TPF using <code class="docutils literal notranslate
 <div class="output_area rendered_html docutils container">
 SearchResult containing 2 data products.
 
-<table id="table6247417936">
+<table id="table6430270512">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 11</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr007024511</td><td>0.0</td></tr>
@@ -806,7 +806,7 @@ where the variable flux is “brightest.”</p>
 <img alt="../../_images/tutorials_3-science-examples_periodograms-verifying-the-location-of-a-signal_35_1.png" src="../../_images/tutorials_3-science-examples_periodograms-verifying-the-location-of-a-signal_35_1.png" />
 </div>
 </div>
-<p>From this, we can extract the period of the highest amplitude signal; you will have seen the <code class="docutils literal notranslate"><span class="pre">period_at_max_power</span></code> argument in one of the periodogram tutorials.</p>
+<p>From this, we can extract the period of the highest amplitude signal; you will have seen the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.period_at_max_power.html?highlight=period_at_max_power">period_at_max_power</a> argument in one of the periodogram tutorials.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>

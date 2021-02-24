@@ -471,7 +471,8 @@ div.rendered_html tbody tr:hover {
 <div class="section" id="1.-Downloading-a-TPF">
 <h2>1. Downloading a TPF<a class="headerlink" href="#1.-Downloading-a-TPF" title="Permalink to this headline">¶</a></h2>
 <p>A TPF contains the original imaging data from which a light curve is derived. Besides the brightness data measured by the charge-coupled device (CCD) camera, a TPF also includes post-processing information such as an estimate of the astronomical background, and a recommended pixel aperture for extracting a light curve.</p>
-<p>First, we download a target pixel file. We will use one quarter’s worth of <em>Kepler</em> data for the star named <a class="reference external" href="http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/">Kepler-8</a>, a star somewhat larger than the Sun, and the host of a <a class="reference external" href="https://en.wikipedia.org/wiki/Hot_Jupiter">hot Jupiter planet</a>.</p>
+<p>First, we download a target pixel file. We will use one quarter’s worth of <em>Kepler</em> data for the star named <a class="reference external" href="http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/">Kepler-8</a>, a star somewhat larger than the Sun, and the host of a <a class="reference external" href="https://en.wikipedia.org/wiki/Hot_Jupiter">hot Jupiter planet</a>. To search for TPF’s that contain our object of interest we will use the
+<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile</a> function as follows,</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -489,7 +490,7 @@ div.rendered_html tbody tr:hover {
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6268704224">
+<table id="table6459744016">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -653,7 +654,7 @@ can learn more about background removal in Section 4.2 of the <a class="referenc
 <div class="section" id="3.-Apertures">
 <h2>3. Apertures<a class="headerlink" href="#3.-Apertures" title="Permalink to this headline">¶</a></h2>
 <p>As part of the data processing done by the <em>Kepler</em> pipeline, each TPF includes a recommended <em>optimal aperture mask</em>. This aperture mask is optimized to ensure that the stellar signal has a high signal-to-noise ratio, with minimal contamination from the background.</p>
-<p>The optimal aperture is stored in the TPF as the <code class="docutils literal notranslate"><span class="pre">pipeline_mask</span></code> property. We can have a look at it by calling it here:</p>
+<p>The optimal aperture is stored in the TPF as the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.pipeline_mask.html?highlight=pipeline_mask">pipeline_mask</a> property. We can have a look at it by calling it here:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -708,7 +709,7 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 <div class="section" id="4.-Simple-Aperture-Photometry">
 <h2>4. Simple Aperture Photometry<a class="headerlink" href="#4.-Simple-Aperture-Photometry" title="Permalink to this headline">¶</a></h2>
 <p>Finally, let’s learn how to perform simple aperture photometry (SAP) using the provided optimal aperture in <code class="docutils literal notranslate"><span class="pre">pipeline_mask</span></code> and the TPF.</p>
-<p>Using the full TPF for all cadences in the quarter, we can perform aperture photometry using the <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code> method as follows:</p>
+<p>Using the full TPF for all cadences in the quarter, we can perform aperture photometry using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve()</a> method as follows:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -734,7 +735,7 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 </div>
 <div class="output_area rendered_html docutils container">
 <i>KeplerLightCurve targetid=6922244 length=4116</i>
-<table id="table6277051488" class="table-striped table-bordered table-condensed">
+<table id="table6468794304" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>quality</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th><th>pix</th><th>pix</th><th></th><th></th></tr></thead>
 <thead><tr><th>object</th><th>float32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>int32</th></tr></thead>
@@ -760,7 +761,7 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 <tr><td>442.20350409652747</td><td>43151.5625</td><td>6.599262714385986</td><td>683.0024686391082</td><td>190.7814194325506</td><td>16310</td><td>0</td></tr>
 </table></div>
 </div>
-<p>Note that this <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ object has fewer data columns than in light curves downloaded directly from MAST. This is because we are extracting our light curve directly from the TPF using minimal processing, whereas light curves created using the official pipeline include more processing and more columns.</p>
+<p>Note that this <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object has fewer data columns than in light curves downloaded directly from MAST. This is because we are extracting our light curve directly from the TPF using minimal processing, whereas light curves created using the official pipeline include more processing and more columns.</p>
 <p>We can visualize the light curve as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -790,7 +791,7 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 <p>This light curve is similar to the SAP light curve we previously encountered in the light curve tutorial.</p>
 <div class="section" id="Note">
 <h3>Note<a class="headerlink" href="#Note" title="Permalink to this headline">¶</a></h3>
-<p>The background flux can be plotted in a similar way, using the <code class="docutils literal notranslate"><span class="pre">`get_bkg_lightcurve()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve">https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve</a>&gt;`__ method. This does not require an aperture, but instead sums the flux in the TPF’s <code class="docutils literal notranslate"><span class="pre">FLUX_BKG</span></code> column at each timestamp.</p>
+<p>The background flux can be plotted in a similar way, using the <code class="docutils literal notranslate"><span class="pre">get_bkg_lightcurve()</span></code> method. This does not require an aperture, but instead sums the flux in the TPF’s <code class="docutils literal notranslate"><span class="pre">FLUX_BKG</span></code> column at each timestamp.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
@@ -823,7 +824,7 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 </div>
 <div class="section" id="Exercises">
 <h2>Exercises<a class="headerlink" href="#Exercises" title="Permalink to this headline">¶</a></h2>
-<p>Some stars, such as the planet-hosting star Kepler-10, have been observed both with <em>Kepler</em> and <em>TESS</em>. In this exercise, download and plot both the <em>TESS</em> and <em>Kepler</em> TPFs, along with the optimal apertures. You can do this by either selecting the TPFs from the list returned by <code class="docutils literal notranslate"><span class="pre">`search_targetpixelfile()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.search_targetpixelfile.html">https://docs.lightkurve.org/api/lightkurve.search.search_targetpixelfile.html</a>&gt;`__, or by using the <code class="docutils literal notranslate"><span class="pre">mission</span></code> keyword argument when searching.</p>
+<p>Some stars, such as the planet-hosting star Kepler-10, have been observed both with <em>Kepler</em> and <em>TESS</em>. In this exercise, download and plot both the <em>TESS</em> and <em>Kepler</em> TPFs, along with the optimal apertures. You can do this by either selecting the TPFs from the list returned by <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile()</a>, or by using the <code class="docutils literal notranslate"><span class="pre">mission</span></code> keyword argument when searching.</p>
 <p>Both <em>Kepler</em> and <em>TESS</em> produce target pixel file data products, but these can look different across the two missions. <em>TESS</em> is focused on brighter stars and has larger pixels, so a star that might occupy many pixels in <em>Kepler</em> may only occupy a few in <em>TESS</em>.</p>
 <p>How do light curves extracted from both of them compare?</p>
 <div class="nbinput nblast docutils container">
@@ -854,7 +855,7 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 <div class="output_area rendered_html docutils container">
 SearchResult containing 53 data products.
 
-<table id="table6278799712">
+<table id="table6471904464">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>

@@ -201,7 +201,7 @@
    "source": [
     "Here we can see a strong peak near 13 days, which is consistent with the sinusoidal trend we saw in the time-domain plot earlier. The reason there are so few aliases in this periodogram is most likely because the star we've chosen has a variability that is very close to sinusoidal, which is not always the case.\n",
     "\n",
-    "To obtain an estimate of the rotation period, we can now access the `period_at_max_power` property:"
+    "To obtain an estimate of the rotation period, we can now access the [period_at_max_power](https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.period_at_max_power.html?highlight=period_at_max_power) property:"
    ]
   },
   {
@@ -261,7 +261,7 @@
     "id": "T8LvQgp0sg_G"
    },
    "source": [
-    "Lightkurve uses the Lomb-Scargle method to make periodograms. For more information on Lomb-Scargle periodograms, read [Vanderplas (2017)](https://arxiv.org/pdf/1703.09824.pdf). Without delving into the fine details here, Lomb-Scargle works by fitting a sinusoidal curve at each of the frequencies in the periodogram, and uses this fit to determine the value of power each frequency has in the periodogram. These model fits are stored in the periodogram object and can be extracted.\n",
+    "Lightkurve uses the [Lomb-Scargle](https://docs.lightkurve.org/reference/api/lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve.html?highlight=lombscargle) method to make periodograms. For more information on Lomb-Scargle periodograms, read [Vanderplas (2017)](https://arxiv.org/pdf/1703.09824.pdf). Without delving into the fine details here, Lomb-Scargle works by fitting a sinusoidal curve at each of the frequencies in the periodogram, and uses this fit to determine the value of power each frequency has in the periodogram. These model fits are stored in the periodogram object and can be extracted.\n",
     "\n",
     "In the graph below, we visualize the Lomb-Scargle model associated with the highest peak by extracting it and then plotting it on top of our time series data. We need to pass in the `time` range we want the model for, as well as the specific `frequency` for which we want the model returned."
    ]
@@ -591,7 +591,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.6"
+   "version": "3.6.10"
   }
  },
  "nbformat": 4,

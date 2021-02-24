@@ -341,7 +341,7 @@
 <h1>lightkurve.correctors.CBVCorrector<a class="headerlink" href="#lightkurve-correctors-cbvcorrector" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="lightkurve.correctors.CBVCorrector">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">lightkurve.correctors.</span></code><code class="sig-name descname"><span class="pre">CBVCorrector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolate_cbvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_not_load_cbvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.CBVCorrector" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">lightkurve.correctors.</span></code><code class="sig-name descname"><span class="pre">CBVCorrector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolate_cbvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrapolate_cbvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_not_load_cbvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.CBVCorrector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for removing systematics using Cotrending Basis Vectors (CBVs)
 from Kepler/K2/TESS.</p>
 <p>On construction of this object, the relevent CBVs will be downloaded from
@@ -395,10 +395,10 @@ Equivalent to: designmatrix prior sigma = np.median(self.lc.flux_err) / np.sqrt(
 </dl>
 <dl class="py method">
 <dt id="lightkurve.correctors.CBVCorrector.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolate_cbvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_not_load_cbvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.CBVCorrector.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolate_cbvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrapolate_cbvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_not_load_cbvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.CBVCorrector.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor</p>
 <p>This constructor will retrieve all relevant CBVs from MAST and then
-align them with the passed-in light curve.</p>
+align or interpolate them with the passed-in light curve.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -407,6 +407,9 @@ align them with the passed-in light curve.</p>
 <dt><strong>interpolate_cbvs</strong><span class="classifier">bool</span></dt><dd><p>By default, the cbvs will be ‘aligned’ to the lightcurve. If you
 wish to interpolate the cbvs instead then set this to True.
 Uses Piecewise Cubic Hermite Interpolating Polynomial (PCHIP).</p>
+</dd>
+<dt><strong>extrapolate_cbvs</strong><span class="classifier">bool</span></dt><dd><p>Set to True if the CBVs also have to be extrapolated outside their time 
+stamp range. (If False then those cadences are filled with NaNs.)</p>
 </dd>
 <dt><strong>do_not_load_cbvs</strong><span class="classifier">bool</span></dt><dd><p>If True then the CBVs will NOT be loaded from MAST. 
 Use this option if you wish to use the CBV corrector methods with only a 

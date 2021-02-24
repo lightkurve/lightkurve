@@ -476,13 +476,13 @@ div.rendered_html tbody tr:hover {
 <p>After each roll, <em>Kepler</em> retained its fine-pointing at the same field of view. Because the camera rotated by 90 degrees, all of the target stars fell on different parts of the charge-coupled device (CCD) camera. This had an effect on the amount of flux recorded for the same star, because different CCD pixels have different sensitivities. The way in which the flux from the same stars was distributed on the CCD (called the point spread function or PSF) also changed after each roll, due to focus
 changes and other instrumental effects. As a result, the aperture mask set for a star had to be recomputed after each roll, and may capture slightly different amounts of flux.</p>
 <p>The data obtained between rolls is referred to as a quarter. While there are changes to the flux <em>systematics</em>, not much else changes quarter to quarter, and the majority of the target list remains identical. This means that, after removing systematic trends (such as was done for the presearch data conditioning simple aperture photometry (PDCSAP) flux), multiple quarters together can form one continuous observation.</p>
-<!-- ![](https://keplergo.arc.nasa.gov/images/program/Orbit_Mar5_09L.gif) --><p><img alt="ad33b7e6cbb8492cb106a31eb778c10a" class="no-scaled-link" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Kepler_space_telescope_orbit.png/800px-Kepler_space_telescope_orbit.png" style="width: 800px;" /></p>
+<!-- ![](https://keplergo.arc.nasa.gov/images/program/Orbit_Mar5_09L.gif) --><p><img alt="bce3616eacff44de913c4a8851115391" class="no-scaled-link" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Kepler_space_telescope_orbit.png/800px-Kepler_space_telescope_orbit.png" style="width: 800px;" /></p>
 <p><em>Figure</em>: Infographic showcasing the necessity of <em>Kepler</em>’s quarterly rolls and its Earth-trailing orbit. Source: <a class="reference external" href="https://keplergo.arc.nasa.gov/ExtendedMissionOverview.shtml">Kepler Science Center</a>.</p>
 <p><strong>Note</strong>: Observations by <em>K2</em> and <em>TESS</em> are also broken down into chunks of a month or more, called campaigns (for <em>K2</em>) and sectors (for <em>TESS</em>). While not discussed in this tutorial, the tools below work for these data products as well.</p>
 </div>
 <div class="section" id="2.-Downloading-Multiple-KeplerLightCurve-Objects-at-Once">
 <h2>2. Downloading Multiple <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> Objects at Once<a class="headerlink" href="#2.-Downloading-Multiple-KeplerLightCurve-Objects-at-Once" title="Permalink to this headline">¶</a></h2>
-<p>To start, we can use Lightkurve’s <code class="docutils literal notranslate"><span class="pre">`search_lightcurve()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html">https://docs.lightkurve.org/api/lightkurve.search.search_lightcurve.html</a>&gt;`__ function to see what data are available for our target star on the <a class="reference external" href="https://archive.stsci.edu/kepler/">Mikulski Archive for Space Telescopes</a> (MAST) archive. We will use the star <a class="reference external" href="http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/">Kepler-8</a>, a star somewhat larger than the Sun, and the host of a <a class="reference external" href="https://en.wikipedia.org/wiki/Hot_Jupiter">hot Jupiter
+<p>To start, we can use Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve">search_lightcurve()</a> function to see what data are available for our target star on the <a class="reference external" href="https://archive.stsci.edu/kepler/">Mikulski Archive for Space Telescopes</a> (MAST) archive. We will use the star <a class="reference external" href="http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/">Kepler-8</a>, a star somewhat larger than the Sun, and the host of a <a class="reference external" href="https://en.wikipedia.org/wiki/Hot_Jupiter">hot Jupiter
 planet</a>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -501,7 +501,7 @@ planet</a>.</p>
 <div class="output_area rendered_html docutils container">
 SearchResult containing 18 data products.
 
-<table id="table6303998928">
+<table id="table6438998656">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -526,7 +526,7 @@ SearchResult containing 18 data products.
 </div>
 <p>In this list, each row represents a different observing quarter, for a total of 18 quarters across four years. The <strong>observation</strong> column lists the <em>Kepler</em> Quarter. The <strong>target_name</strong> represents the <em>Kepler</em> Input Catalogue (KIC) ID of the target, and the <strong>productFilename</strong> column is the name of the FITS files downloaded from MAST. The <strong>distance</strong> column shows the separation on the sky between the searched coordinates and the downloaded objects — this is only relevant when searching for
 specific coordinates in the sky, and not when looking for individual objects.</p>
-<p>Instead of downloading a single quarter using the <code class="docutils literal notranslate"><span class="pre">`download()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html#lightkurve.search.SearchResult.download">https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html#lightkurve.search.SearchResult.download</a>&gt;`__ function, we can use the <code class="docutils literal notranslate"><span class="pre">`download_all()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html#lightkurve.search.SearchResult.download_all">https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html#lightkurve.search.SearchResult.download_all</a>&gt;`__ function to access all 18 quarters at once (this might take a while).</p>
+<p>Instead of downloading a single quarter using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.SearchResult.download.html?highlight=download#lightkurve.SearchResult.download">download()</a> function, we can use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.SearchResult.download_all.html?highlight=download_all">download_all()</a> function to access all 18 quarters at once (this might take a while).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -547,8 +547,8 @@ LightCurveCollection of 18 objects:
         KIC 6922244 (18 KeplerLightCurves) Quarters: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
 </pre></div></div>
 </div>
-<p>All of the downloaded data are stored in a <code class="docutils literal notranslate"><span class="pre">`LightCurveCollection</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection">https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection</a>&gt;`__. This object acts as a wrapper for 18 separate <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ objects, listed above.</p>
-<p>We can access the <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ objects and interact with them as usual through the <code class="docutils literal notranslate"><span class="pre">`LightCurveCollection</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection">https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection</a>&gt;`__.</p>
+<p>All of the downloaded data are stored in a <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code>. This object acts as a wrapper for 18 separate <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> objects, listed above.</p>
+<p>We can access the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> objects and interact with them as usual through the <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -565,7 +565,7 @@ LightCurveCollection of 18 objects:
 </div>
 <div class="output_area rendered_html docutils container">
 <i>KeplerLightCurve targetid=6922244 length=4116</i>
-<table id="table6303953824" class="table-striped table-bordered table-condensed">
+<table id="table6439029728" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>quality</th><th>timecorr</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>sap_flux</th><th>sap_flux_err</th><th>sap_bkg</th><th>sap_bkg_err</th><th>pdcsap_flux</th><th>pdcsap_flux_err</th><th>sap_quality</th><th>psf_centr1</th><th>psf_centr1_err</th><th>psf_centr2</th><th>psf_centr2_err</th><th>mom_centr1</th><th>mom_centr1_err</th><th>mom_centr2</th><th>mom_centr2_err</th><th>pos_corr1</th><th>pos_corr2</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th><th></th><th>d</th><th>pix</th><th>pix</th><th></th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th></tr></thead>
 <thead><tr><th>object</th><th>float32</th><th>float32</th><th>int32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>int32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
@@ -618,7 +618,7 @@ LightCurveCollection of 18 objects:
 </div>
 <div class="section" id="Note:">
 <h3>Note:<a class="headerlink" href="#Note:" title="Permalink to this headline">¶</a></h3>
-<p>The example given above also works for downloading target pixel files (TPFs). This will produce a <code class="docutils literal notranslate"><span class="pre">`TargetPixelFileCollection</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection">https://docs.lightkurve.org/api/lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection</a>&gt;`__ object instead.</p>
+<p>The example given above also works for downloading target pixel files (TPFs). This will produce a <code class="docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code> object instead.</p>
 </div>
 </div>
 <div class="section" id="3.-Investigating-the-Data">
@@ -650,7 +650,7 @@ LightCurveCollection of 18 objects:
 <h2>4. Normalizing a Light Curve<a class="headerlink" href="#4.-Normalizing-a-Light-Curve" title="Permalink to this headline">¶</a></h2>
 <p>If we want to see the actual variation of the targeted object over the course of these observations, the plot above isn’t very useful to us. It is also not useful to have flux expressed in physical units, because it is affected by the observing conditions such as telescope focus and pointing (see above).</p>
 <p>Instead, it is a common practice to normalize light curves by dividing by their median value. This means that the median of the newly normalized light curve will be equal to 1, and that the relative size of signals in the observation (such as transits) will be maintained.</p>
-<p>A normalization can be performed using the <code class="docutils literal notranslate"><span class="pre">`normalize()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.normalize">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.normalize</a>&gt;`__ method of a <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__, for example:</p>
+<p>A normalization can be performed using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.normalize.html?highlight=normalize#lightkurve.LightCurve.normalize">normalize()</a> method of a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code>, for example:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -677,7 +677,7 @@ LightCurveCollection of 18 objects:
 </div>
 </div>
 <p>In the figure above, we have plotted the normalized PDCSAP flux for Quarter 4. The median normalized flux is at 1, and the transit depths lie around 0.991, indicating a 0.9% dip in brightness due to the planet transiting the star.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">`LightCurveCollection</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html">https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html</a>&gt;`__ also has a <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method. We can use it to plot the PDCSAP flux. The method automatically normalizes the flux in same way we did for a single quarter above.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code> also has a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.FoldedLightCurve.plot.html?highlight=plot#lightkurve.FoldedLightCurve.plot">plot()</a> method. We can use it to plot the PDCSAP flux. The method automatically normalizes the flux in same way we did for a single quarter above.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
@@ -707,8 +707,7 @@ LightCurveCollection of 18 objects:
 </div>
 <div class="section" id="5.-Combining-Multiple-Observations-into-a-Single-Light-Curve">
 <h2>5. Combining Multiple Observations into a Single Light Curve<a class="headerlink" href="#5.-Combining-Multiple-Observations-into-a-Single-Light-Curve" title="Permalink to this headline">¶</a></h2>
-<p>Finally, we can combine these different light curves into a single <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ object. This is done using the <code class="docutils literal notranslate"><span class="pre">`stitch()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection.stitch">https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection.stitch</a>&gt;`__ method. This method concatenates all quarters in our
-<code class="docutils literal notranslate"><span class="pre">`LightCurveCollection</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection">https://docs.lightkurve.org/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection</a>&gt;`__ together, and normalizes them at the same time, in the manner we saw above.</p>
+<p>Finally, we can combine these different light curves into a single <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object. This is done using the <code class="docutils literal notranslate"><span class="pre">stitch()</span></code> method. This method concatenates all quarters in our <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code> together, and normalizes them at the same time, in the manner we saw above.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -725,7 +724,7 @@ LightCurveCollection of 18 objects:
 </div>
 <div class="output_area rendered_html docutils container">
 <i>KeplerLightCurve targetid=6922244 length=65504</i>
-<table id="table6311741088" class="table-striped table-bordered table-condensed">
+<table id="table6448110416" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>quality</th><th>timecorr</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>sap_flux</th><th>sap_flux_err</th><th>sap_bkg</th><th>sap_bkg_err</th><th>pdcsap_flux</th><th>pdcsap_flux_err</th><th>sap_quality</th><th>psf_centr1</th><th>psf_centr1_err</th><th>psf_centr2</th><th>psf_centr2_err</th><th>mom_centr1</th><th>mom_centr1_err</th><th>mom_centr2</th><th>mom_centr2_err</th><th>pos_corr1</th><th>pos_corr2</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>d</th><th>pix</th><th>pix</th><th></th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th></tr></thead>
 <thead><tr><th>object</th><th>float32</th><th>float32</th><th>int32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>int32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
@@ -751,7 +750,7 @@ LightCurveCollection of 18 objects:
 <tr><td>1591.0021750787782</td><td>9.9999636e-01</td><td>1.8174112e-04</td><td>0</td><td>1.022859e-03</td><td>676.80192</td><td>192.10123</td><td>72531</td><td>3.7825363e+04</td><td>6.9084020e+00</td><td>1.2774999e+03</td><td>5.9428430e-01</td><td>4.8599898e+04</td><td>8.8326321e+00</td><td>0</td><td>676.75964</td><td>1.4915710e-04</td><td>192.31887</td><td>1.9161010e-04</td><td>676.80192</td><td>2.5232456e-04</td><td>192.10123</td><td>2.5267553e-04</td><td>-3.9303382e-03</td><td>1.5094034e-02</td></tr>
 </table></div>
 </div>
-<p>This returns a single <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__! It is in all ways identical to <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__ of a single quarter, just longer. We can plot it the usual way.</p>
+<p>This returns a single <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code>! It is in all ways identical to <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> of a single quarter, just longer. We can plot it the usual way.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>

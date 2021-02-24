@@ -402,7 +402,7 @@ div.rendered_html tbody tr:hover {
 <h1>How to recover the first TESS planet candidate with <em>Lightkurve</em>?<a class="headerlink" href="#How-to-recover-the-first-TESS-planet-candidate-with-Lightkurve?" title="Permalink to this headline">¶</a></h1>
 <p>Data from the TESS mission are <a class="reference external" href="https://archive.stsci.edu/prepds/tess-data-alerts/">available from the data archive at MAST</a>. This tutorial demonstrates how the <a class="reference external" href="http://lightkurve.keplerscience.org">Lightkurve Python package</a> can be used to read in these data and create your own TESS light curves with different aperture masks.</p>
 <p>Below is a quick tutorial on how to get started using <em>Lightkurve</em> and TESS data. We’ll use the nearby, bright target Pi Mensae (ID 261136679), around which the mission team recently discovered a short period planet candidate on a 6.27 day orbit. See the <a class="reference external" href="https://arxiv.org/abs/1809.05967">pre-print paper by Huang et al (2018)</a> for more details.</p>
-<p>TESS data is stored in a binary file format which is documented in the <a class="reference external" href="https://archive.stsci.edu/missions/tess/doc/EXP-TESS-ARC-ICD-TM-0014.pdf">TESS Science Data Products Description Document</a>. <em>Lightkurve</em> provides a <code class="docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code> class which allows you to interact with the data easily.</p>
+<p>TESS data is stored in a binary file format which is documented in the <a class="reference external" href="https://archive.stsci.edu/missions/tess/doc/EXP-TESS-ARC-ICD-TM-0014.pdf">TESS Science Data Products Description Document</a>. <em>Lightkurve</em> provides a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.TessTargetPixelFile.html?highlight=tesstargetpixelfile">TessTargetPixelFile</a> class which allows you to interact with the data easily.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -437,7 +437,7 @@ div.rendered_html tbody tr:hover {
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6287621424">
+<table id="table6468861808">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 01</td><td>2018</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>261136679</td><td>0.0</td></tr>
@@ -604,10 +604,10 @@ TessTargetPixelFile(TICID: 261136679)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x176e21fd0&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x176e48af0&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x176d5ed30&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x17c9dcf70&gt;]
+[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x181b8ae80&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x181bad9a0&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x181ad0f70&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x1877a8be0&gt;]
 </pre></div></div>
 </div>
-<p>You can access each extension and the data inside it in the same way you’d use <code class="docutils literal notranslate"><span class="pre">astropy.io.fits</span></code>. If you want to access data held in the TPF, such as the time of the observations, you can do that easily by using</p>
+<p>You can access each extension and the data inside it in the same way you’d use <a class="reference external" href="https://docs.astropy.org/en/stable/io/fits/">astropy.io.fits</a>. If you want to access data held in the TPF, such as the time of the observations, you can do that easily by using</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
@@ -721,7 +721,7 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <p>These values are in units electrons per second.</p>
 <div class="section" id="Building-Light-Curves-from-TPFs">
 <h2>Building Light Curves from TPFs<a class="headerlink" href="#Building-Light-Curves-from-TPFs" title="Permalink to this headline">¶</a></h2>
-<p>We can use the <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code> method to turn this TPF into a light curve using <em>Simple Aperture Photometry</em>. This will put an aperture on the target, and sum up the flux in all the pixels inside the aperture.</p>
+<p>We can use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve()</a> method to turn this TPF into a light curve using <em>Simple Aperture Photometry</em>. This will put an aperture on the target, and sum up the flux in all the pixels inside the aperture.</p>
 <p>The default for <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code> is to use the mask generated by the TESS pipeline.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
@@ -821,7 +821,7 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_32_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_32_1.png" />
 </div>
 </div>
-<p>There’s a long term trend in this dataset, which we can remove with a simple smoothing filter. You can use the <code class="docutils literal notranslate"><span class="pre">lc.flatten()</span></code> method to apply and divide the <a class="reference external" href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky-Golay smoothing filter</a>. Here we’ll use a <code class="docutils literal notranslate"><span class="pre">window_length</span></code> of 1001 cadences, which is roughly a 5% of the full length of the light curve.</p>
+<p>There’s a long term trend in this dataset, which we can remove with a simple smoothing filter. You can use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.flatten.html?highlight=flatten#lightkurve.LightCurve.flatten">lc.flatten()</a> method to apply and divide the <a class="reference external" href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky-Golay smoothing filter</a>. Here we’ll use a <code class="docutils literal notranslate"><span class="pre">window_length</span></code> of 1001 cadences, which is roughly a 5% of the full length of the light curve.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
@@ -934,7 +934,7 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_41_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_41_1.png" />
 </div>
 </div>
-<p>This looks much better. Now we might want to clip out some outliers from the light curve. We can do that with a simple lightkurve function <code class="docutils literal notranslate"><span class="pre">remove_outliers()</span></code></p>
+<p>This looks much better. Now we might want to clip out some outliers from the light curve. We can do that with a simple lightkurve function <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.remove_outliers.html?highlight=remove_outliers">remove_outliers()</a>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
@@ -961,7 +961,7 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_43_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_43_1.png" />
 </div>
 </div>
-<p>It’s a little hard to see these data because of the plotting style. Let’s use a scatter plot instead. We can do this with the <code class="docutils literal notranslate"><span class="pre">lc.scatter()</span></code> method. This method works in the same way that <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code> works, and takes in the same keyword arguments.</p>
+<p>It’s a little hard to see these data because of the plotting style. Let’s use a scatter plot instead. We can do this with the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.scatter.html?highlight=scatter#lightkurve.LightCurve.scatter">lc.scatter()</a> method. This method works in the same way that <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html">matplotlib.pyplot.scatter</a> works, and takes in the same keyword arguments.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
@@ -987,7 +987,7 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_45_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_45_1.png" />
 </div>
 </div>
-<p>We can also add errorbars using the <code class="docutils literal notranslate"><span class="pre">lc.errorbar()</span></code> method.</p>
+<p>We can also add errorbars using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.errorbar.html?highlight=errorbar#lightkurve.LightCurve.errorbar">lc.errorbar()</a> method.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>

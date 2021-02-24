@@ -418,8 +418,8 @@ div.rendered_html tbody tr:hover {
 <h1>How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS<a class="headerlink" href="#How-to-load-and-use-Cotrending-Basis-Vectors-for-Kepler,-K2-and-TESS" title="Permalink to this headline">¶</a></h1>
 <p>Cotrending Basis Vectors (CBVs) are generated in the PDC component of the Kepler/K2/TESS pipeline and are used to remove systematic trends in light curves. They are built from the most common systematic trends observed in each PDC Unit of Work (Quarter for Kepler, Campaign for K2 and Sector for TESS). Each Kepler and K2 module output and each CCD in TESS has its own set of CBVs. You can read an introduction to the CBVs in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Demystifying Kepler Data</a> or to
 greater detail in the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19081-003-KDPH.pdf">Kepler Data Processing Handbook</a>. The same basic method to generate CBVs is used for all three missions.</p>
-<p>This tutorial provides examples of how to load CBVs from MAST and set them up in a design matrix for use to remove systematic trends. Please consult the <a class="reference external" href="../api/lightkurve.correctors.DesignMatrix.html">DesignMatrix page</a> in the API docs for the full details on that class. A convenient tool has been created called <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> which will utilize the CBVs for the custom removal of systematic trends. See the <a class="reference external" href="https://docs.lightkurve.org/tutorials/04-how-to-use-cbvcorrector.html">CBVCorrector HOWTO
-page</a> for example usage.</p>
+<p>This tutorial provides examples of how to load CBVs from MAST and set them up in a design matrix for use to remove systematic trends. Please consult the <a class="reference external" href="../api/lightkurve.correctors.DesignMatrix.html">DesignMatrix page</a> in the API docs for the full details on that class. A convenient tool has been created called <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.CBVCorrector.html?highlight=cbvcorrector">CBVCorrector</a> which will utilize the CBVs for the custom removal of
+systematic trends. See the <a class="reference external" href="https://docs.lightkurve.org/tutorials/04-how-to-use-cbvcorrector.html">CBVCorrector HOWTO page</a> for example usage.</p>
 <div class="section" id="Cotrending-Basis-Vector-Types">
 <h2>Cotrending Basis Vector Types<a class="headerlink" href="#Cotrending-Basis-Vector-Types" title="Permalink to this headline">¶</a></h2>
 <p>There are three basic types of CBVs: - <strong>Single-Scale</strong> contains all systematic trends combined in a single set of basis vectors. - <strong>Multi-Scale</strong> contains systematic trends in specific wavelet-based band passes. There are usually three sets of multi-scale basis vectors in three bands. - <strong>Spike</strong> contains only short impulsive spike systematics.</p>
@@ -429,7 +429,7 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </div>
 <div class="section" id="Obtaining-the-CBVs">
 <h2>Obtaining the CBVs<a class="headerlink" href="#Obtaining-the-CBVs" title="Permalink to this headline">¶</a></h2>
-<p>Two tools are available to automatically download the CBVs relevent to your target of study: <code class="docutils literal notranslate"><span class="pre">get_kepler_cbvs</span></code> and <code class="docutils literal notranslate"><span class="pre">get_tess_cbvs</span></code>. Here is an example loading in the TESS Multi-Scale Band 2 CBVs for TESS target TIC 99180739, which happens to be on camera 1 and CCD 1. Note that you do not need to have a lightcurve object already loaded. One can directly request whichever CBVs one desires.</p>
+<p>Two tools are available to automatically download the CBVs relevent to your target of study: <code class="docutils literal notranslate"><span class="pre">download_tess_cbvs</span></code> and <code class="docutils literal notranslate"><span class="pre">download_kepler_cbvs</span></code>. Here is an example loading in the TESS Multi-Scale Band 2 CBVs for TESS target TIC 99180739, which happens to be on camera 1 and CCD 1. Note that you do not need to have a lightcurve object already loaded. One can directly request whichever CBVs one desires.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -460,7 +460,7 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </div>
 <div class="output_area rendered_html docutils container">
 <i>TessCotrendingBasisVectors length=3</i>
-<table id="table4529577456" class="table-striped table-bordered table-condensed">
+<table id="table4568551040" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>CADENCENO</th><th>GAP</th><th>VECTOR_1</th><th>VECTOR_2</th><th>VECTOR_3</th><th>VECTOR_4</th><th>VECTOR_5</th><th>VECTOR_6</th><th>VECTOR_7</th><th>VECTOR_8</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>object</th><th>int32</th><th>bool</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
@@ -557,8 +557,8 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </div>
 <div class="section" id="Aligning-the-CBVs-with-your-light-curve">
 <h2>Aligning the CBVs with your light curve<a class="headerlink" href="#Aligning-the-CBVs-with-your-light-curve" title="Permalink to this headline">¶</a></h2>
-<p>The CBVs obtained from MAST may not have the same cadences as the your target. A method called <code class="docutils literal notranslate"><span class="pre">align</span></code> will allow you to align your CBVs to the cadence numbers in your target lightcurve object. The method will use the cadence number (i.e. <code class="docutils literal notranslate"><span class="pre">lc.cadenceno</span></code>) to perform the alignment. Only cadence numbers that exist in both the CBVs and the light curve will have values in the returned CBVs. All cadence numbers that exist in the light curve but not in the CBVs will have NaNs returned for the CBVs
-on those cadences and the GAP set to True.</p>
+<p>The CBVs obtained from MAST may not have the same cadences as the your target. A method called <code class="docutils literal notranslate"><span class="pre">align</span></code> will allow you to align your CBVs to the cadence numbers in your target lightcurve object. The method will use the cadence number (i.e. <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.cadenceno.html?highlight=cadenceno">lc.cadenceno</a>) to perform the alignment. Only cadence numbers that exist in both the CBVs and the light curve will have values in the returned
+CBVs. All cadence numbers that exist in the light curve but not in the CBVs will have NaNs returned for the CBVs on those cadences and the GAP set to True.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>

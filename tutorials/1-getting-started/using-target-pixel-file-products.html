@@ -475,7 +475,7 @@ Manual</a>, Section 2.3.2 for more information.)</p>
 <h2>2. Downloading a Target Pixel File<a class="headerlink" href="#2.-Downloading-a-Target-Pixel-File" title="Permalink to this headline">¶</a></h2>
 <p>The TPFs of stars observed by the <em>Kepler</em> mission are stored on the <a class="reference external" href="https://archive.stsci.edu/kepler/">Mikulksi Archive for Space Telescopes</a> (MAST) archive, along with metadata about the observations, such as which charge-coupled device (CCD) was used at each time.</p>
 <p>Lightkurve’s built-in tools allow us to search and download TPFs from the archive. As we did in the accompanying tutorial on light curves, we will start by downloading one quarter (a <em>Kepler</em> observing period approximately 90 days in duration) of <em>Kepler</em> data for the star named <a class="reference external" href="http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/">Kepler-8</a>, a star somewhat larger than the Sun, and the host of a <a class="reference external" href="https://en.wikipedia.org/wiki/Hot_Jupiter">hot Jupiter planet</a>.</p>
-<p>Using the <code class="docutils literal notranslate"><span class="pre">`search_targetpixelfile</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.search_targetpixelfile.html">https://docs.lightkurve.org/api/lightkurve.search.search_targetpixelfile.html</a>&gt;`__ function, we can find an itemized list of different TPFs available for Kepler-8.</p>
+<p>Using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile</a> function, we can find an itemized list of different TPFs available for Kepler-8.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -493,7 +493,7 @@ Manual</a>, Section 2.3.2 for more information.)</p>
 <div class="output_area rendered_html docutils container">
 SearchResult containing 18 data products.
 
-<table id="table6271734640">
+<table id="table6436849216">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -516,8 +516,8 @@ SearchResult containing 18 data products.
 <tr><td>17</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 </table></div>
 </div>
-<p>In this list, each row represents a different observing period. We find that <em>Kepler</em> recorded 18 quarters of data for this target across four years. The <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> function takes several additional arguments, such as the <code class="docutils literal notranslate"><span class="pre">quarter</span></code> number or the <code class="docutils literal notranslate"><span class="pre">mission</span></code> name. You can find examples of its use in the <a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.search.search_targetpixelfile.html">online documentation</a> for this function.</p>
-<p>The search function returns a <code class="docutils literal notranslate"><span class="pre">`SearchResult</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html">https://docs.lightkurve.org/api/lightkurve.search.SearchResult.html</a>&gt;`__ object which has several convenient operations. For example, we can select the fourth data product in the list as follows:</p>
+<p>In this list, each row represents a different observing period. We find that <em>Kepler</em> recorded 18 quarters of data for this target across four years. The <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> function takes several additional arguments, such as the <code class="docutils literal notranslate"><span class="pre">quarter</span></code> number or the <code class="docutils literal notranslate"><span class="pre">mission</span></code> name. You can find examples of its use in the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">online documentation</a> for this function.</p>
+<p>The search function returns a <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> object which has several convenient operations. For example, we can select the fourth data product in the list as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -534,13 +534,13 @@ SearchResult containing 18 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6271734928">
+<table id="table6438248512">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 </table></div>
 </div>
-<p>We can download this data product using the <code class="docutils literal notranslate"><span class="pre">download()</span></code> method.</p>
+<p>We can download this data product using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.SearchResult.download.html?highlight=download#lightkurve.SearchResult.download">download()</a> method.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -560,7 +560,7 @@ SearchResult containing 1 data products.
 </pre></div>
 </div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">tpf_file</span></code> variable we have obtained in this way is a <code class="docutils literal notranslate"><span class="pre">`KeplerTargetPixelFile</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html">https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html</a>&gt;`__ object.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">tpf_file</span></code> variable we have obtained in this way is a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">KeplerTargetPixelFile</a> object.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -611,7 +611,7 @@ KeplerTargetPixelFile Object (ID: 6922244)
 keyword arguments. You can type <code class="docutils literal notranslate"><span class="pre">help(tpf.plot)</span></code> to see a full list of those options.</p>
 <div class="section" id="Note">
 <h3>Note<a class="headerlink" href="#Note" title="Permalink to this headline">¶</a></h3>
-<p>You can also download TPF FITS files from the archive by hand, store them on your local disk, and open them using the <code class="docutils literal notranslate"><span class="pre">lk.read(&lt;filename&gt;)</span></code> function. This function will return a <code class="docutils literal notranslate"><span class="pre">`KeplerTargetPixelFile</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html">https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html</a>&gt;`__ object just as in the above example. You can find out where Lightkurve stored a given TPF by typing <code class="docutils literal notranslate"><span class="pre">tpf.path</span></code>:</p>
+<p>You can also download TPF FITS files from the archive by hand, store them on your local disk, and open them using the <code class="docutils literal notranslate"><span class="pre">lk.read(&lt;filename&gt;)</span></code> function. This function will return a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">KeplerTargetPixelFile</a> object just as in the above example. You can find out where Lightkurve stored a given TPF by typing <code class="docutils literal notranslate"><span class="pre">tpf.path</span></code>:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
@@ -634,8 +634,8 @@ keyword arguments. You can type <code class="docutils literal notranslate"><span
 </div>
 <div class="section" id="3.-Accessing-the-Metadata">
 <h2>3. Accessing the Metadata<a class="headerlink" href="#3.-Accessing-the-Metadata" title="Permalink to this headline">¶</a></h2>
-<p>Our <code class="docutils literal notranslate"><span class="pre">`KeplerTargetPixelFile</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html">https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html</a>&gt;`__ includes the observation’s metadata, loaded from the header of the TPF files downloaded from MAST. Many of these are similar to the metadata stored in the <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html</a>&gt;`__, which are discussed in the accompanying tutorial.</p>
-<p>The headers containing the metadata can be accessed from the <code class="docutils literal notranslate"><span class="pre">`KeplerTargetPixelFile</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html">https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html</a>&gt;`__ through the <code class="docutils literal notranslate"><span class="pre">get_header()</span></code> method.</p>
+<p>Our <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">KeplerTargetPixelFile</a> includes the observation’s metadata, loaded from the header of the TPF files downloaded from MAST. Many of these are similar to the metadata stored in the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code>, which are discussed in the accompanying tutorial.</p>
+<p>The headers containing the metadata can be accessed from the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">KeplerTargetPixelFile</a> through the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.get_header.html?highlight=get_header">get_header()</a> method.</p>
 <p>For example, the first extension (“extension 0”) of the file provides metadata related to the star, such as its magnitude in different passbands, its movement and position on the sky, and its location on <em>Kepler</em>’s CCD detector:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
@@ -731,8 +731,7 @@ CHECKSUM= &#39;HkS5JjR5HjR5HjR5&#39;   / HDU checksum updated 2015-09-23T02:52:4
 4
 </pre></div></div>
 </div>
-<p>When constructing a <code class="docutils literal notranslate"><span class="pre">`KeplerTargetPixelFile</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html">https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html</a>&gt;`__ from a FITS file, Lightkurve carries a subset of the metadata through into user-friendly object properties for convenience, which are available through shorthands (for example, <code class="docutils literal notranslate"><span class="pre">tpf.quarter</span></code>). You can view these properties with the the
-<code class="docutils literal notranslate"><span class="pre">`show_properties()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties">https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties</a>&gt;`__ method:</p>
+<p>When constructing a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">KeplerTargetPixelFile</a> from a FITS file, Lightkurve carries a subset of the metadata through into user-friendly object properties for convenience, which are available through shorthands (for example, <code class="docutils literal notranslate"><span class="pre">tpf.quarter</span></code>). You can view these properties with the the <code class="docutils literal notranslate"><span class="pre">show_properties()</span></code> method:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -781,8 +780,8 @@ quality_bitmask                                                                 
             wcs                                                                                                               astropy.wcs.wcs.WCS
 </pre></div></div>
 </div>
-<p>A new piece of metadata not included in the <code class="docutils literal notranslate"><span class="pre">`KeplerLightCurve</span></code> &lt;<a class="reference external" href="http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html">http://docs.lightkurve.org/api/lightkurve.lightcurvefile.KeplerLightCurve.html</a>&gt;`__ objects is the <a class="reference external" href="https://fits.gsfc.nasa.gov/fits_wcs.html">World Coordinate System</a> (WCS). The WCS contains information about how pixel positions map to celestial sky coordinates. This is important when comparing a TPF from a <em>Kepler</em>, <em>K2</em>, or <em>TESS</em> observation to an observation of the same star with a different telescope.</p>
-<p>You can access the WCS using <code class="docutils literal notranslate"><span class="pre">tpf.wcs</span></code>, which is an Astropy WCS object:</p>
+<p>A new piece of metadata not included in the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> objects is the <a class="reference external" href="https://fits.gsfc.nasa.gov/fits_wcs.html">World Coordinate System</a> (WCS). The WCS contains information about how pixel positions map to celestial sky coordinates. This is important when comparing a TPF from a <em>Kepler</em>, <em>K2</em>, or <em>TESS</em> observation to an observation of the same star with a different telescope.</p>
+<p>You can access the WCS using <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.wcs.html?highlight=wcs">tpf.wcs</a>, which is an Astropy WCS object:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
@@ -956,8 +955,8 @@ array([[          nan, 5.6079335e+00, 5.1491142e+01, 8.4241745e+01,
 <p>All four of these data arrays are in units of electrons per second.</p>
 <p><strong>Note</strong>: for <em>Kepler</em>, the flux background isn’t a measurement made using the local TPF data. Instead, at each cadence, the <em>Kepler</em> pipeline fits a model to thousands of empty pixels across each CCD in order to estimate a continuum background across the the CCD. For more details read the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, Section 2.6.2.4. In the case of <em>TESS</em>, local
 background pixels contained within a TPF are used instead.</p>
-<p><strong>Note</strong>: The <code class="docutils literal notranslate"><span class="pre">tpf.flux</span></code> values seen above have been quality-masked. This means that cadences of observations that violated the <code class="docutils literal notranslate"><span class="pre">quality_bitmask</span></code> parameter are removed, and so <code class="docutils literal notranslate"><span class="pre">tpf.flux</span></code> represents the data that you probably want to use to do your science. The <code class="docutils literal notranslate"><span class="pre">quality_bitmask</span></code> can also be accessed as a property of a <code class="docutils literal notranslate"><span class="pre">`KeplerTargetPixelFile</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html">https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html</a>&gt;`__. For specific details on the <code class="docutils literal notranslate"><span class="pre">quality</span></code> flags, read
-the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf">Kepler Archive Manual</a>, Section 2.3.1.1.</p>
+<p><strong>Note</strong>: The <code class="docutils literal notranslate"><span class="pre">tpf.flux</span></code> values seen above have been quality-masked. This means that cadences of observations that violated the <code class="docutils literal notranslate"><span class="pre">quality_bitmask</span></code> parameter are removed, and so <code class="docutils literal notranslate"><span class="pre">tpf.flux</span></code> represents the data that you probably want to use to do your science. The <code class="docutils literal notranslate"><span class="pre">quality_bitmask</span></code> can also be accessed as a property of a <code class="docutils literal notranslate"><span class="pre">`KeplerTargetPixelFile</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile</a>&gt;`__. For specific details on the
+<code class="docutils literal notranslate"><span class="pre">quality</span></code> flags, read the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf">Kepler Archive Manual</a>, Section 2.3.1.1.</p>
 <p>If you want to access flux and background flux measurements that <em>have not</em> been quality masked, you can pass a custom <code class="docutils literal notranslate"><span class="pre">quality_bitmask</span></code> parameter to the <code class="docutils literal notranslate"><span class="pre">download()</span></code> or <code class="docutils literal notranslate"><span class="pre">read()</span></code> method as follows:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:

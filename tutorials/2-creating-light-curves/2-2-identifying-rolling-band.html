@@ -525,7 +525,8 @@ Text(0.5, 1.0, &#39;Average Flux Per Background Pixel&#39;)
 </div>
 </div>
 <p>It looks like the signal is still there in the background pixels. Unfortunately this means the signal is not astrophysical.</p>
-<p>We can perform another test by looking at the background in a nearby source. Using the <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> function we can get the nearest neighbor to our target. We first set a search radius in arcseconds and a limit on the number of targets to return. In this case we only want our target and the nearest neighbour within 60 arcseconds, so we’ll set <code class="docutils literal notranslate"><span class="pre">radius</span></code> to 60 and <code class="docutils literal notranslate"><span class="pre">limit</span></code> to 2 targets.</p>
+<p>We can perform another test by looking at the background in a nearby source. Using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile</a> function we can get the nearest neighbor to our target. We first set a search radius in arcseconds and a limit on the number of targets to return. In this case we only want our target and the nearest neighbour within 60 arcseconds, so we’ll set <code class="docutils literal notranslate"><span class="pre">radius</span></code> to 60 and
+<code class="docutils literal notranslate"><span class="pre">limit</span></code> to 2 targets.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -555,7 +556,7 @@ TargetPixelFileCollection of 2 objects:
         7691061 (1 KeplerTargetPixelFiles) Quarters: 16
 </pre></div></div>
 </div>
-<p>Now we can see that <code class="docutils literal notranslate"><span class="pre">tpfs</span></code> is a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> objects. There are two different object IDs, our target and the nearest neighbour.</p>
+<p>Now we can see that <code class="docutils literal notranslate"><span class="pre">tpfs</span></code> is a list of <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">KeplerTargetPixelFile</a> objects. There are two different object IDs, our target and the nearest neighbour.</p>
 <p>Let’s double check that these target pixel files are close to each other</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
