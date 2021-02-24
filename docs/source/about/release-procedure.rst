@@ -38,12 +38,12 @@ The procedure requires the following steps:
 
 8. Create and upload the new package to PyPI:
 
-.. code-block:: bash
+  .. code-block:: bash
 
-    $ poetry build
-    $ poetry publish
+      $ poetry build
+      $ poetry publish
 
 9. Update the version number on the `Lightkurve conda feedstock <https://github.com/conda-forge/lightkurve-feedstock>`_.
-A friendly robot will tend to open a PR to make this change within 1-2 hours, so all we need to do is review any necessary changes in the dependencies and make sure the PR is merged.
+   A friendly robot will tend to open a PR to make this change within 1-2 hours, so all we need to do is review any necessary changes in the dependencies and make sure the PR is merged.
 
-10. Edit `lightkurve/version.py` to contain the next version number with suffix `.dev`.
+10. Edit `pyproject.toml`, `setup.py`, and `lightkurve/version.py` to contain the next version number with suffix `.dev`.
