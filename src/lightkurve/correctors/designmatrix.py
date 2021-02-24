@@ -7,6 +7,7 @@ are design to work with the `RegressionCorrector` class.
 from copy import deepcopy
 import warnings
 
+from astropy import units as u
 import matplotlib.pyplot as plt
 from numba import jit
 import numpy as np
@@ -69,11 +70,17 @@ class DesignMatrix:
             df.columns = columns
         self.columns = list(df.columns)
         self.name = name
+
+        if isinstance(prior_mu, u.Quantity):
+            prior_mu = prior_mu.value
         if prior_mu is None:
             prior_mu = np.zeros(len(df.T))
+        self.prior_mu = np.atleast_1d(prior_mu)
+
+        if isinstance(prior_sigma, u.Quantity):
+            prior_sigma = prior_sigma.value
         if prior_sigma is None:
             prior_sigma = np.ones(len(df.T)) * np.inf
-        self.prior_mu = np.atleast_1d(prior_mu)
         self.prior_sigma = np.atleast_1d(prior_sigma)
 
     @property

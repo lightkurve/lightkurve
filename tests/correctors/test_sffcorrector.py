@@ -235,3 +235,15 @@ def test_sff_nan_centroids():
     lc = search_lightcurve("EPIC 211083408", author="K2").download()
     # This previously raised a ValueError:
     lc[200:500].remove_nans().to_corrector("sff").correct()
+
+
+def test_designmatrix_prior_type():
+    """Regression test for #982: prior_mu and prior_sigma should not be Quantity objects."""
+    size = 10
+    lc = LightCurve(flux=np.random.normal(loc=1.0, scale=0.1, size=size))
+    corr = lc.to_corrector("sff")
+    corr.correct(centroid_col=np.random.normal(loc=1.0, scale=0.1, size=size),
+                 centroid_row=np.random.normal(loc=1.0, scale=0.1, size=size),
+                 windows=1)
+    assert "Quantity" not in str(type(corr.design_matrix_collection.prior_mu))
+    assert "Quantity" not in str(type(corr.design_matrix_collection.prior_sigma))
