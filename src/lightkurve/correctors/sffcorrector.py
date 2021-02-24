@@ -195,7 +195,7 @@ class SFFCorrector(RegressionCorrector):
 
         # I'm putting WEAK priors on the spline that it must be around 1
         s_dm.prior_sigma = (
-            np.ones(len(s_dm.prior_mu)) * 1000 * self.lc.flux.std() + 1e-6
+            np.ones(len(s_dm.prior_mu)) * 1000 * self.lc.flux.std().value + 1e-6
         )
 
         # additional

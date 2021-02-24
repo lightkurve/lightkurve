@@ -238,7 +238,7 @@ def test_sff_nan_centroids():
 
 
 def test_designmatrix_prior_type():
-    """Regression test: prior_mu and prior_sigma should not be Quantity objects."""
+    """Regression test for #982: prior_mu and prior_sigma should not be Quantity objects."""
     size = 10
     lc = LightCurve(flux=np.random.normal(loc=1.0, scale=0.1, size=size))
     corr = lc.to_corrector("sff")
