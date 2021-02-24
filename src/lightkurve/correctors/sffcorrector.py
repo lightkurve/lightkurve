@@ -65,7 +65,7 @@ class SFFCorrector(RegressionCorrector):
         super(SFFCorrector, self).__init__(lc=lc)
 
     def __repr__(self):
-        return "SFFCorrector (LC: {})".format(self.lc.targetid)
+        return "SFFCorrector (LC: {})".format(self.lc.meta.get("TARGETID"))
 
     def correct(
         self,

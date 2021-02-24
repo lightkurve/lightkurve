@@ -126,7 +126,7 @@ class LightCurve(QTimeSeries):
     ----------
     meta : `dict`
         meta data associated with the lightcurve. The header of the underlying FITS file (if applicable)
-        is available here as well.
+        is store in this dictionary. By convention, keys in this dictionary are usually in uppercase.
 
     Notes
     -----
