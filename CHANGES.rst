@@ -1,6 +1,8 @@
 2.0.4 (unreleased)
 ==================
 
+- Fixed a bug in ``SFFCorrector`` which caused ``prior_mu`` and ``prior_sigma``
+  to be Quantity objects rather than arrays. [#982]
 
 
 2.0.3 (2021-02-23)
