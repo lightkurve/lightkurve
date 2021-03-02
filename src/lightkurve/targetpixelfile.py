@@ -21,6 +21,7 @@ from astropy.time import Time
 from astropy.units import Quantity
 import astropy.units as u
 
+import matplotlib
 from matplotlib import patches
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -1145,6 +1146,62 @@ class TargetPixelFile(object):
                         )
                         ax.add_patch(rect)
         return ax
+
+    def _to_matplotlib_animation(self, step=None, interval=200, **plot_args):
+        """Returns a `matplotlib.animation.FuncAnimation` object.
+
+        The animation shows the flux values over time, based on the `tpf.plot()` feature.
+
+        Parameters
+        ----------
+        step : int
+            Spacing between frames.  Default: show 50 frames.
+        interval : int
+            Delay between frames in milliseconds.
+        **plot_args : dict
+            Optional parameters passed to tpf.plot().
+        """
+        if step is None:
+            step = len(self) // 50
+            if step < 1:
+                step = 1
+
+        ax = self.plot(**plot_args)
+
+        def init():
+            return ax.images
+
+        def animate(i):
+            frame = i*step
+            ax.images[0].set_data(self.flux[frame])
+            ax.set_title(f"Frame {frame}")
+            return ax.images
+
+        plt.close(ax.figure)  # prevent figure from showing up in interactive mode
+
+        # `blit=True` means only re-draw the parts that have changed.
+        frames = len(self) // step
+        anim = matplotlib.animation.FuncAnimation(ax.figure, animate, init_func=init,
+                                                  frames=frames, interval=interval,
+                                                  blit=True)
+        return anim
+
+    def animate(self, step=None, interval=200, **plot_args):
+        """Displays an interactive HTML matplotlib animation.
+
+        This feature requires a Jupyter notebook environment.
+
+        Parameters
+        ----------
+        step : int
+            Spacing between frames.  Default: show 50 frames.
+        interval : int
+            Delay between frames in milliseconds.
+        **plot_args : dict
+            Optional parameters passed to tpf.plot().
+        """
+        from IPython.display import HTML
+        return HTML(self._to_matplotlib_animation(**plot_args).to_jshtml())
 
     def to_fits(self, output_fn=None, overwrite=False):
         """Writes the TPF to a FITS file on disk."""
