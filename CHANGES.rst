@@ -2,7 +2,7 @@
 ==================
 
 - Added the ``TargetPixelFile.animate()`` feature to display Target Pixel Files
-  as HTML animations inside Jupyter notebook environments.
+  as HTML animations inside Jupyter notebook environments. [#991]
 
 - Fixed a bug in ``SFFCorrector`` which caused ``prior_mu`` and ``prior_sigma``
   to be Quantity objects rather than arrays. [#982]
