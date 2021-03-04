@@ -1147,15 +1147,17 @@ class TargetPixelFile(object):
                         ax.add_patch(rect)
         return ax
 
-    def _to_matplotlib_animation(self, step=None, interval=200, **plot_args):
+    def _to_matplotlib_animation(self, step: int = None, interval: int = 200, **plot_args) -> "matplotlib.animation.FuncAnimation":
         """Returns a `matplotlib.animation.FuncAnimation` object.
 
-        The animation shows the flux values over time, based on the `tpf.plot()` feature.
+        The animation shows the flux values over time by calling `tpf.plot()` for multiple frames.
 
         Parameters
         ----------
         step : int
-            Spacing between frames.  Default: show 50 frames.
+            Spacing between frames.  By default, the spacing will be determined such that
+            50 frames are shown, i.e. `step = len(tpf) // 50`.  Showing more than 50 frames
+            will be slow on many systems.
         interval : int
             Delay between frames in milliseconds.
         **plot_args : dict
@@ -1186,15 +1188,17 @@ class TargetPixelFile(object):
                                                   blit=True)
         return anim
 
-    def animate(self, step=None, interval=200, **plot_args):
+    def animate(self, step: int = None, interval: int = 200, **plot_args) -> "IPython.core.display.HTML":
         """Displays an interactive HTML matplotlib animation.
 
-        This feature requires a Jupyter notebook environment.
+        This feature requires a Jupyter notebook environment to display correctly.
 
         Parameters
         ----------
         step : int
-            Spacing between frames.  Default: show 50 frames.
+            Spacing between frames.  By default, the spacing will be determined such that
+            50 frames are shown, i.e. `step = len(tpf) // 50`.  Showing more than 50 frames
+            will be slow on many systems.
         interval : int
             Delay between frames in milliseconds.
         **plot_args : dict
