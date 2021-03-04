@@ -1195,9 +1195,7 @@ class TargetPixelFile(object):
         )
         return anim
 
-    def animate(
-        self, step: int = None, interval: int = 200, **plot_args
-    ) -> "IPython.core.display.HTML":
+    def animate(self, step: int = None, interval: int = 200, **plot_args):
         """Displays an interactive HTML matplotlib animation.
 
         This feature requires a Jupyter notebook environment to display correctly.
