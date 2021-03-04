@@ -1147,7 +1147,9 @@ class TargetPixelFile(object):
                         ax.add_patch(rect)
         return ax
 
-    def _to_matplotlib_animation(self, step: int = None, interval: int = 200, **plot_args) -> "matplotlib.animation.FuncAnimation":
+    def _to_matplotlib_animation(
+        self, step: int = None, interval: int = 200, **plot_args
+    ) -> "matplotlib.animation.FuncAnimation":
         """Returns a `matplotlib.animation.FuncAnimation` object.
 
         The animation shows the flux values over time by calling `tpf.plot()` for multiple frames.
@@ -1174,7 +1176,7 @@ class TargetPixelFile(object):
             return ax.images
 
         def animate(i):
-            frame = i*step
+            frame = i * step
             ax.images[0].set_data(self.flux[frame])
             ax.set_title(f"Frame {frame}")
             return ax.images
@@ -1183,12 +1185,19 @@ class TargetPixelFile(object):
 
         # `blit=True` means only re-draw the parts that have changed.
         frames = len(self) // step
-        anim = matplotlib.animation.FuncAnimation(ax.figure, animate, init_func=init,
-                                                  frames=frames, interval=interval,
-                                                  blit=True)
+        anim = matplotlib.animation.FuncAnimation(
+            ax.figure,
+            animate,
+            init_func=init,
+            frames=frames,
+            interval=interval,
+            blit=True,
+        )
         return anim
 
-    def animate(self, step: int = None, interval: int = 200, **plot_args) -> "IPython.core.display.HTML":
+    def animate(
+        self, step: int = None, interval: int = 200, **plot_args
+    ) -> "IPython.core.display.HTML":
         """Displays an interactive HTML matplotlib animation.
 
         This feature requires a Jupyter notebook environment to display correctly.
@@ -1205,6 +1214,7 @@ class TargetPixelFile(object):
             Optional parameters passed to tpf.plot().
         """
         from IPython.display import HTML
+
         return HTML(self._to_matplotlib_animation(**plot_args).to_jshtml())
 
     def to_fits(self, output_fn=None, overwrite=False):
