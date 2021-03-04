@@ -864,3 +864,8 @@ def test_fluxmode():
     assert lc_sum.flux.value[0] == np.nansum(tpf.flux.value[0])
     assert lc_med.flux.value[0] == np.nanmedian(tpf.flux.value[0])
     assert lc_mean.flux.value[0] == np.nanmean(tpf.flux.value[0])
+
+
+def test_animate():
+    tpf = read(filename_tpf_one_center)
+    tpf.animate()
