@@ -1,4 +1,4 @@
-2.0.4 (unreleased)
+2.0.4 (2021-03-11)
 ==================
 
 - Added the ``TargetPixelFile.animate()`` feature to display Target Pixel Files
