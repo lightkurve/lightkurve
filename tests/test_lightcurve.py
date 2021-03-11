@@ -530,44 +530,52 @@ def test_bins_kwarg():
     # Do the shapes of binned lightcurves make sense?
     binned_lc = lc.bin(time_bin_size=10 * u.day)
     assert len(binned_lc) == np.ceil(end_time / 10)
+
     binned_lc = lc.bin(time_bin_size=11 * u.day)
     assert len(binned_lc) == np.ceil(end_time / 11)
+
     # Resulting length with `n_bins=N` yields exactly N bins every time
     binned_lc = lc.bin(time_bin_size=10 * u.day, n_bins=38)
     assert len(binned_lc) == 38
-    # The `bins=`` kwarg can support a list or array
-    pytest.skip("bin_edges format changed in TimeSeries")
+
+    # The `bins=`` kwarg cannot support a list or array with aggregate_downsample < #11266
     time_bin_edges = [0, 10, 20, 30, 40, 50, 60, 70, 80]
-    binned_lc = lc.bin(bins=time_bin_edges)
-    # You get N-1 bins when you enter N fenceposts
-    assert len(binned_lc) == (len(time_bin_edges) - 1)
-    time_bin_edges = np.arange(0, 81, 1)
-    binned_lc = lc.bin(bins=time_bin_edges)
-    assert len(binned_lc) == (len(time_bin_edges) - 1)
-    # Bins outside of the range get stuck in the last bin
-    time_bin_edges = np.arange(0, 61, 1)
-    binned_lc = lc.bin(bins=time_bin_edges)
-    assert len(binned_lc) == (len(time_bin_edges) - 1)
-    # The `bins=`` kwarg can support a list or array
-    for special_bins in ["blocks", "knuth", "scott", "freedman"]:
-        binned_lc = lc.bin(bins=special_bins)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="``bins`` must be a single number."):
+        binned_lc = lc.bin(bins=time_bin_edges)
+        # You get N-1 bins when you enter N fenceposts
+        assert len(binned_lc) == (len(time_bin_edges) - 1)
+
+        time_bin_edges = np.arange(0, 81, 1)
+        binned_lc = lc.bin(bins=time_bin_edges)
+        assert len(binned_lc) == (len(time_bin_edges) - 1)
+
+        # Bins outside of the range get stuck in the last bin
+        time_bin_edges = np.arange(0, 61, 1)
+        binned_lc = lc.bin(bins=time_bin_edges)
+        assert len(binned_lc) == (len(time_bin_edges) - 1)
+
+    # The `bins=`` kwarg supported special values (not to be reimplemented?)
+    with pytest.raises(TypeError, match="``bins`` must have integer type."):
+        for special_bins in ["blocks", "knuth", "scott", "freedman"]:
+            binned_lc = lc.bin(bins=special_bins)
+
+    with pytest.raises(TypeError, match="``bins`` must have integer type."):
         binned_lc = lc.bin(bins="junk_input!")
+
     # In dense bins, flux error should go down as root-N for N number of bins
     binned_lc = lc.bin(binsize=100)  # Exactly 100 samples per bin
-    assert np.isclose(
-        lc.flux_err.mean() / np.sqrt(100), binned_lc.flux_err.mean(), rtol=0.3
-    )
+    assert np.isclose( lc.flux_err.mean() / np.sqrt(100), binned_lc.flux_err.mean(), rtol=0.3 )
     binned_lc = lc.bin(bins=38)  # Roughly 100 samples per bin
-    assert np.isclose(
-        lc.flux_err.mean() / np.sqrt(100), binned_lc.flux_err.mean(), rtol=0.3
-    )
+    assert np.isclose(lc.flux_err.mean() / np.sqrt(100), binned_lc.flux_err.mean(), rtol=0.3)
+
     # The bins parameter must be integer not a float
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="``bins`` must have integer type."):
         binned_lc = lc.bin(bins=381.0)
-    # Binned lightcurve can have *more* bins than input lightcurve
+
+    # Binned lightcurve can have *more* bins than input lightcurve,
+    # but may strip empty bins at start and end.
     binned_lc = lc.bin(bins=10000)
-    assert len(binned_lc) == 10000
+    assert 10000 - 2 <= len(binned_lc) <= 10000
 
     # To-do: Check for unusual edge cases that are now possible:
     #   - Binned lightcurve has NaN fluxes in empty bins
@@ -1098,8 +1106,7 @@ def test_river():
         plt.close()
 
 
-# TEMPORARILY SKIP, cf. https://github.com/lightkurve/lightkurve/issues/663
-@pytest.mark.xfail
+# TEMPORARILY SKIPPED, cf. https://github.com/lightkurve/lightkurve/issues/663
 def test_bin_issue705():
     """Regression test for #705: binning failed."""
     lc = TessLightCurve(time=np.arange(50), flux=np.ones(50), quality=np.zeros(50))

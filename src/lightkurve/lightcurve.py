@@ -1249,7 +1249,7 @@ class LightCurve(QTimeSeries):
         aggregate_func : callable, optional
             The function to use for combining points in the same bin. Defaults
             to np.nanmean.
-        bins : int or iterable of ints
+        bins : int
             The number of bins to divide the lightkurve into. In contrast to
             ``n_bins`` this sets the length of ``time_bin_size`` accordingly.
         binsize : int
@@ -1275,8 +1275,11 @@ class LightCurve(QTimeSeries):
               and (time_bin_size is not None or n_bins is not None)):
             raise ValueError("``bins`` or ``binsize`` conflicts with "
                              "``n_bins`` or ``time_bin_size``.")
-        elif bins is not None and np.array(bins).dtype != np.int:
-            raise TypeError("``bins`` must have integer type.")
+        elif bins is not None:
+            if np.array(bins).dtype != np.int:
+                raise TypeError("``bins`` must have integer type.")
+            elif np.size(bins) != 1:
+                raise ValueError("``bins`` must be a single number.")
 
         if time_bin_start is None:
             time_bin_start = self.time[0]
@@ -1294,8 +1297,7 @@ class LightCurve(QTimeSeries):
         if time_bin_size is None:
             if bins is not None:
                 i = len(self.time) - np.searchsorted(self.time, time_bin_start - 1 * u.ns)
-                time_bin_size = ((self.time[-1] - time_bin_start) * i / ((i -1) * bins)).to(u.day)
-                print(bins, len(self.time), i, self.time[-1] - time_bin_start, time_bin_size)
+                time_bin_size = ((self.time[-1] - time_bin_start) * i / ((i - 1) * bins)).to(u.day)
             elif binsize is not None:
                 i = np.searchsorted(self.time, time_bin_start - 1 * u.ns)
                 time_bin_size = (self.time[i + binsize] - self.time[i]).to(u.day)
