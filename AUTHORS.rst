@@ -91,5 +91,6 @@ We are grateful to the following community members for sharing corrections & sug
 - Joshua Pepper
 - `Joel Ong <https://github.com/darthoctopus>`_
 - `Ben Rackham <https://github.com/brackham>`_
+- `Andrea Guzman Mesa <https://github.com/aguzmanmesa>`_
 
 This list is incomplete. Please open an issue if your name is missing!
