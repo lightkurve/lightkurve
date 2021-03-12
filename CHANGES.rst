@@ -4,6 +4,10 @@
 - Modified ``LightCurve.bin()`` to partially restore the ``bins`` parameter which
   was available in Lightkurve v1.x, to improve backwards compatibility. [#995]
 
+- Modified ``LightCurveCollection.stitch()`` to ignore incompatible columns
+  instead of having them raise a ``ValueError``. [#996]
+
+
 
 2.0.4 (2021-03-11)
 ==================
