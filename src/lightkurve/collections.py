@@ -11,7 +11,7 @@ from astropy.utils.decorators import deprecated
 
 from . import MPLSTYLE
 from .targetpixelfile import TargetPixelFile
-from .utils import LightkurveDeprecationWarning
+from .utils import LightkurveWarning, LightkurveDeprecationWarning
 
 
 log = logging.getLogger(__name__)
@@ -227,6 +227,25 @@ class LightCurveCollection(Collection):
         with warnings.catch_warnings():  # ignore "already normalized" message
             warnings.filterwarnings("ignore", message=".*already.*")
             lcs = [corrector_func(lc) for lc in self]
+
+        # Address issue #954: ignore incompatible columns with the same name
+        columns_to_remove = set()
+        for col in lcs[0].columns:
+            for lc in lcs[1:]:
+                if col in lc.columns:
+                    if not (issubclass(lcs[0][col].__class__, lc[col].__class__) \
+                            or lcs[0][col].__class__.info is lc[col].__class__.info):
+                        columns_to_remove.add(col)
+                        continue
+
+        if len(columns_to_remove) > 0:
+            warnings.warn(
+                    f"The following columns will be excluded from stitching because the column types are incompatible: {columns_to_remove}",
+                    LightkurveWarning,
+                )
+            lcs = [lc.copy() for lc in lcs]
+            [lc.remove_columns(columns_to_remove.intersection(lc.columns)) for lc in lcs]
+
         # Need `join_type='inner'` until AstroPy supports masked Quantities
         return vstack(lcs, join_type="inner", metadata_conflicts="silent")
 
