@@ -1,6 +1,8 @@
 2.0.5 (unreleased)
 ==================
 
+- Modified ``LightCurve.bin()`` to partially restore the ``bins`` parameter which
+  was available in Lightkurve v1.x, to improve backwards compatibility. [#995]
 
 
 2.0.4 (2021-03-11)
