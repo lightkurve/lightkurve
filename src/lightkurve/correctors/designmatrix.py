@@ -9,7 +9,6 @@ import warnings
 
 from astropy import units as u
 import matplotlib.pyplot as plt
-from numba import jit
 import numpy as np
 import pandas as pd
 from scipy.sparse import lil_matrix, csr_matrix, hstack, vstack, issparse, find
@@ -848,7 +847,18 @@ class SparseDesignMatrixCollection(DesignMatrixCollection):
 ####################################################
 
 
-@jit(nopython=True)
+def jit_if_numba_installed():
+    """Decorator which returns `numba.jit` if `numba` is installed."""
+    def decorator(func):
+        try:
+            from numba import jit
+        except ImportError:
+            return func  # return function undecorated
+        return jit(nopython=True)(func)
+    return decorator
+
+
+@jit_if_numba_installed()
 def _spline_basis_vector(x, degree, i, knots):
     """Recursive function to create a single spline basis vector for an input x,
     for the ith knot.
