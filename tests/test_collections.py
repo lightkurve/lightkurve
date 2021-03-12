@@ -1,6 +1,7 @@
 import warnings
 
 import pytest
+from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
 import matplotlib.pyplot as plt
 import numpy as np
@@ -107,7 +108,7 @@ def test_collection_getitem_by_boolean_array():
 
     lcc_f = lcc[[True, False, True]]
     assert lcc_f.data == [lc0, lc2]
-    assert (type(lcc_f), LightCurveCollection)
+    assert type(lcc_f) is LightCurveCollection
 
     # boundary case: 1 element
     lcc_f = lcc[[False, True, False]]
@@ -215,7 +216,7 @@ def test_tpfcollection():
     # ensure index by boolean array also works for TPFs
     tpfc_f = tpfc[[False, True, True]]
     assert tpfc_f.data == [tpf2, tpf2]
-    assert (type(tpfc_f), TargetPixelFileCollection)
+    assert type(tpfc_f) is TargetPixelFileCollection
     # Test __setitem__
     tpf3 = KeplerTargetPixelFile(filename_tpf_one_center, targetid=55)
     tpfc[1] = tpf3
@@ -353,3 +354,11 @@ def test_accessor_k2_campaign():
     tpf1.hdu[0].header["CAMPAIGN"] = 1
     tpfc = TargetPixelFileCollection([tpf0, tpf1])
     assert (tpfc.campaign == [2, 1]).all()
+
+
+def test_unmergeable_columns():
+    """Regression test for #954."""
+    lc1 = LightCurve(data={'time': [1,2,3], 'x': [1,2,3]})
+    lc2 = LightCurve(data={'time': [1,2,3], 'x': [1,2,3]*u.electron/u.second})
+    with pytest.warns(LightkurveWarning, match="column types are incompatible"):
+        LightCurveCollection([lc1, lc2]).stitch()

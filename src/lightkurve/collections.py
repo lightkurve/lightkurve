@@ -240,7 +240,7 @@ class LightCurveCollection(Collection):
 
         if len(columns_to_remove) > 0:
             warnings.warn(
-                    f"The following columns will be ignored from the stitch because the data types are incompatible: {columns_to_remove}",
+                    f"The following columns will be excluded from stitching because the column types are incompatible: {columns_to_remove}",
                     LightkurveWarning,
                 )
             lcs = [lc.copy() for lc in lcs]
