@@ -62,8 +62,6 @@ sphinxcontrib-rawfiles = "^0.1.1"
 pydata-sphinx-theme = "^0.4.1"
 pylint = "^2.6.0"
 ghp-import = "^1.0.1"
-line-profiler = "^3.1.0"
-memory-profiler = "^0.58.0"
 
 [build-system]
 requires = ["setuptools", "poetry-core>=1.0.0"]
