@@ -846,19 +846,6 @@ class SparseDesignMatrixCollection(DesignMatrixCollection):
 # Functions to create commonly-used design matrices.
 ####################################################
 
-
-def jit_if_numba_installed():
-    """Decorator which returns `numba.jit` if `numba` is installed."""
-    def decorator(func):
-        try:
-            from numba import jit
-        except ImportError:
-            return func  # return function undecorated
-        return jit(nopython=True)(func)
-    return decorator
-
-
-@jit_if_numba_installed()
 def _spline_basis_vector(x, degree, i, knots):
     """Recursive function to create a single spline basis vector for an input x,
     for the ith knot.
