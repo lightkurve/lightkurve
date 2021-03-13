@@ -9,7 +9,6 @@ import warnings
 
 from astropy import units as u
 import matplotlib.pyplot as plt
-from numba import jit
 import numpy as np
 import pandas as pd
 from scipy.sparse import lil_matrix, csr_matrix, hstack, vstack, issparse, find
@@ -847,8 +846,6 @@ class SparseDesignMatrixCollection(DesignMatrixCollection):
 # Functions to create commonly-used design matrices.
 ####################################################
 
-
-@jit(nopython=True)
 def _spline_basis_vector(x, degree, i, knots):
     """Recursive function to create a single spline basis vector for an input x,
     for the ith knot.

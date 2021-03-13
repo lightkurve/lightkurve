@@ -1,6 +1,9 @@
 2.0.5 (unreleased)
 ==================
 
+- Removed ``numba`` from the installation requirements and modified
+  ``SparseDesignMatrix`` to no longer use ``numba.jit``. [#997]
+
 - Modified ``LightCurve.bin()`` to partially restore the ``bins`` parameter which
   was available in Lightkurve v1.x, to improve backwards compatibility. [#995]
 
