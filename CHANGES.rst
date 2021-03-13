@@ -1,4 +1,4 @@
-2.0.5 (unreleased)
+2.0.5 (2021-03-13)
 ==================
 
 - Removed ``numba`` from the installation requirements and modified
@@ -9,7 +9,6 @@
 
 - Modified ``LightCurveCollection.stitch()`` to ignore incompatible columns
   instead of having them raise a ``ValueError``. [#996]
-
 
 
 2.0.4 (2021-03-11)
