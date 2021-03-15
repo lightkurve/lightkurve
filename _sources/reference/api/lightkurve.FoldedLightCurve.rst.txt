@@ -76,6 +76,7 @@
       ~FoldedLightCurve.sort
       ~FoldedLightCurve.to_corrector
       ~FoldedLightCurve.to_csv
+      ~FoldedLightCurve.to_excel
       ~FoldedLightCurve.to_fits
       ~FoldedLightCurve.to_pandas
       ~FoldedLightCurve.to_periodogram

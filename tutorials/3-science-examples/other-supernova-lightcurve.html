@@ -383,9 +383,9 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <div style="float:right; margin-bottom:1em;">
-    <a href="https://github.com/lightkurve/lightkurve/tree/master/docs/source/tutorials/3-science-examples/other-supernova-lightcurve.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
-    <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/master/docs/source/tutorials/3-science-examples/other-supernova-lightcurve.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
-    <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/master?filepath=docs/source/tutorials/3-science-examples/other-supernova-lightcurve.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+    <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/3-science-examples/other-supernova-lightcurve.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/tutorials/3-science-examples/other-supernova-lightcurve.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/tutorials/3-science-examples/other-supernova-lightcurve.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
 <br style="clear:both;"><div class="section" id="How-to-make-a-supernova-lightcurve?">
 <h1>How to make a supernova lightcurve?<a class="headerlink" href="#How-to-make-a-supernova-lightcurve?" title="Permalink to this headline">¶</a></h1>
@@ -508,8 +508,8 @@ methods, such as “Self Flat Fielding” (<a class="reference external" href="h
 </div>
 </div>
 <p><strong>Voilà</strong>! We indeed see what looks like a sharply-rising phenomenon at <span class="math notranslate nohighlight">\(t = 2400-2415\)</span> days, distinct from the smoothly-varying background, which could arise from either instrumental artifacts or host-galaxy.</p>
-<p>Let’s identify where the FELT was located within the host galaxy and its K2 postage stamp. We can either visually inspect the lightcurve with <a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/1.05-interact-with-lightcurves-and-tpf.html">interact</a> to look for the position of the explosion, or we can programmatically select cadences to estimate a difference image. I used <code class="docutils literal notranslate"><span class="pre">interact</span></code> with a fine-tuned screen-stretch to see that the FELT appears near pixel column 830, row 231. Furthermore, it looks
-like the flux drops off significantly in the first and last columns.</p>
+<p>Let’s identify where the FELT was located within the host galaxy and its K2 postage stamp. We can either visually inspect the lightcurve with <a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/1.05-interact-with-lightcurves-and-tpf.html">interact</a> to look for the position of the explosion, or we can programmatically select cadences to estimate a difference image. I used
+<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact.html?highlight=interact#lightkurve.KeplerTargetPixelFile.interact">interact()</a> with a fine-tuned screen-stretch to see that the FELT appears near pixel column 830, row 231. Furthermore, it looks like the flux drops off significantly in the first and last columns.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -679,7 +679,7 @@ like the flux drops off significantly in the first and last columns.</p>
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
     </p>
   </div>
 </footer>

@@ -388,9 +388,9 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <div style="float:right; margin-bottom:1em;">
-    <a href="https://github.com/lightkurve/lightkurve/tree/master/docs/source/tutorials/2-creating-light-curves/2-1-saving-a-light-curve.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
-    <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/master/docs/source/tutorials/2-creating-light-curves/2-1-saving-a-light-curve.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
-    <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/master?filepath=docs/source/tutorials/2-creating-light-curves/2-1-saving-a-light-curve.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+    <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/2-creating-light-curves/2-1-saving-a-light-curve.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/tutorials/2-creating-light-curves/2-1-saving-a-light-curve.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/tutorials/2-creating-light-curves/2-1-saving-a-light-curve.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
 <br style="clear:both;"><div class="section" id="How-to-save-a-LightCurve-in-FITS-format?">
 <h1>How to save a LightCurve in FITS format?<a class="headerlink" href="#How-to-save-a-LightCurve-in-FITS-format?" title="Permalink to this headline">¶</a></h1>
@@ -513,7 +513,7 @@ NEXTEND =                    2 / number of standard extensions
 EXTNAME = &#39;PRIMARY &#39;           / name of extension
 EXTVER  =                    1 / extension version number (not format version)
 ORIGIN  = &#39;Unofficial data product&#39; / institution responsible for file
-DATE    = &#39;2021-02-23&#39;         / file creation date.
+DATE    = &#39;2021-03-15&#39;         / file creation date.
 CREATOR = &#39;lightkurve.LightCurve.to_fits()&#39; / pipeline job and program used t
 TELESCOP= &#39;KEPLER  &#39;           / telescope
 INSTRUME= &#39;Kepler Photometer&#39;  / detector type
@@ -524,13 +524,13 @@ RADESYS = &#39;ICRS    &#39;           / reference frame of celestial coordinate
 RA_OBJ  =            291.03872 / [deg] right ascension
 DEC_OBJ =             36.59813 / [deg] declination
 EQUINOX =                 2000 / equinox of celestial coordinate system
-PROCVER = &#39;2.0.4.dev&#39;
+PROCVER = &#39;2.0.6dev&#39;
 MISSION = &#39;Kepler  &#39;
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;0WKo3UIm0UIm0UIm&#39;   / HDU checksum updated 2021-02-23T15:12:20
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2021-02-23T15:12:20
+CHECKSUM= &#39;CJHjDJHjCJHjCJHj&#39;   / HDU checksum updated 2021-03-15T13:05:10
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2021-03-15T13:05:10
 </pre></div></div>
 </div>
 <p>Looks like it has all the correct information about the target. What about the second extension?</p>
@@ -573,8 +573,8 @@ TFORM5  = &#39;D       &#39;
 TTYPE6  = &#39;MOM_CENTR2&#39;
 TFORM6  = &#39;D       &#39;
 EXTNAME = &#39;LIGHTCURVE&#39;
-CHECKSUM= &#39;2W4a5W2W2W2a2W2W&#39;   / HDU checksum updated 2021-02-23T15:12:20
-DATASUM = &#39;350614816&#39;          / data unit checksum updated 2021-02-23T15:12:20
+CHECKSUM= &#39;1Z3a4W1Z1W1a1W1W&#39;   / HDU checksum updated 2021-03-15T13:05:10
+DATASUM = &#39;350614816&#39;          / data unit checksum updated 2021-03-15T13:05:10
 </pre></div></div>
 </div>
 <p>This extension has 7 columns, <code class="docutils literal notranslate"><span class="pre">TIME</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX_ERR</span></code>, <code class="docutils literal notranslate"><span class="pre">SAP_QUALITY</span></code>, <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code>, <code class="docutils literal notranslate"><span class="pre">MOM_CENTR1</span></code>, and <code class="docutils literal notranslate"><span class="pre">MOM_CENTR2</span></code>. What if we wanted to add new keywords to our fits file? HLSP products require some extra keywords. Let’s add some keywords to explain who made the data, and what our HLSP is.</p>
@@ -623,7 +623,7 @@ NEXTEND =                    2 / number of standard extensions
 EXTNAME = &#39;PRIMARY &#39;           / name of extension
 EXTVER  =                    1 / extension version number (not format version)
 ORIGIN  = &#39;Unofficial data product&#39; / institution responsible for file
-DATE    = &#39;2021-02-23&#39;         / file creation date.
+DATE    = &#39;2021-03-15&#39;         / file creation date.
 CREATOR = &#39;lightkurve.LightCurve.to_fits()&#39; / pipeline job and program used t
 TELESCOP= &#39;KEPLER  &#39;           / telescope
 INSTRUME= &#39;Kepler Photometer&#39;  / detector type
@@ -634,7 +634,7 @@ RADESYS = &#39;ICRS    &#39;           / reference frame of celestial coordinate
 RA_OBJ  =            291.03872 / [deg] right ascension
 DEC_OBJ =             36.59813 / [deg] declination
 EQUINOX =                 2000 / equinox of celestial coordinate system
-PROCVER = &#39;2.0.4.dev&#39;
+PROCVER = &#39;2.0.6dev&#39;
 HLSPLEAD= &#39;Kepler/K2 GO office&#39;
 HLSPNAME= &#39;TUTORIAL&#39;
 CITATION= &#39;HEDGES2018&#39;
@@ -642,8 +642,8 @@ MISSION = &#39;Kepler  &#39;
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;LAeINAd9LAdGLAd9&#39;   / HDU checksum updated 2021-02-23T15:12:20
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2021-02-23T15:12:20
+CHECKSUM= &#39;Z7eAd5b9Z5bAd5b9&#39;   / HDU checksum updated 2021-03-15T13:05:10
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2021-03-15T13:05:10
 </pre></div></div>
 </div>
 <p>Now our new keywords are included in the primary header! What about if we want to add more <strong>data columns</strong> to our fits file? We can simply add data columns in the same way. Let’s add the data quality to our fits file.</p>
@@ -754,7 +754,7 @@ ColDefs(
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
     </p>
   </div>
 </footer>

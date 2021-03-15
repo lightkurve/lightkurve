@@ -34,6 +34,7 @@ For a complete listing of all classes and methods, please consult the `API docs 
     1-getting-started/using-target-pixel-file-products.ipynb
     1-getting-started/plotting-target-pixel-files.ipynb
     1-getting-started/interactively-inspecting-data.ipynb
+    1-getting-started/how-to-open-a-lightcurve-in-excel.ipynb
 
 
 2. Creating and correcting light curves

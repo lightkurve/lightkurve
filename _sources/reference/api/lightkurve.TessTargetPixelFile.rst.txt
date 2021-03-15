@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~TessTargetPixelFile.__init__
+      ~TessTargetPixelFile.animate
       ~TessTargetPixelFile.create_threshold_mask
       ~TessTargetPixelFile.cutout
       ~TessTargetPixelFile.estimate_background

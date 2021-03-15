@@ -426,9 +426,9 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <div style="float:right; margin-bottom:1em;">
-    <a href="https://github.com/lightkurve/lightkurve/tree/master/docs/source/tutorials/3-science-examples/asteroseismology-estimating-mass-and-radius.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
-    <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/master/docs/source/tutorials/3-science-examples/asteroseismology-estimating-mass-and-radius.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
-    <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/master?filepath=docs/source/tutorials/3-science-examples/asteroseismology-estimating-mass-and-radius.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+    <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/3-science-examples/asteroseismology-estimating-mass-and-radius.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/tutorials/3-science-examples/asteroseismology-estimating-mass-and-radius.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/tutorials/3-science-examples/asteroseismology-estimating-mass-and-radius.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
 <br style="clear:both;"><div class="section" id="How-to-estimate-a-star’s-mass-and-radius-using-asteroseismology">
 <h1>How to estimate a star’s mass and radius using asteroseismology<a class="headerlink" href="#How-to-estimate-a-star’s-mass-and-radius-using-asteroseismology" title="Permalink to this headline">¶</a></h1>
@@ -538,7 +538,7 @@ studying how these waves disturb the surface of the star. Properties which can b
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.legend.Legend at 0x17fdef880&gt;
+&lt;matplotlib.legend.Legend at 0x17a85be50&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -555,7 +555,7 @@ studying how these waves disturb the surface of the star. Properties which can b
 <h2>2. Estimating the Frequency of Maximum Amplitude <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span><a class="headerlink" href="#2.-Estimating-the-Frequency-of-Maximum-Amplitude-\nu_{\rm-max}" title="Permalink to this headline">¶</a></h2>
 <p>The frequency of maximum amplitude can be estimated in a number of ways. An obvious estimate would be to take the frequency that corresponds to the maximum amplitude in the power spectrum. This would not be a robust estimate however, because the maximum peak is very sensitive to noise and sampling effects.</p>
 <p>Instead, one of the most commonly used methods to estimate <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span> is the 2D autocorrelation function (ACF) method. Literature publications using this method include, for example, <a class="reference external" href="https://arxiv.org/abs/0910.2764">Huber et al. (2009)</a> and <a class="reference external" href="https://arxiv.org/abs/1905.08333">Viani et al. (2019)</a>. A version of this method is provided by the Lightkurve package.</p>
-<p>Before diving into Lightkurve’s tools, we will need to prepare our <code class="docutils literal notranslate"><span class="pre">`Periodogram</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html">https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html</a>&gt;`__ object. We do this by first removing background noise using the <code class="docutils literal notranslate"><span class="pre">`flatten()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.flatten">https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.flatten</a>&gt;`__ method:</p>
+<p>Before diving into Lightkurve’s tools, we will need to prepare our <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.html?highlight=periodogram#lightkurve.periodogram.Periodogram">Periodogram</a> object. We do this by first removing background noise using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.flatten.html?highlight=flatten#lightkurve.periodogram.Periodogram.flatten">flatten()</a> method:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -573,7 +573,7 @@ studying how these waves disturb the surface of the star. Properties which can b
 <img alt="../../_images/tutorials_3-science-examples_asteroseismology-estimating-mass-and-radius_16_0.png" src="../../_images/tutorials_3-science-examples_asteroseismology-estimating-mass-and-radius_16_0.png" />
 </div>
 </div>
-<p>Next, we need to convert the periodogram to a <code class="docutils literal notranslate"><span class="pre">`Seismology</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology">https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology</a>&gt;`__ object, which hosts Lightkurve’s asteroseismology tools:</p>
+<p>Next, we need to convert the periodogram to a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.html?highlight=seismology">Seismology</a> object, which hosts Lightkurve’s asteroseismology tools:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -584,7 +584,7 @@ studying how these waves disturb the surface of the star. Properties which can b
 </div>
 </div>
 <p>Lightkurve’s estimation method uses the autocorrelation function (ACF). Autocorrelation values are the result of calculating the correlation of the data with itself as it is gradually shifted over itself. One way to imagine how the ACF method works is by holding your hands up side by side and slowly shifting them past one another. Where your fingers overlap, the ACF will be high, and vice versa.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">`Seismology</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology">https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology</a>&gt;`__ object provides both <code class="docutils literal notranslate"><span class="pre">estimate</span></code> and <code class="docutils literal notranslate"><span class="pre">diagnose</span></code> methods. The former estimates the value, and the latter shows us how it was calculated. First, let’s call <code class="docutils literal notranslate"><span class="pre">`estimate_numax()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.estimate_numax">https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.estimate_numax</a>&gt;`__:</p>
+<p>The <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.html?highlight=seismology">Seismology</a> object provides both <code class="docutils literal notranslate"><span class="pre">estimate</span></code> and <code class="docutils literal notranslate"><span class="pre">diagnose</span></code> methods. The former estimates the value, and the latter shows us how it was calculated. First, let’s call <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.estimate_numax.html?highlight=estimate_numax">estimate_numax()</a>:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -602,7 +602,7 @@ studying how these waves disturb the surface of the star. Properties which can b
 <div class="math notranslate nohighlight">
 numax: $2145.00$ $\mathrm{\mu Hz}$ (method: ACF2D)</div></div>
 </div>
-<p>Here, the <code class="docutils literal notranslate"><span class="pre">`estimate_numax()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.estimate_numax">https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.estimate_numax</a>&gt;`__ function has measured a value for <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span> from our <code class="docutils literal notranslate"><span class="pre">SNRPeriodogram</span></code>, and has stored it as a property of the <code class="docutils literal notranslate"><span class="pre">`Seismology</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology">https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology</a>&gt;`__ object. We can access the value as follows:</p>
+<p>Here, the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.estimate_numax.html?highlight=estimate_numax">estimate_numax()</a>) function has measured a value for <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span> from our <code class="docutils literal notranslate"><span class="pre">SNRPeriodogram</span></code>, and has stored it as a property of the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.html?highlight=seismology">Seismology</a> object. We can access the value as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
@@ -621,7 +621,7 @@ numax: $2145.00$ $\mathrm{\mu Hz}$ (method: ACF2D)</div></div>
 2145.0
 </pre></div></div>
 </div>
-<p>Before moving on, let’s have a look at exactly how <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span> was measured, using the <code class="docutils literal notranslate"><span class="pre">`diagnose_numax()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.diagnose_numax">https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.diagnose_numax</a>&gt;`__ function.</p>
+<p>Before moving on, let’s have a look at exactly how <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span> was measured, using the <code class="docutils literal notranslate"><span class="pre">`diagnose_numax()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.diagnose_numax.html?highlight=diagnose_numax">https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.diagnose_numax.html?highlight=diagnose_numax</a>&gt;`__ function.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -680,7 +680,7 @@ et al. 2017</a>, which are:</p>
 <div class="math notranslate nohighlight">
 \[\Delta\nu \approx 0.294 \times \nu_{\rm max}^{0772}\, ,\]</div>
 <p>which we assume to be the same for all solar-like oscillators (<a class="reference external" href="https://arxiv.org/abs/0909.5193">Stello et al. 2009</a>).</p>
-<p>To understand how this works in practice, let’s first <code class="docutils literal notranslate"><span class="pre">`estimate_deltanu()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.estimate_deltanu">https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.estimate_deltanu</a>&gt;`__, and then <code class="docutils literal notranslate"><span class="pre">`diagnose_deltanu()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.diagnose_deltanu">https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.diagnose_deltanu</a>&gt;`__.</p>
+<p>To understand how this works in practice, let’s first <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.estimate_deltanu.html?highlight=estimate_deltanu">estimate_deltanu()</a>, and then <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.diagnose_deltanu.html?highlight=diagnose_deltanu">diagnose_deltanu()</a>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -726,7 +726,7 @@ deltanu: $103.11$ $\mathrm{\mu Hz}$ (method: ACF2D)</div></div>
 </div>
 <p>In the top panel we see the region in the frequency spectrum for which the ACF is evaluated, which is one FWHM on either side of <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span>. This region encompasses the strongest modes of oscillation.</p>
 <p>In the bottom panel we can see the ACF, that is, the result of calculating the correlation of the data with itself as it is shifted over itself. Where modes of oscillation overlap with one another, there will be a spike in the ACF. Because the modes are regularly spaced, these spikes will also be regularly spaced, and will reflect the spacing between modes of oscillation.</p>
-<p>The inset on the upper right hand corner shows a region around the <em>empirically</em> estimated <span class="math notranslate nohighlight">\(\Delta\nu\)</span>, which is based on the literature equations shown above. Using the <a class="reference external" href="https://www.scipy.org/">Scipy</a> <code class="docutils literal notranslate"><span class="pre">`find_peaks()</span></code> &lt;<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html</a>&gt;`__ function, Lightkurve finds the tip of the ACF peak nearest to this estimate, and reports this as the <em>measured</em> <span class="math notranslate nohighlight">\(\Delta\nu\)</span>.</p>
+<p>The inset on the upper right hand corner shows a region around the <em>empirically</em> estimated <span class="math notranslate nohighlight">\(\Delta\nu\)</span>, which is based on the literature equations shown above. Using the <a class="reference external" href="https://www.scipy.org/">Scipy</a> find_peaks() function, Lightkurve finds the tip of the ACF peak nearest to this estimate, and reports this as the <em>measured</em> <span class="math notranslate nohighlight">\(\Delta\nu\)</span>.</p>
 </div>
 <div class="section" id="4.-Estimating-Stellar-Mass,-Radius,-and-Surface-Gravity">
 <h2>4. Estimating Stellar Mass, Radius, and Surface Gravity<a class="headerlink" href="#4.-Estimating-Stellar-Mass,-Radius,-and-Surface-Gravity" title="Permalink to this headline">¶</a></h2>
@@ -790,7 +790,7 @@ radius: $1.23$ $\mathrm{R_{\odot}}$ (method: Uncorrected Scaling Relations)</div
 <div class="math notranslate nohighlight">
 logg: $4.29$ $\mathrm{dex}$ (method: Uncorrected Scaling Relations)</div></div>
 </div>
-<p>For the last one, surface gravity (<span class="math notranslate nohighlight">\(g\)</span>) is expressed in log space (that is, <span class="math notranslate nohighlight">\(\log g\)</span>), which is the convention in stellar physics. If we look at our <code class="docutils literal notranslate"><span class="pre">`Seismology</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology">https://docs.lightkurve.org/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology</a>&gt;`__ object now, we’ll see that it has stored all of these variables in one place.</p>
+<p>For the last one, surface gravity (<span class="math notranslate nohighlight">\(g\)</span>) is expressed in log space (that is, <span class="math notranslate nohighlight">\(\log g\)</span>), which is the convention in stellar physics. If we look at our <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.html?highlight=seismology">Seismology</a> object now, we’ll see that it has stored all of these variables in one place.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
@@ -1067,7 +1067,7 @@ archivePrefix = "arXiv",
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
     </p>
   </div>
 </footer>

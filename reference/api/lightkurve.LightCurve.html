@@ -392,7 +392,7 @@ based on a copy, e.g., <code class="docutils literal notranslate"><span class="p
 <dt class="field-odd">Attributes</dt>
 <dd class="field-odd"><dl>
 <dt><strong>meta</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>meta data associated with the lightcurve. The header of the underlying FITS file (if applicable)
-is available here as well.</p>
+is store in this dictionary. By convention, keys in this dictionary are usually in uppercase.</p>
 </dd>
 </dl>
 </dd>
@@ -471,7 +471,7 @@ is available here as well.</p>
 <td><p>Returns a <a class="reference internal" href="lightkurve.FoldedLightCurve.html#lightkurve.FoldedLightCurve" title="lightkurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> object folded on a period and epoch.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_pandas</span></code>(df[, time_scale])</p></td>
-<td><p>Convert a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> to a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
+<td><p>Convert a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> to a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_stingray</span></code>(lc)</p></td>
 <td><p>Create a new <a class="reference internal" href="#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from a <code class="xref py py-obj docutils literal notranslate"><span class="pre">stingray.Lightcurve</span></code>.</p></td>
@@ -599,34 +599,37 @@ is available here as well.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_csv.html#lightkurve.LightCurve.to_csv" title="lightkurve.LightCurve.to_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_csv</span></code></a>([path_or_buf])</p></td>
 <td><p>Writes the light curve to a CSV file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_fits.html#lightkurve.LightCurve.to_fits" title="lightkurve.LightCurve.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>([path, overwrite, flux_column_name])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_excel</span></code>(path_or_buf, **kwargs)</p></td>
+<td><p>Shorthand for <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas().to_excel()</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_fits.html#lightkurve.LightCurve.to_fits" title="lightkurve.LightCurve.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>([path, overwrite, flux_column_name])</p></td>
 <td><p>Converts the light curve to a FITS file in the Kepler/TESS file format.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_pandas.html#lightkurve.LightCurve.to_pandas" title="lightkurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>()</p></td>
-<td><p>Convert this <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> to a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> with a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> index.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_pandas.html#lightkurve.LightCurve.to_pandas" title="lightkurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>(**kwargs)</p></td>
+<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_periodogram.html#lightkurve.LightCurve.to_periodogram" title="lightkurve.LightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodogram</span></code></a>([method])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_periodogram.html#lightkurve.LightCurve.to_periodogram" title="lightkurve.LightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodogram</span></code></a>([method])</p></td>
 <td><p>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_seismology.html#lightkurve.LightCurve.to_seismology" title="lightkurve.LightCurve.to_seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_seismology</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_seismology.html#lightkurve.LightCurve.to_seismology" title="lightkurve.LightCurve.to_seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_seismology</span></code></a>(**kwargs)</p></td>
 <td><p>Returns a <a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object for estimating quick-look asteroseismic quantities.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_stingray</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_stingray</span></code>()</p></td>
 <td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">stingray.Lightcurve</span></code> object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_table.html#lightkurve.LightCurve.to_table" title="lightkurve.LightCurve.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_table.html#lightkurve.LightCurve.to_table" title="lightkurve.LightCurve.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_timeseries</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_timeseries</span></code>()</p></td>
 <td><p><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 2.0.</span></p>
 </div>
 </p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values_equal</span></code>(other)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values_equal</span></code>(other)</p></td>
 <td><p>Element-wise comparison of table with another table, list, or scalar.</p></td>
 </tr>
 </tbody>
@@ -784,7 +787,7 @@ is available here as well.</p>
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
     </p>
   </div>
 </footer>

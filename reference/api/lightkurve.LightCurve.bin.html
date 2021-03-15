@@ -337,7 +337,7 @@
 <h1>lightkurve.LightCurve.bin<a class="headerlink" href="#lightkurve-lightcurve-bin" title="Permalink to this headline">¶</a></h1>
 <dl class="py method">
 <dt id="lightkurve.LightCurve.bin">
-<code class="sig-prename descclassname"><span class="pre">LightCurve.</span></code><code class="sig-name descname"><span class="pre">bin</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_bin_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_bin_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.LightCurve.bin" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">LightCurve.</span></code><code class="sig-name descname"><span class="pre">bin</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_bin_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_bin_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.LightCurve.bin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bins a lightcurve in equally-spaced bins in time.</p>
 <p>If the original light curve contains flux uncertainties (<code class="docutils literal notranslate"><span class="pre">flux_err</span></code>),
 the binned lightcurve will report the root-mean-square error.
@@ -346,16 +346,21 @@ standard deviation of the data.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>time_bin_size</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>, float</span></dt><dd><p>The time interval for the binned time series. (Default unit: days.)</p>
+<dt><strong>time_bin_size</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>, float</span></dt><dd><p>The time interval for the binned time series.
+(Default: 0.5 days; default unit: days.)</p>
 </dd>
 <dt><strong>time_bin_start</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a>, optional</span></dt><dd><p>The start time for the binned time series. Defaults to the first
 time in the sampled time series.</p>
 </dd>
 <dt><strong>n_bins</strong><span class="classifier">int, optional</span></dt><dd><p>The number of bins to use. Defaults to the number needed to fit all
-the original points.</p>
+the original points. Note that this will create this number of bins
+of length <code class="docutils literal notranslate"><span class="pre">time_bin_size</span></code> independent of the lightkurve length.</p>
 </dd>
 <dt><strong>aggregate_func</strong><span class="classifier">callable, optional</span></dt><dd><p>The function to use for combining points in the same bin. Defaults
 to np.nanmean.</p>
+</dd>
+<dt><strong>bins</strong><span class="classifier">int</span></dt><dd><p>The number of bins to divide the lightkurve into. In contrast to
+<code class="docutils literal notranslate"><span class="pre">n_bins</span></code> this sets the length of <code class="docutils literal notranslate"><span class="pre">time_bin_size</span></code> accordingly.</p>
 </dd>
 <dt><strong>binsize</strong><span class="classifier">int</span></dt><dd><p>In Lightkurve v1.x, the default behavior of <a class="reference internal" href="#lightkurve.LightCurve.bin" title="lightkurve.LightCurve.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin()</span></code></a> was to create
 bins which contained an equal number data points in each bin.
@@ -416,7 +421,7 @@ data points.</p>
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
     </p>
   </div>
 </footer>

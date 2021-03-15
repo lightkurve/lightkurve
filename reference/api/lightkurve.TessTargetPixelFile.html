@@ -400,61 +400,64 @@ See the <a class="reference internal" href="lightkurve.KeplerQualityFlags.html#l
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.TessTargetPixelFile.__init__" title="lightkurve.TessTargetPixelFile.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(path[, quality_bitmask])</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_threshold_mask</span></code>([threshold, …])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">animate</span></code>([step, interval])</p></td>
+<td><p>Displays an interactive HTML matplotlib animation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_threshold_mask</span></code>([threshold, …])</p></td>
 <td><p>Returns an aperture mask creating using the thresholding method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cutout</span></code>([center, size])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cutout</span></code>([center, size])</p></td>
 <td><p>Cut a rectangle out of the Target Pixel File.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_background</span></code>([aperture_mask])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_background</span></code>([aperture_mask])</p></td>
 <td><p>Returns an estimate of the median background level in the FLUX column.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_centroids</span></code>([aperture_mask, method])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_centroids</span></code>([aperture_mask, method])</p></td>
 <td><p>Returns the flux center of an object inside <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_aperture_photometry</span></code>([aperture_mask, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_aperture_photometry</span></code>([aperture_mask, …])</p></td>
 <td><p>Returns a LightCurve obtained using aperture photometry.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_fits_images</span></code>(images_flux, position[, …])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_fits_images</span></code>(images_flux, position[, …])</p></td>
 <td><p>Creates a new Target Pixel File from a set of images.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bkg_lightcurve</span></code>([aperture_mask])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bkg_lightcurve</span></code>([aperture_mask])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_coordinates</span></code>([cadence])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_coordinates</span></code>([cadence])</p></td>
 <td><p>Returns two 3D arrays of RA and Dec values in decimal degrees.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_header</span></code>([ext])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_header</span></code>([ext])</p></td>
 <td><p>Returns the metadata embedded in the file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code>(keyword[, hdu, default])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code>(keyword[, hdu, default])</p></td>
 <td><p>Returns a header keyword value.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code>([notebook_url, max_cadences, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code>([notebook_url, max_cadences, …])</p></td>
 <td><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_sky</span></code>([notebook_url, magnitude_limit])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_sky</span></code>([notebook_url, magnitude_limit])</p></td>
 <td><p>Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>([ax, frame, cadenceno, bkg, column, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>([ax, frame, cadenceno, bkg, column, …])</p></td>
 <td><p>Plot the pixel data for a single frame (i.e.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_pixels</span></code>([ax, periodogram, …])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_pixels</span></code>([ax, periodogram, …])</p></td>
 <td><p>Show the light curve of each pixel in a single plot.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_solar_system_objects</span></code>([cadence_mask, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_solar_system_objects</span></code>([cadence_mask, …])</p></td>
 <td><p>Returns a list of asteroids or comets which affected the target pixel files.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code>()</p></td>
 <td><p>Prints a description of all non-callable attributes.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector</span></code>([method])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector</span></code>([method])</p></td>
 <td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> instance to remove systematics.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code>([output_fn, overwrite])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code>([output_fn, overwrite])</p></td>
 <td><p>Writes the TPF to a FITS file on disk.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve</span></code>([method])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve</span></code>([method])</p></td>
 <td><p>Performs photometry on the pixel data and returns a LightCurve object.</p></td>
 </tr>
 </tbody>
@@ -588,7 +591,7 @@ See the <a class="reference internal" href="lightkurve.KeplerQualityFlags.html#l
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
     </p>
   </div>
 </footer>

@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~KeplerTargetPixelFile.__init__
+      ~KeplerTargetPixelFile.animate
       ~KeplerTargetPixelFile.create_threshold_mask
       ~KeplerTargetPixelFile.cutout
       ~KeplerTargetPixelFile.estimate_background

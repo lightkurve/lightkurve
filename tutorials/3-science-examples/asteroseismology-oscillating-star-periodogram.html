@@ -436,9 +436,9 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <div style="float:right; margin-bottom:1em;">
-    <a href="https://github.com/lightkurve/lightkurve/tree/master/docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
-    <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/master/docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
-    <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/master?filepath=docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+    <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
 <br style="clear:both;"><div class="section" id="How-to-understand-and-manipulate-the-periodogram-of-an-oscillating-star">
 <h1>How to understand and manipulate the periodogram of an oscillating star<a class="headerlink" href="#How-to-understand-and-manipulate-the-periodogram-of-an-oscillating-star" title="Permalink to this headline">¶</a></h1>
@@ -459,8 +459,8 @@ div.rendered_html tbody tr:hover {
 <p>In this tutorial, we will focus on <em>intrinsic</em> oscillators: stars that exhibit variability due to processes inside the stars. For example, one of these internal processes is the presence of standing waves trapped in the interior. When the light curve of a star is transformed into the frequency domain, such waves can be observed as distinct peaks in the frequency spectrum of the star. The branch of astronomy that focuses on studying these signals is called
 <a class="reference external" href="https://en.wikipedia.org/wiki/Asteroseismology">asteroseismology</a>.</p>
 <p>Asteroseismology is an important tool because it allows intrinsic properties of a star, such as its mass and radius, to be estimated from the light curve alone. The only requirement is that the quality of the light curve — its duration, sampling, and precision — must be good enough to provide a high-resolution view of the star in the frequency domain. <em>Kepler</em> data is particularly well-suited for this purpose.</p>
-<p>In this tutorial, we will explore two types of intrinsic oscillators that are commonly studied by asteroseismologists: 1. <strong>:math:`delta` Scuti stars</strong>: a class of oscillating stars typically 1.5 to 2.5 times as massive as the Sun, which oscillate due to fluctuations in the opacity of the outer layers of the star. 2. <strong>Solar-Like Oscillators</strong>: a class that includes all stars that oscillate in the same manner as the Sun, namely due to turbulent motion in the convective outer layers of their
-atmospheres. This includes both main sequence stars as well as red giant stars.</p>
+<p>In this tutorial, we will explore two types of intrinsic oscillators that are commonly studied by asteroseismologists: 1. <cite>:math:</cite>delta` Scuti stars &lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Delta_Scuti_variable">https://en.wikipedia.org/wiki/Delta_Scuti_variable</a>&gt;`__: a class of oscillating stars typically 1.5 to 2.5 times as massive as the Sun, which oscillate due to fluctuations in the opacity of the outer layers of the star. 2. <strong>Solar-Like Oscillators</strong>: a class that includes all stars that oscillate in the same manner as the Sun, namely due to
+turbulent motion in the convective outer layers of their atmospheres. This includes both main sequence stars as well as red giant stars.</p>
 </div>
 <div class="section" id="Imports">
 <h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
@@ -497,7 +497,7 @@ atmospheres. This includes both main sequence stars as well as red giant stars.<
 <div class="output_area rendered_html docutils container">
 SearchResult containing 4 data products.
 
-<table id="table6434421296">
+<table id="table6337760560">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 06</td><td>2018</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>37498433</td><td>0.0</td></tr>
@@ -506,7 +506,7 @@ SearchResult containing 4 data products.
 <tr><td>3</td><td>TESS Sector 33</td><td>2020</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>37498433</td><td>0.0</td></tr>
 </table></div>
 </div>
-<p>Success! A light curve for the object appears to be available in the data archive. Let’s go ahead and download the data and convert it straight to a <code class="docutils literal notranslate"><span class="pre">`periodogram</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html">https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html</a>&gt;`__ using the <code class="docutils literal notranslate"><span class="pre">`to_periodogram()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.to_periodogram">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.to_periodogram</a>&gt;`__ function.</p>
+<p>Success! A light curve for the object appears to be available in the data archive. Let’s go ahead and download the data and convert it straight to a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram">periodogram</a> using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.to_periodogram.html?highlight=to_periodogram">to_periodogram()</a> function.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -535,7 +535,7 @@ SearchResult containing 4 data products.
 </div>
 </div>
 <p>We can see that there is a strong power excess around 50 cycles per day. These indicate stellar oscillations.</p>
-<p>To study these peaks in more detail, we can zoom in by recreating the periodogram using the <code class="docutils literal notranslate"><span class="pre">`minimum_frequency</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve">https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve</a>&gt;`__ and <code class="docutils literal notranslate"><span class="pre">`maximum_frequency</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve">https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve</a>&gt;`__ keywords:</p>
+<p>To study these peaks in more detail, we can zoom in by recreating the periodogram using the <code class="docutils literal notranslate"><span class="pre">minimum_frequency</span></code> and <code class="docutils literal notranslate"><span class="pre">maximum_frequency</span></code> keywords:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -592,7 +592,7 @@ SearchResult containing 4 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 15 data products.
 
-<table id="table6435402368">
+<table id="table6338105600">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
@@ -612,8 +612,8 @@ SearchResult containing 15 data products.
 <tr><td>14</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
 </table></div>
 </div>
-<p>To create and plot this periodogram, we will apply a few common practices in the field: - We will combine multiple quarters to improve the frequency resolution. - We will <code class="docutils literal notranslate"><span class="pre">`normalize</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.normalize">https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.normalize</a>&gt;`__ the light curve to parts per million (<code class="docutils literal notranslate"><span class="pre">ppm</span></code>). - We will use the <code class="docutils literal notranslate"><span class="pre">psd</span></code> normalization option when calling
-<code class="docutils literal notranslate"><span class="pre">`to_periodogram</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.to_periodogram">https://docs.lightkurve.org/api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.to_periodogram</a>&gt;`__, which sets the units of frequency to microhertz, and normalizes the power using the spacing between bins of frequency.</p>
+<p>To create and plot this periodogram, we will apply a few common practices in the field: - We will combine multiple quarters to improve the frequency resolution. - We will <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.normalize.html?highlight=normalize">normalize</a> the light curve to parts per million (<code class="docutils literal notranslate"><span class="pre">ppm</span></code>). - We will use the <code class="docutils literal notranslate"><span class="pre">psd</span></code> normalization option when calling
+<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.to_periodogram.html?highlight=to_periodogram">to_periodogram</a>, which sets the units of frequency to microhertz, and normalizes the power using the spacing between bins of frequency.</p>
 <p>We’ll also plot the resulting figure in log-log space.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -622,6 +622,7 @@ SearchResult containing 15 data products.
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">search_result</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
 <span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ppm&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">normalization</span><span class="o">=</span><span class="s1">&#39;psd&#39;</span><span class="p">)</span>
+<span class="c1">#pg = lc.to_periodogram(normalization=&#39;psd&#39;)</span>
 <span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -742,7 +743,7 @@ periodogram are a little broader (usually Lorentzian-like in shape). This may no
 <h2>3. How to Smooth and Detrend a Periodogram<a class="headerlink" href="#3.-How-to-Smooth-and-Detrend-a-Periodogram" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="3.1.-The-box-kernel-filter">
 <h3>3.1. The box kernel filter<a class="headerlink" href="#3.1.-The-box-kernel-filter" title="Permalink to this headline">¶</a></h3>
-<p>To further explore the oscillation modes, we will demonstrate some of Lightkurve’s smoothing tools. There are two types of smoothing functions we can call through the <code class="docutils literal notranslate"><span class="pre">`smooth()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.smooth">https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.smooth</a>&gt;`__ function. Let’s start with a basic “moving median,” also known as a 1D box kernel.</p>
+<p>To further explore the oscillation modes, we will demonstrate some of Lightkurve’s smoothing tools. There are two types of smoothing functions we can call through the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.smooth.html?highlight=smooth">smooth()</a> function. Let’s start with a basic “moving median,” also known as a 1D box kernel.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -810,8 +811,9 @@ frequencies.</p>
 </div>
 <div class="section" id="3.3.-Flattening">
 <h3>3.3. Flattening<a class="headerlink" href="#3.3.-Flattening" title="Permalink to this headline">¶</a></h3>
-<p>When studying modes of oscillation, it is typically preferred to remove the convective background. In a detailed analysis this would involve fitting a model to the background. As can be seen in the figure above, however, Lightkurve’s log median <code class="docutils literal notranslate"><span class="pre">`smooth()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.smooth">https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.smooth</a>&gt;`__ method provides a useful first-order approximation of the background without the need for a model.</p>
-<p>To divide the power spectrum by the background, we can use Lightkurve’s <code class="docutils literal notranslate"><span class="pre">`flatten()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.flatten">https://docs.lightkurve.org/api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.flatten</a>&gt;`__ method. This function uses the log median smoothing method to determine the background, and returns a new <code class="docutils literal notranslate"><span class="pre">`periodogram</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html">https://docs.lightkurve.org/api/lightkurve.periodogram.Periodogram.html</a>&gt;`__ object in which the background has been divided out.</p>
+<p>When studying modes of oscillation, it is typically preferred to remove the convective background. In a detailed analysis this would involve fitting a model to the background. As can be seen in the figure above, however, Lightkurve’s log median <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.smooth.html?highlight=smooth">smooth()</a> method provides a useful first-order approximation of the background without the need for a model.</p>
+<p>To divide the power spectrum by the background, we can use Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.flatten.html?highlight=flatten#lightkurve.periodogram.Periodogram.flatten">flatten()</a> method. This function uses the log median smoothing method to determine the background, and returns a new <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.html?highlight=periodogra#lightkurve.periodogram.Periodogram">periodogram</a>
+object in which the background has been divided out.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -1112,7 +1114,7 @@ archivePrefix = "arXiv",
   <div class="container">
     <p>
           &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
     </p>
   </div>
 </footer>
