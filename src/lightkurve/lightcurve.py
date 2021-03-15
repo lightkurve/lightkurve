@@ -2001,6 +2001,27 @@ class LightCurve(QTimeSeries):
             return path_or_buf.getvalue()
         return result
 
+    def to_pandas(self, **kwargs):
+        """Converts the light curve to a Pandas `~pandas.DataFrame` object.
+
+        The data frame will be indexed by `time` using values corresponding
+        to the light curve's time format.  This is different from the
+        default behavior of `Table.to_pandas()` in AstroPy, which converts
+        time values into ISO timestamps.
+
+        Returns
+        -------
+        dataframe : `pandas.DataFrame`
+            A data frame indexed by `time`.
+        """
+        df = super().to_pandas(**kwargs)
+        # Default AstroPy behavior is to change the time column into ``np.datetime64``
+        # We override it here because it confuses Kepler/TESS users who are used
+        # to working in BTJD and BKJD rather than ISO timestamps.
+        df.index = self.time.value
+        df.index.name = "time"
+        return df
+
     def to_excel(self, path_or_buf, **kwargs) -> None:
         """Shorthand for `to_pandas().to_excel()`.
 
