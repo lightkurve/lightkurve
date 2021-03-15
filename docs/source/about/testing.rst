@@ -2,7 +2,7 @@
 Running the unit tests
 ======================
 
-*Lightkurve* has many `unit tests <https://en.wikipedia.org/wiki/Unit_testing>`_ which check that our basic functionality works as we expect. Before we can make any changes to *Lightkurve* we have to check that these tests all pass. If you open a `pull request <contributing>`_ to *Lightkurve*, these tests will be run automatically. If they pass, your code can be reviewed and potentially merged into the *Lightkurve* master branch.
+*Lightkurve* has many `unit tests <https://en.wikipedia.org/wiki/Unit_testing>`_ which check that our basic functionality works as we expect. Before we can make any changes to *Lightkurve* we have to check that these tests all pass. If you open a `pull request <contributing>`_ to *Lightkurve*, these tests will be run automatically. If they pass, your code can be reviewed and potentially merged into the *Lightkurve* main branch.
 
 However, running these tests online can take a long time. Running the tests locally on your machine is much faster, and will let you check that your work still maintains the expected *Lightkurve* behavior as you develop your code.
 
@@ -22,7 +22,7 @@ In a terminal, `cd` into the *Lightkurve* directory. Yours should look something
 .. image:: https://user-images.githubusercontent.com/14965634/53126462-01a9c780-3515-11e9-9031-1f7cd06fcfb3.png
     :width: 500 px
 
-Note that here we're using the master branch. If you want to run the tests on a branch you are developing, switch to that branch using `git checkout branchname`. Once you're in the `lightkurve` directory, go to the tests directory in `lightkurve/tests`.
+Note that here we're using the main branch. If you want to run the tests on a branch you are developing, switch to that branch using `git checkout branchname`. Once you're in the `lightkurve` directory, go to the tests directory in `lightkurve/tests`.
 
 .. image:: https://user-images.githubusercontent.com/14965634/53126884-ff943880-3515-11e9-9c1e-e4efc10b5bc2.png
     :width: 500 px

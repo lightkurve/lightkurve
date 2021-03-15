@@ -94,9 +94,9 @@ nbsphinx_prolog = r"""
     .. raw:: html
 
         <div style="float:right; margin-bottom:1em;">
-            <a href="https://github.com/lightkurve/lightkurve/tree/master/docs/source/{{ docname }}"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
-            <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/master/docs/source/{{ docname }}"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
-            <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/master?filepath=docs/source/{{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+            <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/{{ docname }}"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+            <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/{{ docname }}"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+            <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/{{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
         </div>
         <br style="clear:both;">
 """

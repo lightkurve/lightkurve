@@ -14,7 +14,7 @@ Lightkurve
 .. |pypi-downloads| image:: https://pepy.tech/badge/lightkurve/month
                 :target: https://pepy.tech/project/lightkurve/month
 .. |test-badge| image:: https://github.com/lightkurve/lightkurve/workflows/Lightkurve-tests/badge.svg
-                 :target: https://github.com/lightkurve/lightkurve/actions?query=branch%3Amaster
+                 :target: https://github.com/lightkurve/lightkurve/actions?query=branch%3Amain
 .. |astropy-badge| image:: https://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
                    :target: http://www.astropy.org
 .. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1181928.svg
@@ -25,7 +25,7 @@ to analyze astronomical flux time series data,
 in particular the pixels and lightcurves obtained by
 **NASA's Kepler and TESS exoplanet missions**.
 
-.. image:: https://raw.githubusercontent.com/lightkurve/lightkurve/master/docs/source/_static/images/lightkurve-teaser.gif
+.. image:: https://raw.githubusercontent.com/lightkurve/lightkurve/main/docs/source/_static/images/lightkurve-teaser.gif
 
 This package aims to lower the barrier for students, astronomers,
 and citizen scientists interested in analyzing Kepler and TESS space telescope data.
