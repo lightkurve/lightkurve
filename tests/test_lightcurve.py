@@ -639,6 +639,7 @@ def test_to_pandas():
     lc = LightCurve(time=time, flux=flux, flux_err=flux_err)
     try:
         df = lc.to_pandas()
+        assert_allclose(df.index, lc.time.value)
         assert_allclose(df.flux, flux)
         assert_allclose(df.flux_err, flux_err)
         df.describe()  # Will fail if for Endianness bugs
