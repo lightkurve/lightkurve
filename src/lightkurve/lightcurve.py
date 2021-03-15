@@ -2001,6 +2001,10 @@ class LightCurve(QTimeSeries):
             return path_or_buf.getvalue()
         return result
 
+    def to_excel(self, *args, **kwargs):
+        """Shorthand for `to_pandas().to_excel()`."""
+        self.to_pandas().to_excel(*args, **kwargs)
+
     def to_periodogram(self, method="lombscargle", **kwargs):
         """Converts the light curve to a `~lightkurve.periodogram.Periodogram`
         power spectrum object.
