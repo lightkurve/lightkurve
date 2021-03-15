@@ -2001,9 +2001,21 @@ class LightCurve(QTimeSeries):
             return path_or_buf.getvalue()
         return result
 
-    def to_excel(self, *args, **kwargs):
-        """Shorthand for `to_pandas().to_excel()`."""
-        self.to_pandas().to_excel(*args, **kwargs)
+    def to_excel(self, path_or_buf, **kwargs) -> None:
+        """Shorthand for `to_pandas().to_excel()`.
+
+        Parameters
+        ----------
+        path_or_buf : string or file handle
+            File path or object.
+        **kwargs : dict
+            Dictionary of arguments to be passed to `to_pandas().to_excel(**kwargs)`.
+        """
+        try:
+            import openpyxl  # optional dependency
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError("You need to install `openpyxl` to use this feature, e.g. use `pip install openpyxl`.")
+        self.to_pandas().to_excel(path_or_buf, **kwargs)
 
     def to_periodogram(self, method="lombscargle", **kwargs):
         """Converts the light curve to a `~lightkurve.periodogram.Periodogram`

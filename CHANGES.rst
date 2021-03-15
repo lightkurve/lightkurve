@@ -3,6 +3,7 @@
 
 - Removed ``ipython`` from the installation requirements. [#999]
 
+- Added the ``LightCurve.to_excel()`` convenience method. [#1000]
 
 
 2.0.5 (2021-03-13)
