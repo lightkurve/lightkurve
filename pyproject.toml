@@ -38,7 +38,6 @@ uncertainties = "^3.1.4"
 patsy = ">=0.5.0"
 fbpca = ">=1.0"
 bokeh = ">=1.0"
-ipython = ">=6.0.0"
 memoization = { version = ">=0.3.1", python = ">=3.6,<4.0" }
 scikit-learn = ">=0.24.0"
 

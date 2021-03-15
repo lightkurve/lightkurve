@@ -749,12 +749,19 @@ def show_citation_instructions():
     """Show citation instructions."""
     from . import PACKAGEDIR, __citation__
 
-    if not is_notebook():
+    # To make installing Lightkurve easier, ipython is an optional dependency,
+    # because we can assume it is installed when notebook-specific features are called
+    try:
+        from IPython.display import HTML
+        ipython_installed = True
+    except ModuleNotFoundError:
+        ipython_installed = False
+
+    if not is_notebook() or not ipython_installed:
         print(__citation__)
     else:
-        from pathlib import Path
-        from IPython.display import HTML
-        import astroquery
+        from pathlib import Path  # local import to speed up `import lightkurve`
+        import astroquery         # local import to speed up `import lightkurve`
 
         templatefile = Path(PACKAGEDIR, "data", "show_citation_instructions.html")
         template = open(templatefile, "r").read()
