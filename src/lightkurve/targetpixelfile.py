@@ -1211,9 +1211,13 @@ class TargetPixelFile(object):
         **plot_args : dict
             Optional parameters passed to tpf.plot().
         """
-        from IPython.display import HTML
-
-        return HTML(self._to_matplotlib_animation(**plot_args).to_jshtml())
+        try:
+            # To make installing Lightkurve easier, ipython is an optional dependency,
+            # because we can assume it is installed when notebook-specific features are called
+            from IPython.display import HTML
+            return HTML(self._to_matplotlib_animation(**plot_args).to_jshtml())
+        except ModuleNotFoundError:
+            log.error("ipython needs to be installed for animate() to work (e.g., `pip install ipython`)")
 
     def to_fits(self, output_fn=None, overwrite=False):
         """Writes the TPF to a FITS file on disk."""
