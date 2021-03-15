@@ -2001,6 +2001,43 @@ class LightCurve(QTimeSeries):
             return path_or_buf.getvalue()
         return result
 
+    def to_pandas(self, **kwargs):
+        """Converts the light curve to a Pandas `~pandas.DataFrame` object.
+
+        The data frame will be indexed by `time` using values corresponding
+        to the light curve's time format.  This is different from the
+        default behavior of `Table.to_pandas()` in AstroPy, which converts
+        time values into ISO timestamps.
+
+        Returns
+        -------
+        dataframe : `pandas.DataFrame`
+            A data frame indexed by `time`.
+        """
+        df = super().to_pandas(**kwargs)
+        # Default AstroPy behavior is to change the time column into ``np.datetime64``
+        # We override it here because it confuses Kepler/TESS users who are used
+        # to working in BTJD and BKJD rather than ISO timestamps.
+        df.index = self.time.value
+        df.index.name = "time"
+        return df
+
+    def to_excel(self, path_or_buf, **kwargs) -> None:
+        """Shorthand for `to_pandas().to_excel()`.
+
+        Parameters
+        ----------
+        path_or_buf : string or file handle
+            File path or object.
+        **kwargs : dict
+            Dictionary of arguments to be passed to `to_pandas().to_excel(**kwargs)`.
+        """
+        try:
+            import openpyxl  # optional dependency
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError("You need to install `openpyxl` to use this feature, e.g. use `pip install openpyxl`.")
+        self.to_pandas().to_excel(path_or_buf, **kwargs)
+
     def to_periodogram(self, method="lombscargle", **kwargs):
         """Converts the light curve to a `~lightkurve.periodogram.Periodogram`
         power spectrum object.
