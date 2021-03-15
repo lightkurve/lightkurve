@@ -1,6 +1,8 @@
 2.0.6 (unreleased)
 ==================
 
+- Removed ``ipython`` from the installation requirements. [#999]
+
 
 
 2.0.5 (2021-03-13)
