@@ -5,6 +5,9 @@
 
 - Added the ``LightCurve.to_excel()`` convenience method. [#1000]
 
+- Added a new tutorial demonstrating how to load a light curve
+  into Excel.
+
 
 2.0.5 (2021-03-13)
 ==================
