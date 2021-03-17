@@ -82,6 +82,9 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
+# Execute notebooks? Possible values: 'always', 'never', 'auto' (default)
+nbsphinx_execute = "auto"
+
 # Some notebook cells take longer than 60 seconds to execute
 nbsphinx_timeout = 300
 
