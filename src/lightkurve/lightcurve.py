@@ -1654,14 +1654,20 @@ class LightCurve(QTimeSeries):
 
         # Normalize the data if requested
         if normalize:
-            if column == "flux":
-                lc_normed = self.normalize()
-            else:
-                lc_tmp = self.copy()
-                lc_tmp["flux"] = flux
-                lc_tmp["flux_err"] = flux_err
-                lc_normed = lc_tmp.normalize()
-            flux, flux_err = lc_normed.flux, lc_normed.flux_err
+            # ignore "light curve is already normalized" message because
+            # the user explicitely asked for normalization here
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", message=".*already.*")
+                if column == "flux":
+                    lc_normed = self.normalize()
+                else:
+                    # Code below is a temporary hack because `normalize()`
+                    # does not have a `column` argument yet
+                    lc_tmp = self.copy()
+                    lc_tmp["flux"] = flux
+                    lc_tmp["flux_err"] = flux_err
+                    lc_normed = lc_tmp.normalize()
+                flux, flux_err = lc_normed.flux, lc_normed.flux_err
 
         # Apply offset if requested
         if offset:
