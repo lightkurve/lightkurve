@@ -291,6 +291,19 @@ class LightCurveCollection(Collection):
                     if jdx != jdxs[0]:  # Avoid multiple labels for same object
                         kwargs["label"] = ""
                     self[jdx].plot(ax=ax, c=f"C{idx}", offset=idx * offset, **kwargs)
+
+            # If some but not all light curves are normalized, ensure the Y label
+            # says "Flux" and not "Normalized Flux"
+            normstatus = [lc.meta.get("NORMALIZED", False) for lc in self]
+            if "normalize" not in kwargs and any(normstatus) and not all(normstatus):
+                warnings.warn(
+                    "Some but not all of the light curves in the collection appear to be normalized. "
+                    "You may wish to use `normalize=True` to ensure all are normalized.",
+                    LightkurveWarning,
+                )
+                if "ylabel" not in kwargs:
+                    ax.set_ylabel("Flux")
+
         return ax
 
 
