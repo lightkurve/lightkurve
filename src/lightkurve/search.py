@@ -735,40 +735,48 @@ def search_lightcurve(
     Examples
     --------
     This example demonstrates how to use the `search_lightcurve()` function to
-    query and download data. Before instantiating a `KeplerLightCurve` object or
+    query and download data. Before instantiating a `LightCurve` object or
     downloading any science products, we can identify potential desired targets with
     `search_lightcurve`::
 
-        >>> from lightkurve import search_lightcurvefile  # doctest: +SKIP
-        >>> search_result = search_lightcurvefile("Kepler-10")  # doctest: +SKIP
+        >>> from lightkurve import search_lightcurve  # doctest: +SKIP
+        >>> search_result = search_lightcurve("Kepler-10")  # doctest: +SKIP
         >>> print(search_result)  # doctest: +SKIP
 
     The above code will query mast for lightcurve files available for the known
     planet system Kepler-10, and display a table containing the available
-    data products. Because Kepler-10 was observed in 15 quarters, the search
-    result will list 15 different files. If we want to download a
-    `~lightkurve.collections.LightCurveFileCollection` object containing all
+    data products. Because Kepler-10 was observed in multiple quarters and sectors
+    by both Kepler and TESS, the search will return many dozen results.
+    If we want to narrow down the search to only return Kepler light curves
+    in long cadence, we can use::
+
+        >>> search_result = search_lightcurve("Kepler-10", author="Kepler", exptime=1800)   # doctest: +SKIP
+        >>> print(search_result)  # doctest: +SKIP
+
+    That is better, we now see 15 light curves corresponding to 15 Kepler quarters.
+    If we want to download a `~lightkurve.collections.LightCurveCollection` object containing all
     15 observations, use::
 
         >>> search_result.download_all()  # doctest: +SKIP
 
-    or we can specify the downloaded products by limiting our search::
+    or we can specify the downloaded products by selecting a specific row using
+    rectangular brackets, for example::
 
-        >>> lcf = search_lightcurvefile('Kepler-10', quarter=2).download()  # doctest: +SKIP
+        >>> lc = search_result[2].download()  # doctest: +SKIP
 
     The above line of code will only search and download Quarter 2 data and
-    create a `LightCurveFile` object called lcf.
+    create a `LightCurve` object called lc.
 
-    We can also pass a radius into `search_lightcurvefile` to perform a cone search::
+    We can also pass a radius into `search_lightcurve` to perform a cone search::
 
-        >>> search_lightcurvefile('Kepler-10', radius=100, quarter=4)  # doctest: +SKIP
+        >>> search_lightcurve('Kepler-10', radius=100, quarter=4, exptime=1800)  # doctest: +SKIP
 
     This will display a table containing all targets within 100 arcseconds of
     Kepler-10 and in Quarter 4.  We can then download a
-    `~lightkurve.collections.LightCurveFileCollection` containing all these
-    products using::
+    `~lightkurve.collections.LightCurveFile` containing all these
+    light curves using::
 
-        >>> search_lightcurvefile('kepler-10', radius=100, quarter=4).download_all()  # doctest: +SKIP
+        >>> search_lightcurve('Kepler-10', radius=100, quarter=4, exptime=1800).download_all()  # doctest: +SKIP
     """
     try:
         return _search_products(
