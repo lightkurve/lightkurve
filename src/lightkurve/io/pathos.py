@@ -52,6 +52,7 @@ def read_pathos_lightcurve(
     )
     lc = lc[quality_mask]
 
+    lc.meta["AUTHOR"] = "PATHOS"
     lc.meta["TARGETID"] = lc.meta.get("TICID")
     lc.meta["QUALITY_BITMASK"] = quality_bitmask
     lc.meta["QUALITY_MASK"] = quality_mask

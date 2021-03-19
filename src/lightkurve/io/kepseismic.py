@@ -23,6 +23,7 @@ def read_kepseismic_lightcurve(filename, **kwargs):
         filename,
         time_format='bkjd')
 
+    lc.meta["AUTHOR"] = "KEPSEISMIC"
     lc.meta["TARGETID"] = lc.meta.get("KEPLERID")
 
     # KEPSEISMIC light curves are normalized by default

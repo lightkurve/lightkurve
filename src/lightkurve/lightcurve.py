@@ -365,15 +365,32 @@ class LightCurve(QTimeSeries):
                 )
             super().__setattr__(name, value, **kwargs)
 
+    def _repr_simple_(self) -> str:
+        """Returns a simple __repr__.
+
+        Used by `LightCurveCollection`.
+        """
+        result = f"<{self.__class__.__name__}"
+        if "LABEL" in self.meta:
+            result += f" LABEL=\"{self.meta.get('LABEL')}\""
+        for kw in ["QUARTER", "CAMPAIGN", "SECTOR", "AUTHOR"]:
+            if kw in self.meta:
+                result += f" {kw}={self.meta.get(kw)}"
+        result += ">"
+        return result
+
     def _base_repr_(self, html=False, descr_vals=None, **kwargs):
         """Defines the description shown by `__repr__` and `_html_repr_`."""
         if descr_vals is None:
             descr_vals = [self.__class__.__name__]
             if self.masked:
                 descr_vals.append("masked=True")
-            if hasattr(self, "targetid"):
-                descr_vals.append(f"targetid={self.targetid}")
             descr_vals.append("length={}".format(len(self)))
+            if "LABEL" in self.meta:
+                descr_vals.append(f"LABEL=\"{self.meta.get('LABEL')}\"")
+            for kw in ["QUARTER", "CAMPAIGN", "SECTOR", "AUTHOR"]:
+                if kw in self.meta:
+                    descr_vals.append(f"{kw}={self.meta.get(kw)}")
         return super()._base_repr_(html=html, descr_vals=descr_vals, **kwargs)
 
     # Define `time`, `flux`, `flux_err` as class attributes to enable IDE

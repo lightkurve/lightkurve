@@ -44,6 +44,7 @@ def read_qlp_lightcurve(filename, flux_column="kspsap_flux", quality_bitmask="de
     )
     lc = lc[quality_mask]
 
+    lc.meta["AUTHOR"] = "QLP"
     lc.meta["TARGETID"] = lc.meta.get("TICID")
     lc.meta["QUALITY_BITMASK"] = quality_bitmask
     lc.meta["QUALITY_MASK"] = quality_mask

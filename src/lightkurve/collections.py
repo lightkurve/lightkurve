@@ -1,5 +1,4 @@
 """Defines collections of data products."""
-import logging
 import warnings
 
 import matplotlib
@@ -14,8 +13,6 @@ from .targetpixelfile import TargetPixelFile
 from .utils import LightkurveWarning, LightkurveDeprecationWarning
 
 
-log = logging.getLogger(__name__)
-
 __all__ = ["LightCurveCollection", "TargetPixelFileCollection"]
 
 
@@ -23,7 +20,8 @@ class Collection(object):
     """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
 
     A collection can be indexed by standard Python list syntax.
-    Additionally, it can be indexed by a subset of `numpy.ndarray` syntax: boolean array indexing and integer array indexing.
+    Additionally, it can be indexed by a subset of `numpy.ndarray` syntax:
+    boolean array indexing and integer array indexing.
 
     Attributes
     ----------
@@ -90,47 +88,11 @@ class Collection(object):
         self.data.append(obj)
 
     def __repr__(self):
-        result = "{} of {} objects:\n".format(self.__class__.__name__, len(self.data))
-        if isinstance(self[0], TargetPixelFile):
-            labels = np.asarray([tpf.targetid for tpf in self])
-        else:
-            labels = np.asarray([lc.meta.get("LABEL") for lc in self])
-
-        try:
-            unique_labels = np.sort(np.unique(labels))
-        except TypeError:
-            unique_labels = [None]
-
-        for idx, targetid in enumerate(unique_labels):
-            jdxs = np.where(labels == targetid)[0]
-            if not hasattr(jdxs, "__iter__"):
-                jdxs = [jdxs]
-
-            if hasattr(self[jdxs[0]], "mission"):
-                mission = self[jdxs[0]].mission
-                if mission == "Kepler":
-                    subtype = "Quarters"
-                elif mission == "K2":
-                    subtype = "Campaigns"
-                elif mission == "TESS":
-                    subtype = "Sectors"
-                else:
-                    subtype = None
-            else:
-                subtype = None
-            objstr = str(type(self[0]))[8:-2].split(".")[-1]
-            title = "\t{} ({} {}s) {}: ".format(targetid, len(jdxs), objstr, subtype)
-            result += title
-            if subtype is not None:
-                result += ",".join(
-                    [
-                        "{}".format(getattr(self[jdx], subtype[:-1].lower()))
-                        for jdx in jdxs
-                    ]
-                )
-            else:
-                result += ",".join(["{}".format(i) for i in np.arange(len(jdxs))])
-            result += "\n"
+        result = f"{self.__class__.__name__} of {len(self)} objects:\n    "
+        # LightCurve objects provide a special `_repr_simple_` method
+        # to avoid printing an entire table here
+        result += "\n    ".join([f"{idx}: " + getattr(obj, "_repr_simple_", obj.__repr__)()
+                                 for idx, obj in enumerate(self)])
         return result
 
     def _safeGetScalarAttr(self, attrName):
@@ -140,17 +102,17 @@ class Collection(object):
 
     @property
     def sector(self):
-        """(TESS-specific) the sectors of the lightcurves / target pixel files.
+        """The sector number for TESS data products.
 
-        The TESS sectors of the lightcurves / target pixel files; `numpy.nan` for those with no sector.
+        Returns `numpy.nan` for data products with lack a sector meta data keyword.
         The attribute is useful for filtering a collection by sector.
 
         Examples
         --------
-        Plot two lightcurves, one from TESS sectors 13 to 19, and one for sector 22
+        Plot two lightcurves, one from TESS sectors 13 to 19, and one for sector 22.
 
             >>> import lightkurve as lk
-            >>> lcc = lk.search_lightcurve('TIC286923464', mission='TESS').download_all()  # doctest: +SKIP
+            >>> lcc = lk.search_lightcurve('TIC286923464', author='SPOC').download_all()  # doctest: +SKIP
             >>> lcc_filtered = lcc[(lcc.sector >= 13) & (lcc.sector <= 19)]  # doctest: +SKIP
             >>> lcc_filtered.plot()  # doctest: +SKIP
             >>> lcc[lcc.sector == 22][0].plot()  # doctest: +SKIP
@@ -203,8 +165,8 @@ class LightCurveCollection(Collection):
         will be removed soon."""
         return LightCurveCollection([lc.SAP_FLUX for lc in self])
 
-    def stitch(self, corrector_func=lambda x: x.normalize()):
-        """Stitch all light curves in the collection into a single lk.LightCurve
+    def stitch(self, corrector_func=lambda x: x.normalize()) -> "LightCurve":
+        """Stitch all light curves in the collection into a single `LightCurve`.
 
         Any function passed to `corrector_func` will be applied to each light curve
         before stitching. For example, passing "lambda x: x.normalize().flatten()"
@@ -279,18 +241,9 @@ class LightCurveCollection(Collection):
                 if kwarg in kwargs:
                     kwargs.pop(kwarg)
 
-            labels = np.asarray([lc.meta.get("LABEL") for lc in self])
-            try:
-                unique_labels = np.sort(np.unique(labels))
-            except TypeError:  # sorting will fail if labels includes None
-                unique_labels = [None]
-
-            for idx, targetid in enumerate(unique_labels):
-                jdxs = np.where(labels == targetid)[0]
-                for jdx in np.atleast_1d(jdxs):
-                    if jdx != jdxs[0]:  # Avoid multiple labels for same object
-                        kwargs["label"] = ""
-                    self[jdx].plot(ax=ax, c=f"C{idx}", offset=idx * offset, **kwargs)
+            for idx, lc in enumerate(self):
+                kwargs['label'] = f"{idx}: {lc.meta.get('LABEL', '(missing label)')}"
+                lc.plot(ax=ax, c=f"C{idx}", offset=idx * offset, **kwargs)
 
             # If some but not all light curves are normalized, ensure the Y label
             # says "Flux" and not "Normalized Flux"
