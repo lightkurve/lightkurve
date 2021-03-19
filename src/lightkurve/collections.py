@@ -165,7 +165,7 @@ class LightCurveCollection(Collection):
         will be removed soon."""
         return LightCurveCollection([lc.SAP_FLUX for lc in self])
 
-    def stitch(self, corrector_func=lambda x: x.normalize()) -> "LightCurve":
+    def stitch(self, corrector_func=lambda x: x.normalize()):
         """Stitch all light curves in the collection into a single `LightCurve`.
 
         Any function passed to `corrector_func` will be applied to each light curve
