@@ -25,6 +25,8 @@ def read_tasoc_lightcurve(filename, flux_column="FLUX_RAW", quality_bitmask=None
     lc = read_generic_lightcurve(
         filename, flux_column=flux_column.lower(), time_format="btjd"
     )
+
+    lc.meta["AUTHOR"] = "TASOC"
     lc.meta["TARGETID"] = lc.meta.get("TICID")
     # TASOC light curves are normalized by default
     lc.meta["NORMALIZED"] = True

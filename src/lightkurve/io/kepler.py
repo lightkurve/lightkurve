@@ -47,6 +47,7 @@ def read_kepler_lightcurve(
     )
     lc = lc[quality_mask]
 
+    lc.meta["AUTHOR"] = "Kepler"
     lc.meta["TARGETID"] = lc.meta.get("KEPLERID")
     lc.meta["QUALITY_BITMASK"] = quality_bitmask
     lc.meta["QUALITY_MASK"] = quality_mask

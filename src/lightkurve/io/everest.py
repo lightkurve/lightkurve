@@ -55,7 +55,7 @@ def read_everest_lightcurve(
     )
     lc = lc[quality_mask]
 
-    lc.meta["LABEL"] = "{} (EVEREST)".format(lc.meta.get("OBJECT"))
+    lc.meta["AUTHOR"] = "EVEREST"
     lc.meta["TARGETID"] = lc.meta.get("KEPLERID")
     lc.meta["QUALITY_BITMASK"] = quality_bitmask
     lc.meta["QUALITY_MASK"] = quality_mask

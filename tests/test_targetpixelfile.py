@@ -738,7 +738,8 @@ def test_aperture_photometry_nan():
     assert np.isnan(lc.flux_err[2])
 
 
-@pytest.mark.remote_data
+#@pytest.mark.remote_data
+@pytest.mark.skip  # At time of writing, the SkyBot API yields too many intermittent HTTP Errors
 def test_SSOs():
     # TESS test
     tpf = TessTargetPixelFile(asteroid_TPF)
