@@ -91,8 +91,12 @@ class Collection(object):
         result = f"{self.__class__.__name__} of {len(self)} objects:\n    "
         # LightCurve objects provide a special `_repr_simple_` method
         # to avoid printing an entire table here
-        result += "\n    ".join([f"{idx}: " + getattr(obj, "_repr_simple_", obj.__repr__)()
-                                 for idx, obj in enumerate(self)])
+        result += "\n    ".join(
+            [
+                f"{idx}: " + getattr(obj, "_repr_simple_", obj.__repr__)()
+                for idx, obj in enumerate(self)
+            ]
+        )
         return result
 
     def _safeGetScalarAttr(self, attrName):
@@ -195,18 +199,23 @@ class LightCurveCollection(Collection):
         for col in lcs[0].columns:
             for lc in lcs[1:]:
                 if col in lc.columns:
-                    if not (issubclass(lcs[0][col].__class__, lc[col].__class__) \
-                            or lcs[0][col].__class__.info is lc[col].__class__.info):
+                    if not (
+                        issubclass(lcs[0][col].__class__, lc[col].__class__)
+                        or lcs[0][col].__class__.info is lc[col].__class__.info
+                    ):
                         columns_to_remove.add(col)
                         continue
 
         if len(columns_to_remove) > 0:
             warnings.warn(
-                    f"The following columns will be excluded from stitching because the column types are incompatible: {columns_to_remove}",
-                    LightkurveWarning,
-                )
+                f"The following columns will be excluded from stitching because the column types are incompatible: {columns_to_remove}",
+                LightkurveWarning,
+            )
             lcs = [lc.copy() for lc in lcs]
-            [lc.remove_columns(columns_to_remove.intersection(lc.columns)) for lc in lcs]
+            [
+                lc.remove_columns(columns_to_remove.intersection(lc.columns))
+                for lc in lcs
+            ]
 
         # Need `join_type='inner'` until AstroPy supports masked Quantities
         return vstack(lcs, join_type="inner", metadata_conflicts="silent")
@@ -242,7 +251,7 @@ class LightCurveCollection(Collection):
                     kwargs.pop(kwarg)
 
             for idx, lc in enumerate(self):
-                kwargs['label'] = f"{idx}: {lc.meta.get('LABEL', '(missing label)')}"
+                kwargs["label"] = f"{idx}: {lc.meta.get('LABEL', '(missing label)')}"
                 lc.plot(ax=ax, c=f"C{idx}", offset=idx * offset, **kwargs)
 
             # If some but not all light curves are normalized, ensure the Y label
