@@ -1116,7 +1116,8 @@ def test_bin_issue705():
         lc.bin(binsize=15)
 
 
-@pytest.mark.remote_data
+#@pytest.mark.remote_data
+@pytest.mark.skip  # At time of writing, the SkyBot API yields too many intermittent HTTP Errors
 def test_SSOs():
     # TESS test
     lc = TessTargetPixelFile(asteroid_TPF).to_lightcurve(aperture_mask="all")
