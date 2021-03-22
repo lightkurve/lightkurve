@@ -927,14 +927,14 @@ def _search_products(
     # passed a radius value), because strict target name search does not apply.
     if filetype.lower() == "ffi" and radius is None:
         radius = 0.0001 * u.arcsec
-    # No campaign should be given otherwise split K2 campaigns will be filtered out
+    # No campaign should be given for TPFs otherwise split K2 campaigns will be filtered out
     observations = _query_mast(
         target,
         radius=radius,
         project=mission,
         provenance_name=provenance_name,
         exptime=exptime,
-        sequence_number=sector,
+        sequence_number=(campaign if filetype != "Target Pixel" else None) or sector,
         **extra_query_criteria,
     )
     log.debug(
