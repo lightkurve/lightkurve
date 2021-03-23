@@ -422,7 +422,7 @@ def test_download_flux_column():
 
 
 @pytest.mark.remote_data
-def test_cadence_filtering():
+def test_exptime_filtering():
     """Can we pass "fast", "short", exposure time to the cadence argument?"""
     # Try `cadence="fast"`
     res = search_lightcurve("AU Mic", sector=27, cadence="fast")
@@ -444,8 +444,8 @@ def test_cadence_filtering():
     res = search_lightcurve("AU Mic", sector=27, exptime="fast")
     assert len(res) == 1
     assert res.exptime[0].value == 20
-    # Try `exptime="short"`
-    res = search_lightcurve("AU Mic", sector=27, exptime="short")
+    # Try `exptime="SHoRt"` -- mixed lower/uppercase is on purpose
+    res = search_lightcurve("AU Mic", sector=27, exptime="SHoRt")
     assert len(res) == 1
     assert res.table["t_exptime"][0] == 120
     # Try `exptime=20`

@@ -1310,12 +1310,14 @@ def _mask_by_exptime(products, exptime):
     mask = np.ones(len(products), dtype=bool)
     if isinstance(exptime, (int, float)):
         mask &= products["exptime"] == exptime
-    elif exptime in ["fast"]:
-        mask &= products["exptime"] < 60
-    elif exptime in ["short"]:
-        mask &= (products["exptime"] >= 60) & (products["exptime"] < 300)
-    elif exptime in ["long", "ffi"]:
-        mask &= products["exptime"] >= 300
+    elif isinstance(exptime, str):
+        exptime = exptime.lower()
+        if exptime in ["fast"]:
+            mask &= products["exptime"] < 60
+        elif exptime in ["short"]:
+            mask &= (products["exptime"] >= 60) & (products["exptime"] < 300)
+        elif exptime in ["long", "ffi"]:
+            mask &= products["exptime"] >= 300
     return mask
 
 

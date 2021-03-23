@@ -7,6 +7,7 @@
 - Fixed a bug in ``LightCurveCollection.plot()`` which caused an incorrect y label
   when the collection contained normalized and non-normalized light curves. [#1002]
 
+- Modified the search functions to make the ``exptime`` parameter case-insensitive.
 
 
 2.0.6 (2021-03-15)
