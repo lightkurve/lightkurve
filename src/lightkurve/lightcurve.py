@@ -62,6 +62,7 @@ class QTimeSeries(TimeSeries):
         and Lightkurve requires the correspond astropy release.
         """
         # string-typed columns should not have a unit, or it will make convert_col_for_table crash!
+        # see https://github.com/lightkurve/lightkurve/pull/980#issuecomment-806178939
         if hasattr(col, 'dtype'):
             if hasattr(col, 'unit') and col.dtype.kind in {'U', 'S'}:
                 del col.unit
