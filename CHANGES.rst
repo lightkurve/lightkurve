@@ -1,8 +1,10 @@
 2.0.7dev (unreleased)
 =====================
 
+- Fixed a bug in ``CBVCorrector`` causing it to not work on K2 data. [#1012]
+
 - Modified ``LightCurveCollection`` to have a more simple and generic ``__repr__()``
-  which does not group objects by target id.
+  which does not group objects by target id. [#1002]
 
 - Fixed a bug in ``LightCurveCollection.plot()`` which caused an incorrect y label
   when the collection contained normalized and non-normalized light curves. [#1002]
