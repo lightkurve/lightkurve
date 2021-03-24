@@ -1,6 +1,11 @@
 2.0.7dev (unreleased)
 =====================
 
+- Added support for reading CDIPS light curves. [#980]
+
+- Fixed a bug which caused ``LightCurve`` object instantiation to fail if
+  a string-typed column had a unit set. [#980]
+
 - Fixed a bug in ``CBVCorrector`` causing it to not work on K2 data. [#1012]
 
 - Modified ``LightCurveCollection`` to have a more simple and generic ``__repr__()``
