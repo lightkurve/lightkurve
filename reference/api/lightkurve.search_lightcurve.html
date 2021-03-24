@@ -330,38 +330,46 @@ By default all months will be returned.</p>
 </dl>
 <p class="rubric">Examples</p>
 <p>This example demonstrates how to use the <a class="reference internal" href="#lightkurve.search_lightcurve" title="lightkurve.search_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurve()</span></code></a> function to
-query and download data. Before instantiating a <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object or
+query and download data. Before instantiating a <a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object or
 downloading any science products, we can identify potential desired targets with
 <a class="reference internal" href="#lightkurve.search_lightcurve" title="lightkurve.search_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurve</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_lightcurvefile</span>  
-<span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">)</span>  
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_lightcurve</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span> <span class="o">=</span> <span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">)</span>  
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">search_result</span><span class="p">)</span>  
 </pre></div>
 </div>
 <p>The above code will query mast for lightcurve files available for the known
 planet system Kepler-10, and display a table containing the available
-data products. Because Kepler-10 was observed in 15 quarters, the search
-result will list 15 different files. If we want to download a
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFileCollection</span></code> object containing all
+data products. Because Kepler-10 was observed in multiple quarters and sectors
+by both Kepler and TESS, the search will return many dozen results.
+If we want to narrow down the search to only return Kepler light curves
+in long cadence, we can use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span> <span class="o">=</span> <span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span>   
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">search_result</span><span class="p">)</span>  
+</pre></div>
+</div>
+<p>That is better, we now see 15 light curves corresponding to 15 Kepler quarters.
+If we want to download a <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveCollection</span></code> object containing all
 15 observations, use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>  
 </pre></div>
 </div>
-<p>or we can specify the downloaded products by limiting our search:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lcf</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s1">&#39;Kepler-10&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  
+<p>or we can specify the downloaded products by selecting a specific row using
+rectangular brackets, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">search_result</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  
 </pre></div>
 </div>
 <p>The above line of code will only search and download Quarter 2 data and
-create a <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFile</span></code> object called lcf.</p>
-<p>We can also pass a radius into <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code> to perform a cone search:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s1">&#39;Kepler-10&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>  
+create a <a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object called lc.</p>
+<p>We can also pass a radius into <a class="reference internal" href="#lightkurve.search_lightcurve" title="lightkurve.search_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurve</span></code></a> to perform a cone search:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;Kepler-10&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span>  
 </pre></div>
 </div>
 <p>This will display a table containing all targets within 100 arcseconds of
 Kepler-10 and in Quarter 4.  We can then download a
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFileCollection</span></code> containing all these
-products using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s1">&#39;kepler-10&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>  
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFile</span></code> containing all these
+light curves using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;Kepler-10&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>  
 </pre></div>
 </div>
 </dd></dl>

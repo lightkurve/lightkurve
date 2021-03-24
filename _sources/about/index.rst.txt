@@ -21,6 +21,7 @@ Developer documentation
 .. toctree::
     :maxdepth: 1
 
+    vision.rst
     contributing.rst
     testing.rst
     documentation.rst
