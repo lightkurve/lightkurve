@@ -1320,7 +1320,7 @@ class CotrendingBasisVectors(TimeSeries):
                     np.full(np.count_nonzero(np.isnan(dataTbl['VECTOR_{}'.format(idx)])), 0.0)
                 # Only post this warning once
                 if (not warning_posted):
-                    log.warning('Some interpolated (or extrapolated) CBV values have been set to NaN')
+                    log.warning('Some interpolated (or extrapolated) CBV values have been set to zero')
                     warning_posted = True
 
         dataTbl.meta = self.meta.copy()
