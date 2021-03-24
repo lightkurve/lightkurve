@@ -1532,3 +1532,10 @@ def test_plot_with_offset():
     ax = lc.plot(offset=1)
     plt.close(ax.figure)
     assert lc.flux[0].value == 1.0
+
+
+def test_string_column_with_unit():
+    """Regression test for #980."""
+    # string-typed columns with a unit set were making `_convert_col_for_table` crash
+    col = Column(data=["a", "b", "c"], unit='unitless')
+    LightCurve(data={'time': [1, 2, 3], 'x': col})
