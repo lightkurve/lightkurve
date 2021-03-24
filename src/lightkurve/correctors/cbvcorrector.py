@@ -589,7 +589,7 @@ class CBVCorrector(RegressionCorrector):
         if (self.lc.mission == 'TESS'):
             # 24 degrees of a TESS CCD array (2 CCD's wide) is 86,400 arcseconds
             max_search_radius = np.sqrt(2) * (86400/2.0)
-        elif (self.lc.mission == 'Kepler' or self.lc.mission == 'Kepler'):
+        elif (self.lc.mission == 'Kepler' or self.lc.mission == 'K2'):
             # One Kepler CCD spans 4,096 arcseconds
             max_search_radius = np.sqrt(2) * 4096
         else:
@@ -1296,7 +1296,7 @@ class CotrendingBasisVectors(TimeSeries):
             if (np.min(lc.time.value) < np.min(gapRemovedCBVtime) or
                 np.max(lc.time.value) > np.max(gapRemovedCBVtime)   ):
                 log.warning('Extrapolation of CBVs appears to be necessary. '
-                            'Extrapolated values will be filled with NaNs. '
+                            'Extrapolated values will be filled with zeros. '
                             'Recommend setting extrapolate=True')
 
         # Create the new cbv object with no basis vectors, yet...
@@ -1314,10 +1314,14 @@ class CotrendingBasisVectors(TimeSeries):
                     self['VECTOR_{}'.format(idx)][np.logical_not(self.gap_indicators.value)], 
                     extrapolate=extrapolate)
             dataTbl['VECTOR_{}'.format(idx)] = fInterp(lc.time.value)
-            # Only post this warnign once
-            if (not warning_posted and  np.any(np.isnan(dataTbl['VECTOR_{}'.format(idx)]))):
-                log.warning('Some interpolated (or extrapolated) CBV values have been set to NaN')
-                warning_posted = True
+            # Replace NaNs with 0.0
+            if (np.any(np.isnan(dataTbl['VECTOR_{}'.format(idx)]))):
+                dataTbl['VECTOR_{}'.format(idx)][np.isnan(dataTbl['VECTOR_{}'.format(idx)])] = \
+                    np.full(np.count_nonzero(np.isnan(dataTbl['VECTOR_{}'.format(idx)])), 0.0)
+                # Only post this warning once
+                if (not warning_posted):
+                    log.warning('Some interpolated (or extrapolated) CBV values have been set to zero')
+                    warning_posted = True
 
         dataTbl.meta = self.meta.copy()
 

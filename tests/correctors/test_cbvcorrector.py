@@ -167,6 +167,7 @@ def test_CotrendingBasisVectors_nonretrieval():
     cbv_interpolated = cbvs.interpolate(sample_lc, extrapolate=False)
     assert np.all(cbv_interpolated.time.value == sample_lc.time.value)
     # Extrapolation test
+    # If extrapolate=False then all outside values set to 0.0
     xCbv = np.linspace(0.0, 1.5 * np.pi, num=nCbvCadences)
     dataTbl = Table(
         [
@@ -181,22 +182,16 @@ def test_CotrendingBasisVectors_nonretrieval():
     cbvs = CotrendingBasisVectors(dataTbl, cbvTime)
     cbv_interpolated = cbvs.interpolate(sample_lc, extrapolate=False)
     assert np.all(
-        np.isnan(
             cbv_interpolated["VECTOR_1"].value[
                 np.nonzero(cbv_interpolated.time.value > 1.5 * np.pi)[0]
-            ]
-        )
+            ] == 0.0
     )
     # extrapolate
     cbv_interpolated = cbvs.interpolate(sample_lc, extrapolate=True)
     assert np.all(
-        np.logical_not(
-            np.isnan(
                 cbv_interpolated["VECTOR_1"].value[
                     np.nonzero(cbv_interpolated.time.value > 1.5 * np.pi)[0]
-                ]
-            )
-        )
+                ] != 0.0
     )
 
 
@@ -450,6 +445,10 @@ def test_CBVCorrector_retrieval():
     assert isinstance(lc, KeplerLightCurve)
     assert lc.flux.unit == u.Unit("electron / second")
 
+    lc = cbvCorrector.correct()
+    assert isinstance(lc, KeplerLightCurve)
+    assert lc.flux.unit == u.Unit("electron / second")
+
     # ***
     # Try some expected failures
 
@@ -479,11 +478,11 @@ def test_CBVCorrector_retrieval():
     cbv_indices = [np.arange(1,9)]
     # This will generate an warning about the need for extrapolation
     cbvCorrector = CBVCorrector(lc, interpolate_cbvs=True, extrapolate_cbvs=False)
-    # This will generate a light curve with all NaNs
+    # This will generate a light curve with the last value well below the median corrected flux
     cbvCorrector.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices, alpha=1e-4)
-    with pytest.raises(AssertionError):
-        assert np.logical_not(np.all(np.isnan(cbvCorrector.corrected_lc.flux)))
-    # This will NOT generate all NaNs
+    assert (cbvCorrector.corrected_lc.flux[-1] - np.median(cbvCorrector.corrected_lc.flux)).value < -300
+    # This will generate a light curve with the last value at about the median corrected flux
     cbvCorrector = CBVCorrector(lc, interpolate_cbvs=True, extrapolate_cbvs=True)
     cbvCorrector.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices, alpha=1e-4)
-    assert np.logical_not(np.all(np.isnan(cbvCorrector.corrected_lc.flux)))
+    assert ((cbvCorrector.corrected_lc.flux[-1] - np.median(cbvCorrector.corrected_lc.flux)).value > 0.0 and  
+            (cbvCorrector.corrected_lc.flux[-1] - np.median(cbvCorrector.corrected_lc.flux)).value < 20)
