@@ -1,5 +1,5 @@
-2.0.7dev (unreleased)
-=====================
+2.0.7 (2021-03-24)
+==================
 
 - Added support for reading CDIPS light curves. [#980]
 
