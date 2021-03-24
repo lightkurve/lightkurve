@@ -35,14 +35,14 @@ def test_read_cdips():
         lc = read_cdips_lightcurve(url, flux_column=ext)
         assert type(lc).__name__ == "TessLightCurve"
         # Are `time` and `flux` consistent with the FITS file?
-        assert_array_equal(f[1].data['TIME'][lc.meta['QUALITY_MASK']],
+        assert_array_equal(f[1].data['TMID_BJD'][lc.meta['QUALITY_MASK']],
                            lc.time.value)
         assert_array_equal(f[1].data[ext][lc.meta['QUALITY_MASK']],
                            lc.flux.value)
         fluxes.append(lc.flux)
     # Different extensions should show different fluxes
     for i in range(11):
-        assert not np.array_equal(fluxes[i] , fluxes[i+1])
+        assert not np.array_equal(fluxes[i].value , fluxes[i+1].value)
 
 @pytest.mark.remote_data
 def test_search_cdips():

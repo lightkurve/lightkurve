@@ -22,7 +22,8 @@ def read_cdips_lightcurve(filename,
     do not provide the bitflags necessary for a user to apply a new bitmask.
     Therefore, frames corresponding to "momentum dumps and coarse point modes"
     are removed according to Bouma et al. 2019, and no other quality filtering
-    is allowed.
+    is allowed. The `quality_bitmask` parameter is ignored but accepted for
+    compatibility with other data format readers.
 
     Parameters
     ----------
@@ -53,9 +54,6 @@ def read_cdips_lightcurve(filename,
     # Set the appropriate error column for this aperture
     quality_column = f"irq{ap}"
 
-    if quality_bitmask is not None:
-        log.warning("Quality filtering is not enabled for CDIPS lightcurves")
-
     lc = read_generic_lightcurve(filename,
                                  time_column="tmid_bjd",
                                  flux_column=flux_column.lower(),
@@ -74,6 +72,7 @@ def read_cdips_lightcurve(filename,
     quality_mask = (lc['quality']=="G") | (lc['quality']=="0")
     lc = lc[quality_mask]
 
+    lc.meta["AUTHOR"] = "CDIPS"
     lc.meta['TARGETID'] = lc.meta.get('TICID')
     lc.meta['QUALITY_BITMASK'] = 36
     lc.meta['QUALITY_MASK'] = quality_mask
