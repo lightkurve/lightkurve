@@ -1215,7 +1215,7 @@ class TargetPixelFile(object):
             # To make installing Lightkurve easier, ipython is an optional dependency,
             # because we can assume it is installed when notebook-specific features are called
             from IPython.display import HTML
-            return HTML(self._to_matplotlib_animation(**plot_args).to_jshtml())
+            return HTML(self._to_matplotlib_animation(step=step, interval=interval, **plot_args).to_jshtml())
         except ModuleNotFoundError:
             log.error("ipython needs to be installed for animate() to work (e.g., `pip install ipython`)")
 
