@@ -4,6 +4,10 @@
 - Fixed a bug which caused the ``step`` and ``interval`` parameters
   to be ignored in ``TargetPixelFile.animate()``.
 
+- Modified ``TargetPixelFile.pipeline_mask`` to return a default mask
+  if the aperture extension is missing from the file.
+
+
 2.0.7 (2021-03-24)
 ==================
 

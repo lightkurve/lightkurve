@@ -284,14 +284,20 @@ class TargetPixelFile(object):
 
     @property
     def pipeline_mask(self):
-        """Returns the optimal aperture mask used by the pipeline."""
+        """Returns the optimal aperture mask used by the pipeline.
+
+        If the aperture extension is missing from the file, a mask
+        composed of all `True` values will be returned.
+        """
         # Both Kepler and TESS flag the pixels in the optimal aperture using
         # bit number 2 in the aperture mask extension, e.g. see Section 6 of
         # the TESS Data Products documentation (EXP-TESS-ARC-ICD-TM-0014.pdf).
         try:
             return self.hdu[2].data & 2 > 0
-        except TypeError:  # Early versions of TESScut returned floats in HDU 2
-            return np.ones(self.hdu[2].data.shape, dtype=bool)
+        except (IndexError, TypeError):
+            # `IndexError` may be raised if the aperture extension (#2) is missing
+            # `TypeError` may be raised because early versions of TESScut returned floats in HDU 2
+            return np.ones(self.hdu[1].data["FLUX"][0].shape, dtype=bool)
 
     @property
     def shape(self):
