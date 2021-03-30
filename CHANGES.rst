@@ -1,5 +1,5 @@
-2.0.8dev (unreleased)
-=====================
+2.0.8 (2021-03-30)
+==================
 
 - Fixed a bug which caused the ``step`` and ``interval`` parameters
   to be ignored in ``TargetPixelFile.animate()``.
