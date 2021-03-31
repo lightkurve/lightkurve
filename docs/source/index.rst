@@ -18,13 +18,9 @@ and improve scientific fidelity by providing accessible open source
 Python :ref:`tools <api>` and :ref:`tutorials <tutorials>`
 for time domain astronomy.
 
-
-.. code-block:: python
-    :caption: Example: downloading & plotting a phase-folded light curve of Proxima Centauri.
-
-    import lightkurve as lk
-    lightcurve = lk.search_lightcurve("Proxima Centauri", mission="TESS").download()
-    lightcurve.fold(period=11.184).plot()
+.. image:: _static/images/lightkurve-teaser.gif
+  :width: 800
+  :alt: Lightkurve example usage
 
 
 Documentation
