@@ -2728,7 +2728,15 @@ class TessTargetPixelFile(TargetPixelFile):
     @property
     def background_mask(self):
         """Returns the background mask used by the TESS pipeline."""
-        return self.hdu[2].data & 4 > 0
+        # The TESS pipeline flags the pixels in the background aperture using
+        # bit number 4, cf. Section 6 of the TESS Data Products documentation
+        # (EXP-TESS-ARC-ICD-TM-0014.pdf).
+        try:
+            return self.hdu[2].data & 4 > 0
+        except (IndexError, TypeError):
+            # `IndexError` may be raised if the aperture extension (#2) is missing
+            # `TypeError` may be raised because early versions of TESScut returned floats in HDU 2
+            return np.zeros(self.hdu[1].data["FLUX"][0].shape, dtype=bool)
 
     @property
     def sector(self):
