@@ -2,10 +2,10 @@
 ==================
 
 - Added the ``head()``, ``tail()``, and ``truncate()`` convenience methods
-  to the ``LightCurve`` class.
+  to the ``LightCurve`` class. [#1017]
 
 - Modified ``TargetPixelFile.to_lightcurve()`` to accept "sff", "cbv", and "pld"
-  as options for the ``method`` keyword argument.
+  as options for the ``method`` keyword argument. [#1017]
 
 - Fixed a bug in ``LightCurve.append()`` which caused the method to crash
   if the light curves contained incompatible column types. [#1015]
