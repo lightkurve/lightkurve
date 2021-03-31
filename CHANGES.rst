@@ -1,3 +1,10 @@
+2.0.9 (unreleased)
+==================
+
+- Fixed a bug in ``LightCurve.append()`` which caused the method to crash
+  if the light curves contained incompatible column types. [#1015]
+
+
 2.0.8 (2021-03-30)
 ==================
 

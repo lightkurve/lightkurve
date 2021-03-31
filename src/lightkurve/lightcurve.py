@@ -667,8 +667,10 @@ class LightCurve(QTimeSeries):
             )
         if not hasattr(others, "__iter__"):
             others = (others,)
-        # Need `join_type='inner'` until AstroPy supports masked Quantities
-        return vstack((self, *others), join_type="inner", metadata_conflicts="silent")
+
+        # Re-use LightCurveCollection.stitch() to avoid code duplication
+        from .collections import LightCurveCollection  # avoid circular import
+        return LightCurveCollection((self, *others)).stitch(corrector_func=None)
 
     def flatten(
         self,
