@@ -1539,3 +1539,15 @@ def test_string_column_with_unit():
     # string-typed columns with a unit set were making `_convert_col_for_table` crash
     col = Column(data=["a", "b", "c"], unit='unitless')
     LightCurve(data={'time': [1, 2, 3], 'x': col})
+
+
+def test_head_tail_truncate():
+    """Simple test for the `head()`, `tail()`, and `truncate()` methods."""
+    lc = LightCurve({'time': [1, 2, 3, 4, 5], 'flux':[1, 2, 3, 4, 5]})
+    assert lc.head(1).flux == 1
+    assert lc.head(n=1).flux == 1
+    assert lc.tail(1).flux == 5
+    assert lc.tail(n=1).flux == 5
+    assert all(lc.truncate(2, 4).flux == [2, 3, 4])
+    assert lc.truncate(before=2).head(1).flux == 2
+    assert lc.truncate(after=3).tail(1).flux == 3

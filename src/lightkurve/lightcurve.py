@@ -2286,7 +2286,7 @@ class LightCurve(QTimeSeries):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
-    def to_corrector(self, method="sff"):
+    def to_corrector(self, method="sff", **kwargs):
         """Returns a corrector object to remove instrument systematics.
 
         Parameters
@@ -2294,6 +2294,8 @@ class LightCurve(QTimeSeries):
         methods : string
             Currently, only "sff" is supported.  This will return a
             `SFFCorrector` class instance.
+         **kwargs : dict
+            Extra keyword arguments to be passed to the corrector class.
 
         Returns
         -------
@@ -2301,22 +2303,18 @@ class LightCurve(QTimeSeries):
             Instance of a Corrector class, which typically provides `correct()`
             and `diagnose()` methods.
         """
-        allowed_methods = ["sff"]
         if method == "pld":
             raise ValueError(
                 "The 'pld' method can only be used on "
                 "`TargetPixelFile` objects, not `LightCurve` objects."
             )
-        if method not in allowed_methods:
-            raise ValueError(
-                ("Unrecognized method '{0}'\n" "allowed methods are: {1}").format(
-                    method, allowed_methods
-                )
-            )
+        method = validate_method(method, supported_methods=["sff", "cbv"])
         if method == "sff":
             from .correctors import SFFCorrector
-
-            return SFFCorrector(self)
+            return SFFCorrector(self, **kwargs)
+        elif method == "cbv":
+            from .correctors import CBVCorrector
+            return CBVCorrector(self, **kwargs)
 
     @deprecated_renamed_argument(
         "t0", "epoch_time", "2.0", warning_type=LightkurveDeprecationWarning
@@ -2645,6 +2643,58 @@ class LightCurve(QTimeSeries):
         result = result[result.distance > 0]
         log.info(f"Found {len(result)} neighbors.")
         return result
+
+    def head(self, n: int = 5):
+        """Return the first n rows.
+
+        Parameters
+        ----------
+        n : int
+            Number of rows to return.
+
+        Returns
+        -------
+        lc : LightCurve
+            Light curve containing the first n rows.
+        """
+        return self[:n]
+
+    def tail(self, n: int = 5):
+        """Return the last n rows.
+
+        Parameters
+        ----------
+        n : int
+            Number of rows to return.
+
+        Returns
+        -------
+        lc : LightCurve
+            Light curve containing the last n rows.
+        """
+        return self[-n:]
+
+    def truncate(self, before: float = None, after: float = None):
+        """Truncates the light curve before and after some time value.
+
+        Parameters
+        ---------_
+        before : float
+            Truncate all rows before this time value.
+        after : float
+            Truncate all rows after this time value.
+
+        Returns
+        -------
+        truncated_lc : LightCurve
+            The truncated light curve.
+        """
+        mask = np.ones(len(self), dtype=bool)
+        if before:
+            mask &= self.time.value >= before
+        if after:
+            mask &= self.time.value <= after
+        return self[mask]
 
 
 class FoldedLightCurve(LightCurve):
