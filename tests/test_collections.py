@@ -357,8 +357,10 @@ def test_accessor_k2_campaign():
 
 
 def test_unmergeable_columns():
-    """Regression test for #954."""
+    """Regression test for #954 and #1015."""
     lc1 = LightCurve(data={'time': [1,2,3], 'x': [1,2,3]})
     lc2 = LightCurve(data={'time': [1,2,3], 'x': [1,2,3]*u.electron/u.second})
     with pytest.warns(LightkurveWarning, match="column types are incompatible"):
         LightCurveCollection([lc1, lc2]).stitch()
+    with pytest.warns(LightkurveWarning, match="column types are incompatible"):
+        lc1.append(lc2)
