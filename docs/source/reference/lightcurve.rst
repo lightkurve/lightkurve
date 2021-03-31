@@ -79,9 +79,12 @@ The following methods all return a new `LightCurve` object.
   LightCurve.fill_gaps
   LightCurve.flatten
   LightCurve.fold
+  LightCurve.head
   LightCurve.normalize
   LightCurve.remove_nans
   LightCurve.remove_outliers
+  LightCurve.tail
+  LightCurve.truncate
 
 
 
@@ -92,6 +95,7 @@ Conversions
 
   LightCurve.to_corrector
   LightCurve.to_csv
+  LightCurve.to_excel
   LightCurve.to_fits
   LightCurve.to_pandas
   LightCurve.to_periodogram

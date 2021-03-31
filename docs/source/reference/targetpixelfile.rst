@@ -55,3 +55,4 @@ Constructor
    KeplerTargetPixelFile.plot_pixels
    KeplerTargetPixelFile.get_header
    KeplerTargetPixelFile.get_keyword
+   KeplerTargetPixelFile.animate
