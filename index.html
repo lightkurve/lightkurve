@@ -167,14 +167,7 @@ Lightkurve aims to lower barriers, promote best practices, reduce costs,
 and improve scientific fidelity by providing accessible open source
 Python <a class="reference internal" href="reference/index.html#api"><span class="std std-ref">tools</span></a> and <a class="reference internal" href="tutorials/index.html#tutorials"><span class="std std-ref">tutorials</span></a>
 for time domain astronomy.</p>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Example: downloading &amp; plotting a phase-folded light curve of Proxima Centauri.</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
-<span class="n">lightcurve</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;Proxima Centauri&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s2">&quot;TESS&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<span class="n">lightcurve</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">11.184</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
+<a class="reference internal image-reference" href="_images/lightkurve-teaser.gif"><img alt="Lightkurve example usage" src="_images/lightkurve-teaser.gif" style="width: 800px;" /></a>
 <div class="section" id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">

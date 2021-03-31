@@ -37,6 +37,7 @@
       ~LightCurve.from_stingray
       ~LightCurve.from_timeseries
       ~LightCurve.group_by
+      ~LightCurve.head
       ~LightCurve.index_column
       ~LightCurve.index_mode
       ~LightCurve.insert_row
@@ -74,6 +75,7 @@
       ~LightCurve.show_in_notebook
       ~LightCurve.show_properties
       ~LightCurve.sort
+      ~LightCurve.tail
       ~LightCurve.to_corrector
       ~LightCurve.to_csv
       ~LightCurve.to_excel
@@ -84,6 +86,7 @@
       ~LightCurve.to_stingray
       ~LightCurve.to_table
       ~LightCurve.to_timeseries
+      ~LightCurve.truncate
       ~LightCurve.values
       ~LightCurve.values_equal
    

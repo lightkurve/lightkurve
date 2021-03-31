@@ -37,6 +37,7 @@
       ~FoldedLightCurve.from_stingray
       ~FoldedLightCurve.from_timeseries
       ~FoldedLightCurve.group_by
+      ~FoldedLightCurve.head
       ~FoldedLightCurve.index_column
       ~FoldedLightCurve.index_mode
       ~FoldedLightCurve.insert_row
@@ -74,6 +75,7 @@
       ~FoldedLightCurve.show_in_notebook
       ~FoldedLightCurve.show_properties
       ~FoldedLightCurve.sort
+      ~FoldedLightCurve.tail
       ~FoldedLightCurve.to_corrector
       ~FoldedLightCurve.to_csv
       ~FoldedLightCurve.to_excel
@@ -84,6 +86,7 @@
       ~FoldedLightCurve.to_stingray
       ~FoldedLightCurve.to_table
       ~FoldedLightCurve.to_timeseries
+      ~FoldedLightCurve.truncate
       ~FoldedLightCurve.values
       ~FoldedLightCurve.values_equal
    

@@ -13,7 +13,7 @@
    "source": [
     "Cotrending Basis Vectors (CBVs) are generated in the PDC component of the Kepler/K2/TESS pipeline and are used to remove systematic trends in light curves. They are built from the most common systematic trends observed in each PDC Unit of Work (Quarter for Kepler, Campaign for K2 and Sector for TESS). Each Kepler and K2 module output and each TESS CCD has its own set of CBVs. You can read an introduction to the CBVs in [Demystifying Kepler Data](https://arxiv.org/pdf/1207.3093.pdf) or to greater detail in the [Kepler Data Processing Handbook](https://archive.stsci.edu/kepler/manuals/KSCI-19081-003-KDPH.pdf). The same basic method to generate CBVs is used for all three missions.\n",
     "\n",
-    "This tutorial provides examples of how to utilize the various CBVs to clean lightcurves of common trends experienced by all targets. The technique exploits two goodness metrics that characterize the performance of the fit. [CBVCorrector](https://docs.lightkurve.org/reference/api/lightkurve.correctors.CBVCorrector.html?highlight=cbvcorrector) inherits the [RegressionCorrector](https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector) class in LightKurve. It is recommend to first read the tutorial on [obtaining the CBVs](https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.html)  before reading this tutorial."
+    "This tutorial provides examples of how to utilize the various CBVs to clean lightcurves of common trends experienced by all targets. The technique exploits two goodness metrics that characterize the performance of the fit. [CBVCorrector](https://docs.lightkurve.org/reference/api/lightkurve.correctors.CBVCorrector.html) inherits the [RegressionCorrector](https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector) class in LightKurve. It is recommend to first read the tutorial on [obtaining the CBVs](https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.html)  before reading this tutorial."
    ]
   },
   {
@@ -168,15 +168,15 @@
    "source": [
     "There are four correction methods within `CBVCorrector`:\n",
     "\n",
-    "- **correct**: Performs a numerical correction by optimizing the L2-Norm regularization penalty term using the goodness metrics as the Loss Function.\n",
+    "- **correct**: Performs a numerical correction using the LightKurve [RegressionCorrector.correct](https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.correct.html?highlight=regressioncorrector%20correct#lightkurve.correctors.RegressionCorrector.correct) method while optimizing the L2-Norm regularization penalty term using the goodness metrics as the Loss Function.\n",
     "\n",
     "- **correct_gaussian_prior**: Performs an analytical correction using the LightKurve [RegressionCorrector.correct](https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.correct.html?highlight=regressioncorrector%20correct#lightkurve.correctors.RegressionCorrector.correct) method while setting the L2-Norm (Ridge Regression) regularization penalty term as the Gaussian prior.\n",
     "\n",
     "- **correct_elasticnet**:  Performs the correction using Scikit-Learn's [ElasticNet](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html), which combines both an L1- and L2-Norm regularization.\n",
     "\n",
-    "- **correct_regressioncorrector**: Performs the standard `RegressionCorrector.correct` correction. RegressionCorrector is the superclass to CBVCorrector.\n",
+    "- **correct_regressioncorrector**: Performs the standard [RegressionCorrector.correct](https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.correct.html?highlight=regressioncorrector%20correct#lightkurve.correctors.RegressionCorrector.correct) correction. RegressionCorrector is the superclass to CBVCorrector and this is a \"passthrough\" method to access the superclass `correct` method.\n",
     "\n",
-    "If you are unfamilar with L1-Norm (LASSO) and L2-Norm (Ridge Regression) regularization then there are severel [excellent](https://press.princeton.edu/books/hardcover/9780691198309/statistics-data-mining-and-machine-learning-in-astronomy) [introductions](https://en.wikipedia.org/wiki/Regularization_(mathematics)). You can read how a L2-norm relates to a Gaussian prior in a linear design matrix in [this reference](https://katbailey.github.io/post/from-both-sides-now-the-math-of-linear-regression/).\n",
+    "If you are unfamilar with L1-Norm (LASSO) and L2-Norm (Ridge Regression) regularization then there are [severel](https://www.statlearning.com/), [excellent](https://press.princeton.edu/books/hardcover/9780691198309/statistics-data-mining-and-machine-learning-in-astronomy), [introductions](https://en.wikipedia.org/wiki/Regularization_(mathematics)). You can read how a L2-norm relates to a Gaussian prior in a linear design matrix in [this reference](https://katbailey.github.io/post/from-both-sides-now-the-math-of-linear-regression/).\n",
     "\n",
     "The default method is `correct` and generally speaking, one can use just this method to obtain a good fit. The other methods are for advanced usage.\n",
     "\n",
@@ -633,7 +633,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "CBVCorrector works equally across Kepler, K2 and TESS. However the Multi-Scale and Spike basis vectors are only available for TESS[<sup>1</sup>](#fn1). \n",
+    "CBVCorrector works equally across Kepler, K2 and TESS. However the Multi-Scale and Spike basis vectors are only available for TESS[<sup>1</sup>](#fn1). For K2, the [PLDCorrector](https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-3-k2-pldcorrector.html) and [SFFCorrector](https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-3-k2-sffcorrector.html) classes might work better than `CBVCorrector`.\n",
     "\n",
     "If you want to just get the CBVs but not generate a CBVCorrector object then use the functions _download_kepler_cbvs_ and _download_tess_cbvs_ within the cbvcorrector module as explained [here](https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.html)."
    ]
@@ -725,18 +725,20 @@
    ]
   },
   {
-   "cell_type": "raw",
+   "cell_type": "code",
+   "execution_count": null,
    "metadata": {},
+   "outputs": [],
    "source": [
-    "# Perform an initial optimization with a L2-Norm regularization\n",
-    "cbvCorrector.correct(cbv_type=cbv_type, cbv_indices=cbv_indices);\n",
+    "# 1) Perform an initial optimization with a L2-Norm regularization\n",
+    "# cbvCorrector.correct(cbv_type=cbv_type, cbv_indices=cbv_indices);\n",
     "\n",
-    "# Examine the quality of the resultant lightcurve in cbvcorrector.corrected_lc\n",
+    "# 2) Examine the quality of the resultant lightcurve in cbvcorrector.corrected_lc\n",
     "# Determine how to adjust the priors and make changes to the design matrix\n",
-    "cbvCorrector.design_matrix_collection[i].prior_sigma[j] = # ... adjust the priors\n",
+    "# cbvCorrector.design_matrix_collection[i].prior_sigma[j] = # ... adjust the priors\n",
     "\n",
-    "# Call the superclass correct method with the adjusted design_matrix_collection\n",
-    "cbvCorrector.correct_regressioncorrector(cbvCorrector.design_matrix_collection, **kwargs)"
+    "# 3) Call the superclass correct method with the adjusted design_matrix_collection\n",
+    "# cbvCorrector.correct_regressioncorrector(cbvCorrector.design_matrix_collection, **kwargs)"
    ]
   },
   {
@@ -807,7 +809,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.6.10"
+   "version": "3.8.8"
   }
  },
  "nbformat": 4,

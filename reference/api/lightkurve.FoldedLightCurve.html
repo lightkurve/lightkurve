@@ -301,7 +301,7 @@ and implements different plotting defaults.</p>
 <td><p>Returns a boolean array that is <code class="docutils literal notranslate"><span class="pre">True</span></code> during transits and <code class="docutils literal notranslate"><span class="pre">False</span></code> elsewhere.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.FoldedLightCurve.errorbar.html#lightkurve.FoldedLightCurve.errorbar" title="lightkurve.FoldedLightCurve.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
+<td><p>Plot the folded light curve using matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_cdpp</span></code>([transit_duration, …])</p></td>
 <td><p>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</p></td>
@@ -333,116 +333,122 @@ and implements different plotting defaults.</p>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">group_by</span></code>(keys)</p></td>
 <td><p>Group this table by the specified <code class="docutils literal notranslate"><span class="pre">keys</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index_column</span></code>(name)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">head</span></code>([n])</p></td>
+<td><p>Return the first n rows.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index_column</span></code>(name)</p></td>
 <td><p>Return the positional index of column <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index_mode</span></code>(mode)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index_mode</span></code>(mode)</p></td>
 <td><p>Return a context manager for an indexing mode.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert_row</span></code>(index[, vals, mask])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert_row</span></code>(index[, vals, mask])</p></td>
 <td><p>Add a new row before the given <code class="docutils literal notranslate"><span class="pre">index</span></code> position in the table.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_bls</span></code>([notebook_url, minimum_period, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_bls</span></code>([notebook_url, minimum_period, …])</p></td>
 <td><p>Display an interactive Jupyter Notebook widget to find planets.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">itercols</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">itercols</span></code>()</p></td>
 <td><p>Iterate over the columns of this table.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterrows</span></code>(*names)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterrows</span></code>(*names)</p></td>
 <td><p>Iterate over rows of table returning a tuple of values for each row.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keep_columns</span></code>(names)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keep_columns</span></code>(names)</p></td>
 <td><p>Keep only the columns specified (remove the others).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">more</span></code>([max_lines, max_width, show_name, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">more</span></code>([max_lines, max_width, show_name, …])</p></td>
 <td><p>Interactively browse table with a paging interface.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code>([unit])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code>([unit])</p></td>
 <td><p>Returns a normalized version of the light curve.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pformat</span></code>([max_lines, max_width, show_name, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pformat</span></code>([max_lines, max_width, show_name, …])</p></td>
 <td><p>Return a list of lines for the formatted string representation of</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pformat_all</span></code>([max_lines, max_width, …])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pformat_all</span></code>([max_lines, max_width, …])</p></td>
 <td><p>Return a list of lines for the formatted string representation of</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.FoldedLightCurve.plot.html#lightkurve.FoldedLightCurve.plot" title="lightkurve.FoldedLightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.FoldedLightCurve.plot.html#lightkurve.FoldedLightCurve.plot" title="lightkurve.FoldedLightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(**kwargs)</p></td>
+<td><p>Plot the folded light curve using matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html#lightkurve.FoldedLightCurve.plot_river" title="lightkurve.FoldedLightCurve.plot_river"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_river</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html#lightkurve.FoldedLightCurve.plot_river" title="lightkurve.FoldedLightCurve.plot_river"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_river</span></code></a>(**kwargs)</p></td>
 <td><p>Plot the folded light curve in a river style.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pprint</span></code>([max_lines, max_width, show_name, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pprint</span></code>([max_lines, max_width, show_name, …])</p></td>
 <td><p>Print a formatted string representation of the table.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pprint_all</span></code>([max_lines, max_width, …])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pprint_all</span></code>([max_lines, max_width, …])</p></td>
 <td><p>Print a formatted string representation of the entire table.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_solar_system_objects</span></code>([cadence_mask, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_solar_system_objects</span></code>([cadence_mask, …])</p></td>
 <td><p>Returns a list of asteroids or comets which affected the light curve.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code>(filename[, time_column, time_format, …])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code>(filename[, time_column, time_format, …])</p></td>
 <td><p>Read and parse a file and returns a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_column</span></code>(name)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_column</span></code>(name)</p></td>
 <td><p>Remove a column from the table.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_columns</span></code>(names)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_columns</span></code>(names)</p></td>
 <td><p>Remove several columns from the table.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_indices</span></code>(colname)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_indices</span></code>(colname)</p></td>
 <td><p>Remove all indices involving the given column.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_nans</span></code>([column])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_nans</span></code>([column])</p></td>
 <td><p>Removes cadences where <code class="docutils literal notranslate"><span class="pre">column</span></code> is a NaN.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_outliers</span></code>([sigma, sigma_lower, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_outliers</span></code>([sigma, sigma_lower, …])</p></td>
 <td><p>Removes outlier data points using sigma-clipping.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_row</span></code>(index)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_row</span></code>(index)</p></td>
 <td><p>Remove a row from the table.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_rows</span></code>(row_specifier)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_rows</span></code>(row_specifier)</p></td>
 <td><p>Remove rows from the table.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename_column</span></code>(name, new_name)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename_column</span></code>(name, new_name)</p></td>
 <td><p>Rename a column.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename_columns</span></code>(names, new_names)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename_columns</span></code>(names, new_names)</p></td>
 <td><p>Rename multiple columns.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">replace_column</span></code>(name, col[, copy])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">replace_column</span></code>(name, col[, copy])</p></td>
 <td><p>Replace column <code class="docutils literal notranslate"><span class="pre">name</span></code> with the new <code class="docutils literal notranslate"><span class="pre">col</span></code> object.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse</span></code>()</p></td>
 <td><p>Reverse the row order of table rows.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">round</span></code>([decimals])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">round</span></code>([decimals])</p></td>
 <td><p>Round numeric columns in-place to the specified number of decimals.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.FoldedLightCurve.scatter.html#lightkurve.FoldedLightCurve.scatter" title="lightkurve.FoldedLightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.3.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.FoldedLightCurve.scatter.html#lightkurve.FoldedLightCurve.scatter" title="lightkurve.FoldedLightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(**kwargs)</p></td>
+<td><p>Plot the folded light curve using matplotlib’s <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_neighbors</span></code>([limit, radius])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_neighbors</span></code>([limit, radius])</p></td>
 <td><p>Search the data archive at MAST for the most nearby light curves.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_in_browser</span></code>([max_lines, jsviewer, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_in_browser</span></code>([max_lines, jsviewer, …])</p></td>
 <td><p>Render the table in HTML and show it in a web browser.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_in_notebook</span></code>([tableid, css, …])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_in_notebook</span></code>([tableid, css, …])</p></td>
 <td><p>Render the table in HTML and show it in the IPython notebook.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code>()</p></td>
 <td><p>Prints a description of all non-callable attributes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort</span></code>([keys, reverse])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort</span></code>([keys, reverse])</p></td>
 <td><p>Sort the table according to one or more keys.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tail</span></code>([n])</p></td>
+<td><p>Return the last n rows.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector</span></code>([method])</p></td>
 <td><p>Returns a corrector object to remove instrument systematics.</p></td>
@@ -477,10 +483,13 @@ and implements different plotting defaults.</p>
 </div>
 </p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">truncate</span></code>([before, after])</p></td>
+<td><p>Truncates the light curve before and after some time value.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values_equal</span></code>(other)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values_equal</span></code>(other)</p></td>
 <td><p>Element-wise comparison of table with another table, list, or scalar.</p></td>
 </tr>
 </tbody>

@@ -353,7 +353,7 @@
 <h1>lightkurve.KeplerTargetPixelFile.to_lightcurve<a class="headerlink" href="#lightkurve-keplertargetpixelfile-to-lightcurve" title="Permalink to this headline">¶</a></h1>
 <dl class="py method">
 <dt id="lightkurve.KeplerTargetPixelFile.to_lightcurve">
-<code class="sig-prename descclassname"><span class="pre">KeplerTargetPixelFile.</span></code><code class="sig-name descname"><span class="pre">to_lightcurve</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aperture'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.to_lightcurve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">KeplerTargetPixelFile.</span></code><code class="sig-name descname"><span class="pre">to_lightcurve</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sap'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.to_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs photometry on the pixel data and returns a LightCurve object.</p>
 <p>See the docstring of <code class="xref py py-obj docutils literal notranslate"><span class="pre">aperture_photometry()</span></code> for valid
 arguments if the method is ‘aperture’.  Otherwise, see the docstring
@@ -361,7 +361,7 @@ of <code class="xref py py-obj docutils literal notranslate"><span class="pre">p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>method</strong><span class="classifier">‘aperture’ or ‘prf’.</span></dt><dd><p>Photometry method to use.</p>
+<dt><strong>method</strong><span class="classifier">‘aperture’, ‘prf’, ‘sap’, ‘sff’, ‘cbv’, ‘pld’.</span></dt><dd><p>Photometry method to use.</p>
 </dd>
 <dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Extra arguments to be passed to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">aperture_photometry</span></code> or the
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_photometry</span></code> method of this class.</p>
