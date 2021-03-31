@@ -529,7 +529,7 @@ class TargetPixelFile(object):
                     idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
-    def to_lightcurve(self, method="aperture", **kwargs):
+    def to_lightcurve(self, method="sap", corrector=None, **kwargs):
         """Performs photometry on the pixel data and returns a LightCurve object.
 
         See the docstring of `aperture_photometry()` for valid
@@ -538,7 +538,7 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        method : 'aperture' or 'prf'.
+        method : 'aperture', 'prf', 'sap', 'sff', 'cbv', 'pld'.
             Photometry method to use.
         **kwargs : dict
             Extra arguments to be passed to the `aperture_photometry` or the
@@ -549,12 +549,16 @@ class TargetPixelFile(object):
         lc : LightCurve object
             Object containing the resulting lightcurve.
         """
-        if method == "aperture":
+        method = validate_method(method, supported_methods=["aperture", "prf", "sap", "sff", "cbv", "pld"])
+        if method in ["aperture", "sap"]:
             return self.extract_aperture_photometry(**kwargs)
         elif method == "prf":
             return self.prf_lightcurve(**kwargs)
-        else:
-            raise ValueError("Photometry method must be 'aperture' or 'prf'.")
+        elif method in ["sff", "cbv"]:
+            lc = self.extract_aperture_photometry(**kwargs)
+            return lc.to_corrector(method).correct()
+        elif method == "pld":
+            return self.to_corrector("pld", **kwargs).correct()
 
     def _resolve_default_aperture_mask(self, aperture_mask):
         if isinstance(aperture_mask, str) and (aperture_mask == "default"):
@@ -1347,7 +1351,7 @@ class TargetPixelFile(object):
             self, notebook_url=notebook_url, magnitude_limit=magnitude_limit
         )
 
-    def to_corrector(self, method="pld"):
+    def to_corrector(self, method="pld", **kwargs):
         """Returns a `Corrector` instance to remove systematics.
 
         Parameters
@@ -1355,6 +1359,8 @@ class TargetPixelFile(object):
         methods : string
             Currently, only "pld" is supported.  This will return a
             `PLDCorrector` class instance.
+        **kwargs : dict
+            Extra keyword arguments to be passed on to the corrector class.
 
         Returns
         -------
@@ -1378,7 +1384,7 @@ class TargetPixelFile(object):
         if method == "pld":
             from .correctors import PLDCorrector
 
-            return PLDCorrector(self)
+            return PLDCorrector(self, **kwargs)
 
     def cutout(self, center=None, size=5):
         """Cut a rectangle out of the Target Pixel File.
