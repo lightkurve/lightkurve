@@ -1,4 +1,4 @@
-2.0.9 (unreleased)
+2.0.9 (2021-03-31)
 ==================
 
 - Added the ``head()``, ``tail()``, and ``truncate()`` convenience methods
