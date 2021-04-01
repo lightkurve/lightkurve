@@ -979,10 +979,9 @@ def _search_products(
             # K2 campaigns 9, 10, and 11 were split into two halfs, which are
             # listed separately in the table with suffixes "-1" and "-2"
             if obs_project == "K2" and result["sequence_number"][idx] in [9, 10, 11]:
-                obs_camp = result["sequence_number"][idx]
                 for half in [1,2]:
-                    if f"c{obs_camp}{half}" in result["obs_id"][idx]:
-                        obs_seqno = f"{int(obs_camp):02d}-{half}"
+                    if f"c{tmp_seqno}{half}" in result["obs_id"][idx]:
+                        obs_seqno = f"{int(tmp_seqno):02d}-{half}"
             result["mission"][idx] = "{} {} {}".format(
                 obs_project, obs_prefix.get(obs_project, ""), obs_seqno
             )
