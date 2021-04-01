@@ -498,3 +498,20 @@ def test_spoc_ffi_lightcurve():
     assert search.exptime[0] == 30 * u.minute  # Sector 26 had 30-minute FFIs
     lc = search.download()
     all(lc.flux == lc.pdcsap_flux)
+
+
+@pytest.mark.remote_data
+def test_split_k2_campaigns():
+    """Do split K2 campaign sections appear separately in search results?"""
+    # Campaign 9
+    search_c09 = search_targetpixelfile("EPIC 228162462", cadence="long", campaign=9)
+    assert search_c09.table["mission"][0] == "K2 Campaign 09a"
+    assert search_c09.table["mission"][1] == "K2 Campaign 09b"
+    # Campaign 10
+    search_c10 = search_targetpixelfile("EPIC 228725972", cadence="long", campaign=10)
+    assert search_c10.table["mission"][0] == "K2 Campaign 10a"
+    assert search_c10.table["mission"][1] == "K2 Campaign 10b"
+    # Campaign 11
+    search_c11 = search_targetpixelfile("EPIC 203830112", cadence="long", campaign=11)
+    assert search_c11.table["mission"][0] == "K2 Campaign 11a"
+    assert search_c11.table["mission"][1] == "K2 Campaign 11b"

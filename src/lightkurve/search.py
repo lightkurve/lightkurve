@@ -976,6 +976,12 @@ def _search_products(
                     obs_seqno = f"{int(tmp_seqno):02d}"
                 except IndexError:
                     obs_seqno = ""
+            # K2 campaigns 9, 10, and 11 were split into two sections, which are
+            # listed separately in the table with suffixes "a" and "b"
+            if obs_project == "K2" and result["sequence_number"][idx] in [9, 10, 11]:
+                for half,letter in zip([1,2],['a','b']):
+                    if f"c{tmp_seqno}{half}" in result["productFilename"][idx]:
+                        obs_seqno = f"{int(tmp_seqno):02d}{letter}"
             result["mission"][idx] = "{} {} {}".format(
                 obs_project, obs_prefix.get(obs_project, ""), obs_seqno
             )
