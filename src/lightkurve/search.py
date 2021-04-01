@@ -976,7 +976,7 @@ def _search_products(
                     obs_seqno = f"{int(tmp_seqno):02d}"
                 except IndexError:
                     obs_seqno = ""
-            # K2 campaigns 9, 10, and 11 were split into two halfs, which are
+            # K2 campaigns 9, 10, and 11 were split into two sections, which are
             # listed separately in the table with suffixes "-1" and "-2"
             if obs_project == "K2" and result["sequence_number"][idx] in [9, 10, 11]:
                 for half in [1,2]:
