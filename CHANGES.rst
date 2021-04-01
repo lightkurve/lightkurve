@@ -1,3 +1,11 @@
+2.0.10 (unreleased)
+===================
+
+- Modified the search functions to ensure the two parts of K2 Campaigns
+  9, 10, and 11 are more clearly marked. [#1018]
+
+
+
 2.0.9 (2021-03-31)
 ==================
 
