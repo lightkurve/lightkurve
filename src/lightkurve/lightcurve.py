@@ -195,6 +195,9 @@ class LightCurve(QTimeSeries):
     # initial construction of the object using `_new_attributes_relax`.
     _new_attributes_relax = True
 
+    # cf. issue #925
+    __array_priority__ = 100_000
+
     def __init__(self, data=None, *args, time=None, flux=None, flux_err=None, **kwargs):
         # Delay checking for required columns until the end
         self._required_columns_relax = True

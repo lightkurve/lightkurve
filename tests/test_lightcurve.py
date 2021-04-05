@@ -134,6 +134,17 @@ def test_math_operators_on_units():
     assert lc_div.flux_err.unit == 1 / u.pixel
 
 
+def test_math_regression_925():
+    """Regression test for #925: left hand side multiplication with a np.float failed."""
+    lc = LightCurve(time=[1, 2, 3], flux=[1, 1, 1], flux_err=[1, 1, 1])
+    for three in [3, 3.0, np.float64(3), u.Quantity(3.)]:
+        # left hand side multiplication with a numpy float failed in the past, cf. #925
+        assert all((three * lc).flux == 3)
+        assert all((lc * three).flux == 3)
+        assert all((three + lc).flux == 4)
+        assert all((lc + three).flux == 4)
+
+
 @pytest.mark.remote_data
 @pytest.mark.parametrize("path, mission", [(TABBY_Q8, "Kepler"), (K2_C08, "K2")])
 def test_KeplerLightCurveFile(path, mission):
