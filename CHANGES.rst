@@ -4,6 +4,8 @@
 - Modified the search functions to ensure the two parts of K2 Campaigns
   9, 10, and 11 are more clearly marked. [#1018]
 
+- Fixed a bug in ``LightCurve`` which caused left-hand side multiplication
+  with NumPy floats and AstroPy Quantity objects to fail. [#925]
 
 
 2.0.9 (2021-03-31)
