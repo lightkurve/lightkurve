@@ -7,6 +7,9 @@
 - Fixed a bug in ``LightCurve`` which caused left-hand side multiplication
   with NumPy floats and AstroPy Quantity objects to fail. [#925]
 
+- Fixed a bug which caused ``TargetPixelFile.to_lightcurve()`` to fail when
+  a pixel file lacked the keywords "TUNIT5" or "TUNIT6".
+
 
 2.0.9 (2021-03-31)
 ==================

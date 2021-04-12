@@ -344,19 +344,17 @@ class TargetPixelFile(object):
     @property
     def flux(self) -> Quantity:
         """Returns the flux for all good-quality cadences."""
-        if self.get_header(1)["TUNIT5"] == "e-/s":
+        unit = None
+        if self.get_header(1).get("TUNIT5") == "e-/s":
             unit = "electron/s"
-        else:
-            unit = "dimensionless"
         return Quantity(self.hdu[1].data["FLUX"][self.quality_mask], unit=unit)
 
     @property
     def flux_err(self) -> Quantity:
         """Returns the flux uncertainty for all good-quality cadences."""
-        if self.get_header(1)["TUNIT6"] == "e-/s":
+        unit = None
+        if self.get_header(1).get("TUNIT6") == "e-/s":
             unit = "electron/s"
-        else:
-            unit = "dimensionless"
         return Quantity(self.hdu[1].data["FLUX_ERR"][self.quality_mask], unit=unit)
 
     @property
@@ -893,8 +891,9 @@ class TargetPixelFile(object):
             is_allnan = ~np.any(np.isfinite(self.flux_err[:, apmask]), axis=1)
             flux_err[is_allnan] = np.nan
 
-        if self.get_header(1)["TUNIT5"] == "e-/s":
+        if self.get_header(1).get("TUNIT5") == "e-/s":
             flux = Quantity(flux, unit="electron/s")
+        if self.get_header(1).get("TUNIT6") == "e-/s":
             flux_err = Quantity(flux_err, unit="electron/s")
 
         return flux, flux_err, centroid_col, centroid_row
@@ -2039,10 +2038,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         # Use the KEPLERID keyword as the default targetid
         if self.targetid is None:
-            try:
-                self.targetid = self.get_header()["KEPLERID"]
-            except KeyError:
-                pass
+            self.targetid = self.get_header().get("KEPLERID")
 
     def __repr__(self):
         return "KeplerTargetPixelFile Object (ID: {})".format(self.targetid)
@@ -2717,10 +2713,7 @@ class TessTargetPixelFile(TargetPixelFile):
 
         # Use the TICID keyword as the default targetid
         if self.targetid is None:
-            try:
-                self.targetid = self.get_header()["TICID"]
-            except KeyError:
-                pass
+            self.targetid = self.get_header().get("TICID")
 
     def __repr__(self):
         return "TessTargetPixelFile(TICID: {})".format(self.targetid)
