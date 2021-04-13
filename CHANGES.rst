@@ -10,6 +10,9 @@
 - Fixed a bug which caused ``TargetPixelFile.to_lightcurve()`` to fail when
   a pixel file lacked the keywords "TUNIT5" or "TUNIT6".
 
+- Fixed a bug which caused the ``column`` parameter to be ignored in
+  ``TargetPixelFile.animate()``.
+
 
 2.0.9 (2021-03-31)
 ==================

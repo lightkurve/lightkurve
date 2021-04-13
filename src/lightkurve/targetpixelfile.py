@@ -1179,6 +1179,7 @@ class TargetPixelFile(object):
             if step < 1:
                 step = 1
 
+        column = plot_args.get("column", "FLUX")
         ax = self.plot(**plot_args)
 
         def init():
@@ -1186,7 +1187,7 @@ class TargetPixelFile(object):
 
         def animate(i):
             frame = i * step
-            ax.images[0].set_data(self.flux[frame])
+            ax.images[0].set_data(self.hdu[1].data[column][self.quality_mask][frame])
             ax.set_title(f"Frame {frame}")
             return ax.images
 
