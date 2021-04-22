@@ -13,6 +13,9 @@
 - Fixed a bug which caused the ``column`` parameter to be ignored in
   ``TargetPixelFile.animate()``.
 
+- Fixed a bug in ``TargetPixelFile.interact()`` when ``ylim_func`` is specified and
+  users tap to select custom apertures. [#1033]
+
 
 2.0.9 (2021-03-31)
 ==================
@@ -229,7 +232,7 @@ lightkurve.search
   MAST by default, including community-contributed light curves. [#933]
 
 - Modified the search functions to show the author and exposure time of each
-  data product in the search results table. [#831]  
+  data product in the search results table. [#831]
 
 - Added support for reading in High Level Science Product light curves, including
   TESS-SPOC, QLP, TASOC, K2SFF, EVEREST, PATHOS. [#739, #913, #935, #939]
