@@ -1,9 +1,0 @@
-sphinx
-sphinx-automodapi
-sphinxcontrib-rawfiles
-amunra-sphinx-theme
-nbsphinx
-graphviz
-ghp-import
-numpydoc
-pandocfilters
