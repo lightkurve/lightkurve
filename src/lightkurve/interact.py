@@ -784,7 +784,7 @@ def show_interact_widget(
                 if ylim_func is None:
                     ylims = get_lightcurve_y_limits(lc_source)
                 else:
-                    ylims = ylim_func(lc_new)
+                    ylims = _to_unitless(ylim_func(lc_new))
                 fig_lc.y_range.start = ylims[0]
                 fig_lc.y_range.end = ylims[1]
             else:
