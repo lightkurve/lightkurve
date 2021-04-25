@@ -482,7 +482,6 @@ def test_cdpp_tabby():
     assert np.abs(lc2.estimate_cdpp().value - lc.cdpp6_0) < 30
 
 
-# TEMPORARILY SKIPPED, cf. https://github.com/lightkurve/lightkurve/issues/663
 def test_bin():
     """Does binning work?"""
     with warnings.catch_warnings():  # binsize is deprecated
@@ -605,7 +604,6 @@ def test_bins_kwarg():
     #   - Bins = 310.0
 
 
-# TEMPORARILY SKIPPED, cf. https://github.com/lightkurve/lightkurve/issues/663
 def test_bin_quality():
     """Binning must also revise the quality and centroid columns."""
     lc = KeplerLightCurve(
@@ -1129,7 +1127,6 @@ def test_river():
         plt.close()
 
 
-# TEMPORARILY SKIPPED, cf. https://github.com/lightkurve/lightkurve/issues/663
 def test_bin_issue705():
     """Regression test for #705: binning failed."""
     lc = TessLightCurve(time=np.arange(50), flux=np.ones(50), quality=np.zeros(50))
