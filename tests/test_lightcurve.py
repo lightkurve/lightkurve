@@ -519,6 +519,17 @@ def test_bin():
         assert np.round(lc.bin(2000).flux_err[0], 2) == 0.01
 
 
+def test_bin_meta():
+    """Ensure .bin() result carries original meta. See #1040 """
+    lc = LightCurve(
+        time=np.arange(10), flux=2 * np.ones(10), flux_err=2 ** 0.5 * np.ones(10)
+    )
+    lc.meta['CREATOR'] = 'lk unit test'
+    lc.meta['SECTOR'] = 99
+    binned_lc = lc.bin(time_bin_size=5)
+    assert binned_lc.meta == lc.meta
+
+
 def test_bin_folded():
     # bin folded light curves issue #927
     lc = LightCurve(
