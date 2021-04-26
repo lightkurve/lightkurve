@@ -1382,9 +1382,7 @@ class LightCurve(QTimeSeries):
             ts.remove_column(colname)
             ts.add_column(tmpcol, name=colname, index=idx)
 
-        binned_lc = self.__class__(ts)
-        binned_lc.meta.update(self.meta)
-        return binned_lc
+        return self.__class__(ts, meta=self.meta)
 
     def estimate_cdpp(
         self, transit_duration=13, savgol_window=101, savgol_polyorder=2, sigma=5.0
