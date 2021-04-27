@@ -1381,7 +1381,9 @@ def test_attr_access_others():
     assert_array_equal(lc.foo, val_of_col_updated)
 
     # case the same name is present as column name, meta key, and actual attribute
-    lc.bar = "bar_attr_val"
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        lc.bar = "bar_attr_val"
     lc["bar"] = [7, 8, 9]
     lc.meta["BAR"] = "bar_meta_val"
     assert lc.bar == "bar_attr_val"  # actual attribute takes priority
