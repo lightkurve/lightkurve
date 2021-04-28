@@ -55,6 +55,18 @@ def detect_filetype(hdulist: HDUList) -> str:
     if all(
         x in hdulist[1].columns.names
         for x in [
+            "LC0_AP1",
+            "ELC0_AP1",
+            "LC1_AP1",
+            "ELC1_AP1",
+        ]
+    ):
+        return "DIAMANTE"
+
+    # Likewise, DIAMANTE products can only be identified by their column name fingerprint
+    if all(
+        x in hdulist[1].columns.names
+        for x in [
             "PSF_FLUX_RAW",
             "PSF_FLUX_COR",
             "AP4_FLUX_RAW",
