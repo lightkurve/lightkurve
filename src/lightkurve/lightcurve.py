@@ -19,6 +19,7 @@ from astropy import units as u
 from astropy.units import Quantity
 from astropy.timeseries import TimeSeries, aggregate_downsample
 from astropy.table import vstack
+from astropy.stats import calculate_bin_edges
 from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 from astropy.utils.exceptions import AstropyUserWarning
 
@@ -37,9 +38,12 @@ __all__ = ["LightCurve", "KeplerLightCurve", "TessLightCurve", "FoldedLightCurve
 
 log = logging.getLogger(__name__)
 
+_HAS_VAR_BINS = 'time_bin_end' in aggregate_downsample.__kwdefaults__
+
 
 class QColumn(Column):
-    """(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``."""
+    """(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``.
+    """
 
     @property
     def value(self):
@@ -47,7 +51,8 @@ class QColumn(Column):
 
 
 class QMaskedColumn(MaskedColumn):
-    """(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``."""
+    """(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``.
+    """
 
     @property
     def value(self):
@@ -56,10 +61,11 @@ class QMaskedColumn(MaskedColumn):
 
 class QTimeSeries(TimeSeries):
     def _convert_col_for_table(self, col):
-        """Ensure resulting column has  ``.value`` accessor to raw data, irrespective of type of input.
+        """
+        Ensure resulting column has  ``.value`` accessor to raw data, irrespective of type of input.
 
         It won't be needed once https://github.com/astropy/astropy/pull/10962 is in astropy release
-        and Lightkurve requires the correspond astropy release.
+        and Lightkurve requires the corresponding astropy release (4.3).
         """
         # string-typed columns should not have a unit, or it will make convert_col_for_table crash!
         # see https://github.com/lightkurve/lightkurve/pull/980#issuecomment-806178939
@@ -103,7 +109,8 @@ class QTimeSeries(TimeSeries):
 
 
 class LightCurve(QTimeSeries):
-    """Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.
+    """
+    Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.
 
     Compared to the generic `~astropy.timeseries.TimeSeries` class, `LightCurve`
     ensures that each object has `time`, `flux`, and `flux_err` columns.
@@ -1250,6 +1257,7 @@ class LightCurve(QTimeSeries):
         self,
         time_bin_size=None,
         time_bin_start=None,
+        time_bin_end=None,
         n_bins=None,
         aggregate_func=None,
         bins=None,
@@ -1264,12 +1272,30 @@ class LightCurve(QTimeSeries):
 
         Parameters
         ----------
-        time_bin_size : `~astropy.units.Quantity`, float
-            The time interval for the binned time series.
+        time_bin_size : `~astropy.units.Quantity` or `~astropy.time.TimeDelta`, optional
+            The time interval for the binned time series - this is either a scalar
+            value (in which case all time bins will be assumed to have the same
+            duration) or as an array of values (in which case each time bin can
+            have a different duration). If this argument is provided,
+            ``time_bin_end`` should not be provided.
             (Default: 0.5 days; default unit: days.)
-        time_bin_start : `~astropy.time.Time`, optional
-            The start time for the binned time series. Defaults to the first
+        time_bin_start : `~astropy.time.Time` or iterable, optional
+            The start time for the binned time series - this can be either given
+            directly as a `~astropy.time.Time` array or as any iterable that
+            initializes the `~astropy.time.Time` class. This can also be a scalar
+            value if ``time_bin_size`` is provided. Defaults to the first
             time in the sampled time series.
+        time_bin_end : `~astropy.time.Time` or iterable, optional
+            The times of the end of each bin - this can be either given directly as
+            a `~astropy.time.Time` array or as any iterable that initializes the
+            `~astropy.time.Time` class. This can only be given if ``time_bin_start``
+            is an array of values. If ``time_bin_end`` is a scalar, time bins are
+            assumed to be contiguous, such that the end of each bin is the start
+            of the next one, and ``time_bin_end`` gives the end time for the last
+            bin. If ``time_bin_end`` is an array, the time bins do not need to be
+            contiguous. If this argument is provided, ``time_bin_size`` should not
+            be provided. This option, like the iterable form of ``time_bin_start``,
+            requires Astropy 4.3.
         n_bins : int, optional
             The number of bins to use. Defaults to the number needed to fit all
             the original points. Note that this will create this number of bins
@@ -1277,9 +1303,15 @@ class LightCurve(QTimeSeries):
         aggregate_func : callable, optional
             The function to use for combining points in the same bin. Defaults
             to np.nanmean.
-        bins : int
-            The number of bins to divide the lightkurve into. In contrast to
-            ``n_bins`` this sets the length of ``time_bin_size`` accordingly.
+        bins : int, iterable or str, optional
+            If an int, this gives the number of bins to divide the lightkurve into.
+            In contrast to ``n_bins`` this adjusts the length of ``time_bin_size``
+            to accommodate the input time series length.
+            If it is an iterable of ints, it specifies the indices of the bin edges.
+            If a string, it must be one of  'blocks', 'knuth', 'scott' or 'freedman'
+            defining a method of automatically determining an optimal bin size.
+            See `~astropy.stats.histogram` for a description of each method.
+            Note that 'blocks' is not a useful method for regularly sampled data.
         binsize : int
             In Lightkurve v1.x, the default behavior of `bin()` was to create
             bins which contained an equal number data points in each bin.
@@ -1297,6 +1329,7 @@ class LightCurve(QTimeSeries):
         binned_lc : `LightCurve`
             A new light curve which has been binned.
         """
+        kwargs = dict()
         if binsize is not None and bins is not None:
             raise ValueError("Only one of ``bins`` and ``binsize`` can be specified.")
         elif ((binsize is not None or bins is not None)
@@ -1304,10 +1337,11 @@ class LightCurve(QTimeSeries):
             raise ValueError("``bins`` or ``binsize`` conflicts with "
                              "``n_bins`` or ``time_bin_size``.")
         elif bins is not None:
-            if np.array(bins).dtype != np.int:
+            if (bins not in ('blocks', 'knuth', 'scott', 'freedman') and
+                    np.array(bins).dtype != np.int):
                 raise TypeError("``bins`` must have integer type.")
-            elif np.size(bins) != 1:
-                raise ValueError("``bins`` must be a single number.")
+            elif (isinstance(bins, str) or np.size(bins) != 1) and not _HAS_VAR_BINS:
+                raise ValueError("Sequence or method for ``bins`` requires Astropy 4.3.")
 
         if time_bin_start is None:
             time_bin_start = self.time[0]
@@ -1324,14 +1358,34 @@ class LightCurve(QTimeSeries):
         # Backwards compatibility with Lightkurve v1.x
         if time_bin_size is None:
             if bins is not None:
-                i = len(self.time) - np.searchsorted(self.time, time_bin_start - 1 * u.ns)
-                time_bin_size = ((self.time[-1] - time_bin_start) * i / ((i - 1) * bins)).to(u.day)
+                if np.size(bins) == 1 and _HAS_VAR_BINS:
+                    # This actually calculates equal-length bins just as the method below;
+                    # should it instead set equal-number bins with binsize=int(len(self) / bins)?
+                    # Get start times in mjd and convert back to original format
+                    bin_starts = calculate_bin_edges(self.time.mjd, bins=bins)[:-1]
+                    time_bin_start = Time(Time(bin_starts, format='mjd'), format=self.time.format)
+                elif np.size(bins) == 1:
+                    warnings.warn(
+                        '"classic" `bins` require Astropy 4.3; will use constant lengths in time.',
+                        LightkurveWarning)
+                    i = len(self.time) - np.searchsorted(self.time, time_bin_start - 1 * u.ns)
+                    time_bin_size = ((self.time[-1] - time_bin_start) * i /
+                                     ((i - 1) * bins)).to(u.day)
+                else:
+                    time_bin_start = self.time[bins[:-1]]
+                    kwargs['time_bin_end'] = self.time[bins[1:]]
             elif binsize is not None:
-                i = np.searchsorted(self.time, time_bin_start - 1 * u.ns)
-                time_bin_size = (self.time[i + binsize] - self.time[i]).to(u.day)
+                if _HAS_VAR_BINS:
+                    time_bin_start = self.time[::binsize] - 1 * u.ns
+                else:
+                    warnings.warn(
+                        '`binsize` requires Astropy 4.3 to guarantee equal number of points; '
+                        'will use estimated time lengths for bins.', LightkurveWarning)
+                    i = np.searchsorted(self.time, time_bin_start - 1 * u.ns)
+                    time_bin_size = (self.time[i + binsize] - self.time[i]).to(u.day)
             else:
                 time_bin_size = 0.5 * u.day
-        if not isinstance(time_bin_size, Quantity):
+        elif not isinstance(time_bin_size, Quantity):
             time_bin_size *= u.day
 
         # Call AstroPy's aggregate_downsample
@@ -1344,6 +1398,7 @@ class LightCurve(QTimeSeries):
                 n_bins=n_bins,
                 time_bin_start=time_bin_start,
                 aggregate_func=aggregate_func,
+                **kwargs
             )
 
             # If `flux_err` is populated, assume the errors combine as the root-mean-square
