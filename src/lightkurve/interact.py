@@ -424,6 +424,16 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         if len(new) > 0:
             msg = "Selected:<br><br>"
             for idx in new:
+                tic_id = source.data['tic'].iat[idx]
+                if tic_id is not None:  # TESS-specific meta data, if available
+                    msg = msg + f"""
+TIC {tic_id}
+(<a target="_blank" href="https://exofop.ipac.caltech.edu/tess/target.php?id={tic_id}">ExoFOP</a>)
+<br>
+TESS Mag {source.data['TESSmag'].iat[idx]}
+<br>
+"""
+                # the main meta data
                 msg = msg + f"""
 Gaia source {source.data['source'].iat[idx]}
 (<a target="_blank" href="http://vizier.u-strasbg.fr/viz-bin/VizieR-S?Gaia DR2 {source.data['source'].iat[idx]}">Vizier</a>)
