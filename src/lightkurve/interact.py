@@ -367,7 +367,32 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     target_x, target_y = tpf.wcs.all_world2pix([[tpf.ra, tpf.dec]], 0)[0]
     fig.cross(x=tpf.column + target_x, y=tpf.row + target_y, size=20, color="black", line_width=1)
 
-    return fig, r
+    # a widget that displays some of the selected star's metadata
+    # so that they can be copied (e.g., GAIA ID).
+    # It is a workaround, because bokeh's hover tooltip disappears as soon as the mouse is away from the star.
+    message_selected_target = Div(text="")
+
+    def show_target_info(attr, old, new):
+        if len(new) > 0:
+            msg = "Selected:<br><br>"
+            for idx in new:
+                msg = msg + f"""
+Gaia source {source.data['source'].iat[idx]}
+(<a target="_blank" href="http://vizier.u-strasbg.fr/viz-bin/VizieR-S?Gaia DR2 {source.data['source'].iat[idx]}">Vizier</a>)
+<br>
+G {source.data['Gmag'].iat[idx]}
+<br>
+RA  {source.data['ra'].iat[idx]}
+<br>
+DEC {source.data['dec'].iat[idx]}
+<br><br>
+"""
+            message_selected_target.text = msg
+        # else do nothing (not clearing the widget) for now.
+
+    source.selected.on_change("indices", show_target_info)
+
+    return fig, r, message_selected_target
 
 
 def make_tpf_figure_elements(
@@ -939,7 +964,7 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", magnitude_limit=18):
             plot_width=640,
             plot_height=600,
         )
-        fig_tpf, r = add_gaia_figure_elements(
+        fig_tpf, r, message_selected_target = add_gaia_figure_elements(
             tpf, fig_tpf, magnitude_limit=magnitude_limit
         )
 
@@ -962,7 +987,7 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", magnitude_limit=18):
             )
 
         # Layout all of the plots
-        widgets_and_figures = layout([fig_tpf, stretch_slider])
+        widgets_and_figures = layout([fig_tpf, message_selected_target], [stretch_slider])
         doc.add_root(widgets_and_figures)
 
     output_notebook(verbose=False, hide_banner=True)
