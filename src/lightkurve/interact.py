@@ -354,14 +354,15 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
                 ("DEC", "@dec{0,0.00000000}"),
                 ("pmRA", "@pmra{0,0.000} mas/yr"),
                 ("pmDE", "@pmde{0,0.000} mas/yr"),
-                ("x", "@x"),
-                ("y", "@y"),
+                ("x", "@x{0}"),
+                ("y", "@y{0}"),
             ],
             renderers=[r],
             mode="mouse",
             point_policy="snap_to_data",
         )
     )
+
     return fig, r
 
 
