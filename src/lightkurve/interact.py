@@ -363,6 +363,10 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         )
     )
 
+    # mark the target's position too
+    target_x, target_y = tpf.wcs.all_world2pix([[tpf.ra, tpf.dec]], 0)[0]
+    fig.cross(x=tpf.column + target_x, y=tpf.row + target_y, size=20, color="black", line_width=1)
+
     return fig, r
 
 
