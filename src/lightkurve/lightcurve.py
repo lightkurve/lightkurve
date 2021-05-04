@@ -368,7 +368,7 @@ class LightCurve(QTimeSeries):
                     (
                         "Lightkurve doesn't allow columns or meta values to be created via a new attribute name."
                         "A new attribute is created. It will not be carried over when the object is copied."
-                        " - see https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html"
+                        " - see https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.html"
                     ),
                     UserWarning,
                     stacklevel=2,
