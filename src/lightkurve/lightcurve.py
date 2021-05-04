@@ -362,6 +362,7 @@ class LightCurve(QTimeSeries):
                 name not in self.__dict__
                 and not name.startswith("_")
                 and not self._new_attributes_relax
+                and name != 'meta'
             ):
                 warnings.warn(
                     (
