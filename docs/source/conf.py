@@ -19,6 +19,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.mathjax',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.viewcode',
     'nbsphinx',
     'numpydoc',
     'sphinxcontrib.rawfiles']
