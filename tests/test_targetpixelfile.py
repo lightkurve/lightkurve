@@ -1,3 +1,4 @@
+import collections
 import os
 import tempfile
 import warnings
@@ -842,6 +843,11 @@ def test_tpf_meta():
         tpf.meta["CHANNEL"] = 44
     with pytest.raises(TypeError):
         tpf.meta["KEY-NEW"] = 44
+    # needed for current internal HduToMetaMapping-based meta, ensuring it has
+    # a friendly __repr__() and __str__()
+    expected = collections.OrderedDict(tpf.meta).__repr__()
+    assert tpf.meta.__repr__() == expected
+    assert tpf.meta.__str__() == expected
 
 
 def test_estimate_background():
