@@ -66,7 +66,11 @@ class HduToMetaMapping(collections.abc.Mapping):
     """Provides a read-only view of HDU header in `astropy.timeseries.TimeSeries.meta` format"""
 
     def __init__(self, hdu):
-        self._dict = {}
+        # use OrderedDict rather than simple dict for 2 reasons:
+        # 1. more friendly __repr__ and __str__
+        # 2. make the behavior between a TPF and a LC is more consistent.
+        #    (LightCurve.meta is an OrderedDict)
+        self._dict = collections.OrderedDict()
         self._dict.update(hdu.header)
 
     def __getitem__(self, key):
@@ -77,6 +81,12 @@ class HduToMetaMapping(collections.abc.Mapping):
 
     def __iter__(self):
         return iter(self._dict)
+
+    def __repr__(self):
+        return self._dict.__repr__()
+
+    def __str__(self):
+        return self._dict.__str__()
 
 
 class TargetPixelFile(object):
