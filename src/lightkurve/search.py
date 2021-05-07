@@ -7,7 +7,7 @@ import re
 import warnings
 from requests import HTTPError
 
-from memoization import cached
+import diskcache
 import numpy as np
 from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
@@ -47,6 +47,88 @@ AUTHOR_LINKS = {
     "EVEREST": "https://archive.stsci.edu/hlsp/everest",
     "TESScut": "https://mast.stsci.edu/tesscut/",
 }
+
+
+# an instance of this is to expose to users to control MAST query cache
+class SearchResultCache(object):
+    def __init__(self):
+        self.expire_seconds = 86400
+        self._cache_dir = None
+        self._impl_real = None
+
+    @property
+    def cache_dir(self):
+        self._cache_dir
+
+    @cache_dir.setter
+    def cache_dir(self, value):
+        if value != self._cache_dir:
+            self._cache_dir = value
+            # once dir is set, init / re-init the actual cache implementation
+            self._impl_real = None
+
+    def clear(self):
+        self._impl.clear()
+
+    @property
+    def _impl(self):
+        # lazy init so that users have a chance to set cache_dir in some init codes
+        if self._impl_real is None:
+            cache_dir_real = self._cache_dir
+            if cache_dir_real is None:
+                cache_dir_real = os.path.join(os.path.expanduser("~"), ".lightkurve-cache")
+            cache_dir_real = os.path.join(cache_dir_real, "searchResult")
+            self._impl_real = diskcache.Cache(directory=cache_dir_real)
+        return self._impl_real
+
+    def _memoize(self, name=None, typed=False, expire=None, tag=None):
+        # Based on Cache.memorize(). Tweaked so that it allows cache dir to be set
+        # *after* decoration happens.
+        # Source: https://github.com/grantjenks/python-diskcache/blob/v5.2.1/diskcache/core.py
+
+        #  first adding aliases to the modules / functions referenced.
+        import functools as ft
+        ENOVAL = diskcache.core.ENOVAL
+        full_name = diskcache.core.full_name
+        args_to_key = diskcache.core.args_to_key
+
+        # the actual implementation
+        if callable(name):
+            raise TypeError('name cannot be callable')
+
+        def decorator(func):
+            "Decorator created by memoize() for callable `func`."
+            base = (full_name(func),) if name is None else (name,)
+
+            @ft.wraps(func)
+            def wrapper(*args, **kwargs):
+                "Wrapper for callable to cache arguments and return values."
+                key = wrapper.__cache_key__(*args, **kwargs)
+                # tweaked to refer to real cache instance at runtime, rather than the time of decoration
+                # so that the right cache instane (with correct dir) is used.
+                result = self._impl.get(key, default=ENOVAL, retry=True)
+
+                if result is ENOVAL:
+                    result = func(*args, **kwargs)
+                    if expire is None or expire > 0:
+                        # tweaked to refer to real cache instance at runtime, rather than the time of decoration
+                        # so that the right cache instane (with correct dir) is used.
+                        self._impl.set(key, result, expire, tag=tag, retry=True)
+
+                return result
+
+            def __cache_key__(*args, **kwargs):
+                "Make key for cache given function arguments."
+                return args_to_key(base, args, kwargs, typed)
+
+            wrapper.__cache_key__ = __cache_key__
+            return wrapper
+
+        return decorator
+
+
+# the instance that is exposed to users
+sr_cache = SearchResultCache()
 
 
 class SearchError(Exception):
@@ -536,7 +618,7 @@ class SearchResult(object):
         return path
 
 
-@cached
+@sr_cache._memoize(expire=sr_cache.expire_seconds, tag="tpf")
 def search_targetpixelfile(
     target,
     radius=None,
@@ -665,7 +747,7 @@ def search_lightcurvefile(*args, **kwargs):
     return search_lightcurve(*args, **kwargs)
 
 
-@cached
+@sr_cache._memoize(expire=sr_cache.expire_seconds, tag="lc")
 def search_lightcurve(
     target,
     radius=None,
@@ -797,7 +879,7 @@ def search_lightcurve(
         return SearchResult(None)
 
 
-@cached
+@sr_cache._memoize(expire=sr_cache.expire_seconds, tag="tesscut")
 def search_tesscut(target, sector=None):
     """Search the `MAST TESSCut service <https://mast.stsci.edu/tesscut/>`_ for a region
     of sky that is available as a TESS Full Frame Image cutout.
