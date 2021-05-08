@@ -52,6 +52,23 @@ except ImportError:
     # We will print a nice error message in the `show_interact_widget` function
     pass
 
+from pandas import Series
+from astropy.io import ascii
+
+# TODO: to be moved to some util package
+def search_nearby_of_tess_target(tic_id):
+    # To avoid warnings in attempting to convert GAIA DR2 id as int32
+    return ascii.read(f"https://exofop.ipac.caltech.edu/tess/download_nearbytarget.php?id={tic_id}&output=csv",
+                      format="csv",
+                      fast_reader=False, converters={'GAIA DR2': [ascii.convert_numpy(np.str)]})
+
+def get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key):
+    res = tab[tab['GAIA DR2'] == str(nearby_gaia_id)]
+    if len(res) > 0:
+        return res[0][key]
+    else:
+        return None
+
 
 def _to_unitless(items):
     """Convert the values in the item list to unitless one"""
@@ -257,6 +274,32 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     return fig, vertical_line
 
 
+def _add_nearby_tics_if_tess(tpf, source, tooltips):
+    tic_id = tpf.meta['TICID']
+    if tic_id is None:
+        return source, tooltips
+
+    # nearby TICs from ExoFOP
+    tab = search_nearby_of_tess_target(tic_id)
+
+    col_gaia_id = source.data['source']
+    # use pandas Series rather than plain list, so they look like the existing columns in the source
+    col_tic_id = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, gaia_id, 'TIC ID') for gaia_id in col_gaia_id.array],
+                        dtype=np.str)
+    col_tess_mag = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, gaia_id, 'TESS Mag') for gaia_id in col_gaia_id.array],
+                          dtype=np.float)
+
+    source.data['tic'] = col_tic_id
+    source.data['TESSmag'] = col_tess_mag
+
+    # issue: if tic / TESSmag of a star is none, the tooltip will show Nan as value, it might be too distracting
+    # A potential workaround is to set dtype of the pandas Series to panda native "Int64", "Float64" that treats
+    # the Series as None as N/A. But it does not work yet, as bokeh cannot handle such series, complaining
+    #  AttributeError: 'IntegerArray' object has no attribute 'tolist'
+    tooltips = [("TIC", "@tic"), ("TESS Mag", "@TESSmag")] + tooltips
+    return source, tooltips
+
+
 def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     """Make the Gaia Figure Elements"""
     # Get the positions of the Gaia sources
@@ -327,6 +370,21 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         )
     )
 
+    tooltips = [
+        ("Gaia source", "@source"),
+        ("G", "@Gmag"),
+        ("Parallax (mas)", "@plx (~@one_over_plx{0,0} pc)"),
+        ("RA", "@ra{0,0.00000000}"),
+        ("DEC", "@dec{0,0.00000000}"),
+        ("pmRA", "@pmra{0,0.000} mas/yr"),
+        ("pmDE", "@pmde{0,0.000} mas/yr"),
+        ("x", "@x{0}"),
+        ("y", "@y{0}"),
+        ]
+
+    source, tooltips = _add_nearby_tics_if_tess(tpf, source, tooltips)
+
+
     r = fig.circle(
         "x",
         "y",
@@ -346,23 +404,53 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 
     fig.add_tools(
         HoverTool(
-            tooltips=[
-                ("Gaia source", "@source"),
-                ("G", "@Gmag"),
-                ("Parallax (mas)", "@plx (~@one_over_plx{0,0} pc)"),
-                ("RA", "@ra{0,0.00000000}"),
-                ("DEC", "@dec{0,0.00000000}"),
-                ("pmRA", "@pmra{0,0.000} mas/yr"),
-                ("pmDE", "@pmde{0,0.000} mas/yr"),
-                ("x", "@x"),
-                ("y", "@y"),
-            ],
+            tooltips=tooltips,
             renderers=[r],
             mode="mouse",
             point_policy="snap_to_data",
         )
     )
-    return fig, r
+
+    # mark the target's position too
+    target_x, target_y = tpf.wcs.all_world2pix([[tpf.ra, tpf.dec]], 0)[0]
+    fig.cross(x=tpf.column + target_x, y=tpf.row + target_y, size=20, color="black", line_width=1)
+
+    # a widget that displays some of the selected star's metadata
+    # so that they can be copied (e.g., GAIA ID).
+    # It is a workaround, because bokeh's hover tooltip disappears as soon as the mouse is away from the star.
+    message_selected_target = Div(text="")
+
+    def show_target_info(attr, old, new):
+        if len(new) > 0:
+            msg = "Selected:<br><br>"
+            for idx in new:
+                tic_id = source.data['tic'].iat[idx]
+                if tic_id is not None:  # TESS-specific meta data, if available
+                    msg = msg + f"""
+TIC {tic_id}
+(<a target="_blank" href="https://exofop.ipac.caltech.edu/tess/target.php?id={tic_id}">ExoFOP</a>)
+<br>
+TESS Mag {source.data['TESSmag'].iat[idx]}
+<br>
+"""
+                # the main meta data
+                msg = msg + f"""
+Gaia source {source.data['source'].iat[idx]}
+(<a target="_blank" href="http://vizier.u-strasbg.fr/viz-bin/VizieR-S?Gaia DR2 {source.data['source'].iat[idx]}">Vizier</a>)
+<br>
+G {source.data['Gmag'].iat[idx]}
+<br>
+RA  {source.data['ra'].iat[idx]}
+<br>
+DEC {source.data['dec'].iat[idx]}
+<br><br>
+"""
+            message_selected_target.text = msg
+        # else do nothing (not clearing the widget) for now.
+
+    source.selected.on_change("indices", show_target_info)
+
+    return fig, r, message_selected_target
 
 
 def make_tpf_figure_elements(
@@ -934,7 +1022,7 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", magnitude_limit=18):
             plot_width=640,
             plot_height=600,
         )
-        fig_tpf, r = add_gaia_figure_elements(
+        fig_tpf, r, message_selected_target = add_gaia_figure_elements(
             tpf, fig_tpf, magnitude_limit=magnitude_limit
         )
 
@@ -957,7 +1045,7 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", magnitude_limit=18):
             )
 
         # Layout all of the plots
-        widgets_and_figures = layout([fig_tpf, stretch_slider])
+        widgets_and_figures = layout([fig_tpf, message_selected_target], [stretch_slider])
         doc.add_root(widgets_and_figures)
 
     output_notebook(verbose=False, hide_banner=True)
