@@ -378,8 +378,8 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         ("DEC", "@dec{0,0.00000000}"),
         ("pmRA", "@pmra{0,0.000} mas/yr"),
         ("pmDE", "@pmde{0,0.000} mas/yr"),
-        ("x", "@x{0}"),
-        ("y", "@y{0}"),
+        ("column", "@x{0.0}"),
+        ("row", "@y{0.0}"),
         ]
 
     source, tooltips = _add_nearby_tics_if_tess(tpf, source, tooltips)
