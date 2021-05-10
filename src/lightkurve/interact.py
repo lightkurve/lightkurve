@@ -444,6 +444,10 @@ RA  {source.data['ra'].iat[idx]}
 <br>
 DEC {source.data['dec'].iat[idx]}
 <br><br>
+Search: <a target="_blank"
+           href="http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Gaia DR2 {source.data['source'].iat[idx]}&NbIdent=1&Radius=2&Radius.unit=arcmin&submit=submit+id">
+           SIMBAD</a> by Gaia ID
+<br>
 """
             message_selected_target.text = msg
         # else do nothing (not clearing the widget) for now.
