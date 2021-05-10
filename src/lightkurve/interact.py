@@ -288,15 +288,18 @@ def _add_nearby_tics_if_tess(tpf, source, tooltips):
                         dtype=np.str)
     col_tess_mag = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, gaia_id, 'TESS Mag') for gaia_id in col_gaia_id.array],
                           dtype=np.float)
+    col_separation = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, gaia_id, 'Separation (arcsec)') for gaia_id in col_gaia_id.array],
+                            dtype=np.float)
 
     source.data['tic'] = col_tic_id
     source.data['TESSmag'] = col_tess_mag
+    source.data['separation'] = col_separation
 
-    # issue: if tic / TESSmag of a star is none, the tooltip will show Nan as value, it might be too distracting
+    # issue: if tic / TESSmag of a star is None, the tooltip will show NaN as value, it might be too distracting
     # A potential workaround is to set dtype of the pandas Series to panda native "Int64", "Float64" that treats
     # the Series as None as N/A. But it does not work yet, as bokeh cannot handle such series, complaining
     #  AttributeError: 'IntegerArray' object has no attribute 'tolist'
-    tooltips = [("TIC", "@tic"), ("TESS Mag", "@TESSmag")] + tooltips
+    tooltips = [("TIC", "@tic"), ("TESS Mag", "@TESSmag"), ("Separation", "@separation\"")] + tooltips
     return source, tooltips
 
 
@@ -431,6 +434,8 @@ TIC {tic_id}
 (<a target="_blank" href="https://exofop.ipac.caltech.edu/tess/target.php?id={tic_id}">ExoFOP</a>)
 <br>
 TESS Mag {source.data['TESSmag'].iat[idx]}
+<br>
+Separation {source.data['separation'].iat[idx]}"
 <br>
 """
                 # the main meta data
