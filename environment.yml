@@ -1,0 +1,40 @@
+name: lightkurve_env
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.7
+  - numpy
+  - scipy
+  - matplotlib
+  - astropy>=4.1
+  - astroquery>=0.3.10
+  - beautifulsoup4
+  - tqdm
+  - pandas
+  - bokeh
+  - jupyter
+  - oktopus
+  - ipython
+  - seaborn
+  - scikit-learn
+  - requests
+  - pytest
+  - sphinx # for documentation and testing
+  - nbsphinx # for documentation and testing
+  - numpydoc # for documentation and testing
+  - sphinx-automodapi # for documentation and testing
+  - black
+  - isort
+  - tox
+  - uncertainties
+  - mypy
+  - pip
+  - pip:
+      #- sphinxcontrib-rawfiles
+      #- twine
+      #- pydata-sphinx-theme
+      #- pytest-remotedata
+      #- pytest-doctestplus
+      #- pytest-cov
+      - fbpca
