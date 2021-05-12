@@ -57,10 +57,16 @@ from astropy.io import ascii
 
 # TODO: to be moved to some util package
 def search_nearby_of_tess_target(tic_id):
-    # To avoid warnings in attempting to convert GAIA DR2 id as int32
+    # To avoid warnings / overflow error in attempting to convert GAIA DR2, TIC ID, TOI
+    # as int32 (the default) in some cases
     return ascii.read(f"https://exofop.ipac.caltech.edu/tess/download_nearbytarget.php?id={tic_id}&output=csv",
                       format="csv",
-                      fast_reader=False, converters={'GAIA DR2': [ascii.convert_numpy(np.str)]})
+                      fast_reader=False,
+                      converters={
+                          "GAIA DR2": [ascii.convert_numpy(np.str)],
+                          "TIC ID": [ascii.convert_numpy(np.str)],
+                          "TOI": [ascii.convert_numpy(np.str)],
+                          })
 
 def get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key):
     res = tab[tab['GAIA DR2'] == str(nearby_gaia_id)]
