@@ -68,12 +68,12 @@ def search_nearby_of_tess_target(tic_id):
                           "TOI": [ascii.convert_numpy(np.str)],
                           })
 
-def get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key):
+def get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key, default=None):
     res = tab[tab['GAIA DR2'] == str(nearby_gaia_id)]
     if len(res) > 0:
         return res[0][key]
     else:
-        return None
+        return default
 
 
 def _to_unitless(items):
@@ -290,12 +290,19 @@ def _add_nearby_tics_if_tess(tpf, source, tooltips):
 
     col_gaia_id = source.data['source']
     # use pandas Series rather than plain list, so they look like the existing columns in the source
-    col_tic_id = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, gaia_id, 'TIC ID') for gaia_id in col_gaia_id.array],
+    #
+    # Note: we convert all the data to string to better handles cases when a star has no TIC
+    # In such cases, if we supply None as a value in a pandas Series,
+    # bokeh's tooltip template will render it as NaN (rather than empty string)
+    # To avoid NaN display, we force the Series to use string dtype, and for stars with missing TICs,
+    # empty string will be used as the value. bokeh's tooltip template can correctly render it as empty string
+    gaia_ids = col_gaia_id.array
+    col_tic_id = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, id, 'TIC ID', "") for id in gaia_ids],
                         dtype=np.str)
-    col_tess_mag = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, gaia_id, 'TESS Mag') for gaia_id in col_gaia_id.array],
-                          dtype=np.float)
-    col_separation = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, gaia_id, 'Separation (arcsec)') for gaia_id in col_gaia_id.array],
-                            dtype=np.float)
+    col_tess_mag = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, id, 'TESS Mag', "") for id in gaia_ids],
+                          dtype=np.str)
+    col_separation = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, id, 'Separation (arcsec)', "") for id in gaia_ids],
+                            dtype=np.str)
 
     source.data['tic'] = col_tic_id
     source.data['TESSmag'] = col_tess_mag
@@ -305,7 +312,7 @@ def _add_nearby_tics_if_tess(tpf, source, tooltips):
     # A potential workaround is to set dtype of the pandas Series to panda native "Int64", "Float64" that treats
     # the Series as None as N/A. But it does not work yet, as bokeh cannot handle such series, complaining
     #  AttributeError: 'IntegerArray' object has no attribute 'tolist'
-    tooltips = [("TIC", "@tic"), ("TESS Mag", "@TESSmag"), ("Separation", "@separation\"")] + tooltips
+    tooltips = [("TIC", "@tic"), ("TESS Mag", "@TESSmag"), ("Separation (\")", "@separation")] + tooltips
     return source, tooltips
 
 
