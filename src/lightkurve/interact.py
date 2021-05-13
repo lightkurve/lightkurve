@@ -437,36 +437,45 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     message_selected_target = Div(text="")
 
     def show_target_info(attr, old, new):
+        # the following is essentially redoing the bokeh tooltip template above in plain HTML
+        # with some slight tweak, mainly to add some helpful links.
+        #
+        # Note: in source, columns "x" and "y" are ndarray while other column are pandas Series,
+        # so the access api is slightly different.
         if len(new) > 0:
-            msg = "Selected:<br><br>"
+            msg = "Selected:<br><table>"
             for idx in new:
                 tic_id = source.data['tic'].iat[idx]
-                if tic_id is not None:  # TESS-specific meta data, if available
-                    msg = msg + f"""
-TIC {tic_id}
-(<a target="_blank" href="https://exofop.ipac.caltech.edu/tess/target.php?id={tic_id}">ExoFOP</a>)
-<br>
-TESS Mag {source.data['TESSmag'].iat[idx]}
-<br>
-Separation {source.data['separation'].iat[idx]}"
-<br>
+                if tic_id is not None and tic_id != "":  # TESS-specific meta data, if available
+                    msg += f"""
+<tr><td>TIC</td><td>{tic_id}
+(<a target="_blank" href="https://exofop.ipac.caltech.edu/tess/target.php?id={tic_id}">ExoFOP</a>)</td></tr>
+<tr><td>TESS Mag</td><td>{source.data['TESSmag'].iat[idx]}</td></tr>
+<tr><td>Separation (")</td><td>{source.data['separation'].iat[idx]}</td></tr>
 """
                 # the main meta data
-                msg = msg + f"""
-Gaia source {source.data['source'].iat[idx]}
-(<a target="_blank" href="http://vizier.u-strasbg.fr/viz-bin/VizieR-S?Gaia DR2 {source.data['source'].iat[idx]}">Vizier</a>)
-<br>
-G {source.data['Gmag'].iat[idx]}
-<br>
-RA  {source.data['ra'].iat[idx]}
-<br>
-DEC {source.data['dec'].iat[idx]}
-<br><br>
-Search: <a target="_blank"
-           href="http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Gaia DR2 {source.data['source'].iat[idx]}&NbIdent=1&Radius=2&Radius.unit=arcmin&submit=submit+id">
-           SIMBAD</a> by Gaia ID
-<br>
+                msg += f"""
+<tr><td>Gaia source</td><td>{source.data['source'].iat[idx]}
+(<a target="_blank"
+    href="http://vizier.u-strasbg.fr/viz-bin/VizieR-S?Gaia DR2 {source.data['source'].iat[idx]}">Vizier</a>)</td></tr>
+<tr><td>G</td><td>{source.data['Gmag'].iat[idx]:.3f}</td></tr>
+<tr><td>Parallax (mas)</td>
+    <td>{source.data['plx'].iat[idx]:,.3f} (~ {source.data['one_over_plx'].iat[idx]:,.0f} pc)</td>
+</tr>
+<tr><td>RA</td><td>{source.data['ra'].iat[idx]:,.8f}</td></tr>
+<tr><td>DEC</td><td>{source.data['dec'].iat[idx]:,.8f}</td></tr>
+<tr><td>pmRA</td><td>{source.data['pmra'].iat[idx]:,.3f} mas/yr</td></tr>
+<tr><td>pmDE</td><td>{source.data['pmde'].iat[idx]:,.3f} mas/yr</td></tr>
+<tr><td>column</td><td>{source.data['x'][idx]:.1f}</td></tr>
+<tr><td>row</td><td>{source.data['y'][idx]:.1f}</td></tr>
+<tr><td colspan="2">Search
+<a target="_blank"
+   href="http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Gaia DR2 {source.data['source'].iat[idx]}&NbIdent=1&Radius=2&Radius.unit=arcmin&submit=submit+id">
+SIMBAD by Gaia ID</a></td></tr>
+<tr><td colspan="2">&nbsp;</td></tr>
 """
+
+            msg += "\n<table>"
             message_selected_target.text = msg
         # else do nothing (not clearing the widget) for now.
 
