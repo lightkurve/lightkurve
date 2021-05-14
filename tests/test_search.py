@@ -147,7 +147,7 @@ def test_search_tesscut():
     assert len(search_tesscut("pi Mensae", sector=1).table) == 1
     assert len(search_tesscut("pi Mensae").table) > 1
     # Cutout by TIC ID
-    assert len(search_tesscut("TIC 206669860", sector=2).table) == 1
+    assert len(search_tesscut("TIC 206669860", sector=28).table) == 1
     # Cutout by RA, dec string
     search_string = search_tesscut("30.578761, -83.210593")
     # Cutout by SkyCoord
