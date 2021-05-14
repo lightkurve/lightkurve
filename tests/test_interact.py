@@ -186,7 +186,7 @@ def test_interact_sky_functions_case_nearby_tics_failed(monkeypatch):
     def mock_raise(*args):
         raise IOError("simulated service unavailable")
 
-    monkeypatch.setattr(lk_interact, "search_nearby_of_tess_target", mock_raise)
+    monkeypatch.setattr(lk_interact, "_search_nearby_of_tess_target", mock_raise)
 
     tpf = TessTargetPixelFile(example_tpf_tess)
     mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]

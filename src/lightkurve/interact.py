@@ -21,8 +21,10 @@ import warnings
 import numpy as np
 import astropy.units as u
 from astropy.coordinates import SkyCoord, Angle
+from astropy.io import ascii
 from astropy.stats import sigma_clip
 from astropy.utils.exceptions import AstropyUserWarning
+from pandas import Series
 
 from .utils import KeplerQualityFlags, LightkurveWarning
 
@@ -52,11 +54,8 @@ except ImportError:
     # We will print a nice error message in the `show_interact_widget` function
     pass
 
-from pandas import Series
-from astropy.io import ascii
 
-# TODO: to be moved to some util package
-def search_nearby_of_tess_target(tic_id):
+def _search_nearby_of_tess_target(tic_id):
     # To avoid warnings / overflow error in attempting to convert GAIA DR2, TIC ID, TOI
     # as int32 (the default) in some cases
     return ascii.read(f"https://exofop.ipac.caltech.edu/tess/download_nearbytarget.php?id={tic_id}&output=csv",
@@ -68,7 +67,8 @@ def search_nearby_of_tess_target(tic_id):
                           "TOI": [ascii.convert_numpy(np.str)],
                           })
 
-def get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key, default=None):
+
+def _get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key, default=None):
     res = tab[tab['GAIA DR2'] == str(nearby_gaia_id)]
     if len(res) > 0:
         return res[0][key]
@@ -290,7 +290,7 @@ def _add_nearby_tics_if_tess(tpf, source, tooltips):
         return source, tooltips
 
     # nearby TICs from ExoFOP
-    tab = search_nearby_of_tess_target(tic_id)
+    tab = _search_nearby_of_tess_target(tic_id)
 
     col_gaia_id = source.data['source']
     # use pandas Series rather than plain list, so they look like the existing columns in the source
@@ -301,11 +301,11 @@ def _add_nearby_tics_if_tess(tpf, source, tooltips):
     # To avoid NaN display, we force the Series to use string dtype, and for stars with missing TICs,
     # empty string will be used as the value. bokeh's tooltip template can correctly render it as empty string
     gaia_ids = col_gaia_id.array
-    col_tic_id = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, id, 'TIC ID', "") for id in gaia_ids],
+    col_tic_id = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TIC ID', "") for id in gaia_ids],
                         dtype=np.str)
-    col_tess_mag = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, id, 'TESS Mag', "") for id in gaia_ids],
+    col_tess_mag = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TESS Mag', "") for id in gaia_ids],
                           dtype=np.str)
-    col_separation = Series(data=[get_tic_meta_of_gaia_in_nearby(tab, id, 'Separation (arcsec)', "") for id in gaia_ids],
+    col_separation = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'Separation (arcsec)', "") for id in gaia_ids],
                             dtype=np.str)
 
     source.data['tic'] = col_tic_id
