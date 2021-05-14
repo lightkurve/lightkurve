@@ -19,10 +19,11 @@ import logging
 import warnings
 
 import numpy as np
-import astropy.units as u
 from astropy.coordinates import SkyCoord, Angle
 from astropy.io import ascii
 from astropy.stats import sigma_clip
+from astropy.time import Time
+import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
 from pandas import Series
 
@@ -74,6 +75,41 @@ def _get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key, default=None):
         return res[0][key]
     else:
         return default
+
+
+def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
+    # all parameters have units
+    time_diff = (new_time - equinox).to(u.year)
+    ra_corrected = ra + pm_ra * time_diff
+    dec_corrected = dec + pm_dec * time_diff
+    return ra_corrected, dec_corrected
+
+
+def _get_corrected_coordinate(tpf_or_lc):
+    """Extract coordinate from Kepler/TESS FITS, with proper motion corrected
+       to the start of observation if proper motion is available."""
+    h = tpf_or_lc.meta
+    new_time = tpf_or_lc.time[0]
+
+    ra = h.get("RA_OBJ")
+    dec = h.get("DEC_OBJ")
+
+    if ra is None or dec is None:
+        return None, None
+
+    pm_ra = h.get("PMRA")
+    pm_dec = h.get("PMDEC")
+    equinox = h.get("EQUINOX")
+
+    if pm_ra is None or pm_dec is None or equinox is None:
+        return ra, dec
+
+    ra_corrected, dec_corrected = _correct_with_proper_motion(
+            ra * u.deg, dec *u.deg,
+            pm_ra * u.milliarcsecond / u.year, pm_dec * u.milliarcsecond / u.year,
+            Time(equinox, format="decimalyear", scale="tdb"),
+            new_time)
+    return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value
 
 
 def _to_unitless(items):
@@ -437,7 +473,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     )
 
     # mark the target's position too
-    target_x, target_y = tpf.wcs.all_world2pix([[tpf.ra, tpf.dec]], 0)[0]
+    target_x, target_y = tpf.wcs.all_world2pix([_get_corrected_coordinate(tpf)], 0)[0]
     fig.cross(x=tpf.column + target_x, y=tpf.row + target_y, size=20, color="black", line_width=1)
 
     # a widget that displays some of the selected star's metadata
