@@ -515,8 +515,12 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 <tr><td>row</td><td>{source.data['y'][idx]:.1f}</td></tr>
 <tr><td colspan="2">Search
 <a target="_blank"
-   href="http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Gaia DR2 {source.data['source'].iat[idx]}&NbIdent=1&Radius=2&Radius.unit=arcmin&submit=submit+id">
+   href="http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Gaia DR2 {source.data['source'].iat[idx]}">
 SIMBAD by Gaia ID</a></td></tr>
+<tr><td colspan="2">
+<a target="_blank"
+   href="http://simbad.u-strasbg.fr/simbad/sim-coo?Coord={source.data['ra'].iat[idx]}+{source.data['dec'].iat[idx]}&Radius=2&Radius.unit=arcmin">
+SIMBAD by coordinate</a></td></tr>
 <tr><td colspan="2">&nbsp;</td></tr>
 """
 
