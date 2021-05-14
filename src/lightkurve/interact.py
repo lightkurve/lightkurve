@@ -281,8 +281,12 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
 
 
 def _add_nearby_tics_if_tess(tpf, source, tooltips):
-    tic_id = tpf.meta['TICID']
-    if tic_id is None:
+    tic_id = tpf.meta.get('TICID', None)
+    # handle 3 cases:
+    # - TESS tpf has a valid id, type integer
+    # - Some TESSCut has empty string while and some others has None
+    # - Kepler tpf does not have the header
+    if tic_id is None or tic_id == "":
         return source, tooltips
 
     # nearby TICs from ExoFOP
@@ -445,7 +449,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         if len(new) > 0:
             msg = "Selected:<br><table>"
             for idx in new:
-                tic_id = source.data['tic'].iat[idx]
+                tic_id = source.data['tic'].iat[idx] if source.data.get('tic') is not None else None
                 if tic_id is not None and tic_id != "":  # TESS-specific meta data, if available
                     msg += f"""
 <tr><td>TIC</td><td>{tic_id}

@@ -19,6 +19,9 @@ except ImportError:
     bad_optional_imports = True
 
 example_tpf = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
+example_tpf_kepler = get_pkg_data_filename("data/test-tpf-kplr-tabby-first-cadence.fits")
+example_tpf_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
+example_tpf_tesscut = get_pkg_data_filename("data/test-tpf-tesscut_1x1.fits")
 
 
 def test_bokeh_import_error(caplog):
@@ -148,7 +151,12 @@ def test_interact_functions():
 
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
-def test_interact_sky_functions():
+@pytest.mark.parametrize("tpf_class, tpf_file", [
+    (TessTargetPixelFile, example_tpf_tess),
+    (TessTargetPixelFile, example_tpf_tesscut),
+    (KeplerTargetPixelFile, example_tpf_kepler)
+    ])
+def test_interact_sky_functions(tpf_class, tpf_file):
     """Do the helper functions in the interact module run without syntax error?"""
     import bokeh
     from lightkurve.interact import (
@@ -156,8 +164,7 @@ def test_interact_sky_functions():
         make_tpf_figure_elements,
         add_gaia_figure_elements,
     )
-
-    tpf = TessTargetPixelFile(example_tpf)
+    tpf = tpf_class(tpf_file)
     mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
     tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
     fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source)
