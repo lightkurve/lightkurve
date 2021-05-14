@@ -150,6 +150,7 @@ def test_interact_functions():
     show_interact_widget(tpf)
 
 
+@pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 @pytest.mark.parametrize("tpf_class, tpf_file", [
     (TessTargetPixelFile, example_tpf_tess),
@@ -172,6 +173,8 @@ def test_interact_sky_functions(tpf_class, tpf_file):
     add_gaia_figure_elements(tpf, fig1, magnitude_limit=22)
 
 
+@pytest.mark.remote_data
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_sky_functions_case_nearby_tics_failed(monkeypatch):
     import bokeh
     from lightkurve.interact import (
