@@ -388,20 +388,14 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     if len(result) == 0:
         raise no_targets_found_message
 
-    # Apply correction for proper motion
-    year = ((tpf.time[0].jd - 2457206.375) * u.day).to(u.year)
-    pmra = (
-        ((np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond / u.year) * year)
-        .to(u.deg)
-        .value
-    )
-    pmdec = (
-        ((np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond / u.year) * year)
-        .to(u.deg)
-        .value
-    )
-    result.RA_ICRS += pmra
-    result.DE_ICRS += pmdec
+    ra_corrected, dec_corrected = _correct_with_proper_motion(
+            np.nan_to_num(np.asarray(result.RA_ICRS)) * u.deg, np.nan_to_num(np.asarray(result.DE_ICRS)) * u.deg,
+            np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond / u.year,
+            np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond / u.year,
+            Time(2457206.375, format="jd", scale="tdb"),
+            tpf.time[0])
+    result.RA_ICRS = ra_corrected.to(u.deg).value
+    result.DE_ICRS = dec_corrected.to(u.deg).value
 
     # Convert to pixel coordinates
     radecs = np.vstack([result["RA_ICRS"], result["DE_ICRS"]]).T
