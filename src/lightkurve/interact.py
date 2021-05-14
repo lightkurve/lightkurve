@@ -402,8 +402,13 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         ("row", "@y{0.0}"),
         ]
 
-    source, tooltips = _add_nearby_tics_if_tess(tpf, source, tooltips)
-
+    try:
+        source, tooltips = _add_nearby_tics_if_tess(tpf, source, tooltips)
+    except Exception as err:
+        warnings.warn(
+            f"interact_sky() - cannot obtain nearby TICs. Skip it. The error: {err}",
+            LightkurveWarning,
+        )
 
     r = fig.circle(
         "x",

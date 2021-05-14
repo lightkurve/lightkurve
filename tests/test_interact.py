@@ -172,6 +172,27 @@ def test_interact_sky_functions(tpf_class, tpf_file):
     add_gaia_figure_elements(tpf, fig1, magnitude_limit=22)
 
 
+def test_interact_sky_functions_case_nearby_tics_failed(monkeypatch):
+    import bokeh
+    from lightkurve.interact import (
+        prepare_tpf_datasource,
+        make_tpf_figure_elements,
+        add_gaia_figure_elements,
+    )
+    import lightkurve.interact as lk_interact
+    def mock_raise(*args):
+        raise IOError("simulated service unavailable")
+
+    monkeypatch.setattr(lk_interact, "search_nearby_of_tess_target", mock_raise)
+
+    tpf = TessTargetPixelFile(example_tpf_tess)
+    mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
+    tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
+    fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source)
+    with pytest.warns(LightkurveWarning, match="cannot obtain nearby TICs"):
+        add_gaia_figure_elements(tpf, fig1)
+
+
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_ylim_with_nans():
     """Regression test for #679: y limits should not be NaN."""
