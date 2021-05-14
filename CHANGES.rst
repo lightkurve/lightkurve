@@ -16,6 +16,8 @@
 - Fixed a bug in ``TargetPixelFile.interact()`` when ``ylim_func`` is specified and
   users tap to select custom apertures. [#1033]
 
+- Improve the user interface of ``TargetPixelFile.interact_sky()``, including providing
+  TIC information when applicable. [#1050]
 
 2.0.9 (2021-03-31)
 ==================
