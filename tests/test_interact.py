@@ -176,6 +176,10 @@ def test_interact_sky_functions(tpf_class, tpf_file):
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_sky_functions_case_nearby_tics_failed(monkeypatch):
+    """Test to ensure in case Nearby TIC service from ExoFOP not available,
+       interact_sky will still function (without the TIC information) rather
+       than raising exceptions.
+    """
     import bokeh
     from lightkurve.interact import (
         prepare_tpf_datasource,
@@ -183,6 +187,7 @@ def test_interact_sky_functions_case_nearby_tics_failed(monkeypatch):
         add_gaia_figure_elements,
     )
     import lightkurve.interact as lk_interact
+
     def mock_raise(*args):
         raise IOError("simulated service unavailable")
 
