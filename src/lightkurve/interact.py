@@ -104,10 +104,17 @@ def _get_corrected_coordinate(tpf_or_lc):
     if pm_ra is None or pm_dec is None or equinox is None:
         return ra, dec
 
+    # Note: it'd be better / extensible if the unit is a property of the tpf or lc
+    if tpf_or_lc.meta.get("TICID") is not None:
+        pm_unit = u.milliarcsecond / u.year
+    else:  # assumes to be Kepler / K2
+        pm_unit = u.arcsecond / u.year
+
     ra_corrected, dec_corrected = _correct_with_proper_motion(
             ra * u.deg, dec *u.deg,
-            pm_ra * u.milliarcsecond / u.year, pm_dec * u.milliarcsecond / u.year,
-            Time(equinox, format="decimalyear", scale="tdb"),
+            pm_ra * pm_unit, pm_dec * pm_unit,
+            # e.g., equinox 2000 is treated as J2000 is set to be noon of 2000-01-01 TT
+            Time(equinox, format="decimalyear", scale="tt") + 0.5,
             new_time)
     return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value
 
@@ -503,8 +510,8 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 </tr>
 <tr><td>RA</td><td>{source.data['ra'].iat[idx]:,.8f}</td></tr>
 <tr><td>DEC</td><td>{source.data['dec'].iat[idx]:,.8f}</td></tr>
-<tr><td>pmRA</td><td>{source.data['pmra'].iat[idx]:,.3f} mas/yr</td></tr>
-<tr><td>pmDE</td><td>{source.data['pmde'].iat[idx]:,.3f} mas/yr</td></tr>
+<tr><td>pmRA</td><td>{source.data['pmra'].iat[idx]} mas/yr</td></tr>
+<tr><td>pmDE</td><td>{source.data['pmde'].iat[idx]} mas/yr</td></tr>
 <tr><td>column</td><td>{source.data['x'][idx]:.1f}</td></tr>
 <tr><td>row</td><td>{source.data['y'][idx]:.1f}</td></tr>
 <tr><td colspan="2">Search
