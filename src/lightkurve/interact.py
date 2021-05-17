@@ -80,6 +80,12 @@ def _get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key, default=None):
 def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
     # all parameters have units
 
+    if pm_ra is None or pm_dec is None or (np.all(pm_ra == 0) and np.all(pm_dec == 0)):
+        warnings.warn((f"Proper motion correction cannot be applied, as none is supplied. pm_ra: {pm_ra}, pm_dec: {pm_dec}. "
+                       "Use RA Dec as is."),
+                      category=LightkurveWarning)
+        return ra, dec
+
     # To be more accurate, we should have supplied distance to SkyCoord
     # in theory, for Gaia DR2 data, we can infer the distance from the parallax provided.
     # It is not done for 2 reasons:
