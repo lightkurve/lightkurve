@@ -194,6 +194,13 @@ def test_search_tesscut_download(caplog):
         log.setLevel("DEBUG")
         tpf_cached = search_string[0].download(cutout_size=(3, 5))
         assert "Cached file found." in caplog.text
+        # test #1063 - ensure when download_dir is specified, there is no error
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory(dir=".", prefix="temp_lk_cache_4test_") as download_dir:
+            # ensure relative path works, the bug in #1063
+            tpf_w_download_dir = search_string[0].download(cutout_size=(3, 5), download_dir=download_dir)
+            assert tpf_w_download_dir.flux[0].shape == (3, 5)
+            tpf_w_download_dir = None  # remove the tpf reference so that the underlying file can be deleted on Windows
     except HTTPError as exc:
         # TESSCut will occasionally return a "504 Gateway Timeout error" when
         # it is overloaded.  We don't want this to trigger a test failure.
