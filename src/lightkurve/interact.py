@@ -79,10 +79,27 @@ def _get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key, default=None):
 
 def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
     # all parameters have units
-    time_diff = (new_time - equinox).to(u.year)
-    ra_corrected = ra + pm_ra * time_diff
-    dec_corrected = dec + pm_dec * time_diff
-    return ra_corrected, dec_corrected
+
+    # To be more accurate, we should have supplied distance to SkyCoord
+    # in theory, for Gaia DR2 data, we can infer the distance from the parallax provided.
+    # It is not done for 2 reasons:
+    # 1. Gaia DR2 data has negative parallax values occasionally. Correctly handling them could be tricky. See:
+    #    https://www.cosmos.esa.int/documents/29201/1773953/Gaia+DR2+primer+version+1.3.pdf/a4459741-6732-7a98-1406-a1bea243df79
+    # 2. For our purpose (ploting in various interact usage) here, the added distance does not making
+    #    noticeable significant difference. E.g., applying it to Proxima Cen, a target with large parallax
+    #    and huge proper motion, does not change the result in any noticeable way.
+    #
+    c = SkyCoord(ra, dec, pm_ra_cosdec=pm_ra, pm_dec=pm_dec,
+                frame='icrs', obstime=equinox)
+
+    # Suppress ErfaWarning temporarily as a workaround for:
+    #   https://github.com/astropy/astropy/issues/11747
+    with warnings.catch_warnings():
+        # the same warning appears both as an ErfaWarning and a astropy warning
+        # so we filter by the message instead
+        warnings.filterwarnings("ignore", message="ERFA function")
+        new_c = c.apply_space_motion(new_obstime=new_time)
+    return new_c.ra, new_c.dec
 
 
 def _get_corrected_coordinate(tpf_or_lc):
