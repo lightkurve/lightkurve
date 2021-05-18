@@ -362,12 +362,13 @@ class LightCurve(QTimeSeries):
                 name not in self.__dict__
                 and not name.startswith("_")
                 and not self._new_attributes_relax
+                and name != 'meta'
             ):
                 warnings.warn(
                     (
                         "Lightkurve doesn't allow columns or meta values to be created via a new attribute name."
                         "A new attribute is created. It will not be carried over when the object is copied."
-                        " - see https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html"
+                        " - see https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.html"
                     ),
                     UserWarning,
                     stacklevel=2,

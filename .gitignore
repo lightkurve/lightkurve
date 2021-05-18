@@ -49,6 +49,9 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
+# temp directory generated in test
+#  (that should have been cleaned up automatically in nomral test run)
+temp_lk_cache_4test_*
 
 # Translations
 *.mo

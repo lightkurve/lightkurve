@@ -19,6 +19,10 @@
 - Improve the user interface of ``TargetPixelFile.interact_sky()``, including providing
   TIC information when applicable. [#1050]
 
+- Fixed a bug in ``search_tesscut().download()`` when ``download_dir`` is specified.
+  [#1063]
+
+
 2.0.9 (2021-03-31)
 ==================
 

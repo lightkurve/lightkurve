@@ -1362,6 +1362,30 @@ def test_attr_access_meta():
     assert lc.keycase == "value lower"  # the meta entry with exact case is retrieved
 
 
+@pytest.mark.parametrize(
+    "lc",
+    [
+        LightCurve(time=[1, 2, 3], flux=[4, 5, 6], meta={'SECTOR': 5}),
+        LightCurve(time=[1, 2, 3], flux=[4, 5, 6]),
+    ],
+)
+def test_meta_assignment(lc):
+    """Test edge cases in trying to assign meta (#1046)"""
+
+    # ensure lc.meta assignment does not emit any warnings.
+    meta_new = {'TSTART': 123456789.0}
+    with pytest.warns(None) as record:
+        lc.meta = meta_new
+
+    if (len(record) > 0):
+        pytest.fail(f"{len(record)} unexpected warning: {record[0]}")
+
+    # for the case existing meta is not empty
+    # ensure the assignment overwrites it
+    # (rather than just copying the values over to the existing one)
+    assert lc.meta == meta_new
+
+
 def test_attr_access_others():
     """Test accessing attributes, misc. boundary cases"""
     u_e_s = u.electron / u.second
@@ -1381,7 +1405,9 @@ def test_attr_access_others():
     assert_array_equal(lc.foo, val_of_col_updated)
 
     # case the same name is present as column name, meta key, and actual attribute
-    lc.bar = "bar_attr_val"
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        lc.bar = "bar_attr_val"
     lc["bar"] = [7, 8, 9]
     lc.meta["BAR"] = "bar_meta_val"
     assert lc.bar == "bar_attr_val"  # actual attribute takes priority

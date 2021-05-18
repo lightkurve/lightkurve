@@ -30,3 +30,7 @@ mypy:
 # Order the imports using `isort`
 isort:
 	$(CMD) isort $(PYMODULE) $(TESTS)
+
+# Generate a setup.py file from pyproject.toml
+setup.py: pyproject.toml
+	$(CMD) dephell deps convert

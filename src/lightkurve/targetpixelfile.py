@@ -66,7 +66,11 @@ class HduToMetaMapping(collections.abc.Mapping):
     """Provides a read-only view of HDU header in `astropy.timeseries.TimeSeries.meta` format"""
 
     def __init__(self, hdu):
-        self._dict = {}
+        # use OrderedDict rather than simple dict for 2 reasons:
+        # 1. more friendly __repr__ and __str__
+        # 2. make the behavior between a TPF and a LC is more consistent.
+        #    (LightCurve.meta is an OrderedDict)
+        self._dict = collections.OrderedDict()
         self._dict.update(hdu.header)
 
     def __getitem__(self, key):
@@ -77,6 +81,12 @@ class HduToMetaMapping(collections.abc.Mapping):
 
     def __iter__(self):
         return iter(self._dict)
+
+    def __repr__(self):
+        return self._dict.__repr__()
+
+    def __str__(self):
+        return self._dict.__str__()
 
 
 class TargetPixelFile(object):
@@ -1801,6 +1811,7 @@ class TargetPixelFile(object):
         corrector_func=None,
         style="lightkurve",
         title=None,
+        markersize=0.5,
         **kwargs,
     ):
         """Show the light curve of each pixel in a single plot.
@@ -1831,8 +1842,31 @@ class TargetPixelFile(object):
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
+        markersize : float
+            Size of the markers in the lightcurve plot. For periodogram plot, it is used as the line width.
+            Default: 0.5
         kwargs : dict
             e.g. extra parameters to be passed to `lc.to_periodogram`.
+
+        Examples
+        --------
+        Inspect the lightcurve around a possible transit at per-pixel level::
+
+            >>> import lightkurve as lk
+            >>> # A possible transit around time BTJD 2277.0. Inspect the lightcurve around that time
+            >>> tpf = tpf[(tpf.time.value >= 2276.5) & (tpf.time.value <= 2277.5)]    # doctest: +SKIP
+            >>> tpf.plot_pixels(aperture_mask='pipeline')  # doctest: +SKIP
+            >>>
+            >>> # Variation: shade the pixel based on the flux at frame 0
+            >>> # increase markersize so that it is more legible for pixels with yellow background (the brightest pixels)
+            >>> tpf.plot_pixels(aperture_mask='pipeline', show_flux=True, markersize=1.5)  # doctest: +SKIP
+            >>>
+            >>> # Variation: Customize the plot's size so that each pixel is about 1 inch by 1 inch
+            >>> import matplotlib.pyplot as plt
+            >>> fig = plt.figure(figsize=(tpf.flux[0].shape[0] * 1.0, tpf.flux[0].shape[1] * 1.0))    # doctest: +SKIP
+            >>> tpf.plot_pixels(ax=fig.gca(), aperture_mask='pipeline')    # doctest: +SKIP
+
+
         """
         if style == "lightkurve" or style is None:
             style = MPLSTYLE
@@ -1935,7 +1969,7 @@ class TargetPixelFile(object):
                             pixel_list[k].power.value,
                             marker="None",
                             color=markercolor,
-                            lw=0.5,
+                            lw=markersize,
                         )
                     else:
                         gax.plot(
@@ -1943,7 +1977,7 @@ class TargetPixelFile(object):
                             pixel_list[k].flux.value,
                             marker=".",
                             color=markercolor,
-                            ms=0.5,
+                            ms=markersize,
                             lw=0,
                         )
 
