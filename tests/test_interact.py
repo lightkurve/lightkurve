@@ -59,6 +59,7 @@ def test_graceful_exit_outside_notebook():
     assert result is None
 
 
+@pytest.mark.remote_data  # due to test (TABBY_TPF is remote)
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_custom_aperture_mask():
     """Can we provide a custom lightcurve to show?"""
@@ -77,6 +78,7 @@ def test_custom_aperture_mask():
         tpf.interact(aperture_mask=mask)
 
 
+@pytest.mark.remote_data  # due to test (TABBY_TPF is remote)
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_custom_exported_filename():
     """Can we provide a custom lightcurve to show?"""
@@ -98,6 +100,7 @@ def test_custom_exported_filename():
         tpf[mask].interact()
 
 
+@pytest.mark.remote_data  # due to test (TABBY_TPF is remote)
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_transform_and_ylim_funcs():
     """Test the transform_func and ylim_func"""
