@@ -19,10 +19,13 @@ import logging
 import warnings
 
 import numpy as np
-import astropy.units as u
 from astropy.coordinates import SkyCoord, Angle
+from astropy.io import ascii
 from astropy.stats import sigma_clip
+from astropy.time import Time
+import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
+from pandas import Series
 
 from .utils import KeplerQualityFlags, LightkurveWarning
 
@@ -51,6 +54,92 @@ try:
 except ImportError:
     # We will print a nice error message in the `show_interact_widget` function
     pass
+
+
+def _search_nearby_of_tess_target(tic_id):
+    # To avoid warnings / overflow error in attempting to convert GAIA DR2, TIC ID, TOI
+    # as int32 (the default) in some cases
+    return ascii.read(f"https://exofop.ipac.caltech.edu/tess/download_nearbytarget.php?id={tic_id}&output=csv",
+                      format="csv",
+                      fast_reader=False,
+                      converters={
+                          "GAIA DR2": [ascii.convert_numpy(np.str)],
+                          "TIC ID": [ascii.convert_numpy(np.str)],
+                          "TOI": [ascii.convert_numpy(np.str)],
+                          })
+
+
+def _get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key, default=None):
+    res = tab[tab['GAIA DR2'] == str(nearby_gaia_id)]
+    if len(res) > 0:
+        return res[0][key]
+    else:
+        return default
+
+
+def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
+    # all parameters have units
+
+    if pm_ra is None or pm_dec is None or (np.all(pm_ra == 0) and np.all(pm_dec == 0)):
+        warnings.warn((f"Proper motion correction cannot be applied, as none is supplied. pm_ra: {pm_ra}, pm_dec: {pm_dec}. "
+                       "Use RA Dec as is."),
+                      category=LightkurveWarning)
+        return ra, dec
+
+    # To be more accurate, we should have supplied distance to SkyCoord
+    # in theory, for Gaia DR2 data, we can infer the distance from the parallax provided.
+    # It is not done for 2 reasons:
+    # 1. Gaia DR2 data has negative parallax values occasionally. Correctly handling them could be tricky. See:
+    #    https://www.cosmos.esa.int/documents/29201/1773953/Gaia+DR2+primer+version+1.3.pdf/a4459741-6732-7a98-1406-a1bea243df79
+    # 2. For our purpose (ploting in various interact usage) here, the added distance does not making
+    #    noticeable significant difference. E.g., applying it to Proxima Cen, a target with large parallax
+    #    and huge proper motion, does not change the result in any noticeable way.
+    #
+    c = SkyCoord(ra, dec, pm_ra_cosdec=pm_ra, pm_dec=pm_dec,
+                frame='icrs', obstime=equinox)
+
+    # Suppress ErfaWarning temporarily as a workaround for:
+    #   https://github.com/astropy/astropy/issues/11747
+    with warnings.catch_warnings():
+        # the same warning appears both as an ErfaWarning and a astropy warning
+        # so we filter by the message instead
+        warnings.filterwarnings("ignore", message="ERFA function")
+        new_c = c.apply_space_motion(new_obstime=new_time)
+    return new_c.ra, new_c.dec
+
+
+def _get_corrected_coordinate(tpf_or_lc):
+    """Extract coordinate from Kepler/TESS FITS, with proper motion corrected
+       to the start of observation if proper motion is available."""
+    h = tpf_or_lc.meta
+    new_time = tpf_or_lc.time[0]
+
+    ra = h.get("RA_OBJ")
+    dec = h.get("DEC_OBJ")
+
+    if ra is None or dec is None:
+        return None, None
+
+    pm_ra = h.get("PMRA")
+    pm_dec = h.get("PMDEC")
+    equinox = h.get("EQUINOX")
+
+    if pm_ra is None or pm_dec is None or equinox is None:
+        return ra, dec
+
+    # Note: it'd be better / extensible if the unit is a property of the tpf or lc
+    if tpf_or_lc.meta.get("TICID") is not None:
+        pm_unit = u.milliarcsecond / u.year
+    else:  # assumes to be Kepler / K2
+        pm_unit = u.arcsecond / u.year
+
+    ra_corrected, dec_corrected = _correct_with_proper_motion(
+            ra * u.deg, dec *u.deg,
+            pm_ra * pm_unit, pm_dec * pm_unit,
+            # e.g., equinox 2000 is treated as J2000 is set to be noon of 2000-01-01 TT
+            Time(equinox, format="decimalyear", scale="tt") + 0.5,
+            new_time)
+    return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value
 
 
 def _to_unitless(items):
@@ -257,6 +346,46 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     return fig, vertical_line
 
 
+def _add_nearby_tics_if_tess(tpf, source, tooltips):
+    tic_id = tpf.meta.get('TICID', None)
+    # handle 3 cases:
+    # - TESS tpf has a valid id, type integer
+    # - Some TESSCut has empty string while and some others has None
+    # - Kepler tpf does not have the header
+    if tic_id is None or tic_id == "":
+        return source, tooltips
+
+    # nearby TICs from ExoFOP
+    tab = _search_nearby_of_tess_target(tic_id)
+
+    col_gaia_id = source.data['source']
+    # use pandas Series rather than plain list, so they look like the existing columns in the source
+    #
+    # Note: we convert all the data to string to better handles cases when a star has no TIC
+    # In such cases, if we supply None as a value in a pandas Series,
+    # bokeh's tooltip template will render it as NaN (rather than empty string)
+    # To avoid NaN display, we force the Series to use string dtype, and for stars with missing TICs,
+    # empty string will be used as the value. bokeh's tooltip template can correctly render it as empty string
+    gaia_ids = col_gaia_id.array
+    col_tic_id = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TIC ID', "") for id in gaia_ids],
+                        dtype=np.str)
+    col_tess_mag = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TESS Mag', "") for id in gaia_ids],
+                          dtype=np.str)
+    col_separation = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'Separation (arcsec)', "") for id in gaia_ids],
+                            dtype=np.str)
+
+    source.data['tic'] = col_tic_id
+    source.data['TESSmag'] = col_tess_mag
+    source.data['separation'] = col_separation
+
+    # issue: if tic / TESSmag of a star is None, the tooltip will show NaN as value, it might be too distracting
+    # A potential workaround is to set dtype of the pandas Series to panda native "Int64", "Float64" that treats
+    # the Series as None as N/A. But it does not work yet, as bokeh cannot handle such series, complaining
+    #  AttributeError: 'IntegerArray' object has no attribute 'tolist'
+    tooltips = [("TIC", "@tic"), ("TESS Mag", "@TESSmag"), ("Separation (\")", "@separation")] + tooltips
+    return source, tooltips
+
+
 def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     """Make the Gaia Figure Elements"""
     # Get the positions of the Gaia sources
@@ -289,20 +418,14 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     if len(result) == 0:
         raise no_targets_found_message
 
-    # Apply correction for proper motion
-    year = ((tpf.time[0].jd - 2457206.375) * u.day).to(u.year)
-    pmra = (
-        ((np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond / u.year) * year)
-        .to(u.deg)
-        .value
-    )
-    pmdec = (
-        ((np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond / u.year) * year)
-        .to(u.deg)
-        .value
-    )
-    result.RA_ICRS += pmra
-    result.DE_ICRS += pmdec
+    ra_corrected, dec_corrected = _correct_with_proper_motion(
+            np.nan_to_num(np.asarray(result.RA_ICRS)) * u.deg, np.nan_to_num(np.asarray(result.DE_ICRS)) * u.deg,
+            np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond / u.year,
+            np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond / u.year,
+            Time(2457206.375, format="jd", scale="tdb"),
+            tpf.time[0])
+    result.RA_ICRS = ra_corrected.to(u.deg).value
+    result.DE_ICRS = dec_corrected.to(u.deg).value
 
     # Convert to pixel coordinates
     radecs = np.vstack([result["RA_ICRS"], result["DE_ICRS"]]).T
@@ -327,6 +450,26 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         )
     )
 
+    tooltips = [
+        ("Gaia source", "@source"),
+        ("G", "@Gmag"),
+        ("Parallax (mas)", "@plx (~@one_over_plx{0,0} pc)"),
+        ("RA", "@ra{0,0.00000000}"),
+        ("DEC", "@dec{0,0.00000000}"),
+        ("pmRA", "@pmra{0,0.000} mas/yr"),
+        ("pmDE", "@pmde{0,0.000} mas/yr"),
+        ("column", "@x{0.0}"),
+        ("row", "@y{0.0}"),
+        ]
+
+    try:
+        source, tooltips = _add_nearby_tics_if_tess(tpf, source, tooltips)
+    except Exception as err:
+        warnings.warn(
+            f"interact_sky() - cannot obtain nearby TICs. Skip it. The error: {err}",
+            LightkurveWarning,
+        )
+
     r = fig.circle(
         "x",
         "y",
@@ -346,23 +489,72 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 
     fig.add_tools(
         HoverTool(
-            tooltips=[
-                ("Gaia source", "@source"),
-                ("G", "@Gmag"),
-                ("Parallax (mas)", "@plx (~@one_over_plx{0,0} pc)"),
-                ("RA", "@ra{0,0.00000000}"),
-                ("DEC", "@dec{0,0.00000000}"),
-                ("pmRA", "@pmra{0,0.000} mas/yr"),
-                ("pmDE", "@pmde{0,0.000} mas/yr"),
-                ("x", "@x"),
-                ("y", "@y"),
-            ],
+            tooltips=tooltips,
             renderers=[r],
             mode="mouse",
             point_policy="snap_to_data",
         )
     )
-    return fig, r
+
+    # mark the target's position too
+    target_x, target_y = tpf.wcs.all_world2pix([_get_corrected_coordinate(tpf)], 0)[0]
+    fig.cross(x=tpf.column + target_x, y=tpf.row + target_y, size=20, color="black", line_width=1)
+
+    # a widget that displays some of the selected star's metadata
+    # so that they can be copied (e.g., GAIA ID).
+    # It is a workaround, because bokeh's hover tooltip disappears as soon as the mouse is away from the star.
+    message_selected_target = Div(text="")
+
+    def show_target_info(attr, old, new):
+        # the following is essentially redoing the bokeh tooltip template above in plain HTML
+        # with some slight tweak, mainly to add some helpful links.
+        #
+        # Note: in source, columns "x" and "y" are ndarray while other column are pandas Series,
+        # so the access api is slightly different.
+        if len(new) > 0:
+            msg = "Selected:<br><table>"
+            for idx in new:
+                tic_id = source.data['tic'].iat[idx] if source.data.get('tic') is not None else None
+                if tic_id is not None and tic_id != "":  # TESS-specific meta data, if available
+                    msg += f"""
+<tr><td>TIC</td><td>{tic_id}
+(<a target="_blank" href="https://exofop.ipac.caltech.edu/tess/target.php?id={tic_id}">ExoFOP</a>)</td></tr>
+<tr><td>TESS Mag</td><td>{source.data['TESSmag'].iat[idx]}</td></tr>
+<tr><td>Separation (")</td><td>{source.data['separation'].iat[idx]}</td></tr>
+"""
+                # the main meta data
+                msg += f"""
+<tr><td>Gaia source</td><td>{source.data['source'].iat[idx]}
+(<a target="_blank"
+    href="http://vizier.u-strasbg.fr/viz-bin/VizieR-S?Gaia DR2 {source.data['source'].iat[idx]}">Vizier</a>)</td></tr>
+<tr><td>G</td><td>{source.data['Gmag'].iat[idx]:.3f}</td></tr>
+<tr><td>Parallax (mas)</td>
+    <td>{source.data['plx'].iat[idx]:,.3f} (~ {source.data['one_over_plx'].iat[idx]:,.0f} pc)</td>
+</tr>
+<tr><td>RA</td><td>{source.data['ra'].iat[idx]:,.8f}</td></tr>
+<tr><td>DEC</td><td>{source.data['dec'].iat[idx]:,.8f}</td></tr>
+<tr><td>pmRA</td><td>{source.data['pmra'].iat[idx]} mas/yr</td></tr>
+<tr><td>pmDE</td><td>{source.data['pmde'].iat[idx]} mas/yr</td></tr>
+<tr><td>column</td><td>{source.data['x'][idx]:.1f}</td></tr>
+<tr><td>row</td><td>{source.data['y'][idx]:.1f}</td></tr>
+<tr><td colspan="2">Search
+<a target="_blank"
+   href="http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Gaia DR2 {source.data['source'].iat[idx]}">
+SIMBAD by Gaia ID</a></td></tr>
+<tr><td colspan="2">
+<a target="_blank"
+   href="http://simbad.u-strasbg.fr/simbad/sim-coo?Coord={source.data['ra'].iat[idx]}+{source.data['dec'].iat[idx]}&Radius=2&Radius.unit=arcmin">
+SIMBAD by coordinate</a></td></tr>
+<tr><td colspan="2">&nbsp;</td></tr>
+"""
+
+            msg += "\n<table>"
+            message_selected_target.text = msg
+        # else do nothing (not clearing the widget) for now.
+
+    source.selected.on_change("indices", show_target_info)
+
+    return fig, r, message_selected_target
 
 
 def make_tpf_figure_elements(
@@ -934,7 +1126,7 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", magnitude_limit=18):
             plot_width=640,
             plot_height=600,
         )
-        fig_tpf, r = add_gaia_figure_elements(
+        fig_tpf, r, message_selected_target = add_gaia_figure_elements(
             tpf, fig_tpf, magnitude_limit=magnitude_limit
         )
 
@@ -957,7 +1149,7 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", magnitude_limit=18):
             )
 
         # Layout all of the plots
-        widgets_and_figures = layout([fig_tpf, stretch_slider])
+        widgets_and_figures = layout([fig_tpf, message_selected_target], [stretch_slider])
         doc.add_root(widgets_and_figures)
 
     output_notebook(verbose=False, hide_banner=True)
