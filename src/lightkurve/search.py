@@ -531,7 +531,7 @@ class SearchResult(object):
             cutout_path = TesscutClass().download_cutouts(
                 coords, size=cutout_size, sector=sector, path=tesscut_dir
             )
-            path = os.path.join(download_dir, cutout_path[0][0])
+            path = cutout_path[0][0]  # the cutoutpath already contains testcut_dir
             log.debug("Finished downloading.")
         return path
 

@@ -16,6 +16,9 @@
 - Fixed a bug in ``TargetPixelFile.interact()`` when ``ylim_func`` is specified and
   users tap to select custom apertures. [#1033]
 
+- Fixed a bug in ``search_tesscut().download()`` when ``download_dir`` is specified.
+  [#1063]
+
 
 2.0.9 (2021-03-31)
 ==================
