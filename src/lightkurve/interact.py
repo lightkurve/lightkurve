@@ -78,13 +78,14 @@ def _get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key, default=None):
 
 
 def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
+    """Return proper-motion corrected RA / Dec.
+       It also return whether proper motion correction is applied or not."""
     # all parameters have units
 
-    if pm_ra is None or pm_dec is None or (np.all(pm_ra == 0) and np.all(pm_dec == 0)):
-        warnings.warn((f"Proper motion correction cannot be applied, as none is supplied. pm_ra: {pm_ra}, pm_dec: {pm_dec}. "
-                       "Use RA Dec as is."),
-                      category=LightkurveWarning)
-        return ra, dec
+    if ra is None or dec is None or \
+       pm_ra is None or pm_dec is None or (np.all(pm_ra == 0) and np.all(pm_dec == 0)) or \
+       equinox is None:
+        return ra, dec, False
 
     # To be more accurate, we should have supplied distance to SkyCoord
     # in theory, for Gaia DR2 data, we can infer the distance from the parallax provided.
@@ -105,7 +106,7 @@ def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
         # so we filter by the message instead
         warnings.filterwarnings("ignore", message="ERFA function")
         new_c = c.apply_space_motion(new_obstime=new_time)
-    return new_c.ra, new_c.dec
+    return new_c.ra, new_c.dec, True
 
 
 def _get_corrected_coordinate(tpf_or_lc):
@@ -117,15 +118,9 @@ def _get_corrected_coordinate(tpf_or_lc):
     ra = h.get("RA_OBJ")
     dec = h.get("DEC_OBJ")
 
-    if ra is None or dec is None:
-        return None, None
-
     pm_ra = h.get("PMRA")
     pm_dec = h.get("PMDEC")
     equinox = h.get("EQUINOX")
-
-    if pm_ra is None or pm_dec is None or equinox is None:
-        return ra, dec
 
     # Note: it'd be better / extensible if the unit is a property of the tpf or lc
     if tpf_or_lc.meta.get("TICID") is not None:
@@ -133,13 +128,13 @@ def _get_corrected_coordinate(tpf_or_lc):
     else:  # assumes to be Kepler / K2
         pm_unit = u.arcsecond / u.year
 
-    ra_corrected, dec_corrected = _correct_with_proper_motion(
+    ra_corrected, dec_corrected, pm_corrected = _correct_with_proper_motion(
             ra * u.deg, dec *u.deg,
             pm_ra * pm_unit, pm_dec * pm_unit,
             # e.g., equinox 2000 is treated as J2000 is set to be noon of 2000-01-01 TT
             Time(equinox, format="decimalyear", scale="tt") + 0.5,
             new_time)
-    return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value
+    return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value, pm_corrected
 
 
 def _to_unitless(items):
@@ -418,7 +413,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     if len(result) == 0:
         raise no_targets_found_message
 
-    ra_corrected, dec_corrected = _correct_with_proper_motion(
+    ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
             np.nan_to_num(np.asarray(result.RA_ICRS)) * u.deg, np.nan_to_num(np.asarray(result.DE_ICRS)) * u.deg,
             np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond / u.year,
             np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond / u.year,
@@ -497,8 +492,15 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     )
 
     # mark the target's position too
-    target_x, target_y = tpf.wcs.all_world2pix([_get_corrected_coordinate(tpf)], 0)[0]
-    fig.cross(x=tpf.column + target_x, y=tpf.row + target_y, size=20, color="black", line_width=1)
+    target_ra, target_dec, pm_corrected = _get_corrected_coordinate(tpf)
+    if target_ra is not None and target_dec is not None:
+        target_x, target_y = tpf.wcs.all_world2pix([(target_ra, target_dec)], 0)[0]
+        fig.cross(x=tpf.column + target_x, y=tpf.row + target_y, size=20, color="black", line_width=1)
+        if not pm_corrected:
+            warnings.warn(("Proper motion correction cannot be applied to the target, as none is available. "
+                           "Thus the target (the cross) might be noticeably away from its actual position, "
+                           "if it has large proper motion."),
+                           category=LightkurveWarning)
 
     # a widget that displays some of the selected star's metadata
     # so that they can be copied (e.g., GAIA ID).
