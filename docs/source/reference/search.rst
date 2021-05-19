@@ -54,3 +54,32 @@ For example, a search result can be filtered by exposure time using
   SearchResult.ra
   SearchResult.dec
   SearchResult.table
+
+
+Data products collection
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+`SearchResult.download_all` returns a `LightCurveCollection` or a
+`TargetPixelFileCollection` object. They contain the data products, along with some convenience functions.
+
+A collection can also be further filtered using standard Python list syntax,
+and a subset of `numpy.ndarray` syntax.
+For example, a collection can be filtered by TESS sectors using
+``lcc[(lcc.sector >= 13) & (lcc.sector <= 19)]``.
+
+.. autosummary::
+  :toctree: api/
+
+  LightCurveCollection
+  LightCurveCollection.stitch
+  LightCurveCollection.plot
+  LightCurveCollection.append
+  LightCurveCollection.campaign
+  LightCurveCollection.quarter
+  LightCurveCollection.sector
+  TargetPixelFileCollection
+  TargetPixelFileCollection.plot
+  TargetPixelFileCollection.append
+  TargetPixelFileCollection.campaign
+  TargetPixelFileCollection.quarter
+  TargetPixelFileCollection.sector
