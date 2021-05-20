@@ -653,6 +653,7 @@ class LombScarglePeriodogram(Periodogram):
         freq_unit=None,
         normalization="amplitude",
         ls_method="fast",
+        flux_column="flux",
         **kwargs
     ):
         """Creates a `Periodogram` from a LightCurve using the Lomb-Scargle method.
@@ -774,6 +775,8 @@ class LombScarglePeriodogram(Periodogram):
         ls_method : str
             Default: `'fast'`. Passed to the `method` keyword of
             `astropy.stats.LombScargle()`.
+        flux_column : str
+            Default: `'flux'`. Which column of lc to compute periodogram of.
         kwargs : dict
             Keyword arguments passed to `astropy.stats.LombScargle()`
 
@@ -784,8 +787,8 @@ class LombScarglePeriodogram(Periodogram):
         """
         # Input validation
         normalization = validate_method(normalization, ["psd", "amplitude"])
-        if np.isnan(lc.flux).any():
-            lc = lc.remove_nans()
+        if np.isnan(lc[flux_column]).any():
+            lc = lc.remove_nans(flux_column)
             log.debug(
                 "Lightcurve contains NaN values."
                 "These are removed before creating the periodogram."
@@ -942,11 +945,11 @@ class LombScarglePeriodogram(Periodogram):
 
         if float(astropy.__version__[0]) >= 3:
             LS = LombScargle(
-                time, lc.flux, nterms=nterms, normalization="psd", **kwargs
+                time, lc[flux_column], nterms=nterms, normalization="psd", **kwargs
             )
             power = LS.power(frequency, method=ls_method)
         else:
-            LS = LombScargle(time, lc.flux, nterms=nterms, **kwargs)
+            LS = LombScargle(time, lc[flux_column], nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization="psd")
 
         if normalization == "psd":  # Power spectral density

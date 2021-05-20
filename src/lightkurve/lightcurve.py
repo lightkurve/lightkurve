@@ -2086,7 +2086,7 @@ class LightCurve(QTimeSeries):
         ``minimum_frequency``, ``maximum_frequency``, ``mininum_period``,
         ``maximum_period``, ``frequency``, ``period``, ``nterms``,
         ``nyquist_factor``, ``oversample_factor``, ``freq_unit``,
-        ``normalization``, ``ls_method``.
+        ``normalization``, ``ls_method``, ``flux_column``.
 
         Optional keywords accepted if ``method='bls'`` are
         ``minimum_period``, ``maximum_period``, ``period``,
