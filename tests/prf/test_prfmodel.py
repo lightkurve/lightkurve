@@ -12,6 +12,7 @@ from lightkurve.prf import KeplerPRF, SimpleKeplerPRF
 from lightkurve.targetpixelfile import KeplerTargetPixelFile
 
 
+@pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_prf_normalization():
     """Does the PRF model integrate to the requested flux across the focal plane?"""
     for channel in [1, 20, 40, 60, 84]:
@@ -26,6 +27,7 @@ def test_prf_normalization():
                 assert np.isclose(prf_sum, flux, rtol=0.1)
 
 
+@pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_simple_kepler_prf():
     """Ensures that concentric PRFs have the same values."""
     prf_1 = SimpleKeplerPRF(channel=16, shape=[20, 20], column=0, row=0)
@@ -54,6 +56,7 @@ def test_simple_kepler_prf_interpolation_consistency():
     np.isclose(np.sum(np.abs(sprf_data - cal_prf_subsampled_normalized)), 0)
 
 
+@pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_get_model_prf():
     tpf_fn = get_pkg_data_filename("../../tests/data/test-tpf-star.fits")
     tpf = KeplerTargetPixelFile(tpf_fn)
@@ -70,6 +73,7 @@ def test_get_model_prf():
     assert prf.row == prf_from_tpf.row
 
 
+@pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_keplerprf_gradient_against_simplekeplerprf():
     """is the gradient of KeplerPRF consistent with
     the gradient of SimpleKeplerPRF?
@@ -82,6 +86,7 @@ def test_keplerprf_gradient_against_simplekeplerprf():
     assert_allclose(prf_grad[:-3], simple_prf.gradient(**params))
 
 
+@pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 @pytest.mark.parametrize(
     "param_to_test",
     [

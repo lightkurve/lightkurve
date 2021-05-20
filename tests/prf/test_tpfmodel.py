@@ -50,12 +50,14 @@ def test_backgroundprior():
     assert not np.isfinite(bp(flux + 0.1))
 
 
+@pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_tpf_model_simple():
     prf = SimpleKeplerPRF(channel=16, shape=[10, 10], column=15, row=15)
     model = TPFModel(prfmodel=prf)
     assert model.prfmodel.channel == 16
 
 
+@pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_tpf_model():
     col, row, flux, bgflux = 1, 2, 3, 4
     shape = (7, 8)
@@ -136,6 +138,7 @@ def test_tpf_model_fitting():
     phot.run([tpf[1].data])
 
 
+@pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_empty_model():
     """Can we fit the background flux in a model without stars?"""
     shape = (4, 3)
@@ -147,6 +150,7 @@ def test_empty_model():
     assert np.isclose(results.background.flux, bgflux, rtol=1e-2)
 
 
+@pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_model_with_one_star():
     """Can we fit the background flux in a model with one star?"""
     channel = 42

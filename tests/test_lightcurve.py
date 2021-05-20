@@ -999,6 +999,7 @@ def test_targetid():
     assert lc.targetid == 20
 
 
+@pytest.mark.remote_data  # due to test (K2_C08 is remote)
 def test_regression_346():
     """Regression test for https://github.com/lightkurve/lightkurve/issues/346"""
     # This previously triggered an IndexError:

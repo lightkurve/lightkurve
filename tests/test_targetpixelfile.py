@@ -602,6 +602,7 @@ def test_interact_sky():
         tpf.interact_sky()
 
 
+@pytest.mark.remote_data  # get_model / get_prf_model relies on calibration files on stsci.edu
 def test_get_models():
     """Can we obtain PRF and TPF models?"""
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask=None)
