@@ -13,7 +13,7 @@ Lightkurve's style.
 
     Examples
     --------
-    Create a scatter plot with a custom size using Lihgtkurve's style.
+    Create a scatter plot with a custom size using Lightkurve's style.
 
         >>> with plt.style.context(MPLSTYLE):  # doctest: +SKIP
         >>>     ax = plt.figure(figsize=(6, 3)).gca()  # doctest: +SKIP
