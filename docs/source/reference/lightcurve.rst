@@ -63,6 +63,7 @@ Plotting
   LightCurve.scatter
   LightCurve.errorbar
   LightCurve.plot_river
+  MPLSTYLE
 
 
 Data manipulation

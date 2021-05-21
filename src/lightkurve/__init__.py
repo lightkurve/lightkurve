@@ -6,7 +6,20 @@ import os
 
 PACKAGEDIR = os.path.abspath(os.path.dirname(__file__))
 MPLSTYLE = "{}/data/lightkurve.mplstyle".format(PACKAGEDIR)
+"""Lightkurve's stylesheet for matplotlib.
 
+It is useful for users who create their own figures and want their figures following
+Lightkurve's style.
+
+    Examples
+    --------
+    Create a scatter plot with a custom size using Lihgtkurve's style.
+
+        >>> with plt.style.context(MPLSTYLE):  # doctest: +SKIP
+        >>>     ax = plt.figure(figsize=(6, 3)).gca()  # doctest: +SKIP
+        >>>     lc.scatter(ax=ax)  # doctest: +SKIP
+
+"""
 
 # Bibtex entry detailing how to cite the package
 __citation__ = """@MISC{2018ascl.soft12013L,
