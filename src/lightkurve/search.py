@@ -366,8 +366,8 @@ class SearchResult(object):
     ):
         """Download and open all data products in the search result.
 
-        This method will returns a `~lightkurve.collections.TargetPixelFileCollection` or
-        `~lightkurve.collections.LightCurveCollection`.
+        This method will returns a `~lightkurve.TargetPixelFileCollection` or
+        `~lightkurve.LightCurveCollection`.
 
         Parameters
         ----------
@@ -399,8 +399,8 @@ class SearchResult(object):
         Returns
         -------
         collection : `~lightkurve.collections.Collection` object
-            Returns a `~lightkurve.collections.LightCurveCollection` or
-            `~lightkurve.collections.TargetPixelFileCollection`,
+            Returns a `~lightkurve.LightCurveCollection` or
+            `~lightkurve.TargetPixelFileCollection`,
             containing all entries in the products table
 
         Raises
