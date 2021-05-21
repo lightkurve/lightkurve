@@ -63,8 +63,8 @@ class QTimeSeries(TimeSeries):
         """
         # string-typed columns should not have a unit, or it will make convert_col_for_table crash!
         # see https://github.com/lightkurve/lightkurve/pull/980#issuecomment-806178939
-        if hasattr(col, 'dtype'):
-            if hasattr(col, 'unit') and col.dtype.kind in {'U', 'S'}:
+        if hasattr(col, "dtype"):
+            if hasattr(col, "unit") and col.dtype.kind in {"U", "S"}:
                 del col.unit
 
         col = super()._convert_col_for_table(col)
@@ -107,6 +107,10 @@ class LightCurve(QTimeSeries):
 
     Compared to the generic `~astropy.timeseries.TimeSeries` class, `LightCurve`
     ensures that each object has `time`, `flux`, and `flux_err` columns.
+    These three columns are special for two reasons:
+    1. they are the key columns upon which all light curve operations operate;
+    2. they are always present (though they may be populated with ``NaN`` values).
+
     `LightCurve` objects also provide user-friendly attribute access to
     columns and meta data.
 
@@ -362,7 +366,7 @@ class LightCurve(QTimeSeries):
                 name not in self.__dict__
                 and not name.startswith("_")
                 and not self._new_attributes_relax
-                and name != 'meta'
+                and name != "meta"
             ):
                 warnings.warn(
                     (
@@ -432,6 +436,42 @@ class LightCurve(QTimeSeries):
     @flux_err.setter
     def flux_err(self, flux_err):
         self["flux_err"] = flux_err
+
+    def set_flux(self, flux_column, flux_err_column=None):
+        """Assign a different column to be the flux column.
+
+        Parameters
+        ----------
+        flux_column : str
+            Name of the column that should become the 'flux' column.
+        flux_err_column : str or `None`
+            Name of the column that should become the 'flux_err' column.
+            By default, the column will be used that is obtained by adding the
+            suffix "_err" to the value of ``flux_column``.  If such a
+            column does not exist, ``flux_err`` will be populated with NaN values.
+
+        Returns
+        -------
+        lc : LightCurve
+            Copy of the ``LightCurve`` object with the new flux values assigned.
+        """
+        # Input validation
+        if flux_column not in self.columns:
+            raise ValueError(f"'{flux_column}' is not a column")
+        if flux_err_column and flux_err_column not in self.columns:
+            raise ValueError(f"'{flux_err_column}' is not a column")
+
+        lc = self.copy()
+        lc["flux"] = lc[flux_column]
+        if flux_err_column:  # not None
+            lc["flux_err"] = lc[flux_err_column]
+        else:
+            flux_err_column = flux_column + "_err"
+            if flux_err_column in lc.columns:
+                lc["flux_err"] = lc[flux_err_column]
+            else:
+                lc["flux_err"][:] = np.nan
+        return lc
 
     # Define deprecated attributes for compatibility with Lightkurve v1.x:
 
@@ -674,6 +714,7 @@ class LightCurve(QTimeSeries):
 
         # Re-use LightCurveCollection.stitch() to avoid code duplication
         from .collections import LightCurveCollection  # avoid circular import
+
         return LightCurveCollection((self, *others)).stitch(corrector_func=None)
 
     def flatten(
@@ -1300,10 +1341,13 @@ class LightCurve(QTimeSeries):
         """
         if binsize is not None and bins is not None:
             raise ValueError("Only one of ``bins`` and ``binsize`` can be specified.")
-        elif ((binsize is not None or bins is not None)
-              and (time_bin_size is not None or n_bins is not None)):
-            raise ValueError("``bins`` or ``binsize`` conflicts with "
-                             "``n_bins`` or ``time_bin_size``.")
+        elif (binsize is not None or bins is not None) and (
+            time_bin_size is not None or n_bins is not None
+        ):
+            raise ValueError(
+                "``bins`` or ``binsize`` conflicts with "
+                "``n_bins`` or ``time_bin_size``."
+            )
         elif bins is not None:
             if np.array(bins).dtype != np.int:
                 raise TypeError("``bins`` must have integer type.")
@@ -1325,8 +1369,12 @@ class LightCurve(QTimeSeries):
         # Backwards compatibility with Lightkurve v1.x
         if time_bin_size is None:
             if bins is not None:
-                i = len(self.time) - np.searchsorted(self.time, time_bin_start - 1 * u.ns)
-                time_bin_size = ((self.time[-1] - time_bin_start) * i / ((i - 1) * bins)).to(u.day)
+                i = len(self.time) - np.searchsorted(
+                    self.time, time_bin_start - 1 * u.ns
+                )
+                time_bin_size = (
+                    (self.time[-1] - time_bin_start) * i / ((i - 1) * bins)
+                ).to(u.day)
             elif binsize is not None:
                 i = np.searchsorted(self.time, time_bin_start - 1 * u.ns)
                 time_bin_size = (self.time[i + binsize] - self.time[i]).to(u.day)
@@ -2070,7 +2118,9 @@ class LightCurve(QTimeSeries):
         try:
             import openpyxl  # optional dependency
         except ModuleNotFoundError:
-            raise ModuleNotFoundError("You need to install `openpyxl` to use this feature, e.g. use `pip install openpyxl`.")
+            raise ModuleNotFoundError(
+                "You need to install `openpyxl` to use this feature, e.g. use `pip install openpyxl`."
+            )
         self.to_pandas().to_excel(path_or_buf, **kwargs)
 
     def to_periodogram(self, method="lombscargle", **kwargs):
@@ -2315,9 +2365,11 @@ class LightCurve(QTimeSeries):
         method = validate_method(method, supported_methods=["sff", "cbv"])
         if method == "sff":
             from .correctors import SFFCorrector
+
             return SFFCorrector(self, **kwargs)
         elif method == "cbv":
             from .correctors import CBVCorrector
+
             return CBVCorrector(self, **kwargs)
 
     @deprecated_renamed_argument(
