@@ -35,7 +35,7 @@ goto end
 :clean
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS%
 rem Force autogenerating the API docs
-del source\api\lightkurve.*
+del source\reference\api\lightkurve.*
 goto end
 
 :help
