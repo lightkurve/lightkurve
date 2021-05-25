@@ -51,8 +51,10 @@ class Collection(object):
         return len(self.data)
 
     def __getitem__(self, index_or_mask):
-        if isinstance(index_or_mask, (int, np.integer, slice)):
+        if isinstance(index_or_mask, (int, np.integer)):
             return self.data[index_or_mask]
+        elif isinstance(index_or_mask, slice):
+            return type(self)(self.data[index_or_mask])
         elif all([isinstance(i, (bool, np.bool_)) for i in index_or_mask]):
             # case indexOrMask is bool array like, e.g., np.ndarray, collections.abc.Sequence, etc.
 
