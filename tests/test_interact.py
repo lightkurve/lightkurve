@@ -7,7 +7,7 @@ import pytest
 
 from lightkurve import LightkurveWarning
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from .test_targetpixelfile import TABBY_TPF
+from .test_targetpixelfile import filename_tpf_tabby_lite
 from lightkurve.interact import get_lightcurve_y_limits
 
 
@@ -59,14 +59,13 @@ def test_graceful_exit_outside_notebook():
     assert result is None
 
 
-@pytest.mark.remote_data  # due to test (TABBY_TPF is remote)
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_custom_aperture_mask():
     """Can we provide a custom lightcurve to show?"""
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
         warnings.simplefilter("ignore", LightkurveWarning)
-        tpfs = [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(example_tpf)]
+        tpfs = [KeplerTargetPixelFile(filename_tpf_tabby_lite), TessTargetPixelFile(example_tpf)]
     import bokeh
 
     for tpf in tpfs:
@@ -78,7 +77,6 @@ def test_custom_aperture_mask():
         tpf.interact(aperture_mask=mask)
 
 
-@pytest.mark.remote_data  # due to test (TABBY_TPF is remote)
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_custom_exported_filename():
     """Can we provide a custom lightcurve to show?"""
@@ -87,7 +85,7 @@ def test_custom_exported_filename():
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
         warnings.simplefilter("ignore", LightkurveWarning)
-        tpfs = [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(example_tpf)]
+        tpfs = [KeplerTargetPixelFile(filename_tpf_tabby_lite), TessTargetPixelFile(example_tpf)]
     for tpf in tpfs:
         tpf.interact(exported_filename="demo.fits")
         tpf[0:2].interact()
@@ -100,14 +98,13 @@ def test_custom_exported_filename():
         tpf[mask].interact()
 
 
-@pytest.mark.remote_data  # due to test (TABBY_TPF is remote)
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_transform_and_ylim_funcs():
     """Test the transform_func and ylim_func"""
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
         warnings.simplefilter("ignore", LightkurveWarning)
-        tpfs = [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(example_tpf)]
+        tpfs = [KeplerTargetPixelFile(filename_tpf_tabby_lite), TessTargetPixelFile(example_tpf)]
     for tpf in tpfs:
         tpf.interact(transform_func=lambda lc: lc.normalize())
         tpf.interact(transform_func=lambda lc: lc.flatten().normalize())
