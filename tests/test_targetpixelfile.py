@@ -250,11 +250,10 @@ def test_wcs():
         assert type(w).__name__ == "WCS"
 
 
-@pytest.mark.remote_data
 @pytest.mark.parametrize("method", [("moments"), ("quadratic")])
 def test_wcs_tabby(method):
     """Test the centroids from Tabby's star against simbad values"""
-    tpf = KeplerTargetPixelFile(TABBY_TPF)
+    tpf = KeplerTargetPixelFile(filename_tpf_tabby_lite)
     tpf.wcs
     ra, dec = tpf.get_coordinates(0)
     col, row = tpf.estimate_centroids(method=method)
