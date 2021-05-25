@@ -29,6 +29,8 @@ from .test_synthetic_data import filename_synthetic_flat
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
 filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
+# a local version of TABBY_TPF with ~ 2 days of data; should be sufficient for most tests
+filename_tpf_tabby_lite = get_pkg_data_filename("data/test-tpf-kplr-tabby-100-cadences.fits")
 
 TABBY_Q8 = (
     "https://archive.stsci.edu/missions/kepler/lightcurves"
@@ -248,11 +250,10 @@ def test_wcs():
         assert type(w).__name__ == "WCS"
 
 
-@pytest.mark.remote_data
 @pytest.mark.parametrize("method", [("moments"), ("quadratic")])
 def test_wcs_tabby(method):
     """Test the centroids from Tabby's star against simbad values"""
-    tpf = KeplerTargetPixelFile(TABBY_TPF)
+    tpf = KeplerTargetPixelFile(filename_tpf_tabby_lite)
     tpf.wcs
     ra, dec = tpf.get_coordinates(0)
     col, row = tpf.estimate_centroids(method=method)
