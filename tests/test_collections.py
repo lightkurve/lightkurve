@@ -175,6 +175,33 @@ def test_collection_getitem_by_other_array():
         lcc[[True, "def"]]
 
 
+def test_collection_getitem_by_slices():
+    """Tests Collection.__getitem__ by slices"""
+    lc0 = LightCurve(
+        time=np.arange(1, 5),
+        flux=np.arange(1, 5),
+        flux_err=np.arange(1, 5),
+        targetid=50000,
+    )
+    lc1 = LightCurve(
+        time=np.arange(10, 15),
+        flux=np.arange(10, 15),
+        flux_err=np.arange(10, 15),
+        targetid=120334,
+    )
+    lc2 = LightCurve(
+        time=np.arange(15, 20),
+        flux=np.arange(15, 20),
+        flux_err=np.arange(15, 20),
+        targetid=23456,
+    )
+    lcc = LightCurveCollection([lc0, lc1, lc2])
+
+    assert lcc[:2].data == [lc0, lc1]
+
+    assert lcc[1:999].data == [lc1, lc2]
+
+
 def test_collection_setitem():
     """Tests Collection. __setitem__"""
     lc = LightCurve(
