@@ -22,6 +22,9 @@
 - Fixed a bug in ``search_tesscut().download()`` when ``download_dir`` is specified.
   [#1063]
 
+- Fixed a bug in ``LightCurveCollection`` and ``TargetPixelFileCollection``, where
+  indexing by slice, e.g., ``lc_collection[0:2]``, incorrectly returns a ``list`` [#1077]
+
 
 2.0.9 (2021-03-31)
 ==================
