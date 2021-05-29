@@ -46,6 +46,8 @@ try:
         Range1d,
         LinearColorMapper,
         BasicTicker,
+        Arrow,
+        VeeHead,
     )
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
@@ -487,9 +489,9 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         size="size",
         line_color=None,
         selection_color="firebrick",
-        nonselection_fill_alpha=0.0,
+        nonselection_fill_alpha=0.3,
         nonselection_line_color=None,
-        nonselection_line_alpha=0.0,
+        nonselection_line_alpha=1.0,
         fill_color="firebrick",
         hover_fill_color="firebrick",
         hover_alpha=0.9,
@@ -515,6 +517,57 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
                            "Thus the target (the cross) might be noticeably away from its actual position, "
                            "if it has large proper motion."),
                            category=LightkurveWarning)
+
+    # display an arrow on the selected target
+    arrow_head = VeeHead(size=16)
+    arrow_4_selected = Arrow(end=arrow_head, line_color="red", line_width=4,
+                             x_start=0, y_start=0, x_end=0, y_end=0, tags=["selected"],
+                             visible=False)
+    fig.add_layout(arrow_4_selected)
+
+    def show_arrow_at_target(attr, old, new):
+        if len(new) > 0:
+            x, y = source.data["x"][new[0]], source.data["y"][new[0]]
+
+            # workaround: the arrow_head color should have been specified once
+            # in its creation, but it seems to hit a bokeh bug, resulting in an error
+            # of the form  ValueError("expected ..., got {'value': 'red'}")
+            # in actual websocket call, it seems that the color value is
+            # sent as "{'value': 'red'}", but they are expdecting "red" instead.
+            # somehow the error is bypassed if I specify it later in here.
+            #
+            # The issue is present in bokeh 2.2.3 / 2.1.1, but  not in bokeh 2.3.1
+            # I cannot identify a specific issue /PR on github about it though.
+            arrow_head.fill_color = "red"
+            arrow_head.line_color = "black"
+
+            # place the arrow near (x,y), taking care of boundary cases (at the edge of the plot)
+            if x < fig.x_range.start + 1:
+                # boundary case: the point is at the left edge of the plot
+                arrow_4_selected.x_start = x + 0.85
+                arrow_4_selected.x_end = x + 0.2
+            else:  # normal case
+                arrow_4_selected.x_start = x - 0.85
+                arrow_4_selected.x_end = x - 0.2
+
+            if y > fig.y_range.end - 0.5:
+                # boundary case: the point is at near the top of the plot
+                arrow_4_selected.y_start = y - 0.4
+                arrow_4_selected.y_end = y - 0.1
+            elif y < fig.y_range.start + 0.5:
+                # boundary case: the point is at near the top of the plot
+                arrow_4_selected.y_start = y + 0.4
+                arrow_4_selected.y_end = y + 0.1
+            else:  # normal case
+                arrow_4_selected.y_start = y
+                arrow_4_selected.y_end = y
+
+            arrow_4_selected.visible = True
+        else:
+            arrow_4_selected.visible = False
+
+    source.selected.on_change("indices", show_arrow_at_target)
+
 
     # a widget that displays some of the selected star's metadata
     # so that they can be copied (e.g., GAIA ID).
@@ -567,6 +620,10 @@ SIMBAD by coordinate</a></td></tr>
             msg += "\n<table>"
             message_selected_target.text = msg
         # else do nothing (not clearing the widget) for now.
+
+    def on_selected_change(*args):
+        show_arrow_at_target(*args)
+        show_target_info(*args)
 
     source.selected.on_change("indices", show_target_info)
 
