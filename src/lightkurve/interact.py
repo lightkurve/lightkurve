@@ -509,9 +509,11 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 
     # mark the target's position too
     target_ra, target_dec, pm_corrected = _get_corrected_coordinate(tpf)
+    target_x, target_y = None, None
     if target_ra is not None and target_dec is not None:
-        target_x, target_y = tpf.wcs.all_world2pix([(target_ra, target_dec)], 0)[0]
-        fig.cross(x=tpf.column + target_x, y=tpf.row + target_y, size=20, color="black", line_width=1)
+        pix_x, pix_y = tpf.wcs.all_world2pix([(target_ra, target_dec)], 0)[0]
+        target_x, target_y = tpf.column + pix_x, tpf.row + pix_y
+        fig.cross(x=target_x, y=target_y, size=20, color="black", line_width=1)
         if not pm_corrected:
             warnings.warn(("Proper motion correction cannot be applied to the target, as none is available. "
                            "Thus the target (the cross) might be noticeably away from its actual position, "
@@ -546,9 +548,19 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
                 # boundary case: the point is at the left edge of the plot
                 arrow_4_selected.x_start = x + 0.85
                 arrow_4_selected.x_end = x + 0.2
-            else:  # normal case
+            elif x > fig.x_range.end - 1:
+                # boundary case: the point is at the right edge of the plot
                 arrow_4_selected.x_start = x - 0.85
                 arrow_4_selected.x_end = x - 0.2
+            elif target_x is None or x < target_x:
+                # normal case 1 : point is to the left of the target
+                arrow_4_selected.x_start = x - 0.85
+                arrow_4_selected.x_end = x - 0.2
+            else:
+                # normal case 2 : point is to the right of the target
+                # flip arrow's direction so that it won't overlap with the target
+                arrow_4_selected.x_start = x + 0.85
+                arrow_4_selected.x_end = x + 0.2
 
             if y > fig.y_range.end - 0.5:
                 # boundary case: the point is at near the top of the plot
