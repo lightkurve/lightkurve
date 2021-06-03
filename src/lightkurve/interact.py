@@ -642,9 +642,20 @@ SIMBAD by coordinate</a></td></tr>
     return fig, r, message_selected_target
 
 
+def to_selected_pixels_source(tpf_source):
+    xx = tpf_source.data["xx"].flatten()
+    yy = tpf_source.data["yy"].flatten()
+    selected_indices = tpf_source.selected.indices
+    return ColumnDataSource(dict(
+        xx=xx[selected_indices],
+        yy=yy[selected_indices],
+    ))
+
+
 def make_tpf_figure_elements(
     tpf,
     tpf_source,
+    tpf_source_selectable=True,
     pedestal=None,
     fiducial_frame=None,
     plot_width=370,
@@ -769,16 +780,33 @@ def make_tpf_figure_elements(
     color_bar.formatter = PrintfTickFormatter(format="%14i")
 
     if tpf_source is not None:
-        fig.rect(
-            "xx",
-            "yy",
-            1,
-            1,
-            source=tpf_source,
-            fill_color="gray",
-            fill_alpha=0.4,
-            line_color="white",
-        )
+        if tpf_source_selectable:
+            fig.rect(
+                "xx",
+                "yy",
+                1,
+                1,
+                source=tpf_source,
+                fill_color="gray",
+                fill_alpha=0.4,
+                line_color="white",
+                )
+        else:
+            # Paint the selected pixels such that they cannot be selected / deselected.
+            # Used to show specified aperture pixels without letting users to
+            # change them in ``interact_sky```
+            selected_pixels_source = to_selected_pixels_source(tpf_source)
+            r_selected = fig.rect(
+                "xx",
+                "yy",
+                1,
+                1,
+                source=selected_pixels_source,
+                fill_color="gray",
+                fill_alpha=0.0,
+                line_color="white",
+                )
+            r_selected.nonselection_glyph = None
 
     # Configure the stretch slider and its callback function
     if scale == "log":
@@ -1157,7 +1185,7 @@ def show_interact_widget(
     return show(create_interact_ui, notebook_url=notebook_url)
 
 
-def show_skyview_widget(tpf, notebook_url="localhost:8888", magnitude_limit=18):
+def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="default",  magnitude_limit=18):
     """skyview
 
     Parameters
@@ -1199,14 +1227,18 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", magnitude_limit=18):
     else:
         fiducial_frame = 0
 
+    aperture_mask = tpf._parse_aperture_mask(aperture_mask)
+
     def create_interact_ui(doc):
+        tpf_source = prepare_tpf_datasource(tpf, aperture_mask)
+
         # The data source includes metadata for hover-over tooltips
-        tpf_source = None
 
         # Create the TPF figure and its stretch slider
         fig_tpf, stretch_slider = make_tpf_figure_elements(
             tpf,
             tpf_source,
+            tpf_source_selectable=False,
             fiducial_frame=fiducial_frame,
             plot_width=640,
             plot_height=600,

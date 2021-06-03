@@ -1345,7 +1345,7 @@ class TargetPixelFile(object):
             **kwargs,
         )
 
-    def interact_sky(self, notebook_url="localhost:8888", magnitude_limit=18):
+    def interact_sky(self, notebook_url="localhost:8888", aperture_mask="empty", magnitude_limit=18):
         """Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.
 
         Parameters
@@ -1365,7 +1365,7 @@ class TargetPixelFile(object):
         from .interact import show_skyview_widget
 
         return show_skyview_widget(
-            self, notebook_url=notebook_url, magnitude_limit=magnitude_limit
+            self, notebook_url=notebook_url, aperture_mask=aperture_mask, magnitude_limit=magnitude_limit
         )
 
     def to_corrector(self, method="pld", **kwargs):
