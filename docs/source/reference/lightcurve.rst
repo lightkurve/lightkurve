@@ -83,7 +83,7 @@ The following methods all return a new `LightCurve` object.
   LightCurve.normalize
   LightCurve.remove_nans
   LightCurve.remove_outliers
-  LightCurve.set_flux
+  LightCurve.select_flux
   LightCurve.tail
   LightCurve.truncate
 

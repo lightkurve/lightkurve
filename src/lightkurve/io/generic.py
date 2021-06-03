@@ -115,5 +115,6 @@ def read_generic_lightcurve(
     tab.meta["RA"] = hdulist[0].header.get("RA_OBJ")
     tab.meta["DEC"] = hdulist[0].header.get("DEC_OBJ")
     tab.meta["FILENAME"] = filename
+    tab.meta["FLUX_ORIGIN"] = flux_column
 
     return LightCurve(time=time, data=tab)

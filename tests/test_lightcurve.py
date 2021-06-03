@@ -1591,21 +1591,22 @@ def test_head_tail_truncate():
     assert lc.truncate(after=3).tail(1).flux == 3
 
 
-def test_set_flux():
-    """Simple test for the `LightCurve.set_flux()` method."""
+def test_select_flux():
+    """Simple test for the `LightCurve.select_flux()` method."""
     lc = LightCurve(data={'time': [1,2,3],
                           'newflux': [4, 5, 6],
                           'newflux_err': [7, 8, 9]})
     # Can we set flux to newflux?
-    assert all(lc.set_flux("newflux").flux == lc.newflux)
-    # Did `set_flux()` return a copy rather than operating in place?
+    assert all(lc.select_flux("newflux").flux == lc.newflux)
+    assert lc.select_flux("newflux").meta["FLUX_ORIGIN"] == "newflux"
+    # Did `select_flux()` return a copy rather than operating in place?
     assert not all(lc.flux == lc.newflux)
-    # Does `set_flux()` set the error column by default?
-    assert all(lc.set_flux("newflux").flux_err == lc.newflux_err)
+    # Does `select_flux()` set the error column by default?
+    assert all(lc.select_flux("newflux").flux_err == lc.newflux_err)
     # Can a different error column be specified?
-    assert all(lc.set_flux("newflux", flux_err_column="newflux").flux_err == lc.newflux)
+    assert all(lc.select_flux("newflux", flux_err_column="newflux").flux_err == lc.newflux)
     # Do invalid column names raise a ValueError?
     with pytest.raises(ValueError):
-        lc.set_flux("doesnotexist")
+        lc.select_flux("doesnotexist")
     with pytest.raises(ValueError):
-        lc.set_flux("newflux", "doesnotexist")
+        lc.select_flux("newflux", "doesnotexist")

@@ -63,8 +63,8 @@ class QTimeSeries(TimeSeries):
         """
         # string-typed columns should not have a unit, or it will make convert_col_for_table crash!
         # see https://github.com/lightkurve/lightkurve/pull/980#issuecomment-806178939
-        if hasattr(col, "dtype"):
-            if hasattr(col, "unit") and col.dtype.kind in {"U", "S"}:
+        if hasattr(col, 'dtype'):
+            if hasattr(col, 'unit') and col.dtype.kind in {'U', 'S'}:
                 del col.unit
 
         col = super()._convert_col_for_table(col)
@@ -366,7 +366,7 @@ class LightCurve(QTimeSeries):
                 name not in self.__dict__
                 and not name.startswith("_")
                 and not self._new_attributes_relax
-                and name != "meta"
+                and name != 'meta'
             ):
                 warnings.warn(
                     (
@@ -387,7 +387,7 @@ class LightCurve(QTimeSeries):
         result = f"<{self.__class__.__name__}"
         if "LABEL" in self.meta:
             result += f" LABEL=\"{self.meta.get('LABEL')}\""
-        for kw in ["QUARTER", "CAMPAIGN", "SECTOR", "AUTHOR"]:
+        for kw in ["QUARTER", "CAMPAIGN", "SECTOR", "AUTHOR", "FLUX_ORIGIN"]:
             if kw in self.meta:
                 result += f" {kw}={self.meta.get(kw)}"
         result += ">"
@@ -402,7 +402,7 @@ class LightCurve(QTimeSeries):
             descr_vals.append("length={}".format(len(self)))
             if "LABEL" in self.meta:
                 descr_vals.append(f"LABEL=\"{self.meta.get('LABEL')}\"")
-            for kw in ["QUARTER", "CAMPAIGN", "SECTOR", "AUTHOR"]:
+            for kw in ["QUARTER", "CAMPAIGN", "SECTOR", "AUTHOR", "FLUX_ORIGIN"]:
                 if kw in self.meta:
                     descr_vals.append(f"{kw}={self.meta.get(kw)}")
         return super()._base_repr_(html=html, descr_vals=descr_vals, **kwargs)
@@ -437,8 +437,12 @@ class LightCurve(QTimeSeries):
     def flux_err(self, flux_err):
         self["flux_err"] = flux_err
 
-    def set_flux(self, flux_column, flux_err_column=None):
+    def select_flux(self, flux_column, flux_err_column=None):
         """Assign a different column to be the flux column.
+
+        This method returns a copy of the LightCurve in which the ``flux``
+        and ``flux_err`` columns have been replaced by the values contained
+        in a different column.
 
         Parameters
         ----------
@@ -454,6 +458,14 @@ class LightCurve(QTimeSeries):
         -------
         lc : LightCurve
             Copy of the ``LightCurve`` object with the new flux values assigned.
+
+        Examples
+        --------
+        You can use this function to change the flux data on which most Lightkurve
+        features operate.  For example, to view a periodogram based on the "sap_flux"
+        column in a TESS light curve, use::
+
+            >>> lc.select_flux("sap_flux").to_periodogram("lombscargle").plot()  # doctest: +SKIP
         """
         # Input validation
         if flux_column not in self.columns:
@@ -466,11 +478,15 @@ class LightCurve(QTimeSeries):
         if flux_err_column:  # not None
             lc["flux_err"] = lc[flux_err_column]
         else:
-            flux_err_column = flux_column + "_err"
+            # if `flux_err_column` is unspecified, we attempt to use
+            # f"{flux_column}_err" if it exists
+            flux_err_column = f"{flux_column}_err"
             if flux_err_column in lc.columns:
                 lc["flux_err"] = lc[flux_err_column]
             else:
                 lc["flux_err"][:] = np.nan
+
+        lc.meta['FLUX_ORIGIN'] = flux_column
         return lc
 
     # Define deprecated attributes for compatibility with Lightkurve v1.x:
