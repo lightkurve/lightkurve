@@ -1,4 +1,4 @@
-2.0.10 (unreleased)
+2.0.10 (2021-06-04)
 ===================
 
 - Modified the search functions to ensure the two parts of K2 Campaigns
@@ -16,7 +16,7 @@
 - Fixed a bug in ``TargetPixelFile.interact()`` when ``ylim_func`` is specified and
   users tap to select custom apertures. [#1033]
 
-- Improve the user interface of ``TargetPixelFile.interact_sky()``, including providing
+- Improved the user interface of ``TargetPixelFile.interact_sky()``, including providing
   TIC information when applicable. [#1050]
 
 - Fixed a bug in ``search_tesscut().download()`` when ``download_dir`` is specified.
