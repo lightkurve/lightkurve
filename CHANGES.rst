@@ -28,6 +28,9 @@
 - Added the ``LightCurve.select_flux()`` method to make it easier to use a different
   column to populate the ``flux`` and ``flux_err`` columns. [#1076]
 
+- Modified the MIT Quicklook Pipeline (QLP) light curve file reader to use the "SAP_FLUX"
+  column as the default flux column. [#1083]
+
 
 2.0.9 (2021-03-31)
 ==================

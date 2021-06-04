@@ -9,15 +9,22 @@ from ..utils import TessQualityFlags
 from .generic import read_generic_lightcurve
 
 
-def read_qlp_lightcurve(filename, flux_column="kspsap_flux", quality_bitmask="default"):
-    """Returns a `TessLightCurve`.
+def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column="kspsap_flux_err", quality_bitmask="default"):
+    """Returns a `TessLightCurve` object given a light curve file from the MIT Quicklook Pipeline (QLP).
+
+    By default, QLP's `sap_flux` column is used to populate the `flux` values,
+    and 'kspsap_flux_err' is used to populate `flux_err`. For a discussion
+    related to this choice, see https://github.com/lightkurve/lightkurve/issues/1083
 
     Parameters
     ----------
     filename : str
         Local path or remote url of a QLP light curve FITS file.
-    flux_column : 'pdcsap_flux' or 'sap_flux'
+    flux_column : 'sap_flux', 'kspsap_flux', 'kspsap_flux_sml', 'kspsap_flux_lag', or 'sap_bkg'
         Which column in the FITS file contains the preferred flux data?
+        By default the "Simple Aperture Photometry" flux (sap_flux) is used.
+    flux_err_column: 'kspsap_flux_err', or 'sap_bkg_err'
+      Which column in the FITS file contains the preferred flux_err data?
     quality_bitmask : str or int
         Bitmask (integer) which identifies the quality flag bitmask that should
         be used to mask out bad cadences. If a string is passed, it has the
@@ -33,7 +40,7 @@ def read_qlp_lightcurve(filename, flux_column="kspsap_flux", quality_bitmask="de
 
         See the :class:`TessQualityFlags` class for details on the bitmasks.
     """
-    lc = read_generic_lightcurve(filename, flux_column=flux_column, time_format="btjd")
+    lc = read_generic_lightcurve(filename, flux_column=flux_column, flux_err_column=flux_err_column, time_format="btjd")
 
     # Filter out poor-quality data
     # NOTE: Unfortunately Astropy Table masking does not yet work for columns
