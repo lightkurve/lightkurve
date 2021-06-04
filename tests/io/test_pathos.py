@@ -33,6 +33,7 @@ def test_read_pathos():
     for ext in exts:
         lc = read_pathos_lightcurve(url, flux_column=ext)
         assert type(lc).__name__ == "TessLightCurve"
+        assert lc.meta["FLUX_ORIGIN"] == ext.lower()
         # Are `time` and `flux` consistent with the FITS file?
         assert_array_equal(f[1].data["TIME"][lc.meta["QUALITY_MASK"]], lc.time.value)
         assert_array_equal(f[1].data[ext][lc.meta["QUALITY_MASK"]], lc.flux.value)

@@ -162,6 +162,7 @@ def test_KeplerLightCurveFile(path, mission):
     assert lc.time.format == "bkjd"
     assert lc.time.scale == "tdb"
     assert lc.flux.unit == u.electron / u.second
+    assert lc.meta["FLUX_ORIGIN"] == "sap_flux"
 
     # Does the data match what one would obtain using pyfits.open?
     hdu = pyfits.open(path)
@@ -191,6 +192,7 @@ def test_TessLightCurveFile(quality_bitmask):
     assert lc.ccd == hdu[0].header["CCD"]
     assert lc.ra == hdu[0].header["RA_OBJ"]
     assert lc.dec == hdu[0].header["DEC_OBJ"]
+    assert lc.meta["FLUX_ORIGIN"] == "sap_flux"
 
     assert_array_equal(lc.time[0:10].value, hdu[1].data["TIME"][0:10])
     assert_array_equal(lc.flux[0:10].value, hdu[1].data["SAP_FLUX"][0:10])
