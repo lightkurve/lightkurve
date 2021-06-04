@@ -27,10 +27,8 @@ def test_read_tasoc():
 
     lc = read_tasoc_lightcurve(url, flux_column="FLUX_RAW")
 
-    flux_lc = lc.flux.value
-
-    # print(flux_lc, fluxes)
-    assert np.sum(fluxes) == np.sum(flux_lc)
+    assert lc.meta["FLUX_ORIGIN"] == "flux_raw"
+    assert_array_equal(fluxes, lc.flux.value)
 
 
 @pytest.mark.remote_data

@@ -107,6 +107,10 @@ class LightCurve(QTimeSeries):
 
     Compared to the generic `~astropy.timeseries.TimeSeries` class, `LightCurve`
     ensures that each object has `time`, `flux`, and `flux_err` columns.
+    These three columns are special for two reasons:
+    1. they are the key columns upon which all light curve operations operate;
+    2. they are always present (though they may be populated with ``NaN`` values).
+
     `LightCurve` objects also provide user-friendly attribute access to
     columns and meta data.
 
@@ -383,7 +387,7 @@ class LightCurve(QTimeSeries):
         result = f"<{self.__class__.__name__}"
         if "LABEL" in self.meta:
             result += f" LABEL=\"{self.meta.get('LABEL')}\""
-        for kw in ["QUARTER", "CAMPAIGN", "SECTOR", "AUTHOR"]:
+        for kw in ["QUARTER", "CAMPAIGN", "SECTOR", "AUTHOR", "FLUX_ORIGIN"]:
             if kw in self.meta:
                 result += f" {kw}={self.meta.get(kw)}"
         result += ">"
@@ -398,7 +402,7 @@ class LightCurve(QTimeSeries):
             descr_vals.append("length={}".format(len(self)))
             if "LABEL" in self.meta:
                 descr_vals.append(f"LABEL=\"{self.meta.get('LABEL')}\"")
-            for kw in ["QUARTER", "CAMPAIGN", "SECTOR", "AUTHOR"]:
+            for kw in ["QUARTER", "CAMPAIGN", "SECTOR", "AUTHOR", "FLUX_ORIGIN"]:
                 if kw in self.meta:
                     descr_vals.append(f"{kw}={self.meta.get(kw)}")
         return super()._base_repr_(html=html, descr_vals=descr_vals, **kwargs)
@@ -432,6 +436,58 @@ class LightCurve(QTimeSeries):
     @flux_err.setter
     def flux_err(self, flux_err):
         self["flux_err"] = flux_err
+
+    def select_flux(self, flux_column, flux_err_column=None):
+        """Assign a different column to be the flux column.
+
+        This method returns a copy of the LightCurve in which the ``flux``
+        and ``flux_err`` columns have been replaced by the values contained
+        in a different column.
+
+        Parameters
+        ----------
+        flux_column : str
+            Name of the column that should become the 'flux' column.
+        flux_err_column : str or `None`
+            Name of the column that should become the 'flux_err' column.
+            By default, the column will be used that is obtained by adding the
+            suffix "_err" to the value of ``flux_column``.  If such a
+            column does not exist, ``flux_err`` will be populated with NaN values.
+
+        Returns
+        -------
+        lc : LightCurve
+            Copy of the ``LightCurve`` object with the new flux values assigned.
+
+        Examples
+        --------
+        You can use this function to change the flux data on which most Lightkurve
+        features operate.  For example, to view a periodogram based on the "sap_flux"
+        column in a TESS light curve, use::
+
+            >>> lc.select_flux("sap_flux").to_periodogram("lombscargle").plot()  # doctest: +SKIP
+        """
+        # Input validation
+        if flux_column not in self.columns:
+            raise ValueError(f"'{flux_column}' is not a column")
+        if flux_err_column and flux_err_column not in self.columns:
+            raise ValueError(f"'{flux_err_column}' is not a column")
+
+        lc = self.copy()
+        lc["flux"] = lc[flux_column]
+        if flux_err_column:  # not None
+            lc["flux_err"] = lc[flux_err_column]
+        else:
+            # if `flux_err_column` is unspecified, we attempt to use
+            # f"{flux_column}_err" if it exists
+            flux_err_column = f"{flux_column}_err"
+            if flux_err_column in lc.columns:
+                lc["flux_err"] = lc[flux_err_column]
+            else:
+                lc["flux_err"][:] = np.nan
+
+        lc.meta['FLUX_ORIGIN'] = flux_column
+        return lc
 
     # Define deprecated attributes for compatibility with Lightkurve v1.x:
 
@@ -674,6 +730,7 @@ class LightCurve(QTimeSeries):
 
         # Re-use LightCurveCollection.stitch() to avoid code duplication
         from .collections import LightCurveCollection  # avoid circular import
+
         return LightCurveCollection((self, *others)).stitch(corrector_func=None)
 
     def flatten(
@@ -1300,10 +1357,13 @@ class LightCurve(QTimeSeries):
         """
         if binsize is not None and bins is not None:
             raise ValueError("Only one of ``bins`` and ``binsize`` can be specified.")
-        elif ((binsize is not None or bins is not None)
-              and (time_bin_size is not None or n_bins is not None)):
-            raise ValueError("``bins`` or ``binsize`` conflicts with "
-                             "``n_bins`` or ``time_bin_size``.")
+        elif (binsize is not None or bins is not None) and (
+            time_bin_size is not None or n_bins is not None
+        ):
+            raise ValueError(
+                "``bins`` or ``binsize`` conflicts with "
+                "``n_bins`` or ``time_bin_size``."
+            )
         elif bins is not None:
             if np.array(bins).dtype != np.int:
                 raise TypeError("``bins`` must have integer type.")
@@ -1325,8 +1385,12 @@ class LightCurve(QTimeSeries):
         # Backwards compatibility with Lightkurve v1.x
         if time_bin_size is None:
             if bins is not None:
-                i = len(self.time) - np.searchsorted(self.time, time_bin_start - 1 * u.ns)
-                time_bin_size = ((self.time[-1] - time_bin_start) * i / ((i - 1) * bins)).to(u.day)
+                i = len(self.time) - np.searchsorted(
+                    self.time, time_bin_start - 1 * u.ns
+                )
+                time_bin_size = (
+                    (self.time[-1] - time_bin_start) * i / ((i - 1) * bins)
+                ).to(u.day)
             elif binsize is not None:
                 i = np.searchsorted(self.time, time_bin_start - 1 * u.ns)
                 time_bin_size = (self.time[i + binsize] - self.time[i]).to(u.day)
@@ -2070,7 +2134,9 @@ class LightCurve(QTimeSeries):
         try:
             import openpyxl  # optional dependency
         except ModuleNotFoundError:
-            raise ModuleNotFoundError("You need to install `openpyxl` to use this feature, e.g. use `pip install openpyxl`.")
+            raise ModuleNotFoundError(
+                "You need to install `openpyxl` to use this feature, e.g. use `pip install openpyxl`."
+            )
         self.to_pandas().to_excel(path_or_buf, **kwargs)
 
     def to_periodogram(self, method="lombscargle", **kwargs):
@@ -2315,9 +2381,11 @@ class LightCurve(QTimeSeries):
         method = validate_method(method, supported_methods=["sff", "cbv"])
         if method == "sff":
             from .correctors import SFFCorrector
+
             return SFFCorrector(self, **kwargs)
         elif method == "cbv":
             from .correctors import CBVCorrector
+
             return CBVCorrector(self, **kwargs)
 
     @deprecated_renamed_argument(

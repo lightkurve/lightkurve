@@ -25,6 +25,9 @@
 - Fixed a bug in ``LightCurveCollection`` and ``TargetPixelFileCollection``, where
   indexing by slice, e.g., ``lc_collection[0:2]``, incorrectly returns a ``list`` [#1077]
 
+- Added the ``LightCurve.select_flux()`` method to make it easier to use a different
+  column to populate the ``flux`` and ``flux_err`` columns. [#1076]
+
 
 2.0.9 (2021-03-31)
 ==================

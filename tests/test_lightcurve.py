@@ -162,6 +162,7 @@ def test_KeplerLightCurveFile(path, mission):
     assert lc.time.format == "bkjd"
     assert lc.time.scale == "tdb"
     assert lc.flux.unit == u.electron / u.second
+    assert lc.meta["FLUX_ORIGIN"] == "sap_flux"
 
     # Does the data match what one would obtain using pyfits.open?
     hdu = pyfits.open(path)
@@ -191,6 +192,7 @@ def test_TessLightCurveFile(quality_bitmask):
     assert lc.ccd == hdu[0].header["CCD"]
     assert lc.ra == hdu[0].header["RA_OBJ"]
     assert lc.dec == hdu[0].header["DEC_OBJ"]
+    assert lc.meta["FLUX_ORIGIN"] == "sap_flux"
 
     assert_array_equal(lc.time[0:10].value, hdu[1].data["TIME"][0:10])
     assert_array_equal(lc.flux[0:10].value, hdu[1].data["SAP_FLUX"][0:10])
@@ -1589,3 +1591,24 @@ def test_head_tail_truncate():
     assert all(lc.truncate(2, 4).flux == [2, 3, 4])
     assert lc.truncate(before=2).head(1).flux == 2
     assert lc.truncate(after=3).tail(1).flux == 3
+
+
+def test_select_flux():
+    """Simple test for the `LightCurve.select_flux()` method."""
+    lc = LightCurve(data={'time': [1,2,3],
+                          'newflux': [4, 5, 6],
+                          'newflux_err': [7, 8, 9]})
+    # Can we set flux to newflux?
+    assert all(lc.select_flux("newflux").flux == lc.newflux)
+    assert lc.select_flux("newflux").meta["FLUX_ORIGIN"] == "newflux"
+    # Did `select_flux()` return a copy rather than operating in place?
+    assert not all(lc.flux == lc.newflux)
+    # Does `select_flux()` set the error column by default?
+    assert all(lc.select_flux("newflux").flux_err == lc.newflux_err)
+    # Can a different error column be specified?
+    assert all(lc.select_flux("newflux", flux_err_column="newflux").flux_err == lc.newflux)
+    # Do invalid column names raise a ValueError?
+    with pytest.raises(ValueError):
+        lc.select_flux("doesnotexist")
+    with pytest.raises(ValueError):
+        lc.select_flux("newflux", "doesnotexist")
