@@ -108,7 +108,7 @@ class Collection(object):
 
     @property
     def sector(self):
-        """The sector number for TESS data products.
+        """(TESS-specific) the quarters of the lightcurves / target pixel files.
 
         Returns `numpy.nan` for data products with lack a sector meta data keyword.
         The attribute is useful for filtering a collection by sector.

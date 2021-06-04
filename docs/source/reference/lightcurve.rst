@@ -45,7 +45,7 @@ Metadata
 
 All meta data are stored in the `meta` dictionary.
 For convenience, meta data can be accessed as object attributes,
-e.g. ``LightCurve.sector`` is a short-hand for ``LightCurve.meta["sector"]``.
+e.g. ``LightCurve.sector`` is a short-hand for ``LightCurve.meta["SECTOR"]``.
 
 .. autosummary::
    :toctree: api/
@@ -63,6 +63,7 @@ Plotting
   LightCurve.scatter
   LightCurve.errorbar
   LightCurve.plot_river
+  MPLSTYLE
 
 
 Data manipulation
@@ -72,7 +73,7 @@ The following methods all return a new `LightCurve` object.
 
 .. autosummary::
   :toctree: api/
-   
+
   LightCurve.append
   LightCurve.copy
   LightCurve.bin
@@ -112,7 +113,7 @@ Other Utility Methods
 
 .. autosummary::
   :toctree: api/
-  
+
   LightCurve.estimate_cdpp
   LightCurve.query_solar_system_objects
   LightCurve.interact_bls
