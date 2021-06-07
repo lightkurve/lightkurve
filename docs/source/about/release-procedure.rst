@@ -13,10 +13,12 @@ The procedure requires the following steps:
 
 3. Remove the suffix `.dev` from the version number in `pyproject.toml`, `setup.py`, and `lightkurve/version.py`, and commit this change to the `main` branch. Note that Lightkurve follows a `semantic versioning scheme <https://semver.org>`_.
 
-4. Verify that all unit tests pass:
+4. Ensure the latest version of the `main` branch has been checked out, and verify that all unit tests pass:
 
 .. code-block:: bash
 
+    $ git checkout main
+    $ git pull
     $ pytest --remote-data
 
 5. Verify that the docs and all tutorial notebooks can be compiled without failure (see *Building documentation* above), and upload them to the webserver.
