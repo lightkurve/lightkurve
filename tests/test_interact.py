@@ -156,13 +156,13 @@ def test_interact_functions():
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
-@pytest.mark.parametrize("tpf_class, tpf_file", [
-    (TessTargetPixelFile, example_tpf_tess),
-    (TessTargetPixelFile, example_tpf_tesscut),
-    (KeplerTargetPixelFile, example_tpf_kepler),
-    (TessTargetPixelFile, example_tpf_no_pm),
+@pytest.mark.parametrize("tpf_class, tpf_file, aperture_mask", [
+    (TessTargetPixelFile, example_tpf_tess, "pipeline"),
+    (TessTargetPixelFile, example_tpf_tesscut, "empty"),
+    (KeplerTargetPixelFile, example_tpf_kepler, "threshold"),
+    (TessTargetPixelFile, example_tpf_no_pm, "default"),
     ])
-def test_interact_sky_functions(tpf_class, tpf_file):
+def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
     """Do the helper functions in the interact module run without syntax error?"""
     import bokeh
     from lightkurve.interact import (
@@ -171,9 +171,9 @@ def test_interact_sky_functions(tpf_class, tpf_file):
         add_gaia_figure_elements,
     )
     tpf = tpf_class(tpf_file)
-    mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
+    mask = tpf._parse_aperture_mask(aperture_mask)
     tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
-    fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source)
+    fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source, tpf_source_selectable=False)
     add_gaia_figure_elements(tpf, fig1)
     add_gaia_figure_elements(tpf, fig1, magnitude_limit=22)
 
