@@ -156,6 +156,7 @@ def test_interact_functions():
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
+@pytest.mark.filterwarnings("ignore:Proper motion correction cannot be applied to the target")  # for TESSCut
 @pytest.mark.parametrize("tpf_class, tpf_file, aperture_mask", [
     (TessTargetPixelFile, example_tpf_tess, "pipeline"),
     (TessTargetPixelFile, example_tpf_tesscut, "empty"),
