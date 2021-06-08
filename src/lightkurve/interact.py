@@ -674,6 +674,9 @@ def make_tpf_figure_elements(
         TPF to show.
     tpf_source : bokeh.plotting.ColumnDataSource
         TPF data source.
+    tpf_source_selectable : boolean
+        True if the tpf_source is selectable. False to show the selected pixels
+        in the tpf_source only. Default is True.
     pedestal: float
         A scalar value to be added to the TPF flux values, often to avoid
         taking the log of a negative number in colorbars.
@@ -1185,7 +1188,7 @@ def show_interact_widget(
     return show(create_interact_ui, notebook_url=notebook_url)
 
 
-def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="default",  magnitude_limit=18):
+def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty",  magnitude_limit=18):
     """skyview
 
     Parameters
@@ -1201,6 +1204,9 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="defau
         will need to supply this value for the application to display
         properly. If no protocol is supplied in the URL, e.g. if it is
         of the form "localhost:8888", then "http" will be used.
+    aperture_mask : array-like, 'pipeline', 'threshold', 'default', 'background', or 'empty'
+        Highlight pixels selected by aperture_mask.
+        Default is 'empty': no pixel is highlighted.
     magnitude_limit : float
         A value to limit the results in based on Gaia Gmag. Default, 18.
     """

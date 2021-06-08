@@ -1359,6 +1359,9 @@ class TargetPixelFile(object):
             will need to supply this value for the application to display
             properly. If no protocol is supplied in the URL, e.g. if it is
             of the form "localhost:8888", then "http" will be used.
+        aperture_mask : array-like, 'pipeline', 'threshold', 'default', 'background', or 'empty'
+            Highlight pixels selected by aperture_mask.
+            Default is 'empty': no pixel is highlighted.
         magnitude_limit : float
             A value to limit the results in based on Gaia Gmag. Default, 18.
         """
