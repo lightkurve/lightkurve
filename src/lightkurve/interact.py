@@ -1242,6 +1242,7 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="defau
             fiducial_frame=fiducial_frame,
             plot_width=640,
             plot_height=600,
+            tools="tap,box_zoom,wheel_zoom,reset"
         )
         fig_tpf, r, message_selected_target = add_gaia_figure_elements(
             tpf, fig_tpf, magnitude_limit=magnitude_limit
