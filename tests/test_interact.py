@@ -22,6 +22,8 @@ example_tpf = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.g
 example_tpf_kepler = get_pkg_data_filename("data/test-tpf-kplr-tabby-first-cadence.fits")
 example_tpf_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
 example_tpf_tesscut = get_pkg_data_filename("data/test-tpf-tesscut_1x1.fits")
+# Headers PMRA, PMDEC, PMTOTAL are removed
+example_tpf_no_pm = get_pkg_data_filename("data/tess25155310-s01-first-cadences_no_pm.fits.gz")
 
 
 def test_bokeh_import_error(caplog):
@@ -155,7 +157,8 @@ def test_interact_functions():
 @pytest.mark.parametrize("tpf_class, tpf_file", [
     (TessTargetPixelFile, example_tpf_tess),
     (TessTargetPixelFile, example_tpf_tesscut),
-    (KeplerTargetPixelFile, example_tpf_kepler)
+    (KeplerTargetPixelFile, example_tpf_kepler),
+    (TessTargetPixelFile, example_tpf_no_pm),
     ])
 def test_interact_sky_functions(tpf_class, tpf_file):
     """Do the helper functions in the interact module run without syntax error?"""

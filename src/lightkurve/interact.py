@@ -122,6 +122,10 @@ def _get_corrected_coordinate(tpf_or_lc):
     pm_dec = h.get("PMDEC")
     equinox = h.get("EQUINOX")
 
+    if ra is None or dec is None or pm_ra is None or pm_dec is None or equinox is None:
+        # case cannot apply proper motion due to missing parameters
+        return ra, dec, False
+
     # Note: it'd be better / extensible if the unit is a property of the tpf or lc
     if tpf_or_lc.meta.get("TICID") is not None:
         pm_unit = u.milliarcsecond / u.year
