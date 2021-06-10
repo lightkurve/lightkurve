@@ -354,6 +354,10 @@ def _add_nearby_tics_if_tess(tpf, source, tooltips):
     if tic_id is None or tic_id == "":
         return source, tooltips
 
+    if isinstance(tic_id, str):
+        # for cases tpf is from tpf.cutout() call in #1089
+        tic_id = tic_id.replace("_CUTOUT", "")
+
     # nearby TICs from ExoFOP
     tab = _search_nearby_of_tess_target(tic_id)
 
