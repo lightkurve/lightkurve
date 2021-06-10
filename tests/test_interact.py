@@ -5,7 +5,7 @@ from astropy.utils.data import get_pkg_data_filename
 import numpy as np
 import pytest
 
-from lightkurve import LightkurveWarning
+from lightkurve import LightkurveWarning, LightkurveError
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from .test_targetpixelfile import filename_tpf_tabby_lite
 from lightkurve.interact import get_lightcurve_y_limits
@@ -24,6 +24,8 @@ example_tpf_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.f
 example_tpf_tesscut = get_pkg_data_filename("data/test-tpf-tesscut_1x1.fits")
 # Headers PMRA, PMDEC, PMTOTAL are removed
 example_tpf_no_pm = get_pkg_data_filename("data/tess25155310-s01-first-cadences_no_pm.fits.gz")
+# Headers for PM, ra/dec, and equinox all removed
+example_tpf_no_target_position = get_pkg_data_filename("data/tess25155310-s01-first-cadences_no_target_position.fits.gz")
 
 
 def test_bokeh_import_error(caplog):
@@ -174,6 +176,25 @@ def test_interact_sky_functions(tpf_class, tpf_file):
     fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source)
     add_gaia_figure_elements(tpf, fig1)
     add_gaia_figure_elements(tpf, fig1, magnitude_limit=22)
+
+
+@pytest.mark.remote_data
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
+def test_interact_sky_functions_case_no_target_coordinate():
+    import bokeh
+    from lightkurve.interact import (
+        prepare_tpf_datasource,
+        make_tpf_figure_elements,
+        add_gaia_figure_elements,
+    )
+    tpf_class, tpf_file = TessTargetPixelFile, example_tpf_no_target_position
+
+    tpf = tpf_class(tpf_file)
+    mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
+    tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
+    fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source)
+    with pytest.raises(LightkurveError, match=r".* no valid coordinate.*"):
+        add_gaia_figure_elements(tpf, fig1)
 
 
 @pytest.mark.remote_data

@@ -27,7 +27,7 @@ import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
 from pandas import Series
 
-from .utils import KeplerQualityFlags, LightkurveWarning
+from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError
 
 log = logging.getLogger(__name__)
 
@@ -388,7 +388,13 @@ def _add_nearby_tics_if_tess(tpf, source, tooltips):
 def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     """Make the Gaia Figure Elements"""
     # Get the positions of the Gaia sources
-    c1 = SkyCoord(tpf.ra, tpf.dec, frame="icrs", unit="deg")
+    try:
+        c1 = SkyCoord(tpf.ra, tpf.dec, frame="icrs", unit="deg")
+    except Exception as err:
+        msg = ("Cannot get nearby stars in GAIA because TargetPixelFile has no valid coordinate. "
+               f"ra: {tpf.ra}, dec: {tpf.dec}")
+        raise LightkurveError(msg) from err
+
     # Use pixel scale for query size
     pix_scale = 4.0  # arcseconds / pixel for Kepler, default
     if tpf.mission == "TESS":
