@@ -27,7 +27,7 @@ import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
 from pandas import Series
 
-from .utils import KeplerQualityFlags, LightkurveWarning
+from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError
 
 log = logging.getLogger(__name__)
 
@@ -121,6 +121,10 @@ def _get_corrected_coordinate(tpf_or_lc):
     pm_ra = h.get("PMRA")
     pm_dec = h.get("PMDEC")
     equinox = h.get("EQUINOX")
+
+    if ra is None or dec is None or pm_ra is None or pm_dec is None or equinox is None:
+        # case cannot apply proper motion due to missing parameters
+        return ra, dec, False
 
     # Note: it'd be better / extensible if the unit is a property of the tpf or lc
     if tpf_or_lc.meta.get("TICID") is not None:
@@ -350,6 +354,10 @@ def _add_nearby_tics_if_tess(tpf, source, tooltips):
     if tic_id is None or tic_id == "":
         return source, tooltips
 
+    if isinstance(tic_id, str):
+        # for cases tpf is from tpf.cutout() call in #1089
+        tic_id = tic_id.replace("_CUTOUT", "")
+
     # nearby TICs from ExoFOP
     tab = _search_nearby_of_tess_target(tic_id)
 
@@ -384,7 +392,13 @@ def _add_nearby_tics_if_tess(tpf, source, tooltips):
 def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     """Make the Gaia Figure Elements"""
     # Get the positions of the Gaia sources
-    c1 = SkyCoord(tpf.ra, tpf.dec, frame="icrs", unit="deg")
+    try:
+        c1 = SkyCoord(tpf.ra, tpf.dec, frame="icrs", unit="deg")
+    except Exception as err:
+        msg = ("Cannot get nearby stars in GAIA because TargetPixelFile has no valid coordinate. "
+               f"ra: {tpf.ra}, dec: {tpf.dec}")
+        raise LightkurveError(msg) from err
+
     # Use pixel scale for query size
     pix_scale = 4.0  # arcseconds / pixel for Kepler, default
     if tpf.mission == "TESS":

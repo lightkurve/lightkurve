@@ -1,3 +1,11 @@
+2.0.11 (unreleased)
+===================
+
+- Fixed bugs in ``TargetPixelFile.interact_sky()`` when a `TargetPixelFile`
+  does not have the target's proper motion / coordinate; or it is from
+  `tpf.cutout()` call. [#1088]
+
+
 2.0.10 (2021-06-04)
 ===================
 

@@ -1478,12 +1478,6 @@ class TargetPixelFile(object):
             if label in hdu.header:
                 hdu.header[label] = fits.card.Undefined()
 
-        keys = np.asarray([k for k in self.get_header().keys()])
-        if "KEPLERID" in keys:
-            hdu.header["KEPLERID"] = "{}{}".format(hdu.header["KEPLERID"], "_CUTOUT")
-        if "TICID" in keys:
-            hdu.header["TICID"] = "{}{}".format(hdu.header["TICID"], "_CUTOUT")
-
         # HDUList
         hdus = [hdu]
 
