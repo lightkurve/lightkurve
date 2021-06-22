@@ -723,7 +723,7 @@ def test_cutout():
         ntpf = tpf.cutout(SkyCoord(tpf.ra, tpf.dec, unit="deg"), size=2)
         ntpf = tpf.cutout(size=2)
         assert np.product(ntpf.flux.shape[1:]) == 4
-        assert ntpf.targetid == "{}_CUTOUT".format(tpf.targetid)
+        assert ntpf.targetid == tpf.targetid
 
 
 def test_aperture_photometry_nan():
