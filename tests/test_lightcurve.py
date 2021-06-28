@@ -1730,9 +1730,16 @@ def test_head_tail_truncate():
 
 def test_select_flux():
     """Simple test for the `LightCurve.select_flux()` method."""
+    u_e_s = u.electron / u.second
     lc = LightCurve(data={'time': [1,2,3],
-                          'newflux': [4, 5, 6],
-                          'newflux_err': [7, 8, 9]})
+                          'flux': [2, 3, 4] * u_e_s,
+                          'flux_err': [0, 1, 2] * u_e_s,
+                          'newflux': [4, 5, 6] * u_e_s,
+                          'newflux_err': [7, 8, 9] * u_e_s,
+                          'newflux_n1': [0.9, 1, 1.1] * u.dimensionless_unscaled,  # normalized, unitless
+                          'newflux_n2': [0.9, 1, 1.1],  # normalized, no unit
+                          },
+                          )
     # Can we set flux to newflux?
     assert all(lc.select_flux("newflux").flux == lc.newflux)
     assert lc.select_flux("newflux").meta["FLUX_ORIGIN"] == "newflux"
@@ -1742,11 +1749,20 @@ def test_select_flux():
     assert all(lc.select_flux("newflux").flux_err == lc.newflux_err)
     # Can a different error column be specified?
     assert all(lc.select_flux("newflux", flux_err_column="newflux").flux_err == lc.newflux)
+    # ensure flux_err in the new lc is nan if the origin does not have it
+    assert all(np.isnan(lc.select_flux("newflux_n1")["flux_err"]))
     # Do invalid column names raise a ValueError?
     with pytest.raises(ValueError):
         lc.select_flux("doesnotexist")
     with pytest.raises(ValueError):
         lc.select_flux("newflux", "doesnotexist")
+    # Test for setting normalized correctly (#1091)
+    lc_n = lc.normalize(unit="percent")
+    assert lc_n.meta["NORMALIZED"]  # expected behavior of normalize, not the real test
+    assert lc_n.select_flux("newflux").meta.get("NORMALIZED", False) is False  # actual test 1
+    assert lc.meta.get("NORMALIZED", False) is False  # expected behavior, not the real test
+    assert lc.select_flux("newflux_n1").meta.get("NORMALIZED", False)  # actual test 2a, the new column is normalized
+    assert lc.select_flux("newflux_n2").meta.get("NORMALIZED", False)  # actual test 2b, the new column is normalized
 
 
 def test_transit_mask_with_quantities():
