@@ -1,5 +1,8 @@
+import pytest
+
+
 def pytest_runtest_setup(item):
-    """Our tests will often run in headless virtual environments. For this
+    r"""Our tests will often run in headless virtual environments. For this
     reason, we enforce the use of matplotlib's robust Agg backend, because it
     does not require a graphical display.
 
@@ -10,3 +13,21 @@ def pytest_runtest_setup(item):
     import matplotlib
 
     matplotlib.use("Agg")
+
+
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "memtest: mark memory usage tests that need to be run in isolation"
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    keywordexpr = config.option.keyword
+    markexpr = config.option.markexpr
+    if keywordexpr or markexpr:
+        return  # let pytest handle this
+
+    skip_memtest = pytest.mark.skip(reason='memtest skipped, need -m memtest option to run')
+    for item in items:
+        if 'memtest' in item.keywords:
+            item.add_marker(skip_memtest)
