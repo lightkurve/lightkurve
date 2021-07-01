@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: [3.6, 3.7, 3.8-remote-data, 3.9]
+        name: [3.6, 3.7, 3.8-remote-data, 3.8-memtest, 3.9]
         include:
           - name: 3.6
             python-version: 3.6
