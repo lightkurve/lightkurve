@@ -14,6 +14,13 @@ def pytest_runtest_setup(item):
 
     matplotlib.use("Agg")
 
+# Add a marker @pytest.mark.memtest
+# - used to mark tests that stress memory, typically done by limiting the memory Python can use
+# - thus they should be run in isolation.
+#
+# - skipped by default
+# - tests marked as such can be run by "-m memtest" option
+
 
 def pytest_configure(config):
     config.addinivalue_line(
