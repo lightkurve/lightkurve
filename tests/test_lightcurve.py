@@ -634,20 +634,24 @@ def duplicate_and_stitch(lc, num_copies):
     return LightCurveCollection(lcc).stitch()
 
 
-lc_for_mem_test = duplicate_and_stitch(read(TESS_SIM), 10)
 
 @pytest.mark.memtest
 @pytest.mark.skipif(bad_resource_module_imports, reason="Requires resource module, only available for Unix")
+@pytest.mark.remote_data
 @pytest.mark.parametrize(
-    "lc, dict_of_bin_args",
+    "dict_of_bin_args",
     [  # variants for lc.bin() call, they all result in roughly the same number of bins.
-        (lc_for_mem_test, dict(bins=10000)),
-        (lc_for_mem_test, dict(binsize=10)),
-        (lc_for_mem_test, dict(time_bin_size=20 * u.min)),
+        dict(bins=10000),
+        dict(binsize=10),
+        dict(time_bin_size=20 * u.min),
     ]
 )
-def test_bin_memory_usage(lc, dict_of_bin_args):
+def test_bin_memory_usage(dict_of_bin_args):
     """Ensure lc.bin() does not use excessive memory (#1092)"""
+
+    # create a large lightcurve that could stress memory
+    lc = duplicate_and_stitch(read(TESS_SIM), 10)
+
     import resource
 
     # empirically, need about 1.1Gb just to open and stitch the lc
