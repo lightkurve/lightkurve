@@ -658,7 +658,7 @@ def test_bin_memory_usage(dict_of_bin_args):
     # (with ipython kernel)
     # if we hit excessive memory usage like those in #1092,
     # the system can easily need another 1+ Gb.
-    memory_limit = 1.5 * 1024 * 1024 * 1024
+    memory_limit = int(1.5 * 1024 * 1024 * 1024)
     resource.setrlimit(resource.RLIMIT_AS, (memory_limit, memory_limit))
 
     # Ensure it does not result in  Out of Memory Error
