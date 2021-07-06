@@ -2362,16 +2362,18 @@ class LightCurve(QTimeSeries):
         Parameters
         ----------
         methods : string
-            Currently, only "sff" is supported.  This will return a
-            `SFFCorrector` class instance.
+            Currently, "sff" and "cbv" are supported.  This will return a
+            `~correctors.SFFCorrector` and `~correctors.CBVCorrector`
+            class instance respectively.
          **kwargs : dict
             Extra keyword arguments to be passed to the corrector class.
 
         Returns
         -------
-        correcter : `lightkurve.Correcter`
-            Instance of a Corrector class, which typically provides `correct()`
-            and `diagnose()` methods.
+        correcter : `~correctors.corrector.Corrector`
+            Instance of a Corrector class, which typically provides
+            `~correctors.corrector.Corrector.correct()`
+            and `~correctors.corrector.Corrector.diagnose()` methods.
         """
         if method == "pld":
             raise ValueError(
