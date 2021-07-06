@@ -540,17 +540,25 @@ class TargetPixelFile(object):
     def to_lightcurve(self, method="sap", corrector=None, **kwargs):
         """Performs photometry on the pixel data and returns a LightCurve object.
 
-        See the docstring of `aperture_photometry()` for valid
-        arguments if the method is 'aperture'.  Otherwise, see the docstring
-        of `prf_photometry()` for valid arguments if the method is 'prf'.
+        The valid keyword arguments depends on the method chosen:
+
+        - 'sap' or 'aperture': see the docstring of `extract_aperture_photometry()`
+        - 'prf': see the docstring of `extract_prf_photometry()`
+        - 'pld': see the docstring of `to_corrector()`
+
+        For methods 'sff' and 'cbv', they are syntactic shortcuts of:
+
+        - creating a lightcurve using 'sap' method,
+        - corrects the created lightcurve using `LightCurve.to_corrector()`
+          of the respective method.
 
         Parameters
         ----------
         method : 'aperture', 'prf', 'sap', 'sff', 'cbv', 'pld'.
-            Photometry method to use.
+            Photometry method to use. 'aperture' is an alias of 'sap'.
         **kwargs : dict
-            Extra arguments to be passed to the `aperture_photometry` or the
-            `prf_photometry` method of this class.
+            Extra arguments to be passed to the `extract_aperture_photometry()`, the
+            `extract_prf_photometry()`, or the `to_corrector()` method of this class.
 
         Returns
         -------
