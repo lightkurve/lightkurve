@@ -1370,21 +1370,21 @@ class TargetPixelFile(object):
         )
 
     def to_corrector(self, method="pld", **kwargs):
-        """Returns a `Corrector` instance to remove systematics.
+        """Returns a `~correctors.corrector.Corrector` instance to remove systematics.
 
         Parameters
         ----------
         methods : string
             Currently, only "pld" is supported.  This will return a
-            `PLDCorrector` class instance.
+            `~correctors.PLDCorrector` class instance.
         **kwargs : dict
             Extra keyword arguments to be passed on to the corrector class.
 
         Returns
         -------
-        correcter : `lightkurve.Correcter`
-            Instance of a Corrector class, which typically provides `correct()`
-            and `diagnose()` methods.
+        correcter : `~correctors.corrector.Corrector`
+            Instance of a Corrector class, which typically provides `~correctors.PLDCorrector.correct()`
+            and `~correctors.PLDCorrector.diagnose()` methods.
         """
         allowed_methods = ["pld"]
         if method == "sff":
@@ -2150,7 +2150,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             at each cadence. Defaults to 'sum'.
         centroid_method : str, 'moments' or 'quadratic'
             For the details on this arguments, please refer to the documentation
-            for `TargetPixelFile.estimate_centroids`.
+            for `estimate_centroids()`.
 
         Returns
         -------
@@ -2288,8 +2288,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             If `True`, fitting cadences will be distributed across multiple
             cores using Python's `multiprocessing` module.
         **kwargs : dict
-            Keywords to be passed to `tpf.get_model()` to create the
-            `TPFModel` object that will be fit.
+            Keywords to be passed to `get_model()` to create the
+            `~prf.TPFModel` object that will be fit.
 
         Returns
         -------
@@ -2809,7 +2809,7 @@ class TessTargetPixelFile(TargetPixelFile):
             at each cadence. Defaults to 'sum'.
         centroid_method : str, 'moments' or 'quadratic'
             For the details on this arguments, please refer to the documentation
-            for `TargetPixelFile.estimate_centroids`.
+            for `estimate_centroids()`.
 
         Returns
         -------
