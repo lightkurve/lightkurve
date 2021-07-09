@@ -202,14 +202,11 @@ def test_tpf_ones(centroid_method):
     for tpf in tpfs:
         lc = tpf.to_lightcurve(aperture_mask="all", centroid_method=centroid_method)
         assert np.all(lc.flux.value == 1)
-        assert np.all(
-            (lc.centroid_col.value < tpf.column + tpf.shape[1]).all()
-            * (lc.centroid_col.value > tpf.column).all()
-        )
-        assert np.all(
-            (lc.centroid_row.value < tpf.row + tpf.shape[2]).all()
-            * (lc.centroid_row.value > tpf.row).all()
-        )
+        # The test TPF file contains 3x3 pixels with a single bright pixel in the center pixel.
+        # Because pixel coordinates refer to the center of a pixel (cf. #755),
+        # we expect the centroid to be exactly one larger than the corner coordinates.
+        assert np.all(lc.centroid_row.value == tpf.row + 1)
+        assert np.all(lc.centroid_col.value == tpf.column + 1)
 
 
 @pytest.mark.parametrize(
