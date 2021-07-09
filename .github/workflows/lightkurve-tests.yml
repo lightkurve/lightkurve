@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: [3.6, 3.7, 3.8-remote-data, 3.9]
+        name: [3.6, 3.7, 3.8-remote-data, 3.8-memtest, 3.9]
         include:
           - name: 3.6
             python-version: 3.6
@@ -31,6 +31,9 @@ jobs:
           - name: 3.8-remote-data
             python-version: 3.8
             pytest-command: poetry run pytest --remote-data --doctest-modules
+          - name: 3.8-memtest
+            python-version: 3.8
+            pytest-command: poetry run pytest -m memtest --remote-data
           - name: 3.9
             python-version: 3.9
             pytest-command: poetry run pytest
