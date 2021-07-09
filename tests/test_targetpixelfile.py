@@ -191,7 +191,7 @@ def test_tpf_zeros():
 
 @pytest.mark.parametrize("centroid_method", [("moments"), ("quadratic")])
 def test_tpf_ones(centroid_method):
-    """Does the LightCurve of a one-flux TPF make sense?"""
+    """Does the LightCurve of a one-flux TPF make sense? Regression test for #1103."""
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
         warnings.simplefilter("ignore", LightkurveWarning)
@@ -205,6 +205,7 @@ def test_tpf_ones(centroid_method):
         # The test TPF file contains 3x3 pixels with a single bright pixel in the center pixel.
         # Because pixel coordinates refer to the center of a pixel (cf. #755),
         # we expect the centroid to be exactly one larger than the corner coordinates.
+        # This is a regression test for #1103.
         assert np.all(lc.centroid_row.value == tpf.row + 1)
         assert np.all(lc.centroid_col.value == tpf.column + 1)
 
