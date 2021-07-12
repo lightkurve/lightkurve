@@ -2895,6 +2895,16 @@ class FoldedLightCurve(LightCurve):
         return self.time
 
     @property
+    def cycle(self):
+        """The cycle of the correspond `time_original`.
+        The first cycle is cycle 0, irrespective of whether it is a complete one or not.
+        """
+        cycle_epoch_start = self.epoch_time - self.period / 2
+        result = np.asarray(np.floor(((self.time_original - cycle_epoch_start) / self.period).value), dtype=int)
+        result = result - result.min()
+        return result
+
+    @property
     def odd_mask(self):
         """Boolean mask which flags the odd-numbered cycles (1, 3, 5, etc).
 
@@ -2914,10 +2924,7 @@ class FoldedLightCurve(LightCurve):
             >>> f[f.odd_mask].scatter()  # doctest: +SKIP
             >>> f[f.even_mask].scatter()  # doctest: +SKIP
         """
-        cycle = (
-            self.time_original - self.time.value * (self.period) - self.period * 0.5
-        ) / (self.period * 2)
-        return (cycle.value % 1) < 0.5
+        return self.cycle % 2 == 1
 
     @property
     def even_mask(self):
