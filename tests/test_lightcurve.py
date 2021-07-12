@@ -300,9 +300,22 @@ def test_lightcurve_fold_odd_even_masks(normalize_phase):
             return False
         return np.array([_mask(t) for t in fold.time_original.value])
 
-    even_expected = create_expected_even(fold)
+    def create_expected_cycle(times):
+        def _cycle(t):
+            if t < 1:
+                return 0
+            elif 1 <= t < 5:
+                return 1
+            elif 5 <= t < 9:
+                return 2
+            else:
+                return 3
+        return np.array([_cycle(t) for t in fold.time_original.value])
 
+    even_expected = create_expected_even(fold)
     assert_array_equal(even, even_expected)
+
+    assert_array_equal(fold.cycle, create_expected_cycle(fold))
 
     # the following plot is only useful for visualizing the result,
     # say, when someone copies the test to Jupyter notebook to run
