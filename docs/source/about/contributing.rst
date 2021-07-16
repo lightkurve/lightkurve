@@ -44,6 +44,8 @@ Head to a local directory of your choice and download your fork:
     $ git clone https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git
 
 
+.. _install-dev-env:
+
 3. Install the development environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
