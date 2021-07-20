@@ -9,6 +9,9 @@
 
 - Various improvements to the online documentation. [#1102]
 
+- Fixed a bug in ``TargetPixelFile.estimate_centroids`` which caused the column
+  and row coordinates reported to be off by 0.5. [#1103]
+
 
 2.0.10 (2021-06-04)
 ===================

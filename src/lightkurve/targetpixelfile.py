@@ -818,7 +818,7 @@ class TargetPixelFile(object):
         """Compute the "center of mass" of the light based on the 2D moments;
         this is a helper method for `estimate_centroids()`."""
         aperture_mask = self._parse_aperture_mask(aperture_mask)
-        yy, xx = np.indices(self.shape[1:]) + 0.5
+        yy, xx = np.indices(self.shape[1:])
         yy = self.row + yy
         xx = self.column + xx
         total_flux = np.nansum(self.flux[:, aperture_mask], axis=1)
@@ -842,10 +842,8 @@ class TargetPixelFile(object):
             col, row = centroid_quadratic(self.flux[idx], mask=aperture_mask)
             col_centr.append(col)
             row_centr.append(row)
-        # Finally, we add .5 to the result bellow because the convention is that
-        # pixels are centered at .5, 1.5, 2.5, ...
-        col_centr = np.asfarray(col_centr) + self.column + 0.5
-        row_centr = np.asfarray(row_centr) + self.row + 0.5
+        col_centr = np.asfarray(col_centr) + self.column
+        row_centr = np.asfarray(row_centr) + self.row
         col_centr = Quantity(col_centr, unit="pixel")
         row_centr = Quantity(row_centr, unit="pixel")
         return col_centr, row_centr
