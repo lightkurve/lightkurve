@@ -613,6 +613,62 @@ def test_bin_quality():
     assert_allclose(binned_lc.centroid_row, [2./3, 2])  # Expect mean
 
 
+# BEGIN codes for lc.bin memory usage test
+#
+
+bad_resource_module_imports = False
+try:
+    import resource  # supported on Unix only
+except ImportError:
+    bad_resource_module_imports = True
+
+
+def duplicate_and_stitch(lc, num_copies):
+    """Helper to create a large LC by duplicating and stitching the supplied one"""
+    duration = lc.time.max() - lc.time.min()
+    lcc = [lc]
+    for i in range(1, num_copies):
+        lc_copy = lc.copy()
+        lc_copy.time = lc_copy.time + (duration + 1 * u.day) * i
+        lcc.append(lc_copy)
+    return LightCurveCollection(lcc).stitch()
+
+
+
+@pytest.mark.memtest
+@pytest.mark.skipif(bad_resource_module_imports, reason="Requires resource module, only available for Unix")
+@pytest.mark.remote_data
+@pytest.mark.parametrize(
+    "dict_of_bin_args",
+    [  # variants for lc.bin() call, they all result in roughly the same number of bins.
+        dict(bins=10000),
+        dict(binsize=10),
+        dict(time_bin_size=20 * u.min),
+    ]
+)
+def test_bin_memory_usage(dict_of_bin_args):
+    """Ensure lc.bin() does not use excessive memory (#1092)"""
+
+    # create a large lightcurve that could stress memory
+    lc = duplicate_and_stitch(read(TESS_SIM), 10)
+
+    import resource
+
+    # empirically, need about 1.1Gb just to open and stitch the lc
+    # (with ipython kernel)
+    # if we hit excessive memory usage like those in #1092,
+    # the system can easily need another 1+ Gb.
+    memory_limit = int(1.5 * 1024 * 1024 * 1024)
+    resource.setrlimit(resource.RLIMIT_AS, (memory_limit, memory_limit))
+
+    # Ensure it does not result in  Out of Memory Error
+    with warnings.catch_warnings():  # lc.bin(binsize=n) is  is deprecated
+        warnings.simplefilter("ignore", LightkurveDeprecationWarning)
+        lc_b = lc.bin(**dict_of_bin_args)
+
+#
+# END codes for lc.bin memory usage test
+
 def test_normalize():
     """Does the `LightCurve.normalize()` method normalize the flux?"""
     lc = LightCurve(

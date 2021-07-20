@@ -5,6 +5,10 @@
   does not have the target's proper motion / coordinate; or it is from
   `tpf.cutout()` call. [#1088]
 
+- Fixed excessive memory usage by ``LightCurve.bin()``. [#1096]
+
+- Various improvements to the online documentation. [#1102]
+
 - Fixed a bug in ``TargetPixelFile.estimate_centroids`` which caused the column
   and row coordinates reported to be off by 0.5. [#1103]
 

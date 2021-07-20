@@ -1386,13 +1386,13 @@ class LightCurve(QTimeSeries):
         if time_bin_size is None:
             if bins is not None:
                 i = len(self.time) - np.searchsorted(
-                    self.time, time_bin_start - 1 * u.ns
+                    self.time.value, time_bin_start.value - 1e-10
                 )
                 time_bin_size = (
                     (self.time[-1] - time_bin_start) * i / ((i - 1) * bins)
                 ).to(u.day)
             elif binsize is not None:
-                i = np.searchsorted(self.time, time_bin_start - 1 * u.ns)
+                i = np.searchsorted(self.time.value, time_bin_start.value - 1e-10)
                 time_bin_size = (self.time[i + binsize] - self.time[i]).to(u.day)
             else:
                 time_bin_size = 0.5 * u.day
@@ -2362,16 +2362,18 @@ class LightCurve(QTimeSeries):
         Parameters
         ----------
         methods : string
-            Currently, only "sff" is supported.  This will return a
-            `SFFCorrector` class instance.
+            Currently, "sff" and "cbv" are supported.  This will return a
+            `~correctors.SFFCorrector` and `~correctors.CBVCorrector`
+            class instance respectively.
          **kwargs : dict
             Extra keyword arguments to be passed to the corrector class.
 
         Returns
         -------
-        correcter : `lightkurve.Correcter`
-            Instance of a Corrector class, which typically provides `correct()`
-            and `diagnose()` methods.
+        correcter : `~correctors.corrector.Corrector`
+            Instance of a Corrector class, which typically provides
+            `~correctors.corrector.Corrector.correct()`
+            and `~correctors.corrector.Corrector.diagnose()` methods.
         """
         if method == "pld":
             raise ValueError(

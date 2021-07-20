@@ -41,6 +41,9 @@ Constructor
    KeplerTargetPixelFile.wcs
    KeplerTargetPixelFile.get_coordinates
    KeplerTargetPixelFile.to_lightcurve
+   KeplerTargetPixelFile.extract_aperture_photometry
+   KeplerTargetPixelFile.extract_prf_photometry
+   KeplerTargetPixelFile.get_model
    KeplerTargetPixelFile.create_threshold_mask
    KeplerTargetPixelFile.estimate_background
    KeplerTargetPixelFile.estimate_centroids
