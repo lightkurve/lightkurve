@@ -1213,6 +1213,11 @@ class CotrendingBasisVectors(TimeSeries):
             Aligned to the light curve
         """
 
+        # The fraction of cadences that do not align to throw a
+        # warning about the CBVs being poorly aligned to the light curve
+        poorly_aligned_threshold = 0.5
+        poorly_aligned_flag = False
+
         if not isinstance(lc, LightCurve):
             raise Exception('<lc> must be a LightCurve class')
 
@@ -1221,9 +1226,14 @@ class CotrendingBasisVectors(TimeSeries):
             # Make a deepcopy so we do not just return a modified original
             cbvs = copy.deepcopy(self)
 
-            # NaN any cadences in light curve and not in CBVs
+            # NaN any CBV cadences that are in the light curve and not in CBVs
             # This requires us to add rows to the CBV table
             lc_nan_mask = np.logical_not(np.in1d(lc.cadenceno, cbvs.cadenceno))
+            # Determine if the CBVs are poorly aligned to the light curve
+            if ((np.count_nonzero(lc_nan_mask) / len(lc_nan_mask)) >
+                            poorly_aligned_threshold):
+                poorly_aligned_flag = True
+
             lc_nan_indices = np.nonzero(lc_nan_mask)[0]
             # Sadly, there is no TimesSeries.add_rows (plural), so we have to
             # add each row in a for-loop
@@ -1247,11 +1257,17 @@ class CotrendingBasisVectors(TimeSeries):
             try:
                 # This method is fast but might cause errors
                 keep_indices = np.nonzero(np.in1d(cbvs.cadenceno, lc.cadenceno))[0]
+                # Determine if the CBVs are poorly aligned to the light curve
+                if (len(keep_indices) / len(cbvs)) < poorly_aligned_threshold:
+                    poorly_aligned_flag = True
                 cbvs = cbvs[keep_indices]
             except:
                 # This method is slow but appears to be more robust
                 trim_indices = np.nonzero(np.logical_not(
                     np.in1d(cbvs.cadenceno, lc.cadenceno)))[0]
+                # Determine if the CBVs are poorly aligned to the light curve
+                if (len(trim_indices) / len(cbvs)) > poorly_aligned_threshold:
+                    poorly_aligned_flag = True
                 cbvs.remove_rows(trim_indices)
 
             # Now sort the CBVs by cadenceno
@@ -1260,6 +1276,11 @@ class CotrendingBasisVectors(TimeSeries):
         else:
             raise Exception('align requires cadence numbers for the ' + \
                     'light curve. NO SYNCHRONIZATION OCCURED')
+
+        # Only issue this warning once
+        if poorly_aligned_flag:
+            log.warning('The {} CBVs do not appear to be well aligned to the '
+                'light curve. Consider using "interpolate_cbvs=True"'.format(cbvs.cbv_type))
 
         return cbvs
 
