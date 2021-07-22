@@ -12,8 +12,11 @@
 - Fixed a bug in ``TargetPixelFile.estimate_centroids`` which caused the column
   and row coordinates reported to be off by 0.5. [#1103]
 
-- Fixed the BKJD and BTJD AstroPy time formats to use the Barycentric Dynamical
-  Time (TDB) scale by default.
+- Fixed a bug which caused a light curve's meta data to be lost after
+  calling ``LightCurve.bin()``. [#1041]
+
+- Modified the BKJD and BTJD AstroPy time formats to use the Barycentric
+  Dynamical Time (TDB) scale by default. [#1112]
 
 
 
