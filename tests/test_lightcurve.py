@@ -484,7 +484,6 @@ def test_cdpp_tabby():
     assert np.abs(lc2.estimate_cdpp().value - lc.cdpp6_0) < 30
 
 
-# TEMPORARILY SKIPPED, cf. https://github.com/lightkurve/lightkurve/issues/663
 def test_bin():
     """Does binning work?"""
     with warnings.catch_warnings():  # binsize is deprecated
@@ -519,6 +518,17 @@ def test_bin():
             time=np.arange(2000), flux=np.random.normal(loc=42, scale=0.01, size=2000)
         )
         assert np.round(lc.bin(2000).flux_err[0], 2) == 0.01
+
+
+def test_bin_meta():
+    """Ensure .bin() result carries original meta. See #1040 """
+    lc = LightCurve(
+        time=np.arange(10), flux=2 * np.ones(10), flux_err=2 ** 0.5 * np.ones(10)
+    )
+    lc.meta['CREATOR'] = 'lk unit test'
+    lc.meta['SECTOR'] = 99
+    binned_lc = lc.bin(time_bin_size=5)
+    assert binned_lc.meta == lc.meta
 
 
 def test_bin_folded():
@@ -596,7 +606,6 @@ def test_bins_kwarg():
     #   - Bins = 310.0
 
 
-# TEMPORARILY SKIPPED, cf. https://github.com/lightkurve/lightkurve/issues/663
 def test_bin_quality():
     """Binning must also revise the quality and centroid columns."""
     lc = KeplerLightCurve(
@@ -1177,7 +1186,6 @@ def test_river():
         plt.close()
 
 
-# TEMPORARILY SKIPPED, cf. https://github.com/lightkurve/lightkurve/issues/663
 def test_bin_issue705():
     """Regression test for #705: binning failed."""
     lc = TessLightCurve(time=np.arange(50), flux=np.ones(50), quality=np.zeros(50))
