@@ -37,6 +37,13 @@ __all__ = ["LightCurve", "KeplerLightCurve", "TessLightCurve", "FoldedLightCurve
 
 log = logging.getLogger(__name__)
 
+def _to_unitless_day(data):
+    if isinstance(data, Quantity):
+        return data.to(u.day).value
+    elif not np.isscalar(data):
+        return np.asarray([_to_unitless_day(item) for item in data]).flatten()
+    else:
+        return data
 
 class QColumn(Column):
     """(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``."""
@@ -2597,9 +2604,9 @@ class LightCurve(QTimeSeries):
 
         Parameters
         ----------
-        period : float, or array-like
+        period : `~astropy.units.Quantity`, float, or array-like
             Period(s) of the transits.
-        duration : float, or array-like
+        duration : `~astropy.units.Quantity`, float, or array-like
             Duration(s) of the transits.
         transit_time : `~astropy.time.Time`, float, or array-like
             Transit midpoint(s) of the transits.
@@ -2623,6 +2630,9 @@ class LightCurve(QTimeSeries):
             >>> lc.create_transit_mask(transit_time=[2., 3.], period=[2., 10.], duration=[0.1, 0.1])
             array([False,  True,  True,  True, False])
         """
+        period = _to_unitless_day(period)
+        duration = _to_unitless_day(duration)
+
         # Ensure all parameters are 1D-arrays
         period = np.atleast_1d(period)
         duration = np.atleast_1d(duration)
