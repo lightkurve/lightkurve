@@ -15,6 +15,9 @@
 - Fixed a bug which caused a light curve's meta data to be lost after
   calling ``LightCurve.bin()``. [#1041]
 
+- Modified the BKJD and BTJD AstroPy time formats to use the Barycentric
+  Dynamical Time (TDB) scale by default. [#1112]
+
 - Modified ``LightCurve.create_transit_mask()`` to accept AstroPy ``Quantity``
   objects for the ``period`` and ``duration`` parameters. [#1119]
 
