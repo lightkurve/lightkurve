@@ -15,6 +15,9 @@
 - Fixed a bug which caused a light curve's meta data to be lost after
   calling ``LightCurve.bin()``. [#1041]
 
+- Modified ``LightCurve.create_transit_mask()`` to accept AstroPy ``Quantity``
+  objects for the ``period`` and ``duration`` parameters. [#1119]
+
 
 
 2.0.10 (2021-06-04)
