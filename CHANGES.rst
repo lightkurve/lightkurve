@@ -18,6 +18,9 @@
 - Modified the BKJD and BTJD AstroPy time formats to use the Barycentric
   Dynamical Time (TDB) scale by default. [#1112]
 
+- Modified ``LightCurve.create_transit_mask()`` to accept AstroPy ``Quantity``
+  objects for the ``period`` and ``duration`` parameters. [#1119]
+
 
 
 2.0.10 (2021-06-04)

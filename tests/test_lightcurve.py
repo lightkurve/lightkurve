@@ -1538,6 +1538,22 @@ def test_create_transit_mask():
     # Are all unmasked values in transit?
     assert all(f < 0.9 for f in synthetic_lc[mask].flux.value)
 
+    # #1117: Repeat multi-planet planet mask test,
+    # ensure values specified in Quantity are also accepted.
+    mask = synthetic_lc.create_transit_mask(
+        period=u.Quantity([period, period_2], unit="day"),  # inputs in Quantity
+        # ensure:
+        # 1. implementation does proper conversion
+        # 2. accept a mix of float and Quantity
+        duration=[duration, (duration_2 * u.day).to(u.hr)],
+        transit_time=[transit_time, transit_time_2],
+    )
+
+    # Are all masked values out of transit?
+    assert all(f > 0.9 for f in synthetic_lc[~mask].flux.value)
+    # Are all unmasked values in transit?
+    assert all(f < 0.9 for f in synthetic_lc[mask].flux.value)
+
 
 def test_row_repr():
     """Regression test for #830: ensure the repr works for a single row."""
