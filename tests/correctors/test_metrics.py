@@ -7,6 +7,7 @@ from lightkurve.correctors.metrics import (
     overfit_metric_lombscargle,
     underfit_metric_neighbors,
     _compute_correlation,
+    _align_to_lc,
 )
 
 
@@ -81,3 +82,21 @@ def test_compute_correlation():
         ]
     )
     assert_allclose(correlation_matrix, correlation_truth)
+
+def test_align_to_lc():
+    """ Test to ensure we can properly align different light curves
+    """
+
+    time = np.arange(1, 100, 0.1)
+    lc1 = LightCurve(time=time, flux=1, flux_err=0.0)
+    lc1['cadenceno'] = np.arange(1,len(time)+1)
+    lc2 = LightCurve(time=time, flux=2, flux_err=0.0)
+    lc2['cadenceno'] = np.arange(1,len(time)+1)
+
+    # Remove different cadences from both light curve and align the second to the first
+    lc1 = lc1[0:10].append(lc1[20:100])
+    lc2 = lc2[0:50].append(lc2[70:100])
+
+    aligned_lc2 = _align_to_lc(lc2, lc1)
+
+    assert np.all(lc1['cadenceno'] == aligned_lc2['cadenceno'])
