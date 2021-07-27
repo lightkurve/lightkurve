@@ -24,6 +24,9 @@
 - Modified ``CBVCorrector`` to issue a warning message of the CBVs are
   poorly aligned to the input light curve. [#1113]
 
+- Fixed a bug in ``underfit_metric_neighbors()`` which caused the alignment
+  of light curves to fail. [#1120]
+
 
 
 2.0.10 (2021-06-04)
