@@ -1837,16 +1837,10 @@ def download_tess_cbvs(sector=None, camera=None,
     # TODO: figure out a way to pad an integer number with forward zeros
     # without needing a conditional
     sector = int(sector)
-    if (sector < 10):
-        curlSearchString = 's000' + str(sector) + '-' + str(camera) + '-' + str(ccd) + '-'
-    elif (sector >= 10 and sector < 100):
-        curlSearchString = 's00' + str(sector) + '-' + str(camera) + '-' + str(ccd) + '-'
-    elif (sector >= 100 and sector < 1000):
-        curlSearchString = 's0' + str(sector) + '-' + str(camera) + '-' + str(ccd) + '-'
-    elif (sector > 999):
-        # TESS will be truly blessed if it gets to more than 999 sectors!
-        raise Exception('Only up to 999 Sectors is currently supported')
-    else:
+
+    try:
+        curlSearchString = 's%04d-%s-%s-' % (sector, str(camera),str(ccd))
+    except:
         raise Exception('Error parsing sector string when getting TESS CBV FITS files')
 
     try:
