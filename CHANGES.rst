@@ -21,6 +21,9 @@
 - Modified ``LightCurve.create_transit_mask()`` to accept AstroPy ``Quantity``
   objects for the ``period`` and ``duration`` parameters. [#1119]
 
+- Modified ``CBVCorrector`` to issue a warning message of the CBVs are
+  poorly aligned to the input light curve. [#1113]
+
 
 
 2.0.10 (2021-06-04)
