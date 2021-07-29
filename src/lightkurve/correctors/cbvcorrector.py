@@ -90,7 +90,7 @@ class CBVCorrector(RegressionCorrector):
     """
 
     def __init__(self, lc, interpolate_cbvs=False, extrapolate_cbvs=False, do_not_load_cbvs=False,
-        cbvdir=None):
+        cbv_dir=None):
         """Constructor
 
         This constructor will retrieve all relevant CBVs from MAST and then
@@ -111,7 +111,7 @@ class CBVCorrector(RegressionCorrector):
             If True then the CBVs will NOT be loaded from MAST. 
             Use this option if you wish to use the CBV corrector methods with only a 
             custom design matrix (via the ext_dm argument in the corrector methods)
-        cbvdir : str
+        cbv_dir : str
             Path to directory holding TESS CBVs. If this is provided, will not query
             MAST by default.
         """
@@ -144,7 +144,7 @@ class CBVCorrector(RegressionCorrector):
             elif self.lc.mission == 'TESS':
                 # For TESS we load multiple CBV types
                 # Single-Scale
-                cbvs.append(load_tess_cbvs(cbvdir=cbvdir,sector=self.lc.sector,
+                cbvs.append(load_tess_cbvs(cbv_dir=cbv_dir,sector=self.lc.sector,
                     camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='SingleScale'))
             
                 # Multi-Scale
@@ -154,7 +154,7 @@ class CBVCorrector(RegressionCorrector):
                 moreData = True
                 while moreData:
                     iBand += 1
-                    cbvObj = load_tess_cbvs(cbvdir=cbvdir,sector=self.lc.sector,
+                    cbvObj = load_tess_cbvs(cbv_dir=cbv_dir,sector=self.lc.sector,
                         camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='MultiScale',
                         band=iBand)
                     if (cbvObj.band == iBand):
@@ -163,7 +163,7 @@ class CBVCorrector(RegressionCorrector):
                         moreData = False
             
                 # Spike
-                cbvs.append(load_tess_cbvs(cbvdir=cbvdir,sector=self.lc.sector,
+                cbvs.append(load_tess_cbvs(cbv_dir=cbv_dir,sector=self.lc.sector,
                     camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='Spike'))
             
             else:
@@ -1768,9 +1768,11 @@ def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
         raise Exception('CBVS were not found')
 
 
-def load_tess_cbvs(cbvdir=None,sector=None, camera=None,
+def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
         ccd=None, cbv_type='SingleScale', band=None):
-    """Loads TESS cotrending basis vectors already saved locally 
+    """Loads TESS cotrending basis vectors, either from a directory of 
+    CBV files already saved locally if cbv_dir is passed, or else 
+    will retrieve the relevant files programmatically from MAST. 
 
     This function fetches the Cotrending Basis Vectors FITS HDU for the desired
     cotrending basis vectors.
@@ -1783,7 +1785,7 @@ def load_tess_cbvs(cbvdir=None,sector=None, camera=None,
 
     Parameters
     ----------
-    cbvdir   : str
+    cbv_dir   : str
         Data directory where CBVs live. If None, queries MAST.
     sector : int, list of ints
         TESS Sector number.
@@ -1845,10 +1847,10 @@ def load_tess_cbvs(cbvdir=None,sector=None, camera=None,
         raise Exception('Error parsing sector string when getting TESS CBV FITS files')
 
     try:
-        if cbvdir is not None:
+        if cbv_dir is not None:
             # Read in the relevant curl script file and find the line for the CBV
             # data we are looking for
-            data = glob.glob(cbvdir+'*.fits')
+            data = glob.glob(cbv_dir+'*.fits')
             fname = None
             for line in data:
                 strLine = str(line)
@@ -1868,9 +1870,6 @@ def load_tess_cbvs(cbvdir=None,sector=None, camera=None,
             curlUrl = curlBaseUrl + str(sector) + curlEndUrl
 
             # This is the string to search for in the curl script file
-            # Pad the sector number with a first '0' if less than 10
-            # TODO: figure out a way to pad an integer number with forward zeros
-            # without needing a conditional
 
             # Read in the relevant curl script file and find the line for the CBV
             # data we are looking for
