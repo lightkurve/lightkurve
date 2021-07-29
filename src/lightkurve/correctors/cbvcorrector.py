@@ -31,7 +31,7 @@ from .metrics import overfit_metric_lombscargle, underfit_metric_neighbors, MinT
 log = logging.getLogger(__name__)
 
 __all__ = ['CBVCorrector', 'CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
-        'TessCotrendingBasisVectors', 'download_kepler_cbvs','load_tess_cbvs']
+        'TessCotrendingBasisVectors', 'load_kepler_cbvs','load_tess_cbvs']
 
 #*******************************************************************************
 # CBV Corrector Class
@@ -136,10 +136,10 @@ class CBVCorrector(RegressionCorrector):
 
         if (not do_not_load_cbvs):
             if self.lc.mission == 'Kepler':
-                cbvs.append(download_kepler_cbvs(mission=self.lc.mission, quarter=self.lc.quarter,
+                cbvs.append(load_kepler_cbvs(cbv_dir=cbv_dir,mission=self.lc.mission, quarter=self.lc.quarter,
                         channel=self.lc.channel))
             elif self.lc.mission == 'K2':
-                cbvs.append(download_kepler_cbvs(mission=self.lc.mission, campaign=self.lc.campaign,
+                cbvs.append(load_kepler_cbvs(cbv_dir=cbv_dir,mission=self.lc.mission, campaign=self.lc.campaign,
                         channel=self.lc.channel))
             elif self.lc.mission == 'TESS':
                 # For TESS we load multiple CBV types
@@ -1677,10 +1677,10 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
 #*******************************************************************************
 # Functions
 
-def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
+def load_kepler_cbvs(cbv_dir=None,mission=None, quarter=None, campaign=None,
         channel=None, module=None, output=None):
-    """Searches the public data archive at MAST <https://archive.stsci.edu>
-    for Kepler or K2 cotrending basis vectors.
+    """Loads Kepler or K2 cotrending basis vectors, either from a local directory cbv_dir 
+    or searches the public data archive at MAST <https://archive.stsci.edu>.
 
     This function fetches the Cotrending Basis Vectors FITS HDU for the desired
     mission, quarter/campaign and channel or module/output, etc...
@@ -1712,7 +1712,7 @@ def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
     This example will read in the CBVs for Kepler quarter 8,
     and then extract the first 8 CBVs for module.output 16.4
 
-        >>> cbvs = download_kepler_cbvs(mission='Kepler', quarter=8, module=16, output=4) # doctest: +SKIP
+        >>> cbvs = load_kepler_cbvs(mission='Kepler', quarter=8, module=16, output=4) # doctest: +SKIP
 
     """
 
@@ -1745,22 +1745,40 @@ def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
         cbvBaseUrl = "http://archive.stsci.edu/missions/k2/cbv/"
 
     try:
-        soup = BeautifulSoup(requests.get(cbvBaseUrl).text, 'html.parser')
-        cbv_files = [fn['href'] for fn in soup.find_all('a') if fn['href'].endswith('fits')]
+        kepler_cbv_fname = None
+        if cbv_dir is not None:
+            cbv_files = glob.glob(cbv_dir+'*.fits')
 
-        if mission == 'Kepler':
-            quarter = 'q{:02}'.format(quarter)
-            for cbv_file in cbv_files:
-                if quarter + '-d25' in cbv_file:
-                    break
-        elif mission == 'K2':
-            campaign = 'c{:02}'.format(campaign)
-            for cbv_file in cbv_files:
-                if campaign in cbv_file:
-                    break
+            if mission == 'Kepler':
+                quarter = 'q{:02}'.format(quarter)
+                for cbv_file in cbv_files:
+                    if quarter + '-d25' in cbv_file:
+                        kepler_cbv_fname = cbv_file
+                        break
+            elif mission == 'K2':
+                campaign = 'c{:02}'.format(campaign)
+                for cbv_file in cbv_files:
+                    if campaign in cbv_file:
+                        kepler_cbv_fname = cbv_file
+                        break
 
-        kepler_cbv_url = cbvBaseUrl + cbv_file
-        hdu = pyfits.open(kepler_cbv_url)
+        else:
+            cbv_files = [fn['href'] for fn in soup.find_all('a') if fn['href'].endswith('fits')]
+
+            if mission == 'Kepler':
+                quarter = 'q{:02}'.format(quarter)
+                for cbv_file in cbv_files:
+                    if quarter + '-d25' in cbv_file:
+                        break
+            elif mission == 'K2':
+                campaign = 'c{:02}'.format(campaign)
+                for cbv_file in cbv_files:
+                    if campaign in cbv_file:
+                        break
+
+            
+            kepler_cbv_fname = cbvBaseUrl + cbv_file
+        hdu = pyfits.open(kepler_cbv_fname)
 
         return KeplerCotrendingBasisVectors.from_hdu(hdu=hdu, module=module, output=output)
 
