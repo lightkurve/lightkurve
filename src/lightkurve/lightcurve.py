@@ -2758,7 +2758,7 @@ class LightCurve(QTimeSeries):
         """
         return self[-n:]
 
-    def truncate(self, before: float = None, after: float = None):
+    def truncate(self, before: float = None, after: float = None, column="time"):
         """Truncates the light curve before and after some time value.
 
         Parameters
@@ -2767,17 +2767,22 @@ class LightCurve(QTimeSeries):
             Truncate all rows before this time value.
         after : float
             Truncate all rows after this time value.
+        column : str, optional
+            The name of the column on which the truncation is based. Defaults to 'time'.
 
         Returns
         -------
         truncated_lc : LightCurve
             The truncated light curve.
         """
+        def _to_unitless(data):
+            return np.asarray(getattr(data, "value", data))
+
         mask = np.ones(len(self), dtype=bool)
         if before:
-            mask &= self.time.value >= before
+            mask &= _to_unitless(getattr(self, column)) >= before
         if after:
-            mask &= self.time.value <= after
+            mask &= _to_unitless(getattr(self, column)) <= after
         return self[mask]
 
 
