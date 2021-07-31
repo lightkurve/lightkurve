@@ -678,6 +678,7 @@ def test_bin_memory_usage(dict_of_bin_args):
 #
 # END codes for lc.bin memory usage test
 
+
 def test_normalize():
     """Does the `LightCurve.normalize()` method normalize the flux?"""
     lc = LightCurve(
@@ -685,6 +686,12 @@ def test_normalize():
     )
     assert_allclose(np.median(lc.normalize().flux), 1)
     assert_allclose(np.median(lc.normalize().flux_err), 0.05 / 5)
+
+    # already in relative units
+    lc = LightCurve(time=np.arange(10), flux=np.ones(10)).normalize()
+    with pytest.warns(None) as warn_record:
+        lc.normalize()
+    assert len(warn_record) == 0
 
 
 def test_invalid_normalize():
@@ -704,11 +711,6 @@ def test_invalid_normalize():
     lc = LightCurve(time=np.arange(10), flux=-np.ones(10), flux_err=0.05 * np.ones(10))
     with pytest.warns(LightkurveWarning, match="negative"):
         lc.normalize()
-
-    # already in relative units
-    lc = LightCurve(time=np.arange(10), flux=np.ones(10))
-    with pytest.warns(LightkurveWarning, match="relative"):
-        lc.normalize().normalize()
 
 
 def test_to_pandas():
