@@ -27,6 +27,8 @@
 - Fixed a bug in ``underfit_metric_neighbors()`` which caused the alignment
   of light curves to fail. [#1120]
 
+- Removed an unnecessary warning triggered when ``LightCurve.normalize()`` is called
+  on an already-normalized light curve. [#1128]
 
 
 2.0.10 (2021-06-04)
