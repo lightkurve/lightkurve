@@ -112,7 +112,7 @@ class CBVCorrector(RegressionCorrector):
             Use this option if you wish to use the CBV corrector methods with only a 
             custom design matrix (via the ext_dm argument in the corrector methods)
         cbv_dir : str
-            Path to directory holding TESS CBVs. If this is provided, will not query
+            Path to specific directory holding TESS CBVs. If this is None, will query
             MAST by default.
         """
         if not isinstance(lc, LightCurve):
@@ -1694,6 +1694,8 @@ def load_kepler_cbvs(cbv_dir=None,mission=None, quarter=None, campaign=None,
 
     Parameters
     ----------
+    cbv_dir : str
+        Path to specific directory holding Kepler CBVs. If None, queries MAST.
     mission : str, list of str
         'Kepler' or 'K2'
     quarter or campaign : int
@@ -1804,7 +1806,7 @@ def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
     Parameters
     ----------
     cbv_dir   : str
-        Data directory where CBVs live. If None, queries MAST.
+        Path to specific directory holding TESS CBVs. If None, queries MAST.
     sector : int, list of ints
         TESS Sector number.
     camera and ccd : int
