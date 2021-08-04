@@ -51,8 +51,11 @@ class CrowdingCorrector(Corrector):
     >>> tpf_lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
     >>> pld = PLDCorrector(tpf, aperture_mask=tpf.pipeline_mask)
     >>> pld_lc = pld.correct(pca_components=5, aperture_mask=tpf.pipeline_mask)
-    >>> lc_crowd = lk.CrowdCorrector(tpf, pld_lc)
-    >>> lc_crowd.plot()"""
+    >>> CROWDSAP = tpf.hdu[1].header['CROWDSAP']
+    >>> FLFRCSAP = tpf.hdu[1].header['FLFRCSAP']
+    >>> cc = CrowdingCorrector(pld_lc)
+    >>> lc = cc.correct(crowdsap=CROWDSAP, flfrcsap=FLFRCSAP)"""
+
     def __init__(self, lc):
         self.lc = lc
         self.flux = lc.flux
