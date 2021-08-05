@@ -71,32 +71,7 @@ class BiasBackgroundCorrector(Corrector):
     >>> aper_new2 = ndimage.binary_dilation(sat_mask, iterations=2) 
     >>> inBackgroundAperture3 = inBackgroundAperture2 * ~aper_new2
     >>> bkg = np.where(inBackgroundAperture3==True)
-    >>> bkg2 = [bkg[0],bkg[1]]
-    >>> medval = []
-    >>> for a in range(tpf.shape[1:]):
-    >>>
-    >>>     custom_mask = np.zeros((tpf.shape[1:]), dtype='bool')
-    >>>     custom_mask[bkg2[0][a],bkg2[1][a]] = True
-    >>>     lc = tpf[tpf.quality == 0].to_lightcurve(aperture_mask=custom_mask)
-    >>>     medval.append(np.nanmedian(lc.flux.value))
-    >>> sorted_index = np.argsort(medval)
-    >>> sort_int = [sorted_index[0],sorted_index[1],sorted_index[2]]
-    >>> vals2 = [medval[sorted_index[0]],medval[sorted_index[1]],medval[sorted_index[2]]]
-    >>> if vals2[2] < 0:
-    >>>     bgBias = np.abs(vals2[2])
-    >>> else:
-    >>>     bgBias = 0
-    >>> print("This is the estimate for the background bias:", bgBias)
-    >>> nPix = np.sum(tpf.pipeline_mask)
-    >>> CROWDSAP = tpf.hdu[1].header['CROWDSAP']
-    >>> FLFRCSAP = tpf.hdu[1].header['FLFRCSAP']
-    >>> medFluxPdc = np.nanmedian(lcf[lcf.quality == 0].flux.value)
-    >>> pdcCorrection = bgBias*nPix*CROWDSAP/FLFRCSAP
-    >>> cor_flux = lcf.flux.value + pdcCorrection
-    >>> lc_corr = lk.LightCurve(time=lcf.time.value, flux=cor_flux, flux_err=lcf.flux_err.value)
-    >>> transitBias = (pdcCorrection/medFluxPdc)*100
-    >>> print("transitBias value:", transitBias, "%")"""
-
+    >>> bkg2 = [bkg[0],bkg[1]]"""
     
     def __init__(self, tpf, lc):
         self.tpf = tpf
