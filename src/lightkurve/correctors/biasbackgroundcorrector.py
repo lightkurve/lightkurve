@@ -74,6 +74,7 @@ class BiasBackgroundCorrector(Corrector):
     >>> bkg2 = [bkg[0],bkg[1]]
     >>> medval = []
     >>> for a in range(tpf.shape[1]):
+    >>>
     >>>     custom_mask = np.zeros((tpf.shape[1:]), dtype='bool')
     >>>     custom_mask[bkg2[0][a],bkg2[1][a]] = True
     >>>     lc = tpf[tpf.quality == 0].to_lightcurve(aperture_mask=custom_mask)
@@ -84,7 +85,7 @@ class BiasBackgroundCorrector(Corrector):
     >>> if vals2[2] < 0:
     >>>     bgBias = np.abs(vals2[2])
     >>> else:
-            bgBias = 0
+    >>>     bgBias = 0
     >>> print("This is the estimate for the background bias:", bgBias)
     >>> nPix = np.sum(tpf.pipeline_mask)
     >>> CROWDSAP = tpf.hdu[1].header['CROWDSAP']
