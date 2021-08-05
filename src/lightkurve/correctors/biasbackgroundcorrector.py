@@ -73,7 +73,7 @@ class BiasBackgroundCorrector(Corrector):
     >>> bkg = np.where(inBackgroundAperture3==True)
     >>> bkg2 = [bkg[0],bkg[1]]
     >>> medval = []
-    >>> for a in range(tpf.shape[1]):
+    >>> for a in range(tpf.shape[1:]):
     >>>
     >>>     custom_mask = np.zeros((tpf.shape[1:]), dtype='bool')
     >>>     custom_mask[bkg2[0][a],bkg2[1][a]] = True
