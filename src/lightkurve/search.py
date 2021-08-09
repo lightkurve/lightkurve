@@ -48,6 +48,16 @@ AUTHOR_LINKS = {
     "TESScut": "https://mast.stsci.edu/tesscut/",
 }
 
+REPR_COLUMNS_BASE = [
+    "#",
+    "mission",
+    "year",
+    "author",
+    "exptime",
+    "target_name",
+    "distance",
+]
+
 
 class SearchError(Exception):
     pass
@@ -78,6 +88,7 @@ class SearchResult(object):
             if len(table) > 0:
                 self._add_columns()
                 self._sort_table()
+        self.display_extra_columns = None
 
     def _sort_table(self):
         """Sort the table of search results by distance, author, and filename.
@@ -119,21 +130,27 @@ class SearchResult(object):
         out = "SearchResult containing {} data products.".format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = [
-            "#",
-            "mission",
-            "year",
-            "author",
-            "exptime",
-            "target_name",
-            "distance",
-        ]
+        columns = REPR_COLUMNS_BASE
+        if self.display_extra_columns is not None:
+            columns = REPR_COLUMNS_BASE + self.display_extra_columns
+
         self.table["#"] = [idx for idx in range(len(self.table))]
         out += "\n\n" + "\n".join(self.table[columns].pformat(max_width=300, html=html))
         # Make sure author names show up as clickable links
         if html:
             for author, url in AUTHOR_LINKS.items():
                 out = out.replace(f">{author}<", f"><a href='{url}'>{author}</a><")
+            # special HTML formating for TESS proposal_id
+            tess_table = self.table[self.table["project"] == "TESS"]
+            for p_ids in np.unique(tess_table["proposal_id"]):
+                # for CDIPS products, proposal_id is a np MaskedConstant, not a string
+                if p_ids == "N/A" or (not isinstance(p_ids, str)):
+                    continue
+                # e.g., handle cases with multiple proposals, e.g.,  G12345_G67890
+                p_id_links = [f"""\
+<a href='https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs.html#:~:text={p_id}'>{p_id}</a>\
+""" for p_id in p_ids.split("_")]
+                out = out.replace(f">{p_ids}<", f">{' , '.join(p_id_links)}<")
         return out
 
     def _repr_html_(self):
