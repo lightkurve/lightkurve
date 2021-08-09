@@ -20,6 +20,7 @@ from .targetpixelfile import TargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveCollection
 from .utils import suppress_stdout, LightkurveWarning, LightkurveDeprecationWarning
 from .io import read
+from . import conf
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
@@ -88,7 +89,7 @@ class SearchResult(object):
             if len(table) > 0:
                 self._add_columns()
                 self._sort_table()
-        self.display_extra_columns = None
+        self.display_extra_columns = conf.search_result_display_extra_columns
 
     def _sort_table(self):
         """Sort the table of search results by distance, author, and filename.
