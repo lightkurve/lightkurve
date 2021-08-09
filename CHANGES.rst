@@ -21,6 +21,14 @@
 - Modified ``LightCurve.create_transit_mask()`` to accept AstroPy ``Quantity``
   objects for the ``period`` and ``duration`` parameters. [#1119]
 
+- Modified ``CBVCorrector`` to issue a warning message of the CBVs are
+  poorly aligned to the input light curve. [#1113]
+
+- Fixed a bug in ``underfit_metric_neighbors()`` which caused the alignment
+  of light curves to fail. [#1120]
+
+- Removed an unnecessary warning triggered when ``LightCurve.normalize()`` is called
+  on an already-normalized light curve. [#1128]
 
 
 2.0.10 (2021-06-04)

@@ -1053,15 +1053,6 @@ class LightCurve(QTimeSeries):
                 "not what you want".format(median_flux),
                 LightkurveWarning,
             )
-        # Warn if the light curve was already normalized before
-        if self.meta.get("NORMALIZED"):
-            warnings.warn(
-                "The light curve already appears to be in relative "
-                "units; `normalize()` will convert the light curve "
-                "into relative units for a second time, which is "
-                "probably not what you want.".format(self.flux.unit),
-                LightkurveWarning,
-            )
 
         # Create a new light curve instance and normalize its values
         lc = self.copy()
