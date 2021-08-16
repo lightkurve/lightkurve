@@ -1,4 +1,4 @@
-"""Defines CowdingCorrector
+"""Defines CrowdingCorrector
 """
 import logging
 import warnings
@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib
 import lightkurve as lk
 from lightkurve.correctors import PLDCorrector
+from astropy import units as u
 
 from .corrector import Corrector
 
@@ -18,7 +19,7 @@ log = logging.getLogger(__name__)
 
 
 class CrowdingCorrector(Corrector):
-    """Implements the crowing correction on a SAP light curve that has already 
+    """Implements the crowding correction on a SAP light curve that has already 
     been corrected for instrumental noise/scattered light using a pervious 
     corrector function. 
 
@@ -40,7 +41,7 @@ class CrowdingCorrector(Corrector):
     Note that the light curve must be generated from the optimal aperture stored
     in the TPF as well. Otherwise the keywords are not applicable.
 
-    Exaples
+    Examples
     ------
     Download the TPF file for WR21a, obtain a PLD-corrected light curve, and
     then correct it for crowding:
@@ -101,9 +102,12 @@ class CrowdingCorrector(Corrector):
         
         #Calculate the new uncertainties
         flux_err_corr = self.flux_err.value/FLFRCSAP
+
+        #Define units for the lc
+        unit = u.electron/ u.s
         
         #Convert into a LightCurve object
-        corrected_lc = lk.LightCurve(time=self.time.value, flux=flux_corr, flux_err=flux_err_corr)
+        corrected_lc = lk.LightCurve(time=self.time, flux=flux_corr*unit, flux_err=flux_err_corr*unit)
             
         return corrected_lc
 
