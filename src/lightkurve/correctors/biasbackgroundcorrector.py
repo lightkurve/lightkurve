@@ -96,7 +96,7 @@ class BiasBackgroundCorrector(Corrector):
         inBackgroundAperture2 = inBackgroundAperture * ~halo
 
         #Remove any pixels from the background that might be saturated + a 2 pixel halo around them
-        svalue = (200000.2)*.95 #This is an approximation only
+        svalue = (200000/2)*.95 #This is an approximation only
         tp = np.where(self.flux.value >=svalue)
         
         tp1 = tp[1] #x-axis
