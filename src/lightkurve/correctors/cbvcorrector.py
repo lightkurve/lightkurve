@@ -5,6 +5,7 @@ import copy
 import requests
 import urllib.request
 import glob
+import os
 
 from astropy.io import fits as pyfits
 from astropy.table import Table
@@ -1147,7 +1148,11 @@ class CotrendingBasisVectors(TimeSeries):
                 _, ax = plt.subplots(1)
 
             # Plot gaps as NaN
-            timeArray = self.time.copy().value
+            timeArray = np.array(self.time.copy().value)
+            try:
+                timeArray[~self.time.value.mask] = np.nan # kepler cbvs are masked arrays and do not support item assignment
+            except:
+                pass
             timeArray[np.nonzero(self.gap_indicators)[0]] = np.nan
 
             # Get the CBV arrays that were requested
@@ -1770,7 +1775,7 @@ def load_kepler_cbvs(cbv_dir=None,mission=None, quarter=None, campaign=None,
     try:
         kepler_cbv_fname = None
         if cbv_dir is not None:
-            cbv_files = glob.glob(cbv_dir+'*.fits')
+            cbv_files = glob.glob(os.path.join(cbv_dir,'*.fits'))
 
             if mission == 'Kepler':
                 quarter = 'q{:02}'.format(quarter)
@@ -1784,8 +1789,8 @@ def load_kepler_cbvs(cbv_dir=None,mission=None, quarter=None, campaign=None,
                     if campaign in cbv_file:
                         kepler_cbv_fname = cbv_file
                         break
-
         else:
+            soup = BeautifulSoup(requests.get(cbvBaseUrl).text, 'html.parser')
             cbv_files = [fn['href'] for fn in soup.find_all('a') if fn['href'].endswith('fits')]
 
             if mission == 'Kepler':
@@ -1891,7 +1896,7 @@ def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
         if cbv_dir is not None:
             # Read in the relevant curl script file and find the line for the CBV
             # data we are looking for
-            data = glob.glob(cbv_dir+'*.fits')
+            data = glob.glob(os.path.join(cbv_dir,'*.fits'))
             fname = None
             for line in data:
                 strLine = str(line)
