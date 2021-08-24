@@ -58,20 +58,8 @@ class BiasBackgroundCorrector(Corrector):
     >>> from scipy import ndimage
     >>> tpf = lk.search_targetpixelfile('TOI-824', sector=11).download()
     >>> lcf = lk.search_lightcurve('TOI-824', author='SPOC', sector=11).download()
-    >>> pix = tpf.flux.value
-    >>> inBackgroundAperture = ~tpf.pipeline_mask 
-    >>> halo = ndimage.binary_dilation(tpf.pipeline_mask, iterations=1) 
-    >>> inBackgroundAperture2 = inBackgroundAperture * ~halo
-    >>> svalue = 200000
-    >>> tp = np.where(tpf.flux.value >=svalue)
-    >>> tp1 = tp[1]
-    >>> tp2 = tp[2] 
-    >>> sat_mask = np.zeros((tpf.shape[1:]), dtype='bool')
-    >>> sat_mask[tp1,tp2] = True
-    >>> aper_new2 = ndimage.binary_dilation(sat_mask, iterations=2) 
-    >>> inBackgroundAperture3 = inBackgroundAperture2 * ~aper_new2
-    >>> bkg = np.where(inBackgroundAperture3==True)
-    >>> bkg2 = [bkg[0],bkg[1]]"""
+    >>> bg = BiasBackgroundCorrector(tpf, lcf)
+    >>> bgBias, pdcCorrection, transitBias, corrected_lc = bg.correct()"""
     
     def __init__(self, tpf, lc):
         self.tpf = tpf
@@ -156,7 +144,13 @@ class BiasBackgroundCorrector(Corrector):
 
             #Correct the flux and make a new PDCSAP_FLUX light curve
             flux_corr = self.lc.flux.value + pdcCorrection
-            corrected_lc = lk.LightCurve(time=self.lc.time.value, flux=flux_corr, flux_err=self.lc.flux_err.value)
+
+            #Get the units of the flux
+            unit = self.lc.flux.unit
+
+            #Make up the corrected light curve and preserve meta data
+            corrected_lc  = self.lc.copy()
+            corrected_lc.flux = flux_corr
 
             #plot this up
             ax = self.lc.scatter(label='PDCSAP')
