@@ -104,10 +104,14 @@ class CrowdingCorrector(Corrector):
         flux_err_corr = self.flux_err.value/FLFRCSAP
 
         #Define units for the lc
-        unit = u.electron/ u.s
-        
-        #Convert into a LightCurve object
-        corrected_lc = lk.LightCurve(time=self.time, flux=flux_corr*unit, flux_err=flux_err_corr*unit)
+        unit = self.flux.unit
+
+        #Copy the original lc
+        corrected_lc = self.lc.copy()
+
+        #Adjust the flux and the flux error - this preserves meta data
+        corrected_lc.flux =  flux_corr*unit
+        corrected_lc.flux_err = flux_err_corr*unit
             
         return corrected_lc
 
