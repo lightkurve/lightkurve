@@ -18,4 +18,4 @@ from .pldcorrector import *
 from .sffcorrector import *
 from .cbvcorrector import *
 from .regressioncorrector import *
-from .biasbackgroundcorrector import *
+from .DR38backgroundbiasissuecorrector import *
