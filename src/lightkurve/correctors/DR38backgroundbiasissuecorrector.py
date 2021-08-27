@@ -64,7 +64,7 @@ class DR38BackgroundBiasIssueCorrector(Corrector):
     >>> tpf = lk.search_targetpixelfile('TOI-824', sector=11).download()
     >>> lcf = lk.search_lightcurve('TOI-824', author='SPOC', sector=11).download()
     >>> bg = DR38BackgroundBiasIssueCorrector(tpf, lcf)
-    >>> bgBias, pdcCorrection, transitBias, corrected_lc = bg.correct()"""
+    >>> corrected_lc = bg.correct()"""
     
     def __init__(self, tpf, lc):
         self.tpf = tpf
