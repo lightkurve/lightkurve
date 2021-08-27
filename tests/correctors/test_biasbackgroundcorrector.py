@@ -7,9 +7,9 @@ from numpy.testing import assert_almost_equal
 from scipy import ndimage
 
 import lightkurve as lk
-from lightkurve.correctors import BiasBackgroundCorrector
+from lightkurve.correctors import DR38BackgroundBiasIssueCorrector
 
-def test_biasbackgroundcorrector_priors():
+def test_DR38BackgroundBiasIssueCorrector_priors():
     """This test will check that the transit depth is being calculated
     corectly
     """
