@@ -55,7 +55,7 @@ class CrowdedAperturePhotometryCorrector(Corrector):
     >>> crowdsap = tpf.hdu[1].header['CROWDSAP']
     >>> flfrsap = tpf.hdu[1].header['FLFRCSAP']
     >>> cc = CrowdedAperturePhotometryCorrector(pld_lc)
-    >>> lc = cc.correct(crowdsap=CROWDSAP, flfrcsap=FLFRCSAP)"""
+    >>> lc = cc.correct(crowdsap=crowdsap, flfrcsap=flfrsap)"""
 
     def __init__(self, lc):
         self.lc = lc
