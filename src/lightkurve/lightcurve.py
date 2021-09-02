@@ -2200,7 +2200,7 @@ class LightCurve(QTimeSeries):
         return Seismology.from_lightcurve(self, **kwargs)
 
     def to_fits(
-        self, path=None, overwrite=False, flux_column_name="FLUX", **extra_data
+        self, path=None, overwrite=False, flux_column_name="FLUX", extra_data=None
     ):
         """Converts the light curve to a FITS file in the Kepler/TESS file format.
 
@@ -2246,7 +2246,7 @@ class LightCurve(QTimeSeries):
             )
             return fits.Header.fromtextfile(template_fn)
 
-        def _make_primary_hdu(extra_data=None):
+        def _make_primary_hdu(extra_data=extra_data):
             """Returns the primary extension (#0)."""
             if extra_data is None:
                 extra_data = {}
@@ -2278,7 +2278,7 @@ class LightCurve(QTimeSeries):
                         log.warning("Value for {} is None.".format(kw))
             return hdu
 
-        def _make_lightcurve_extension(extra_data=None):
+        def _make_lightcurve_extension(extra_data=extra_data):
             """Create the 'LIGHTCURVE' extension (i.e. extension #1)."""
             # Turn the data arrays into fits columns and initialize the HDU
             if extra_data is None:
@@ -2966,7 +2966,7 @@ class KeplerLightCurve(LightCurve):
         overwrite=False,
         flux_column_name="FLUX",
         aperture_mask=None,
-        **extra_data,
+        extra_data=None,
     ):
         """Writes the KeplerLightCurve to a FITS file.
 
@@ -3015,7 +3015,7 @@ class KeplerLightCurve(LightCurve):
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = kepler_specific_data[kw]
         hdu = super(KeplerLightCurve, self).to_fits(
-            path=None, overwrite=overwrite, **extra_data
+            path=None, overwrite=overwrite, extra_data=extra_data
         )
 
         hdu[0].header["QUARTER"] = self.meta.get("QUARTER")
@@ -3086,7 +3086,7 @@ class TessLightCurve(LightCurve):
         overwrite=False,
         flux_column_name="FLUX",
         aperture_mask=None,
-        **extra_data,
+        extra_data=None,
     ):
         """Writes the KeplerLightCurve to a FITS file.
 
@@ -3133,7 +3133,7 @@ class TessLightCurve(LightCurve):
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = tess_specific_data[kw]
         hdu = super(TessLightCurve, self).to_fits(
-            path=None, overwrite=overwrite, **extra_data
+            path=None, overwrite=overwrite, extra_data=extra_data
         )
 
         # We do this because the TESS file format is subtly different in the
