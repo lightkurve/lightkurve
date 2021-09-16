@@ -185,8 +185,8 @@ class LightCurveCollection(Collection):
             This function is applied to each light curve in the collection
             prior to stitching. The default is to normalize each light curve.
         sort_by : str or list of str
-            The key(s) to order the stitched light curve by. If None, use the
-            order of the collection list. The default key is time.
+            The key(s) to order the stitched light curves by. If None, the collection
+            list will not be sorted. The default key is time.
 
         Returns
         -------
@@ -224,7 +224,10 @@ class LightCurveCollection(Collection):
 
         # Need `join_type='inner'` until AstroPy supports masked Quantities
         stitched_lc = vstack(lcs, join_type="inner", metadata_conflicts="silent")
-        stitched_lc.sort(sort_by)
+
+        if sort_by is not None:
+            stitched_lc.sort(sort_by)
+
         return stitched_lc
 
     def plot(self, ax=None, offset=0.0, **kwargs) -> matplotlib.axes.Axes:
