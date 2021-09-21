@@ -30,6 +30,9 @@
 - Removed an unnecessary warning triggered when ``LightCurve.normalize()`` is called
   on an already-normalized light curve. [#1128]
 
+- Fixed an AstroPy warning ("dropping mask in Quantity column") which was encountered
+  when opening a light curve with AstroPy v4.3 installed.
+
 
 2.0.10 (2021-06-04)
 ===================

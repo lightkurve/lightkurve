@@ -74,7 +74,11 @@ class QTimeSeries(TimeSeries):
             if hasattr(col, 'unit') and col.dtype.kind in {'U', 'S'}:
                 del col.unit
 
-        col = super()._convert_col_for_table(col)
+        # ignore "dropping mask in Quantity column" warning issued up until AstroPy v4.3.1
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message=".*dropping mask.*")
+            col = super()._convert_col_for_table(col)
+
         if (
             isinstance(col, Column)
             and getattr(col, "unit", None) is None
