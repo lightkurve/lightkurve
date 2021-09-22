@@ -2758,7 +2758,7 @@ class LightCurve(QTimeSeries):
         """
         return self[-n:]
 
-    def truncate(self, before: float = None, after: float = None, column="time"):
+    def truncate(self, before: float = None, after: float = None, column: str = "time"):
         """Truncates the light curve before and after some time value.
 
         Parameters
