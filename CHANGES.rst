@@ -19,7 +19,7 @@
   Dynamical Time (TDB) scale by default. [#1112]
 
 - Modified ``LightCurve.create_transit_mask()`` to accept AstroPy ``Quantity``
-  objects for the ``period`` and ``duration`` parameters. [#1119]
+  objects for ``period``, ``transit_time``, and ``duration``. [#1119, #1141]
 
 - Modified ``CBVCorrector`` to issue a warning message of the CBVs are
   poorly aligned to the input light curve. [#1113]

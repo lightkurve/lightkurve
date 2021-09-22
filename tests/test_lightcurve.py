@@ -1694,3 +1694,11 @@ def test_select_flux():
         lc.select_flux("doesnotexist")
     with pytest.raises(ValueError):
         lc.select_flux("newflux", "doesnotexist")
+
+
+def test_transit_mask_with_quantities():
+    """Regression test for #1141."""
+    lc = LightCurve(time=range(10), flux=range(10))
+    mask_quantity = lc.create_transit_mask(period=2.9*u.day, transit_time=1*u.day, duration=1*u.day)
+    mask_no_quantity = lc.create_transit_mask(period=2.9, transit_time=1, duration=1)
+    assert all(mask_quantity == mask_no_quantity)
