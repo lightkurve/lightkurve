@@ -9,7 +9,7 @@
 
 - Various improvements to the online documentation. [#1102]
 
-- Fixed a bug in ``TargetPixelFile.estimate_centroids`` which caused the column
+- Fixed a bug in ``TargetPixelFile.estimate_centroids()`` which caused the column
   and row coordinates reported to be off by 0.5. [#1103]
 
 - Fixed a bug which caused a light curve's meta data to be lost after
@@ -36,6 +36,7 @@
 - Fixed a bug in ``TargetPixelFile.animate`` which caused a ``ModuleNotFoundError``
   to be raised when using older versions of matplotlib. [#1139]
 
+- Added a ``column`` parameter to ``LightCurve.truncate()``. [#1116]
 
 
 2.0.10 (2021-06-04)
