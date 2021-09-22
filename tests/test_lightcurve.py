@@ -1674,6 +1674,16 @@ def test_head_tail_truncate():
     assert lc.truncate(before=2).head(1).flux == 2
     assert lc.truncate(after=3).tail(1).flux == 3
 
+    # test optional column parameter for truncate()
+    lc["cadenceno"] = [901, 902, 903, 904, 905]
+    assert all(lc.truncate(902, 904, column="cadenceno").flux == [2, 3, 4])
+
+    # case it is a property, not a column. furthermore, it is plain numbers
+    with warnings.catch_warnings():
+        # we do want to create an attribute in this case
+        warnings.simplefilter("ignore", UserWarning)
+        lc.cycle = [11, 12, 15, 14, 13]
+    assert all(lc.truncate(12, 14, column="cycle").flux == [2, 4, 5])
 
 def test_select_flux():
     """Simple test for the `LightCurve.select_flux()` method."""
