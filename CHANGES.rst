@@ -33,6 +33,10 @@
 - Fixed an AstroPy warning ("dropping mask in Quantity column") which was encountered
   when opening a light curve with AstroPy v4.3 installed.
 
+- Fixed a bug in ``TargetPixelFile.animate`` which caused a ``ModuleNotFoundError``
+  to be raised when using older versions of matplotlib. [#1139]
+
+
 
 2.0.10 (2021-06-04)
 ===================
