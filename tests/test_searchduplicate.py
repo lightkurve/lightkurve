@@ -14,7 +14,7 @@ from requests import HTTPError
 from astroquery.mast import Catalogs
 
 from lightkurve.utils import LightkurveWarning, LightkurveError
-from lightkurve import SearchDuplicate
+from lightkurve import searchduplicate
 
 
 @pytest.mark.remote_data
