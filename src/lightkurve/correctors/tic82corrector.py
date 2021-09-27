@@ -41,7 +41,7 @@ def search_tic(name=None, ra=None, dec=None, tic=None):
     Example
     >>> import lightkurve as lk
     >>> from lightkurve.correctors import TIC82Corrector.search_tic as search_tic 
-    >>> lk.search_tic(tic=1716106614)
+    >>> table = search_tic(tic=1716106614)
     
     """
     if name!=None:
