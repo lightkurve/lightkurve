@@ -8,7 +8,7 @@ from numpy.testing import assert_almost_equal
 from astroquery.mast import Catalogs
 
 import lightkurve as lk
-from lightkurve.correctors import search_tic
+from lightkurve.correctors import TIC82Corrector.search_tic as search_tic
 from lightkurve.correctors import TIC82Corrector
 
 
