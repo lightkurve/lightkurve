@@ -58,4 +58,3 @@ from .convenience import *
 from .collections import *
 from .io import *
 from .search import *
-from .search_duplicate import *

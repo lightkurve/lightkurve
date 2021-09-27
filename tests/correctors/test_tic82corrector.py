@@ -8,7 +8,32 @@ from numpy.testing import assert_almost_equal
 from astroquery.mast import Catalogs
 
 import lightkurve as lk
+from lightkurve.correctors import search_tic
 from lightkurve.correctors import TIC82Corrector
+
+
+@pytest.mark.remote_data
+def test_search_tic():
+    """ TIC 158324245 was classified as a SPLIT in TIC v8.2
+    This means that it itself is not a real star, but composed of several other stars
+    The brightest real star is called the DUPLICATE and replaces the MAST paramters of 
+    the original. 
+
+    There is then an additional faint star. 
+    This procedure should return the ID's of all associated stars. 
+    """
+    #catalog_data = Catalogs.query_object("TIC 158324245", radius=0.001, catalog="TIC", version=8.2)
+    #table = catalog_data["ID", "ra", "dec", "Tmag", "disposition", "duplicate_id"]
+
+    table = search_tic(tic="158324245")
+
+    assert table['ID'][0] == '158324245'
+    assert table['ID'][1] == '1717079071'
+    assert table['ID'][2] == '1717079066'
+
+    assert table['disposition'][0] == 'SPLIT'
+    assert table['disposition'][1] == 'DUPLICATE'
+
 
 def test_TIC82Corrector_priors():
     """This test will check that correction to the SAP flux is being calculated
