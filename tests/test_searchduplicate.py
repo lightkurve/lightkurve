@@ -14,11 +14,11 @@ from requests import HTTPError
 from astroquery.mast import Catalogs
 
 from lightkurve.utils import LightkurveWarning, LightkurveError
-from lightkurve import searchduplicate
+from lightkurve import search_duplicate
 
 
 @pytest.mark.remote_data
-def test_SearchDuplicate():
+def test_searchduplicate():
     """ TIC 158324245 was classified as a SPLIT in TIC v8.2
     This means that it itself is not a real star, but composed of several other stars
     The brightest real star is called the DUPLICATE and replaces the MAST paramters of 
@@ -27,8 +27,10 @@ def test_SearchDuplicate():
     There is then an additional faint star. 
     This procedure should return the ID's of all associated stars. 
     """
-    catalog_data = Catalogs.query_object("TIC 158324245", radius=0.001, catalog="TIC", version=8.2)
-    table = catalog_data["ID", "ra", "dec", "Tmag", "disposition", "duplicate_id"]
+    #catalog_data = Catalogs.query_object("TIC 158324245", radius=0.001, catalog="TIC", version=8.2)
+    #table = catalog_data["ID", "ra", "dec", "Tmag", "disposition", "duplicate_id"]
+
+    table = lk.search_duplicate(tic="158324245")
 
     assert table['ID'][0] == '158324245'
     assert table['ID'][1] == '1717079071'
