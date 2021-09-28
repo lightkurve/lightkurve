@@ -74,7 +74,11 @@ class QTimeSeries(TimeSeries):
             if hasattr(col, 'unit') and col.dtype.kind in {'U', 'S'}:
                 del col.unit
 
-        col = super()._convert_col_for_table(col)
+        # ignore "dropping mask in Quantity column" warning issued up until AstroPy v4.3.1
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message=".*dropping mask.*")
+            col = super()._convert_col_for_table(col)
+
         if (
             isinstance(col, Column)
             and getattr(col, "unit", None) is None
@@ -2621,8 +2625,13 @@ class LightCurve(QTimeSeries):
             >>> lc.create_transit_mask(transit_time=[2., 3.], period=[2., 10.], duration=[0.1, 0.1])
             array([False,  True,  True,  True, False])
         """
+        # Convert Quantity objects to floats in units "day"
         period = _to_unitless_day(period)
         duration = _to_unitless_day(duration)
+
+        # If ``transit_time`` is a ``Quantity```, attempt converting it to a ``Time`` object
+        if isinstance(transit_time, Quantity):
+            transit_time = Time(transit_time, format=self.time.format, scale=self.time.scale)
 
         # Ensure all parameters are 1D-arrays
         period = np.atleast_1d(period)
@@ -2749,7 +2758,7 @@ class LightCurve(QTimeSeries):
         """
         return self[-n:]
 
-    def truncate(self, before: float = None, after: float = None):
+    def truncate(self, before: float = None, after: float = None, column: str = "time"):
         """Truncates the light curve before and after some time value.
 
         Parameters
@@ -2758,17 +2767,22 @@ class LightCurve(QTimeSeries):
             Truncate all rows before this time value.
         after : float
             Truncate all rows after this time value.
+        column : str, optional
+            The name of the column on which the truncation is based. Defaults to 'time'.
 
         Returns
         -------
         truncated_lc : LightCurve
             The truncated light curve.
         """
+        def _to_unitless(data):
+            return np.asarray(getattr(data, "value", data))
+
         mask = np.ones(len(self), dtype=bool)
         if before:
-            mask &= self.time.value >= before
+            mask &= _to_unitless(getattr(self, column)) >= before
         if after:
-            mask &= self.time.value <= after
+            mask &= _to_unitless(getattr(self, column)) <= after
         return self[mask]
 
 

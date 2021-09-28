@@ -1674,6 +1674,16 @@ def test_head_tail_truncate():
     assert lc.truncate(before=2).head(1).flux == 2
     assert lc.truncate(after=3).tail(1).flux == 3
 
+    # test optional column parameter for truncate()
+    lc["cadenceno"] = [901, 902, 903, 904, 905]
+    assert all(lc.truncate(902, 904, column="cadenceno").flux == [2, 3, 4])
+
+    # case it is a property, not a column. furthermore, it is plain numbers
+    with warnings.catch_warnings():
+        # we do want to create an attribute in this case
+        warnings.simplefilter("ignore", UserWarning)
+        lc.cycle = [11, 12, 15, 14, 13]
+    assert all(lc.truncate(12, 14, column="cycle").flux == [2, 4, 5])
 
 def test_select_flux():
     """Simple test for the `LightCurve.select_flux()` method."""
@@ -1694,3 +1704,11 @@ def test_select_flux():
         lc.select_flux("doesnotexist")
     with pytest.raises(ValueError):
         lc.select_flux("newflux", "doesnotexist")
+
+
+def test_transit_mask_with_quantities():
+    """Regression test for #1141."""
+    lc = LightCurve(time=range(10), flux=range(10))
+    mask_quantity = lc.create_transit_mask(period=2.9*u.day, transit_time=1*u.day, duration=1*u.day)
+    mask_no_quantity = lc.create_transit_mask(period=2.9, transit_time=1, duration=1)
+    assert all(mask_quantity == mask_no_quantity)
