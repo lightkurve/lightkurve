@@ -41,7 +41,7 @@ def search_tic(name=None, ra=None, dec=None, tic=None):
     Example
     >>> import lightkurve as lk
     >>> from lightkurve.correctors import search_tic
-    >>> table = search_tic(tic=1716106614)
+    >>> table = search_tic(tic=394177355)
     
     """
     if name!=None:
@@ -119,10 +119,10 @@ class TIC82Corrector(Corrector):
 
     >>> import lightkurve as lk
     >>> from lightkurve.correctors import TIC82Corrector, search_tic
-    >>> table = search_tic(tic=1716106609)
-    >>> SPLIT_LK = lk.search_lightcurve("TIC 1716106609", mission="TESS")
-    >>> lcs = SPLIT_LK[0].download()
-    >>> corrected_split_lc = TIC82Corrector(table, lcs)"""
+    >>> table = search_tic(tic=394177355)
+    >>> SPLIT= lk.search_lightcurve("TIC 394177355", mission="TESS", author="SPOC", sector=14)
+    >>> SPLIT_lc = SPLIT[0].download()
+    >>> corrected_split_lc = TIC82Corrector(table, SPLIT_lc)"""
     
     def __init__(self, table, lc):
         self.table = table
