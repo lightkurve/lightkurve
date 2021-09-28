@@ -118,9 +118,11 @@ class TIC82Corrector(Corrector):
     which will identify the kind of issue you are working with.
 
     >>> import lightkurve as lk
-    >>> table = lk.SearchDuplicate(tic=1716106609)
+    >>> from lightkurve.correctors import TIC82Corrector
+    >>> from lightkurve.correctors import TIC82Corrector.search_tic as search_tic
+    >>> table = search_tic(tic=1716106609)
     >>> SPLIT_LK = lk.search_lightcurve("TIC 1716106609", mission="TESS")
-    >>> corrected_split_lc = lk.TIC82Corrector(table, SPLIT_LK)"""
+    >>> corrected_split_lc = TIC82Corrector(table, SPLIT_LK)"""
     
     def __init__(self, table, lc):
         self.table = table
