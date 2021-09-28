@@ -114,14 +114,15 @@ class TIC82Corrector(Corrector):
     In this notebook we will fix the flux for any object identified as a split or join.
     Exaples
     ------
-    You will first need to run your obect of interest through SearchDuplicate and from that you will get a table
+    You will first need to run your obect of interest through search_tic and from that you will get a table
     which will identify the kind of issue you are working with.
 
     >>> import lightkurve as lk
     >>> from lightkurve.correctors import TIC82Corrector, search_tic
     >>> table = search_tic(tic=1716106609)
     >>> SPLIT_LK = lk.search_lightcurve("TIC 1716106609", mission="TESS")
-    >>> corrected_split_lc = TIC82Corrector(table, SPLIT_LK)"""
+    >>> lcs = SPLIT_LK[0].download()
+    >>> corrected_split_lc = TIC82Corrector(table, lcs)"""
     
     def __init__(self, table, lc):
         self.table = table
