@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.corrector.Corrector.correct
+=================================================
+
+.. currentmodule:: lightkurve.correctors.corrector
+
+.. automethod:: Corrector.correct

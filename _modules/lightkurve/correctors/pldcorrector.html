@@ -1,0 +1,778 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.correctors.pldcorrector &#8212; Lightkurve </title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+      <div class="navbar-end-item">
+        <form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for lightkurve.correctors.pldcorrector</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines a `PLDCorrector` class which provides a simple way to correct a</span>
+<span class="sd">light curve by utilizing the pixel time series data contained within the</span>
+<span class="sd">target&#39;s own Target Pixel File.</span>
+
+<span class="sd">`PLDCorrector` builds upon `RegressionCorrector` by correlating the light curve</span>
+<span class="sd">against a design matrix composed of the following elements:</span>
+<span class="sd">* A background light curve to capture the dominant scattered light systematics.</span>
+<span class="sd">* Background-corrected pixel time series to capture any residual systematics.</span>
+<span class="sd">* Splines to capture the target&#39;s intrinsic variability.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations_with_replacement</span> <span class="k">as</span> <span class="n">multichoose</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">astropy.utils.decorators</span> <span class="kn">import</span> <span class="n">deprecated</span><span class="p">,</span> <span class="n">deprecated_renamed_argument</span>
+
+<span class="kn">from</span> <span class="nn">.designmatrix</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DesignMatrix</span><span class="p">,</span>
+    <span class="n">DesignMatrixCollection</span><span class="p">,</span>
+    <span class="n">SparseDesignMatrixCollection</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.regressioncorrector</span> <span class="kn">import</span> <span class="n">RegressionCorrector</span>
+<span class="kn">from</span> <span class="nn">.designmatrix</span> <span class="kn">import</span> <span class="n">create_spline_matrix</span><span class="p">,</span> <span class="n">create_sparse_spline_matrix</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">MPLSTYLE</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">LightkurveDeprecationWarning</span>
+
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PLDCorrector&quot;</span><span class="p">,</span> <span class="s2">&quot;TessPLDCorrector&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="PLDCorrector"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">[docs]</a><span class="k">class</span> <span class="nc">PLDCorrector</span><span class="p">(</span><span class="n">RegressionCorrector</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Implements the Pixel Level Decorrelation (PLD) systematics removal method.</span>
+
+<span class="sd">    Special case of `.RegressionCorrector` where the `.DesignMatrix` is</span>
+<span class="sd">    composed of background-corrected pixel time series.</span>
+
+<span class="sd">    The design matrix also contains columns representing a spline in time</span>
+<span class="sd">    design to capture the intrinsic, long-term variability of the target.</span>
+
+<span class="sd">    Pixel Level Decorrelation (PLD) was developed by [1]_ to remove</span>
+<span class="sd">    systematic noise caused by spacecraft jitter for the Spitzer</span>
+<span class="sd">    Space Telescope. It was adapted to K2 data by [2]_ and [3]_</span>
+<span class="sd">    for the EVEREST pipeline [4]_.</span>
+<span class="sd">    For a detailed description and implementation of PLD, please refer to</span>
+<span class="sd">    these references. Lightkurve provides a reference implementation</span>
+<span class="sd">    of PLD that is less sophisticated than EVEREST, but is suitable</span>
+<span class="sd">    for quick-look analyses and detrending experiments.</span>
+<span class="sd">    Our simple implementation of PLD is performed by first calculating the</span>
+<span class="sd">    noise model for each cadence in time. This function goes up to arbitrary</span>
+<span class="sd">    order, and is represented by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...</span>
+
+<span class="sd">    where</span>
+<span class="sd">      - :math:`m_i` is the noise model at time :math:`t_i`</span>
+<span class="sd">      - :math:`f_{il}` is the flux in the :math:`l^\text{th}` pixel at time :math:`t_i`</span>
+<span class="sd">      - :math:`a_l` is the first-order PLD coefficient on the linear term</span>
+<span class="sd">      - :math:`b_{lm}` is the second-order PLD coefficient on the :math:`l^\text{th}`,</span>
+<span class="sd">        :math:`m^\text{th}` pixel pair</span>
+
+<span class="sd">    We perform Principal Component Analysis (PCA) to reduce the number of</span>
+<span class="sd">    vectors in our final model to limit the set to best capture instrumental</span>
+<span class="sd">    noise. With a PCA-reduced set of vectors, we can construct a design matrix</span>
+<span class="sd">    containing fractional pixel fluxes.</span>
+<span class="sd">    To solve for the PLD model, we need to minimize the difference squared</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \chi^2 = \sum_i \frac{(y_i - m_i)^2}{\sigma_i^2},</span>
+
+<span class="sd">    where :math:`y_i` is the observed flux value at time :math:`t_i`, by solving</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial \chi^2}{\partial a_l} = 0.</span>
+
+<span class="sd">    The design matrix also contains columns representing a spline in time</span>
+<span class="sd">    design to capture the intrinsic, long-term variability of the target.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Download the pixel data for GJ 9827 and obtain a PLD-corrected light curve:</span>
+
+<span class="sd">    &gt;&gt;&gt; import lightkurve as lk</span>
+<span class="sd">    &gt;&gt;&gt; tpf = lk.search_targetpixelfile(&quot;GJ9827&quot;).download() # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; corrector = tpf.to_corrector(&#39;pld&#39;) # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; lc = corrector.correct() # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; lc.plot() # doctest: +SKIP</span>
+
+<span class="sd">    However, the above example will over-fit the small transits!</span>
+<span class="sd">    It is necessary to mask the transits using `corrector.correct(cadence_mask=...)`.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Deming et al. (2015), ads:2015ApJ...805..132D.</span>
+<span class="sd">        (arXiv:1411.7404)</span>
+<span class="sd">    .. [2] Luger et al. (2016), ads:2016AJ....152..100L</span>
+<span class="sd">        (arXiv:1607.00524)</span>
+<span class="sd">    .. [3] Luger et al. (2018), ads:2018AJ....156...99L</span>
+<span class="sd">        (arXiv:1702.05488)</span>
+<span class="sd">    .. [4] EVEREST pipeline webpage, https://rodluger.github.io/everest</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PLDCorrector.__init__"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tpf</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">aperture_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span>
+        <span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span>
+        <span class="c1"># Remove cadences that have NaN flux (cf. #874). We don&#39;t simply call</span>
+        <span class="c1"># `lc.remove_nans()` here because we need to mask both lc &amp; tpf.</span>
+        <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+        <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span> <span class="o">=</span> <span class="n">tpf</span><span class="p">[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">lc</span><span class="o">=</span><span class="n">lc</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;PLDCorrector (ID: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">create_design_matrix</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pld_order</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">pca_components</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">pld_aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">background_aperture_mask</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">,</span>
+        <span class="n">spline_n_knots</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">spline_degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">normalize_background_pixels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a `.DesignMatrixCollection` containing a `DesignMatrix` object</span>
+<span class="sd">        for the background regressors, the PLD pixel component regressors, and</span>
+<span class="sd">        the spline regressors.</span>
+
+<span class="sd">        If the parameters `pld_order` and `pca_components` are None, their</span>
+<span class="sd">        value will be assigned based on the mission. K2 and TESS experience</span>
+<span class="sd">        different dominant sources of noise, and require different defaults.</span>
+<span class="sd">        For information about how the defaults were chosen, see Pull Request #746.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pld_order : int</span>
+<span class="sd">            The order of Pixel Level De-correlation to be performed. First order</span>
+<span class="sd">            (`n=1`) uses only the pixel fluxes to construct the design matrix.</span>
+<span class="sd">            Higher order populates the design matrix with columns constructed</span>
+<span class="sd">            from the products of pixel fluxes.</span>
+<span class="sd">        pca_components : int or tuple of int</span>
+<span class="sd">            Number of terms added to the design matrix for each order of PLD</span>
+<span class="sd">            pixel fluxes. Increasing this value may provide higher precision</span>
+<span class="sd">            at the expense of slower speed and/or overfitting.</span>
+<span class="sd">            If performing PLD with `pld_order &gt; 1`, `pca_components` can be</span>
+<span class="sd">            a tuple containing the number of terms for each order of PLD.</span>
+<span class="sd">            If a single int is passed, the same number of terms will be used</span>
+<span class="sd">            for each order. If zero is passed, PCA will not be performed.</span>
+<span class="sd">            Defaults to 16 for K2 and 8 for TESS.</span>
+<span class="sd">        pld_aperture_mask : array-like, &#39;pipeline&#39;, &#39;all&#39;, &#39;threshold&#39;, or None</span>
+<span class="sd">            A boolean array describing the aperture such that `True` means</span>
+<span class="sd">            that the pixel will be used when selecting the PLD basis vectors.</span>
+<span class="sd">            If `None` or `all` are passed in, all pixels will be used.</span>
+<span class="sd">            If &#39;pipeline&#39; is passed, the mask suggested by the official pipeline</span>
+<span class="sd">            will be returned.</span>
+<span class="sd">            If &#39;threshold&#39; is passed, all pixels brighter than 3-sigma above</span>
+<span class="sd">            the median flux will be used.</span>
+<span class="sd">        spline_n_knots : int</span>
+<span class="sd">            Number of knots in spline.</span>
+<span class="sd">        spline_degree : int</span>
+<span class="sd">            Polynomial degree of spline.</span>
+<span class="sd">        sparse : bool</span>
+<span class="sd">            Whether to create `SparseDesignMatrix`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dm : `.DesignMatrixCollection`</span>
+<span class="sd">            `.DesignMatrixCollection` containing pixel, background, and spline</span>
+<span class="sd">            components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Validate the inputs</span>
+        <span class="n">pld_aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">_parse_aperture_mask</span><span class="p">(</span><span class="n">pld_aperture_mask</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pld_aperture_mask</span> <span class="o">=</span> <span class="n">pld_aperture_mask</span>
+        <span class="n">background_aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">_parse_aperture_mask</span><span class="p">(</span>
+            <span class="n">background_aperture_mask</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">background_aperture_mask</span> <span class="o">=</span> <span class="n">background_aperture_mask</span>
+
+        <span class="k">if</span> <span class="n">spline_n_knots</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Default to a spline per 50 data points</span>
+            <span class="n">spline_n_knots</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="p">)</span> <span class="o">/</span> <span class="mi">50</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+            <span class="n">DMC</span> <span class="o">=</span> <span class="n">SparseDesignMatrixCollection</span>
+            <span class="n">spline</span> <span class="o">=</span> <span class="n">create_sparse_spline_matrix</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">DMC</span> <span class="o">=</span> <span class="n">DesignMatrixCollection</span>
+            <span class="n">spline</span> <span class="o">=</span> <span class="n">create_spline_matrix</span>
+
+        <span class="c1"># We set the width of all coefficient priors to 10 times the standard</span>
+        <span class="c1"># deviation to prevent the fit from going crazy.</span>
+        <span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span>
+
+        <span class="c1"># Flux normalize background components for K2 and not for TESS by default</span>
+        <span class="n">bkg_pixels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[:,</span> <span class="n">background_aperture_mask</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">normalize_background_pixels</span><span class="p">:</span>
+            <span class="n">bkg_flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[:,</span> <span class="n">background_aperture_mask</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">bkg_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span> <span class="o">/</span> <span class="n">f</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bkg_pixels</span><span class="p">,</span> <span class="n">bkg_flux</span><span class="p">)])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bkg_pixels</span> <span class="o">=</span> <span class="n">bkg_pixels</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1"># Remove NaNs</span>
+        <span class="n">bkg_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">r</span><span class="p">)]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">bkg_pixels</span><span class="p">])</span>
+
+        <span class="c1"># Create background design matrix</span>
+        <span class="n">dm_bkg</span> <span class="o">=</span> <span class="n">DesignMatrix</span><span class="p">(</span><span class="n">bkg_pixels</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">)</span>
+        <span class="c1"># Apply PCA</span>
+        <span class="n">dm_bkg</span> <span class="o">=</span> <span class="n">dm_bkg</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">pca_components</span><span class="p">)</span>
+        <span class="c1"># Set prior sigma to 10 * standard deviation</span>
+        <span class="n">dm_bkg</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">dm_bkg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">prior_sigma</span>
+
+        <span class="c1"># Create a design matric containing splines plus a constant</span>
+        <span class="n">dm_spline</span> <span class="o">=</span> <span class="n">spline</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">n_knots</span><span class="o">=</span><span class="n">spline_n_knots</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="n">spline_degree</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">append_constant</span><span class="p">()</span>
+        <span class="c1"># Set prior sigma to 10 * standard deviation</span>
+        <span class="n">dm_spline</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">dm_spline</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">prior_sigma</span>
+
+        <span class="c1"># Create a PLD matrix if there are pixels in the pld_aperture_mask</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pld_aperture_mask</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Flux normalize the PLD components</span>
+            <span class="n">pld_pixels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[:,</span> <span class="n">pld_aperture_mask</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="n">pld_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">r</span> <span class="o">/</span> <span class="n">f</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pld_pixels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">value</span><span class="p">)]</span>
+            <span class="p">)</span>
+            <span class="c1"># Remove NaNs</span>
+            <span class="n">pld_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">r</span><span class="p">)]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">pld_pixels</span><span class="p">])</span>
+
+            <span class="c1"># Use the DesignMatrix infrastructure to apply PCA to the regressors.</span>
+            <span class="n">regressors_dm</span> <span class="o">=</span> <span class="n">DesignMatrix</span><span class="p">(</span><span class="n">pld_pixels</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pca_components</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">regressors_dm</span> <span class="o">=</span> <span class="n">regressors_dm</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">pca_components</span><span class="p">)</span>
+            <span class="n">regressors_pld</span> <span class="o">=</span> <span class="n">regressors_dm</span><span class="o">.</span><span class="n">values</span>
+
+            <span class="c1"># Create a DesignMatrix for each PLD order</span>
+            <span class="n">all_pld</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pld_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">reg_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">multichoose</span><span class="p">(</span><span class="n">regressors_pld</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">order</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+                <span class="n">pld_n</span> <span class="o">=</span> <span class="n">DesignMatrix</span><span class="p">(</span>
+                    <span class="n">reg_n</span><span class="p">,</span>
+                    <span class="n">prior_sigma</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">reg_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">prior_sigma</span> <span class="o">/</span> <span class="n">reg_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;pld_order_</span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="c1"># Apply PCA.</span>
+                <span class="k">if</span> <span class="n">pca_components</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">pld_n</span> <span class="o">=</span> <span class="n">pld_n</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">pca_components</span><span class="p">)</span>
+                    <span class="c1"># Calling pca() resets the priors, so we set them again.</span>
+                    <span class="n">pld_n</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">pld_n</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">prior_sigma</span> <span class="o">/</span> <span class="n">pca_components</span>
+                    <span class="p">)</span>
+                <span class="n">all_pld</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pld_n</span><span class="p">)</span>
+
+            <span class="c1"># Create the collection of DesignMatrix objects.</span>
+            <span class="c1"># DesignMatrix 1 contains the PLD pixel series</span>
+            <span class="n">dm_pixels</span> <span class="o">=</span> <span class="n">DesignMatrixCollection</span><span class="p">(</span><span class="n">all_pld</span><span class="p">)</span><span class="o">.</span><span class="n">to_designmatrix</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pixel_series&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+                    <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+                    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;.*Not all matrices are `SparseDesignMatrix` objects..*&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">dm_collection</span> <span class="o">=</span> <span class="n">DMC</span><span class="p">([</span><span class="n">dm_pixels</span><span class="p">,</span> <span class="n">dm_bkg</span><span class="p">,</span> <span class="n">dm_spline</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+                    <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+                    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;.*Not all matrices are `SparseDesignMatrix` objects..*&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">dm_collection</span> <span class="o">=</span> <span class="n">DMC</span><span class="p">([</span><span class="n">dm_bkg</span><span class="p">,</span> <span class="n">dm_spline</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">dm_collection</span>
+
+<div class="viewcode-block" id="PLDCorrector.correct"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.PLDCorrector.correct.html#lightkurve.correctors.PLDCorrector.correct">[docs]</a>    <span class="nd">@deprecated_renamed_argument</span><span class="p">(</span>
+        <span class="s2">&quot;n_pca_terms&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pca_components&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;2.0&quot;</span><span class="p">,</span>
+        <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nd">@deprecated_renamed_argument</span><span class="p">(</span>
+        <span class="s2">&quot;use_gp&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span>
+    <span class="p">)</span>
+    <span class="nd">@deprecated_renamed_argument</span><span class="p">(</span>
+        <span class="s2">&quot;gp_timescale&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span>
+    <span class="p">)</span>
+    <span class="nd">@deprecated_renamed_argument</span><span class="p">(</span>
+        <span class="s2">&quot;aperture_mask&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pld_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pca_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pld_aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">background_aperture_mask</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">,</span>
+        <span class="n">spline_n_knots</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">spline_degree</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">normalize_background_pixels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">restore_trend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">cadence_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">niters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">propagate_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">use_gp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">gp_timescale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a systematics-corrected light curve.</span>
+
+<span class="sd">        If the parameters `pld_order` and `pca_components` are None, their</span>
+<span class="sd">        value will be assigned based on the mission. K2 and TESS experience</span>
+<span class="sd">        different dominant sources of noise, and require different defaults.</span>
+<span class="sd">        For information about how the defaults were chosen, see PR #746 at</span>
+<span class="sd">        https://github.com/lightkurve/lightkurve/pull/746#issuecomment-658458270</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pld_order : int</span>
+<span class="sd">            The order of Pixel Level De-correlation to be performed. First order</span>
+<span class="sd">            (`n=1`) uses only the pixel fluxes to construct the design matrix.</span>
+<span class="sd">            Higher order populates the design matrix with columns constructed</span>
+<span class="sd">            from the products of pixel fluxes. Default 3 for K2 and 1 for TESS.</span>
+<span class="sd">        pca_components : int</span>
+<span class="sd">            Number of terms added to the design matrix for each order of PLD</span>
+<span class="sd">            pixel fluxes. Increasing this value may provide higher precision</span>
+<span class="sd">            at the expense of slower speed and/or overfitting.</span>
+<span class="sd">        pld_aperture_mask : array-like, &#39;pipeline&#39;, &#39;all&#39;, &#39;threshold&#39;, or None</span>
+<span class="sd">            A boolean array describing the aperture such that `True` means</span>
+<span class="sd">            that the pixel will be used when selecting the PLD basis vectors.</span>
+<span class="sd">            If `None` or `all` are passed in, all pixels will be used.</span>
+<span class="sd">            If &#39;pipeline&#39; is passed, the mask suggested by the official pipeline</span>
+<span class="sd">            will be returned.</span>
+<span class="sd">            If &#39;threshold&#39; is passed, all pixels brighter than 3-sigma above</span>
+<span class="sd">            the median flux will be used.</span>
+<span class="sd">        spline_n_knots : int</span>
+<span class="sd">            Number of knots in spline.</span>
+<span class="sd">        spline_degree : int</span>
+<span class="sd">            Polynomial degree of spline.</span>
+<span class="sd">        restore_trend : bool</span>
+<span class="sd">            Whether to restore the long term spline trend to the light curve.</span>
+<span class="sd">        sparse : bool</span>
+<span class="sd">            Whether to create `SparseDesignMatrix`.</span>
+<span class="sd">        cadence_mask : np.ndarray of bools (optional)</span>
+<span class="sd">            Mask, where True indicates a cadence that should be used.</span>
+<span class="sd">        sigma : int (default 5)</span>
+<span class="sd">            Standard deviation at which to remove outliers from fitting</span>
+<span class="sd">        niters : int (default 5)</span>
+<span class="sd">            Number of iterations to fit and remove outliers</span>
+<span class="sd">        propagate_errors : bool (default False)</span>
+<span class="sd">            Whether to propagate the uncertainties from the regression. Default is False.</span>
+<span class="sd">            Setting to True will increase run time, but will sample from multivariate normal</span>
+<span class="sd">            distribution of weights.</span>
+<span class="sd">        use_gp, gp_timescale : DEPRECATED</span>
+<span class="sd">            As of Lightkurve v2.0 PLDCorrector uses splines instead of Gaussian Processes.</span>
+<span class="sd">        aperture_mask : DEPRECATED</span>
+<span class="sd">            As of Lightkurve v2.0 the `aperture_mask` parameter needs to be</span>
+<span class="sd">            passed to the class constructor.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        clc : `.LightCurve`</span>
+<span class="sd">            Noise-corrected `.LightCurve`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore_trend</span> <span class="o">=</span> <span class="n">restore_trend</span>
+
+        <span class="c1"># Set mission-specific values for pld_order and pca_components</span>
+        <span class="k">if</span> <span class="n">pld_order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MISSION&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;K2&quot;</span><span class="p">:</span>
+                <span class="n">pld_order</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pld_order</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">pca_components</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MISSION&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;K2&quot;</span><span class="p">:</span>
+                <span class="n">pca_components</span> <span class="o">=</span> <span class="mi">16</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pca_components</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="k">if</span> <span class="n">pld_aperture_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MISSION&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;K2&quot;</span><span class="p">:</span>
+                <span class="c1"># K2 noise is dominated by motion</span>
+                <span class="n">pld_aperture_mask</span> <span class="o">=</span> <span class="s2">&quot;threshold&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># TESS noise is dominated by background</span>
+                <span class="n">pld_aperture_mask</span> <span class="o">=</span> <span class="s2">&quot;empty&quot;</span>
+        <span class="k">if</span> <span class="n">normalize_background_pixels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MISSION&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;K2&quot;</span><span class="p">:</span>
+                <span class="n">normalize_background_pixels</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">normalize_background_pixels</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_design_matrix</span><span class="p">(</span>
+            <span class="n">pld_aperture_mask</span><span class="o">=</span><span class="n">pld_aperture_mask</span><span class="p">,</span>
+            <span class="n">background_aperture_mask</span><span class="o">=</span><span class="n">background_aperture_mask</span><span class="p">,</span>
+            <span class="n">pld_order</span><span class="o">=</span><span class="n">pld_order</span><span class="p">,</span>
+            <span class="n">pca_components</span><span class="o">=</span><span class="n">pca_components</span><span class="p">,</span>
+            <span class="n">spline_n_knots</span><span class="o">=</span><span class="n">spline_n_knots</span><span class="p">,</span>
+            <span class="n">spline_degree</span><span class="o">=</span><span class="n">spline_degree</span><span class="p">,</span>
+            <span class="n">normalize_background_pixels</span><span class="o">=</span><span class="n">normalize_background_pixels</span><span class="p">,</span>
+            <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">clc</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span>
+            <span class="n">dm</span><span class="p">,</span>
+            <span class="n">cadence_mask</span><span class="o">=</span><span class="n">cadence_mask</span><span class="p">,</span>
+            <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
+            <span class="n">niters</span><span class="o">=</span><span class="n">niters</span><span class="p">,</span>
+            <span class="n">propagate_errors</span><span class="o">=</span><span class="n">propagate_errors</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">restore_trend</span><span class="p">:</span>
+            <span class="n">clc</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="p">[</span><span class="s2">&quot;spline&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="p">[</span><span class="s2">&quot;spline&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">flux</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">clc</span></div>
+
+<div class="viewcode-block" id="PLDCorrector.diagnose"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.PLDCorrector.diagnose.html#lightkurve.correctors.PLDCorrector.diagnose">[docs]</a>    <span class="k">def</span> <span class="nf">diagnose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns diagnostic plots to assess the most recent call to `correct()`.</span>
+<span class="sd">        If `correct()` has not yet been called, a ``ValueError`` will be raised.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `~matplotlib.axes.Axes`</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;corrected_lc&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;You need to call the `correct()` method &quot;</span>
+                <span class="s2">&quot;before you can call `diagnose()`.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+        <span class="c1"># Plot the right version of corrected light curve</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore_trend</span><span class="p">:</span>
+            <span class="n">clc</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">corrected_lc</span>
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="p">[</span><span class="s2">&quot;spline&quot;</span><span class="p">]</span>
+                <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="p">[</span><span class="s2">&quot;spline&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">corrected_lc</span>
+
+        <span class="n">uncorr_cdpp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span>
+        <span class="n">corr_cdpp</span> <span class="o">=</span> <span class="n">clc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span>
+
+        <span class="c1"># Get y-axis limits</span>
+        <span class="n">ylim</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">min</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">clc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">value</span><span class="p">)),</span>
+            <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">clc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">value</span><span class="p">)),</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Use lightkurve plotting style</span>
+        <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">MPLSTYLE</span><span class="p">):</span>
+            <span class="c1"># Plot background model</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">clip_outliers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;uncorrected (</span><span class="si">{</span><span class="n">uncorr_cdpp</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ylim</span><span class="p">)</span>  <span class="c1"># use same ylim for all plots</span>
+
+            <span class="c1"># Plot pixel and spline components</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">clc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;corrected (</span><span class="si">{</span><span class="n">corr_cdpp</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;dodgerblue&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;C1&quot;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">,</span> <span class="s2">&quot;spline&quot;</span><span class="p">,</span> <span class="s2">&quot;pixel_series&quot;</span><span class="p">]:</span>
+                    <span class="n">tmplc</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                        <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+                        <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">tmplc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ylim</span><span class="p">)</span>
+
+            <span class="c1"># Plot final corrected light curve with outliers marked</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;uncorrected (</span><span class="si">{</span><span class="n">uncorr_cdpp</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">clc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;outlier_mask&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+            <span class="p">)</span>
+            <span class="n">clc</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">cadence_mask</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">c</span><span class="o">=</span><span class="s2">&quot;dodgerblue&quot;</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+                <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;~cadence_mask&quot;</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">clc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;corrected (</span><span class="si">{</span><span class="n">corr_cdpp</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ylim</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">axs</span></div>
+
+<div class="viewcode-block" id="PLDCorrector.diagnose_masks"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.PLDCorrector.diagnose_masks.html#lightkurve.correctors.PLDCorrector.diagnose_masks">[docs]</a>    <span class="k">def</span> <span class="nf">diagnose_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Show different aperture masks used by PLD in the most recent call to</span>
+<span class="sd">        `correct()`. If `correct()` has not yet been called, a ``ValueError``</span>
+<span class="sd">        will be raised.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `~matplotlib.axes.Axes`</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;corrected_lc&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;You need to call the `correct()` method &quot;</span>
+                <span class="s2">&quot;before you can call `diagnose()`.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Use lightkurve plotting style</span>
+        <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">MPLSTYLE</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># Show light curve aperture mask</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">aperture_mask</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aperture_mask</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;aperture_mask&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># Show PLD pixel mask</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">aperture_mask</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pld_aperture_mask</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;pld_aperture_mask&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">aperture_mask</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">background_aperture_mask</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;background_aperture_mask&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">axs</span></div></div>
+
+
+<span class="c1"># `TessPLDCorrector` was briefly introduced in Lightkurve v1.9</span>
+<span class="c1"># but was removed in v2.0 in favor of a single generic `PLDCorrector`.</span>
+<span class="nd">@deprecated</span><span class="p">(</span>
+    <span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;PLDCorrector&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span>
+<span class="p">)</span>
+<span class="k">class</span> <span class="nc">TessPLDCorrector</span><span class="p">(</span><span class="n">PLDCorrector</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

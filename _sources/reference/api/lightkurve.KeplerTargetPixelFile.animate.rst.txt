@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.animate
+========================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.animate

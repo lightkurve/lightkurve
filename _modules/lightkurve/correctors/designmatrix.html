@@ -1,0 +1,1197 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.correctors.designmatrix &#8212; Lightkurve </title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+      <div class="navbar-end-item">
+        <form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for lightkurve.correctors.designmatrix</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines design matrix objects to aid linear regression problems.</span>
+
+<span class="sd">Specifically, this module adds the `DesignMatrix`, `DesignMatrixCollection`,</span>
+<span class="sd">`SparseDesignMatrix`, and `SparseDesignMatrixCollection` classes which</span>
+<span class="sd">are design to work with the `RegressionCorrector` class.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">lil_matrix</span><span class="p">,</span> <span class="n">csr_matrix</span><span class="p">,</span> <span class="n">hstack</span><span class="p">,</span> <span class="n">vstack</span><span class="p">,</span> <span class="n">issparse</span><span class="p">,</span> <span class="n">find</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">MPLSTYLE</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">LightkurveWarning</span><span class="p">,</span> <span class="n">plot_image</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;DesignMatrix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SparseDesignMatrix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DesignMatrixCollection&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SparseDesignMatrixCollection&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="DesignMatrix"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix">[docs]</a><span class="k">class</span> <span class="nc">DesignMatrix</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A matrix of column vectors for use in linear regression.</span>
+
+<span class="sd">    The purpose of this class is to provide a convenient method to interact</span>
+<span class="sd">    with a set of one or more regressors which are known to correlate with</span>
+<span class="sd">    trends or systematic noise signals which we want to remove from a light</span>
+<span class="sd">    curve. Specifically, this class is designed to provide the design matrix</span>
+<span class="sd">    for use by Lightkurve&#39;s `.RegressionCorrector` class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : dict, array, or `pandas.DataFrame` object</span>
+<span class="sd">        Columns to include in the design matrix.  If this object is not a</span>
+<span class="sd">        `~pandas.DataFrame` then it will be passed to the DataFrame constructor.</span>
+<span class="sd">    columns : iterable of str (optional)</span>
+<span class="sd">        Column names, if not already provided via ``df``.</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the matrix.</span>
+<span class="sd">    prior_mu : array</span>
+<span class="sd">        Prior means of the coefficients associated with each column in a linear</span>
+<span class="sd">        regression problem.</span>
+<span class="sd">    prior_sigma : array</span>
+<span class="sd">        Prior standard deviations of the coefficients associated with each</span>
+<span class="sd">        column in a linear regression problem.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from lightkurve.correctors.designmatrix import DesignMatrix, create_spline_matrix</span>
+<span class="sd">    &gt;&gt;&gt; DesignMatrix(np.arange(100), name=&#39;slope&#39;)</span>
+<span class="sd">    slope DesignMatrix (100, 1)</span>
+<span class="sd">    &gt;&gt;&gt; create_spline_matrix(np.arange(100), n_knots=5, name=&#39;spline&#39;)</span>
+<span class="sd">    spline DesignMatrix (100, 5)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DesignMatrix.__init__"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;unnamed_matrix&quot;</span><span class="p">,</span> <span class="n">prior_mu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prior_sigma</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span>
+        <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prior_mu</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="n">prior_mu</span> <span class="o">=</span> <span class="n">prior_mu</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="n">prior_mu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prior_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">prior_mu</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prior_sigma</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">prior_sigma</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="n">prior_sigma</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">prior_sigma</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">X</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Design matrix &quot;X&quot; to be used in RegressionCorrector objects&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">values</span>
+
+<div class="viewcode-block" id="DesignMatrix.copy"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.copy.html#lightkurve.correctors.DesignMatrix.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a deepcopy of DesignMatrix&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DesignMatrix.plot"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.plot.html#lightkurve.correctors.DesignMatrix.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Visualize the design matrix values as an image.</span>
+
+<span class="sd">        Uses Matplotlib&#39;s `~lightkurve.utils.plot_image` to visualize the</span>
+<span class="sd">        matrix values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
+<span class="sd">            a new one will be created.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Extra parameters to be passed to `.plot_image`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `~matplotlib.axes.Axes`</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">MPLSTYLE</span><span class="p">):</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_image</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Component&quot;</span><span class="p">,</span>
+                <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span>
+                <span class="n">clabel</span><span class="o">=</span><span class="s2">&quot;Component Value&quot;</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.6</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">40</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span>
+                    <span class="p">[</span><span class="sa">r</span><span class="s2">&quot;$</span><span class="si">{}</span><span class="s2">$&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">],</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="DesignMatrix.plot_priors"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.plot_priors.html#lightkurve.correctors.DesignMatrix.plot_priors">[docs]</a>    <span class="k">def</span> <span class="nf">plot_priors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Visualize the coefficient priors.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
+<span class="sd">            a new one will be created.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `~matplotlib.axes.Axes`</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">gauss</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">mu</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">MPLSTYLE</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">):</span>
+                <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">gauss</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">s</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Priors&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_prior_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a random sample from the prior distribution.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DesignMatrix.split"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.split.html#lightkurve.correctors.DesignMatrix.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` with regressors split into multiple</span>
+<span class="sd">        columns.</span>
+
+<span class="sd">        This method will return a new design matrix containing</span>
+<span class="sd">        n_columns * len(row_indices) regressors.  This is useful in situations</span>
+<span class="sd">        where the linear regression can be improved by fitting separate</span>
+<span class="sd">        coefficients for different contiguous parts of the regressors.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row_indices : iterable of integers</span>
+<span class="sd">            Every regressor (i.e. column) in the design matrix will be split</span>
+<span class="sd">            up over multiple columns separated at the indices provided.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `.DesignMatrix`</span>
+<span class="sd">            A new design matrix with shape (n_rows, len(row_indices)*n_columns).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_indices</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">row_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">row_indices</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">row_indices</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">or</span> <span class="p">(</span><span class="n">row_indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="c1"># Where do the submatrices begin and end?</span>
+        <span class="n">lower_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">)</span>
+        <span class="n">upper_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_indices</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">))</span>
+
+        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lower_idx</span><span class="p">)),</span> <span class="n">lower_idx</span><span class="p">,</span> <span class="n">upper_idx</span><span class="p">):</span>
+            <span class="n">new_columns</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">new_columns</span><span class="p">))</span>
+
+        <span class="n">prior_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dfs</span><span class="p">))])</span>
+        <span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dfs</span><span class="p">))])</span>
+
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">prior_mu</span> <span class="o">=</span> <span class="n">prior_mu</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">prior_sigma</span>
+        <span class="k">return</span> <span class="n">dm</span></div>
+
+<div class="viewcode-block" id="DesignMatrix.standardize"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.standardize.html#lightkurve.correctors.DesignMatrix.standardize">[docs]</a>    <span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` in which the columns have been</span>
+<span class="sd">        median-subtracted and sigma-divided.</span>
+
+<span class="sd">        For each column in the matrix, this method will subtract the median of</span>
+<span class="sd">        the column and divide by the column&#39;s standard deviation, i.e. it</span>
+<span class="sd">        will compute the column&#39;s so-called &quot;standard scores&quot; or &quot;z-values&quot;.</span>
+
+<span class="sd">        This operation is useful because it will make the matrix easier to</span>
+<span class="sd">        visualize and makes fitted coefficients easier to interpret.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">        * Standardizing a spline design matrix will break the splines.</span>
+<span class="sd">        * Columns with constant values (i.e. zero standard deviation) will be</span>
+<span class="sd">        left unchanged.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `.DesignMatrix`</span>
+<span class="sd">            A new design matrix with median-subtracted &amp; sigma-divided columns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">))</span>
+        <span class="n">ar</span><span class="p">[</span><span class="n">ar</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="c1"># If a column has zero standard deviation, it will not change!</span>
+        <span class="n">is_const</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="n">median</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">~</span><span class="n">is_const</span><span class="p">])</span>
+        <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">~</span><span class="n">is_const</span><span class="p">])</span>
+        <span class="n">ar</span><span class="p">[:,</span> <span class="o">~</span><span class="n">is_const</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ar</span><span class="p">[:,</span> <span class="o">~</span><span class="n">is_const</span><span class="p">]</span> <span class="o">-</span> <span class="n">median</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span>
+        <span class="n">new_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">new_df</span>
+        <span class="k">return</span> <span class="n">dm</span></div>
+
+<div class="viewcode-block" id="DesignMatrix.pca"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.pca.html#lightkurve.correctors.DesignMatrix.pca">[docs]</a>    <span class="k">def</span> <span class="nf">pca</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nterms</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` with a smaller number of regressors.</span>
+
+<span class="sd">        This method will use Principal Components Analysis (PCA) to reduce</span>
+<span class="sd">        the number of columns in the matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nterms : int</span>
+<span class="sd">            Number of columns in the new matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `.DesignMatrix`</span>
+<span class="sd">            A new design matrix with PCA applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># nterms cannot be langer than the number of columns in the matrix</span>
+        <span class="k">if</span> <span class="n">nterms</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">nterms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># We use `fbpca.pca` instead of `np.linalg.svd` because it is faster.</span>
+        <span class="c1"># Note that fbpca is randomized, and has n_iter=2 as default,</span>
+        <span class="c1"># we find this to be too few, and that n_iter=10 is still fast but</span>
+        <span class="c1"># produces more stable results.</span>
+        <span class="kn">from</span> <span class="nn">fbpca</span> <span class="kn">import</span> <span class="n">pca</span>  <span class="c1"># local import because not used elsewhere</span>
+
+        <span class="n">new_values</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pca</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">nterms</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DesignMatrix</span><span class="p">(</span><span class="n">new_values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DesignMatrix.append_constant"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.append_constant.html#lightkurve.correctors.DesignMatrix.append_constant">[docs]</a>    <span class="k">def</span> <span class="nf">append_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prior_mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">prior_sigma</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` with a column of ones appended.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `.DesignMatrix`</span>
+<span class="sd">            New design matrix with a column of ones appended. This column is</span>
+<span class="sd">            named &quot;offset&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">extra_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;offset&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">,</span> <span class="n">extra_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">prior_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">,</span> <span class="n">prior_mu</span><span class="p">)</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">,</span> <span class="n">prior_sigma</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dm</span></div>
+
+    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function for validating.&quot;&quot;&quot;</span>
+        <span class="c1"># Matrix rank shouldn&#39;t be significantly smaller than the # of columns</span>
+        <span class="k">if</span> <span class="n">rank</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;The design matrix has low rank (</span><span class="si">{}</span><span class="s2">) compared to the &quot;</span>
+                    <span class="s2">&quot;number of columns (</span><span class="si">{}</span><span class="s2">), which suggests that the &quot;</span>
+                    <span class="s2">&quot;matrix contains duplicate or correlated columns. &quot;</span>
+                    <span class="s2">&quot;This may prevent the regression from succeeding. &quot;</span>
+                    <span class="s2">&quot;Consider reducing the dimensionality by calling the &quot;</span>
+                    <span class="s2">&quot;`pca()` method.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                    <span class="n">LightkurveWarning</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;`prior_mu` must have shape </span><span class="si">{}</span><span class="s2">&quot;</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;`prior_sigma` must have shape </span><span class="si">{}</span><span class="s2">&quot;</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;`prior_sigma` values cannot be smaller than &quot;</span> <span class="s2">&quot;or equal to zero&quot;</span>
+                <span class="p">)</span>
+
+<div class="viewcode-block" id="DesignMatrix.validate"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.validate.html#lightkurve.correctors.DesignMatrix.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Emits `LightkurveWarning` if matrix has low rank or priors have incorrect shape.</span>
+
+<span class="sd">        Note that for `SparseDesignMatrix` objects, calculating the rank will</span>
+<span class="sd">        force the design matrix to be evaluated and stored in memory, reducing</span>
+<span class="sd">        the speed and memory savings of SparseDesignMatrix.</span>
+
+<span class="sd">        For `SparseDesignMatrix`, rank checks will be turned off by default.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rank</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Matrix rank computed using `numpy.linalg.matrix_rank`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tuple specifying the shape of the matrix as (n_rows, n_columns).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;2D numpy array containing the matrix values.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> DesignMatrix </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DesignMatrix.to_sparse"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.to_sparse.html#lightkurve.correctors.DesignMatrix.to_sparse">[docs]</a>    <span class="k">def</span> <span class="nf">to_sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert this dense matrix object to a `SparseDesignMatrix`.</span>
+
+<span class="sd">        The values of this design matrix will be converted to a</span>
+<span class="sd">        `scipy.sparse.csr_matrix`, which stores the values in a</span>
+<span class="sd">        lower memory matrix. This is not recommended for dense matrices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">SparseDesignMatrix</span><span class="p">(</span>
+            <span class="n">csr_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">),</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+            <span class="n">prior_mu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">,</span>
+            <span class="n">prior_sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="DesignMatrix.collect"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.collect.html#lightkurve.correctors.DesignMatrix.collect">[docs]</a>    <span class="k">def</span> <span class="nf">collect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Join two designmatrices, return a design matrix collection &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DesignMatrixCollection</span><span class="p">([</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">])</span></div></div>
+
+
+<div class="viewcode-block" id="DesignMatrixCollection"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrixCollection.html#lightkurve.correctors.DesignMatrixCollection">[docs]</a><span class="k">class</span> <span class="nc">DesignMatrixCollection</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Object which stores multiple design matrices.</span>
+
+<span class="sd">    DesignMatrixCollection objects are useful when users want to regress against</span>
+<span class="sd">    multiple different systematics, but still keep the different systematics distinct.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from lightkurve.correctors.designmatrix import create_spline_matrix, DesignMatrix, DesignMatrixCollection</span>
+<span class="sd">    &gt;&gt;&gt; dm1 = create_spline_matrix(np.arange(100), n_knots=5, name=&#39;spline&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; dm2 = DesignMatrix(np.arange(100), name=&#39;slope&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; dmc = DesignMatrixCollection([dm1, dm2])</span>
+<span class="sd">    &gt;&gt;&gt; dmc</span>
+<span class="sd">    DesignMatrixCollection:</span>
+<span class="sd">        spline DesignMatrix (100, 5)</span>
+<span class="sd">        slope DesignMatrix (100, 1)</span>
+<span class="sd">    &gt;&gt;&gt; dmc.matrices</span>
+<span class="sd">    [spline DesignMatrix (100, 5), slope DesignMatrix (100, 1)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DesignMatrixCollection.__init__"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrixCollection.html#lightkurve.correctors.DesignMatrixCollection.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrices</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">issparse</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">X</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matrices</span><span class="p">]):</span>
+            <span class="c1"># This collection is designed for dense matrices, so we warn if a</span>
+            <span class="c1"># SparseDesignMatrix is passed</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;Some matrices are `SparseDesignMatrix` objects. &quot;</span>
+                    <span class="s2">&quot;Sparse matrices will be converted to dense matrices.&quot;</span>
+                <span class="p">),</span>
+                <span class="n">LightkurveWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">dense_matrices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matrices</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">SparseDesignMatrix</span><span class="p">):</span>
+                    <span class="n">dense_matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">to_dense</span><span class="p">())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dense_matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span> <span class="o">=</span> <span class="n">dense_matrices</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span> <span class="o">=</span> <span class="n">matrices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">X</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_child_class</span> <span class="o">=</span> <span class="n">DesignMatrix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;2D numpy array containing the matrix values.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">values</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prior_mu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Coefficient prior means.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">prior_mu</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prior_sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Coefficient prior standard deviations.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Visualize the design matrix values as an image.</span>
+
+<span class="sd">        Uses Matplotlib&#39;s `~lightkurve.utils.plot_image` to visualize the</span>
+<span class="sd">        matrix values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
+<span class="sd">            a new one will be created.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Extra parameters to be passed to `.plot_image`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `~matplotlib.axes.Axes`</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">temp_dm</span> <span class="o">=</span> <span class="n">DesignMatrix</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">df</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">temp_dm</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Design Matrix Collection&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span>
+
+    <span class="k">def</span> <span class="nf">plot_priors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Visualize the `prior_mu` and `prior_sigma` attributes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
+<span class="sd">            a new one will be created.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `~matplotlib.axes.Axes`</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">[</span><span class="n">dm</span><span class="o">.</span><span class="n">plot_priors</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span> <span class="k">for</span> <span class="n">dm</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ax</span>
+
+    <span class="k">def</span> <span class="nf">_get_prior_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a random sample from the prior distribution.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">dm</span><span class="o">.</span><span class="n">sample_priors</span><span class="p">()</span> <span class="k">for</span> <span class="n">dm</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrixCollection` with regressors split into</span>
+<span class="sd">        multiple columns.</span>
+
+<span class="sd">        This method will return a new design matrix collection by calling</span>
+<span class="sd">        `DesignMatrix.split` on each matrix in the collection.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row_indices : iterable of integers</span>
+<span class="sd">            Every regressor (i.e. column) in the design matrix will be split</span>
+<span class="sd">            up over multiple columns separated at the indices provided.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `.DesignMatrixCollection`</span>
+<span class="sd">            A new design matrix collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">row_indices</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrixCollection` in which all the</span>
+<span class="sd">        matrices have been standardized using the `DesignMatrix.standardize`</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `.DesignMatrixCollection`</span>
+<span class="sd">            The new design matrix collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">standardize</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List of column names.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">key</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="p">])</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="p">[</span><span class="n">arg</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;DesignMatrixCollection:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">())</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_designmatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Flatten a `DesignMatrixCollection` into a `DesignMatrix`.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_child_class</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+            <span class="n">prior_mu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">,</span>
+            <span class="n">prior_sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SparseDesignMatrix"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SparseDesignMatrix.html#lightkurve.correctors.SparseDesignMatrix">[docs]</a><span class="k">class</span> <span class="nc">SparseDesignMatrix</span><span class="p">(</span><span class="n">DesignMatrix</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A matrix of column vectors for use in linear regression.</span>
+
+<span class="sd">    This class is similar to the `DesignMatrix` class, but uses the</span>
+<span class="sd">    `scipy.sparse` library to improve speed in the case of sparse matrices.</span>
+
+<span class="sd">    The purpose of this class is to provide a convenient method to interact</span>
+<span class="sd">    with a set of one or more regressors which are known to correlate with</span>
+<span class="sd">    trends or systematic noise signals which we want to remove from a light</span>
+<span class="sd">    curve. Specifically, this class is designed to provide the design matrix</span>
+<span class="sd">    for use by Lightkurve&#39;s `.RegressionCorrector` class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : `scipy.sparse` matrix</span>
+<span class="sd">        The values to build the design matrix with</span>
+<span class="sd">    columns : iterable of str (optional)</span>
+<span class="sd">        Column names</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the matrix.</span>
+<span class="sd">    prior_mu : array</span>
+<span class="sd">        Prior means of the coefficients associated with each column in a linear</span>
+<span class="sd">        regression problem.</span>
+<span class="sd">    prior_sigma : array</span>
+<span class="sd">        Prior standard deviations of the coefficients associated with each</span>
+<span class="sd">        column in a linear regression problem.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SparseDesignMatrix.__init__"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SparseDesignMatrix.html#lightkurve.correctors.SparseDesignMatrix.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;unnamed_matrix&quot;</span><span class="p">,</span> <span class="n">prior_mu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prior_sigma</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Must pass a `scipy.sparse` matrix (e.g. `scipy.sparse.csr_matrix`)&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">prior_mu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prior_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">prior_sigma</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_X</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span> <span class="o">=</span> <span class="n">prior_mu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">prior_sigma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_child_class</span> <span class="o">=</span> <span class="n">SparseDesignMatrix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">X</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Design matrix &quot;X&quot; to be used in RegressionCorrector objects&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_X</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;2D numpy array containing the matrix values.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if the matrix has the right shapes. Set rank to True to test matrix rank.&quot;&quot;&quot;</span>
+        <span class="c1"># For sparse matrices, calculating the rank is expensive, and negates</span>
+        <span class="c1"># the benefits of using sparse. Validate will ignore rank by default.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` with regressors split into multiple</span>
+<span class="sd">        columns.</span>
+
+<span class="sd">        This method will return a new design matrix containing</span>
+<span class="sd">        n_columns * len(row_indices) regressors.  This is useful in situations</span>
+<span class="sd">        where the linear regression can be improved by fitting separate</span>
+<span class="sd">        coefficients for different contiguous parts of the regressors.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row_indices : iterable of integers</span>
+<span class="sd">            Every regressor (i.e. column) in the design matrix will be split</span>
+<span class="sd">            up over multiple columns separated at the indices provided.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `.SparseDesignMatrix`</span>
+<span class="sd">            A new design matrix with shape (n_rows, len(row_indices)*n_columns).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">row_indices</span><span class="p">,</span> <span class="s2">&quot;__iter__&quot;</span><span class="p">):</span>
+            <span class="n">row_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">row_indices</span><span class="p">]</span>
+
+        <span class="c1"># You can&#39;t split on the first or last index</span>
+        <span class="n">row_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">row_indices</span><span class="p">)[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">row_indices</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]])]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">row_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">prior_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row_indices</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row_indices</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">_X</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">dm</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">lil_matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">)</span>
+            <span class="p">],</span>
+            <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lil&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">non_zero</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="n">non_zero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">non_zero</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">_X</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span> <span class="n">non_zero</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">dm</span><span class="o">.</span><span class="n">columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dm</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dm</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row_indices</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">prior_mu</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">[</span><span class="n">non_zero</span><span class="p">]</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">[</span><span class="n">non_zero</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">dm</span>
+
+    <span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` in which the columns have been</span>
+<span class="sd">        mean-subtracted and sigma-divided.</span>
+
+<span class="sd">        For each column in the matrix, this method will subtract the mean of</span>
+<span class="sd">        the column and divide by the column&#39;s standard deviation, i.e. it</span>
+<span class="sd">        will compute the column&#39;s so-called &quot;standard scores&quot; or &quot;z-values&quot;.</span>
+
+<span class="sd">        This operation is useful because it will make the matrix easier to</span>
+<span class="sd">        visualize and makes fitted coefficients easier to interpret.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">        * Standardizing a spline design matrix will break the splines.</span>
+<span class="sd">        * Columns with constant values (i.e. zero standard deviation) will be</span>
+<span class="sd">        left unchanged.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `.SparseDesignMatrix`</span>
+<span class="sd">            A new design matrix with mean-subtracted &amp; sigma-divided columns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">idx</span><span class="p">,</span> <span class="n">jdx</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">weights</span><span class="p">[</span><span class="n">dm</span><span class="o">.</span><span class="n">X</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">jdx</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">v</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">jdx</span><span class="p">)</span>
+        <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">v</span><span class="p">[</span><span class="n">jdx</span> <span class="o">==</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">mean</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="n">jdx</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))))</span>
+                <span class="o">**</span> <span class="mf">0.5</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">jdx</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">mean</span><span class="p">[</span><span class="n">std</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">std</span><span class="p">[</span><span class="n">std</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">white</span> <span class="o">=</span> <span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">X</span> <span class="o">-</span> <span class="n">vstack</span><span class="p">([</span><span class="n">lil_matrix</span><span class="p">(</span><span class="n">mean</span><span class="p">)]</span> <span class="o">*</span> <span class="n">dm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span>
+            <span class="n">vstack</span><span class="p">([</span><span class="n">lil_matrix</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">std</span><span class="p">)]</span> <span class="o">*</span> <span class="n">dm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">_X</span> <span class="o">=</span> <span class="n">white</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dm</span>
+
+    <span class="k">def</span> <span class="nf">pca</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nterms</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` with a smaller number of regressors.</span>
+
+<span class="sd">        This method will use Principal Components Analysis (PCA) to reduce</span>
+<span class="sd">        the number of columns in the matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nterms : int</span>
+<span class="sd">            Number of columns in the new matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `.SparseDesignMatrix`</span>
+<span class="sd">            A new design matrix with PCA applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">nterms</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">to_sparse</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">append_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prior_mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">prior_sigma</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` with a column of ones appended.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `.SparseDesignMatrix`</span>
+<span class="sd">            New design matrix with a column of ones appended. This column is</span>
+<span class="sd">            named &quot;offset&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">_X</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">([</span><span class="n">dm</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">lil_matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lil&quot;</span><span class="p">)</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">prior_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">,</span> <span class="n">prior_mu</span><span class="p">)</span>
+        <span class="n">dm</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">,</span> <span class="n">prior_sigma</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dm</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="n">key</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No such column as `</span><span class="si">{}</span><span class="s2">`.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span> <span class="n">loc</span><span class="p">]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> SparseDesignMatrix </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">collect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Join two designmatrices, return a design matrix collection &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">SparseDesignMatrixCollection</span><span class="p">([</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">to_dense</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert a SparseDesignMatrix object to a dense DesignMatrix</span>
+
+<span class="sd">        The values of this design matrix will be converted to a</span>
+<span class="sd">        `numpy.ndarray`. This is not recommended for sparse matrices containing</span>
+<span class="sd">        mostly zeros.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DesignMatrix</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+            <span class="n">prior_mu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">,</span>
+            <span class="n">prior_sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SparseDesignMatrixCollection"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SparseDesignMatrixCollection.html#lightkurve.correctors.SparseDesignMatrixCollection">[docs]</a><span class="k">class</span> <span class="nc">SparseDesignMatrixCollection</span><span class="p">(</span><span class="n">DesignMatrixCollection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A set of design matrices.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SparseDesignMatrixCollection.__init__"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SparseDesignMatrixCollection.html#lightkurve.correctors.SparseDesignMatrixCollection.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrices</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">issparse</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">X</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matrices</span><span class="p">]):</span>
+            <span class="c1"># This collection is designed for sparse matrices, so we raise a warning if a dense DesignMatrix is passed</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;Not all matrices are `SparseDesignMatrix` objects. &quot;</span>
+                    <span class="s2">&quot;Dense matrices will be converted to sparse matrices.&quot;</span>
+                <span class="p">),</span>
+                <span class="n">LightkurveWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">sparse_matrices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matrices</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">DesignMatrix</span><span class="p">):</span>
+                    <span class="n">sparse_matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">to_sparse</span><span class="p">())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sparse_matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span> <span class="o">=</span> <span class="n">sparse_matrices</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span> <span class="o">=</span> <span class="n">matrices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">X</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_child_class</span> <span class="o">=</span> <span class="n">SparseDesignMatrix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Visualize the design matrix values as an image.</span>
+
+<span class="sd">        Uses Matplotlib&#39;s `~lightkurve.utils.plot_image` to visualize the</span>
+<span class="sd">        matrix values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
+<span class="sd">            a new one will be created.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Extra parameters to be passed to `.plot_image`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `~matplotlib.axes.Axes`</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">temp_dm</span> <span class="o">=</span> <span class="n">SparseDesignMatrix</span><span class="p">(</span><span class="n">hstack</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">X</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]))</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">temp_dm</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Design Matrix Collection&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;SparseDesignMatrixCollection:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">())</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+<span class="c1">####################################################</span>
+<span class="c1"># Functions to create commonly-used design matrices.</span>
+<span class="c1">####################################################</span>
+
+<span class="k">def</span> <span class="nf">_spline_basis_vector</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">knots</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Recursive function to create a single spline basis vector for an input x,</span>
+<span class="sd">    for the ith knot.</span>
+
+<span class="sd">    See https://en.wikipedia.org/wiki/B-spline for a definition of B-spline</span>
+<span class="sd">    basis vectors</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : np.ndarray</span>
+<span class="sd">        Input x</span>
+<span class="sd">    degree : int</span>
+<span class="sd">        Degree of spline to calculate basis for</span>
+<span class="sd">    i : int</span>
+<span class="sd">        The index of the knot to calculate the basis for</span>
+<span class="sd">    knots : np.ndarray</span>
+<span class="sd">        Array of all knots</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    B : np.ndarray</span>
+<span class="sd">        A vector of same length as x containing the spline basis for the ith knot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">B</span><span class="p">[(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">knots</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">knots</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">knots</span><span class="p">[</span><span class="n">degree</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">knots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">knots</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">knots</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">knots</span><span class="p">[</span><span class="n">degree</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">knots</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">alpha1</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">knots</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">da</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">alpha1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">knots</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">knots</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">alpha2</span> <span class="o">=</span> <span class="p">(</span><span class="n">knots</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">db</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">alpha2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="p">(</span><span class="n">_spline_basis_vector</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">degree</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">i</span><span class="p">,</span> <span class="n">knots</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha1</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="n">_spline_basis_vector</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">degree</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">knots</span><span class="p">)</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">B</span>
+
+
+<span class="k">def</span> <span class="nf">create_sparse_spline_matrix</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n_knots</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;spline&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a piecewise polynomial function, creating a continuous, smooth function in x</span>
+
+<span class="sd">    See https://en.wikipedia.org/wiki/B-spline for the definitions of Basis Splines</span>
+
+<span class="sd">    B-spline vectors of degree higher than 0 are created using recursion, using the</span>
+<span class="sd">    `_spline_basis_vector` function to evaluate the basis vectors for x, for each knot.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : np.ndarray</span>
+<span class="sd">        vector to spline</span>
+<span class="sd">    n_knots: int</span>
+<span class="sd">        Number of knots (default: 20).</span>
+<span class="sd">    knots : np.ndarray [optional]</span>
+<span class="sd">        Optional array containing knots</span>
+<span class="sd">    degree: int</span>
+<span class="sd">        Polynomial degree.</span>
+<span class="sd">    name: string</span>
+<span class="sd">        Name to pass to `.SparseDesignMatrix` (default: &#39;spline&#39;).</span>
+<span class="sd">    include_intercept: bool</span>
+<span class="sd">        Whether to include row of ones to find intercept. Default False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dm: `.SparseDesignMatrix`</span>
+<span class="sd">        Design matrix object with shape (len(x), n_knots*degree).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># To use jit we have to use float64</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_knots</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`n_knots` must be an integer.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_knots</span> <span class="o">-</span> <span class="n">degree</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n_knots must be greater than degree.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">knots</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">n_knots</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">knots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">n_knots</span> <span class="o">-</span> <span class="n">degree</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="p">)</span>
+        <span class="n">knots</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">knots</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">knots</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">n_knots</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pass either `n_knots` or `knots`.&quot;</span><span class="p">)</span>
+    <span class="n">knots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">knots</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">knots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">knots</span><span class="p">)</span>
+    <span class="n">knots_wbounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">()]</span> <span class="o">*</span> <span class="p">(</span><span class="n">degree</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">knots</span><span class="p">),</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span> <span class="o">*</span> <span class="p">(</span><span class="n">degree</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">matrices</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">csr_matrix</span><span class="p">(</span><span class="n">_spline_basis_vector</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">knots_wbounds</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">knots_wbounds</span><span class="p">)</span> <span class="o">-</span> <span class="n">degree</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">spline_dm</span> <span class="o">=</span> <span class="n">vstack</span><span class="p">([</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matrices</span> <span class="k">if</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">SparseDesignMatrix</span><span class="p">(</span><span class="n">spline_dm</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">create_spline_matrix</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">n_knots</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;spline&quot;</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : np.ndarray</span>
+<span class="sd">        vector to spline</span>
+<span class="sd">    n_knots: int</span>
+<span class="sd">        Number of knots (default: 20).</span>
+<span class="sd">    degree: int</span>
+<span class="sd">        Polynomial degree.</span>
+<span class="sd">    name: string</span>
+<span class="sd">        Name to pass to `.DesignMatrix` (default: &#39;spline&#39;).</span>
+<span class="sd">    include_intercept: bool</span>
+<span class="sd">        Whether to include row of ones to find intercept. Default False.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dm: `.DesignMatrix`</span>
+<span class="sd">        Design matrix object with shape (len(x), n_knots*degree).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">patsy</span> <span class="kn">import</span> <span class="n">dmatrix</span>  <span class="c1"># local import because it&#39;s rarely-used</span>
+
+    <span class="k">if</span> <span class="n">knots</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dm_formula</span> <span class="o">=</span> <span class="s2">&quot;bs(x, knots=</span><span class="si">{}</span><span class="s2">, degree=</span><span class="si">{}</span><span class="s2">, include_intercept=</span><span class="si">{}</span><span class="s2">) - 1&quot;</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">knots</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">include_intercept</span>
+        <span class="p">)</span>
+        <span class="n">spline_dm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dmatrix</span><span class="p">(</span><span class="n">dm_formula</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">}))</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">spline_dm</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;knot</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spline_dm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])],</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dm_formula</span> <span class="o">=</span> <span class="s2">&quot;bs(x, df=</span><span class="si">{}</span><span class="s2">, degree=</span><span class="si">{}</span><span class="s2">, include_intercept=</span><span class="si">{}</span><span class="s2">) - 1&quot;</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">n_knots</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">include_intercept</span>
+        <span class="p">)</span>
+        <span class="n">spline_dm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dmatrix</span><span class="p">(</span><span class="n">dm_formula</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">}))</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">spline_dm</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;knot</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_knots</span><span class="p">)]</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">DesignMatrix</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

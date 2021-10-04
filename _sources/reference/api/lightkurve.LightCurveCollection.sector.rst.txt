@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurveCollection.sector
+======================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: LightCurveCollection.sector

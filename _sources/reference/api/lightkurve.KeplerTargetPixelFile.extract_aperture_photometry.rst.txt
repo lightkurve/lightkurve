@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.extract\_aperture\_photometry
+==============================================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.extract_aperture_photometry

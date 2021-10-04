@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.to\_excel
+===============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.to_excel

@@ -1,0 +1,711 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.correctors.sffcorrector &#8212; Lightkurve </title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+      <div class="navbar-end-item">
+        <form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for lightkurve.correctors.sffcorrector</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines the `SFFCorrector` class.</span>
+
+<span class="sd">`SFFCorrector` enables systematics to be removed from light curves using the</span>
+<span class="sd">Self Flat-Fielding (SFF) method described in Vanderburg and Johnson (2014).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">astropy.modeling</span> <span class="kn">import</span> <span class="n">models</span><span class="p">,</span> <span class="n">fitting</span>
+<span class="kn">from</span> <span class="nn">astropy.units</span> <span class="kn">import</span> <span class="n">Quantity</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">DesignMatrix</span><span class="p">,</span> <span class="n">DesignMatrixCollection</span><span class="p">,</span> <span class="n">SparseDesignMatrixCollection</span>
+<span class="kn">from</span> <span class="nn">.regressioncorrector</span> <span class="kn">import</span> <span class="n">RegressionCorrector</span>
+<span class="kn">from</span> <span class="nn">.designmatrix</span> <span class="kn">import</span> <span class="n">create_spline_matrix</span><span class="p">,</span> <span class="n">create_sparse_spline_matrix</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">MPLSTYLE</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">LightkurveWarning</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SFFCorrector&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="SFFCorrector"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector">[docs]</a><span class="k">class</span> <span class="nc">SFFCorrector</span><span class="p">(</span><span class="n">RegressionCorrector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Special case of `.RegressionCorrector` where the `.DesignMatrix` includes</span>
+<span class="sd">    the target&#39;s centroid positions.</span>
+
+<span class="sd">    The design matrix also contains columns representing a spline in time</span>
+<span class="sd">    design to capture the intrinsic, long-term variability of the target.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lc : `.LightCurve`</span>
+<span class="sd">        The light curve that needs to be corrected.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SFFCorrector.__init__"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lc</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="s2">&quot;mission&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;TESS&quot;</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The SFF correction method is not suitable for use &quot;</span>
+                <span class="s2">&quot;with TESS data, because the spacecraft motion does &quot;</span>
+                <span class="s2">&quot;not proceed along a consistent arc.&quot;</span><span class="p">,</span>
+                <span class="n">LightkurveWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_lc</span> <span class="o">=</span> <span class="n">lc</span>
+        <span class="k">if</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+
+        <span class="c1"># Setting these values as None so we don&#39;t get a value error if the</span>
+        <span class="c1"># user tries to access them before &quot;correct()&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_points</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">windows</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bins</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timescale</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breakindex</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centroid_col</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centroid_row</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SFFCorrector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">lc</span><span class="o">=</span><span class="n">lc</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;SFFCorrector (LC: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TARGETID&quot;</span><span class="p">))</span>
+
+<div class="viewcode-block" id="SFFCorrector.correct"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SFFCorrector.correct.html#lightkurve.correctors.SFFCorrector.correct">[docs]</a>    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">centroid_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">centroid_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">windows</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">timescale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">breakindex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">restore_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">additional_design_matrix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">polyorder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find the best fit correction for the light curve.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        centroid_col : np.ndarray of floats (optional)</span>
+<span class="sd">            Array of centroid column positions. If ``None``, will use the</span>
+<span class="sd">            `centroid_col` attribute of the input light curve by default.</span>
+<span class="sd">        centroid_row : np.ndarray of floats (optional)</span>
+<span class="sd">            Array of centroid row positions. If ``None``, will use the</span>
+<span class="sd">            `centroid_row` attribute of the input light curve by default.</span>
+<span class="sd">        windows : int</span>
+<span class="sd">            Number of windows to split the data into to perform the correction.</span>
+<span class="sd">            Default 20.</span>
+<span class="sd">        bins : int</span>
+<span class="sd">            Number of &quot;knots&quot; to place on the arclength spline. More bins will</span>
+<span class="sd">            increase the number of knots, making the spline smoother in arclength.</span>
+<span class="sd">            Default 10.</span>
+<span class="sd">        timescale: float</span>
+<span class="sd">            Time scale of the b-spline fit to the light curve in time, in units</span>
+<span class="sd">            of input light curve time.</span>
+<span class="sd">        breakindex : None, int or list of ints (optional)</span>
+<span class="sd">            Optionally the user can break the light curve into sections. Set</span>
+<span class="sd">            break index to either an index at which to break, or list of indicies.</span>
+<span class="sd">        degree : int</span>
+<span class="sd">            The degree of polynomials in the splines in time and arclength. Higher</span>
+<span class="sd">            values will create smoother splines. Default 3.</span>
+<span class="sd">        cadence_mask : np.ndarray of bools (optional)</span>
+<span class="sd">            Mask, where True indicates a cadence that should be used.</span>
+<span class="sd">        sigma : int (default 5)</span>
+<span class="sd">            Standard deviation at which to remove outliers from fitting</span>
+<span class="sd">        niters : int (default 5)</span>
+<span class="sd">            Number of iterations to fit and remove outliers</span>
+<span class="sd">        restore_trend : bool (default False)</span>
+<span class="sd">            Whether to restore the long term spline trend to the light curve</span>
+<span class="sd">        propagate_errors : bool (default False)</span>
+<span class="sd">            Whether to propagate the uncertainties from the regression. Default is False.</span>
+<span class="sd">            Setting to True will increase run time, but will sample from multivariate normal</span>
+<span class="sd">            distribution of weights.</span>
+<span class="sd">        additional_design_matrix : `~lightkurve.lightcurve.Correctors.DesignMatrix` (optional)</span>
+<span class="sd">            Additional design matrix to remove, e.g. containing background vectors.</span>
+<span class="sd">        polyorder : int</span>
+<span class="sd">            Deprecated as of Lightkurve v1.4.  Use ``degree`` instead.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        corrected_lc : `~lightkurve.lightcurve.LightCurve`</span>
+<span class="sd">            Corrected light curve, with noise removed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">DMC</span><span class="p">,</span> <span class="n">spline</span> <span class="o">=</span> <span class="n">DesignMatrixCollection</span><span class="p">,</span> <span class="n">create_spline_matrix</span>
+        <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+            <span class="n">DMC</span><span class="p">,</span> <span class="n">spline</span> <span class="o">=</span> <span class="n">SparseDesignMatrixCollection</span><span class="p">,</span> <span class="n">create_sparse_spline_matrix</span>
+
+        <span class="k">if</span> <span class="n">polyorder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;`polyorder` is deprecated and no longer used, &quot;</span>
+                <span class="s2">&quot;please use the `degree` keyword instead.&quot;</span><span class="p">,</span>
+                <span class="n">LightkurveWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">centroid_col</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;centroid_col&quot;</span><span class="p">)</span>
+            <span class="n">centroid_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">centroid_col</span>
+        <span class="k">if</span> <span class="n">centroid_row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;centroid_row&quot;</span><span class="p">)</span>
+            <span class="n">centroid_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">centroid_row</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">centroid_row</span><span class="p">),</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">)]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Centroids contain NaN values.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_points</span> <span class="o">=</span> <span class="n">_get_window_points</span><span class="p">(</span>
+            <span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">,</span> <span class="n">windows</span><span class="p">,</span> <span class="n">breakindex</span><span class="o">=</span><span class="n">breakindex</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">windows</span> <span class="o">=</span> <span class="n">windows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bins</span> <span class="o">=</span> <span class="n">bins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timescale</span> <span class="o">=</span> <span class="n">timescale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breakindex</span> <span class="o">=</span> <span class="n">breakindex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arclength</span> <span class="o">=</span> <span class="n">_estimate_arclength</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">)</span>
+
+        <span class="n">lower_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_points</span><span class="p">),</span> <span class="nb">int</span><span class="p">)</span>
+        <span class="n">upper_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_points</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">)),</span> <span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">dms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lower_idx</span><span class="p">)),</span> <span class="n">lower_idx</span><span class="p">,</span> <span class="n">upper_idx</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arclength</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">):</span>
+                <span class="n">ar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arclength</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arclength</span><span class="p">)</span>
+            <span class="n">knots</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">ar</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">ar</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">ar</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">dm</span> <span class="o">=</span> <span class="n">spline</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="n">knots</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="n">degree</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">dm</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;window</span><span class="si">{}</span><span class="s2">_bin</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">jdx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">jdx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">]</span>
+
+            <span class="c1"># I&#39;m putting VERY weak priors on the SFF motion vectors</span>
+            <span class="c1"># (1e-6 is being added to prevent sigma from being zero)</span>
+            <span class="n">ps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mi">10000</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1e-6</span>
+            <span class="n">dm</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="n">ps</span>
+            <span class="n">dms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dm</span><span class="p">)</span>
+
+        <span class="n">sff_dm</span> <span class="o">=</span> <span class="n">DMC</span><span class="p">(</span><span class="n">dms</span><span class="p">)</span><span class="o">.</span><span class="n">to_designmatrix</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sff&quot;</span><span class="p">)</span>  <span class="c1"># .standardize()</span>
+
+        <span class="c1"># long term</span>
+        <span class="n">n_knots</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">timescale</span><span class="p">)</span>
+
+        <span class="n">s_dm</span> <span class="o">=</span> <span class="n">spline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">n_knots</span><span class="o">=</span><span class="n">n_knots</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;spline&quot;</span><span class="p">)</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">n_knots</span><span class="p">)]</span>
+        <span class="c1">#        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]</span>
+        <span class="n">s_dm</span><span class="o">.</span><span class="n">prior_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">means</span><span class="p">)</span>
+
+        <span class="c1"># I&#39;m putting WEAK priors on the spline that it must be around 1</span>
+        <span class="n">s_dm</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s_dm</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">))</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="mf">1e-6</span>
+        <span class="p">)</span>
+
+        <span class="c1"># additional</span>
+        <span class="k">if</span> <span class="n">additional_design_matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">additional_design_matrix</span><span class="p">,</span> <span class="n">DesignMatrix</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;`additional_design_matrix` must be a DesignMatrix object.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">additional_design_matrix</span> <span class="o">=</span> <span class="n">additional_design_matrix</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="n">DMC</span><span class="p">([</span><span class="n">s_dm</span><span class="p">,</span> <span class="n">sff_dm</span><span class="p">,</span> <span class="n">additional_design_matrix</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="n">DMC</span><span class="p">([</span><span class="n">s_dm</span><span class="p">,</span> <span class="n">sff_dm</span><span class="p">])</span>
+
+        <span class="c1"># correct</span>
+        <span class="n">clc</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SFFCorrector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">dm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># clean</span>
+        <span class="k">if</span> <span class="n">restore_trend</span><span class="p">:</span>
+            <span class="n">trend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="p">[</span><span class="s2">&quot;spline&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">flux</span>
+            <span class="n">clc</span> <span class="o">+=</span> <span class="n">trend</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">trend</span><span class="p">)</span>
+        <span class="n">clc</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">clc</span></div>
+
+<div class="viewcode-block" id="SFFCorrector.diagnose"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SFFCorrector.diagnose.html#lightkurve.correctors.SFFCorrector.diagnose">[docs]</a>    <span class="k">def</span> <span class="nf">diagnose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a diagnostic plot which visualizes what happened during the</span>
+<span class="sd">        most recent call to `correct()`.&quot;&quot;&quot;</span>
+        <span class="n">axs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_diagnostic_plot</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_points</span><span class="p">:</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SFFCorrector.diagnose_arclength"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SFFCorrector.diagnose_arclength.html#lightkurve.correctors.SFFCorrector.diagnose_arclength">[docs]</a>    <span class="k">def</span> <span class="nf">diagnose_arclength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a diagnostic plot which visualizes arclength vs flux</span>
+<span class="sd">        from most recent call to `correct()`.&quot;&quot;&quot;</span>
+
+        <span class="n">max_plot</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">MPLSTYLE</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">windows</span> <span class="o">/</span> <span class="n">max_plot</span><span class="p">)),</span>
+                <span class="n">max_plot</span><span class="p">,</span>
+                <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">windows</span> <span class="o">/</span> <span class="n">max_plot</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)),</span>
+                <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">axs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">axs</span><span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Arclength Plot/Window&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">lower_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_points</span><span class="p">),</span> <span class="nb">int</span><span class="p">)</span>
+            <span class="n">upper_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_points</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">)),</span> <span class="nb">int</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;additional_design_matrix&quot;</span><span class="p">):</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">additional_design_matrix</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span>
+                    <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="p">[</span><span class="s2">&quot;spline&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">flux</span>
+                    <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">flux</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="p">[</span><span class="s2">&quot;spline&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">flux</span>
+
+            <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagnostic_lightcurves</span><span class="p">[</span><span class="s2">&quot;sff&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">flux</span>
+
+            <span class="n">idx</span><span class="p">,</span> <span class="n">jdx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lower_idx</span><span class="p">,</span> <span class="n">upper_idx</span><span class="p">):</span>
+                <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">jdx</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">jdx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Flux&quot;</span><span class="p">)</span>
+
+                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arclength</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Data&quot;</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">arclength</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">][</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">cadence_mask</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">]],</span>
+                    <span class="n">f</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">][</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">cadence_mask</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">]],</span>
+                    <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                    <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+                    <span class="n">c</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Outliers&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arclength</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">arclength</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">][</span><span class="n">s</span><span class="p">],</span>
+                    <span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">])</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">]))[</span><span class="n">s</span><span class="p">],</span>
+                    <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C2&quot;</span><span class="p">,</span>
+                    <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Model&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">jdx</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">jdx</span> <span class="o">&gt;=</span> <span class="n">max_plot</span><span class="p">:</span>
+                    <span class="n">jdx</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">):</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span></div></div>
+
+
+<span class="c1">######################</span>
+<span class="c1">#  Helper functions  #</span>
+<span class="c1">######################</span>
+
+
+<span class="k">def</span> <span class="nf">_get_centroid_dm</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;centroids&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a `.DesignMatrix` containing (col, row) centroid positions</span>
+<span class="sd">    and transformations thereof.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    col : np.ndarray</span>
+<span class="sd">        centroid column</span>
+<span class="sd">    row : np.ndarray</span>
+<span class="sd">        centroid row</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name to pass to `.DesignMatrix` (default: &#39;centroids&#39;).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dm: np.ndarray</span>
+<span class="sd">        Design matrix with shape len(c) x 10</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">col</span><span class="p">,</span>
+        <span class="n">row</span><span class="p">,</span>
+        <span class="n">col</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">row</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">col</span> <span class="o">**</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">row</span> <span class="o">**</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">col</span> <span class="o">*</span> <span class="n">row</span><span class="p">,</span>
+        <span class="n">col</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">row</span><span class="p">,</span>
+        <span class="n">col</span> <span class="o">*</span> <span class="n">row</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">col</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">row</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sa">r</span><span class="s2">&quot;col&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;row&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;col^2&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;row^2&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;col^3&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;row^3&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;col \times row&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;col^2 \times row&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;col \times row^2&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;col^2 \times row^2&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">DesignMatrix</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_thruster_firings</span><span class="p">(</span><span class="n">arclength</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find locations where K2 fired thrusters</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arc : np.ndarray</span>
+<span class="sd">        arclength as a function of time</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    thrusters: np.ndarray of bools</span>
+<span class="sd">        True at times where thrusters were fired.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arclength</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">):</span>
+        <span class="n">arc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">arclength</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">arc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">arclength</span><span class="p">)</span>
+    <span class="c1"># Rate of change of rate of change of arclength wrt time</span>
+    <span class="n">d2adt2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">arc</span><span class="p">))</span>
+    <span class="c1"># Fit a Gaussian, most points lie in a tight region, thruster firings are outliers</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Gaussian1D</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stddev</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="n">fitter</span> <span class="o">=</span> <span class="n">fitting</span><span class="o">.</span><span class="n">LevMarLSQFitter</span><span class="p">()</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+        <span class="n">d2adt2</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">d2adt2</span><span class="p">)],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">),</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">xbins</span> <span class="o">=</span> <span class="n">h</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">fitter</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">xbins</span><span class="p">,</span> <span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">weights</span><span class="o">=</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="c1"># Depending on the orientation of the roll, it is hard to return</span>
+    <span class="c1"># the point before the firing or the point after the firing.</span>
+    <span class="c1"># This makes sure we always return the same value, no matter the roll orientation.</span>
+    <span class="k">def</span> <span class="nf">_start_and_end</span><span class="p">(</span><span class="n">start_or_end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find points at the start or end of a roll.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">start_or_end</span> <span class="o">==</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span>
+            <span class="n">thrusters</span> <span class="o">=</span> <span class="p">(</span><span class="n">d2adt2</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">stddev</span> <span class="o">*</span> <span class="o">-</span><span class="mi">5</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">d2adt2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">start_or_end</span> <span class="o">==</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span>
+            <span class="n">thrusters</span> <span class="o">=</span> <span class="p">(</span><span class="n">d2adt2</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">stddev</span> <span class="o">*</span> <span class="mi">5</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">d2adt2</span><span class="p">)</span>
+        <span class="c1"># Pick the best thruster in each cluster</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">thrusters</span><span class="p">)),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">thrusters</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span>
+            <span class="n">thrusters</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">thrusters</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">jdx</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">idx</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">[</span><span class="n">jdx</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">th</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">jdx</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">th</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">arc</span><span class="p">)[</span><span class="n">idx</span><span class="p">[</span><span class="n">jdx</span><span class="p">]])</span>
+                        <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">arc</span><span class="p">)[</span><span class="n">idx</span><span class="p">[</span><span class="n">jdx</span><span class="p">]][</span><span class="n">m</span><span class="p">[</span><span class="n">jdx</span><span class="p">]])</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                    <span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="n">m</span><span class="p">[</span><span class="n">jdx</span><span class="p">]</span>
+                <span class="p">)</span>
+        <span class="n">thrusters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">thrusters</span>
+
+    <span class="c1"># Get the start and end points</span>
+    <span class="n">thrusters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">_start_and_end</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">),</span> <span class="n">_start_and_end</span><span class="p">(</span><span class="s2">&quot;end&quot;</span><span class="p">)])</span>
+    <span class="n">thrusters</span> <span class="o">=</span> <span class="n">thrusters</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Take just the first point.</span>
+    <span class="n">thrusters</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">thrusters</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">thrusters</span>
+    <span class="k">return</span> <span class="n">thrusters</span>
+
+
+<span class="k">def</span> <span class="nf">_get_window_points</span><span class="p">(</span>
+    <span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">,</span> <span class="n">windows</span><span class="p">,</span> <span class="n">arclength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">breakindex</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns indices where thrusters are fired.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lc : `.LightCurve` object</span>
+<span class="sd">        Input light curve</span>
+<span class="sd">    windows: int</span>
+<span class="sd">        Number of windows to split the light curve into</span>
+<span class="sd">    arc: np.ndarray</span>
+<span class="sd">        Arclength for the roll motion</span>
+<span class="sd">    breakindex: int</span>
+<span class="sd">        Cadence where there is a natural break. Windows will be automatically put here.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">arclength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">arclength</span> <span class="o">=</span> <span class="n">_estimate_arclength</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">)</span>
+
+    <span class="c1"># Validate break indices</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">breakindex</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">breakindexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">breakindex</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">breakindex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">breakindexes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">breakindex</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">breakindex</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">breakindexes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">breakindexes</span> <span class="o">=</span> <span class="n">breakindex</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">breakindexes</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`breakindex` must be an int or a list&quot;</span><span class="p">)</span>
+
+    <span class="c1"># If the user asks for break indices we should still return them,</span>
+    <span class="c1"># even if there is only 1 window.</span>
+    <span class="k">if</span> <span class="n">windows</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">breakindexes</span>
+
+    <span class="c1"># Find evenly spaced window points</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">)</span> <span class="o">/</span> <span class="n">windows</span>
+    <span class="n">lower_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">breakindexes</span><span class="p">)</span>
+    <span class="n">upper_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">breakindexes</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">))</span>
+    <span class="n">window_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">dt</span><span class="p">),</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lower_idx</span><span class="p">,</span> <span class="n">upper_idx</span><span class="p">)]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Get thruster firings</span>
+    <span class="n">thrusters</span> <span class="o">=</span> <span class="n">_get_thruster_firings</span><span class="p">(</span><span class="n">arclength</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">breakindexes</span><span class="p">:</span>
+        <span class="n">thrusters</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">thrusters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">thrusters</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Find the nearest point to each thruster firing, unless it&#39;s a user supplied break point</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">thrusters</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">window_points</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">thrusters</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">thrusters</span> <span class="o">-</span> <span class="n">wp</span><span class="p">))]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">wp</span> <span class="ow">in</span> <span class="n">window_points</span>
+            <span class="k">if</span> <span class="n">wp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">breakindexes</span>
+        <span class="p">]</span>
+    <span class="n">window_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">window_points</span><span class="p">,</span> <span class="n">breakindexes</span><span class="p">]))</span>
+
+    <span class="c1"># If the first or last windows are very short (&lt;40% median window length),</span>
+    <span class="c1"># then we add them to the second or penultimate window, respectively,</span>
+    <span class="c1"># by removing their break points.</span>
+    <span class="n">median_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">window_points</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">window_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">median_length</span><span class="p">:</span>
+        <span class="n">window_points</span> <span class="o">=</span> <span class="n">window_points</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="n">window_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">median_length</span><span class="p">):</span>
+        <span class="n">window_points</span> <span class="o">=</span> <span class="n">window_points</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">window_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_estimate_arclength</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Estimate the arclength given column and row centroid positions.</span>
+
+<span class="sd">    We use the approximation that the arclength equals</span>
+
+<span class="sd">        (row**2 + col**2)**0.5</span>
+
+<span class="sd">    For this to work, row and column must be correlated not anticorrelated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="n">centroid_col</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">centroid_row</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">centroid_row</span><span class="p">)</span>
+    <span class="c1"># Force c to be correlated not anticorrelated</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="o">-</span> <span class="n">col</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">col</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">row</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

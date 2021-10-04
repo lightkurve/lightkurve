@@ -71,6 +71,7 @@
       ~LightCurve.round
       ~LightCurve.scatter
       ~LightCurve.search_neighbors
+      ~LightCurve.select_flux
       ~LightCurve.show_in_browser
       ~LightCurve.show_in_notebook
       ~LightCurve.show_properties

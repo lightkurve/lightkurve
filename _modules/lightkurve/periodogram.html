@@ -1,0 +1,1541 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.periodogram &#8212; Lightkurve </title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+      <div class="navbar-end-item">
+        <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for lightkurve.periodogram</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines the Periodogram class and associated tools.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">import</span> <span class="nn">astropy</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+<span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">astropy.units</span> <span class="kn">import</span> <span class="n">cds</span>
+<span class="kn">from</span> <span class="nn">astropy.convolution</span> <span class="kn">import</span> <span class="n">convolve</span><span class="p">,</span> <span class="n">Box1DKernel</span>
+<span class="kn">from</span> <span class="nn">astropy.time</span> <span class="kn">import</span> <span class="n">Time</span>
+
+<span class="c1"># LombScargle was moved from astropy.stats to astropy.timeseries in AstroPy v3.2</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">astropy.timeseries</span> <span class="kn">import</span> <span class="n">LombScargle</span>
+    <span class="kn">from</span> <span class="nn">astropy.timeseries</span> <span class="kn">import</span> <span class="n">implementations</span>  <span class="c1"># for .main._is_regular</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="kn">import</span> <span class="n">LombScargle</span>
+    <span class="kn">from</span> <span class="nn">astropy.stats.lombscargle</span> <span class="kn">import</span> <span class="n">implementations</span>
+
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">MPLSTYLE</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">LightkurveWarning</span><span class="p">,</span> <span class="n">validate_method</span>
+<span class="kn">from</span> <span class="nn">.lightcurve</span> <span class="kn">import</span> <span class="n">LightCurve</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Periodogram&quot;</span><span class="p">,</span> <span class="s2">&quot;LombScarglePeriodogram&quot;</span><span class="p">,</span> <span class="s2">&quot;BoxLeastSquaresPeriodogram&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="Periodogram"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram">[docs]</a><span class="k">class</span> <span class="nc">Periodogram</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generic class to represent a power spectrum (frequency vs power data).</span>
+
+<span class="sd">    The Periodogram class represents a power spectrum, with values of</span>
+<span class="sd">    frequency on the x-axis (in any frequency units) and values of power on the</span>
+<span class="sd">    y-axis (in units of flux^2 / [frequency units]).</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frequency : `~astropy.units.Quantity`</span>
+<span class="sd">        Array of frequencies as an AstroPy Quantity object.</span>
+<span class="sd">    power : `~astropy.units.Quantity`</span>
+<span class="sd">        Array of power-spectral-densities. The Quantity must have units of</span>
+<span class="sd">        `flux^2 / freq_unit`, where freq_unit is the unit of the frequency</span>
+<span class="sd">        attribute.</span>
+<span class="sd">    nyquist : float</span>
+<span class="sd">        The Nyquist frequency of the lightcurve. In units of freq_unit, where</span>
+<span class="sd">        freq_unit is the unit of the frequency attribute.</span>
+<span class="sd">    label : str</span>
+<span class="sd">        Human-friendly object label, e.g. &quot;KIC 123456789&quot;.</span>
+<span class="sd">    targetid : str</span>
+<span class="sd">        Identifier of the target.</span>
+<span class="sd">    default_view : &quot;frequency&quot; or &quot;period&quot;</span>
+<span class="sd">        Should plots be shown in frequency space or period space by default?</span>
+<span class="sd">    meta : dict</span>
+<span class="sd">        Free-form metadata associated with the Periodogram.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">frequency</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;The array of frequency values.&quot;&quot;&quot;</span>
+
+    <span class="n">power</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;The array of power values.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Periodogram.__init__"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">frequency</span><span class="p">,</span>
+        <span class="n">power</span><span class="p">,</span>
+        <span class="n">nyquist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">targetid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">default_view</span><span class="o">=</span><span class="s2">&quot;frequency&quot;</span><span class="p">,</span>
+        <span class="n">meta</span><span class="o">=</span><span class="p">{},</span>
+    <span class="p">):</span>
+        <span class="c1"># Input validation</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">frequency</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;frequency must be an `astropy.units.Quantity` object.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">power</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;power must be an `astropy.units.Quantity` object.&quot;</span><span class="p">)</span>
+        <span class="c1"># Frequency must have frequency units</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">frequency</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">Hz</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">u</span><span class="o">.</span><span class="n">UnitConversionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Frequency must be in units of 1/time.&quot;</span><span class="p">)</span>
+        <span class="c1"># Frequency and power must have sensible shapes</span>
+        <span class="k">if</span> <span class="n">frequency</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;frequency and power must have a length greater than 1.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">frequency</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">power</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;frequency and power must have the same length.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="n">frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">power</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nyquist</span> <span class="o">=</span> <span class="n">nyquist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="n">targetid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_view</span><span class="p">(</span><span class="n">default_view</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">meta</span></div>
+
+    <span class="k">def</span> <span class="nf">_validate_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Verifies whether `view` is is one of {&quot;frequency&quot;, &quot;period&quot;} and</span>
+<span class="sd">        raises a helpful `ValueError` if not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;default_view&quot;</span><span class="p">):</span>
+            <span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_view</span>
+        <span class="k">return</span> <span class="n">validate_method</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_is_evenly_spaced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns true if the values in ``frequency`` are evenly spaced.</span>
+
+<span class="sd">        This helper method exists because some features, such as ``smooth()``,</span>
+<span class="sd">        ``estimate_numax()``, and ``estimate_deltanu()``, require a grid of</span>
+<span class="sd">        evenly-spaced frequencies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># verify that the first differences are all equal</span>
+        <span class="n">freqdiff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">freqdiff</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">freqdiff</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">period</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The array of periods, i.e. 1/frequency.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Power of the highest peak in the periodogram.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">frequency_at_max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Frequency value corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">period_at_max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Period value corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency_at_max_power</span>
+
+<div class="viewcode-block" id="Periodogram.bin"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.bin.html#lightkurve.periodogram.Periodogram.bin">[docs]</a>    <span class="k">def</span> <span class="nf">bin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Bins the power spectrum.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        binsize : int</span>
+<span class="sd">            The factor by which to bin the power spectrum, in the sense that</span>
+<span class="sd">            the power spectrum will be smoothed by taking the mean in bins</span>
+<span class="sd">            of size N / binsize, where N is the length of the original</span>
+<span class="sd">            frequency array. Defaults to 10.</span>
+<span class="sd">        method : str, one of &#39;mean&#39; or &#39;median&#39;</span>
+<span class="sd">            Method to use for binning. Default is &#39;mean&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        binned_periodogram : a `Periodogram` object</span>
+<span class="sd">            Returns a new `Periodogram` object which has been binned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Input validation</span>
+        <span class="k">if</span> <span class="n">binsize</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;binsize must be larger than or equal to 1&quot;</span><span class="p">)</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">validate_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">])</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)</span> <span class="o">/</span> <span class="n">binsize</span><span class="p">)</span>  <span class="c1"># length of the binned arrays</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+            <span class="n">binned_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">[:</span> <span class="n">m</span> <span class="o">*</span> <span class="n">binsize</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">binsize</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">binned_power</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">[:</span> <span class="n">m</span> <span class="o">*</span> <span class="n">binsize</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">binsize</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;median&quot;</span><span class="p">:</span>
+            <span class="n">binned_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">[:</span> <span class="n">m</span> <span class="o">*</span> <span class="n">binsize</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">binsize</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="n">binned_power</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">[:</span> <span class="n">m</span> <span class="o">*</span> <span class="n">binsize</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">binsize</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+
+        <span class="n">binned_pg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">binned_pg</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="n">binned_freq</span>
+        <span class="n">binned_pg</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">binned_power</span>
+        <span class="k">return</span> <span class="n">binned_pg</span></div>
+
+<div class="viewcode-block" id="Periodogram.smooth"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.smooth.html#lightkurve.periodogram.Periodogram.smooth">[docs]</a>    <span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;boxkernel&quot;</span><span class="p">,</span> <span class="n">filter_width</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Smooths the power spectrum using the &#39;boxkernel&#39; or &#39;logmedian&#39; method.</span>
+
+<span class="sd">        If `method` is set to &#39;boxkernel&#39;, this method will smooth the power</span>
+<span class="sd">        spectrum by convolving with a numpy Box1DKernel with a width of</span>
+<span class="sd">        `filter_width`, where `filter width` is in units of frequency.</span>
+<span class="sd">        This is best for filtering out noise while maintaining seismic mode</span>
+<span class="sd">        peaks. This method requires the Periodogram to have an evenly spaced</span>
+<span class="sd">        grid of frequencies. A `ValueError` exception will be raised if this is</span>
+<span class="sd">        not the case.</span>
+
+<span class="sd">        If `method` is set to &#39;logmedian&#39;, it smooths the power spectrum using</span>
+<span class="sd">        a moving median which moves across the power spectrum in a steps of</span>
+
+<span class="sd">        log10(x0) + 0.5 * filter_width</span>
+
+<span class="sd">        where `filter width` is in log10(frequency) space. This is best for</span>
+<span class="sd">        estimating the noise background, as it filters over the seismic peaks.</span>
+
+<span class="sd">        Periodograms that are unsmoothed have multiplicative noise that is</span>
+<span class="sd">        distributed as chi squared 2 degrees of freedom.  This noise</span>
+<span class="sd">        distribution has a well defined mean and median but the two are not</span>
+<span class="sd">        equivalent.  The mean of a chi squared 2 dof distribution is 2, but the</span>
+<span class="sd">        median is 2(8/9)**3.</span>
+<span class="sd">        (see https://en.wikipedia.org/wiki/Chi-squared_distribution)</span>
+<span class="sd">        In order to maintain consistency between &#39;boxkernel&#39; and &#39;logmedian&#39; a</span>
+<span class="sd">        correction factor of (8/9)**3 is applied to (i.e., the median is divided</span>
+<span class="sd">        by the factor) to the median values.</span>
+
+<span class="sd">        In addition to consistency with the &#39;boxkernel&#39; method, the correction</span>
+<span class="sd">        of the median values is useful when applying the periodogram flatten</span>
+<span class="sd">        method.  The flatten method divides the periodgram by the smoothed</span>
+<span class="sd">        periodogram using the &#39;logmedian&#39; method.  By appyling the correction</span>
+<span class="sd">        factor we follow asteroseismic convention that the signal-to-noise</span>
+<span class="sd">        power has a mean value of unity.  (note the signal-to-noise power is</span>
+<span class="sd">        really the signal plus noise divided by the noise and hence should be</span>
+<span class="sd">        unity in the absence of any signal)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : str, one of &#39;boxkernel&#39; or &#39;logmedian&#39;</span>
+<span class="sd">            The smoothing method to use. Defaults to &#39;boxkernel&#39;.</span>
+<span class="sd">        filter_width : float</span>
+<span class="sd">            If `method` = &#39;boxkernel&#39;, this is the width of the smoothing filter</span>
+<span class="sd">            in units of frequency.</span>
+<span class="sd">            If method = `logmedian`, this is the width of the smoothing filter</span>
+<span class="sd">            in log10(frequency) space.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        smoothed_pg : `Periodogram` object</span>
+<span class="sd">            Returns a new `Periodogram` object in which the power spectrum</span>
+<span class="sd">            has been smoothed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">validate_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;boxkernel&quot;</span><span class="p">,</span> <span class="s2">&quot;logmedian&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;boxkernel&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">filter_width</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;the `filter_width` parameter must be &quot;</span>
+                    <span class="s2">&quot;larger than 0 for the &#39;boxkernel&#39; method.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">filter_width</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">filter_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">u</span><span class="o">.</span><span class="n">UnitConversionError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;the `filter_width` parameter must have &quot;</span> <span class="s2">&quot;frequency units.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Check to see if we have a grid of evenly spaced periods instead.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_evenly_spaced</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;the &#39;boxkernel&#39; method requires the periodogram &quot;</span>
+                    <span class="s2">&quot;to have a grid of evenly spaced frequencies.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">fs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">))</span>
+            <span class="n">box_kernel</span> <span class="o">=</span> <span class="n">Box1DKernel</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">filter_width</span> <span class="o">/</span> <span class="n">fs</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+            <span class="n">smooth_power</span> <span class="o">=</span> <span class="n">convolve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">box_kernel</span><span class="p">)</span>
+            <span class="n">smooth_pg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">smooth_pg</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">smooth_power</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">smooth_pg</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;logmedian&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filter_width</span><span class="p">,</span> <span class="n">astropy</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;the &#39;logmedian&#39; method requires a dimensionless &quot;</span>
+                    <span class="s2">&quot;value for `filter_width` in log10(frequency) space.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">bkg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">corr_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mf">8.0</span> <span class="o">/</span> <span class="mf">9.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span>
+            <span class="k">while</span> <span class="n">x0</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">filter_width</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bkg</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="n">bkg</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">/</span> <span class="n">corr_factor</span>
+                    <span class="n">count</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">x0</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">filter_width</span>
+            <span class="n">bkg</span> <span class="o">/=</span> <span class="n">count</span>
+            <span class="n">smooth_pg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">smooth_pg</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">bkg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">smooth_pg</span></div>
+
+<div class="viewcode-block" id="Periodogram.plot"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.plot.html#lightkurve.periodogram.Periodogram.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="s2">&quot;lightkurve&quot;</span><span class="p">,</span>
+        <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plots the Periodogram.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scale: str</span>
+<span class="sd">            Set x,y axis to be &quot;linear&quot; or &quot;log&quot;. Default is linear.</span>
+<span class="sd">        ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
+<span class="sd">            a new one will be generated.</span>
+<span class="sd">        xlabel : str</span>
+<span class="sd">            Plot x axis label</span>
+<span class="sd">        ylabel : str</span>
+<span class="sd">            Plot y axis label</span>
+<span class="sd">        title : str</span>
+<span class="sd">            Plot set_title</span>
+<span class="sd">        style : str</span>
+<span class="sd">            Path or URL to a matplotlib style file, or name of one of</span>
+<span class="sd">            matplotlib&#39;s built-in stylesheets (e.g. &#39;ggplot&#39;).</span>
+<span class="sd">            Lightkurve&#39;s custom stylesheet is used by default.</span>
+<span class="sd">        view : str</span>
+<span class="sd">            {&#39;frequency&#39;, &#39;period&#39;}. Default &#39;frequency&#39;. If &#39;frequency&#39;, x-axis</span>
+<span class="sd">            units will be frequency. If &#39;period&#39;, the x-axis units will be</span>
+<span class="sd">            period and &#39;log&#39; scale.</span>
+<span class="sd">        kwargs : dict</span>
+<span class="sd">            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">unit</span>
+
+        <span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_view</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">unit</span>
+            <span class="k">if</span> <span class="n">view</span> <span class="o">==</span> <span class="s2">&quot;period&quot;</span><span class="p">:</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="o">.</span><span class="n">unit</span>
+
+        <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;lightkurve&quot;</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="n">MPLSTYLE</span>
+        <span class="k">if</span> <span class="n">ylabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Power&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">unit_label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="s2">&quot;latex&quot;</span><span class="p">)</span>
+                <span class="c1"># The line below is a workaround for AstroPy bug #9218.</span>
+                <span class="c1"># It can be removed once the fix for that issue is widespread.</span>
+                <span class="c1"># See https://github.com/astropy/astropy/pull/9218</span>
+                <span class="n">unit_label</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\^{([^}]+)}\^{([^}]+)}&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;^{\g&lt;1&gt;^{\g&lt;2&gt;}}&quot;</span><span class="p">,</span> <span class="n">unit_label</span>
+                <span class="p">)</span>
+                <span class="n">ylabel</span> <span class="o">+=</span> <span class="s2">&quot; [</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">unit_label</span><span class="p">)</span>
+
+        <span class="c1"># This will need to be fixed with housekeeping. Self.label currently doesnt exist.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;label&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;label&quot;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+
+        <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+            <span class="c1"># Plot frequency and power</span>
+            <span class="k">if</span> <span class="n">view</span> <span class="o">==</span> <span class="s2">&quot;frequency&quot;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">xlabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;Frequency [</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="s2">&quot;latex&quot;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">view</span> <span class="o">==</span> <span class="s2">&quot;period&quot;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">xlabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;Period [</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="s2">&quot;latex&quot;</span><span class="p">))</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+            <span class="c1"># Show the legend if labels were set</span>
+            <span class="n">legend_labels</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">legend_labels</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="Periodogram.flatten"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.flatten.html#lightkurve.periodogram.Periodogram.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;logmedian&quot;</span><span class="p">,</span> <span class="n">filter_width</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">return_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Estimates the Signal-To-Noise (SNR) spectrum by dividing out an</span>
+<span class="sd">        estimate of the noise background.</span>
+
+<span class="sd">        This method divides the power spectrum by a background estimated</span>
+<span class="sd">        using a moving filter in log10 space by default. For details on the</span>
+<span class="sd">        `method` and `filter_width` parameters, see `Periodogram.smooth()`</span>
+
+<span class="sd">        Dividing the power through by the noise background produces a spectrum</span>
+<span class="sd">        with no units of power. Since the signal is divided through by a measure</span>
+<span class="sd">        of the noise, we refer to this as a `Signal-To-Noise` spectrum.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : str, one of &#39;boxkernel&#39; or &#39;logmedian&#39;</span>
+<span class="sd">            Background estimation method passed on to `Periodogram.smooth()`.</span>
+<span class="sd">            Defaults to &#39;logmedian&#39;.</span>
+<span class="sd">        filter_width : float</span>
+<span class="sd">            If `method` = &#39;boxkernel&#39;, this is the width of the smoothing filter</span>
+<span class="sd">            in units of frequency.</span>
+<span class="sd">            If method = `logmedian`, this is the width of the smoothing filter</span>
+<span class="sd">            in log10(frequency) space.</span>
+<span class="sd">        return_trend : bool</span>
+<span class="sd">            If True, then the background estimate, alongside the SNR spectrum,</span>
+<span class="sd">            will be returned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        snr_spectrum : `Periodogram` object</span>
+<span class="sd">            Returns a periodogram object where the power is an estimate of the</span>
+<span class="sd">            signal-to-noise of the spectrum, creating by dividing the powers</span>
+<span class="sd">            with a simple estimate of the noise background using a smoothing filter.</span>
+<span class="sd">        bkg : `Periodogram` object</span>
+<span class="sd">            The estimated power spectrum of the background noise. This is only</span>
+<span class="sd">            returned if `return_trend = True`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bkg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">filter_width</span><span class="o">=</span><span class="n">filter_width</span><span class="p">)</span>
+        <span class="n">snr_pg</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">/</span> <span class="n">bkg</span><span class="o">.</span><span class="n">power</span>
+        <span class="n">snr</span> <span class="o">=</span> <span class="n">SNRPeriodogram</span><span class="p">(</span>
+            <span class="n">snr_pg</span><span class="o">.</span><span class="n">frequency</span><span class="p">,</span>
+            <span class="n">snr_pg</span><span class="o">.</span><span class="n">power</span><span class="p">,</span>
+            <span class="n">nyquist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nyquist</span><span class="p">,</span>
+            <span class="n">targetid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">meta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_trend</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">snr</span><span class="p">,</span> <span class="n">bkg</span>
+        <span class="k">return</span> <span class="n">snr</span></div>
+
+<div class="viewcode-block" id="Periodogram.to_table"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.to_table.html#lightkurve.periodogram.Periodogram.to_table">[docs]</a>    <span class="k">def</span> <span class="nf">to_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Exports the Periodogram as an Astropy Table.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        table : `~astropy.table.Table` object</span>
+<span class="sd">            An AstroPy Table with columns &#39;frequency&#39;, &#39;period&#39;, and &#39;power&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Table</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">),</span>
+            <span class="n">names</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">,</span> <span class="s2">&quot;power&quot;</span><span class="p">),</span>
+            <span class="n">meta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Periodogram.copy"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.copy.html#lightkurve.periodogram.Periodogram.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a copy of the Periodogram object.</span>
+
+<span class="sd">        This method uses the `copy.deepcopy` function to ensure that all</span>
+<span class="sd">        objects stored within the Periodogram are copied.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pg_copy : Periodogram</span>
+<span class="sd">            A new `Periodogram` object which is a copy of the original.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Periodogram(ID: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">copy_self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">copy_self</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">copy_self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">copy_self</span>
+
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">copy_self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">copy_self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">copy_self</span><span class="o">.</span><span class="n">power</span> <span class="o">+</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">copy_self</span>
+
+    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="o">-</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">copy_self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">copy_self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">other</span> <span class="o">-</span> <span class="n">copy_self</span><span class="o">.</span><span class="n">power</span>
+        <span class="k">return</span> <span class="n">copy_self</span>
+
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">copy_self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">copy_self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">other</span> <span class="o">*</span> <span class="n">copy_self</span><span class="o">.</span><span class="n">power</span>
+        <span class="k">return</span> <span class="n">copy_self</span>
+
+    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">copy_self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">copy_self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">other</span> <span class="o">/</span> <span class="n">copy_self</span><span class="o">.</span><span class="n">power</span>
+        <span class="k">return</span> <span class="n">copy_self</span>
+
+    <span class="k">def</span> <span class="nf">__div__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__truediv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rdiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Periodogram.show_properties"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.show_properties.html#lightkurve.periodogram.Periodogram.show_properties">[docs]</a>    <span class="k">def</span> <span class="nf">show_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Prints a summary of the non-callable attributes of the Periodogram object.</span>
+
+<span class="sd">        Prints in order of type (ints, strings, lists, arrays and others).</span>
+<span class="sd">        Prints in alphabetical order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">astropy</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+                    <span class="n">unit</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">unit</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">value</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;res&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">}</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;res&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">}</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+                <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;hdu&quot;</span><span class="p">:</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;res&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">}</span>
+                    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;print&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">])</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;print&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;print&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">])</span>
+                            <span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;print&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;print&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;print&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;array </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;array&quot;</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;print&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;list length </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;list&quot;</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                        <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;print&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;None&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;print&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;str&quot;</span>
+                <span class="k">elif</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;wcs&quot;</span><span class="p">:</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;print&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;astropy.wcs.wcs.WCS&quot;</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;other&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;print&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;other&quot;</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
+            <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Attribute&quot;</span><span class="p">,</span> <span class="s2">&quot;Description&quot;</span><span class="p">,</span> <span class="s2">&quot;Units&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="s2">&quot;other&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">dic</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">dic</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">typ</span><span class="p">:</span>
+                    <span class="n">output</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="n">attr</span><span class="p">,</span> <span class="n">dic</span><span class="p">[</span><span class="s2">&quot;print&quot;</span><span class="p">],</span> <span class="n">dic</span><span class="p">[</span><span class="s2">&quot;unit&quot;</span><span class="p">]])</span>
+                    <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;lightkurve.Periodogram properties:&quot;</span><span class="p">)</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">max_lines</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_width</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Periodogram.to_seismology"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.to_seismology.html#lightkurve.periodogram.Periodogram.to_seismology">[docs]</a>    <span class="k">def</span> <span class="nf">to_seismology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a `~lightkurve.seismology.Seismology` object to analyze the periodogram.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        seismology : `~lightkurve.seismology.Seismology`</span>
+<span class="sd">            Helper object to run asteroseismology methods.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.seismology</span> <span class="kn">import</span> <span class="n">Seismology</span>
+
+        <span class="k">return</span> <span class="n">Seismology</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">SNRPeriodogram</span><span class="p">(</span><span class="n">Periodogram</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Defines a Signal-to-Noise Ratio (SNR) Periodogram class.</span>
+
+<span class="sd">    This class is nearly identical to the standard :class:`Periodogram` class,</span>
+<span class="sd">    but has different plotting defaults.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SNRPeriodogram</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;SNRPeriodogram(ID: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot the SNR spectrum using matplotlib&#39;s `plot` method.</span>
+<span class="sd">        See `Periodogram.plot` for details on the accepted arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs : dict</span>
+<span class="sd">            Dictionary of arguments ot be passed to `Periodogram.plot`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SNRPeriodogram</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;ylabel&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Signal to Noise Ratio (SNR)&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span>
+
+
+<span class="k">class</span> <span class="nc">LombScarglePeriodogram</span><span class="p">(</span><span class="n">Periodogram</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subclass of :class:`Periodogram &lt;lightkurve.periodogram.Periodogram&gt;`</span>
+<span class="sd">    representing a power spectrum generated using the Lomb Scargle method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_LS_object</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;ls_obj&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nterms</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;nterms&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ls_method</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;ls_method&quot;</span><span class="p">,</span> <span class="s2">&quot;fastchi2&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LombScarglePeriodogram</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;LombScarglePeriodogram(ID: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LombScarglePeriodogram.from_lightcurve"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_lightcurve</span><span class="p">(</span>
+        <span class="n">lc</span><span class="p">,</span>
+        <span class="n">minimum_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">maximum_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">minimum_period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">maximum_period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nterms</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">nyquist_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">oversample_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">freq_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">normalization</span><span class="o">=</span><span class="s2">&quot;amplitude&quot;</span><span class="p">,</span>
+        <span class="n">ls_method</span><span class="o">=</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a `Periodogram` from a LightCurve using the Lomb-Scargle method.</span>
+
+<span class="sd">        By default, the periodogram will be created for a regular grid of</span>
+<span class="sd">        frequencies from one frequency separation to the Nyquist frequency,</span>
+<span class="sd">        where the frequency separation is determined as 1 / the time baseline.</span>
+
+<span class="sd">        The min frequency and/or max frequency (or max period and/or min period)</span>
+<span class="sd">        can be passed to set custom limits for the frequency grid. Alternatively,</span>
+<span class="sd">        the user can provide a custom regular grid using the `frequency`</span>
+<span class="sd">        parameter or a custom regular grid of periods using the `period`</span>
+<span class="sd">        parameter.</span>
+
+<span class="sd">        The sampling of the spectrum can be changed using the</span>
+<span class="sd">        `oversample_factor` parameter. An oversampled spectrum</span>
+<span class="sd">        (oversample_factor &gt; 1) is useful for displaying the full details</span>
+<span class="sd">        of the spectrum, allowing the frequencies and amplitudes to be</span>
+<span class="sd">        measured directly from the plot itself, with no fitting required.</span>
+<span class="sd">        This is recommended for most applications, with a value of 5 or</span>
+<span class="sd">        10. On the other hand, an oversample_factor of 1 means the spectrum</span>
+<span class="sd">        is critically sampled, where every point in the spectrum is</span>
+<span class="sd">        independent of the others. This may be used when Lorentzians are to</span>
+<span class="sd">        be fitted to modes in the power spectrum, in cases where the mode</span>
+<span class="sd">        lifetimes are shorter than the time-base of the data (which is</span>
+<span class="sd">        sometimes the case for solar-like oscillations). An</span>
+<span class="sd">        oversample_factor of 1 is suitable for these stars because the</span>
+<span class="sd">        modes are usually fully resolved. That is, the power from each mode</span>
+<span class="sd">        is spread over a range of frequencies due to damping.  Hence, any</span>
+<span class="sd">        small error from measuring mode frequencies by taking the maximum</span>
+<span class="sd">        of the peak is negligible compared with the intrinsic linewidth of</span>
+<span class="sd">        the modes.</span>
+
+<span class="sd">        The `normalization` parameter will normalize the spectrum to either</span>
+<span class="sd">        power spectral density (&quot;psd&quot;) or amplitude (&quot;amplitude&quot;). Users</span>
+<span class="sd">        doing asteroseismology on classical pulsators (e.g. delta Scutis)</span>
+<span class="sd">        typically prefer `normalization=&quot;amplitude&quot;` because &quot;amplitude&quot;</span>
+<span class="sd">        has higher dynamic range (high and low peaks visible</span>
+<span class="sd">        simultaneously), and we often want to read off amplitudes from the</span>
+<span class="sd">        plot. If `normalization=&quot;amplitude&quot;`, the default value for</span>
+<span class="sd">        `oversample_factor` is set to 5 and `freq_unit` is 1/day.</span>
+<span class="sd">        Alternatively, users doing asteroseismology on solar-like</span>
+<span class="sd">        oscillators tend to prefer `normalization=&quot;psd&quot;` because power</span>
+<span class="sd">        density has a scaled axis that depends on the length of the</span>
+<span class="sd">        observing time, and is used when we are interested in noise levels</span>
+<span class="sd">        (e.g. granulation) and are looking at damped oscillations. If</span>
+<span class="sd">        `normalization=&quot;psd&quot;`, the default value for `oversample_factor` is</span>
+<span class="sd">        set to 1 and `freq_unit` is set to microHz.  Default values of</span>
+<span class="sd">        `freq_unit` and `oversample_factor` can be overridden. See Appendix</span>
+<span class="sd">        A of Kjeldsen &amp; Bedding, 1995 for a full discussion of</span>
+<span class="sd">        normalization and measurement of oscillation amplitudes</span>
+<span class="sd">        (http://adsabs.harvard.edu/abs/1995A%26A...293...87K).</span>
+
+<span class="sd">        The parameter nterms controls how many Fourier terms are used in the</span>
+<span class="sd">        model. Setting the Nyquist_factor to be greater than 1 will sample the</span>
+<span class="sd">        space beyond the Nyquist frequency, which may introduce aliasing.</span>
+
+<span class="sd">        The `freq_unit` parameter allows a request for alternative units in frequency</span>
+<span class="sd">        space. By default frequency is in (1/day) and power in (amplitude).</span>
+<span class="sd">        Asteroseismologists for example may want frequency in (microHz)</span>
+<span class="sd">        in which case they would pass `freq_unit=u.microhertz`.</span>
+
+<span class="sd">        By default this method uses the LombScargle &#39;fast&#39; method, which assumes</span>
+<span class="sd">        a regular grid. If a regular grid of periods (i.e. an irregular grid of</span>
+<span class="sd">        frequencies) it will use the &#39;slow&#39; method. If nterms &gt; 1 is passed, it</span>
+<span class="sd">        will use the &#39;fastchi2&#39; method for regular grids, and &#39;chi2&#39; for</span>
+<span class="sd">        irregular grids.</span>
+
+<span class="sd">        Caution: this method assumes that the LightCurve&#39;s time (lc.time)</span>
+<span class="sd">        is given in units of days.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lc : LightCurve object</span>
+<span class="sd">            The LightCurve from which to compute the Periodogram.</span>
+<span class="sd">        minimum_frequency : float</span>
+<span class="sd">            If specified, use this minimum frequency rather than one over the</span>
+<span class="sd">            time baseline.</span>
+<span class="sd">        maximum_frequency : float</span>
+<span class="sd">            If specified, use this maximum frequency rather than nyquist_factor</span>
+<span class="sd">            times the nyquist frequency.</span>
+<span class="sd">        minimum_period : float</span>
+<span class="sd">            If specified, use 1./minium_period as the maximum frequency rather</span>
+<span class="sd">            than nyquist_factor times the nyquist frequency.</span>
+<span class="sd">        maximum_period : float</span>
+<span class="sd">            If specified, use 1./maximum_period as the minimum frequency rather</span>
+<span class="sd">            than one over the time baseline.</span>
+<span class="sd">        frequency :  array-like</span>
+<span class="sd">            The grid of frequencies to use. If given a unit, it is converted to</span>
+<span class="sd">            units of freq_unit. If not, it is assumed to be in units of</span>
+<span class="sd">            freq_unit. This over rides any set frequency limits.</span>
+<span class="sd">        period : array-like</span>
+<span class="sd">            The grid of periods to use (as 1/period). If given a unit, it is</span>
+<span class="sd">            converted to units of freq_unit. If not, it is assumed to be in</span>
+<span class="sd">            units of 1/freq_unit. This overrides any set period limits.</span>
+<span class="sd">        nterms : int</span>
+<span class="sd">            Default 1. Number of terms to use in the Fourier fit.</span>
+<span class="sd">        nyquist_factor : int</span>
+<span class="sd">            Default 1. The multiple of the average Nyquist frequency. Is</span>
+<span class="sd">            overriden by maximum_frequency (or minimum period).</span>
+<span class="sd">        oversample_factor : int</span>
+<span class="sd">            Default: None. The frequency spacing, determined by the time</span>
+<span class="sd">            baseline of the lightcurve, is divided by this factor, oversampling</span>
+<span class="sd">            the frequency space. This parameter is identical to the</span>
+<span class="sd">            samples_per_peak parameter in astropy.LombScargle(). If</span>
+<span class="sd">            normalization=&#39;amplitude&#39;, oversample_factor will be set to 5. If</span>
+<span class="sd">            normalization=&#39;psd&#39;, it will be 1. These defaults can be</span>
+<span class="sd">            overridden.</span>
+<span class="sd">        freq_unit : `astropy.units.core.CompositeUnit`</span>
+<span class="sd">            Default: None. The desired frequency units for the Lomb Scargle</span>
+<span class="sd">            periodogram. This implies that 1/freq_unit is the units for period.</span>
+<span class="sd">            With default normalization (&#39;amplitude&#39;), the freq_unit is set to</span>
+<span class="sd">            1/day, which can be overridden. &#39;psd&#39; normalization will set</span>
+<span class="sd">            freq_unit to microhertz.</span>
+<span class="sd">        normalization : &#39;psd&#39; or &#39;amplitude&#39;</span>
+<span class="sd">            Default: `&#39;amplitude&#39;`. The desired normalization of the spectrum.</span>
+<span class="sd">            Can be either power spectral density (`&#39;psd&#39;`) or amplitude</span>
+<span class="sd">            (`&#39;amplitude&#39;`).</span>
+<span class="sd">        ls_method : str</span>
+<span class="sd">            Default: `&#39;fast&#39;`. Passed to the `method` keyword of</span>
+<span class="sd">            `astropy.stats.LombScargle()`.</span>
+<span class="sd">        kwargs : dict</span>
+<span class="sd">            Keyword arguments passed to `astropy.stats.LombScargle()`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Periodogram : `Periodogram` object</span>
+<span class="sd">            Returns a Periodogram object extracted from the lightcurve.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Input validation</span>
+        <span class="n">normalization</span> <span class="o">=</span> <span class="n">validate_method</span><span class="p">(</span><span class="n">normalization</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;psd&quot;</span><span class="p">,</span> <span class="s2">&quot;amplitude&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;Lightcurve contains NaN values.&quot;</span>
+                <span class="s2">&quot;These are removed before creating the periodogram.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Setting default frequency units</span>
+        <span class="k">if</span> <span class="n">freq_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">freq_unit</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">day</span> <span class="k">if</span> <span class="n">normalization</span> <span class="o">==</span> <span class="s2">&quot;amplitude&quot;</span> <span class="k">else</span> <span class="n">u</span><span class="o">.</span><span class="n">microhertz</span>
+
+        <span class="c1"># Default oversample factor</span>
+        <span class="k">if</span> <span class="n">oversample_factor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">oversample_factor</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="k">if</span> <span class="n">normalization</span> <span class="o">==</span> <span class="s2">&quot;amplitude&quot;</span> <span class="k">else</span> <span class="mf">1.0</span>
+
+        <span class="k">if</span> <span class="s2">&quot;min_period&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;`min_period` keyword is deprecated, &quot;</span>
+                <span class="s2">&quot;please use `minimum_period` instead.&quot;</span><span class="p">,</span>
+                <span class="n">LightkurveWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">minimum_period</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;min_period&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;max_period&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;`max_period` keyword is deprecated, &quot;</span>
+                <span class="s2">&quot;please use `maximum_period` instead.&quot;</span><span class="p">,</span>
+                <span class="n">LightkurveWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">maximum_period</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_period&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;min_frequency&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;`min_frequency` keyword is deprecated, &quot;</span>
+                <span class="s2">&quot;please use `minimum_frequency` instead.&quot;</span><span class="p">,</span>
+                <span class="n">LightkurveWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">minimum_frequency</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;min_frequency&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;max_frequency&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;`max_frequency` keyword is deprecated, &quot;</span>
+                <span class="s2">&quot;please use `maximum_frequency` instead.&quot;</span><span class="p">,</span>
+                <span class="n">LightkurveWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">maximum_frequency</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_frequency&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># Check if any values of period have been passed and set format accordingly</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="p">[</span><span class="n">period</span><span class="p">,</span> <span class="n">minimum_period</span><span class="p">,</span> <span class="n">maximum_period</span><span class="p">]):</span>
+            <span class="n">default_view</span> <span class="o">=</span> <span class="s2">&quot;period&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">default_view</span> <span class="o">=</span> <span class="s2">&quot;frequency&quot;</span>
+
+        <span class="c1"># If period and frequency keywords have both been set, throw an error</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="p">[</span><span class="n">period</span><span class="p">,</span> <span class="n">minimum_period</span><span class="p">,</span> <span class="n">maximum_period</span><span class="p">]))</span> <span class="o">&amp;</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+                <span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="p">[</span><span class="n">frequency</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;You have input keyword arguments for both frequency and period. &quot;</span>
+                <span class="s2">&quot;Please only use one.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">time</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Approximate Nyquist Frequency and frequency bin width in terms of days</span>
+        <span class="n">nyquist</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">))))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">cds</span><span class="o">.</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">/</span> <span class="n">oversample_factor</span>
+
+        <span class="c1"># Convert these values to requested frequency unit</span>
+        <span class="n">nyquist</span> <span class="o">=</span> <span class="n">nyquist</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">freq_unit</span><span class="p">)</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">freq_unit</span><span class="p">)</span>
+
+        <span class="c1"># Warn if there is confusing input</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">frequency</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">([</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">[</span><span class="n">minimum_frequency</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="p">]])</span>
+        <span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;You have passed both a grid of frequencies &quot;</span>
+                <span class="s2">&quot;and min_frequency/maximum_frequency arguments; &quot;</span>
+                <span class="s2">&quot;the latter will be ignored.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">([</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">[</span><span class="n">minimum_period</span><span class="p">,</span> <span class="n">maximum_period</span><span class="p">]])</span>
+        <span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;You have passed a grid of periods &quot;</span>
+                <span class="s2">&quot;and minimum_period/maximum_period arguments; &quot;</span>
+                <span class="s2">&quot;the latter will be ignored.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Tidy up the period stuff...</span>
+        <span class="k">if</span> <span class="n">maximum_period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># minimum_frequency MUST be none by this point.</span>
+            <span class="n">minimum_frequency</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">maximum_period</span>
+        <span class="k">if</span> <span class="n">minimum_period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># maximum_frequency MUST be none by this point.</span>
+            <span class="n">maximum_frequency</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">minimum_period</span>
+        <span class="c1"># If the user specified a period, copy it into the frequency.</span>
+        <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">frequency</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">period</span>
+
+        <span class="c1"># Do unit conversions if user input min/max frequency or period</span>
+        <span class="k">if</span> <span class="n">frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">minimum_frequency</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">minimum_frequency</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">minimum_frequency</span><span class="p">,</span> <span class="n">freq_unit</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">maximum_frequency</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">maximum_frequency</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">maximum_frequency</span><span class="p">,</span> <span class="n">freq_unit</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">minimum_frequency</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">maximum_frequency</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">minimum_frequency</span> <span class="o">&gt;</span> <span class="n">maximum_frequency</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">default_view</span> <span class="o">==</span> <span class="s2">&quot;frequency&quot;</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;minimum_frequency cannot be larger than maximum_frequency&quot;</span>
+                        <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">default_view</span> <span class="o">==</span> <span class="s2">&quot;period&quot;</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;minimum_period cannot be larger than maximum_period&quot;</span>
+                        <span class="p">)</span>
+            <span class="c1"># If nothing has been passed in, set them to the defaults</span>
+            <span class="k">if</span> <span class="n">minimum_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">minimum_frequency</span> <span class="o">=</span> <span class="n">fs</span>
+            <span class="k">if</span> <span class="n">maximum_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">maximum_frequency</span> <span class="o">=</span> <span class="n">nyquist</span> <span class="o">*</span> <span class="n">nyquist_factor</span>
+
+            <span class="c1"># Create frequency grid evenly spaced in frequency</span>
+            <span class="n">frequency</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">minimum_frequency</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Convert to desired units</span>
+        <span class="n">frequency</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">frequency</span><span class="p">,</span> <span class="n">freq_unit</span><span class="p">)</span>
+
+        <span class="c1"># Change to compatible ls method if sampling not even in frequency</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">implementations</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">_is_regular</span><span class="p">(</span><span class="n">frequency</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ls_method</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="s2">&quot;fastchi2&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fast&quot;</span><span class="p">,</span>
+        <span class="p">]:</span>
+            <span class="n">oldmethod</span> <span class="o">=</span> <span class="n">ls_method</span>
+            <span class="n">ls_method</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;fastchi2&quot;</span><span class="p">:</span> <span class="s2">&quot;chi2&quot;</span><span class="p">,</span> <span class="s2">&quot;fast&quot;</span><span class="p">:</span> <span class="s2">&quot;slow&quot;</span><span class="p">}[</span><span class="n">ls_method</span><span class="p">]</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;The requested periodogram is not evenly sampled in frequency.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Method has been changed from &#39;</span><span class="si">{}</span><span class="s2">&#39; to &#39;</span><span class="si">{}</span><span class="s2">&#39; to allow for this.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">oldmethod</span><span class="p">,</span> <span class="n">ls_method</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">nterms</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ls_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;fastchi2&quot;</span><span class="p">,</span> <span class="s2">&quot;chi2&quot;</span><span class="p">]):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Building a Lomb Scargle Periodogram using the `slow` method. &quot;</span>
+                <span class="s2">&quot;`nterms` has been set to &gt;1, however this is not supported under the `</span><span class="si">{}</span><span class="s2">` method. &quot;</span>
+                <span class="s2">&quot;To run with higher nterms, set `ls_method` to either &#39;fastchi2&#39;, or &#39;chi2&#39;. &quot;</span>
+                <span class="s2">&quot;Please refer to the `astropy.timeseries.periodogram.LombScargle` documentation.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">ls_method</span>
+                <span class="p">),</span>
+                <span class="n">LightkurveWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">nterms</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">astropy</span><span class="o">.</span><span class="n">__version__</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">LS</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span>
+                <span class="n">time</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">nterms</span><span class="o">=</span><span class="n">nterms</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="s2">&quot;psd&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="n">LS</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">frequency</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">ls_method</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LS</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">nterms</span><span class="o">=</span><span class="n">nterms</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="n">LS</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">frequency</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">ls_method</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="s2">&quot;psd&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">normalization</span> <span class="o">==</span> <span class="s2">&quot;psd&quot;</span><span class="p">:</span>  <span class="c1"># Power spectral density</span>
+            <span class="c1"># Rescale from the unnormalized power output by Astropy&#39;s</span>
+            <span class="c1"># Lomb-Scargle function to units of flux_variance / [frequency unit]</span>
+            <span class="c1"># that may be of more interest for asteroseismology.</span>
+            <span class="n">power</span> <span class="o">*=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">*</span> <span class="n">oversample_factor</span> <span class="o">*</span> <span class="n">fs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">normalization</span> <span class="o">==</span> <span class="s2">&quot;amplitude&quot;</span><span class="p">:</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">power</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+
+        <span class="c1"># Periodogram needs properties</span>
+        <span class="k">return</span> <span class="n">LombScarglePeriodogram</span><span class="p">(</span>
+            <span class="n">frequency</span><span class="o">=</span><span class="n">frequency</span><span class="p">,</span>
+            <span class="n">power</span><span class="o">=</span><span class="n">power</span><span class="p">,</span>
+            <span class="n">nyquist</span><span class="o">=</span><span class="n">nyquist</span><span class="p">,</span>
+            <span class="n">targetid</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TARGETID&quot;</span><span class="p">),</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LABEL&quot;</span><span class="p">),</span>
+            <span class="n">default_view</span><span class="o">=</span><span class="n">default_view</span><span class="p">,</span>
+            <span class="n">ls_obj</span><span class="o">=</span><span class="n">LS</span><span class="p">,</span>
+            <span class="n">nterms</span><span class="o">=</span><span class="n">nterms</span><span class="p">,</span>
+            <span class="n">ls_method</span><span class="o">=</span><span class="n">ls_method</span><span class="p">,</span>
+            <span class="n">meta</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Obtain the flux model for a given frequency and time</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time : np.ndarray</span>
+<span class="sd">            Time points to evaluate model.</span>
+<span class="sd">        frequency : frequency to evaluate model. Default is the frequency at</span>
+<span class="sd">                    max power.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        result : lightkurve.LightCurve</span>
+<span class="sd">            Model object with the time and flux model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LS_object</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No `astropy` Lomb Scargle object exists.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">frequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency_at_max_power</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LS_object</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">frequency</span><span class="p">)</span>
+        <span class="n">lc</span> <span class="o">=</span> <span class="n">LightCurve</span><span class="p">(</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">flux</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
+            <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;FREQUENCY&quot;</span><span class="p">:</span> <span class="n">frequency</span><span class="p">},</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;LS Model&quot;</span><span class="p">,</span>
+            <span class="n">targetid</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> LS Model&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">BoxLeastSquaresPeriodogram</span><span class="p">(</span><span class="n">Periodogram</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subclass of :class:`Periodogram &lt;lightkurve.periodogram.Periodogram&gt;`</span>
+<span class="sd">    representing a power spectrum generated using the Box Least Squares (BLS) method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;duration&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;depth&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snr</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;snr&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_BLS_result</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;bls_result&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_BLS_object</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;bls_obj&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">transit_time</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;transit_time&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;flux&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;time_unit&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BoxLeastSquaresPeriodogram</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;BoxLeastSquaresPeriodogram(ID: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BoxLeastSquaresPeriodogram.from_lightcurve"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_lightcurve</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a `Periodogram` from a LightCurve using the Box Least Squares (BLS) method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lc : `LightCurve` object</span>
+<span class="sd">            The LightCurve from which to compute the Periodogram.</span>
+<span class="sd">        duration : float, array_like, or `~astropy.units.Quantity`, optional</span>
+<span class="sd">            The set of durations that will be considered.</span>
+<span class="sd">            Default to `[0.05, 0.10, 0.15, 0.20, 0.25, 0.33]` if not specified.</span>
+<span class="sd">        period : array_like or `~astropy.units.Quantity`, optional</span>
+<span class="sd">            The periods where the Periodogram should be computed.</span>
+<span class="sd">            If not provided, a default will be created using</span>
+<span class="sd">            `BoxLeastSquares.autoperiod()  &lt;astropy.timeseries.BoxLeastSquares.autoperiod&gt;`.</span>
+<span class="sd">        minimum_period, maximum_period : float or `~astropy.units.Quantity`, optional</span>
+<span class="sd">            If ``period`` is not provided, the minimum/maximum periods to search.</span>
+<span class="sd">            The defaults will be computed as described in the notes below.</span>
+<span class="sd">        frequency_factor : float, optional</span>
+<span class="sd">            If ``period`` is not provided, a factor to control the frequency spacing of periods</span>
+<span class="sd">            to be considered.</span>
+<span class="sd">        kwargs : dict</span>
+<span class="sd">            Keyword arguments passed to</span>
+<span class="sd">            `BoxLeastSquares.power() &lt;astropy.timeseries.BoxLeastSquares.power&gt;`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Periodogram : `Periodogram` object</span>
+<span class="sd">            Returns a Periodogram object extracted from the lightcurve.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If ``period`` is not provided, the default minimum period is computed from maximum duration and</span>
+<span class="sd">        the median observation time gap as</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">                minimum_period = max(median(diff(lc.time)) * 4,</span>
+<span class="sd">                                     max(duration) + median(diff(lc.time)))</span>
+
+<span class="sd">        The default maximum period is computed as</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">                maximum_period = (max(lc.time) - min(lc.time)) / 3</span>
+
+<span class="sd">        ensuring that any systems with at least 3 transits are within the range of searched periods.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># BoxLeastSquares was added to `astropy.stats` in AstroPy v3.1 and then</span>
+        <span class="c1"># moved to `astropy.timeseries` in v3.2, which makes the import below</span>
+        <span class="c1"># somewhat complicated.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">astropy.timeseries</span> <span class="kn">import</span> <span class="n">BoxLeastSquares</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="kn">import</span> <span class="n">BoxLeastSquares</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;BLS requires AstroPy v3.1 or later&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Validate user input for `lc`</span>
+        <span class="c1"># (BoxLeastSquares will not work if flux or flux_err contain NaNs)</span>
+        <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Validate user input for `duration`</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;duration&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.20</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">duration</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;`duration` parameter contains illegal nan or inf value(s)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Validate user input for `period`</span>
+        <span class="n">period</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">minimum_period</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;minimum_period&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">maximum_period</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;maximum_period&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">period</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`period` parameter contains illegal nan or inf value(s)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">minimum_period</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">minimum_period</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">))</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">)),</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">minimum_period</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">maximum_period</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">maximum_period</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">))</span> <span class="o">/</span> <span class="mf">3.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">maximum_period</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+
+        <span class="c1"># Validate user input for `time_unit`</span>
+        <span class="n">time_unit</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;time_unit&quot;</span><span class="p">,</span> <span class="s2">&quot;day&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">time_unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">u</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not a valid value for `time_unit`&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_unit</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Validate user input for `frequency_factor`</span>
+        <span class="n">frequency_factor</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;frequency_factor&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">frequency_factor</span>
+            <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span>
+            <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span>
+        <span class="n">npoints</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">minimum_period</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">maximum_period</span><span class="p">))</span> <span class="o">/</span> <span class="n">df</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">npoints</span> <span class="o">&gt;</span> <span class="mf">1e7</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;`period` contains </span><span class="si">{}</span><span class="s2"> points.&quot;</span>
+                <span class="s2">&quot;Periodogram is too large to evaluate. &quot;</span>
+                <span class="s2">&quot;Consider setting `frequency_factor` to a higher value.&quot;</span>
+                <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">npoints</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">npoints</span> <span class="o">&gt;</span> <span class="mf">1e5</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;`period` contains </span><span class="si">{}</span><span class="s2"> points.&quot;</span>
+                <span class="s2">&quot;Periodogram is likely to be large, and slow to evaluate. &quot;</span>
+                <span class="s2">&quot;Consider setting `frequency_factor` to a higher value.&quot;</span>
+                <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">npoints</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Create BLS object and run the BLS search</span>
+        <span class="n">bls</span> <span class="o">=</span> <span class="n">BoxLeastSquares</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">period</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">autoperiod</span><span class="p">(</span>
+                <span class="n">duration</span><span class="p">,</span>
+                <span class="n">minimum_period</span><span class="o">=</span><span class="n">minimum_period</span><span class="p">,</span>
+                <span class="n">maximum_period</span><span class="o">=</span><span class="n">maximum_period</span><span class="p">,</span>
+                <span class="n">frequency_factor</span><span class="o">=</span><span class="n">frequency_factor</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">period</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">period</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">power</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">power</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">BoxLeastSquaresPeriodogram</span><span class="p">(</span>
+            <span class="n">frequency</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">result</span><span class="o">.</span><span class="n">period</span><span class="p">,</span>
+            <span class="n">power</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">power</span><span class="p">,</span>
+            <span class="n">default_view</span><span class="o">=</span><span class="s2">&quot;period&quot;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LABEL&quot;</span><span class="p">),</span>
+            <span class="n">targetid</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TARGETID&quot;</span><span class="p">),</span>
+            <span class="n">transit_time</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">transit_time</span><span class="p">,</span>
+            <span class="n">duration</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+            <span class="n">depth</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span>
+            <span class="n">bls_result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span>
+            <span class="n">snr</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">depth_snr</span><span class="p">,</span>
+            <span class="n">bls_obj</span><span class="o">=</span><span class="n">bls</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">flux</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span>
+            <span class="n">time_unit</span><span class="o">=</span><span class="n">time_unit</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes commonly used vetting statistics for a transit model.</span>
+
+<span class="sd">        See astropy.stats.bls docs for further details.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        period : float or Quantity</span>
+<span class="sd">            Period of the transits. Default is `period_at_max_power`</span>
+<span class="sd">        duration : float or Quantity</span>
+<span class="sd">            Duration of the transits. Default is `duration_at_max_power`</span>
+<span class="sd">        transit_time : float or Quantity</span>
+<span class="sd">            Transit midpoint of the transits. Default is `transit_time_at_max_power`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        stats : dict</span>
+<span class="sd">            Dictionary of vetting statistics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">period_at_max_power</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No period specified. Using period at max power&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration_at_max_power</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No duration specified. Using duration at max power&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">transit_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">transit_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transit_time_at_max_power</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No transit time specified. Using transit time at max power&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transit_time</span><span class="p">,</span> <span class="n">Time</span><span class="p">):</span>
+            <span class="n">transit_time</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span>
+                <span class="n">transit_time</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">scale</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BLS_object</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">(</span>
+            <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">period</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">transit_time</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_transit_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the transit model using the BLS, returns a lightkurve.LightCurve</span>
+
+<span class="sd">        See astropy.stats.bls docs for further details.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        period : float or Quantity</span>
+<span class="sd">            Period of the transits. Default is `period_at_max_power`</span>
+<span class="sd">        duration : float or Quantity</span>
+<span class="sd">            Duration of the transits. Default is `duration_at_max_power`</span>
+<span class="sd">        transit_time : float or Quantity</span>
+<span class="sd">            Transit midpoint of the transits. Default is `transit_time_at_max_power`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        model : lightkurve.LightCurve</span>
+<span class="sd">            Model of transit</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.lightcurve</span> <span class="kn">import</span> <span class="n">LightCurve</span>
+
+        <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">period_at_max_power</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No period specified. Using period at max power&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration_at_max_power</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No duration specified. Using duration at max power&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">transit_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">transit_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transit_time_at_max_power</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No transit time specified. Using transit time at max power&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transit_time</span><span class="p">,</span> <span class="n">Time</span><span class="p">):</span>
+            <span class="n">transit_time</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span>
+                <span class="n">transit_time</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">scale</span>
+            <span class="p">)</span>
+
+        <span class="n">model_flux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BLS_object</span><span class="o">.</span><span class="n">model</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">period</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">transit_time</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">model_flux</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Transit Model Flux&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">model</span>
+
+    <span class="k">def</span> <span class="nf">get_transit_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a boolean array that is ``True`` during transits and</span>
+<span class="sd">        ``False`` elsewhere.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        period : float or Quantity</span>
+<span class="sd">            Period of the transits. Default is `period_at_max_power`</span>
+<span class="sd">        duration : float or Quantity</span>
+<span class="sd">            Duration of the transits. Default is `duration_at_max_power`</span>
+<span class="sd">        transit_time : float or Quantity</span>
+<span class="sd">            Transit midpoint of the transits. Default is `transit_time_at_max_power`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        transit_mask : np.array of bool</span>
+<span class="sd">            Mask that flags transits. Mask is ``True`` where there are transits.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_transit_model</span><span class="p">(</span>
+            <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="n">transit_time</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">flux</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">transit_time_at_max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the transit time corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transit_time</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">duration_at_max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the duration corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">depth_at_max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the depth corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot the BoxLeastSquaresPeriodogram spectrum using matplotlib&#39;s `plot` method.</span>
+<span class="sd">        See `Periodogram.plot` for details on the accepted arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs : dict</span>
+<span class="sd">            Dictionary of arguments ot be passed to `Periodogram.plot`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoxLeastSquaresPeriodogram</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;ylabel&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;BLS Power&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span>
+
+    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;`flatten` is not implemented for `BoxLeastSquaresPeriodogram`.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;`smooth` is not implemented for `BoxLeastSquaresPeriodogram`. &quot;</span>
+        <span class="p">)</span>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

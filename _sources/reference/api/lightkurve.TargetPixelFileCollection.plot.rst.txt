@@ -1,0 +1,6 @@
+﻿lightkurve.TargetPixelFileCollection.plot
+=========================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: TargetPixelFileCollection.plot

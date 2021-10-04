@@ -4,10 +4,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>How to open a light curve in Excel? &#8212; Lightkurve </title>
     
-  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,88 +21,119 @@
 
     
       
-  <link rel="stylesheet"
-    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
-  <link rel="stylesheet"
-    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
 
     
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Creating your own light curves using custom aperture photometry" href="../2-creating-light-curves/2-1-custom-aperture-photometry.html" />
     <link rel="prev" title="Interactively inspecting Target Pixel Files" href="interactively-inspecting-data.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
-<div class="container-xl">
+    <div class="container-fluid" id="banner"></div>
 
-    <a class="navbar-brand" href="../../index.html">
     
-      <p class="title">Lightkurve v2.0</p>
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
     
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
 
-    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
-      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
-        
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
-        </li>
-        
-        <li class="nav-item active">
-            <a class="nav-link" href="../index.html">Tutorials</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../reference/index.html">API</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../about/index.html">About</a>
-        </li>
-        
-        
-      </ul>
+    
+  </div>
 
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form>
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
 
-      <ul class="navbar-nav">
-        
-          <li class="nav-item">
-            <a class="nav-link" href="https://github.com/lightkurve/lightkurve" target="_blank" rel="noopener">
-              <span><i class="fab fa-github-square"></i></span>
-            </a>
-          </li>
-        
-        
-      </ul>
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
     </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
 </div>
     </nav>
     
@@ -108,50 +141,66 @@
     <div class="container-xl">
       <div class="row">
           
-          <div class="col-12 col-md-3 bd-sidebar">
-          </div>
+            
+            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
+            
           
 
           
           <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
+              <div class="toc-item">
+                
 <div class="tocsection onthispage pt-5 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
 <nav id="bd-toc-nav">
-    <ul class="nav section-nav flex-column">
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Learning-Goals" class="nav-link">Learning Goals</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Imports" class="nav-link">Imports</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#1.-Downloading-a-TESS-light-curve" class="nav-link">1. Downloading a TESS light curve</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#2.-Plotting-a-light-curve" class="nav-link">2. Plotting a light curve</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#3.-Download-the-light-curve-as-an-Excel-spreadsheet" class="nav-link">3. Download the light curve as an Excel spreadsheet</a>
-        </li>
-    
-    </ul>
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Learning-Goals">
+   Learning Goals
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#1.-Downloading-a-TESS-light-curve">
+   1. Downloading a TESS light curve
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#2.-Plotting-a-light-curve">
+   2. Plotting a light curve
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#3.-Download-the-light-curve-as-an-Excel-spreadsheet">
+   3. Download the light curve as an Excel spreadsheet
+  </a>
+ </li>
+</ul>
+
 </nav>
-
-
+              </div>
               
+              <div class="toc-item">
+                
+              </div>
+              
+            
           </div>
           
 
           
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+          
+            
+          
+          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
               
               <div>
                 
@@ -408,9 +457,9 @@ div.rendered_html tbody tr:hover {
     <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/tutorials/1-getting-started/how-to-open-a-lightcurve-in-excel.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
     <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/tutorials/1-getting-started/how-to-open-a-lightcurve-in-excel.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<br style="clear:both;"><div class="section" id="How-to-open-a-light-curve-in-Excel?">
+<br style="clear:both;"><section id="How-to-open-a-light-curve-in-Excel?">
 <h1>How to open a light curve in Excel?<a class="headerlink" href="#How-to-open-a-light-curve-in-Excel?" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="Learning-Goals">
+<section id="Learning-Goals">
 <h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
@@ -419,8 +468,8 @@ div.rendered_html tbody tr:hover {
 <li><p>Understand how to load the data into Excel.</p></li>
 </ul>
 <p>This tutorial is aimed at first time users who may not have used <em>Lightkurve</em> before.</p>
-</div>
-<div class="section" id="Imports">
+</section>
+<section id="Imports">
 <h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
 <p>First we must install and import the <a class="reference external" href="https://docs.lightkurve.org/index.html">Lightkurve</a> package. We can do this as follows:</p>
 <div class="nbinput nblast docutils container">
@@ -443,8 +492,8 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="1.-Downloading-a-TESS-light-curve">
+</section>
+<section id="1.-Downloading-a-TESS-light-curve">
 <h2>1. Downloading a TESS light curve<a class="headerlink" href="#1.-Downloading-a-TESS-light-curve" title="Permalink to this headline">¶</a></h2>
 <p>The light curves of stars created by the TESS mission are stored at the <a class="reference external" href="https://archive.stsci.edu/tess/">Mikulksi Archive for Space Telescopes</a> (MAST) archive, along with metadata about the observations, such as which CCD channel was used at each time.</p>
 <p><em>Lightkurve’s</em> built-in tools allow us to search for light curve files in the archive, and download them and their metadata. In this example, we will start by downloading one sector of TESS data for a star named V1357 Cyg, also known as <a class="reference external" href="https://en.wikipedia.org/wiki/Cygnus_X-1">Cygnus X-1</a>. V1357 Cyg is a galactic X-ray source in the constellation Cygnus.</p>
@@ -485,8 +534,8 @@ SearchResult containing 3 data products.
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="2.-Plotting-a-light-curve">
+</section>
+<section id="2.-Plotting-a-light-curve">
 <h2>2. Plotting a light curve<a class="headerlink" href="#2.-Plotting-a-light-curve" title="Permalink to this headline">¶</a></h2>
 <p>Before loading the light curve data into Excel, it can be useful to have a quick look at the data using <em>Lightkurve’s</em> <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.plot.html?highlight=plot#lightkurve.LightCurve.plot">plot</a> function:</p>
 <div class="nbinput docutils container">
@@ -505,8 +554,8 @@ SearchResult containing 3 data products.
 <img alt="../../_images/tutorials_1-getting-started_how-to-open-a-lightcurve-in-excel_10_0.png" src="../../_images/tutorials_1-getting-started_how-to-open-a-lightcurve-in-excel_10_0.png" />
 </div>
 </div>
-</div>
-<div class="section" id="3.-Download-the-light-curve-as-an-Excel-spreadsheet">
+</section>
+<section id="3.-Download-the-light-curve-as-an-Excel-spreadsheet">
 <h2>3. Download the light curve as an Excel spreadsheet<a class="headerlink" href="#3.-Download-the-light-curve-as-an-Excel-spreadsheet" title="Permalink to this headline">¶</a></h2>
 <p>If you are new to Python, it is likely that you feel more comfortable inspecting and analyzing a light curve in Excel than in Python. That is fine! We can save the light curve data as an Excel spreadsheet named “V1357Cyg.xlsx” as follows:</p>
 <div class="nbinput nblast docutils container">
@@ -529,46 +578,53 @@ SearchResult containing 3 data products.
 </pre></div>
 </div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='left-prev' id="prev-link" href="interactively-inspecting-data.html" title="previous page">Interactively inspecting Target Pixel Files</a>
-    <a class='right-next' id="next-link" href="../2-creating-light-curves/2-1-custom-aperture-photometry.html" title="next page">Creating your own light curves using custom aperture photometry</a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="interactively-inspecting-data.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Interactively inspecting Target Pixel Files</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../2-creating-light-curves/2-1-custom-aperture-photometry.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Creating your own light curves using custom aperture photometry</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
 
       </div>
     </div>
-
-    
-  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
-
-
-    
-    <!-- Google Analytics -->
-    <script>
-      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-      ga('create', 'UA-69171-9', 'auto');
-      ga('set', 'anonymizeIp', true);
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-    <!-- End Google Analytics -->
-    <footer class="footer mt-5 mt-md-0">
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
-    <p>
-          &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
-    </p>
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
   </div>
 </footer>
   </body>

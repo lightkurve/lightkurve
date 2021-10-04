@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.truncate
+==============================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.truncate

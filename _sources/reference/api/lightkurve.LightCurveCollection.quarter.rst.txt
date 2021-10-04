@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurveCollection.quarter
+=======================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: LightCurveCollection.quarter

@@ -1,0 +1,6 @@
+﻿lightkurve.TargetPixelFileCollection.campaign
+=============================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: TargetPixelFileCollection.campaign

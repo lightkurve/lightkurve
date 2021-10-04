@@ -105,3 +105,5 @@ A DesignMatrix supports the following operations:
   :toctree: api/
 
   corrector.Corrector
+  corrector.Corrector.correct
+  corrector.Corrector.diagnose

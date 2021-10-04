@@ -263,7 +263,7 @@
     "\n",
     "Like *Kepler*, the *K2* mission used guide stars to assist with pointing as part of the FGS. Where *Kepler* used 40 guide stars throughout the whole mission, in *K2* it was harder to find suitable guide stars in *K2*'s visually crowded fields along the ecliptic plane, and so four stars were used in each campaign. This predictably reduced pointing stability, as each guide star in *K2* contributed more to the overall pointing.\n",
     "\n",
-    "The majority of *K2* guide stars were stable. However, one of the Campaign 6 guide stars was an eclipsing binary with a period of 0.6046 days. By [folding](https://docs.lightkurve.org/api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.fold) an affected light curve on this period, we can see the impact of the eclipsing binary on an otherwise non-variable target.\n",
+    "The majority of *K2* guide stars were stable. However, one of the Campaign 6 guide stars was an eclipsing binary with a period of 0.6046 days. By [folding](https://docs.lightkurve.org/reference/api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.fold) an affected light curve on this period, we can see the impact of the eclipsing binary on an otherwise non-variable target.\n",
     "\n",
     "The example below is from the [*K2* Data Release Notes 35](https://archive.stsci.edu/missions/k2/doc/drn/KSCI-19156-001_K2-DRN35_C6.pdf) on the reprocessing of Campaign 6:"
    ]

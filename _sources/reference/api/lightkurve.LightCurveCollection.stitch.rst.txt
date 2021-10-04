@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurveCollection.stitch
+======================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurveCollection.stitch

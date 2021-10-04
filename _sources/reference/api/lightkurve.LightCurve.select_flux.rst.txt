@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.select\_flux
+==================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.select_flux

@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurve.head
+==========================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurve.head

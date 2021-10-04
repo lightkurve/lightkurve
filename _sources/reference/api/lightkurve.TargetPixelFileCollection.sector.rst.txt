@@ -1,0 +1,6 @@
+﻿lightkurve.TargetPixelFileCollection.sector
+===========================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: TargetPixelFileCollection.sector

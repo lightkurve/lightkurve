@@ -1,0 +1,6 @@
+﻿lightkurve.KeplerTargetPixelFile.extract\_prf\_photometry
+=========================================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: KeplerTargetPixelFile.extract_prf_photometry

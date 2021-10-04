@@ -1,0 +1,6 @@
+﻿lightkurve.TargetPixelFileCollection.quarter
+============================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: TargetPixelFileCollection.quarter

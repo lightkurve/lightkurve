@@ -4,10 +4,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Searching &amp; downloading Kepler, K2, and TESS data &#8212; Lightkurve </title>
     
-  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,88 +21,119 @@
 
     
       
-  <link rel="stylesheet"
-    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
-  <link rel="stylesheet"
-    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
 
     
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Using Light Curve Files with Lightkurve" href="using-light-curve-file-products.html" />
     <link rel="prev" title="What are Periodogram objects?" href="what-are-periodogram-objects.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
-<div class="container-xl">
+    <div class="container-fluid" id="banner"></div>
 
-    <a class="navbar-brand" href="../../index.html">
     
-      <p class="title">Lightkurve v2.0</p>
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
     
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
 
-    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
-      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
-        
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
-        </li>
-        
-        <li class="nav-item active">
-            <a class="nav-link" href="../index.html">Tutorials</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../reference/index.html">API</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../about/index.html">About</a>
-        </li>
-        
-        
-      </ul>
+    
+  </div>
 
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form>
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
 
-      <ul class="navbar-nav">
-        
-          <li class="nav-item">
-            <a class="nav-link" href="https://github.com/lightkurve/lightkurve" target="_blank" rel="noopener">
-              <span><i class="fab fa-github-square"></i></span>
-            </a>
-          </li>
-        
-        
-      </ul>
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
     </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
 </div>
     </nav>
     
@@ -108,90 +141,119 @@
     <div class="container-xl">
       <div class="row">
           
-          <div class="col-12 col-md-3 bd-sidebar">
-          </div>
+            
+            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
+            
           
 
           
           <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
+              <div class="toc-item">
+                
 <div class="tocsection onthispage pt-5 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
 <nav id="bd-toc-nav">
-    <ul class="nav section-nav flex-column">
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Learning-Goals" class="nav-link">Learning Goals</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Introduction" class="nav-link">Introduction</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Imports" class="nav-link">Imports</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#1.-What-Data-Products-are-Available?" class="nav-link">1. What Data Products are Available?</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#2.-Searching-for-Light-Curves" class="nav-link">2. Searching for Light Curves</a><ul class="nav section-nav flex-column">
-                
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#2.1-Downloading-a-single-light-curve" class="nav-link">2.1 Downloading a single light curve</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#2.2-Downloading-a-collection-of-light-curves" class="nav-link">2.2 Downloading a collection of light curves</a>
-        </li>
-    
-            </ul>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#3.-Searching-for-Target-Pixel-Files" class="nav-link">3. Searching for Target Pixel Files</a><ul class="nav section-nav flex-column">
-                
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#3.1-Downloading-a-single-target-pixel-file" class="nav-link">3.1 Downloading a single target pixel file</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#3.2-Downloading-a-collection-of-target-pixel-files" class="nav-link">3.2 Downloading a collection of target pixel files</a>
-        </li>
-    
-            </ul>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts" class="nav-link">4. Searching for TESS Full Frame Image (FFI) Cutouts</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#5.-Performing-a-Cone-Search" class="nav-link">5. Performing a Cone Search</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#About-this-Notebook" class="nav-link">About this Notebook</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Citing-Lightkurve-and-Astropy" class="nav-link">Citing Lightkurve and Astropy</a>
-        </li>
-    
-    </ul>
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Learning-Goals">
+   Learning Goals
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Introduction">
+   Introduction
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#1.-What-Data-Products-are-Available?">
+   1. What Data Products are Available?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#2.-Searching-for-Light-Curves">
+   2. Searching for Light Curves
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#2.1-Downloading-a-single-light-curve">
+     2.1 Downloading a single light curve
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#2.2-Downloading-a-collection-of-light-curves">
+     2.2 Downloading a collection of light curves
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#3.-Searching-for-Target-Pixel-Files">
+   3. Searching for Target Pixel Files
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.1-Downloading-a-single-target-pixel-file">
+     3.1 Downloading a single target pixel file
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.2-Downloading-a-collection-of-target-pixel-files">
+     3.2 Downloading a collection of target pixel files
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts">
+   4. Searching for
+   <em>
+    TESS
+   </em>
+   Full Frame Image (FFI) Cutouts
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#5.-Performing-a-Cone-Search">
+   5. Performing a Cone Search
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#About-this-Notebook">
+   About this Notebook
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Citing-Lightkurve-and-Astropy">
+   Citing Lightkurve and Astropy
+  </a>
+ </li>
+</ul>
+
 </nav>
-
-
+              </div>
               
+              <div class="toc-item">
+                
+              </div>
+              
+            
           </div>
           
 
           
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+          
+            
+          
+          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
               
               <div>
                 
@@ -448,9 +510,9 @@ div.rendered_html tbody tr:hover {
     <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/tutorials/1-getting-started/searching-for-data-products.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
     <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/tutorials/1-getting-started/searching-for-data-products.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<br style="clear:both;"><div class="section" id="Searching-&amp;-downloading-Kepler,-K2,-and-TESS-data">
+<br style="clear:both;"><section id="Searching-&amp;-downloading-Kepler,-K2,-and-TESS-data">
 <h1>Searching &amp; downloading <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> data<a class="headerlink" href="#Searching-&-downloading-Kepler,-K2,-and-TESS-data" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="Learning-Goals">
+<section id="Learning-Goals">
 <h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
@@ -459,17 +521,17 @@ div.rendered_html tbody tr:hover {
 <li><p>Know how to download <em>TESS</em> Full Frame Image cutouts.</p></li>
 <li><p>Be able to perform a cone search.</p></li>
 </ul>
-</div>
-<div class="section" id="Introduction">
+</section>
+<section id="Introduction">
 <h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> Python package has functions to search for and download observations from <em>Kepler</em>/<em>K2</em> and <em>TESS</em>. These tools are built to make accessing space telescope data clear and straightforward, with intuitive method and keyword names.</p>
 <p>This tutorial outlines what data products are available to query with Lightkurve, and gives examples of how to use the functions to search for and download space telescope observations.</p>
-</div>
-<div class="section" id="Imports">
+</section>
+<section id="Imports">
 <h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
 <p>This tutorial requires the <a class="reference external" href="http://docs.lightkurve.org/">Lightkurve</a> package, which uses <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -480,8 +542,8 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="1.-What-Data-Products-are-Available?">
+</section>
+<section id="1.-What-Data-Products-are-Available?">
 <h2>1. What Data Products are Available?<a class="headerlink" href="#1.-What-Data-Products-are-Available?" title="Permalink to this headline">¶</a></h2>
 <p><em>Kepler</em>/<em>K2</em> and <em>TESS</em> data products are stored on the Mikulski Archive for Space Telescopes (MAST) in two main forms:</p>
 <ul class="simple">
@@ -495,8 +557,8 @@ archive.</p></li>
 <li><p><strong>Full Frame Images (FFIs)</strong>: a download of all active detector pixels at once. <em>TESS</em> FFIs are captured with 30-minute cadence, and custom cutouts of <em>TESS</em> FFIs can be queried and downloaded using <a class="reference external" href="http://docs.lightkurve.org/">Lightkurve</a>.</p></li>
 </ul>
 <p>Lightkurve allows you to query and download each of these data products. The following sections contain examples of how to use the search functions in Lightkurve.</p>
-</div>
-<div class="section" id="2.-Searching-for-Light-Curves">
+</section>
+<section id="2.-Searching-for-Light-Curves">
 <h2>2. Searching for Light Curves<a class="headerlink" href="#2.-Searching-for-Light-Curves" title="Permalink to this headline">¶</a></h2>
 <p>Lightkurve uses <a class="reference external" href="https://astroquery.readthedocs.io/en/latest/">Astroquery</a> to search for data products. Astroquery allows searches based on a target’s coordinates, catalog ID number, or name.</p>
 <p>This is passed into the search function using the <code class="docutils literal notranslate"><span class="pre">target</span></code> keyword, and all valid inputs for identifying a target include:</p>
@@ -509,8 +571,8 @@ archive.</p></li>
 </ul>
 <p>You can also specify which mission you would like to retrieve data from using the <code class="docutils literal notranslate"><span class="pre">mission</span></code> keyword, which takes “Kepler,” “K2,” or “TESS.” By default, all available missions will be returned.</p>
 <p>We will start with the case of searching for a <em>Kepler</em> target using its Kepler Input Catalog (KIC) ID number. Below, we search for <a class="reference external" href="https://arxiv.org/pdf/1001.0417.pdf">KIC 3733346</a>, an <a class="reference external" href="https://en.wikipedia.org/wiki/RR_Lyrae_variable">RR Lyrae star</a>, using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve">search_lightcurve</a> function.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -519,40 +581,10 @@ archive.</p></li>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-SearchResult containing 18 data products.
-
-<table id="table6302690032">
-<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
-<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
-<tr><td>0</td><td>Kepler Quarter 01</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>1</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>2</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>3</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>4</td><td>Kepler Quarter 05</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>5</td><td>Kepler Quarter 06</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>6</td><td>Kepler Quarter 07</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>7</td><td>Kepler Quarter 08</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>8</td><td>Kepler Quarter 09</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>9</td><td>Kepler Quarter 10</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>10</td><td>Kepler Quarter 11</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>11</td><td>Kepler Quarter 11</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>12</td><td>Kepler Quarter 12</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>13</td><td>Kepler Quarter 13</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>14</td><td>Kepler Quarter 14</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>15</td><td>Kepler Quarter 15</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>16</td><td>Kepler Quarter 16</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-<tr><td>17</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-</table></div>
-</div>
 <p><code class="docutils literal notranslate"><span class="pre">search_lightcurve</span></code> returns a <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> table, which contains information about the data products available to download. This search result tells us that KIC 3733346 was observed in <em>Kepler</em> Quarters 1–16.</p>
 <p>You can select an individual entry in this search result by indexing the search result.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -560,22 +592,9 @@ SearchResult containing 18 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-SearchResult containing 1 data products.
-
-<table id="table6302690032">
-<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
-<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
-<tr><td>0</td><td>Kepler Quarter 01</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-</table></div>
-</div>
 <p>For more information about the available data products, the <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> has a full table accessible by calling <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.SearchResult.table.html?highlight=table">.table</a>. This full table contains the columns listed below. Definitions of each of these terms can be found <a class="reference external" href="https://mast.stsci.edu/api/v0/_c_a_o_mfields.html">here</a>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -584,74 +603,9 @@ SearchResult containing 1 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-dataproduct_type
-calib_level
-obs_collection
-obs_id
-target_name
-s_ra
-s_dec
-t_min
-t_max
-t_exptime
-wavelength_region
-filters
-em_min
-em_max
-target_classification
-obs_title
-t_obs_release
-instrument_name
-proposal_pi
-proposal_id
-proposal_type
-project
-sequence_number
-provenance_name
-s_region
-jpegURL
-dataURL
-dataRights
-mtFlag
-srcDen
-intentType
-obsid
-objID
-exptime
-distance
-obsID
-obs_collection_products
-dataproduct_type_products
-description
-type
-dataURI
-productType
-productGroupDescription
-productSubGroupDescription
-productDocumentationURL
-project_products
-prvversion
-proposal_id_products
-productFilename
-size
-parent_obsid
-dataRights_products
-calib_level_products
-author
-mission
-#
-year
-sort_order
-</pre></div></div>
-</div>
 <p>These column names can also be used to search for specific entries in the table.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -662,23 +616,10 @@ sort_order
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-SearchResult containing 1 data products.
-
-<table id="table6302758800">
-<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
-<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
-<tr><td>0</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-</table></div>
-</div>
 <p>You can also narrow down the list of observations when you make the search using the following mission-specific keywords: * <em>Kepler</em>: <code class="docutils literal notranslate"><span class="pre">quarter</span></code> * <em>K2</em>: <code class="docutils literal notranslate"><span class="pre">campaign</span></code> * <em>TESS</em>: <code class="docutils literal notranslate"><span class="pre">sector</span></code></p>
 <p>Let’s perform the search for KIC 3733346 again, this time specifying that we only want data from <em>Kepler</em> Quarter 2.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -687,24 +628,11 @@ SearchResult containing 1 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-SearchResult containing 1 data products.
-
-<table id="table6300972176">
-<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
-<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
-<tr><td>0</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
-</table></div>
-</div>
-<div class="section" id="2.1-Downloading-a-single-light-curve">
+<section id="2.1-Downloading-a-single-light-curve">
 <h3>2.1 Downloading a single light curve<a class="headerlink" href="#2.1-Downloading-a-single-light-curve" title="Permalink to this headline">¶</a></h3>
 <p>A light curve can be downloaded by calling <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.SearchResult.download.html?highlight=download#lightkurve.SearchResult.download">.download()</a>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -713,41 +641,9 @@ SearchResult containing 1 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<i>KeplerLightCurve length=4075 LABEL=&quot;KIC 3733346&quot; QUARTER=2 AUTHOR=Kepler</i>
-<table id="table6304309408" class="table-striped table-bordered table-condensed">
-<thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>quality</th><th>timecorr</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>sap_flux</th><th>sap_flux_err</th><th>sap_bkg</th><th>sap_bkg_err</th><th>pdcsap_flux</th><th>pdcsap_flux_err</th><th>sap_quality</th><th>psf_centr1</th><th>psf_centr1_err</th><th>psf_centr2</th><th>psf_centr2_err</th><th>mom_centr1</th><th>mom_centr1_err</th><th>mom_centr2</th><th>mom_centr2_err</th><th>pos_corr1</th><th>pos_corr2</th></tr></thead>
-<thead><tr><th></th><th>electron / s</th><th>electron / s</th><th></th><th>d</th><th>pix</th><th>pix</th><th></th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th></tr></thead>
-<thead><tr><th>object</th><th>float32</th><th>float32</th><th>int32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>int32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
-<tr><td>169.7659418421681</td><td>9.2319516e+04</td><td>9.2697735e+00</td><td>0</td><td>3.263322e-03</td><td>781.81123</td><td>786.73051</td><td>2977</td><td>8.9092305e+04</td><td>8.8779488e+00</td><td>2.0773477e+03</td><td>7.0835429e-01</td><td>9.2319516e+04</td><td>9.2697735e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.81123</td><td>1.2057812e-04</td><td>786.73051</td><td>1.4581889e-04</td><td>1.0092091e-01</td><td>-1.9298431e-01</td></tr>
-<tr><td>169.7863760557957</td><td>8.9214008e+04</td><td>9.1563263e+00</td><td>0</td><td>3.263836e-03</td><td>781.80745</td><td>786.73005</td><td>2978</td><td>8.6126133e+04</td><td>8.7672691e+00</td><td>2.0793108e+03</td><td>7.0831001e-01</td><td>8.9214008e+04</td><td>9.1563263e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.80745</td><td>1.2411721e-04</td><td>786.73005</td><td>1.5003627e-04</td><td>1.0036582e-01</td><td>-1.9279599e-01</td></tr>
-<tr><td>169.80681006918894</td><td>8.5608195e+04</td><td>9.0206089e+00</td><td>0</td><td>3.264349e-03</td><td>781.80376</td><td>786.72918</td><td>2979</td><td>8.2681344e+04</td><td>8.6362791e+00</td><td>2.0772085e+03</td><td>7.0797533e-01</td><td>8.5608195e+04</td><td>9.0206089e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.80376</td><td>1.2850568e-04</td><td>786.72918</td><td>1.5526263e-04</td><td>1.0042009e-01</td><td>-1.9289577e-01</td></tr>
-<tr><td>169.8272442823436</td><td>8.3063625e+04</td><td>8.9255180e+00</td><td>0</td><td>3.264862e-03</td><td>781.80081</td><td>786.72913</td><td>2980</td><td>8.0246992e+04</td><td>8.5434341e+00</td><td>2.0767546e+03</td><td>7.0811391e-01</td><td>8.3063625e+04</td><td>8.9255180e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.80081</td><td>1.3182692e-04</td><td>786.72913</td><td>1.5920549e-04</td><td>1.0021163e-01</td><td>-1.9266903e-01</td></tr>
-<tr><td>169.84767829527118</td><td>8.4244992e+04</td><td>8.9700022e+00</td><td>0</td><td>3.265375e-03</td><td>781.80242</td><td>786.72905</td><td>2981</td><td>8.1373969e+04</td><td>8.5879698e+00</td><td>2.0805510e+03</td><td>7.0775980e-01</td><td>8.4244992e+04</td><td>8.9700022e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.80242</td><td>1.3028238e-04</td><td>786.72905</td><td>1.5737538e-04</td><td>1.0010726e-01</td><td>-1.9241102e-01</td></tr>
-<tr><td>169.86811250773462</td><td>9.7360805e+04</td><td>9.4567146e+00</td><td>0</td><td>3.265888e-03</td><td>781.81441</td><td>786.73210</td><td>2982</td><td>9.3887734e+04</td><td>9.0560179e+00</td><td>2.0782170e+03</td><td>7.0836788e-01</td><td>9.7360805e+04</td><td>9.4567146e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.81441</td><td>1.1529749e-04</td><td>786.73210</td><td>1.3958653e-04</td><td>9.8970458e-02</td><td>-1.9224431e-01</td></tr>
-<tr><td>169.88854651995644</td><td>1.2825345e+05</td><td>1.0503614e+01</td><td>0</td><td>3.266400e-03</td><td>781.83651</td><td>786.73500</td><td>2983</td><td>1.2337022e+05</td><td>1.0063412e+01</td><td>2.0774846e+03</td><td>7.0743954e-01</td><td>1.2825345e+05</td><td>1.0503614e+01</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.83651</td><td>9.1639682e-05</td><td>786.73500</td><td>1.1152634e-04</td><td>9.9608414e-02</td><td>-1.9224758e-01</td></tr>
-<tr><td>169.90898063195345</td><td>1.5187158e+05</td><td>1.1233888e+01</td><td>0</td><td>3.266912e-03</td><td>781.84701</td><td>786.73606</td><td>2984</td><td>1.4590969e+05</td><td>1.0766508e+01</td><td>2.0792261e+03</td><td>7.0833290e-01</td><td>1.5187158e+05</td><td>1.1233888e+01</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.84701</td><td>7.9801415e-05</td><td>786.73606</td><td>9.7487238e-05</td><td>9.8825477e-02</td><td>-1.9200189e-01</td></tr>
-<tr><td>169.9294148437184</td><td>1.6871948e+05</td><td>1.1725034e+01</td><td>0</td><td>3.267424e-03</td><td>781.85356</td><td>786.73615</td><td>2985</td><td>1.6198620e+05</td><td>1.1240104e+01</td><td>2.0780894e+03</td><td>7.0873052e-01</td><td>1.6871948e+05</td><td>1.1725034e+01</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.85356</td><td>7.3274212e-05</td><td>786.73615</td><td>8.9778732e-05</td><td>9.9280514e-02</td><td>-1.9207963e-01</td></tr>
-<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-<tr><td>258.2631828811136</td><td>9.4131328e+04</td><td>9.3219748e+00</td><td>0</td><td>2.598361e-03</td><td>781.66350</td><td>787.06774</td><td>7308</td><td>8.9727844e+04</td><td>8.9079256e+00</td><td>2.1440417e+03</td><td>7.0889163e-01</td><td>9.4131328e+04</td><td>9.3219748e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.66350</td><td>1.2083405e-04</td><td>787.06774</td><td>1.4286327e-04</td><td>-5.0929710e-02</td><td>1.4663801e-01</td></tr>
-<tr><td>258.28361569694243</td><td>9.2878820e+04</td><td>9.2731094e+00</td><td>0</td><td>2.597577e-03</td><td>781.66157</td><td>787.06740</td><td>7309</td><td>8.8527227e+04</td><td>8.8611145e+00</td><td>2.1467869e+03</td><td>7.0827138e-01</td><td>9.2878820e+04</td><td>9.2731094e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.66157</td><td>1.2219569e-04</td><td>787.06740</td><td>1.4442031e-04</td><td>-5.1394299e-02</td><td>1.4658417e-01</td></tr>
-<tr><td>258.3040484127632</td><td>9.2034094e+04</td><td>9.2417078e+00</td><td>1100000000000000000</td><td>2.596793e-03</td><td>781.65987</td><td>787.06772</td><td>7310</td><td>8.7705906e+04</td><td>8.8319845e+00</td><td>2.1418911e+03</td><td>7.0921260e-01</td><td>9.2034094e+04</td><td>9.2417078e+00</td><td>1100000000000000000</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.65987</td><td>1.2317530e-04</td><td>787.06772</td><td>1.4557109e-04</td><td>-5.2788489e-02</td><td>1.4718631e-01</td></tr>
-<tr><td>258.32448132812715</td><td>9.1409266e+04</td><td>9.2205820e+00</td><td>0</td><td>2.596008e-03</td><td>781.66046</td><td>787.06774</td><td>7311</td><td>8.7112359e+04</td><td>8.8111296e+00</td><td>2.1419580e+03</td><td>7.0941931e-01</td><td>9.1409266e+04</td><td>9.2205820e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.66046</td><td>1.2387938e-04</td><td>787.06774</td><td>1.4640002e-04</td><td>-5.1082097e-02</td><td>1.4737232e-01</td></tr>
-<tr><td>258.34491414348304</td><td>9.0934453e+04</td><td>9.2037315e+00</td><td>0</td><td>2.595223e-03</td><td>781.66006</td><td>787.06733</td><td>7312</td><td>8.6663805e+04</td><td>8.7947636e+00</td><td>2.1399746e+03</td><td>7.0873111e-01</td><td>9.0934453e+04</td><td>9.2037315e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.66006</td><td>1.2442317e-04</td><td>787.06733</td><td>1.4701700e-04</td><td>-5.1297914e-02</td><td>1.4743482e-01</td></tr>
-<tr><td>258.3653468583798</td><td>9.0627711e+04</td><td>9.1926651e+00</td><td>0</td><td>2.594438e-03</td><td>781.65842</td><td>787.06748</td><td>7313</td><td>8.6410219e+04</td><td>8.7850523e+00</td><td>2.1412927e+03</td><td>7.0846963e-01</td><td>9.0627711e+04</td><td>9.1926651e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.65842</td><td>1.2473276e-04</td><td>787.06748</td><td>1.4736662e-04</td><td>-5.3477854e-02</td><td>1.4825350e-01</td></tr>
-<tr><td>258.4062125879427</td><td>9.2799812e+04</td><td>9.2735319e+00</td><td>0</td><td>2.592868e-03</td><td>781.66311</td><td>787.06602</td><td>7315</td><td>8.8482406e+04</td><td>8.8615150e+00</td><td>2.1397761e+03</td><td>7.0821041e-01</td><td>9.2799812e+04</td><td>9.2735319e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.66311</td><td>1.2222759e-04</td><td>787.06602</td><td>1.4448226e-04</td><td>-5.0823554e-02</td><td>1.4643176e-01</td></tr>
-<tr><td>258.4266453021337</td><td>9.2305727e+04</td><td>9.2546864e+00</td><td>0</td><td>2.592082e-03</td><td>781.66219</td><td>787.06568</td><td>7316</td><td>8.8041828e+04</td><td>8.8437214e+00</td><td>2.1407056e+03</td><td>7.0872313e-01</td><td>9.2305727e+04</td><td>9.2546864e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.66219</td><td>1.2274201e-04</td><td>787.06568</td><td>1.4511198e-04</td><td>-5.2071981e-02</td><td>1.4703403e-01</td></tr>
-<tr><td>258.4470781163327</td><td>8.9541500e+04</td><td>9.1516228e+00</td><td>0</td><td>2.591296e-03</td><td>781.65845</td><td>787.06562</td><td>7317</td><td>8.5375305e+04</td><td>8.7458200e+00</td><td>2.1410559e+03</td><td>7.0890176e-01</td><td>8.9541500e+04</td><td>9.1516228e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.65845</td><td>1.2598942e-04</td><td>787.06562</td><td>1.4883128e-04</td><td>-5.3206120e-02</td><td>1.4745203e-01</td></tr>
-<tr><td>258.46751103029237</td><td>8.5948555e+04</td><td>9.0121727e+00</td><td>0</td><td>2.590510e-03</td><td>781.65486</td><td>787.06465</td><td>7318</td><td>8.1906250e+04</td><td>8.6120892e+00</td><td>2.1406807e+03</td><td>7.0841718e-01</td><td>8.5948555e+04</td><td>9.0121727e+00</td><td>0</td><td>nan</td><td>nan</td><td>nan</td><td>nan</td><td>781.65486</td><td>1.3045572e-04</td><td>787.06465</td><td>1.5403067e-04</td><td>-5.2536737e-02</td><td>1.4800853e-01</td></tr>
-</table></div>
-</div>
 <p>This returns a single <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object, which is shown above in the form of an <code class="docutils literal notranslate"><span class="pre">astropy</span></code> table. We can examine the light curve using the <code class="docutils literal notranslate"><span class="pre">plot</span></code> method.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -755,28 +651,12 @@ SearchResult containing 1 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_1-getting-started_searching-for-data-products_22_1.png" src="../../_images/tutorials_1-getting-started_searching-for-data-products_22_1.png" />
-</div>
-</div>
-</div>
-<div class="section" id="2.2-Downloading-a-collection-of-light-curves">
+</section>
+<section id="2.2-Downloading-a-collection-of-light-curves">
 <h3>2.2 Downloading a collection of light curves<a class="headerlink" href="#2.2-Downloading-a-collection-of-light-curves" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> object also has a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.SearchResult.download_all.html?highlight=download_all">download_all</a> method, allowing you to download multiple light curves. This returns a <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code>, a convenient container for <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -785,24 +665,10 @@ SearchResult containing 1 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-LightCurveCollection of 5 objects:
-    0: &lt;KeplerLightCurve LABEL=&#34;KIC 3733346&#34; QUARTER=1 AUTHOR=Kepler&gt;
-    1: &lt;KeplerLightCurve LABEL=&#34;KIC 3733346&#34; QUARTER=2 AUTHOR=Kepler&gt;
-    2: &lt;KeplerLightCurve LABEL=&#34;KIC 3733346&#34; QUARTER=3 AUTHOR=Kepler&gt;
-    3: &lt;KeplerLightCurve LABEL=&#34;KIC 3733346&#34; QUARTER=4 AUTHOR=Kepler&gt;
-    4: &lt;KeplerLightCurve LABEL=&#34;KIC 3733346&#34; QUARTER=5 AUTHOR=Kepler&gt;
-</pre></div></div>
-</div>
 <p>The <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code> has a number of useful functions for plotting and manipulating the light curves. For more information about how to combine multiple light curves, please see the tutorial on combining multiple quarters of <em>Kepler</em> observations.</p>
 <p>One of the methods the collection enables you to use is <code class="docutils literal notranslate"><span class="pre">plot</span></code>, making it possible to quickly visualize all observations in your collection.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -813,25 +679,9 @@ LightCurveCollection of 5 objects:
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_1-getting-started_searching-for-data-products_27_1.png" src="../../_images/tutorials_1-getting-started_searching-for-data-products_27_1.png" />
-</div>
-</div>
 <p>You can also iterate through a collection to label them more clearly and to perform additional actions like normalization.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -841,21 +691,14 @@ LightCurveCollection of 5 objects:
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_1-getting-started_searching-for-data-products_29_0.png" src="../../_images/tutorials_1-getting-started_searching-for-data-products_29_0.png" />
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="3.-Searching-for-Target-Pixel-Files">
+</section>
+</section>
+<section id="3.-Searching-for-Target-Pixel-Files">
 <h2>3. Searching for Target Pixel Files<a class="headerlink" href="#3.-Searching-for-Target-Pixel-Files" title="Permalink to this headline">¶</a></h2>
 <p>The other primary data product used by Lightkurve is the <a class="reference external" href="https://heasarc.gsfc.nasa.gov/docs/tess/data-products.html#target-pixel-files-tpfs">TargetPixelFile</a>, or TPF. A TPF is a stack of images containing the flux in each pixel at each cadence.</p>
 <p>Similar to the approach above, we can use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile</a> method to identify available observations.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -864,26 +707,12 @@ LightCurveCollection of 5 objects:
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-SearchResult containing 2 data products.
-
-<table id="table6307458928">
-<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
-<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
-<tr><td>0</td><td>K2 Campaign 06</td><td>2015</td><td><a href='https://archive.stsci.edu/k2/data_products.html'>K2</a></td><td>1800</td><td>ktwo212779596</td><td>0.0</td></tr>
-<tr><td>1</td><td>K2 Campaign 17</td><td>2018</td><td><a href='https://archive.stsci.edu/k2/data_products.html'>K2</a></td><td>1800</td><td>ktwo212779596</td><td>0.0</td></tr>
-</table></div>
-</div>
 <p>This returns a table which contains the same information as a light curve search result.</p>
-<div class="section" id="3.1-Downloading-a-single-target-pixel-file">
+<section id="3.1-Downloading-a-single-target-pixel-file">
 <h3>3.1 Downloading a single target pixel file<a class="headerlink" href="#3.1-Downloading-a-single-target-pixel-file" title="Permalink to this headline">¶</a></h3>
 <p>When you call <code class="docutils literal notranslate"><span class="pre">download</span></code> on a search result containing more than one entry, it will download only the first entry in the search result. Lightkurve will raise a friendly warning to let you know when this occurs.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -891,18 +720,9 @@ SearchResult containing 2 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/gb/dev/lightkurve/src/lightkurve/search.py:346: LightkurveWarning: Warning: 2 files available to download. Only the first file has been downloaded. Please use `download_all()` or specify additional criteria (e.g. quarter, campaign, or sector) to limit your search.
-  warnings.warn(
-</pre></div></div>
-</div>
 <p>We can view a single cadence of the TPF using the <code class="docutils literal notranslate"><span class="pre">plot</span></code> method.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -910,25 +730,9 @@ SearchResult containing 2 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 212779596, Cadence: 111362&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_1-getting-started_searching-for-data-products_38_1.png" src="../../_images/tutorials_1-getting-started_searching-for-data-products_38_1.png" />
-</div>
-</div>
 <p>If we want to turn the TPF into a light curve, there is a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve</a> method.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -937,29 +741,13 @@ SearchResult containing 2 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_1-getting-started_searching-for-data-products_40_1.png" src="../../_images/tutorials_1-getting-started_searching-for-data-products_40_1.png" />
-</div>
-</div>
 <p>For more information about using and plotting TPFs, please see the tutorials on using <em>Kepler</em> target pixel file products with Lightkurve and plotting <em>Kepler</em> target pixel file products with Lightkurve.</p>
-</div>
-<div class="section" id="3.2-Downloading-a-collection-of-target-pixel-files">
+</section>
+<section id="3.2-Downloading-a-collection-of-target-pixel-files">
 <h3>3.2 Downloading a collection of target pixel files<a class="headerlink" href="#3.2-Downloading-a-collection-of-target-pixel-files" title="Permalink to this headline">¶</a></h3>
 <p>You can also download multiple TPFs at a time using the <code class="docutils literal notranslate"><span class="pre">download_all</span></code> method, which returns a <code class="docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -968,20 +756,9 @@ SearchResult containing 2 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-TargetPixelFileCollection of 2 objects:
-    0: KeplerTargetPixelFile Object (ID: 212779596)
-    1: KeplerTargetPixelFile Object (ID: 212779596)
-</pre></div></div>
-</div>
 <p>A single cadence of each of these TPFs can be inspected with the <code class="docutils literal notranslate"><span class="pre">plot</span></code> method.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -989,31 +766,13 @@ TargetPixelFileCollection of 2 objects:
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 212779596, Cadence: 111362&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;,
-       &lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 212779596, Cadence: 158445&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;],
-      dtype=object)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_1-getting-started_searching-for-data-products_46_1.png" src="../../_images/tutorials_1-getting-started_searching-for-data-products_46_1.png" />
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts">
+</section>
+</section>
+<section id="4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts">
 <h2>4. Searching for <em>TESS</em> Full Frame Image (FFI) Cutouts<a class="headerlink" href="#4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts" title="Permalink to this headline">¶</a></h2>
 <p>It is also possible to download targets observed in the <em>TESS</em> Full Frame Images (FFIs) using Lightkurve. This is done using <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_tesscut.html?highlight=search_tesscut">search_tesscut</a>, which utilizes the <a class="reference external" href="https://mast.stsci.edu/tesscut/">TESSCut</a> tool (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract">Brasseur et. al 2019</a>).</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1022,31 +781,9 @@ array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 212779596, Cadenc
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-SearchResult containing 10 data products.
-
-<table id="table6307514976">
-<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
-<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
-<tr><td>0</td><td>TESS Sector 01</td><td>2018</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>Pi Men</td><td>0.0</td></tr>
-<tr><td>1</td><td>TESS Sector 04</td><td>2018</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>Pi Men</td><td>0.0</td></tr>
-<tr><td>2</td><td>TESS Sector 08</td><td>2019</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>Pi Men</td><td>0.0</td></tr>
-<tr><td>3</td><td>TESS Sector 11</td><td>2019</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>Pi Men</td><td>0.0</td></tr>
-<tr><td>4</td><td>TESS Sector 12</td><td>2019</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>Pi Men</td><td>0.0</td></tr>
-<tr><td>5</td><td>TESS Sector 13</td><td>2019</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>Pi Men</td><td>0.0</td></tr>
-<tr><td>6</td><td>TESS Sector 27</td><td>2020</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>475</td><td>Pi Men</td><td>0.0</td></tr>
-<tr><td>7</td><td>TESS Sector 28</td><td>2020</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>475</td><td>Pi Men</td><td>0.0</td></tr>
-<tr><td>8</td><td>TESS Sector 31</td><td>2020</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>475</td><td>Pi Men</td><td>0.0</td></tr>
-<tr><td>9</td><td>TESS Sector 34</td><td>2021</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>475</td><td>Pi Men</td><td>0.0</td></tr>
-</table></div>
-</div>
 <p><em>TESS</em> FFI cutouts are downloaded as <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> objects. This is done using the same download function as above, but it now takes an additional argument <code class="docutils literal notranslate"><span class="pre">cutout_size</span></code>, which describes the number of pixels along the side of the cutout, and can be an <code class="docutils literal notranslate"><span class="pre">int</span></code> or a <code class="docutils literal notranslate"><span class="pre">tuple</span></code>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1055,28 +792,12 @@ SearchResult containing 10 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: Pi Men, Cadence: 0&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_1-getting-started_searching-for-data-products_51_1.png" src="../../_images/tutorials_1-getting-started_searching-for-data-products_51_1.png" />
-</div>
-</div>
-</div>
-<div class="section" id="5.-Performing-a-Cone-Search">
+</section>
+<section id="5.-Performing-a-Cone-Search">
 <h2>5. Performing a Cone Search<a class="headerlink" href="#5.-Performing-a-Cone-Search" title="Permalink to this headline">¶</a></h2>
 <p>If you are interested in identifying a number of nearby targets, you can perform a cone search, which will return all available targets within a cone of a specfied radius on the sky. The radius can be either a <code class="docutils literal notranslate"><span class="pre">float</span></code> or an <a class="reference external" href="https://docs.astropy.org/en/stable/units/">astropy.units.Quantity</a> object. If a float is given, it will be assumed to be in units of arcseconds. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then we default to 0.0001 arcsec.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1085,33 +806,18 @@ SearchResult containing 10 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-SearchResult containing 3 data products.
-
- #     mission     year author exptime  target_name  distance
-                                  s                   arcsec
---- -------------- ---- ------ ------- ------------- --------
-  0 K2 Campaign 12 2016     K2    1800 ktwo246199087      0.0
-  1 K2 Campaign 12 2016     K2    1800 ktwo200164267     12.1
-  2 K2 Campaign 12 2016     K2    1800 ktwo246199173     95.5
-</pre></div></div>
-</div>
 <p>The <code class="docutils literal notranslate"><span class="pre">distance</span></code> column describes the distance on the sky in arcseconds from the target or coordinates passed into the search.</p>
-</div>
-<div class="section" id="About-this-Notebook">
+</section>
+<section id="About-this-Notebook">
 <h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
 <p><strong>Authors</strong>: Nicholas Saunders (<a class="reference external" href="mailto:nksaun&#37;&#52;&#48;hawaii&#46;edu">nksaun<span>&#64;</span>hawaii<span>&#46;</span>edu</a>)</p>
 <p><strong>Updated</strong>: September 28, 2020</p>
-</div>
-<div class="section" id="Citing-Lightkurve-and-Astropy">
+</section>
+<section id="Citing-Lightkurve-and-Astropy">
 <h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or its dependencies in your published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1119,232 +825,54 @@ SearchResult containing 3 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<head>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-
-<style>
-    button {
-        border: 1px solid;
-        padding: 0.2em;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 0.8em;
-        margin: 0.2em;
-        cursor: pointer;
-    }
-
-    .citation-button-1 {background-color: #4CAF50;} /* Green */
-    .citation-button-2 {background-color: #008CBA;} /* Blue */
-</style>
-
-<script type="text/javascript">
-    function copyBibtex(package) {
-        var copyText = document.getElementById(package + "Text");
-        copyText.select();
-        document.execCommand("copy");
-        alert("BibTex has been copied to your clipboard")
-    }
-</script>
-</head>
-
-<body>
-    <textarea id="lightkurveText" style="position: absolute; left: -9999px; z-index: -9999;">
-@MISC{2018ascl.soft12013L,
-    author = {{Lightkurve Collaboration} and {Cardoso}, J.~V.~d.~M. and
-                {Hedges}, C. and {Gully-Santiago}, M. and {Saunders}, N. and
-                {Cody}, A.~M. and {Barclay}, T. and {Hall}, O. and
-                {Sagear}, S. and {Turtelboom}, E. and {Zhang}, J. and
-                {Tzanidakis}, A. and {Mighell}, K. and {Coughlin}, J. and
-                {Bell}, K. and {Berta-Thompson}, Z. and {Williams}, P. and
-                {Dotson}, J. and {Barentsen}, G.},
-    title = "{Lightkurve: Kepler and TESS time series analysis in Python}",
-    keywords = {Software, NASA},
-howpublished = {Astrophysics Source Code Library},
-        year = 2018,
-    month = dec,
-archivePrefix = "ascl",
-    eprint = {1812.013},
-    adsurl = {http://adsabs.harvard.edu/abs/2018ascl.soft12013L},
-}
-    </textarea>
-    <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
-@ARTICLE{2018AJ....156..123T,
-   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
-    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
-    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
-    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
-    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
-    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
-    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
-    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
-    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
-    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
-    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
-    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
-    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
-    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
-    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
-    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
-    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
-    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
-    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
-    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
-    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
-    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
-    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
-    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
-    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
-    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
-    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
-    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
-    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
-    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
-    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
-    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
-    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
-    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
-    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
-    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
-    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
-    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
-    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
-    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
-    {Zabalza}, V. and {Contributors}, (.},
-    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
-  journal = {\aj},
-archivePrefix = "arXiv",
-   eprint = {1801.02634},
- primaryClass = "astro-ph.IM",
- keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
-     year = 2018,
-    month = sep,
-   volume = 156,
-      eid = {123},
-    pages = {123},
-      doi = {10.3847/1538-3881/aabc4f},
-   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
-}
-
-
-    </textarea>
-    <textarea id="astroqueryText" style="position: absolute; left: -9999px; z-index: -9999;">
-@ARTICLE{2019AJ....157...98G,
-   author = {{Ginsburg}, A. and {Sip{\H o}cz}, B.~M. and {Brasseur}, C.~E. and
-    {Cowperthwaite}, P.~S. and {Craig}, M.~W. and {Deil}, C. and
-    {Guillochon}, J. and {Guzman}, G. and {Liedtke}, S. and {Lian Lim}, P. and
-    {Lockhart}, K.~E. and {Mommert}, M. and {Morris}, B.~M. and
-    {Norman}, H. and {Parikh}, M. and {Persson}, M.~V. and {Robitaille}, T.~P. and
-    {Segovia}, J.-C. and {Singer}, L.~P. and {Tollerud}, E.~J. and
-    {de Val-Borro}, M. and {Valtchanov}, I. and {Woillez}, J. and
-    {The Astroquery collaboration} and {a subset of the astropy collaboration}
-    },
-    title = "{astroquery: An Astronomical Web-querying Package in Python}",
-  journal = {\aj},
-archivePrefix = "arXiv",
-   eprint = {1901.04520},
- primaryClass = "astro-ph.IM",
- keywords = {astronomical databases: miscellaneous, virtual observatory tools},
-     year = 2019,
-    month = mar,
-   volume = 157,
-      eid = {98},
-    pages = {98},
-      doi = {10.3847/1538-3881/aafc33},
-   adsurl = {http://adsabs.harvard.edu/abs/2019AJ....157...98G},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
-}
-
-    </textarea>
-    <textarea id="tesscutText" style="position: absolute; left: -9999px; z-index: -9999;">
-@MISC{2019ascl.soft05007B,
-        author = {{Brasseur}, C.~E. and {Phillip}, Carlita and {Fleming}, Scott W. and
-          {Mullally}, S.~E. and {White}, Richard L.},
-         title = "{Astrocut: Tools for creating cutouts of TESS images}",
-      keywords = {Software},
-          year = 2019,
-         month = may,
-           eid = {ascl:1905.007},
-         pages = {ascl:1905.007},
- archivePrefix = {ascl},
-        eprint = {1905.007},
-        adsurl = {https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B},
-       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
- }
-    </textarea>
-
-    <p>
-        When using Lightkurve, we kindly request that you cite the following packages:
-        <ul>
-            <li>
-                <a href="https://docs.lightkurve.org">lightkurve</a>
-                <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astropy.org">astropy</a>
-                <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astroquery.readthedocs.io">astroquery</a>
-                <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                —  if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
-            </li>
-            <li>
-                <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
-                <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                — if you are using <i>search_tesscut()</i>.
-            </li>
-        </ul>
-    </p>
-</body></div>
-</div>
 <p><img alt="Space Telescope Logo" class="no-scaled-link" src="https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png" style="width: 200px;" /></p>
-</div>
-</div>
+</section>
+</section>
 
 
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='left-prev' id="prev-link" href="what-are-periodogram-objects.html" title="previous page">What are <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects?</a>
-    <a class='right-next' id="next-link" href="using-light-curve-file-products.html" title="next page">Using Light Curve Files with Lightkurve</a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="what-are-periodogram-objects.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">What are <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects?</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="using-light-curve-file-products.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Using Light Curve Files with Lightkurve</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
 
       </div>
     </div>
-
-    
-  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
-
-
-    
-    <!-- Google Analytics -->
-    <script>
-      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-      ga('create', 'UA-69171-9', 'auto');
-      ga('set', 'anonymizeIp', true);
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-    <!-- End Google Analytics -->
-    <footer class="footer mt-5 mt-md-0">
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
-    <p>
-          &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
-    </p>
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
   </div>
 </footer>
   </body>

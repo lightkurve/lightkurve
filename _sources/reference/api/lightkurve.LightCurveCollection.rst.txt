@@ -1,0 +1,35 @@
+﻿lightkurve.LightCurveCollection
+===============================
+
+.. currentmodule:: lightkurve
+
+.. autoclass:: LightCurveCollection
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LightCurveCollection.__init__
+      ~LightCurveCollection.append
+      ~LightCurveCollection.plot
+      ~LightCurveCollection.stitch
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LightCurveCollection.PDCSAP_FLUX
+      ~LightCurveCollection.SAP_FLUX
+      ~LightCurveCollection.campaign
+      ~LightCurveCollection.quarter
+      ~LightCurveCollection.sector
+   
+   

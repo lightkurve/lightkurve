@@ -71,6 +71,7 @@
       ~FoldedLightCurve.round
       ~FoldedLightCurve.scatter
       ~FoldedLightCurve.search_neighbors
+      ~FoldedLightCurve.select_flux
       ~FoldedLightCurve.show_in_browser
       ~FoldedLightCurve.show_in_notebook
       ~FoldedLightCurve.show_properties

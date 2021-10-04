@@ -1,0 +1,1134 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.seismology.core &#8212; Lightkurve </title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+      <div class="navbar-end-item">
+        <form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for lightkurve.seismology.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines the Seismology class.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">find_peaks</span>
+
+<span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">astropy.units</span> <span class="kn">import</span> <span class="n">cds</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">MPLSTYLE</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">stellar_estimators</span>
+<span class="kn">from</span> <span class="nn">..periodogram</span> <span class="kn">import</span> <span class="n">SNRPeriodogram</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">LightkurveWarning</span><span class="p">,</span> <span class="n">validate_method</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">SeismologyQuantity</span>
+
+<span class="c1"># Import the optional Bokeh dependency required by ``interact_echelle```,</span>
+<span class="c1"># or print a friendly error otherwise.</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">bokeh</span>  <span class="c1"># Import bokeh first so we get an ImportError we can catch</span>
+    <span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="kn">import</span> <span class="n">show</span><span class="p">,</span> <span class="n">output_notebook</span>
+    <span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">figure</span>
+    <span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">LogColorMapper</span><span class="p">,</span> <span class="n">Slider</span><span class="p">,</span> <span class="n">RangeSlider</span><span class="p">,</span> <span class="n">Button</span>
+    <span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="kn">import</span> <span class="n">layout</span><span class="p">,</span> <span class="n">Spacer</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="c1"># Nice error will be raised when ``interact_echelle``` is called.</span>
+    <span class="k">pass</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Seismology&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="Seismology"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology">[docs]</a><span class="k">class</span> <span class="nc">Seismology</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Enables astroseismic quantities to be estimated from periodograms.</span>
+
+<span class="sd">    This class provides easy access to methods to estimate numax, deltanu, radius,</span>
+<span class="sd">    mass, and logg, and stores them on its tray for easy diagnostic plotting.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Download the TESS light curve for HIP 116158:</span>
+
+<span class="sd">        &gt;&gt;&gt; import lightkurve as lk</span>
+<span class="sd">        &gt;&gt;&gt; lc = lk.search_lightcurve(&quot;HIP 116158&quot;, sector=2).download()  # doctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; lc = lc.normalize().remove_nans().remove_outliers()  # doctest: +SKIP</span>
+
+<span class="sd">    Create a Lomb-Scargle periodogram:</span>
+
+<span class="sd">        &gt;&gt;&gt; pg = lc.to_periodogram(normalization=&#39;psd&#39;, minimum_frequency=100, maximum_frequency=800)  # doctest: +SKIP</span>
+
+<span class="sd">    Create a Seismology object and use it to estimate parameters:</span>
+
+<span class="sd">        &gt;&gt;&gt; seismology = pg.flatten().to_seismology()  # doctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; seismology.estimate_numax()  # doctest: +SKIP</span>
+<span class="sd">        numax: 415.00 uHz (method: ACF2D)</span>
+<span class="sd">        &gt;&gt;&gt; seismology.estimate_deltanu()  # doctest: +SKIP</span>
+<span class="sd">        deltanu: 28.78 uHz (method: ACF2D)</span>
+<span class="sd">        &gt;&gt;&gt; seismology.estimate_radius(teff=5080)  # doctest: +SKIP</span>
+<span class="sd">        radius: 2.78 solRad (method: Uncorrected Scaling Relations)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    periodogram : `~lightkurve.periodogram.Periodogram` object</span>
+<span class="sd">        Periodogram to be analyzed. Must be background-corrected,</span>
+<span class="sd">        e.g. using `periodogram.flatten()`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">periodogram</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;The periodogram from which seismological parameters are being extracted.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Seismology.__init__"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">periodogram</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">periodogram</span><span class="p">,</span> <span class="n">SNRPeriodogram</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Seismology received a periodogram which does not appear &quot;</span>
+                <span class="s2">&quot;to have been background-corrected. Please consider calling &quot;</span>
+                <span class="s2">&quot;`periodogram.flatten()` prior to extracting seismological parameters.&quot;</span><span class="p">,</span>
+                <span class="n">LightkurveWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span> <span class="o">=</span> <span class="n">periodogram</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="s2">&quot;numax&quot;</span><span class="p">,</span> <span class="s2">&quot;deltanu&quot;</span><span class="p">,</span> <span class="s2">&quot;mass&quot;</span><span class="p">,</span> <span class="s2">&quot;radius&quot;</span><span class="p">,</span> <span class="s2">&quot;logg&quot;</span><span class="p">])</span>
+        <span class="n">tray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">tray</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">tray_str</span> <span class="o">=</span> <span class="s2">&quot; - no values have been computed so far.&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tray_str</span> <span class="o">=</span> <span class="s2">&quot; - computed values:</span><span class="se">\n</span><span class="s2"> * &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> * &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">[</span><span class="n">tray</span><span class="p">]]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;Seismology(ID: </span><span class="si">{}</span><span class="s2">)</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">tray_str</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Seismology.from_lightcurve"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.from_lightcurve.html#lightkurve.seismology.Seismology.from_lightcurve">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_lightcurve</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a `Seismology` object given a `LightCurve`.&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Building a Seismology object directly from a light curve &quot;</span>
+            <span class="s2">&quot;uses default periodogram parameters. For further tuneability, &quot;</span>
+            <span class="s2">&quot;create a periodogram object first, using `to_periodogram`.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">Seismology</span><span class="p">(</span>
+            <span class="n">periodogram</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">fill_gaps</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_validate_numax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numax</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raises exception if `numax` is None and `self.numax` is not set.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">numax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">numax</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                    <span class="s2">&quot;You need to call `Seismology.estimate_numax()` first.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">numax</span>
+
+    <span class="k">def</span> <span class="nf">_validate_deltanu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deltanu</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raises exception if `deltanu` is None and `self.deltanu` is not set.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">deltanu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deltanu</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                    <span class="s2">&quot;You need to call `Seismology.estimate_deltanu()` first.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">deltanu</span>
+
+    <span class="k">def</span> <span class="nf">_clean_echelle</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">deltanu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">numax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">minimum_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">maximum_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">smooth_filter_width</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Takes input seismology object and creates the necessary arrays for an echelle</span>
+<span class="sd">        diagram. Validates all the inputs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        deltanu : float</span>
+<span class="sd">            Value for the large frequency separation of the seismic mode</span>
+<span class="sd">            frequencies in the periodogram. Assumed to have the same units as</span>
+<span class="sd">            the frequencies, unless given an Astropy unit.</span>
+<span class="sd">            Is assumed to be in the same units as frequency if not given a unit.</span>
+<span class="sd">        numax : float</span>
+<span class="sd">            Value for the frequency of maximum oscillation. If a numax is</span>
+<span class="sd">            passed, a suitable range one FWHM of the mode envelope either side</span>
+<span class="sd">            of the will be shown. This is overwritten by custom frequency ranges.</span>
+<span class="sd">            Is assumed to be in the same units as frequency if not given a unit.</span>
+<span class="sd">        minimum_frequency : float</span>
+<span class="sd">            The minimum frequency at which to display the echelle</span>
+<span class="sd">            Is assumed to be in the same units as frequency if not given a unit.</span>
+<span class="sd">        maximum_frequency : float</span>
+<span class="sd">            The maximum frequency at which to display the echelle.</span>
+<span class="sd">            Is assumed to be in the same units as frequency if not given a unit.</span>
+<span class="sd">        smooth_filter_width : float</span>
+<span class="sd">            If given a value, will smooth periodogram used to plot the echelle</span>
+<span class="sd">            diagram using the periodogram.smooth(method=&#39;boxkernel&#39;) method with</span>
+<span class="sd">            a filter width of `smooth_filter_width`. This helps visualise the</span>
+<span class="sd">            echelle diagram. Is assumed to be in the same units as the</span>
+<span class="sd">            periodogram frequency.</span>
+<span class="sd">        ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
+<span class="sd">            a new one will be created.</span>
+<span class="sd">        scale: str</span>
+<span class="sd">            Set z axis to be &quot;linear&quot; or &quot;log&quot;. Default is linear.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ep : np.ndarray</span>
+<span class="sd">            Echelle diagram power</span>
+<span class="sd">        x_f : np.ndarray</span>
+<span class="sd">            frequencies for X axis</span>
+<span class="sd">        y_f : np.ndarray</span>
+<span class="sd">            frequencies for Y axis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">minimum_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">maximum_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">numax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_numax</span><span class="p">(</span><span class="n">numax</span><span class="p">)</span>
+        <span class="n">deltanu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_deltanu</span><span class="p">(</span><span class="n">deltanu</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">numax</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">numax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">numax</span> <span class="o">=</span> <span class="n">numax</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">unit</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">deltanu</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">deltanu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">deltanu</span> <span class="o">=</span> <span class="n">deltanu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">unit</span>
+
+        <span class="k">if</span> <span class="n">smooth_filter_width</span><span class="p">:</span>
+            <span class="n">pgsmooth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">filter_width</span><span class="o">=</span><span class="n">smooth_filter_width</span><span class="p">)</span>
+            <span class="n">freq</span> <span class="o">=</span> <span class="n">pgsmooth</span><span class="o">.</span><span class="n">frequency</span>  <span class="c1"># Makes code below more readable below</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="n">pgsmooth</span><span class="o">.</span><span class="n">power</span>  <span class="c1"># Makes code below more readable below</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span>  <span class="c1"># Makes code below more readable</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">power</span>  <span class="c1"># Makes code below more readable</span>
+
+        <span class="n">fmin</span> <span class="o">=</span> <span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">fmax</span> <span class="o">=</span> <span class="n">freq</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Check for any superfluous input</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">numax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">([</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">[</span><span class="n">minimum_frequency</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="p">]])</span>
+        <span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;You have passed both a numax and a frequency limit. &quot;</span>
+                <span class="s2">&quot;The frequency limit will override the numax input.&quot;</span><span class="p">,</span>
+                <span class="n">LightkurveWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Ensure input numax is in the correct units (if there is one)</span>
+        <span class="k">if</span> <span class="n">numax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">numax</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">numax</span><span class="p">,</span> <span class="n">freq</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="n">numax</span> <span class="o">&gt;</span> <span class="n">freq</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;You can&#39;t pass in a numax outside the&quot;</span>
+                    <span class="s2">&quot;frequency range of the periodogram.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">fwhm</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_fwhm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="p">,</span> <span class="n">numax</span><span class="p">)</span>
+
+            <span class="n">fmin</span> <span class="o">=</span> <span class="n">numax</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">fwhm</span>
+            <span class="k">if</span> <span class="n">fmin</span> <span class="o">&lt;</span> <span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">fmin</span> <span class="o">=</span> <span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="n">fmax</span> <span class="o">=</span> <span class="n">numax</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">fwhm</span>
+            <span class="k">if</span> <span class="n">fmax</span> <span class="o">&gt;</span> <span class="n">freq</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">fmax</span> <span class="o">=</span> <span class="n">freq</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1"># Set limits and set them in the right units</span>
+        <span class="k">if</span> <span class="n">minimum_frequency</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fmin</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">minimum_frequency</span><span class="p">,</span> <span class="n">freq</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="n">fmin</span> <span class="o">&gt;</span> <span class="n">freq</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;You can&#39;t pass in a limit outside the &quot;</span>
+                    <span class="s2">&quot;frequency range of the periodogram.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">maximum_frequency</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fmax</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">maximum_frequency</span><span class="p">,</span> <span class="n">freq</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="n">fmax</span> <span class="o">&gt;</span> <span class="n">freq</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;You can&#39;t pass in a limit outside the &quot;</span>
+                    <span class="s2">&quot;frequency range of the periodogram.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Make sure fmin and fmax are Quantities or code below will break</span>
+        <span class="n">fmin</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">fmin</span><span class="p">,</span> <span class="n">freq</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="n">fmax</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">fmax</span><span class="p">,</span> <span class="n">freq</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+        <span class="c1"># Add on 1x deltanu so we don&#39;t miss off any important range due to rounding</span>
+        <span class="k">if</span> <span class="n">fmax</span> <span class="o">&lt;</span> <span class="n">freq</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">deltanu</span><span class="p">:</span>
+            <span class="n">fmax</span> <span class="o">+=</span> <span class="n">deltanu</span>
+
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">freq</span><span class="p">))</span>
+        <span class="n">x0</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">fs</span><span class="p">)</span>
+
+        <span class="n">ff</span> <span class="o">=</span> <span class="n">freq</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">fmin</span> <span class="o">/</span> <span class="n">fs</span><span class="p">)</span> <span class="o">-</span> <span class="n">x0</span> <span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">fmax</span> <span class="o">/</span> <span class="n">fs</span><span class="p">)</span> <span class="o">-</span> <span class="n">x0</span><span class="p">]</span>  <span class="c1"># Selected frequency range</span>
+        <span class="n">pp</span> <span class="o">=</span> <span class="n">power</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">fmin</span> <span class="o">/</span> <span class="n">fs</span><span class="p">)</span> <span class="o">-</span> <span class="n">x0</span> <span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">fmax</span> <span class="o">/</span> <span class="n">fs</span><span class="p">)</span> <span class="o">-</span> <span class="n">x0</span><span class="p">]</span>  <span class="c1"># Power range</span>
+
+        <span class="c1"># Reshape the power into n_rows of n_columns</span>
+        <span class="c1">#  When modulus ~ zero, deltanu divides into frequency without remainder</span>
+        <span class="n">mod_zeros</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">ff</span> <span class="o">%</span> <span class="n">deltanu</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># The bottom left corner of the plot is the lowest frequency that</span>
+        <span class="c1"># divides into deltanu with almost zero remainder</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">mod_zeros</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># The top left corner of the plot is the highest frequency that</span>
+        <span class="c1"># divides into deltanu with almost zero remainder.  This index is the</span>
+        <span class="c1"># approximate end, because we fix an integer number of rows and columns</span>
+        <span class="n">approx_end</span> <span class="o">=</span> <span class="n">mod_zeros</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># The number of rows is the number of times you can partition your</span>
+        <span class="c1">#  frequency range into chunks of size deltanu, start and ending at</span>
+        <span class="c1">#  frequencies that divide nearly evenly into deltanu</span>
+        <span class="n">n_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mod_zeros</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="c1"># The number of columns is the total number of frequency points divided</span>
+        <span class="c1">#  by the number of rows, floor divided to the nearest integer value</span>
+        <span class="n">n_columns</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">approx_end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_rows</span><span class="p">)</span>
+
+        <span class="c1"># The exact end point is therefore the ncolumns*nrows away from the start</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">n_columns</span> <span class="o">*</span> <span class="n">n_rows</span>
+
+        <span class="n">ep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">pp</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_columns</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">scale</span> <span class="o">==</span> <span class="s2">&quot;log&quot;</span><span class="p">:</span>
+            <span class="n">ep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">ep</span><span class="p">)</span>
+
+        <span class="c1"># Reshape the freq into n_rowss of n_columnss &amp; create arays</span>
+        <span class="n">ef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ff</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_columns</span><span class="p">))</span>
+        <span class="n">x_f</span> <span class="o">=</span> <span class="p">(</span><span class="n">ef</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">ef</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">%</span> <span class="n">deltanu</span>
+        <span class="n">y_f</span> <span class="o">=</span> <span class="n">ef</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ep</span><span class="p">,</span> <span class="n">x_f</span><span class="p">,</span> <span class="n">y_f</span>
+
+<div class="viewcode-block" id="Seismology.plot_echelle"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.plot_echelle.html#lightkurve.seismology.Seismology.plot_echelle">[docs]</a>    <span class="k">def</span> <span class="nf">plot_echelle</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">deltanu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">numax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">minimum_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">maximum_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">smooth_filter_width</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Blues&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plots an echelle diagram of the periodogram by stacking the</span>
+<span class="sd">        periodogram in slices of deltanu.</span>
+
+<span class="sd">        Modes of equal radial degree should appear approximately vertically aligned.</span>
+<span class="sd">        If no structure is present, you are likely dealing with a faulty deltanu</span>
+<span class="sd">        value or a low signal to noise case.</span>
+
+<span class="sd">        This method is adapted from work by Daniel Hey &amp; Guy Davies.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        deltanu : float</span>
+<span class="sd">            Value for the large frequency separation of the seismic mode</span>
+<span class="sd">            frequencies in the periodogram. Assumed to have the same units as</span>
+<span class="sd">            the frequencies, unless given an Astropy unit.</span>
+<span class="sd">            Is assumed to be in the same units as frequency if not given a unit.</span>
+<span class="sd">        numax : float</span>
+<span class="sd">            Value for the frequency of maximum oscillation. If a numax is</span>
+<span class="sd">            passed, a suitable range one FWHM of the mode envelope either side</span>
+<span class="sd">            of the will be shown. This is overwritten by custom frequency ranges.</span>
+<span class="sd">            Is assumed to be in the same units as frequency if not given a unit.</span>
+<span class="sd">        minimum_frequency : float</span>
+<span class="sd">            The minimum frequency at which to display the echelle</span>
+<span class="sd">            Is assumed to be in the same units as frequency if not given a unit.</span>
+<span class="sd">        maximum_frequency : float</span>
+<span class="sd">            The maximum frequency at which to display the echelle.</span>
+<span class="sd">            Is assumed to be in the same units as frequency if not given a unit.</span>
+<span class="sd">        smooth_filter_width : float</span>
+<span class="sd">            If given a value, will smooth periodogram used to plot the echelle</span>
+<span class="sd">            diagram using the periodogram.smooth(method=&#39;boxkernel&#39;) method with</span>
+<span class="sd">            a filter width of `smooth_filter_width`. This helps visualise the</span>
+<span class="sd">            echelle diagram. Is assumed to be in the same units as the</span>
+<span class="sd">            periodogram frequency.</span>
+<span class="sd">        scale: str</span>
+<span class="sd">            Set z axis to be &quot;linear&quot; or &quot;log&quot;. Default is linear.</span>
+<span class="sd">        cmap : str</span>
+<span class="sd">            The name of the matplotlib colourmap to use in the echelle diagram.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">minimum_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">maximum_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">numax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_numax</span><span class="p">(</span><span class="n">numax</span><span class="p">)</span>
+        <span class="n">deltanu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_deltanu</span><span class="p">(</span><span class="n">deltanu</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">numax</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">numax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">numax</span> <span class="o">=</span> <span class="n">numax</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">unit</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">deltanu</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">deltanu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">deltanu</span> <span class="o">=</span> <span class="n">deltanu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">unit</span>
+
+        <span class="n">ep</span><span class="p">,</span> <span class="n">x_f</span><span class="p">,</span> <span class="n">y_f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_echelle</span><span class="p">(</span>
+            <span class="n">numax</span><span class="o">=</span><span class="n">numax</span><span class="p">,</span>
+            <span class="n">deltanu</span><span class="o">=</span><span class="n">deltanu</span><span class="p">,</span>
+            <span class="n">minimum_frequency</span><span class="o">=</span><span class="n">minimum_frequency</span><span class="p">,</span>
+            <span class="n">maximum_frequency</span><span class="o">=</span><span class="n">maximum_frequency</span><span class="p">,</span>
+            <span class="n">smooth_filter_width</span><span class="o">=</span><span class="n">smooth_filter_width</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Plot the echelle diagram</span>
+        <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">MPLSTYLE</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+            <span class="n">extent</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">x_f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">y_f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">y_f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">figsize</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.figsize&quot;</span><span class="p">]</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">figsize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">figsize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">extent</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">extent</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">extent</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">extent</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">vmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">ep</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">ep</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="mi">99</span><span class="p">)</span>
+
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                <span class="n">ep</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                <span class="n">aspect</span><span class="o">=</span><span class="n">a</span> <span class="o">/</span> <span class="n">b</span><span class="p">,</span>
+                <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span>
+                <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span>
+                <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">extend</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="p">,</span> <span class="n">SNRPeriodogram</span><span class="p">):</span>
+                <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Signal to Noise Ratio (SNR)&quot;</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="n">cds</span><span class="o">.</span><span class="n">ppm</span><span class="p">:</span>
+                <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Amplitude [</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="s2">&quot;latex&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Power Spectral Density [</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="s2">&quot;latex&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">scale</span> <span class="o">==</span> <span class="s2">&quot;log&quot;</span><span class="p">:</span>
+                <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;log10(&quot;</span> <span class="o">+</span> <span class="n">ylabel</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+
+            <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Frequency mod. </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">deltanu</span><span class="p">))</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">&quot;Frequency [</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="s2">&quot;latex&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Echelle diagram for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">ax</span></div>
+
+    <span class="k">def</span> <span class="nf">_make_echelle_elements</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">deltanu</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+        <span class="n">minimum_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">maximum_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">smooth_filter_width</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+        <span class="n">plot_width</span><span class="o">=</span><span class="mi">490</span><span class="p">,</span>
+        <span class="n">plot_height</span><span class="o">=</span><span class="mi">340</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Echelle&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function to make the elements of the echelle diagram for bokeh plotting.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">deltanu</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">):</span>
+            <span class="n">deltanu</span> <span class="o">=</span> <span class="n">deltanu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">unit</span>
+
+        <span class="k">if</span> <span class="n">smooth_filter_width</span><span class="p">:</span>
+            <span class="n">pgsmooth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">filter_width</span><span class="o">=</span><span class="n">smooth_filter_width</span><span class="p">)</span>
+            <span class="n">freq</span> <span class="o">=</span> <span class="n">pgsmooth</span><span class="o">.</span><span class="n">frequency</span>  <span class="c1"># Makes code below more readable below</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span>  <span class="c1"># Makes code below more readable</span>
+
+        <span class="n">ep</span><span class="p">,</span> <span class="n">x_f</span><span class="p">,</span> <span class="n">y_f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_echelle</span><span class="p">(</span>
+            <span class="n">deltanu</span><span class="o">=</span><span class="n">deltanu</span><span class="p">,</span>
+            <span class="n">minimum_frequency</span><span class="o">=</span><span class="n">minimum_frequency</span><span class="p">,</span>
+            <span class="n">maximum_frequency</span><span class="o">=</span><span class="n">maximum_frequency</span><span class="p">,</span>
+            <span class="n">smooth_filter_width</span><span class="o">=</span><span class="n">smooth_filter_width</span><span class="p">,</span>
+            <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span>
+            <span class="n">plot_width</span><span class="o">=</span><span class="n">plot_width</span><span class="p">,</span>
+            <span class="n">plot_height</span><span class="o">=</span><span class="n">plot_height</span><span class="p">,</span>
+            <span class="n">x_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="n">y_f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">y_f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;pan,box_zoom,reset&quot;</span><span class="p">,</span>
+            <span class="n">toolbar_location</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span>
+            <span class="n">border_fill_color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;Frequency [</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">freq</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;Frequency / </span><span class="si">{:.3f}</span><span class="s2"> Mod. 1&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">deltanu</span><span class="p">)</span>
+
+        <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">ep</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">99.9</span><span class="p">])</span>
+        <span class="n">vlo</span><span class="p">,</span> <span class="n">vhi</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">lo</span><span class="p">,</span> <span class="mf">1.7</span> <span class="o">*</span> <span class="n">hi</span>
+        <span class="n">vstep</span> <span class="o">=</span> <span class="p">(</span><span class="n">lo</span> <span class="o">-</span> <span class="n">hi</span><span class="p">)</span> <span class="o">/</span> <span class="mi">500</span>
+        <span class="n">color_mapper</span> <span class="o">=</span> <span class="n">LogColorMapper</span><span class="p">(</span><span class="n">palette</span><span class="o">=</span><span class="s2">&quot;RdYlGn10&quot;</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="n">lo</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">hi</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">image</span><span class="p">(</span>
+            <span class="n">image</span><span class="o">=</span><span class="p">[</span><span class="n">ep</span><span class="o">.</span><span class="n">value</span><span class="p">],</span>
+            <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">y_f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">dw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">dh</span><span class="o">=</span><span class="n">y_f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">color_mapper</span><span class="o">=</span><span class="n">color_mapper</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">stretch_slider</span> <span class="o">=</span> <span class="n">RangeSlider</span><span class="p">(</span>
+            <span class="n">start</span><span class="o">=</span><span class="n">vlo</span><span class="p">,</span>
+            <span class="n">end</span><span class="o">=</span><span class="n">vhi</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="n">vstep</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">),</span>
+            <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;vertical&quot;</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mi">230</span><span class="p">,</span>
+            <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;rtl&quot;</span><span class="p">,</span>
+            <span class="n">show_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;stretch&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">stretch_change_callback</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;TPF stretch slider callback.&quot;&quot;&quot;</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;img&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">color_mapper</span><span class="o">.</span><span class="n">high</span> <span class="o">=</span> <span class="n">new</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;img&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">color_mapper</span><span class="o">.</span><span class="n">low</span> <span class="o">=</span> <span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">stretch_slider</span><span class="o">.</span><span class="n">on_change</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">stretch_change_callback</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">stretch_slider</span>
+
+<div class="viewcode-block" id="Seismology.interact_echelle"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.interact_echelle.html#lightkurve.seismology.Seismology.interact_echelle">[docs]</a>    <span class="k">def</span> <span class="nf">interact_echelle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="s2">&quot;localhost:8888&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Display an interactive Jupyter notebook widget showing an Echelle diagram.</span>
+
+<span class="sd">        This feature only works inside an active Jupyter Notebook, and</span>
+<span class="sd">        requires an optional dependency, ``bokeh`` (v1.0 or later).</span>
+<span class="sd">        This dependency can be installed using e.g. `conda install bokeh`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        notebook_url : str</span>
+<span class="sd">            Location of the Jupyter notebook page (default: &quot;localhost:8888&quot;)</span>
+<span class="sd">            When showing Bokeh applications, the Bokeh server must be</span>
+<span class="sd">            explicitly configured to allow connections originating from</span>
+<span class="sd">            different URLs. This parameter defaults to the standard notebook</span>
+<span class="sd">            host and port. If you are running on a different location, you</span>
+<span class="sd">            will need to supply this value for the application to display</span>
+<span class="sd">            properly. If no protocol is supplied in the URL, e.g. if it is</span>
+<span class="sd">            of the form &quot;localhost:8888&quot;, then &quot;http&quot; will be used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">bokeh</span>
+
+            <span class="k">if</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">__version__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;interact() requires Bokeh version 1.0 or later&quot;</span><span class="p">,</span> <span class="n">LightkurveWarning</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;The interact() tool requires the `bokeh` Python package; &quot;</span>
+                <span class="s2">&quot;you can install bokeh using e.g. `conda install bokeh`.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">maximum_frequency</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+            <span class="s2">&quot;maximum_frequency&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">)</span>
+        <span class="n">minimum_frequency</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+            <span class="s2">&quot;minimum_frequency&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;deltanu&quot;</span><span class="p">):</span>
+            <span class="n">dnu</span> <span class="o">=</span> <span class="n">SeismologyQuantity</span><span class="p">(</span>
+                <span class="n">quantity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">/</span> <span class="mi">30</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;deltanu&quot;</span><span class="p">,</span>
+                <span class="n">method</span><span class="o">=</span><span class="s2">&quot;echelle&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dnu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deltanu</span>
+
+        <span class="k">def</span> <span class="nf">create_interact_ui</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+            <span class="n">fig_tpf</span><span class="p">,</span> <span class="n">stretch_slider</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_echelle_elements</span><span class="p">(</span>
+                <span class="n">dnu</span><span class="p">,</span>
+                <span class="n">maximum_frequency</span><span class="o">=</span><span class="n">maximum_frequency</span><span class="p">,</span>
+                <span class="n">minimum_frequency</span><span class="o">=</span><span class="n">minimum_frequency</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+            <span class="n">maxdnu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="mi">5</span>
+            <span class="c1"># Interactive slider widgets</span>
+            <span class="n">dnu_slider</span> <span class="o">=</span> <span class="n">Slider</span><span class="p">(</span>
+                <span class="n">start</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                <span class="n">end</span><span class="o">=</span><span class="n">maxdnu</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">dnu</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Delta Nu&quot;</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="mi">290</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">r_button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+            <span class="n">l_button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;&lt;&quot;</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+            <span class="n">rr_button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;&gt;&gt;&quot;</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+            <span class="n">ll_button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;&lt;&lt;&quot;</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
+                <span class="sd">&quot;&quot;&quot;Callback to take action when dnu slider changes&quot;&quot;&quot;</span>
+                <span class="n">dnu</span> <span class="o">=</span> <span class="n">SeismologyQuantity</span><span class="p">(</span>
+                    <span class="n">quantity</span><span class="o">=</span><span class="n">dnu_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">microhertz</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;deltanu&quot;</span><span class="p">,</span>
+                    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;echelle&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">ep</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_echelle</span><span class="p">(</span>
+                    <span class="n">deltanu</span><span class="o">=</span><span class="n">dnu</span><span class="p">,</span>
+                    <span class="n">minimum_frequency</span><span class="o">=</span><span class="n">minimum_frequency</span><span class="p">,</span>
+                    <span class="n">maximum_frequency</span><span class="o">=</span><span class="n">maximum_frequency</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span>
+                <span class="n">fig_tpf</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;img&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data_source</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ep</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+                <span class="n">fig_tpf</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;Frequency / </span><span class="si">{:.3f}</span><span class="s2"> Mod. 1&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dnu</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">go_right_by_one_small</span><span class="p">():</span>
+                <span class="sd">&quot;&quot;&quot;Step forward in time by a single cadence&quot;&quot;&quot;</span>
+                <span class="n">existing_value</span> <span class="o">=</span> <span class="n">dnu_slider</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">if</span> <span class="n">existing_value</span> <span class="o">&lt;</span> <span class="n">maxdnu</span><span class="p">:</span>
+                    <span class="n">dnu_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">existing_value</span> <span class="o">+</span> <span class="mf">0.002</span>
+
+            <span class="k">def</span> <span class="nf">go_left_by_one_small</span><span class="p">():</span>
+                <span class="sd">&quot;&quot;&quot;Step back in time by a single cadence&quot;&quot;&quot;</span>
+                <span class="n">existing_value</span> <span class="o">=</span> <span class="n">dnu_slider</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">if</span> <span class="n">existing_value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">dnu_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">existing_value</span> <span class="o">-</span> <span class="mf">0.002</span>
+
+            <span class="k">def</span> <span class="nf">go_right_by_one</span><span class="p">():</span>
+                <span class="sd">&quot;&quot;&quot;Step forward in time by a single cadence&quot;&quot;&quot;</span>
+                <span class="n">existing_value</span> <span class="o">=</span> <span class="n">dnu_slider</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">if</span> <span class="n">existing_value</span> <span class="o">&lt;</span> <span class="n">maxdnu</span><span class="p">:</span>
+                    <span class="n">dnu_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">existing_value</span> <span class="o">+</span> <span class="mf">0.01</span>
+
+            <span class="k">def</span> <span class="nf">go_left_by_one</span><span class="p">():</span>
+                <span class="sd">&quot;&quot;&quot;Step back in time by a single cadence&quot;&quot;&quot;</span>
+                <span class="n">existing_value</span> <span class="o">=</span> <span class="n">dnu_slider</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">if</span> <span class="n">existing_value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">dnu_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">existing_value</span> <span class="o">-</span> <span class="mf">0.01</span>
+
+            <span class="n">dnu_slider</span><span class="o">.</span><span class="n">on_change</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">update</span><span class="p">)</span>
+            <span class="n">r_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">go_right_by_one_small</span><span class="p">)</span>
+            <span class="n">l_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">go_left_by_one_small</span><span class="p">)</span>
+            <span class="n">rr_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">go_right_by_one</span><span class="p">)</span>
+            <span class="n">ll_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">go_left_by_one</span><span class="p">)</span>
+
+            <span class="n">widgets_and_figures</span> <span class="o">=</span> <span class="n">layout</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">fig_tpf</span><span class="p">,</span> <span class="p">[</span><span class="n">Spacer</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mi">20</span><span class="p">),</span> <span class="n">stretch_slider</span><span class="p">]],</span>
+                <span class="p">[</span>
+                    <span class="n">ll_button</span><span class="p">,</span>
+                    <span class="n">Spacer</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+                    <span class="n">l_button</span><span class="p">,</span>
+                    <span class="n">Spacer</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">25</span><span class="p">),</span>
+                    <span class="n">dnu_slider</span><span class="p">,</span>
+                    <span class="n">Spacer</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+                    <span class="n">r_button</span><span class="p">,</span>
+                    <span class="n">Spacer</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">23</span><span class="p">),</span>
+                    <span class="n">rr_button</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
+            <span class="n">doc</span><span class="o">.</span><span class="n">add_root</span><span class="p">(</span><span class="n">widgets_and_figures</span><span class="p">)</span>
+
+        <span class="n">output_notebook</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide_banner</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">show</span><span class="p">(</span><span class="n">create_interact_ui</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="n">notebook_url</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Seismology.estimate_numax"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.estimate_numax.html#lightkurve.seismology.Seismology.estimate_numax">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_numax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;acf2d&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the frequency of the peak of the seismic oscillation modes envelope.</span>
+
+<span class="sd">        At present, the only method supported is based on using a</span>
+<span class="sd">        2D autocorrelation function (ACF2D).  This method is implemented by the</span>
+<span class="sd">        `~lightkurve.seismology.estimate_numax_acf2d` function which accepts</span>
+<span class="sd">        the parameters `numaxs`, `window_width`, and `spacing`.</span>
+<span class="sd">        For details and literature references, please read the detailed</span>
+<span class="sd">        docstring of this function by typing ``lightkurve.seismology.estimate_numax_acf2d?``</span>
+<span class="sd">        in a Python terminal or notebook.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : str</span>
+<span class="sd">            Method to use. Only ``&quot;acf2d&quot;`` is supported at this time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numax : `~lightkurve.seismology.SeismologyQuantity`</span>
+<span class="sd">            Numax of the periodogram, including details on the units and method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">validate_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">supported_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;acf2d&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;acf2d&quot;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">.numax_estimators</span> <span class="kn">import</span> <span class="n">estimate_numax_acf2d</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="n">estimate_numax_acf2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numax</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="Seismology.diagnose_numax"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.diagnose_numax.html#lightkurve.seismology.Seismology.diagnose_numax">[docs]</a>    <span class="k">def</span> <span class="nf">diagnose_numax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create diagnostic plots showing how numax was estimated.&quot;&quot;&quot;</span>
+        <span class="n">numax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_numax</span><span class="p">(</span><span class="n">numax</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numax</span><span class="o">.</span><span class="n">diagnostics_plot_method</span><span class="p">(</span><span class="n">numax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Seismology.estimate_deltanu"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.estimate_deltanu.html#lightkurve.seismology.Seismology.estimate_deltanu">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_deltanu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;acf2d&quot;</span><span class="p">,</span> <span class="n">numax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the average value of the large frequency spacing, DeltaNu,</span>
+<span class="sd">        of the seismic oscillations of the target.</span>
+
+<span class="sd">        At present, the only method supported is based on using an</span>
+<span class="sd">        autocorrelation function (ACF2D).  This method is implemented by the</span>
+<span class="sd">        `~lightkurve.seismology.estimate_deltanu_acf2d` function which requires</span>
+<span class="sd">        the parameter `numax`. For details and literature references, please</span>
+<span class="sd">        read the detailed docstring of this function by typing</span>
+<span class="sd">        ``lightkurve.seismology.estimate_deltanu_acf2d?`` in a Python terminal or notebook.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : str</span>
+<span class="sd">            Method to use. Only ``&quot;acf2d&quot;`` is supported at this time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        deltanu : `~lightkurve.seismology.SeismologyQuantity`</span>
+<span class="sd">            DeltaNu of the periodogram, including details on the units and method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">validate_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">supported_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;acf2d&quot;</span><span class="p">])</span>
+        <span class="n">numax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_numax</span><span class="p">(</span><span class="n">numax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;acf2d&quot;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">.deltanu_estimators</span> <span class="kn">import</span> <span class="n">estimate_deltanu_acf2d</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="n">estimate_deltanu_acf2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="p">,</span> <span class="n">numax</span><span class="o">=</span><span class="n">numax</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deltanu</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="Seismology.diagnose_deltanu"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.diagnose_deltanu.html#lightkurve.seismology.Seismology.diagnose_deltanu">[docs]</a>    <span class="k">def</span> <span class="nf">diagnose_deltanu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deltanu</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create diagnostic plots showing how numax was estimated.&quot;&quot;&quot;</span>
+        <span class="n">deltanu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_deltanu</span><span class="p">(</span><span class="n">deltanu</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">deltanu</span><span class="o">.</span><span class="n">diagnostics_plot_method</span><span class="p">(</span><span class="n">deltanu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Seismology.estimate_radius"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.estimate_radius.html#lightkurve.seismology.Seismology.estimate_radius">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">teff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">numax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">deltanu</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a stellar radius estimate based on the scaling relations.</span>
+
+<span class="sd">        The two global observable seismic parameters, numax and deltanu, along with</span>
+<span class="sd">        temperature, scale with fundamental stellar properties (Brown et al. 1991;</span>
+<span class="sd">        Kjeldsen &amp; Bedding 1995). These scaling relations can be rearranged to</span>
+<span class="sd">        calculate a stellar radius as</span>
+
+<span class="sd">        R = Rsol * (numax/numax_sol)(deltanu/deltanusol)^-2(Teff/Teffsol)^0.5</span>
+
+<span class="sd">        where R is the radius and Teff is the effective temperature, and the suffix</span>
+<span class="sd">        &#39;sol&#39; indicates a solar value. In this method we use the solar values for</span>
+<span class="sd">        numax and deltanu as given in Huber et al. (2011) and for Teff as given in</span>
+<span class="sd">        Prsa et al. (2016).</span>
+
+<span class="sd">        This code structure borrows from work done in Bellinger et al. (2019), which</span>
+<span class="sd">        also functions as an accessible explanation of seismic scaling relations.</span>
+
+<span class="sd">        If no value of effective temperature is given, this function will check the</span>
+<span class="sd">        meta data of the `Periodogram` object used to create the `Seismology` object.</span>
+<span class="sd">        These data will often contain an effective tempearture from the Kepler Input</span>
+<span class="sd">        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract),</span>
+<span class="sd">        or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these</span>
+<span class="sd">        catalogues are estimated using photometry, and so have large associated uncertainties</span>
+<span class="sd">        (roughly 200 K, see KIC). For more better results, spectroscopic measurements of</span>
+<span class="sd">        temperature are often more precise.</span>
+
+<span class="sd">        NOTE: These scaling relations are scaled to the Sun, and therefore do not</span>
+<span class="sd">        always produce an entirely accurate result for more evolved stars.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        numax : float</span>
+<span class="sd">            The frequency of maximum power of the seismic mode envelope. If not</span>
+<span class="sd">            given an astropy unit, assumed to be in units of microhertz.</span>
+<span class="sd">        deltanu : float</span>
+<span class="sd">            The frequency spacing between two consecutive overtones of equal radial</span>
+<span class="sd">            degree. If not given an astropy unit, assumed to be in units of</span>
+<span class="sd">            microhertz.</span>
+<span class="sd">        teff : float</span>
+<span class="sd">            The effective temperature of the star. In units of Kelvin.</span>
+<span class="sd">        numax_err : float</span>
+<span class="sd">            Error on numax. Assumed to be same units as numax</span>
+<span class="sd">        deltanu_err : float</span>
+<span class="sd">            Error on deltanu. Assumed to be same units as deltanu</span>
+<span class="sd">        teff_err : float</span>
+<span class="sd">            Error on Teff. Assumed to be same units as Teff.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        radius : `~lightkurve.seismology.SeismologyQuantity`</span>
+<span class="sd">            Stellar radius estimate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">numax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_numax</span><span class="p">(</span><span class="n">numax</span><span class="p">)</span>
+        <span class="n">deltanu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_deltanu</span><span class="p">(</span><span class="n">deltanu</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">teff</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">teff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TEFF&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">teff</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;You must provide an effective temperature argument (`teff`) to `estimate_radius`,&quot;</span>
+                    <span class="s2">&quot;because the Periodogram object does not contain it in its meta data (i.e. `pg.meta[&#39;TEFF&#39;]` is missing&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Using value for effective temperature from the Kepler Input Catalogue.&quot;</span>
+                    <span class="s2">&quot;These temperatue values may sometimes differ significantly from modern estimates.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">stellar_estimators</span><span class="o">.</span><span class="n">estimate_radius</span><span class="p">(</span><span class="n">numax</span><span class="p">,</span> <span class="n">deltanu</span><span class="p">,</span> <span class="n">teff</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="Seismology.estimate_mass"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.estimate_mass.html#lightkurve.seismology.Seismology.estimate_mass">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">teff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">numax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">deltanu</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates mass using the asteroseismic scaling relations.</span>
+
+<span class="sd">        The two global observable seismic parameters, numax and deltanu, along with</span>
+<span class="sd">        temperature, scale with fundamental stellar properties (Brown et al. 1991;</span>
+<span class="sd">        Kjeldsen &amp; Bedding 1995). These scaling relations can be rearranged to</span>
+<span class="sd">        calculate a stellar mass as</span>
+
+<span class="sd">        M = Msol * (numax/numax_sol)^3(deltanu/deltanusol)^-4(Teff/Teffsol)^1.5</span>
+
+<span class="sd">        where M is the mass and Teff is the effective temperature, and the suffix</span>
+<span class="sd">        &#39;sol&#39; indicates a solar value. In this method we use the solar values for</span>
+<span class="sd">        numax and deltanu as given in Huber et al. (2011) and for Teff as given in</span>
+<span class="sd">        Prsa et al. (2016).</span>
+
+<span class="sd">        This code structure borrows from work done in Bellinger et al. (2019), which</span>
+<span class="sd">        also functions as an accessible explanation of seismic scaling relations.</span>
+
+<span class="sd">        If no value of effective temperature is given, this function will check the</span>
+<span class="sd">        meta data of the `Periodogram` object used to create the `Seismology` object.</span>
+<span class="sd">        These data will often contain an effective tempearture from the Kepler Input</span>
+<span class="sd">        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract),</span>
+<span class="sd">        or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these</span>
+<span class="sd">        catalogues are estimated using photometry, and so have large associated uncertainties</span>
+<span class="sd">        (roughly 200 K, see KIC). For more better results, spectroscopic measurements of</span>
+<span class="sd">        temperature are often more precise.</span>
+
+<span class="sd">        NOTE: These scaling relations are scaled to the Sun, and therefore do not</span>
+<span class="sd">        always produce an entirely accurate result for more evolved stars.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        numax : float</span>
+<span class="sd">            The frequency of maximum power of the seismic mode envelope. If not</span>
+<span class="sd">            given an astropy unit, assumed to be in units of microhertz.</span>
+<span class="sd">        deltanu : float</span>
+<span class="sd">            The frequency spacing between two consecutive overtones of equal radial</span>
+<span class="sd">            degree. If not given an astropy unit, assumed to be in units of</span>
+<span class="sd">            microhertz.</span>
+<span class="sd">        teff : float</span>
+<span class="sd">            The effective temperature of the star. In units of Kelvin.</span>
+<span class="sd">        numax_err : float</span>
+<span class="sd">            Error on numax. Assumed to be same units as numax</span>
+<span class="sd">        deltanu_err : float</span>
+<span class="sd">            Error on deltanu. Assumed to be same units as deltanu</span>
+<span class="sd">        teff_err : float</span>
+<span class="sd">            Error on Teff. Assumed to be same units as Teff.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mass : `~lightkurve.seismology.SeismologyQuantity`</span>
+<span class="sd">            Stellar mass estimate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">numax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_numax</span><span class="p">(</span><span class="n">numax</span><span class="p">)</span>
+        <span class="n">deltanu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_deltanu</span><span class="p">(</span><span class="n">deltanu</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">teff</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">teff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TEFF&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">teff</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;You must provide an effective temperature argument (`teff`) to `estimate_radius`,&quot;</span>
+                    <span class="s2">&quot;because the Periodogram object does not contain it in its meta data (i.e. `pg.meta[&#39;TEFF&#39;]` is missing&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Using value for effective temperature from the Kepler Input Catalogue.&quot;</span>
+                    <span class="s2">&quot;These temperatue values may sometimes differ significantly from modern estimates.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">stellar_estimators</span><span class="o">.</span><span class="n">estimate_mass</span><span class="p">(</span><span class="n">numax</span><span class="p">,</span> <span class="n">deltanu</span><span class="p">,</span> <span class="n">teff</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="Seismology.estimate_logg"><a class="viewcode-back" href="../../../reference/api/lightkurve.seismology.Seismology.estimate_logg.html#lightkurve.seismology.Seismology.estimate_logg">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_logg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">teff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">numax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates the log of the surface gravity using the asteroseismic scaling</span>
+<span class="sd">        relations.</span>
+
+<span class="sd">        The two global observable seismic parameters, numax and deltanu, along with</span>
+<span class="sd">        temperature, scale with fundamental stellar properties (Brown et al. 1991;</span>
+<span class="sd">        Kjeldsen &amp; Bedding 1995). These scaling relations can be rearranged to</span>
+<span class="sd">        calculate a stellar surface gravity as</span>
+
+<span class="sd">            g = gsol * (numax/numax_sol)(Teff/Teffsol)^0.5</span>
+
+<span class="sd">        where g is the surface gravity and Teff is the effective temperature,</span>
+<span class="sd">        and the suffix &#39;sol&#39; indicates a solar value. In this method we use the</span>
+<span class="sd">        solar values for numax as given in Huber et al. (2011) and for Teff as given</span>
+<span class="sd">        in Prsa et al. (2016). The solar surface gravity is calcluated from the</span>
+<span class="sd">        astropy constants for solar mass and radius and does not have an error.</span>
+
+<span class="sd">        The solar surface gravity is returned as log10(g) with units in dex, as is</span>
+<span class="sd">        common in the astrophysics literature.</span>
+
+<span class="sd">        This code structure borrows from work done in Bellinger et al. (2019), which</span>
+<span class="sd">        also functions as an accessible explanation of seismic scaling relations.</span>
+
+<span class="sd">        If no value of effective temperature is given, this function will check the</span>
+<span class="sd">        meta data of the `Periodogram` object used to create the `Seismology` object.</span>
+<span class="sd">        These data will often contain an effective tempearture from the Kepler Input</span>
+<span class="sd">        Catalogue (KIC, https://ui.adsabs.harvard.edu/abs/2011AJ....142..112B/abstract),</span>
+<span class="sd">        or from the EPIC or TIC for K2 and TESS respectively. The temperature values in these</span>
+<span class="sd">        catalogues are estimated using photometry, and so have large associated uncertainties</span>
+<span class="sd">        (roughly 200 K, see KIC). For more better results, spectroscopic measurements of</span>
+<span class="sd">        temperature are often more precise.</span>
+
+<span class="sd">        NOTE: These scaling relations are scaled to the Sun, and therefore do not</span>
+<span class="sd">        always produce an entirely accurate result for more evolved stars.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        numax : float</span>
+<span class="sd">            The frequency of maximum power of the seismic mode envelope. If not</span>
+<span class="sd">            given an astropy unit, assumed to be in units of microhertz.</span>
+<span class="sd">        teff : float</span>
+<span class="sd">            The effective temperature of the star. In units of Kelvin.</span>
+<span class="sd">        numax_err : float</span>
+<span class="sd">            Error on numax. Assumed to be same units as numax</span>
+<span class="sd">        teff_err : float</span>
+<span class="sd">            Error on teff. Assumed to be same units as teff.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        logg : `~lightkurve.seismology.SeismologyQuantity`</span>
+<span class="sd">            Stellar surface gravity estimate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">numax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_numax</span><span class="p">(</span><span class="n">numax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">teff</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">teff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodogram</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TEFF&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">teff</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;You must provide an effective temperature argument (`teff`) to `estimate_radius`,&quot;</span>
+                    <span class="s2">&quot;because the Periodogram object does not contain it in its meta data (i.e. `pg.meta[&#39;TEFF&#39;]` is missing&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Using value for effective temperature from the Kepler Input Catalogue.&quot;</span>
+                    <span class="s2">&quot;These temperatue values may sometimes differ significantly from modern estimates.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">stellar_estimators</span><span class="o">.</span><span class="n">estimate_logg</span><span class="p">(</span><span class="n">numax</span><span class="p">,</span> <span class="n">teff</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logg</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span></div></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+﻿lightkurve.MPLSTYLE
+===================
+
+.. currentmodule:: lightkurve
+
+.. autodata:: MPLSTYLE

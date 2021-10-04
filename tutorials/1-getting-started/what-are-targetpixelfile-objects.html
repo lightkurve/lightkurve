@@ -4,10 +4,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>What are TargetPixelFile objects? &#8212; Lightkurve </title>
     
-  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,90 +21,119 @@
 
     
       
-  <link rel="stylesheet"
-    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
-  <link rel="stylesheet"
-    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
 
     
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="What are Periodogram objects?" href="what-are-periodogram-objects.html" />
     <link rel="prev" title="What are LightCurve objects?" href="what-are-lightcurve-objects.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
-<div class="container-xl">
+    <div class="container-fluid" id="banner"></div>
 
-    <a class="navbar-brand" href="../../index.html">
     
-      <p class="title">Lightkurve v2.0</p>
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
     
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
 
-    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
-      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
-        
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
-        </li>
-        
-        <li class="nav-item active">
-            <a class="nav-link" href="../index.html">Tutorials</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../reference/index.html">API</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../about/index.html">About</a>
-        </li>
-        
-        
-      </ul>
+    
+  </div>
 
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form>
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
 
-      <ul class="navbar-nav">
-        
-          <li class="nav-item">
-            <a class="nav-link" href="https://github.com/lightkurve/lightkurve" target="_blank" rel="noopener">
-              <span><i class="fab fa-github-square"></i></span>
-            </a>
-          </li>
-        
-        
-      </ul>
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
     </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
 </div>
     </nav>
     
@@ -110,27 +141,36 @@
     <div class="container-xl">
       <div class="row">
           
-          <div class="col-12 col-md-3 bd-sidebar">
-          </div>
+            
+            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
+            
           
 
           
           <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
+              <div class="toc-item">
+                
 
 <nav id="bd-toc-nav">
-    <ul class="nav section-nav flex-column">
     
-    </ul>
 </nav>
-
-
+              </div>
               
+              <div class="toc-item">
+                
+              </div>
+              
+            
           </div>
           
 
           
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+          
+            
+          
+          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
               
               <div>
                 
@@ -387,7 +427,7 @@ div.rendered_html tbody tr:hover {
     <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/tutorials/1-getting-started/what-are-targetpixelfile-objects.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
     <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/tutorials/1-getting-started/what-are-targetpixelfile-objects.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<br style="clear:both;"><div class="section" id="What-are-TargetPixelFile-objects?">
+<br style="clear:both;"><section id="What-are-TargetPixelFile-objects?">
 <h1>What are <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> objects?<a class="headerlink" href="#What-are-TargetPixelFile-objects?" title="Permalink to this headline">¶</a></h1>
 <p>Target Pixel Files (TPFs) are a file common to Kepler/K2 and the TESS mission. They contain movies of the pixel data centered on a single target star.</p>
 <p>TPFs can be thought of as stacks of images, with one image for every timestamp the telescope took data. Each timestamp is referred to as a <strong>cadence</strong>. These images are cut out ‘postage stamps’ of the full observation to make them easier to work with.</p>
@@ -395,7 +435,7 @@ div.rendered_html tbody tr:hover {
 <p>In this tutorial we’ll cover the basics of working with TPFs. In <em>lightkurve</em> there are classes to work with each mission. For example <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> deals with data from the Kepler (and K2) mission. <code class="docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code> deals with data from the TESS mission. We’ll use a Kepler TPF as an example.</p>
 <p>To load a <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> from a local path or remote url, simply call Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.read.html?highlight=read#lightkurve.LightCurve.read">read</a> function using the location of the file as the parameter:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -406,7 +446,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>You can also search for the url automatically using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile()</a> function. This will search for the right file in the <a class="reference external" href="https://archive.stsci.edu/kepler/">MAST data archive</a> which holds all of the Kepler and K2 data. In this case we want the Target Pixel File with Kepler ID 6922244 for Quarter 4 (Kepler’s observations were split into quarters of a year):</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -417,8 +457,8 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>You can also pass the name of the target or its astronomical coordinates as a parameter to <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code>.</p>
 <p>The above code has created a variable named <code class="docutils literal notranslate"><span class="pre">tpf</span></code> which is a Python object of type <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code>:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -426,18 +466,9 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-KeplerTargetPixelFile Object (ID: 6922244)
-</pre></div></div>
-</div>
 <p>We can access lots of meta data using this object in a simple way. For example, we can find the mission name, and the quarter that the data was taken in by typing the following:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -445,17 +476,8 @@ KeplerTargetPixelFile Object (ID: 6922244)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&#39;Kepler&#39;
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -463,19 +485,10 @@ KeplerTargetPixelFile Object (ID: 6922244)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-4
-</pre></div></div>
-</div>
-<p>You can find the full list of properties in the <a class="reference external" href="https://docs.lightkurve.org/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile">API documentation</a> on this object.</p>
+<p>You can find the full list of properties in the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile">API documentation</a> on this object.</p>
 <p>The most interesting data in a <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> object are the <code class="docutils literal notranslate"><span class="pre">flux</span></code> and <code class="docutils literal notranslate"><span class="pre">time</span></code> values which give access to the brightness of the observed target over time. You can access the timestamps of the observations using the <code class="docutils literal notranslate"><span class="pre">time</span></code> property:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -483,20 +496,10 @@ KeplerTargetPixelFile Object (ID: 6922244)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;Time object: scale=&#39;tdb&#39; format=&#39;bkjd&#39; value=[352.37632485 352.39675805 352.43762445 ... 442.16263546 442.18306983
- 442.2035041 ]&gt;
-</pre></div></div>
-</div>
 <p>By default, <code class="docutils literal notranslate"><span class="pre">time</span></code> is in the Kepler-specific <em>Barycentric Kepler Julian Day</em> format (BKJD).</p>
 <p>Because this is an AstroPy Time object, you access to human-readable ISO timestamps using the <code class="docutils literal notranslate"><span class="pre">time.iso</span></code> property:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -504,20 +507,9 @@ KeplerTargetPixelFile Object (ID: 6922244)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&#39;2009-12-19 21:01:54.467&#39;, &#39;2009-12-19 21:31:19.895&#39;,
-       &#39;2009-12-19 22:30:10.752&#39;, ..., &#39;2010-03-19 15:54:11.704&#39;,
-       &#39;2010-03-19 16:23:37.233&#39;, &#39;2010-03-19 16:53:02.754&#39;], dtype=&#39;&lt;U23&#39;)
-</pre></div></div>
-</div>
 <p><strong>Beware:</strong> these timestamps are in the Solar System Barycentric frame (TDB) and do not include corrections for light travel time or leap seconds. To use a different time scale, such as the Earth-centered UTC system, you can use <a class="reference external" href="http://docs.astropy.org/en/stable/time/#time-scale">AstroPy’s time scale conversion features</a>. For example:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -525,20 +517,9 @@ array([&#39;2009-12-19 21:01:54.467&#39;, &#39;2009-12-19 21:31:19.895&#39;,
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&#39;2009-12-19 21:00:48.284&#39;, &#39;2009-12-19 21:30:13.712&#39;,
-       &#39;2009-12-19 22:29:04.569&#39;, ..., &#39;2010-03-19 15:53:05.518&#39;,
-       &#39;2010-03-19 16:22:31.048&#39;, &#39;2010-03-19 16:51:56.568&#39;], dtype=&#39;&lt;U23&#39;)
-</pre></div></div>
-</div>
 <p>Next, let’s look at the actual image data, which is available via the <code class="docutils literal notranslate"><span class="pre">flux</span></code> property:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -546,18 +527,9 @@ array([&#39;2009-12-19 21:00:48.284&#39;, &#39;2009-12-19 21:30:13.712&#39;,
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-(4116, 5, 5)
-</pre></div></div>
-</div>
 <p>The <code class="docutils literal notranslate"><span class="pre">flux</span></code> data is a 4116x5x5 array in units electrons/second. The first axis is the time axis, and the images themselves are 5 pixels by 5 pixels. You can use the <code class="docutils literal notranslate"><span class="pre">plot</span></code> method on the <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> object to view the data. (By default, this will show just one cadence of the data. But you can pass the cadence you want to look at to the <code class="docutils literal notranslate"><span class="pre">frame</span></code> keyword if you would like to check a particular flux point for thruster firings, cosmic rays or asteroids.)</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -566,25 +538,9 @@ array([&#39;2009-12-19 21:00:48.284&#39;, &#39;2009-12-19 21:30:13.712&#39;,
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 6922244, Cadence: 11914&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_21_1.png" src="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_21_1.png" />
-</div>
-</div>
 <p>The values shown in this image are also directly accessible as an array:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -592,25 +548,13 @@ array([&#39;2009-12-19 21:00:48.284&#39;, &#39;2009-12-19 21:30:13.712&#39;,
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="math notranslate nohighlight">
-$[[{\rm NaN},~5.6079335,~51.491142,~84.241745,~30.221334],~
- [44.04562,~76.861229,~1122.7759,~3226.2029,~454.86777],~
- [25.911165,~229.07593,~9362.6543,~23606.273,~1208.775],~
- [40.10083,~885.43927,~1710.2118,~2625.4871,~707.96606],~
- [157.19417,~837.1344,~510.21539,~1150.1041,~183.1337]] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
-</div>
 <p>You can use normal <code class="docutils literal notranslate"><span class="pre">numpy</span></code> methods on these to find the shape, mean etc!</p>
 <p>We can now turn this Target Pixel File into a light curve, with a single flux value for every time value. Each of the pixels are 4 arcseconds across. The point spread function (PSF) of the telescope causes the light from the star fall onto several different pixels, which can be seen in the image above. Because of this spreading, we have to sum up many pixels to collect all the light from the source. To do this we sum up all the pixels in an <strong>aperture</strong>. An aperture is a pixel mask, where we
 take only the pixels related to the target.</p>
 <p>The <em>Kepler</em> pipeline adds an aperture mask to each target pixel file. This aperture determines which pixels are summed to create a 1-D light curve of the target. There are some science cases where you might want to create a different aperture. For example, there may be a nearby contaminant or you may want to measure the background.</p>
 <p>The standard pipeline aperture is easily accessed in a <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> object using <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.pipeline_mask.html?highlight=pipeline_mask">tpf.pipeline_mask</a>, which is a boolean array:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -618,22 +562,9 @@ take only the pixels related to the target.</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([[False, False, False, False, False],
-       [False, False,  True,  True, False],
-       [False, False,  True,  True, False],
-       [False,  True,  True,  True, False],
-       [False, False, False,  True, False]])
-</pre></div></div>
-</div>
 <p>We can also plot this aperture over the target pixel file above to see if the flux of the star is all contained within the aperture.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -641,26 +572,10 @@ array([[False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 6922244, Cadence: 11914&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_29_1.png" src="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_29_1.png" />
-</div>
-</div>
 <p>Now that we have the aperture we can create a Simple Aperture Photometry light curve in the next tutorial.</p>
 <p>Finally, note that you can inspect all the raw metadata of the target by taking a look at the ‘header’ of the FITS file, which contains information about the data set. Let’s just print the first 10 lines:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -668,27 +583,9 @@ array([[False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-SIMPLE  =                    T / conforms to FITS standards
-BITPIX  =                    8 / array data type
-NAXIS   =                    0 / number of array dimensions
-EXTEND  =                    T / file contains extensions
-NEXTEND =                    2 / number of standard extensions
-EXTNAME = &#39;PRIMARY &#39;           / name of extension
-EXTVER  =                    1 / extension version number (not format version)
-ORIGIN  = &#39;NASA/Ames&#39;          / institution responsible for creating this file
-DATE    = &#39;2015-09-23&#39;         / file creation date.
-CREATOR = &#39;917482 TargetPixelExporterPipelineModule&#39; / pipeline job and program
-</pre></div></div>
-</div>
 <p>We can look at the values in the second extension of the fits file by accessing the AstroPy FITS <code class="docutils literal notranslate"><span class="pre">HDUList</span></code> object. For example, to look at all the column titles:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -696,66 +593,52 @@ CREATOR = &#39;917482 TargetPixelExporterPipelineModule&#39; / pipeline job and 
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-TTYPE1  = &#39;TIME    &#39;           / column title: data time stamps
-TTYPE2  = &#39;TIMECORR&#39;           / column title: barycenter - timeslice correction
-TTYPE3  = &#39;CADENCENO&#39;          / column title: unique cadence number
-TTYPE4  = &#39;RAW_CNTS&#39;           / column title: raw pixel counts
-TTYPE5  = &#39;FLUX    &#39;           / column title: calibrated pixel flux
-TTYPE6  = &#39;FLUX_ERR&#39;           / column title: 1-sigma calibrated uncertainty
-TTYPE7  = &#39;FLUX_BKG&#39;           / column title: calibrated background flux
-TTYPE8  = &#39;FLUX_BKG_ERR&#39;       / column title: 1-sigma cal. background uncertain
-TTYPE9  = &#39;COSMIC_RAYS&#39;        / column title: cosmic ray detections
-TTYPE10 = &#39;QUALITY &#39;           / column title: pixel quality flags
-TTYPE11 = &#39;POS_CORR1&#39;          / column title: column position correction
-TTYPE12 = &#39;POS_CORR2&#39;          / column title: row position correction
-TTYPE13 = &#39;RB_LEVEL&#39;           / column title: rolling band level
-</pre></div></div>
-</div>
-</div>
+</section>
 
 
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='left-prev' id="prev-link" href="what-are-lightcurve-objects.html" title="previous page">What are <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects?</a>
-    <a class='right-next' id="next-link" href="what-are-periodogram-objects.html" title="next page">What are <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects?</a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="what-are-lightcurve-objects.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">What are <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects?</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="what-are-periodogram-objects.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">What are <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects?</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
 
       </div>
     </div>
-
-    
-  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
-
-
-    
-    <!-- Google Analytics -->
-    <script>
-      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-      ga('create', 'UA-69171-9', 'auto');
-      ga('set', 'anonymizeIp', true);
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-    <!-- End Google Analytics -->
-    <footer class="footer mt-5 mt-md-0">
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
-    <p>
-          &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
-    </p>
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
   </div>
 </footer>
   </body>

@@ -4,10 +4,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Creating your own light curves using custom aperture photometry &#8212; Lightkurve </title>
     
-  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,88 +21,119 @@
 
     
       
-  <link rel="stylesheet"
-    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
-  <link rel="stylesheet"
-    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
 
     
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Combining multiple quarters of Kepler data" href="2-1-combining-multiple-quarters.html" />
     <link rel="prev" title="How to open a light curve in Excel?" href="../1-getting-started/how-to-open-a-lightcurve-in-excel.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
-<div class="container-xl">
+    <div class="container-fluid" id="banner"></div>
 
-    <a class="navbar-brand" href="../../index.html">
     
-      <p class="title">Lightkurve v2.0</p>
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
     
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
 
-    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
-      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
-        
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
-        </li>
-        
-        <li class="nav-item active">
-            <a class="nav-link" href="../index.html">Tutorials</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../reference/index.html">API</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../about/index.html">About</a>
-        </li>
-        
-        
-      </ul>
+    
+  </div>
 
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form>
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
 
-      <ul class="navbar-nav">
-        
-          <li class="nav-item">
-            <a class="nav-link" href="https://github.com/lightkurve/lightkurve" target="_blank" rel="noopener">
-              <span><i class="fab fa-github-square"></i></span>
-            </a>
-          </li>
-        
-        
-      </ul>
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
     </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
 </div>
     </nav>
     
@@ -108,108 +141,147 @@
     <div class="container-xl">
       <div class="row">
           
-          <div class="col-12 col-md-3 bd-sidebar">
-          </div>
+            
+            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
+            
           
 
           
           <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
+              <div class="toc-item">
+                
 <div class="tocsection onthispage pt-5 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
 <nav id="bd-toc-nav">
-    <ul class="nav section-nav flex-column">
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Learning-Goals" class="nav-link">Learning Goals</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Introduction" class="nav-link">Introduction</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Imports" class="nav-link">Imports</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#1.-Background" class="nav-link">1. Background</a><ul class="nav section-nav flex-column">
-                
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#1.1-Introduction-to-Kepler-photometry" class="nav-link">1.1 Introduction to Kepler photometry</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#1.2-Aperture-photometry" class="nav-link">1.2 Aperture photometry</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#1.3-Why-not-just-use-published-light-curves?" class="nav-link">1.3 Why not just use published light curves?</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#1.4-Choosing-an-aperture" class="nav-link">1.4 Choosing an aperture</a>
-        </li>
-    
-            </ul>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#2.-Getting-Started" class="nav-link">2. Getting Started</a><ul class="nav section-nav flex-column">
-                
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#2.1-Doing-photometry-with-the-pipeline-aperture" class="nav-link">2.1 Doing photometry with the pipeline aperture</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#2.2-Adjusting-the-aperture" class="nav-link">2.2 Adjusting the aperture</a>
-        </li>
-    
-            </ul>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#3.-Manual-Custom-Apertures" class="nav-link">3. Manual Custom Apertures</a><ul class="nav section-nav flex-column">
-                
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#3.1-Creating-a-custom-threshold-aperture-with-Lightkurve" class="nav-link">3.1 Creating a custom threshold aperture with Lightkurve</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#3.2-Creating-a-custom-aperture-with-NumPy-arrays" class="nav-link">3.2 Creating a custom aperture with NumPy arrays</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#3.3-“Cutting-out”-a-background-star" class="nav-link">3.3 “Cutting out” a background star</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool" class="nav-link">3.4 Creating a custom aperture using the tpf.interact tool</a>
-        </li>
-    
-            </ul>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#About-this-Notebook" class="nav-link">About this Notebook</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Citing-Lightkurve-and-Astropy" class="nav-link">Citing Lightkurve and Astropy</a>
-        </li>
-    
-    </ul>
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Learning-Goals">
+   Learning Goals
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Introduction">
+   Introduction
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#1.-Background">
+   1. Background
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#1.1-Introduction-to-Kepler-photometry">
+     1.1 Introduction to
+     <em>
+      Kepler
+     </em>
+     photometry
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#1.2-Aperture-photometry">
+     1.2 Aperture photometry
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#1.3-Why-not-just-use-published-light-curves?">
+     1.3 Why not just use published light curves?
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#1.4-Choosing-an-aperture">
+     1.4 Choosing an aperture
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#2.-Getting-Started">
+   2. Getting Started
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#2.1-Doing-photometry-with-the-pipeline-aperture">
+     2.1 Doing photometry with the pipeline aperture
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#2.2-Adjusting-the-aperture">
+     2.2 Adjusting the aperture
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#3.-Manual-Custom-Apertures">
+   3. Manual Custom Apertures
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.1-Creating-a-custom-threshold-aperture-with-Lightkurve">
+     3.1 Creating a custom threshold aperture with Lightkurve
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.2-Creating-a-custom-aperture-with-NumPy-arrays">
+     3.2 Creating a custom aperture with NumPy arrays
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.3-“Cutting-out”-a-background-star">
+     3.3 “Cutting out” a background star
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool">
+     3.4 Creating a custom aperture using the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       tpf.interact
+      </span>
+     </code>
+     tool
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#About-this-Notebook">
+   About this Notebook
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Citing-Lightkurve-and-Astropy">
+   Citing Lightkurve and Astropy
+  </a>
+ </li>
+</ul>
+
 </nav>
-
-
+              </div>
               
+              <div class="toc-item">
+                
+              </div>
+              
+            
           </div>
           
 
           
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+          
+            
+          
+          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
               
               <div>
                 
@@ -466,9 +538,9 @@ div.rendered_html tbody tr:hover {
     <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/tutorials/2-creating-light-curves/2-1-custom-aperture-photometry.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
     <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/tutorials/2-creating-light-curves/2-1-custom-aperture-photometry.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<br style="clear:both;"><div class="section" id="Creating-your-own-light-curves-using-custom-aperture-photometry">
+<br style="clear:both;"><section id="Creating-your-own-light-curves-using-custom-aperture-photometry">
 <h1>Creating your own light curves using custom aperture photometry<a class="headerlink" href="#Creating-your-own-light-curves-using-custom-aperture-photometry" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="Learning-Goals">
+<section id="Learning-Goals">
 <h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
@@ -476,16 +548,16 @@ div.rendered_html tbody tr:hover {
 <li><p>Be able to determine the most useful aperture for photometry on a <em>Kepler/K2</em> target.</p></li>
 <li><p>Create your own light curve for a single quarter/campaign of <em>Kepler/K2</em> data.</p></li>
 </ul>
-</div>
-<div class="section" id="Introduction">
+</section>
+<section id="Introduction">
 <h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
 <p>This tutorial is part of a series on handling <em>Kepler</em> and <em>K2</em> data with Astropy and Lightkurve. As you have seen earlier in this series, Lightkurve provides utilities that allow you to create your own light curve from a <em>Kepler</em> or <em>K2</em> target pixel file. In this tutorial, we’ll look at the principles behind the process of performing aperture photometry on a target. Then we’ll get into specifics and learn how to customize our apertures to get the most out of our data.</p>
-</div>
-<div class="section" id="Imports">
+</section>
+<section id="Imports">
 <h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
 <p>We’ll use <a class="reference external" href="https://docs.lightkurve.org/">Lightkurve</a> for downloading and handling <em>Kepler</em> data throughout this tutorial. We’ll also use <a class="reference external" href="https://numpy.org/">NumPy</a> to handle arrays for aperture masks.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -495,10 +567,10 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="1.-Background">
+</section>
+<section id="1.-Background">
 <h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="1.1-Introduction-to-Kepler-photometry">
+<section id="1.1-Introduction-to-Kepler-photometry">
 <h3>1.1 Introduction to <em>Kepler</em> photometry<a class="headerlink" href="#1.1-Introduction-to-Kepler-photometry" title="Permalink to this headline">¶</a></h3>
 <p>When you search for <em>Kepler</em> or <em>K2</em> light curves in the data archive, you can either access simple aperture photometry (SAP) light curves (for example, see the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf">Kepler Data Processing Handbook</a>, Section 6.3.6), or presearch data conditioning simple aperture photometry (PDCSAP) light curves (for example, <a class="reference external" href="https://arxiv.org/pdf/1203.1382.pdf">Stumpe et al., 2012</a>, <a class="reference external" href="https://arxiv.org/pdf/1203.1383.pdf">Smith
 et al., 2012</a>). You can also access the orignal target pixel files (TPFs) from which such light curves were extracted. TPFs are useful for inspecting the calibrated pixels, but when you’re doing science, you usually just want to look at a light curve. This tutorial covers how to use TPFs to <em>create</em> light curves. There are many reasons why you might want to produce your own light curve, which we’ll cover in <a class="reference external" href="#1.3-Why-don't-we-just-use-the-data-from-MAST?">Section
@@ -506,15 +578,15 @@ et al., 2012</a>). You can also access the orignal target pixel files (TPFs) fro
 <p>Before we get into it, it’s important to note that we’re only going to be performing photometry on one quarter at a time. Combining <em>Kepler</em> Quarters is not trivial: because the telescope rotated by 90° every quarter, the same star would fall on different pixels every fourth quarter. Different pixels have different sensitivities, so the size of the TPFs downloaded for a single target changes between adjacent quarters. It’s certainly possible to combine multiple quarters of <em>Kepler</em> data, or
 campaigns of <em>K2</em> data, and you can read more about it in a different tutorial. We won’t cover quarter stitching here, however.</p>
 <p>We also won’t cover systematics correction in this tutorial. Light curves created using custom aperture photometry will still include systematic noise from various sources, such as spacecraft motion. You can read more about noise and noise corrections in other tutorials in this series.</p>
-</div>
-<div class="section" id="1.2-Aperture-photometry">
+</section>
+<section id="1.2-Aperture-photometry">
 <h3>1.2 Aperture photometry<a class="headerlink" href="#1.2-Aperture-photometry" title="Permalink to this headline">¶</a></h3>
 <p>In this tutorial, we’re going to explore photometry in a practical context by creating our own time series data. But first, we’ll go through a quick introduction of some of the theory behind it. Photometry is defined as the process of measuring the brightness of an astronomical object. Specifically, we’ll be doing time series photometry: measuring that brightness over time. Telescopes like <em>Kepler</em> use charge-coupled device (CCD) cameras (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument
 Handbook</a>, Section 4) to take images of their targets at regular intervals — this interval is known as the cadence — and we perform photometry to turn each image into a flux measurement.</p>
 <p>In <em>Kepler</em> and <em>K2</em> data, each targeted object has a TPF, which is used to store the raw pixel data from which a light curve can be produced. <em>Kepler</em>’s pixels are 4x4 arcseconds large, and all stars take up less angular space than this as point sources in the sky. So, theoretically, we could track the flux of a single pixel over time, and call that our light curve. But light that falls on a CCD is spread onto surrounding pixels, proportional to its brightness.</p>
 <p>Let’s have a look at a TPF to see what a star actually looks like in <em>Kepler</em> pixel data. The following line of code downloads the 30-minute long cadence light curve for KIC 7461601 from MAST. You can read more about using Lightkurve to download data in a separate tutorial.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -522,29 +594,13 @@ Handbook</a>, Section 4) to take images of their targets at regular intervals �
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">tpf_example</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 7461601, Cadence: 39049&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_9_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_9_1.png" />
 </div>
 </div>
 <p>You can see how the light from this star is spread out across the TPF. The process of choosing which pixels to use for photometry is referred to as defining an aperture. By adding together the flux in multiple pixels, we get a more accurate measurement of the object’s brightness.</p>
@@ -554,8 +610,8 @@ on higher resolution photometry taken prior to the <em>Kepler</em> mission. For 
 <p>So what about the pixels we don’t use? Think of a grainy photograph: we observe the same thing in all CCD data, but it’s harder to recognize by eye in photographs from telescopes with large pixels. This grainy noise is called “shot noise,” and arises from fluctuations in the current that powers an electronic photon-collecting device. For aperture photometry, we need to worry about shot noise because it dominates what we see in the “background” of an image, that is, the light we see in pixels
 that don’t have any light from our target. In reality, most pixels will be some kind of combination of “signal” and “background.” When we choose our aperture for photometry, we’re looking to optimize the amount of signal we collect, and minimize the noise contribution from the background.</p>
 <p>This is what the aperture used by the <em>Kepler</em> pipeline looks like for our example star:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -563,37 +619,21 @@ that don’t have any light from our target. In reality, most pixels will be som
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 7461601, Cadence: 39049&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_11_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_11_1.png" />
-</div>
-</div>
 <p>You might not expect the star’s aperture to be this shape — stars are point sources, after all. In many cases, stars in <em>Kepler</em> will look circular, as we’d expect. However, at the edge of the focal plane, some targets may appear smeared in one direction. And even for a star with circular spread, the aperture may be a different shape. The way the spread of light interacts with the detector is defined by something called the point spread function (PSF), or pixel response function (PRF).
 <em>Kepler</em>’s PSF/PRF is described in detail in Section 3.5 of the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19033-001.pdf">Kepler Instrument Handbook</a>.</p>
 <p>We’ve looked at a basic example in this section, but as we’ll see later in this tutorial, it can be hard to determine the best aperture for a given target by eye. Choosing the best aperture for your target can be something of a balancing act: using a larger aperture will minimize the effects of PSF changes and spacecraft motion, but conversely it increases the presence of shot noise. This is why <em>Kepler</em> and <em>K2</em> data were processed with an “optimal aperture.” Brightness, PSF, shot noise,
 crowding, and many other factors went into predicting the optimal aperture for producing a SAP or PDCSAP light curve with NASA’s <em>Kepler</em> and <em>K2</em> pipelines. You can read more about the process of creating these apertures in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2016PASP..128l4501S/abstract">Smith et al., 2016</a>, which is equivalent to Chapter 7 of the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf">Kepler Data Processing
 Handbook</a>.</p>
-</div>
-<div class="section" id="1.3-Why-not-just-use-published-light-curves?">
+</section>
+<section id="1.3-Why-not-just-use-published-light-curves?">
 <h3>1.3 Why not just use published light curves?<a class="headerlink" href="#1.3-Why-not-just-use-published-light-curves?" title="Permalink to this headline">¶</a></h3>
 <p>There are several reasons why we might want to create our own light curve from scratch, rather than using the readily available data. One of the main reasons is contamination: particularly in crowded fields, we might find multiple signals in one light curve, meaning there are multiple targets in the TPF. In that case, we would want to make our own light curve using a smaller aperture, to make sure that we’re only picking up the signal from our target star. Alternatively, we might want to use our
 TPF to produce a serendipitous light curve for a contaminating star, especially if it doesn’t have its own SAP/PDCSAP light curve available.</p>
 <p>Another reason we might want to produce our own light curves is to minimize noise. Recall that some pixels might be dominated by shot noise over signal. If we find that some of the pixels in a <em>Kepler</em> pipeline aperture have more noise than signal, we can make our own aperture to see what happens if we exclude those pixels.</p>
 <p>Finally, we might want to produce a light curve for a star that doesn’t have SAP/PDCSAP data available at all. This could be a star in the full-frame images (FFIs), or the superstamps (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/archive_manual.pdf">Kepler Archive Manual</a>, Sections 2.3.3 and 2.2.1). This is less likely to come up with <em>Kepler/K2</em> data, but all of these tools will come in handy when working with <em>TESS</em> full-frame images. There
 are hundreds of thousands of stars in the <em>TESS</em> field of view that weren’t targeted and don’t have readily available light curves. Custom aperture photometry is perfectly suited for inspecting individual targets in the <em>TESS</em> FFIs.</p>
-</div>
-<div class="section" id="1.4-Choosing-an-aperture">
+</section>
+<section id="1.4-Choosing-an-aperture">
 <h3>1.4 Choosing an aperture<a class="headerlink" href="#1.4-Choosing-an-aperture" title="Permalink to this headline">¶</a></h3>
 <p>In NASA’s <em>Kepler</em> and <em>K2</em> pipelines, the process of determining apertures is automated (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf">Kepler Data Processing Handbook</a>, Part II). Here, we’ll manually create our own apertures.</p>
 <p>Without any knowledge of which pixels contain light from our target, the most basic approach is to look at individual pixels and manually determine which pixels to work with. Working offline, we can use Lightkurve’s TPF <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact.html?highlight=interact#lightkurve.KeplerTargetPixelFile.interact">interact()</a> function, which is a convenient way to inspect one or more pixels at a time. Another recommended way to define an
@@ -601,17 +641,17 @@ aperture is by defining a median flux value and only selecting pixels at a certa
 <p>In most situations, a threshold mask will be the best choice for custom aperture photometry, as it doesn’t involve trial and error beyond finding the best sigma value. However, if you’re dealing with multiple bright objects in one TPF, a manual mask may be the better option.</p>
 <p>Both of these methods are most useful when dealing with small amounts of data, such as looking at a handful of individual objects. When working with large datasets, it’s advisable to use the pipeline aperture, as this will be sufficient in the majority of cases with <em>Kepler</em> and <em>K2</em>. However, if you’re processing a large amount of stars which were not targeted during either mission — such as FFI or superstamp data — a good approach would be to experiment with multiple threshold apertures for
 each target and see which one produces the best results.</p>
-</div>
-</div>
-<div class="section" id="2.-Getting-Started">
+</section>
+</section>
+<section id="2.-Getting-Started">
 <h2>2. Getting Started<a class="headerlink" href="#2.-Getting-Started" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="2.1-Doing-photometry-with-the-pipeline-aperture">
+<section id="2.1-Doing-photometry-with-the-pipeline-aperture">
 <h3>2.1 Doing photometry with the pipeline aperture<a class="headerlink" href="#2.1-Doing-photometry-with-the-pipeline-aperture" title="Permalink to this headline">¶</a></h3>
 <p>We’re going to use the built-in functions in Lightkurve for aperture photometry. You may have encountered <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve()</a> in other tutorials in this series. In this section, we’ll explore a number of ways to use this function for custom aperture photometry — but first, let’s do a quick review of the function at its most basic.</p>
 <p>We’ll start by downloading a target pixel file. We’re going to use <em>Kepler</em> long cadence data to look at KIC 2437317, a star which shows brightness variations due to rotation (<a class="reference external" href="https://www.aanda.org/articles/aa/pdf/2015/11/aa26216-15.pdf">Reinhold &amp; Gizon, 2015</a>). We’re downloading Quarter 10, as there was minimal data loss during this quarter (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics
 Manual</a>, Section 4.1).</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -620,8 +660,8 @@ Manual</a>, Section 4.1).</p>
 </div>
 </div>
 <p>Before we do photometry on this star, let’s see what we’re working with by plotting the TPF:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -629,26 +669,10 @@ Manual</a>, Section 4.1).</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2437317, Cadence: 39049&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_19_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_19_1.png" />
-</div>
-</div>
 <p>Notice that this TPF is more crowded than the one we looked at in Section 1. We can still point out which pixels probably contain the star’s signal, and which ones are dominated by noise. However, there’s also a background star in this TPF: the bright pixel to the left. We want to avoid picking up signal from that star.</p>
 <p>We can use Lightkurve to plot the pipeline aperture:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -656,25 +680,9 @@ Manual</a>, Section 4.1).</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2437317, Cadence: 39049&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_21_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_21_1.png" />
-</div>
-</div>
 <p>The pipeline aperture is small in this case, but it avoids capturing any light from the background star. Now we can generate the light curve that results from using that aperture as follows:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -683,27 +691,11 @@ Manual</a>, Section 4.1).</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_23_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_23_1.png" />
-</div>
-</div>
 <p>The signal you can see here is caused by rotational modulation.</p>
 <p>Notice the spikes around 935 and 970 days. These coincide with breaks in the data collection during which <em>Kepler</em> was pointed at Earth to downlink data. These breaks are associated with small focus changes of the <em>Kepler</em> telescope, which are caused by the thermal effects associated with pointing <em>Kepler</em>’s antenna towards Earth. These artifical peaks are a form of systematic noise. We’ll see more evidence of systematic noise in the light curves we look at throughout this tutorial. As we’re
 only focused on performing photometry, we won’t do any light curve corrections to remove such noise, but you can read more about how to do so in other tutorials.</p>
-</div>
-<div class="section" id="2.2-Adjusting-the-aperture">
+</section>
+<section id="2.2-Adjusting-the-aperture">
 <h3>2.2 Adjusting the aperture<a class="headerlink" href="#2.2-Adjusting-the-aperture" title="Permalink to this headline">¶</a></h3>
 <p>Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve()</a> function has an <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code> keyword, which changes the aperture used to perform photometry. Later we’ll look at creating our own apertures, but first, let’s look at the three standard arguments this keyword takes:</p>
 <ul class="simple">
@@ -712,8 +704,8 @@ only focused on performing photometry, we won’t do any light curve corrections
 <li><p><code class="docutils literal notranslate"><span class="pre">'all'</span></code>: use every pixel in the frame for photometry.</p></li>
 </ul>
 <p>We can do a side-by-side comparison of the resulting light curves by normalizing them as follows:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -723,26 +715,10 @@ only focused on performing photometry, we won’t do any light curve corrections
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_26_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_26_1.png" />
-</div>
-</div>
 <p>Our star is fairly bright, with a <em>Kepler</em> magnitude of 14.6, so we don’t see much variation in the noise levels between these three light curves. But as you can see, using all of the pixels means including light from the background star which dilutes our star’s signal, making the rotation harder to detect by eye. On the other hand, using all of the pixels reduces the systematic noise near days 935 and 970, because telescope focus changes have less impact when a large aperture mask is used.</p>
 <p>The threshold mask light curve looks less diluted than the one using all of the pixels, but it still looks markedly different from the light curve from the pipeline aperture. We can use another of Lightkurve’s functions to see why this is the case:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -750,22 +726,10 @@ only focused on performing photometry, we won’t do any light curve corrections
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([[False, False, False, False, False],
-       [False, False, False, False, False],
-       [False, False, False,  True, False],
-       [False, False, False, False, False]])
-</pre></div></div>
-</div>
 <p>This is Lightkurve’s default 3 standard deviations threshold mask, and for this TPF there’s only one pixel with flux above that cutoff. Note how Lightkurve apertures work: pixels marked <code class="docutils literal notranslate"><span class="pre">True</span></code> in the aperture mask array are the ones that are used for photometry.</p>
 <p>We’ll make our own Boolean masks like this later. First, let’s play around with the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.create_threshold_mask.html?highlight=create_threshold_mask">create_threshold_mask()</a> function and try to reproduce the pipeline mask. Keeping in mind that the TPF we looked at above has many more bright pixels than faint ones, we can expect a bright median, so let’s try using a lower threshold:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -774,57 +738,29 @@ array([[False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([[False, False, False, False, False],
-       [False, False,  True,  True, False],
-       [False, False,  True,  True, False],
-       [False, False, False, False, False]])
-</pre></div></div>
-</div>
 <p>Now we’ve recreated the pipeline mask, which we can use to perform photometry again. As we’d expect, it produces the same results as the pipeline mask:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;pipeline&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;pipeline&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;threshold&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;threshold&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">3</span><span class="p">)</span>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;pipeline&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;pipeline&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
+<span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;threshold&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;threshold&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
+<span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
 <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">custom_threshold_mask</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;custom threshold&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_32_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_32_1.png" />
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="3.-Manual-Custom-Apertures">
+</section>
+</section>
+<section id="3.-Manual-Custom-Apertures">
 <h2>3. Manual Custom Apertures<a class="headerlink" href="#3.-Manual-Custom-Apertures" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="3.1-Creating-a-custom-threshold-aperture-with-Lightkurve">
+<section id="3.1-Creating-a-custom-threshold-aperture-with-Lightkurve">
 <h3>3.1 Creating a custom threshold aperture with Lightkurve<a class="headerlink" href="#3.1-Creating-a-custom-threshold-aperture-with-Lightkurve" title="Permalink to this headline">¶</a></h3>
 <p>In this section we’ll look at performing aperture photometry with a custom aperture. We’re going to switch to a different star, KIC 2437901. This star is an oscillating red giant (Colman et al., in prep), but we’re interested in it because it was processed using a large TPF, and there’s a second bright star captured in the image.</p>
 <p>Have a look at the TPF:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -832,8 +768,8 @@ array([[False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -841,25 +777,9 @@ array([[False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2437901, Cadence: 39049&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_36_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_36_1.png" />
-</div>
-</div>
 <p>We’re going to focus on that star in the top right. It’s not captured in the pipeline aperture, but it’s a serendipitous find in the TPF, so we can perform our own photometry on it with a custom aperture. Let’s see what the threshold mask looks like for this TPF:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -867,24 +787,9 @@ array([[False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([[False, False, False, False, False, False, False, False],
-       [False, False, False, False, False, False, False, False],
-       [False, False, False,  True,  True,  True, False, False],
-       [False, False, False,  True,  True, False, False, False],
-       [False, False, False,  True,  True, False, False, False],
-       [False, False, False, False, False, False, False, False],
-       [False, False, False, False, False, False, False, False]])
-</pre></div></div>
-</div>
 <p>We can plot this on top of the TPF, like so:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -892,26 +797,10 @@ array([[False, False, False, False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2437901, Cadence: 39049&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_40_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_40_1.png" />
-</div>
-</div>
 <p>No luck. Our custom aperture still selects the bright star in the center. When the thresholding method yields multiple contiguous regions, the default behavior of the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.create_threshold_mask.html?highlight=create_threshold_mask">create_threshold_mask</a> method is to return the region closest to the center. We can modify this behavior by passing a <code class="docutils literal notranslate"><span class="pre">reference_pixel</span></code> argument to specify the region we are most interested
 in. The argument is defined such that <code class="docutils literal notranslate"><span class="pre">reference_pixel=(0,0)</span></code> refers to the lower left corner. Hence, we can select the region in the upper right corner as follows:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -920,25 +809,9 @@ in. The argument is defined such that <code class="docutils literal notranslate"
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2437901, Cadence: 39049&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_42_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_42_1.png" />
-</div>
-</div>
 <p>Now we can perform aperture photometry using this mask:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -947,30 +820,14 @@ in. The argument is defined such that <code class="docutils literal notranslate"
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_44_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_44_1.png" />
-</div>
-</div>
 <p>Looks like there’s some signal in this star — a two-day period! In fact, this star is KIC 2437948, a likely binary (Colman et al., in prep).</p>
 <p>We could make that signal even clearer by being more selective, and manually assigning <code class="docutils literal notranslate"><span class="pre">True</span></code> to the individual pixels we want to use. The downside to this method is that it takes time and manual work to create a mask by hand. However, when working with small volumes of data, such as one quarter or campaign at a time, or one star, this method can produce good results. In what follows, we will demonstrate three alternative methods to create a mask by hand.</p>
-</div>
-<div class="section" id="3.2-Creating-a-custom-aperture-with-NumPy-arrays">
+</section>
+<section id="3.2-Creating-a-custom-aperture-with-NumPy-arrays">
 <h3>3.2 Creating a custom aperture with NumPy arrays<a class="headerlink" href="#3.2-Creating-a-custom-aperture-with-NumPy-arrays" title="Permalink to this headline">¶</a></h3>
 <p>We can use NumPy to create an aperture mask array by hand. For this star, it would make sense to select a 3x3 zone in the top right of the image. This can be tricky: 2D NumPy arrays index the y-axis first, and are printed with the zeroth y index at the top of the array, whereas a plotted array places zero at the bottom, as with a normal plot.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -981,24 +838,9 @@ in. The argument is defined such that <code class="docutils literal notranslate"
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([[False, False, False, False, False, False, False, False],
-       [False, False, False, False, False, False, False, False],
-       [False, False, False, False, False, False, False, False],
-       [False, False, False, False, False, False, False, False],
-       [False, False, False, False, False,  True,  True,  True],
-       [False, False, False, False, False,  True,  True,  True],
-       [False, False, False, False, False,  True,  True,  True]])
-</pre></div></div>
-</div>
 <p>Let’s plot the custom mask on top of the TPF. Notice that the y-axis in our array appears reversed, as described above. When handling images and NumPy arrays, it’s good practice to plot them every time, and make sure you’re seeing what you expect.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1006,29 +848,13 @@ array([[False, False, False, False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2437901, Cadence: 39049&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_49_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_49_1.png" />
-</div>
-</div>
-</div>
-<div class="section" id="3.3-“Cutting-out”-a-background-star">
+</section>
+<section id="3.3-“Cutting-out”-a-background-star">
 <h3>3.3 “Cutting out” a background star<a class="headerlink" href="#3.3-“Cutting-out”-a-background-star" title="Permalink to this headline">¶</a></h3>
 <p>Using Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.cutout.html?highlight=cutout">cutout()</a> function, we can emulate the process of creating a threshold mask on only the pixels we’re interested in. This method is only suitable for large TPFs with a clearly separated background star, like the case of KIC 2437901 and KIC 2437948.</p>
 <p>Let’s start by cutting out those 3x3 pixels we just used as an aperture mask:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1036,24 +862,8 @@ array([[False, False, False, False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2437901, Cadence: 39049&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_51_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_51_1.png" />
-</div>
-</div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1061,8 +871,8 @@ array([[False, False, False, False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1070,25 +880,9 @@ array([[False, False, False, False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2437901_CUTOUT, Cadence: 39049&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_53_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_53_1.png" />
-</div>
-</div>
 <p>This is still a <a class="reference external" href="https://docs.lightkurve.org/reference/targetpixelfile.html?highlight=targetpixelfile">TargetPixelFile</a> object, so we can use all of the same functions:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1096,20 +890,9 @@ array([[False, False, False, False, False, False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([[False, False, False],
-       [False,  True, False],
-       [False, False, False]])
-</pre></div></div>
-</div>
 <p>Unfortunately, the threshold mask only selects one pixel here. But with a smaller TPF, it’s also more convenient to select individual pixels for our mask:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1121,19 +904,8 @@ array([[False, False, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([[False,  True, False],
-       [False,  True,  True],
-       [False,  True, False]])
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1141,24 +913,8 @@ array([[False,  True, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2437901_CUTOUT, Cadence: 39049&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_58_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_58_1.png" />
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1167,40 +923,24 @@ array([[False,  True, False],
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_59_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_59_1.png" />
-</div>
-</div>
 <p>And there’s our signal again, nice and clear!</p>
-</div>
-<div class="section" id="3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool">
+</section>
+<section id="3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool">
 <h3>3.4 Creating a custom aperture using the <code class="docutils literal notranslate"><span class="pre">tpf.interact</span></code> tool<a class="headerlink" href="#3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool" title="Permalink to this headline">¶</a></h3>
 <p>Finally, it is good to know that there is interactive functionality in Lightkurve to create a mask. We cannot demonstrate it in this static tutorial, but you can try it yourself in a local notebook by running tpf<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact.html?highlight=interact#lightkurve.KeplerTargetPixelFile.interact">.interact()</a>. This will bring up an interactive panel which allows you to select the pixels you want using mouse clicks. Next,
 press “Save Lightcurve” in the bottom left of the panel. This will export your custom aperture light curve to a FITS file in your working directory. The file name follows a similar convention to official <em>Kepler</em> data products. For example, the file name for the example above is <code class="docutils literal notranslate"><span class="pre">kplr002437901-2011271113734_lpd-targ-custom-lc.fits</span></code>.</p>
-</div>
-</div>
-<div class="section" id="About-this-Notebook">
+</section>
+</section>
+<section id="About-this-Notebook">
 <h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
 <p><strong>Author:</strong> <a class="reference external" href="http://orcid.org/0000-0001-8196-516X">Isabel Colman</a> (<code class="docutils literal notranslate"><span class="pre">isabel.colman&#64;sydney.edu.au</span></code>)</p>
 <p><strong>Updated on:</strong> 2020-09-15</p>
-</div>
-<div class="section" id="Citing-Lightkurve-and-Astropy">
+</section>
+<section id="Citing-Lightkurve-and-Astropy">
 <h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1208,232 +948,54 @@ press “Save Lightcurve” in the bottom left of the panel. This will export yo
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<head>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-
-<style>
-    button {
-        border: 1px solid;
-        padding: 0.2em;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 0.8em;
-        margin: 0.2em;
-        cursor: pointer;
-    }
-
-    .citation-button-1 {background-color: #4CAF50;} /* Green */
-    .citation-button-2 {background-color: #008CBA;} /* Blue */
-</style>
-
-<script type="text/javascript">
-    function copyBibtex(package) {
-        var copyText = document.getElementById(package + "Text");
-        copyText.select();
-        document.execCommand("copy");
-        alert("BibTex has been copied to your clipboard")
-    }
-</script>
-</head>
-
-<body>
-    <textarea id="lightkurveText" style="position: absolute; left: -9999px; z-index: -9999;">
-@MISC{2018ascl.soft12013L,
-    author = {{Lightkurve Collaboration} and {Cardoso}, J.~V.~d.~M. and
-                {Hedges}, C. and {Gully-Santiago}, M. and {Saunders}, N. and
-                {Cody}, A.~M. and {Barclay}, T. and {Hall}, O. and
-                {Sagear}, S. and {Turtelboom}, E. and {Zhang}, J. and
-                {Tzanidakis}, A. and {Mighell}, K. and {Coughlin}, J. and
-                {Bell}, K. and {Berta-Thompson}, Z. and {Williams}, P. and
-                {Dotson}, J. and {Barentsen}, G.},
-    title = "{Lightkurve: Kepler and TESS time series analysis in Python}",
-    keywords = {Software, NASA},
-howpublished = {Astrophysics Source Code Library},
-        year = 2018,
-    month = dec,
-archivePrefix = "ascl",
-    eprint = {1812.013},
-    adsurl = {http://adsabs.harvard.edu/abs/2018ascl.soft12013L},
-}
-    </textarea>
-    <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
-@ARTICLE{2018AJ....156..123T,
-   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
-    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
-    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
-    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
-    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
-    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
-    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
-    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
-    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
-    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
-    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
-    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
-    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
-    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
-    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
-    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
-    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
-    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
-    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
-    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
-    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
-    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
-    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
-    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
-    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
-    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
-    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
-    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
-    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
-    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
-    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
-    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
-    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
-    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
-    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
-    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
-    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
-    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
-    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
-    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
-    {Zabalza}, V. and {Contributors}, (.},
-    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
-  journal = {\aj},
-archivePrefix = "arXiv",
-   eprint = {1801.02634},
- primaryClass = "astro-ph.IM",
- keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
-     year = 2018,
-    month = sep,
-   volume = 156,
-      eid = {123},
-    pages = {123},
-      doi = {10.3847/1538-3881/aabc4f},
-   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
-}
-
-
-    </textarea>
-    <textarea id="astroqueryText" style="position: absolute; left: -9999px; z-index: -9999;">
-@ARTICLE{2019AJ....157...98G,
-   author = {{Ginsburg}, A. and {Sip{\H o}cz}, B.~M. and {Brasseur}, C.~E. and
-    {Cowperthwaite}, P.~S. and {Craig}, M.~W. and {Deil}, C. and
-    {Guillochon}, J. and {Guzman}, G. and {Liedtke}, S. and {Lian Lim}, P. and
-    {Lockhart}, K.~E. and {Mommert}, M. and {Morris}, B.~M. and
-    {Norman}, H. and {Parikh}, M. and {Persson}, M.~V. and {Robitaille}, T.~P. and
-    {Segovia}, J.-C. and {Singer}, L.~P. and {Tollerud}, E.~J. and
-    {de Val-Borro}, M. and {Valtchanov}, I. and {Woillez}, J. and
-    {The Astroquery collaboration} and {a subset of the astropy collaboration}
-    },
-    title = "{astroquery: An Astronomical Web-querying Package in Python}",
-  journal = {\aj},
-archivePrefix = "arXiv",
-   eprint = {1901.04520},
- primaryClass = "astro-ph.IM",
- keywords = {astronomical databases: miscellaneous, virtual observatory tools},
-     year = 2019,
-    month = mar,
-   volume = 157,
-      eid = {98},
-    pages = {98},
-      doi = {10.3847/1538-3881/aafc33},
-   adsurl = {http://adsabs.harvard.edu/abs/2019AJ....157...98G},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
-}
-
-    </textarea>
-    <textarea id="tesscutText" style="position: absolute; left: -9999px; z-index: -9999;">
-@MISC{2019ascl.soft05007B,
-        author = {{Brasseur}, C.~E. and {Phillip}, Carlita and {Fleming}, Scott W. and
-          {Mullally}, S.~E. and {White}, Richard L.},
-         title = "{Astrocut: Tools for creating cutouts of TESS images}",
-      keywords = {Software},
-          year = 2019,
-         month = may,
-           eid = {ascl:1905.007},
-         pages = {ascl:1905.007},
- archivePrefix = {ascl},
-        eprint = {1905.007},
-        adsurl = {https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B},
-       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
- }
-    </textarea>
-
-    <p>
-        When using Lightkurve, we kindly request that you cite the following packages:
-        <ul>
-            <li>
-                <a href="https://docs.lightkurve.org">lightkurve</a>
-                <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astropy.org">astropy</a>
-                <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astroquery.readthedocs.io">astroquery</a>
-                <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                —  if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
-            </li>
-            <li>
-                <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
-                <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                — if you are using <i>search_tesscut()</i>.
-            </li>
-        </ul>
-    </p>
-</body></div>
-</div>
 <p><img alt="Space Telescope Logo" class="no-scaled-link" src="https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png" style="width: 200px;" /></p>
-</div>
-</div>
+</section>
+</section>
 
 
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='left-prev' id="prev-link" href="../1-getting-started/how-to-open-a-lightcurve-in-excel.html" title="previous page">How to open a light curve in Excel?</a>
-    <a class='right-next' id="next-link" href="2-1-combining-multiple-quarters.html" title="next page">Combining multiple quarters of <em>Kepler</em> data</a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="../1-getting-started/how-to-open-a-lightcurve-in-excel.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">How to open a light curve in Excel?</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="2-1-combining-multiple-quarters.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Combining multiple quarters of <em>Kepler</em> data</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
 
       </div>
     </div>
-
-    
-  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
-
-
-    
-    <!-- Google Analytics -->
-    <script>
-      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-      ga('create', 'UA-69171-9', 'auto');
-      ga('set', 'anonymizeIp', true);
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-    <!-- End Google Analytics -->
-    <footer class="footer mt-5 mt-md-0">
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
-    <p>
-          &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
-    </p>
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
   </div>
 </footer>
   </body>

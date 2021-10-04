@@ -1,0 +1,6 @@
+﻿lightkurve.LightCurveCollection.append
+======================================
+
+.. currentmodule:: lightkurve
+
+.. automethod:: LightCurveCollection.append

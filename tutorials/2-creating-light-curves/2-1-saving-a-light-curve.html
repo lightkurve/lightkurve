@@ -4,10 +4,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>How to save a LightCurve in FITS format? &#8212; Lightkurve </title>
     
-  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,88 +21,119 @@
 
     
       
-  <link rel="stylesheet"
-    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
-  <link rel="stylesheet"
-    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
 
     
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Instrumental Noise in Kepler and K2 #1: Data Gaps and Quality Flags" href="2-2-kepler-noise-1-data-gaps-and-quality-flags.html" />
     <link rel="prev" title="How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?" href="2-1-cutting-out-tpfs.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
-<div class="container-xl">
+    <div class="container-fluid" id="banner"></div>
 
-    <a class="navbar-brand" href="../../index.html">
     
-      <p class="title">Lightkurve v2.0</p>
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
     
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
 
-    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
-      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
-        
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
-        </li>
-        
-        <li class="nav-item active">
-            <a class="nav-link" href="../index.html">Tutorials</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../reference/index.html">API</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../about/index.html">About</a>
-        </li>
-        
-        
-      </ul>
+    
+  </div>
 
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form>
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
 
-      <ul class="navbar-nav">
-        
-          <li class="nav-item">
-            <a class="nav-link" href="https://github.com/lightkurve/lightkurve" target="_blank" rel="noopener">
-              <span><i class="fab fa-github-square"></i></span>
-            </a>
-          </li>
-        
-        
-      </ul>
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
     </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
 </div>
     </nav>
     
@@ -108,34 +141,46 @@
     <div class="container-xl">
       <div class="row">
           
-          <div class="col-12 col-md-3 bd-sidebar">
-          </div>
+            
+            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
+            
           
 
           
           <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
+              <div class="toc-item">
+                
 <div class="tocsection onthispage pt-5 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
 <nav id="bd-toc-nav">
-    <ul class="nav section-nav flex-column">
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Example:-editing-and-writing-a-lightcurve" class="nav-link">Example: editing and writing a lightcurve</a>
-        </li>
-    
-    </ul>
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Example:-editing-and-writing-a-lightcurve">
+   Example: editing and writing a lightcurve
+  </a>
+ </li>
+</ul>
+
 </nav>
-
-
+              </div>
               
+              <div class="toc-item">
+                
+              </div>
+              
+            
           </div>
           
 
           
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+          
+            
+          
+          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
               
               <div>
                 
@@ -392,17 +437,17 @@ div.rendered_html tbody tr:hover {
     <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/tutorials/2-creating-light-curves/2-1-saving-a-light-curve.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
     <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/tutorials/2-creating-light-curves/2-1-saving-a-light-curve.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<br style="clear:both;"><div class="section" id="How-to-save-a-LightCurve-in-FITS-format?">
+<br style="clear:both;"><section id="How-to-save-a-LightCurve-in-FITS-format?">
 <h1>How to save a LightCurve in FITS format?<a class="headerlink" href="#How-to-save-a-LightCurve-in-FITS-format?" title="Permalink to this headline">¶</a></h1>
 <p>Once you have detrended or altered a lightcurve in some way, you may want to save it as a FITS file. This allows you to easily share the file with your collaborators or submit your lightcurves as a <a class="reference external" href="https://archive.stsci.edu/hlsp/hlsp_guidelines.html">MAST High Level Science Product</a> (HLSP). Lightkurve provides a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.to_fits.html?highlight=to_fits#lightkurve.LightCurve.to_fits">to_fits()</a> method which will easily convert your
 <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.html?highlight=lightcurve#lightkurve.LightCurve">LightCurve</a> object into a fits file.</p>
 <p>Below is a brief demostration showing how <code class="docutils literal notranslate"><span class="pre">to_fits()</span></code> works.</p>
 <p>Note: if you are considering contributing a HLSP you may want to read the <a class="reference external" href="https://archive.stsci.edu/hlsp/hlsp_guidelines_timeseries.html">guidelines</a> for contributing fits files. These include which fits headers are required/suggested for your HLSP to be accepted.</p>
-<div class="section" id="Example:-editing-and-writing-a-lightcurve">
+<section id="Example:-editing-and-writing-a-lightcurve">
 <h2>Example: editing and writing a lightcurve<a class="headerlink" href="#Example:-editing-and-writing-a-lightcurve" title="Permalink to this headline">¶</a></h2>
 <p>First we’ll obtain a random Kepler lightcurve from MAST.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -412,8 +457,8 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <p>Now we’ll make some edits to the lightcurve. Below we use the PDCSAP flux from MAST, remove NaN values using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.remove_nans.html?highlight=remove_nans">.remove_nans()</a> function, and clip out any outliers using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.remove_outliers.html?highlight=remove_outliers">.remove_outliers()</a>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -422,25 +467,9 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-1-saving-a-light-curve_4_1.png" src="../../_images/tutorials_2-creating-light-curves_2-1-saving-a-light-curve_4_1.png" />
-</div>
-</div>
 <p>Now we can use the <code class="docutils literal notranslate"><span class="pre">to_fits</span></code> method to save the lightcurve to a file called <em>output.fits</em>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -449,8 +478,8 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <p>Let’s take a look at the file and check that it behaved as we expect</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -460,17 +489,8 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-astropy.io.fits.hdu.hdulist.HDUList
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -478,20 +498,9 @@ astropy.io.fits.hdu.hdulist.HDUList
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Filename: demo-lightcurve.fits
-No.    Name      Ver    Type      Cards   Dimensions   Format
-  0  PRIMARY       1 PrimaryHDU      26   ()
-  1  LIGHTCURVE    1 BinTableHDU     26   4133R x 6C   [D, E, E, K, D, D]
-</pre></div></div>
-</div>
 <p><code class="docutils literal notranslate"><span class="pre">hdu</span></code> is a set of astropy.io.fits objects, which is what we would expect. Lets take a look at the header of the first extension.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -499,43 +508,9 @@ No.    Name      Ver    Type      Cards   Dimensions   Format
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-SIMPLE  =                    T / conforms to FITS standards
-BITPIX  =                    8 / array data type
-NAXIS   =                    0 / number of array dimensions
-EXTEND  =                    T / file contains extensions
-NEXTEND =                    2 / number of standard extensions
-EXTNAME = &#39;PRIMARY &#39;           / name of extension
-EXTVER  =                    1 / extension version number (not format version)
-ORIGIN  = &#39;Unofficial data product&#39; / institution responsible for file
-DATE    = &#39;2021-03-31&#39;         / file creation date.
-CREATOR = &#39;lightkurve.LightCurve.to_fits()&#39; / pipeline job and program used t
-TELESCOP= &#39;KEPLER  &#39;           / telescope
-INSTRUME= &#39;Kepler Photometer&#39;  / detector type
-OBJECT  = &#39;757076  &#39;           / string version of target id
-KEPLERID=               757076 / unique Kepler target identifier
-CHANNEL =                   56 / CCD channel
-RADESYS = &#39;ICRS    &#39;           / reference frame of celestial coordinates
-RA_OBJ  =            291.03872 / [deg] right ascension
-DEC_OBJ =             36.59813 / [deg] declination
-EQUINOX =                 2000 / equinox of celestial coordinate system
-PROCVER = &#39;2.0.9dev&#39;
-MISSION = &#39;Kepler  &#39;
-DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
-QUARTER =                    3
-CAMPAIGN=
-CHECKSUM= &#39;CHJgDGIfCGIfCGIf&#39;   / HDU checksum updated 2021-03-31T15:30:58
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2021-03-31T15:30:58
-</pre></div></div>
-</div>
 <p>Looks like it has all the correct information about the target. What about the second extension?</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -543,43 +518,9 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2021-03-31T1
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-XTENSION= &#39;BINTABLE&#39;           / binary table extension
-BITPIX  =                    8 / array data type
-NAXIS   =                    2 / number of array dimensions
-NAXIS1  =                   40 / length of dimension 1
-NAXIS2  =                 4133 / length of dimension 2
-PCOUNT  =                    0 / number of group parameters
-GCOUNT  =                    1 / number of groups
-TFIELDS =                    6 / number of table fields
-TTYPE1  = &#39;TIME    &#39;
-TFORM1  = &#39;D       &#39;
-TUNIT1  = &#39;bkjd    &#39;
-TTYPE2  = &#39;FLUX    &#39;
-TFORM2  = &#39;E       &#39;
-TUNIT2  = &#39;e-/s    &#39;
-TTYPE3  = &#39;FLUX_ERR&#39;
-TFORM3  = &#39;E       &#39;
-TUNIT3  = &#39;e-/s    &#39;
-TTYPE4  = &#39;SAP_QUALITY&#39;
-TFORM4  = &#39;K       &#39;
-TTYPE5  = &#39;MOM_CENTR1&#39;
-TFORM5  = &#39;D       &#39;
-TTYPE6  = &#39;MOM_CENTR2&#39;
-TFORM6  = &#39;D       &#39;
-EXTNAME = &#39;LIGHTCURVE&#39;
-CHECKSUM= &#39;3T5Y3T2Y3T2Y3T2Y&#39;   / HDU checksum updated 2021-03-31T15:30:58
-DATASUM = &#39;350614816&#39;          / data unit checksum updated 2021-03-31T15:30:58
-</pre></div></div>
-</div>
 <p>This extension has 7 columns, <code class="docutils literal notranslate"><span class="pre">TIME</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX_ERR</span></code>, <code class="docutils literal notranslate"><span class="pre">SAP_QUALITY</span></code>, <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code>, <code class="docutils literal notranslate"><span class="pre">MOM_CENTR1</span></code>, and <code class="docutils literal notranslate"><span class="pre">MOM_CENTR2</span></code>. What if we wanted to add new keywords to our fits file? HLSP products require some extra keywords. Let’s add some keywords to explain who made the data, and what our HLSP is.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -592,7 +533,7 @@ DATASUM = &#39;350614816&#39;          / data unit checksum updated 2021-03-31T1
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -600,8 +541,8 @@ DATASUM = &#39;350614816&#39;          / data unit checksum updated 2021-03-31T1
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -609,46 +550,9 @@ DATASUM = &#39;350614816&#39;          / data unit checksum updated 2021-03-31T1
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-SIMPLE  =                    T / conforms to FITS standards
-BITPIX  =                    8 / array data type
-NAXIS   =                    0 / number of array dimensions
-EXTEND  =                    T / file contains extensions
-NEXTEND =                    2 / number of standard extensions
-EXTNAME = &#39;PRIMARY &#39;           / name of extension
-EXTVER  =                    1 / extension version number (not format version)
-ORIGIN  = &#39;Unofficial data product&#39; / institution responsible for file
-DATE    = &#39;2021-03-31&#39;         / file creation date.
-CREATOR = &#39;lightkurve.LightCurve.to_fits()&#39; / pipeline job and program used t
-TELESCOP= &#39;KEPLER  &#39;           / telescope
-INSTRUME= &#39;Kepler Photometer&#39;  / detector type
-OBJECT  = &#39;757076  &#39;           / string version of target id
-KEPLERID=               757076 / unique Kepler target identifier
-CHANNEL =                   56 / CCD channel
-RADESYS = &#39;ICRS    &#39;           / reference frame of celestial coordinates
-RA_OBJ  =            291.03872 / [deg] right ascension
-DEC_OBJ =             36.59813 / [deg] declination
-EQUINOX =                 2000 / equinox of celestial coordinate system
-PROCVER = &#39;2.0.9dev&#39;
-HLSPLEAD= &#39;Kepler/K2 GO office&#39;
-HLSPNAME= &#39;TUTORIAL&#39;
-CITATION= &#39;HEDGES2018&#39;
-MISSION = &#39;Kepler  &#39;
-DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
-QUARTER =                    3
-CAMPAIGN=
-CHECKSUM= &#39;Z5dAd2d2Z2d9d2d9&#39;   / HDU checksum updated 2021-03-31T15:30:58
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2021-03-31T15:30:58
-</pre></div></div>
-</div>
 <p>Now our new keywords are included in the primary header! What about if we want to add more <strong>data columns</strong> to our fits file? We can simply add data columns in the same way. Let’s add the data quality to our fits file.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -657,18 +561,8 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2021-03-31T1
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;TimeDelta object: scale=&#39;None&#39; format=&#39;jd&#39; value=[-0.61680215 -0.61654885 -0.61577695 ...  0.61676757  0.61705094
-  0.61726379]&gt;
-</pre></div></div>
-</div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -682,7 +576,7 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2021-03-31T1
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -690,8 +584,8 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2021-03-31T1
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -699,63 +593,54 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2021-03-31T1
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-ColDefs(
-    name = &#39;TIME&#39;; format = &#39;D&#39;; unit = &#39;bkjd&#39;
-    name = &#39;FLUX&#39;; format = &#39;E&#39;; unit = &#39;e-/s&#39;
-    name = &#39;FLUX_ERR&#39;; format = &#39;E&#39;; unit = &#39;e-/s&#39;
-    name = &#39;SAP_QUALITY&#39;; format = &#39;K&#39;
-    name = &#39;MOM_CENTR1&#39;; format = &#39;D&#39;
-    name = &#39;MOM_CENTR2&#39;; format = &#39;D&#39;
-)
-</pre></div></div>
-</div>
 <p>The vector is populated as a data column in the HDU extension. Once all your lightcurves are saved as fits files and you have a README file, you can consider submitting your data products to MAST.</p>
-</div>
-</div>
+</section>
+</section>
 
 
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='left-prev' id="prev-link" href="2-1-cutting-out-tpfs.html" title="previous page">How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?</a>
-    <a class='right-next' id="next-link" href="2-2-kepler-noise-1-data-gaps-and-quality-flags.html" title="next page">Instrumental Noise in <em>Kepler</em> and <em>K2</em> #1: Data Gaps and Quality Flags</a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="2-1-cutting-out-tpfs.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="2-2-kepler-noise-1-data-gaps-and-quality-flags.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Instrumental Noise in <em>Kepler</em> and <em>K2</em> #1: Data Gaps and Quality Flags</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
 
       </div>
     </div>
-
-    
-  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
-
-
-    
-    <!-- Google Analytics -->
-    <script>
-      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-      ga('create', 'UA-69171-9', 'auto');
-      ga('set', 'anonymizeIp', true);
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-    <!-- End Google Analytics -->
-    <footer class="footer mt-5 mt-md-0">
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
-    <p>
-          &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
-    </p>
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
   </div>
 </footer>
   </body>

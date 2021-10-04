@@ -1,0 +1,32 @@
+﻿lightkurve.TargetPixelFileCollection
+====================================
+
+.. currentmodule:: lightkurve
+
+.. autoclass:: TargetPixelFileCollection
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TargetPixelFileCollection.__init__
+      ~TargetPixelFileCollection.append
+      ~TargetPixelFileCollection.plot
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TargetPixelFileCollection.campaign
+      ~TargetPixelFileCollection.quarter
+      ~TargetPixelFileCollection.sector
+   
+   

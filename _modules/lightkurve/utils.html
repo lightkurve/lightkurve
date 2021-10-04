@@ -1,0 +1,1009 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.utils &#8212; Lightkurve </title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+      <div class="navbar-end-item">
+        <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for lightkurve.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module provides various helper functions.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">LogNorm</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">import</span> <span class="nn">astropy</span>
+<span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
+<span class="kn">from</span> <span class="nn">astropy.units.quantity</span> <span class="kn">import</span> <span class="n">Quantity</span>
+<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">from</span> <span class="nn">astropy.visualization</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PercentileInterval</span><span class="p">,</span>
+    <span class="n">ImageNormalize</span><span class="p">,</span>
+    <span class="n">SqrtStretch</span><span class="p">,</span>
+    <span class="n">LinearStretch</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">astropy.time</span> <span class="kn">import</span> <span class="n">Time</span>
+
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;LightkurveError&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LightkurveWarning&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;KeplerQualityFlags&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TessQualityFlags&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bkjd_to_astropy_time&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;btjd_to_astropy_time&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;show_citation_instructions&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">QualityFlags</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abstract class&quot;&quot;&quot;</span>
+
+    <span class="n">STRINGS</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">OPTIONS</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">quality</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts a QUALITY value into a list of human-readable strings.</span>
+
+<span class="sd">        This function takes the QUALITY bitstring that can be found for each</span>
+<span class="sd">        cadence in Kepler/K2/TESS&#39; pixel and light curve files and converts into</span>
+<span class="sd">        a list of human-readable strings explaining the flags raised (if any).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        quality : int</span>
+<span class="sd">            Value from the &#39;QUALITY&#39; column of a Kepler/K2/TESS pixel or lightcurve file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        flags : list of str</span>
+<span class="sd">            List of human-readable strings giving a short description of the</span>
+<span class="sd">            quality flags raised.  Returns an empty list if no flags raised.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If passed an astropy quantity object, get the value</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">):</span>
+            <span class="n">quality</span> <span class="o">=</span> <span class="n">quality</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRINGS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">quality</span> <span class="o">&amp;</span> <span class="n">flag</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">STRINGS</span><span class="p">[</span><span class="n">flag</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_quality_mask</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">quality_array</span><span class="p">,</span> <span class="n">bitmask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a boolean array which flags good cadences given a bitmask.</span>
+
+<span class="sd">        This method is used by the readers of :class:`KeplerTargetPixelFile`</span>
+<span class="sd">        and :class:`KeplerLightCurve` to initialize their `quality_mask`</span>
+<span class="sd">        class attribute which is used to ignore bad-quality data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        quality_array : array of int</span>
+<span class="sd">            &#39;QUALITY&#39; column of a Kepler target pixel or lightcurve file.</span>
+<span class="sd">        bitmask : int or str</span>
+<span class="sd">            Bitmask (int) or one of &#39;none&#39;, &#39;default&#39;, &#39;hard&#39;, or &#39;hardest&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        boolean_mask : array of bool</span>
+<span class="sd">            Boolean array in which `True` means the data is of good quality.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Return an array filled with `True` by default (i.e. ignore nothing)</span>
+        <span class="k">if</span> <span class="n">bitmask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">quality_array</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quality_array</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="n">quality_array</span> <span class="o">=</span> <span class="n">quality_array</span><span class="o">.</span><span class="n">value</span>
+        <span class="c1"># A few pre-defined bitmasks can be specified as strings</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bitmask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">bitmask</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">OPTIONS</span><span class="p">[</span><span class="n">bitmask</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">valid_options</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">OPTIONS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;quality_bitmask=&#39;</span><span class="si">{}</span><span class="s2">&#39; is not supported, &quot;</span>
+                    <span class="s2">&quot;expected one of </span><span class="si">{}</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bitmask</span><span class="p">,</span> <span class="n">valid_options</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="c1"># The bitmask is applied using the bitwise AND operator</span>
+        <span class="n">quality_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">quality_array</span> <span class="o">&amp;</span> <span class="n">bitmask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="c1"># Log the quality masking as info or warning</span>
+        <span class="n">n_cadences</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">quality_array</span><span class="p">)</span>
+        <span class="n">n_cadences_masked</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">quality_mask</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">percent_masked</span> <span class="o">=</span> <span class="mf">100.0</span> <span class="o">*</span> <span class="n">n_cadences_masked</span> <span class="o">/</span> <span class="n">n_cadences</span>
+        <span class="n">logmsg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">{:.0f}</span><span class="s2">% (</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">) of the cadences will be ignored due to the &quot;</span>
+            <span class="s2">&quot;quality mask (quality_bitmask=</span><span class="si">{}</span><span class="s2">).&quot;</span>
+            <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">percent_masked</span><span class="p">,</span> <span class="n">n_cadences_masked</span><span class="p">,</span> <span class="n">n_cadences</span><span class="p">,</span> <span class="n">bitmask</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">percent_masked</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Warning: &quot;</span> <span class="o">+</span> <span class="n">logmsg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">logmsg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">quality_mask</span>
+
+
+<div class="viewcode-block" id="KeplerQualityFlags"><a class="viewcode-back" href="../../reference/api/lightkurve.KeplerQualityFlags.html#lightkurve.KeplerQualityFlags">[docs]</a><span class="k">class</span> <span class="nc">KeplerQualityFlags</span><span class="p">(</span><span class="n">QualityFlags</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class encodes the meaning of the various Kepler QUALITY bitmask flags,</span>
+<span class="sd">    as documented in the Kepler Archive Manual (Ref. [1], Table 2.3).</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.</span>
+<span class="sd">        http://archive.stsci.edu/kepler/manuals/archive_manual.pdf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">AttitudeTweak</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">SafeMode</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">CoarsePoint</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">EarthPoint</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">ZeroCrossing</span> <span class="o">=</span> <span class="mi">16</span>
+    <span class="n">Desat</span> <span class="o">=</span> <span class="mi">32</span>
+    <span class="n">Argabrightening</span> <span class="o">=</span> <span class="mi">64</span>
+    <span class="n">ApertureCosmic</span> <span class="o">=</span> <span class="mi">128</span>
+    <span class="n">ManualExclude</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="c1"># Bit 2**10 = 512 is unused by Kepler</span>
+    <span class="n">SensitivityDropout</span> <span class="o">=</span> <span class="mi">1024</span>
+    <span class="n">ImpulsiveOutlier</span> <span class="o">=</span> <span class="mi">2048</span>
+    <span class="n">ArgabrighteningOnCCD</span> <span class="o">=</span> <span class="mi">4096</span>
+    <span class="n">CollateralCosmic</span> <span class="o">=</span> <span class="mi">8192</span>
+    <span class="n">DetectorAnomaly</span> <span class="o">=</span> <span class="mi">16384</span>
+    <span class="n">NoFinePoint</span> <span class="o">=</span> <span class="mi">32768</span>
+    <span class="n">NoData</span> <span class="o">=</span> <span class="mi">65536</span>
+    <span class="n">RollingBandInAperture</span> <span class="o">=</span> <span class="mi">131072</span>
+    <span class="n">RollingBandInMask</span> <span class="o">=</span> <span class="mi">262144</span>
+    <span class="n">PossibleThrusterFiring</span> <span class="o">=</span> <span class="mi">524288</span>
+    <span class="n">ThrusterFiring</span> <span class="o">=</span> <span class="mi">1048576</span>
+
+    <span class="c1">#: DEFAULT bitmask identifies all cadences which are definitely useless.</span>
+    <span class="n">DEFAULT_BITMASK</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">AttitudeTweak</span>
+        <span class="o">|</span> <span class="n">SafeMode</span>
+        <span class="o">|</span> <span class="n">CoarsePoint</span>
+        <span class="o">|</span> <span class="n">EarthPoint</span>
+        <span class="o">|</span> <span class="n">Desat</span>
+        <span class="o">|</span> <span class="n">ManualExclude</span>
+        <span class="o">|</span> <span class="n">DetectorAnomaly</span>
+        <span class="o">|</span> <span class="n">NoData</span>
+        <span class="o">|</span> <span class="n">ThrusterFiring</span>
+    <span class="p">)</span>
+    <span class="c1">#: HARD bitmask is conservative and may identify cadences which are useful.</span>
+    <span class="n">HARD_BITMASK</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">DEFAULT_BITMASK</span>
+        <span class="o">|</span> <span class="n">SensitivityDropout</span>
+        <span class="o">|</span> <span class="n">ApertureCosmic</span>
+        <span class="o">|</span> <span class="n">CollateralCosmic</span>
+        <span class="o">|</span> <span class="n">PossibleThrusterFiring</span>
+    <span class="p">)</span>
+    <span class="c1">#: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.</span>
+    <span class="n">HARDEST_BITMASK</span> <span class="o">=</span> <span class="mi">2096639</span>
+
+    <span class="c1">#: Dictionary which provides friendly names for the various bitmasks.</span>
+    <span class="n">OPTIONS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;none&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">DEFAULT_BITMASK</span><span class="p">,</span>
+        <span class="s2">&quot;hard&quot;</span><span class="p">:</span> <span class="n">HARD_BITMASK</span><span class="p">,</span>
+        <span class="s2">&quot;hardest&quot;</span><span class="p">:</span> <span class="n">HARDEST_BITMASK</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="c1">#: Pretty string descriptions for each flag</span>
+    <span class="n">STRINGS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;Attitude tweak&quot;</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;Safe mode&quot;</span><span class="p">,</span>
+        <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;Coarse point&quot;</span><span class="p">,</span>
+        <span class="mi">8</span><span class="p">:</span> <span class="s2">&quot;Earth point&quot;</span><span class="p">,</span>
+        <span class="mi">16</span><span class="p">:</span> <span class="s2">&quot;Zero crossing&quot;</span><span class="p">,</span>
+        <span class="mi">32</span><span class="p">:</span> <span class="s2">&quot;Desaturation event&quot;</span><span class="p">,</span>
+        <span class="mi">64</span><span class="p">:</span> <span class="s2">&quot;Argabrightening&quot;</span><span class="p">,</span>
+        <span class="mi">128</span><span class="p">:</span> <span class="s2">&quot;Cosmic ray in optimal aperture&quot;</span><span class="p">,</span>
+        <span class="mi">256</span><span class="p">:</span> <span class="s2">&quot;Manual exclude&quot;</span><span class="p">,</span>
+        <span class="mi">1024</span><span class="p">:</span> <span class="s2">&quot;Sudden sensitivity dropout&quot;</span><span class="p">,</span>
+        <span class="mi">2048</span><span class="p">:</span> <span class="s2">&quot;Impulsive outlier&quot;</span><span class="p">,</span>
+        <span class="mi">4096</span><span class="p">:</span> <span class="s2">&quot;Argabrightening on CCD&quot;</span><span class="p">,</span>
+        <span class="mi">8192</span><span class="p">:</span> <span class="s2">&quot;Cosmic ray in collateral data&quot;</span><span class="p">,</span>
+        <span class="mi">16384</span><span class="p">:</span> <span class="s2">&quot;Detector anomaly&quot;</span><span class="p">,</span>
+        <span class="mi">32768</span><span class="p">:</span> <span class="s2">&quot;No fine point&quot;</span><span class="p">,</span>
+        <span class="mi">65536</span><span class="p">:</span> <span class="s2">&quot;No data&quot;</span><span class="p">,</span>
+        <span class="mi">131072</span><span class="p">:</span> <span class="s2">&quot;Rolling band in optimal aperture&quot;</span><span class="p">,</span>
+        <span class="mi">262144</span><span class="p">:</span> <span class="s2">&quot;Rolling band in full mask&quot;</span><span class="p">,</span>
+        <span class="mi">524288</span><span class="p">:</span> <span class="s2">&quot;Possible thruster firing&quot;</span><span class="p">,</span>
+        <span class="mi">1048576</span><span class="p">:</span> <span class="s2">&quot;Thruster firing&quot;</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="TessQualityFlags"><a class="viewcode-back" href="../../reference/api/lightkurve.TessQualityFlags.html#lightkurve.TessQualityFlags">[docs]</a><span class="k">class</span> <span class="nc">TessQualityFlags</span><span class="p">(</span><span class="n">QualityFlags</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class encodes the meaning of the various TESS QUALITY bitmask flags,</span>
+<span class="sd">    as documented in the TESS Data Products Description Document (Ref. [1], Table 26).</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] TESS Science Data Products Description Document (EXP-TESS-ARC-ICD-0014)</span>
+<span class="sd">        https://archive.stsci.edu/missions/tess/doc/EXP-TESS-ARC-ICD-TM-0014.pdf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">AttitudeTweak</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">SafeMode</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">CoarsePoint</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">EarthPoint</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">Argabrightening</span> <span class="o">=</span> <span class="mi">16</span>
+    <span class="n">Desat</span> <span class="o">=</span> <span class="mi">32</span>
+    <span class="n">ApertureCosmic</span> <span class="o">=</span> <span class="mi">64</span>
+    <span class="n">ManualExclude</span> <span class="o">=</span> <span class="mi">128</span>
+    <span class="n">Discontinuity</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="n">ImpulsiveOutlier</span> <span class="o">=</span> <span class="mi">512</span>
+    <span class="n">CollateralCosmic</span> <span class="o">=</span> <span class="mi">1024</span>
+    <span class="c1">#: The first stray light flag is set manually by MIT based on visual inspection.</span>
+    <span class="n">Straylight</span> <span class="o">=</span> <span class="mi">2048</span>
+    <span class="c1">#: The second stray light flag is set automatically by Ames/SPOC based on background level thresholds.</span>
+    <span class="n">Straylight2</span> <span class="o">=</span> <span class="mi">4096</span>
+
+    <span class="c1">#: DEFAULT bitmask identifies all cadences which are definitely useless.</span>
+    <span class="n">DEFAULT_BITMASK</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">AttitudeTweak</span> <span class="o">|</span> <span class="n">SafeMode</span> <span class="o">|</span> <span class="n">CoarsePoint</span> <span class="o">|</span> <span class="n">EarthPoint</span> <span class="o">|</span> <span class="n">Desat</span> <span class="o">|</span> <span class="n">ManualExclude</span>
+    <span class="p">)</span>
+    <span class="c1">#: HARD bitmask is conservative and may identify cadences which are useful.</span>
+    <span class="n">HARD_BITMASK</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">DEFAULT_BITMASK</span> <span class="o">|</span> <span class="n">ApertureCosmic</span> <span class="o">|</span> <span class="n">CollateralCosmic</span> <span class="o">|</span> <span class="n">Straylight</span> <span class="o">|</span> <span class="n">Straylight2</span>
+    <span class="p">)</span>
+    <span class="c1">#: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.</span>
+    <span class="n">HARDEST_BITMASK</span> <span class="o">=</span> <span class="mi">8191</span>
+
+    <span class="c1">#: Dictionary which provides friendly names for the various bitmasks.</span>
+    <span class="n">OPTIONS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;none&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">DEFAULT_BITMASK</span><span class="p">,</span>
+        <span class="s2">&quot;hard&quot;</span><span class="p">:</span> <span class="n">HARD_BITMASK</span><span class="p">,</span>
+        <span class="s2">&quot;hardest&quot;</span><span class="p">:</span> <span class="n">HARDEST_BITMASK</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="c1">#: Pretty string descriptions for each flag</span>
+    <span class="n">STRINGS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;Attitude tweak&quot;</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;Safe mode&quot;</span><span class="p">,</span>
+        <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;Coarse point&quot;</span><span class="p">,</span>
+        <span class="mi">8</span><span class="p">:</span> <span class="s2">&quot;Earth point&quot;</span><span class="p">,</span>
+        <span class="mi">16</span><span class="p">:</span> <span class="s2">&quot;Argabrightening&quot;</span><span class="p">,</span>
+        <span class="mi">32</span><span class="p">:</span> <span class="s2">&quot;Desaturation event&quot;</span><span class="p">,</span>
+        <span class="mi">64</span><span class="p">:</span> <span class="s2">&quot;Cosmic ray in optimal aperture&quot;</span><span class="p">,</span>
+        <span class="mi">128</span><span class="p">:</span> <span class="s2">&quot;Manual exclude&quot;</span><span class="p">,</span>
+        <span class="mi">256</span><span class="p">:</span> <span class="s2">&quot;Discontinuity corrected&quot;</span><span class="p">,</span>
+        <span class="mi">512</span><span class="p">:</span> <span class="s2">&quot;Impulsive outlier&quot;</span><span class="p">,</span>
+        <span class="mi">1024</span><span class="p">:</span> <span class="s2">&quot;Cosmic ray in collateral data&quot;</span><span class="p">,</span>
+        <span class="mi">2048</span><span class="p">:</span> <span class="s2">&quot;Straylight&quot;</span><span class="p">,</span>
+        <span class="mi">4096</span><span class="p">:</span> <span class="s2">&quot;Straylight2&quot;</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+<span class="k">def</span> <span class="nf">channel_to_module_output</span><span class="p">(</span><span class="n">channel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a (module, output) pair given a CCD channel number.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    channel : int</span>
+<span class="sd">        Channel number</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    module, output : tuple of ints</span>
+<span class="sd">        Module and Output number</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">channel</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">channel</span> <span class="o">&gt;</span> <span class="mi">88</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Channel number must be in the range 1-88.&quot;</span><span class="p">)</span>
+    <span class="n">lookup</span> <span class="o">=</span> <span class="n">_get_channel_lookup_array</span><span class="p">()</span>
+    <span class="n">lookup</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">modout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lookup</span> <span class="o">==</span> <span class="n">channel</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">modout</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">modout</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">module_output_to_channel</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the CCD channel number for a given module and output pair.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module : int</span>
+<span class="sd">        Module number</span>
+<span class="sd">    output : int</span>
+<span class="sd">        Output number</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    channel : int</span>
+<span class="sd">        Channel number</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">module</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">module</span> <span class="o">&gt;</span> <span class="mi">26</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Module number must be in range 1-26.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">output</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">output</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Output number must be 1, 2, 3, or 4.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_get_channel_lookup_array</span><span class="p">()[</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_get_channel_lookup_array</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns a lookup table which maps (module, output) onto channel.&quot;&quot;&quot;</span>
+    <span class="c1"># In the array below, channel == array[module][output]</span>
+    <span class="c1"># Note: modules 1, 5, 21, 25 are the FGS guide star CCDs.</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">86</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">24</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">28</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">32</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">36</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">38</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">43</span><span class="p">,</span> <span class="mi">44</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">46</span><span class="p">,</span> <span class="mi">47</span><span class="p">,</span> <span class="mi">48</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">52</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">56</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">17</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mi">60</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="mi">64</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">19</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">68</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">69</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">71</span><span class="p">,</span> <span class="mi">72</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">21</span><span class="p">,</span> <span class="mi">87</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">73</span><span class="p">,</span> <span class="mi">74</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">76</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">23</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">78</span><span class="p">,</span> <span class="mi">79</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">24</span><span class="p">,</span> <span class="mi">81</span><span class="p">,</span> <span class="mi">82</span><span class="p">,</span> <span class="mi">83</span><span class="p">,</span> <span class="mi">84</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">running_mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">window_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the moving average of an array `data`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : array of numbers</span>
+<span class="sd">        The running mean will be computed on this data.</span>
+<span class="sd">    window_size : int</span>
+<span class="sd">        Window length used to compute the running mean.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">window_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">window_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">cumsum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">cumsum</span><span class="p">[</span><span class="n">window_size</span><span class="p">:]</span> <span class="o">-</span> <span class="n">cumsum</span><span class="p">[:</span><span class="o">-</span><span class="n">window_size</span><span class="p">])</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">bkjd_to_astropy_time</span><span class="p">(</span><span class="n">bkjd</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Time</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Converts Kepler Barycentric Julian Day (BKJD) time values to an</span>
+<span class="sd">    `astropy.time.Time` object.</span>
+
+<span class="sd">    Kepler Barycentric Julian Day (BKJD) is a Julian day minus 2454833.0</span>
+<span class="sd">    (UTC=January 1, 2009 12:00:00) and corrected to the arrival times</span>
+<span class="sd">    at the barycenter of the Solar System.</span>
+<span class="sd">    BKJD is the format in which times are recorded in the Kepler data products.</span>
+<span class="sd">    The time is in the Barycentric Dynamical Time frame (TDB), which is a</span>
+<span class="sd">    time system that is not affected by leap seconds.</span>
+<span class="sd">    See Section 2.3.2 in the Kepler Archive Manual for details.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bkjd : float or array of floats</span>
+<span class="sd">        Barycentric Kepler Julian Day.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    time : `astropy.time.Time` object</span>
+<span class="sd">        Resulting time object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bkjd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">bkjd</span><span class="p">)</span>
+    <span class="c1"># Some data products have missing time values;</span>
+    <span class="c1"># we need to set these to zero or `Time` cannot be instantiated.</span>
+    <span class="n">bkjd</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">bkjd</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">Time</span><span class="p">(</span><span class="n">bkjd</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;bkjd&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;tdb&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">btjd_to_astropy_time</span><span class="p">(</span><span class="n">btjd</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Time</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Converts TESS Barycentric Julian Day (BTJD) values to an</span>
+<span class="sd">    `astropy.time.Time` object.</span>
+
+<span class="sd">    TESS Barycentric Julian Day (BTJD) is a Julian day minus 2457000.0</span>
+<span class="sd">    and corrected to the arrival times at the barycenter of the Solar System.</span>
+<span class="sd">    BTJD is the format in which times are recorded in the TESS data products.</span>
+<span class="sd">    The time is in the Barycentric Dynamical Time frame (TDB), which is a</span>
+<span class="sd">    time system that is not affected by leap seconds.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    btjd : float or array of floats</span>
+<span class="sd">        Barycentric TESS Julian Day</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    time : `astropy.time.Time` object</span>
+<span class="sd">        Resulting time object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">btjd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">btjd</span><span class="p">)</span>
+    <span class="n">btjd</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">btjd</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">Time</span><span class="p">(</span><span class="n">btjd</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;btjd&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;tdb&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">plot_image</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+    <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Pixel Column Number&quot;</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Pixel Row Number&quot;</span><span class="p">,</span>
+    <span class="n">clabel</span><span class="o">=</span><span class="s2">&quot;Flux ($e^{-}s^{-1}$)&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility function to plot a 2D image</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    image : 2d array</span>
+<span class="sd">        Image data.</span>
+<span class="sd">    ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">        A matplotlib axes object to plot into. If no axes is provided,</span>
+<span class="sd">        a new one will be generated.</span>
+<span class="sd">    scale : str</span>
+<span class="sd">        Scale used to stretch the colormap.</span>
+<span class="sd">        Options: &#39;linear&#39;, &#39;sqrt&#39;, or &#39;log&#39;.</span>
+<span class="sd">    origin : str</span>
+<span class="sd">        The origin of the coordinate system.</span>
+<span class="sd">    xlabel : str</span>
+<span class="sd">        Label for the x-axis.</span>
+<span class="sd">    ylabel : str</span>
+<span class="sd">        Label for the y-axis.</span>
+<span class="sd">    clabel : str</span>
+<span class="sd">        Label for the color bar.</span>
+<span class="sd">    title : str or None</span>
+<span class="sd">        Title for the plot.</span>
+<span class="sd">    show_colorbar : bool</span>
+<span class="sd">        Whether or not to show the colorbar</span>
+<span class="sd">    vmin : float</span>
+<span class="sd">        Minimum colorbar value. By default, the 2.5%-percentile is used.</span>
+<span class="sd">    vmax : float</span>
+<span class="sd">        Maximum colorbar value. By default, the 97.5%-percentile is used.</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        Keyword arguments to be passed to `matplotlib.pyplot.imshow`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ax : `~matplotlib.axes.Axes`</span>
+<span class="sd">        The matplotlib axes object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">vmin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">vmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>  <span class="c1"># ignore image NaN values</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">vmin_default</span><span class="p">,</span> <span class="n">vmax_default</span> <span class="o">=</span> <span class="n">PercentileInterval</span><span class="p">(</span><span class="mf">95.0</span><span class="p">)</span><span class="o">.</span><span class="n">get_limits</span><span class="p">(</span>
+                    <span class="n">image</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vmin_default</span><span class="p">,</span> <span class="n">vmax_default</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">vmin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">vmin</span> <span class="o">=</span> <span class="n">vmin_default</span>
+            <span class="k">if</span> <span class="n">vmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">vmax</span> <span class="o">=</span> <span class="n">vmax_default</span>
+
+    <span class="n">norm</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">scale</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span>
+                <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">LinearStretch</span><span class="p">(),</span> <span class="n">clip</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">scale</span> <span class="o">==</span> <span class="s2">&quot;sqrt&quot;</span><span class="p">:</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span>
+                <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">SqrtStretch</span><span class="p">(),</span> <span class="n">clip</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">scale</span> <span class="o">==</span> <span class="s2">&quot;log&quot;</span><span class="p">:</span>
+            <span class="c1"># To use log scale we need to guarantee that vmin &gt; 0, so that</span>
+            <span class="c1"># we avoid division by zero and/or negative values.</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">LogNorm</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">vmin</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">float_info</span><span class="o">.</span><span class="n">epsilon</span><span class="p">),</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;scale </span><span class="si">{}</span><span class="s2"> is not available.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scale</span><span class="p">))</span>
+    <span class="n">cax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_colorbar</span><span class="p">:</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cax</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">clabel</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">tick1On</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tick2On</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">minorticks_off</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ax</span>
+
+
+<span class="k">class</span> <span class="nc">LightkurveError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class for Lightkurve exceptions.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">LightkurveWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class for all Lightkurve warnings.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">LightkurveDeprecationWarning</span><span class="p">(</span><span class="n">LightkurveWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class for all Lightkurve deprecation warnings.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">suppress_stdout</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A simple decorator to suppress function print outputs.&quot;&quot;&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># redirect output to `null`</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">devnull</span><span class="p">:</span>
+            <span class="n">old_out</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">devnull</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># restore to default</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">old_out</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+
+<span class="k">def</span> <span class="nf">validate_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">supported_methods</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raises a `ValueError` if a method is not supported.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    method : str</span>
+<span class="sd">        The method specified by the user.</span>
+<span class="sd">    supported_methods : list of str</span>
+<span class="sd">        The methods supported.  All method names must be lowercase.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    method : str</span>
+<span class="sd">        Will return the method name if it is supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">supported_methods</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">method</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s2">&quot;method &#39;</span><span class="si">{}</span><span class="s2">&#39; is not supported; &quot;</span>
+        <span class="s2">&quot;must be one of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">supported_methods</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">centroid_quadratic</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the quadratic estimate of the centroid in a 2d-array.</span>
+
+<span class="sd">    This method will fit a simple 2D second-order polynomial</span>
+<span class="sd">    $P(x, y) = a + bx + cy + dx^2 + exy + fy^2$</span>
+<span class="sd">    to the 3x3 patch of pixels centered on the brightest pixel within</span>
+<span class="sd">    the image.  This function approximates the core of the Point</span>
+<span class="sd">    Spread Function (PSF) using a bivariate quadratic function, and returns</span>
+<span class="sd">    the maximum (x, y) coordinate of the function using linear algebra.</span>
+
+<span class="sd">    For the motivation and the details around this technique, please refer</span>
+<span class="sd">    to Vakili, M., &amp; Hogg, D. W. 2016, ArXiv, 1610.05873.</span>
+
+<span class="sd">    Caveat: if the brightest pixel falls on the edge of the data array, the fit</span>
+<span class="sd">    will tend to fail or be inaccurate.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : 2D array</span>
+<span class="sd">        The 2D input array representing the pixel values of the image.</span>
+<span class="sd">    mask : array_like (bool), optional</span>
+<span class="sd">        A boolean mask, with the same shape as `data`, where a **True** value</span>
+<span class="sd">        indicates the corresponding element of data is masked.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    column, row : tuple</span>
+<span class="sd">        The coordinates of the centroid in column and row.  If the fit failed,</span>
+<span class="sd">        then (NaN, NaN) will be returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">value</span>
+    <span class="c1"># Step 1: identify the patch of 3x3 pixels (z_)</span>
+    <span class="c1"># that is centered on the brightest pixel (xx, yy)</span>
+    <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">*</span> <span class="n">mask</span>
+    <span class="n">arg_data_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">arg_data_max</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="c1"># Make sure the 3x3 patch does not leave the TPF bounds</span>
+    <span class="k">if</span> <span class="n">yy</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">yy</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">xx</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">xx</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">yy</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">yy</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span>
+    <span class="k">if</span> <span class="n">xx</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">xx</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span>
+
+    <span class="n">z_</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">yy</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">yy</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">xx</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">xx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Next, we will fit the coefficients of the bivariate quadratic with the</span>
+    <span class="c1"># help of a design matrix (A) as defined by Eqn 20 in Vakili &amp; Hogg</span>
+    <span class="c1"># (arxiv:1610.05873). The design matrix contains a</span>
+    <span class="c1"># column of ones followed by pixel coordinates: x, y, x**2, xy, y**2.</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="c1"># We also pre-compute $(A^t A)^-1 A^t$, cf. Eqn 21 in Vakili &amp; Hogg.</span>
+    <span class="n">At</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="c1"># In Python 3 this can become `Aprime = np.linalg.inv(At @ A) @ At`</span>
+    <span class="n">Aprime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">At</span><span class="p">,</span> <span class="n">A</span><span class="p">)),</span> <span class="n">At</span><span class="p">)</span>
+
+    <span class="c1"># Step 2: fit the polynomial $P = a + bx + cy + dx^2 + exy + fy^2$</span>
+    <span class="c1"># following Equation 21 in Vakili &amp; Hogg.</span>
+    <span class="c1"># In Python 3 this can become `Aprime @ z_.flatten()`</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Aprime</span><span class="p">,</span> <span class="n">z_</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+
+    <span class="c1"># Step 3: analytically find the function maximum,</span>
+    <span class="c1"># following https://en.wikipedia.org/wiki/Quadratic_function</span>
+    <span class="n">det</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="n">f</span> <span class="o">-</span> <span class="n">e</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">det</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># No solution</span>
+    <span class="n">xm</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f</span> <span class="o">*</span> <span class="n">b</span> <span class="o">-</span> <span class="n">c</span> <span class="o">*</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">ym</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="n">c</span> <span class="o">-</span> <span class="n">b</span> <span class="o">*</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="k">return</span> <span class="n">xx</span> <span class="o">+</span> <span class="n">xm</span><span class="p">,</span> <span class="n">yy</span> <span class="o">+</span> <span class="n">ym</span>
+
+
+<span class="k">def</span> <span class="nf">_query_solar_system_objects</span><span class="p">(</span>
+    <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;kepler&quot;</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of asteroids/comets given a position and time.</span>
+
+<span class="sd">    This function relies on The Virtual Observatory Sky Body Tracker (SkyBot)</span>
+<span class="sd">    service which can be found at http://vo.imcce.fr/webservices/skybot/</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ra : float</span>
+<span class="sd">        Right Ascension in degrees.</span>
+<span class="sd">    dec : float</span>
+<span class="sd">        Declination in degrees.</span>
+<span class="sd">    times : array of float</span>
+<span class="sd">        Times in Julian Date.</span>
+<span class="sd">    radius : float</span>
+<span class="sd">        Search radius in degrees.</span>
+<span class="sd">    location : str</span>
+<span class="sd">        Spacecraft location. Options include `&#39;kepler&#39;` and `&#39;tess&#39;`.</span>
+<span class="sd">    cache : bool</span>
+<span class="sd">        Whether to cache the search result. Default is True.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    result : `pandas.DataFrame`</span>
+<span class="sd">        DataFrame containing the list of known solar system objects at the</span>
+<span class="sd">        requested time and location.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># We import pandas locally, because it takes quite a bit of time to import,</span>
+    <span class="c1"># and it is only required for this specific feature.</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">location</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;kepler&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">location</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;k2&quot;</span><span class="p">):</span>
+        <span class="n">location</span> <span class="o">=</span> <span class="s2">&quot;C55&quot;</span>
+    <span class="k">elif</span> <span class="n">location</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;tess&quot;</span><span class="p">:</span>
+        <span class="n">location</span> <span class="o">=</span> <span class="s2">&quot;C57&quot;</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://vo.imcce.fr/webservices/skybot/skybotconesearch_query.php?&quot;</span>
+    <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;-mime=text&amp;&quot;</span>
+    <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;-ra=</span><span class="si">{}</span><span class="s2">&amp;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ra</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;-dec=</span><span class="si">{}</span><span class="s2">&amp;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dec</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;-bd=</span><span class="si">{}</span><span class="s2">&amp;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;-loc=</span><span class="si">{}</span><span class="s2">&amp;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Querying for SSOs&quot;</span><span class="p">):</span>
+        <span class="n">url_queried</span> <span class="o">=</span> <span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;EPOCH=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span><span class="n">url_queried</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">open</span><span class="p">(</span><span class="n">response</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;# Flag: -1&quot;</span><span class="p">:</span>  <span class="c1"># error code detected?</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
+                <span class="s2">&quot;SkyBot Solar System query failed.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;URL used:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">url_queried</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Response received:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">open</span><span class="p">(</span><span class="n">response</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s2">&quot;epoch&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;# Num &quot;</span><span class="p">:</span> <span class="s2">&quot;Num&quot;</span><span class="p">,</span> <span class="s2">&quot; Name &quot;</span><span class="p">:</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot; Class &quot;</span><span class="p">:</span> <span class="s2">&quot;Class&quot;</span><span class="p">,</span> <span class="s2">&quot; Mv &quot;</span><span class="p">:</span> <span class="s2">&quot;Mv&quot;</span><span class="p">},</span>
+                <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;columns&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="p">[[</span><span class="s2">&quot;Num&quot;</span><span class="p">,</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Class&quot;</span><span class="p">,</span> <span class="s2">&quot;Mv&quot;</span><span class="p">,</span> <span class="s2">&quot;epoch&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">res</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="k">def</span> <span class="nf">show_citation_instructions</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Show citation instructions.&quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">PACKAGEDIR</span><span class="p">,</span> <span class="n">__citation__</span>
+
+    <span class="c1"># To make installing Lightkurve easier, ipython is an optional dependency,</span>
+    <span class="c1"># because we can assume it is installed when notebook-specific features are called</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span>
+        <span class="n">ipython_installed</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+        <span class="n">ipython_installed</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_notebook</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ipython_installed</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">__citation__</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>  <span class="c1"># local import to speed up `import lightkurve`</span>
+        <span class="kn">import</span> <span class="nn">astroquery</span>         <span class="c1"># local import to speed up `import lightkurve`</span>
+
+        <span class="n">templatefile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">PACKAGEDIR</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;show_citation_instructions.html&quot;</span><span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">templatefile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;LIGHTKURVE_CITATION&quot;</span><span class="p">,</span> <span class="n">__citation__</span><span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;ASTROPY_CITATION&quot;</span><span class="p">,</span> <span class="n">astropy</span><span class="o">.</span><span class="n">__citation__</span><span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;ASTROQUERY_CITATION&quot;</span><span class="p">,</span> <span class="n">astroquery</span><span class="o">.</span><span class="n">__citation__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HTML</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_notebook_environment</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns &#39;jupyter&#39;, &#39;colab&#39;, or &#39;terminal&#39;.</span>
+
+<span class="sd">    One can detect whether or not a piece of Python is running by executing</span>
+<span class="sd">    `get_ipython().__class__`, which returns the following result:</span>
+
+<span class="sd">        * Jupyter notebook: `ipykernel.zmqshell.ZMQInteractiveShell`</span>
+<span class="sd">        * Google colab: `google.colab._shell.Shell`</span>
+<span class="sd">        * IPython terminal: `IPython.terminal.interactiveshell.TerminalInteractiveShell`</span>
+<span class="sd">        * Python terminal: `NameError: name &#39;get_ipython&#39; is not defined`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ipy</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;zmqshell&quot;</span> <span class="ow">in</span> <span class="n">ipy</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;jupyter&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;colab&quot;</span> <span class="ow">in</span> <span class="n">ipy</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;colab&quot;</span>
+    <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+        <span class="k">pass</span>  <span class="c1"># get_ipython() is not a builtin</span>
+    <span class="k">return</span> <span class="s2">&quot;terminal&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">is_notebook</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns `True` if we are running in a notebook.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_get_notebook_environment</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;jupyter&quot;</span><span class="p">,</span> <span class="s2">&quot;colab&quot;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

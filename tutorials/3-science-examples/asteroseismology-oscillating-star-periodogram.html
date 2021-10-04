@@ -4,10 +4,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>How to understand and manipulate the periodogram of an oscillating star &#8212; Lightkurve </title>
     
-  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,90 +21,119 @@
 
     
       
-  <link rel="stylesheet"
-    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
-  <link rel="stylesheet"
-    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
 
     
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="How to make a supernova lightcurve?" href="other-supernova-lightcurve.html" />
     <link rel="prev" title="How to estimate a star’s mass and radius using asteroseismology" href="asteroseismology-estimating-mass-and-radius.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
-<div class="container-xl">
+    <div class="container-fluid" id="banner"></div>
 
-    <a class="navbar-brand" href="../../index.html">
     
-      <p class="title">Lightkurve v2.0</p>
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
     
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.0</p>
+</a>
 
-    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
-      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
-        
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../whats-new-v2.html">What's new?</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../quickstart.html">Quickstart</a>
-        </li>
-        
-        <li class="nav-item active">
-            <a class="nav-link" href="../index.html">Tutorials</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../reference/index.html">API</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../../about/index.html">About</a>
-        </li>
-        
-        
-      </ul>
+    
+  </div>
 
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form>
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
 
-      <ul class="navbar-nav">
-        
-          <li class="nav-item">
-            <a class="nav-link" href="https://github.com/lightkurve/lightkurve" target="_blank" rel="noopener">
-              <span><i class="fab fa-github-square"></i></span>
-            </a>
-          </li>
-        
-        
-      </ul>
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
     </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
 </div>
     </nav>
     
@@ -110,80 +141,107 @@
     <div class="container-xl">
       <div class="row">
           
-          <div class="col-12 col-md-3 bd-sidebar">
-          </div>
+            
+            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
+            
           
 
           
           <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
+              <div class="toc-item">
+                
 <div class="tocsection onthispage pt-5 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
 <nav id="bd-toc-nav">
-    <ul class="nav section-nav flex-column">
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Learning-Goals" class="nav-link">Learning Goals</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Introduction" class="nav-link">Introduction</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Imports" class="nav-link">Imports</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#1.-Exploring-the-Frequency-Spectrum-of-a-\delta-Scuti-Oscillator" class="nav-link">1. Exploring the Frequency Spectrum of a \delta Scuti Oscillator</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#2.-Exploring-the-Frequency-Spectrum-of-a-Solar-Like-Oscillator" class="nav-link">2. Exploring the Frequency Spectrum of a Solar-Like Oscillator</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#3.-How-to-Smooth-and-Detrend-a-Periodogram" class="nav-link">3. How to Smooth and Detrend a Periodogram</a><ul class="nav section-nav flex-column">
-                
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#3.1.-The-box-kernel-filter" class="nav-link">3.1. The box kernel filter</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#3.2.-The-log-median-filter" class="nav-link">3.2. The log median filter</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#3.3.-Flattening" class="nav-link">3.3. Flattening</a>
-        </li>
-    
-            </ul>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#4.-Closing-Comments" class="nav-link">4. Closing Comments</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#About-this-Notebook" class="nav-link">About this Notebook</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#Citing-Lightkurve-and-Astropy" class="nav-link">Citing Lightkurve and Astropy</a>
-        </li>
-    
-    </ul>
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Learning-Goals">
+   Learning Goals
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Introduction">
+   Introduction
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#1.-Exploring-the-Frequency-Spectrum-of-a-\delta-Scuti-Oscillator">
+   1. Exploring the Frequency Spectrum of a
+   <span class="math notranslate nohighlight">
+    \(\delta\)
+   </span>
+   Scuti Oscillator
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#2.-Exploring-the-Frequency-Spectrum-of-a-Solar-Like-Oscillator">
+   2. Exploring the Frequency Spectrum of a Solar-Like Oscillator
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#3.-How-to-Smooth-and-Detrend-a-Periodogram">
+   3. How to Smooth and Detrend a Periodogram
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.1.-The-box-kernel-filter">
+     3.1. The box kernel filter
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.2.-The-log-median-filter">
+     3.2. The log median filter
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.3.-Flattening">
+     3.3. Flattening
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#4.-Closing-Comments">
+   4. Closing Comments
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#About-this-Notebook">
+   About this Notebook
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Citing-Lightkurve-and-Astropy">
+   Citing Lightkurve and Astropy
+  </a>
+ </li>
+</ul>
+
 </nav>
-
-
+              </div>
               
+              <div class="toc-item">
+                
+              </div>
+              
+            
           </div>
           
 
           
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+          
+            
+          
+          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
               
               <div>
                 
@@ -440,9 +498,9 @@ div.rendered_html tbody tr:hover {
     <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
     <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/tutorials/3-science-examples/asteroseismology-oscillating-star-periodogram.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<br style="clear:both;"><div class="section" id="How-to-understand-and-manipulate-the-periodogram-of-an-oscillating-star">
+<br style="clear:both;"><section id="How-to-understand-and-manipulate-the-periodogram-of-an-oscillating-star">
 <h1>How to understand and manipulate the periodogram of an oscillating star<a class="headerlink" href="#How-to-understand-and-manipulate-the-periodogram-of-an-oscillating-star" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="Learning-Goals">
+<section id="Learning-Goals">
 <h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
 <p>By the end of this tutorial you will:</p>
 <ul class="simple">
@@ -452,8 +510,8 @@ div.rendered_html tbody tr:hover {
 <li><p>Be able to smooth a periodogram.</p></li>
 <li><p>Be able to remove features such as the convective background in solar-like oscillators.</p></li>
 </ul>
-</div>
-<div class="section" id="Introduction">
+</section>
+<section id="Introduction">
 <h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
 <p>The brightnesses of stars can oscillate — that is, vary over time — for many different reasons. For example, in the companion tutorials we explored light curves that oscillated due to an eclipsing binary pair transiting in front of one another, and we looked at a star that showed variability due to star spots on its surface rotating in and out of view.</p>
 <p>In this tutorial, we will focus on <em>intrinsic</em> oscillators: stars that exhibit variability due to processes inside the stars. For example, one of these internal processes is the presence of standing waves trapped in the interior. When the light curve of a star is transformed into the frequency domain, such waves can be observed as distinct peaks in the frequency spectrum of the star. The branch of astronomy that focuses on studying these signals is called
@@ -461,12 +519,12 @@ div.rendered_html tbody tr:hover {
 <p>Asteroseismology is an important tool because it allows intrinsic properties of a star, such as its mass and radius, to be estimated from the light curve alone. The only requirement is that the quality of the light curve — its duration, sampling, and precision — must be good enough to provide a high-resolution view of the star in the frequency domain. <em>Kepler</em> data is particularly well-suited for this purpose.</p>
 <p>In this tutorial, we will explore two types of intrinsic oscillators that are commonly studied by asteroseismologists: 1. <cite>:math:</cite>delta` Scuti stars &lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Delta_Scuti_variable">https://en.wikipedia.org/wiki/Delta_Scuti_variable</a>&gt;`__: a class of oscillating stars typically 1.5 to 2.5 times as massive as the Sun, which oscillate due to fluctuations in the opacity of the outer layers of the star. 2. <strong>Solar-Like Oscillators</strong>: a class that includes all stars that oscillate in the same manner as the Sun, namely due to
 turbulent motion in the convective outer layers of their atmospheres. This includes both main sequence stars as well as red giant stars.</p>
-</div>
-<div class="section" id="Imports">
+</section>
+<section id="Imports">
 <h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
 <p>This tutorial only requires <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a>, which in turn uses <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -476,13 +534,13 @@ turbulent motion in the convective outer layers of their atmospheres. This inclu
 </div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="1.-Exploring-the-Frequency-Spectrum-of-a-\delta-Scuti-Oscillator">
+</section>
+<section id="1.-Exploring-the-Frequency-Spectrum-of-a-\delta-Scuti-Oscillator">
 <h2>1. Exploring the Frequency Spectrum of a <span class="math notranslate nohighlight">\(\delta\)</span> Scuti Oscillator<a class="headerlink" href="#1.-Exploring-the-Frequency-Spectrum-of-a-\delta-Scuti-Oscillator" title="Permalink to this headline">¶</a></h2>
 <p><cite>:math:</cite>delta` Scuti stars &lt;<a class="reference external" href="https://en.wikipedia.org/wiki/Delta_Scuti_variable">https://en.wikipedia.org/wiki/Delta_Scuti_variable</a>&gt;`__ are stars roughly 1.5 to 2.5 as massive as the Sun, and oscillate due to fluctuations in the opacity of the outer layers of the star (<a class="reference external" href="https://en.wikipedia.org/wiki/Kappa%E2%80%93mechanism">known as the Kappa mechanism</a>), alternately appearing brighter and fainter.</p>
 <p>An example star of this type is HD 42608, which was recently observed by the <em>TESS</em> space telescope. We can search for these data using Lightkurve:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -490,26 +548,9 @@ turbulent motion in the convective outer layers of their atmospheres. This inclu
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-SearchResult containing 5 data products.
-
-<table id="table4501512640">
-<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
-<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
-<tr><td>0</td><td>TESS Sector 06</td><td>2018</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>37498433</td><td>0.0</td></tr>
-<tr><td>1</td><td>TESS Sector 06</td><td>2018</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>600</td><td>37498433</td><td>0.0</td></tr>
-<tr><td>2</td><td>TESS Sector 06</td><td>2018</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>1800</td><td>37498433</td><td>0.0</td></tr>
-<tr><td>3</td><td>TESS Sector 06</td><td>2018</td><td><a href='https://archive.stsci.edu/hlsp/cdips'>CDIPS</a></td><td>1800</td><td>37498433</td><td>0.0</td></tr>
-<tr><td>4</td><td>TESS Sector 33</td><td>2020</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>37498433</td><td>0.0</td></tr>
-</table></div>
-</div>
 <p>Success! A light curve for the object appears to be available in the data archive. Let’s go ahead and download the data and convert it straight to a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram">periodogram</a> using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.to_periodogram.html?highlight=to_periodogram">to_periodogram()</a> function.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -519,26 +560,10 @@ SearchResult containing 5 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\frac{1}{d}}$]&#39;, ylabel=&#39;Power&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_10_1.png" src="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_10_1.png" />
-</div>
-</div>
 <p>We can see that there is a strong power excess around 50 cycles per day. These indicate stellar oscillations.</p>
 <p>To study these peaks in more detail, we can zoom in by recreating the periodogram using the <code class="docutils literal notranslate"><span class="pre">minimum_frequency</span></code> and <code class="docutils literal notranslate"><span class="pre">maximum_frequency</span></code> keywords:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -548,36 +573,20 @@ SearchResult containing 5 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\frac{1}{d}}$]&#39;, ylabel=&#39;Power&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_12_1.png" src="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_12_1.png" />
-</div>
-</div>
 <p>This is much clearer!</p>
 <p>Stars of this type are known to display multiple types of oscillation, including: - <strong>Radial Oscillations</strong>: caused by the star shrinking and expanding radially. Also called a “breathing mode.” - <strong>Dipole Oscillations</strong>: caused by the star’s hemispheres shrinking and expanding alternately.</p>
 <p>Both types of oscillations are on display in the figure above. Identifying exactly what type of oscillation a given peak represents is challenging. Fortunately, this star (HD 42608) is part of a set of stars for which the oscillations have been analyzed in detail in a research paper by <a class="reference external" href="https://arxiv.org/pdf/2005.06157.pdf">Bedding et al. (2020)</a>, so you can consult that paper to learn more about the details.</p>
 <p>Note that the modes of oscillation are very “sharp” in the figure above. This is because <span class="math notranslate nohighlight">\(\delta\)</span> Scuti oscillations are <em>coherent</em>, which is a term astronomers in the field use for signals that have long lifetimes and are not heavily damped. Because of this, their exact oscillation frequencies can be observed in a fairly straightforward way. This sets <span class="math notranslate nohighlight">\(\delta\)</span> Scuti stars apart from solar-like oscillators, which are damped. Let’s look at an example of such a star next.</p>
-</div>
-<div class="section" id="2.-Exploring-the-Frequency-Spectrum-of-a-Solar-Like-Oscillator">
+</section>
+<section id="2.-Exploring-the-Frequency-Spectrum-of-a-Solar-Like-Oscillator">
 <h2>2. Exploring the Frequency Spectrum of a Solar-Like Oscillator<a class="headerlink" href="#2.-Exploring-the-Frequency-Spectrum-of-a-Solar-Like-Oscillator" title="Permalink to this headline">¶</a></h2>
 <p>Solar-like oscillators exhibit variability driven by a different mechanism than <span class="math notranslate nohighlight">\(\delta\)</span> Scuti stars. They encompass the class of stars that <a class="reference external" href="https://en.wikipedia.org/wiki/Helioseismology">oscillate in the same manner as the Sun</a>. Because they have lower masses than <span class="math notranslate nohighlight">\(\delta\)</span> Scuti stars, solar-like oscillators have convective outer envelopes. The turbulent motion of these envelopes excites standing waves inside the stars which cause brightness changes on the surface. Unlike
 <span class="math notranslate nohighlight">\(\delta\)</span> Scuti stars however, these waves are not coherent. Instead, these waves are stochastic and damped, which means that the lifetimes and amplitudes of the waves are limited and variable.</p>
 <p>While the name might imply that only stars like the Sun are solar-like oscillators, this is not true. All stars with convective outer layers can exhibit solar-like oscillations, including red giant stars!</p>
 <p>Let’s have a look at the Sun-like star KIC 10963065 (<a class="reference external" href="https://arxiv.org/pdf/1612.00436.pdf">also known as Rudy</a>), observed with <em>Kepler</em>. Because solar-like oscillation amplitudes are low, we will need to combine multiple quarters of data to improve our signal-to-noise.</p>
 <p>We can list the available data sets as follows:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -586,38 +595,11 @@ SearchResult containing 5 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-SearchResult containing 15 data products.
-
-<table id="table6325142672">
-<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
-<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
-<tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>1</td><td>Kepler Quarter 01</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>2</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>3</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>4</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>5</td><td>Kepler Quarter 05</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>6</td><td>Kepler Quarter 06</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>7</td><td>Kepler Quarter 07</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>8</td><td>Kepler Quarter 09</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>9</td><td>Kepler Quarter 10</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>10</td><td>Kepler Quarter 11</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>11</td><td>Kepler Quarter 13</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>12</td><td>Kepler Quarter 14</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>13</td><td>Kepler Quarter 15</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-<tr><td>14</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
-</table></div>
-</div>
 <p>To create and plot this periodogram, we will apply a few common practices in the field: - We will combine multiple quarters to improve the frequency resolution. - We will <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.normalize.html?highlight=normalize">normalize</a> the light curve to parts per million (<code class="docutils literal notranslate"><span class="pre">ppm</span></code>). - We will use the <code class="docutils literal notranslate"><span class="pre">psd</span></code> normalization option when calling
 <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.to_periodogram.html?highlight=to_periodogram">to_periodogram</a>, which sets the units of frequency to microhertz, and normalizes the power using the spacing between bins of frequency.</p>
 <p>We’ll also plot the resulting figure in log-log space.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -628,31 +610,6 @@ SearchResult containing 15 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/gb/dev/lightkurve/src/lightkurve/lightcurve.py:990: LightkurveWarning: The light curve already appears to be in relative units; `normalize()` will convert the light curve into relative units for a second time, which is probably not what you want.
-  warnings.warn(
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\mu Hz}$]&#39;, ylabel=&#39;Power [$\\mathrm{\\frac{ppm^{2}}{\\mu Hz}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_19_2.png" src="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_19_2.png" />
-</div>
-</div>
 <p>This periodogram looks very different to that of the <span class="math notranslate nohighlight">\(\delta\)</span> Scuti star above. There is a lot of power excess at low frequencies: this is what we call the <em>convective background</em>, which is additional noise contributed by the convective surface of the star constantly changing. We do not see any clear peaks like we did for the <span class="math notranslate nohighlight">\(\delta\)</span> Scuti oscillator however.</p>
 <p>There is a good reason for this: this main sequence star oscillates at frequencies too large to be seen on this periodogram, lying above the periodogram’s <a class="reference external" href="https://en.wikipedia.org/wiki/Nyquist_frequency">Nyquist frequency</a>.</p>
 <p>The Nyquist frequency is a property of a time series that describes the maximum frequency that can be reliably determined in a periodogram. It stems from the assumption that you need a minimum of two observations per oscillation period to observe a pattern (one observation on the “up,” and one on the “down” oscillation). It is defined as follows:</p>
@@ -660,8 +617,8 @@ SearchResult containing 15 data products.
 <p>where <span class="math notranslate nohighlight">\(\Delta t\)</span> is the observing cadence.</p>
 <p>The reason that we can’t see Rudy’s oscillations in the periodogram above is because we constructed this periodogram using the <em>Kepler</em> 30-minute Long Cadence data. Solar-like oscillators on the main sequence typically oscillate on the order of minutes (five minutes for the Sun), at frequencies much higher than will be visible on this periodogram. To see Rudy’s oscillations, we will need to use the <em>Kepler</em> Short Cadence (SC) observations, which used a time sampling of one minute. We can obtain
 these data as follows:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -674,34 +631,9 @@ these data as follows:</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/gb/dev/lightkurve/src/lightkurve/lightcurve.py:990: LightkurveWarning: The light curve already appears to be in relative units; `normalize()` will convert the light curve into relative units for a second time, which is probably not what you want.
-  warnings.warn(
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\mu Hz}$]&#39;, ylabel=&#39;Power [$\\mathrm{\\frac{ppm^{2}}{\\mu Hz}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_23_2.png" src="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_23_2.png" />
-</div>
-</div>
 <p>Now we can see a power excess near <span class="math notranslate nohighlight">\(2000\, \mu\rm{Hz}\)</span>. This frequency is almost 10 times higher than we could view using the Long Cadence data alone. Let’s zoom in on this region so we can look at the signals in more detail, like we did for the <span class="math notranslate nohighlight">\(\delta\)</span> Scuti star.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -712,41 +644,16 @@ these data as follows:</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/gb/dev/lightkurve/src/lightkurve/lightcurve.py:990: LightkurveWarning: The light curve already appears to be in relative units; `normalize()` will convert the light curve into relative units for a second time, which is probably not what you want.
-  warnings.warn(
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\mu Hz}$]&#39;, ylabel=&#39;Power [$\\mathrm{\\frac{ppm^{2}}{\\mu Hz}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_25_2.png" src="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_25_2.png" />
-</div>
-</div>
 <p>Compared to the <span class="math notranslate nohighlight">\(\delta\)</span> Scuti, the modes of oscillation in the figure above are less sharp, even though we used much more data to create the periodogram. This is because the modes in solar-like oscillators are damped due to the turbulent motion of the convective envelope. This lowers their amplitudes and also causes the lifetimes of the oscillations to be short. The short lifetimes create some uncertainty around the exact oscillation frequency, and so the peaks that appear in the
 periodogram are a little broader (usually Lorentzian-like in shape). This may not be immediately apparant from these figures, but is much clearer if you zoom in on an individual mode.</p>
-</div>
-<div class="section" id="3.-How-to-Smooth-and-Detrend-a-Periodogram">
+</section>
+<section id="3.-How-to-Smooth-and-Detrend-a-Periodogram">
 <h2>3. How to Smooth and Detrend a Periodogram<a class="headerlink" href="#3.-How-to-Smooth-and-Detrend-a-Periodogram" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="3.1.-The-box-kernel-filter">
+<section id="3.1.-The-box-kernel-filter">
 <h3>3.1. The box kernel filter<a class="headerlink" href="#3.1.-The-box-kernel-filter" title="Permalink to this headline">¶</a></h3>
 <p>To further explore the oscillation modes, we will demonstrate some of Lightkurve’s smoothing tools. There are two types of smoothing functions we can call through the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.smooth.html?highlight=smooth">smooth()</a> function. Let’s start with a basic “moving median,” also known as a 1D box kernel.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -756,34 +663,18 @@ periodogram are a little broader (usually Lorentzian-like in shape). This may no
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\mu Hz}$]&#39;, ylabel=&#39;Power [$\\mathrm{\\frac{ppm^{2}}{\\mu Hz}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_29_1.png" src="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_29_1.png" />
-</div>
-</div>
 <p>In the figure above, the smoothed periodogram is plotted over the top of the original periodogram. In this case we have used the <cite>Astropy ``Box1DKernel`</cite> &lt;<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html">https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html</a>&gt;`__ filter, with a filter width of <span class="math notranslate nohighlight">\(0.5\, \mu \rm{Hz}\)</span>. The filter takes the median value of power in a region <span class="math notranslate nohighlight">\(0.5\, \mu \rm{Hz}\)</span> around a data point, and replaces that point with the median value. It then moves on to the next data point. This creates a
 smoothed periodogram of the same length as the original. Because the power values are now correlated, these smoothed periodograms usually aren’t used for computational analysis, but they can aid visual explorations of the location of the oscillation modes.</p>
-</div>
-<div class="section" id="3.2.-The-log-median-filter">
+</section>
+<section id="3.2.-The-log-median-filter">
 <h3>3.2. The log median filter<a class="headerlink" href="#3.2.-The-log-median-filter" title="Permalink to this headline">¶</a></h3>
 <p>While the <code class="docutils literal notranslate"><span class="pre">`Box1DKernel</span></code> &lt;<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html">https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html</a>&gt;`__ filter can be used to help identify modes of oscillation in the presence of noise, it is mostly good for smoothing on small scales. For large scales, we can instead use Lightkurve’s log median filter.</p>
 <p>As we saw above, solar-like oscillators exhibit a large power excess at low frequencies due to the turbulent convection visible near the stellar surface. When studying modes of oscillation, we typically aren’t interested in the convective background, and prefer to remove it.</p>
 <p>The log median filter performs a similar operation to the <code class="docutils literal notranslate"><span class="pre">`Box1DKernel</span></code> &lt;<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html">https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html</a>&gt;`__ filter, but does so in log space. This means that at low frequencies the number of frequency bins of which the median is taken is small, and that at high frequencies many frequency bins are included in the median calculation. As a result, the log median filter smooths over the convection background but ignores the modes of oscillation at high
 frequencies.</p>
 <p>The result of applying a log median filter is demonstrated using the red line in the figure below:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -793,30 +684,14 @@ frequencies.</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\mu Hz}$]&#39;, ylabel=&#39;Power [$\\mathrm{\\frac{ppm^{2}}{\\mu Hz}}$]&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_33_1.png" src="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_33_1.png" />
-</div>
-</div>
-</div>
-<div class="section" id="3.3.-Flattening">
+</section>
+<section id="3.3.-Flattening">
 <h3>3.3. Flattening<a class="headerlink" href="#3.3.-Flattening" title="Permalink to this headline">¶</a></h3>
 <p>When studying modes of oscillation, it is typically preferred to remove the convective background. In a detailed analysis this would involve fitting a model to the background. As can be seen in the figure above, however, Lightkurve’s log median <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.smooth.html?highlight=smooth">smooth()</a> method provides a useful first-order approximation of the background without the need for a model.</p>
 <p>To divide the power spectrum by the background, we can use Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.flatten.html?highlight=flatten#lightkurve.periodogram.Periodogram.flatten">flatten()</a> method. This function uses the log median smoothing method to determine the background, and returns a new <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.html?highlight=periodogra#lightkurve.periodogram.Periodogram">periodogram</a>
 object in which the background has been divided out.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -825,19 +700,10 @@ object in which the background has been divided out.</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-SNRPeriodogram(ID: KIC 10963065)
-</pre></div></div>
-</div>
 <p>The periodogram obtained by dividing by the noise in this way is commonly called a Signal-to-Noise periodogram (<code class="docutils literal notranslate"><span class="pre">SNRPeriodogram</span></code>), because the noise, in the form of the convective background, has been removed. This is a little bit of a misnomer, because there is still noise present in the periodogram.</p>
 <p>We plot the <code class="docutils literal notranslate"><span class="pre">SNRPeriodogram</span></code> below, and see that the modes of oscillation stick out from the noise much more clearly now that the convective background has been removed.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -845,25 +711,9 @@ SNRPeriodogram(ID: KIC 10963065)
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\mu Hz}$]&#39;, ylabel=&#39;Signal to Noise Ratio (SNR)&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_38_1.png" src="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_38_1.png" />
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="4.-Closing-Comments">
+</section>
+</section>
+<section id="4.-Closing-Comments">
 <h2>4. Closing Comments<a class="headerlink" href="#4.-Closing-Comments" title="Permalink to this headline">¶</a></h2>
 <p>In this tutorial, we explored two common types of oscillating stars, and demonstrated how Lightkurve can be used to study their power specta. In the accompanying tutorials, you can learn how to use these tools to extract more detailed information from them, including the radius and mass of a star!</p>
 <p>For further reading on <span class="math notranslate nohighlight">\(\delta\)</span> Scuti stars, solar-like oscillators, and Fourier Transforms, we recommend you consult the following papers:</p>
@@ -873,17 +723,17 @@ SNRPeriodogram(ID: KIC 10963065)
 <li><p><a class="reference external" href="https://arxiv.org/pdf/1303.1957.pdf">Chaplin &amp; Miglio (2013)</a> – A review paper on asteroseismology of solar-like oscillators with <em>Kepler</em>.</p></li>
 <li><p><a class="reference external" href="https://arxiv.org/pdf/1912.12300.pdf">Aerts (2019)</a> – A comprehensive review that covers asteroseismology of a wide range of oscillating stars, including solar-like oscillators and <span class="math notranslate nohighlight">\(\delta\)</span> Scutis.</p></li>
 </ul>
-</div>
-<div class="section" id="About-this-Notebook">
+</section>
+<section id="About-this-Notebook">
 <h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
 <p><strong>Authors</strong>: Oliver Hall (<a class="reference external" href="mailto:oliver&#46;hall&#37;&#52;&#48;esa&#46;int">oliver<span>&#46;</span>hall<span>&#64;</span>esa<span>&#46;</span>int</a>), Geert Barentsen</p>
 <p><strong>Updated On</strong>: 2020-09-29</p>
-</div>
-<div class="section" id="Citing-Lightkurve-and-Astropy">
+</section>
+<section id="Citing-Lightkurve-and-Astropy">
 <h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -891,232 +741,54 @@ SNRPeriodogram(ID: KIC 10963065)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<head>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-
-<style>
-    button {
-        border: 1px solid;
-        padding: 0.2em;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 0.8em;
-        margin: 0.2em;
-        cursor: pointer;
-    }
-
-    .citation-button-1 {background-color: #4CAF50;} /* Green */
-    .citation-button-2 {background-color: #008CBA;} /* Blue */
-</style>
-
-<script type="text/javascript">
-    function copyBibtex(package) {
-        var copyText = document.getElementById(package + "Text");
-        copyText.select();
-        document.execCommand("copy");
-        alert("BibTex has been copied to your clipboard")
-    }
-</script>
-</head>
-
-<body>
-    <textarea id="lightkurveText" style="position: absolute; left: -9999px; z-index: -9999;">
-@MISC{2018ascl.soft12013L,
-    author = {{Lightkurve Collaboration} and {Cardoso}, J.~V.~d.~M. and
-                {Hedges}, C. and {Gully-Santiago}, M. and {Saunders}, N. and
-                {Cody}, A.~M. and {Barclay}, T. and {Hall}, O. and
-                {Sagear}, S. and {Turtelboom}, E. and {Zhang}, J. and
-                {Tzanidakis}, A. and {Mighell}, K. and {Coughlin}, J. and
-                {Bell}, K. and {Berta-Thompson}, Z. and {Williams}, P. and
-                {Dotson}, J. and {Barentsen}, G.},
-    title = "{Lightkurve: Kepler and TESS time series analysis in Python}",
-    keywords = {Software, NASA},
-howpublished = {Astrophysics Source Code Library},
-        year = 2018,
-    month = dec,
-archivePrefix = "ascl",
-    eprint = {1812.013},
-    adsurl = {http://adsabs.harvard.edu/abs/2018ascl.soft12013L},
-}
-    </textarea>
-    <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
-@ARTICLE{2018AJ....156..123T,
-   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
-    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
-    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
-    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
-    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
-    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
-    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
-    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
-    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
-    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
-    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
-    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
-    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
-    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
-    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
-    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
-    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
-    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
-    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
-    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
-    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
-    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
-    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
-    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
-    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
-    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
-    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
-    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
-    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
-    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
-    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
-    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
-    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
-    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
-    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
-    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
-    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
-    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
-    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
-    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
-    {Zabalza}, V. and {Contributors}, (.},
-    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
-  journal = {\aj},
-archivePrefix = "arXiv",
-   eprint = {1801.02634},
- primaryClass = "astro-ph.IM",
- keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
-     year = 2018,
-    month = sep,
-   volume = 156,
-      eid = {123},
-    pages = {123},
-      doi = {10.3847/1538-3881/aabc4f},
-   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
-}
-
-
-    </textarea>
-    <textarea id="astroqueryText" style="position: absolute; left: -9999px; z-index: -9999;">
-@ARTICLE{2019AJ....157...98G,
-   author = {{Ginsburg}, A. and {Sip{\H o}cz}, B.~M. and {Brasseur}, C.~E. and
-    {Cowperthwaite}, P.~S. and {Craig}, M.~W. and {Deil}, C. and
-    {Guillochon}, J. and {Guzman}, G. and {Liedtke}, S. and {Lian Lim}, P. and
-    {Lockhart}, K.~E. and {Mommert}, M. and {Morris}, B.~M. and
-    {Norman}, H. and {Parikh}, M. and {Persson}, M.~V. and {Robitaille}, T.~P. and
-    {Segovia}, J.-C. and {Singer}, L.~P. and {Tollerud}, E.~J. and
-    {de Val-Borro}, M. and {Valtchanov}, I. and {Woillez}, J. and
-    {The Astroquery collaboration} and {a subset of the astropy collaboration}
-    },
-    title = "{astroquery: An Astronomical Web-querying Package in Python}",
-  journal = {\aj},
-archivePrefix = "arXiv",
-   eprint = {1901.04520},
- primaryClass = "astro-ph.IM",
- keywords = {astronomical databases: miscellaneous, virtual observatory tools},
-     year = 2019,
-    month = mar,
-   volume = 157,
-      eid = {98},
-    pages = {98},
-      doi = {10.3847/1538-3881/aafc33},
-   adsurl = {http://adsabs.harvard.edu/abs/2019AJ....157...98G},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
-}
-
-    </textarea>
-    <textarea id="tesscutText" style="position: absolute; left: -9999px; z-index: -9999;">
-@MISC{2019ascl.soft05007B,
-        author = {{Brasseur}, C.~E. and {Phillip}, Carlita and {Fleming}, Scott W. and
-          {Mullally}, S.~E. and {White}, Richard L.},
-         title = "{Astrocut: Tools for creating cutouts of TESS images}",
-      keywords = {Software},
-          year = 2019,
-         month = may,
-           eid = {ascl:1905.007},
-         pages = {ascl:1905.007},
- archivePrefix = {ascl},
-        eprint = {1905.007},
-        adsurl = {https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B},
-       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
- }
-    </textarea>
-
-    <p>
-        When using Lightkurve, we kindly request that you cite the following packages:
-        <ul>
-            <li>
-                <a href="https://docs.lightkurve.org">lightkurve</a>
-                <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astropy.org">astropy</a>
-                <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astroquery.readthedocs.io">astroquery</a>
-                <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                —  if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
-            </li>
-            <li>
-                <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
-                <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                — if you are using <i>search_tesscut()</i>.
-            </li>
-        </ul>
-    </p>
-</body></div>
-</div>
 <p><img alt="Space Telescope Logo" class="no-scaled-link" src="https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png" style="width: 200px;" /></p>
-</div>
-</div>
+</section>
+</section>
 
 
               </div>
               
               
-              <div class='prev-next-bottom'>
-                
-    <a class='left-prev' id="prev-link" href="asteroseismology-estimating-mass-and-radius.html" title="previous page">How to estimate a star’s mass and radius using asteroseismology</a>
-    <a class='right-next' id="next-link" href="other-supernova-lightcurve.html" title="next page">How to make a supernova lightcurve?</a>
-
-              </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="asteroseismology-estimating-mass-and-radius.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">How to estimate a star’s mass and radius using asteroseismology</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="other-supernova-lightcurve.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">How to make a supernova lightcurve?</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
               
           </main>
           
 
       </div>
     </div>
-
-    
-  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
-
-
-    
-    <!-- Google Analytics -->
-    <script>
-      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-      ga('create', 'UA-69171-9', 'auto');
-      ga('set', 'anonymizeIp', true);
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-    <!-- End Google Analytics -->
-    <footer class="footer mt-5 mt-md-0">
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
-    <p>
-          &copy; Copyright Lightkurve developers.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
-    </p>
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
   </div>
 </footer>
   </body>
