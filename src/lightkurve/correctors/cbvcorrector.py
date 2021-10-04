@@ -1143,7 +1143,7 @@ class CotrendingBasisVectors(TimeSeries):
                 _, ax = plt.subplots(1)
 
             # Plot gaps as NaN
-            timeArray = self.time.copy().value
+            timeArray = np.array(self.time.copy().value)
             timeArray[np.nonzero(self.gap_indicators)[0]] = np.nan
 
             # Get the CBV arrays that were requested
