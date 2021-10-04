@@ -113,8 +113,8 @@ html_theme_options = {
     "external_links": [],
     "github_url": "https://github.com/lightkurve/lightkurve",
     "google_analytics_id": "UA-69171-9",
-    "search_bar_position": "navbar",
 }
+
 
 html_title = "Lightkurve "
 
@@ -127,7 +127,7 @@ html_css_files = [
 html_sidebars = {
   "tutorials/*": [],
   "tutorials/*/*": [],
-  "tutorials/*/*/*": []
+  "tutorials/*/*/*": [],
 }
 
 # Raw files we want to copy using the sphinxcontrib-rawfiles extension:

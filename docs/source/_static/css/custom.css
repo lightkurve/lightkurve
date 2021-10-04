@@ -6,13 +6,8 @@
 }
 
 .frontpage > p:nth-of-type(1) {
-    font-size: 1.6em;
+    font-size: 1.5em;
     font-weight: 300;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
-}
-
-.frontpage > .btn {
-    font-size: 1.2em;
-    font-weight: 500;
 }
