@@ -550,7 +550,7 @@ div.rendered_html tbody tr:hover {
 <h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
 <p>We’ll use <a class="reference external" href="https://docs.lightkurve.org/">Lightkurve</a> for downloading and handling <em>Kepler</em> data throughout this tutorial. We’ll also use <a class="reference external" href="https://numpy.org/">NumPy</a> to perform a few auxiliary functions, and <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -573,7 +573,7 @@ div.rendered_html tbody tr:hover {
 which are expressed as an integer. A handy reference document for <em>Kepler</em>’s quality flags is Table 2-3 in the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf">MAST Kepler Archive Manual</a>.</p>
 <p>Let’s start by downloading the data we’ll work with throughout this tutorial:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -584,7 +584,7 @@ which are expressed as an integer. A handy reference document for <em>Kepler</em
 <p>By default, Lightkurve downloads quality-masked data. This means that a variety of cadences with a non-zero quality flag will already be removed from the light curves or TPFs you download using the instruction above.</p>
 <p>For this tutorial, we are also going to download some TPF data with no quality mask applied. We can do this by passing the optional <code class="docutils literal notranslate"><span class="pre">quality_bitmask=0</span></code> argument to the <a class="reference external" href="https://docs.lightkurve.org/reference/search.html?highlight=download">download()</a> method as follows:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -595,8 +595,8 @@ which are expressed as an integer. A handy reference document for <em>Kepler</em
 <p>Passing <code class="docutils literal notranslate"><span class="pre">quality_bitmask=0</span></code> has the effect of including every cadence in the data, even those with serious quality issues or NaN (<a class="reference external" href="https://en.wikipedia.org/wiki/NaN">not a number</a>) values in the flux. This is not necessarily recommended when using Lightkurve, but here it will allow us to explore a wide variety of data quality issues, many of which will be useful to know about if you’re working directly with FITS files from MAST.</p>
 <p>Now that we have our data, let’s have a look at the range of quality flags present. Remember, this is the unmasked data, so every flagged cadence is included.</p>
 <p>Here, we’re using the NumPy function <code class="docutils literal notranslate"><span class="pre">`unique()</span></code> &lt;<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.unique.html">https://numpy.org/doc/stable/reference/generated/numpy.unique.html</a>&gt;`__, which takes an array as its input and returns every unique value:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -604,10 +604,22 @@ which are expressed as an integer. A handy reference document for <em>Kepler</em
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([     0,      1,     16,     64,    128,    144,    256,   4160,
+         8192,   8208,   8320,  12352,  16384,  32772,  32778,  32800,
+        32804,  32816,  98305,  98312,  98314, 393216, 393232, 393344,
+       401408, 409600], dtype=int32)
+</pre></div></div>
+</div>
 <p>You’ll notice that some of these appear to be integers that correspond to bits — that is, powers of two — but others are additive. This indicates that multiple quality issues are present in a particular cadence.</p>
 <p>We can use Lightkurve’s <code class="docutils literal notranslate"><span class="pre">decode()</span></code> function for accessing the information stored in each quality flag:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -616,15 +628,57 @@ which are expressed as an integer. A handy reference document for <em>Kepler</em
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0 []
+1 [&#39;Attitude tweak&#39;]
+16 [&#39;Zero crossing&#39;]
+64 [&#39;Argabrightening&#39;]
+128 [&#39;Cosmic ray in optimal aperture&#39;]
+144 [&#39;Zero crossing&#39;, &#39;Cosmic ray in optimal aperture&#39;]
+256 [&#39;Manual exclude&#39;]
+4160 [&#39;Argabrightening&#39;, &#39;Argabrightening on CCD&#39;]
+8192 [&#39;Cosmic ray in collateral data&#39;]
+8208 [&#39;Zero crossing&#39;, &#39;Cosmic ray in collateral data&#39;]
+8320 [&#39;Cosmic ray in optimal aperture&#39;, &#39;Cosmic ray in collateral data&#39;]
+12352 [&#39;Argabrightening&#39;, &#39;Argabrightening on CCD&#39;, &#39;Cosmic ray in collateral data&#39;]
+16384 [&#39;Detector anomaly&#39;]
+32772 [&#39;Coarse point&#39;, &#39;No fine point&#39;]
+32778 [&#39;Safe mode&#39;, &#39;Earth point&#39;, &#39;No fine point&#39;]
+32800 [&#39;Desaturation event&#39;, &#39;No fine point&#39;]
+32804 [&#39;Coarse point&#39;, &#39;Desaturation event&#39;, &#39;No fine point&#39;]
+32816 [&#39;Zero crossing&#39;, &#39;Desaturation event&#39;, &#39;No fine point&#39;]
+98305 [&#39;Attitude tweak&#39;, &#39;No fine point&#39;, &#39;No data&#39;]
+98312 [&#39;Earth point&#39;, &#39;No fine point&#39;, &#39;No data&#39;]
+98314 [&#39;Safe mode&#39;, &#39;Earth point&#39;, &#39;No fine point&#39;, &#39;No data&#39;]
+393216 [&#39;Rolling band in optimal aperture&#39;, &#39;Rolling band in full mask&#39;]
+393232 [&#39;Zero crossing&#39;, &#39;Rolling band in optimal aperture&#39;, &#39;Rolling band in full mask&#39;]
+393344 [&#39;Cosmic ray in optimal aperture&#39;, &#39;Rolling band in optimal aperture&#39;, &#39;Rolling band in full mask&#39;]
+401408 [&#39;Cosmic ray in collateral data&#39;, &#39;Rolling band in optimal aperture&#39;, &#39;Rolling band in full mask&#39;]
+409600 [&#39;Detector anomaly&#39;, &#39;Rolling band in optimal aperture&#39;, &#39;Rolling band in full mask&#39;]
+</pre></div></div>
+</div>
 <p>We can use Python’s “bitwise and” operator (&amp;) to select the cadence numbers affected by a specific quality flag as follows:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">tpf</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">[(</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span> <span class="o">&amp;</span> <span class="mi">64</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># cadence numbers flagged for &quot;Argabrightening&quot; (flag 64)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([4060, 5767, 6432, 6796, 6797], dtype=int32)
+</pre></div></div>
 </div>
 <p>In the following sections, we’ll walk through the majority of these data quality events, and look at practical examples in the light curve and TPF we downloaded above.</p>
 <p>Some of these flags are not covered in this tutorial, such as rolling bands. For more information on other data quality issues, see other tutorials in this series, as well as the various <a class="reference external" href="https://archive.stsci.edu/missions-and-data/kepler/documents">Kepler Data Handbooks</a>.</p>
@@ -642,8 +696,8 @@ which are expressed as an integer. A handy reference document for <em>Kepler</em
 increased. A change in temperature can slightly change the telescope focus. This manifests in the simple aperture photometry (SAP) data as a downward slope caused by “reheating,” while the flux returns to its previous level. The thermal transient is corrected in PDCSAP data; there is no quality flag for data affected by a thermal transient. (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics
 Handbook</a>, Section 5.5.)</p>
 <p>The following code uses Matplotlib to zoom in on an Earth pointing event and highlight the affected section of the SAP light curve:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -654,13 +708,29 @@ Handbook</a>, Section 5.5.)</p>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.collections.PolyCollection at 0x17cea31c0&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_20_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_20_1.png" />
+</div>
+</div>
 </section>
 <section id="2.2-Safe-modes">
 <h3>2.2 Safe modes<a class="headerlink" href="#2.2-Safe-modes" title="Permalink to this headline">¶</a></h3>
 <p>Safe modes (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 4.2) are another type of thermal transient that appears in <em>Kepler</em> data. A safe mode occured when the telescope temporarily shut off operation due to an unexpected event, usually caused by an issue with the detector electronics.</p>
 <p>There were eleven safe mode events throughout the <em>Kepler</em> mission, and three during <em>K2</em>, in Campaigns 0, 9, and 12. The following code zooms in on the Quarter 2 safe mode, in the same data we’ve used above; note the similarity in appearance between the two thermal transient events.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -671,14 +741,30 @@ Handbook</a>, Section 5.5.)</p>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.collections.PolyCollection at 0x17d0a3700&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_22_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_22_1.png" />
+</div>
+</div>
 </section>
 <section id="2.3-Coarse-pointing-and-loss-of-fine-pointing">
 <h3>2.3 Coarse pointing and loss of fine pointing<a class="headerlink" href="#2.3-Coarse-pointing-and-loss-of-fine-pointing" title="Permalink to this headline">¶</a></h3>
 <p>Running the code below, you’ll see two highlighted regions where there is no thermal transient, but still a gap in the data. Often, gaps like this are caused by a loss of fine pointing (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 4.3). Because there is lower photometric precision when this occurs, these cadences are not suggested for use in photometry, and are replaced
 with NaNs.</p>
 <p>In the <code class="docutils literal notranslate"><span class="pre">QUALITY</span></code> column, there are two flags for this situation: a 4 (bit 3) for coarse point, and 32768 (bit 16) for a loss of fine point. Coarse point is a manual flag, based on preprocessing, and coarse point cadences are removed based on an expected loss of fine pointing. Cadences marked as “no fine point” are due to unexpected events; in practice, these two quality issues manifest in the same manner as gapped data.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -690,15 +776,58 @@ with NaNs.</p>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.collections.PolyCollection at 0x17d21d1c0&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_24_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_24_1.png" />
+</div>
+</div>
 <p>Let’s also look at a TPF cadence affected by a loss of fine pointing:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="nb">print</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">((</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span> <span class="o">&amp;</span> <span class="mi">32804</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)][</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cadenceno</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span> <span class="o">==</span> <span class="mi">32804</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]);</span>
 </pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[[[nan nan nan nan nan]
+  [nan nan nan nan nan]
+  [nan nan nan nan nan]
+  [nan nan nan nan nan]]] electron / s
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2436365, Cadence: 5624&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_26_2.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_26_2.png" />
 </div>
 </div>
 <p>As you can see, there’s no data available for this cadence at the TPF level. The vast majority of data affected by a loss of fine pointing/coarse pointing during the <em>Kepler</em> and <em>K2</em> missions is “gapped” like this. When performing photometry or light curve corrections, it’s important to pay attention to the data on either side of these gaps and make sure you don’t overcorrect it.</p>
@@ -712,8 +841,8 @@ with NaNs.</p>
 <p>Cosmic rays on the detector (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, Section 4.16) are an unavoidable source of quality issues in all space based data. Depending on the severity of the event, an incidence of a cosmic ray can lead to sudden pixel sensitivity dropouts (SPSD) — covered in another tutorial in this series — or even long-term damage. Here, we’ll only look at the
 short-term events.</p>
 <p>The cell below plots a section of our light curve for KIC 2436365 from above, showing a spike caused by a cosmic ray hitting the detector. Note that this is PDCSAP flux: most cosmic rays are removed by presearch data conditioning (PDC), but those that aren’t can be caught by outlier clipping or, in this case, may not be a large enough spike to cause problems.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -724,14 +853,30 @@ short-term events.</p>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.collections.PolyCollection at 0x17d3229d0&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_30_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_30_1.png" />
+</div>
+</div>
 </section>
 <section id="3.2-Argabrightening">
 <h3>3.2 Argabrightening<a class="headerlink" href="#3.2-Argabrightening" title="Permalink to this headline">¶</a></h3>
 <p>Argabrightening (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.8) is a single-cadence quality issue that looks similar to a cosmic ray on the detector. In fact, Argabrightening is thought to be caused by debris hitting the instrument, causing a brief increase in flux. This is distinct from the electronic event caused by a cosmic ray corrupting the pixel readout:
 Argabrightening is the result of physical illumination.</p>
 <p>Using Lightkurve’s <code class="docutils literal notranslate"><span class="pre">KeplerQualityFlags.decode()</span></code> function in <a class="reference external" href="#1.1-Quality-flags">Section 1.1</a>, we saw that a quality flag of 4160 indicates an Argabrightening event on the charge-coupled device (CCD) and in the optimal aperture used for photometry. Let’s see where that shows up in our data:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -739,9 +884,19 @@ Argabrightening is the result of physical illumination.</p>
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([191.8960099 , 226.77612309, 240.36418455, 247.80180137,
+       247.82223423])
+</pre></div></div>
+</div>
 <p>Argabrightening events are removed by the <em>Kepler</em> pipeline for both SAP and PDCSAP data. To see this Argabrightening event, let’s create our own light curve from the TPF, using custom aperture photometry. We can confirm that the spike in the data is right where we expect it:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -752,14 +907,30 @@ Argabrightening is the result of physical illumination.</p>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.collections.PolyCollection at 0x17cfed250&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_34_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_34_1.png" />
+</div>
+</div>
 </section>
 <section id="3.3-Attitude-tweaks">
 <h3>3.3 Attitude tweaks<a class="headerlink" href="#3.3-Attitude-tweaks" title="Permalink to this headline">¶</a></h3>
 <p><em>Kepler</em>’s orientation, or attitude, was adjusted every few days during Quarters 0, 1, and 2 of the nominal mission. Specifically, attitude tweaks ensured that no star would ever move more than 1/100th of a pixel from its expected location in each cadence (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 4.4). From Quarter 3 onwards, changes to the telescope’s Fine
 Guidance Sensor (FGS) system (see the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, particularly sections 2.1 and 2.5.1) led to reduced drift, which meant that attitude tweaks were no longer necessary.</p>
 <p>Because the drift distances in <em>Kepler</em>’s first three quarters were so small, they’re hard to detect without checking the quality flags. Additionally, the discontinuities were for the most part corrected by the data processing pipeline, with only a few remaining:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -768,6 +939,22 @@ Guidance Sensor (FGS) system (see the <a class="reference external" href="https:
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">5300</span><span class="p">,</span> <span class="mi">5400</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">(),</span> <span class="mi">246</span><span class="p">,</span> <span class="mf">246.5</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">);</span>
 </pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.collections.PolyCollection at 0x17d363e20&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_36_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_36_1.png" />
 </div>
 </div>
 </section>
@@ -784,8 +971,8 @@ time.</p>
 <p>For various reasons, some cadences were manually excluded during the data processing stage. In general, these cadences were those on either side of gaps and discontinuities, but sometimes manual exclusions were used to cover specific events that didn’t fall under any other category. For example, during Quarter 12, a series of three coronal mass ejections from the Sun led to multiple cadences being manually excluded (<a class="reference external" href="https://archive.stsci.edu/kepler/release_notes/release_notes25/KSCI-19065-002DRN25.pdf">Kepler Data Release 25
 Notes</a>, Section 12.2). Further solar flares and coronal mass ejections led to manual exclusions in Campaign 15 of <em>K2</em> (<a class="reference external" href="https://archive.stsci.edu/missions/k2/doc/drn/KSCI-19138-001_K2-DRN22_C15.pdf">K2 Data Release 22 Notes</a>, Section 2.2). On both occasions, these incidences led to increased noise and reduced accuracy in pointing.</p>
 <p>The code below plots the SAP light curve for Quarter 12 of KIC 8805616 with no quality-flagged data excluded. Here, you can clearly see the data quality issues caused by the coronal mass ejections, which are highlighted:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -798,6 +985,22 @@ Notes</a>, Section 12.2). Further solar flares and coronal mass ejections led to
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.collections.PolyCollection at 0x17d62f520&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_39_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_39_1.png" />
+</div>
+</div>
 </section>
 </section>
 <section id="4.-K2">
@@ -806,7 +1009,7 @@ Notes</a>, Section 12.2). Further solar flares and coronal mass ejections led to
 thruster firing.</p>
 <p>To get an idea of what the six-hour drift looks like, let’s start by downloading some <em>K2</em> data.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -815,8 +1018,8 @@ thruster firing.</p>
 </div>
 </div>
 <p>Even with <code class="docutils literal notranslate"><span class="pre">quality_bitmask=0</span></code>, the data is gapped at all cadences flagged with bit 20 or 21. You can test this yourself by running the following code, and noting that there are no <code class="docutils literal notranslate"><span class="pre">time</span></code> values provided for any cadences with these quality flags:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -825,9 +1028,26 @@ thruster firing.</p>
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+</pre></div></div>
+</div>
 <p>Now let’s look at the SAP light curve for this star, and see what the six-hour drift looks like in practice:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -835,14 +1055,46 @@ thruster firing.</p>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;sap_flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_45_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_45_1.png" />
+</div>
+</div>
 <p>Fortunately, this systematic is well-represented by the cotrending basis vectors (CBVs) used in the PDC pipeline:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">lc_k2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
 </pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_47_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_47_1.png" />
 </div>
 </div>
 <p>The <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19116-002.pdf">K2 Handbook</a> cautions that these effects can never be fully corrected — you can see this particularly to the left of the plot above. But overall, PDC successfully removes the six-hour drift from <em>K2</em> Long Cadence data, providing high-quality time series data for all targets.</p>
@@ -856,14 +1108,199 @@ thruster firing.</p>
 <section id="Citing-Lightkurve-and-Astropy">
 <h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+<style>
+    button {
+        border: 1px solid;
+        padding: 0.2em;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 0.8em;
+        margin: 0.2em;
+        cursor: pointer;
+    }
+
+    .citation-button-1 {background-color: #4CAF50;} /* Green */
+    .citation-button-2 {background-color: #008CBA;} /* Blue */
+</style>
+
+<script type="text/javascript">
+    function copyBibtex(package) {
+        var copyText = document.getElementById(package + "Text");
+        copyText.select();
+        document.execCommand("copy");
+        alert("BibTex has been copied to your clipboard")
+    }
+</script>
+</head>
+
+<body>
+    <textarea id="lightkurveText" style="position: absolute; left: -9999px; z-index: -9999;">
+@MISC{2018ascl.soft12013L,
+    author = {{Lightkurve Collaboration} and {Cardoso}, J.~V.~d.~M. and
+                {Hedges}, C. and {Gully-Santiago}, M. and {Saunders}, N. and
+                {Cody}, A.~M. and {Barclay}, T. and {Hall}, O. and
+                {Sagear}, S. and {Turtelboom}, E. and {Zhang}, J. and
+                {Tzanidakis}, A. and {Mighell}, K. and {Coughlin}, J. and
+                {Bell}, K. and {Berta-Thompson}, Z. and {Williams}, P. and
+                {Dotson}, J. and {Barentsen}, G.},
+    title = "{Lightkurve: Kepler and TESS time series analysis in Python}",
+    keywords = {Software, NASA},
+howpublished = {Astrophysics Source Code Library},
+        year = 2018,
+    month = dec,
+archivePrefix = "ascl",
+    eprint = {1812.013},
+    adsurl = {http://adsabs.harvard.edu/abs/2018ascl.soft12013L},
+}
+    </textarea>
+    <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
+@ARTICLE{2018AJ....156..123T,
+   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
+    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
+    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
+    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
+    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
+    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
+    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
+    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
+    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
+    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
+    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
+    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
+    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
+    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
+    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
+    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
+    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
+    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
+    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
+    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
+    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
+    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
+    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
+    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
+    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
+    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
+    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
+    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
+    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
+    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
+    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
+    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
+    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
+    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
+    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
+    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
+    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
+    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
+    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
+    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
+    {Zabalza}, V. and {Contributors}, (.},
+    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
+  journal = {\aj},
+archivePrefix = "arXiv",
+   eprint = {1801.02634},
+ primaryClass = "astro-ph.IM",
+ keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
+     year = 2018,
+    month = sep,
+   volume = 156,
+      eid = {123},
+    pages = {123},
+      doi = {10.3847/1538-3881/aabc4f},
+   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+
+    </textarea>
+    <textarea id="astroqueryText" style="position: absolute; left: -9999px; z-index: -9999;">
+@ARTICLE{2019AJ....157...98G,
+   author = {{Ginsburg}, A. and {Sip{\H o}cz}, B.~M. and {Brasseur}, C.~E. and
+    {Cowperthwaite}, P.~S. and {Craig}, M.~W. and {Deil}, C. and
+    {Guillochon}, J. and {Guzman}, G. and {Liedtke}, S. and {Lian Lim}, P. and
+    {Lockhart}, K.~E. and {Mommert}, M. and {Morris}, B.~M. and
+    {Norman}, H. and {Parikh}, M. and {Persson}, M.~V. and {Robitaille}, T.~P. and
+    {Segovia}, J.-C. and {Singer}, L.~P. and {Tollerud}, E.~J. and
+    {de Val-Borro}, M. and {Valtchanov}, I. and {Woillez}, J. and
+    {The Astroquery collaboration} and {a subset of the astropy collaboration}
+    },
+    title = "{astroquery: An Astronomical Web-querying Package in Python}",
+  journal = {\aj},
+archivePrefix = "arXiv",
+   eprint = {1901.04520},
+ primaryClass = "astro-ph.IM",
+ keywords = {astronomical databases: miscellaneous, virtual observatory tools},
+     year = 2019,
+    month = mar,
+   volume = 157,
+      eid = {98},
+    pages = {98},
+      doi = {10.3847/1538-3881/aafc33},
+   adsurl = {http://adsabs.harvard.edu/abs/2019AJ....157...98G},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+    </textarea>
+    <textarea id="tesscutText" style="position: absolute; left: -9999px; z-index: -9999;">
+@MISC{2019ascl.soft05007B,
+        author = {{Brasseur}, C.~E. and {Phillip}, Carlita and {Fleming}, Scott W. and
+          {Mullally}, S.~E. and {White}, Richard L.},
+         title = "{Astrocut: Tools for creating cutouts of TESS images}",
+      keywords = {Software},
+          year = 2019,
+         month = may,
+           eid = {ascl:1905.007},
+         pages = {ascl:1905.007},
+ archivePrefix = {ascl},
+        eprint = {1905.007},
+        adsurl = {https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B},
+       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+ }
+    </textarea>
+
+    <p>
+        When using Lightkurve, we kindly request that you cite the following packages:
+        <ul>
+            <li>
+                <a href="https://docs.lightkurve.org">lightkurve</a>
+                <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            </li>
+            <li>
+                <a href="https://astropy.org">astropy</a>
+                <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            </li>
+            <li>
+                <a href="https://astroquery.readthedocs.io">astroquery</a>
+                <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+                —  if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
+            </li>
+            <li>
+                <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
+                <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+                — if you are using <i>search_tesscut()</i>.
+            </li>
+        </ul>
+    </p>
+</body></div>
 </div>
 <p><img alt="Space Telescope Logo" class="no-scaled-link" src="https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png" style="width: 200px;" /></p>
 </section>

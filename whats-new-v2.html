@@ -577,8 +577,8 @@ div.rendered_html tbody tr:hover {
 <section id="✨-New:-LightCurve-objects-behave-like-tables">
 <h3>✨ New: LightCurve objects behave like tables<a class="headerlink" href="#✨-New:-LightCurve-objects-behave-like-tables" title="Permalink to this headline">¶</a></h3>
 <p>Light curves can still be created as before, but now look and act like tables:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -591,12 +591,27 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<i>LightCurve length=3</i>
+<table id="table4494998208" class="table-striped table-bordered table-condensed">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
+<thead><tr><th></th><th></th><th></th></tr></thead>
+<thead><tr><th>object</th><th>float64</th><th>float64</th></tr></thead>
+<tr><td>2000.0</td><td>1.0</td><td>0.1</td></tr>
+<tr><td>2000.1</td><td>1.0</td><td>0.1</td></tr>
+<tr><td>2000.2</td><td>1.0</td><td>0.1</td></tr>
+</table></div>
+</div>
 </section>
 <section id="✨-New:-Light-curves-support-user-defined-columns">
 <h3>✨ New: Light curves support user-defined columns<a class="headerlink" href="#✨-New:-Light-curves-support-user-defined-columns" title="Permalink to this headline">¶</a></h3>
 <p>Because light curves are now tables, they can contain arbitrary user-defined columns:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -605,12 +620,27 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<i>LightCurve length=3</i>
+<table id="table4494998208" class="table-striped table-bordered table-condensed">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th></tr></thead>
+<thead><tr><th>object</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
+<tr><td>2000.0</td><td>1.0</td><td>0.1</td><td>red</td></tr>
+<tr><td>2000.1</td><td>1.0</td><td>0.1</td><td>green</td></tr>
+<tr><td>2000.2</td><td>1.0</td><td>0.1</td><td>blue</td></tr>
+</table></div>
+</div>
 </section>
 <section id="✨-New:-Columns-and-rows-can-be-accessed-using-index-notation">
 <h3>✨ New: Columns and rows can be accessed using index notation<a class="headerlink" href="#✨-New:-Columns-and-rows-can-be-accessed-using-index-notation" title="Permalink to this headline">¶</a></h3>
 <p>Just like Table objects, columns and rows can be accessed using index notation:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -618,8 +648,22 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<i>LightCurve length=2</i>
+<table id="table6310895472" class="table-striped table-bordered table-condensed">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th></tr></thead>
+<thead><tr><th>object</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
+<tr><td>2000.1</td><td>1.0</td><td>0.1</td><td>green</td></tr>
+<tr><td>2000.2</td><td>1.0</td><td>0.1</td><td>blue</td></tr>
+</table></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -627,12 +671,20 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$[1,~1,~1] \; \mathrm{}$</div></div>
+</div>
 </section>
 <section id="✨-New:-Times-are-stored-as-an-AstroPy-Time-object">
 <h3>✨ New: Times are stored as an AstroPy Time object<a class="headerlink" href="#✨-New:-Times-are-stored-as-an-AstroPy-Time-object" title="Permalink to this headline">¶</a></h3>
 <p>Lightkurve 2 extends <a class="reference external" href="https://docs.astropy.org/en/stable/time/">AstroPy Time</a> by adding support for the TESS and Kepler time formats (“BTJD” and “BKJD”). As a result, the time column is now always a Time object, which enables user to leverage this standard AstroPy feature:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -640,8 +692,17 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Time object: scale=&#39;tdb&#39; format=&#39;btjd&#39; value=[2000.  2000.1 2000.2]&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -649,8 +710,17 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([2459000. , 2459000.1, 2459000.2])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -658,12 +728,22 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([&#39;2020-05-30 12:00:00.000&#39;, &#39;2020-05-30 14:24:00.000&#39;,
+       &#39;2020-05-30 16:48:00.000&#39;], dtype=&#39;&lt;U23&#39;)
+</pre></div></div>
+</div>
 </section>
 <section id="✨-New:-Read-and-write-light-curves-in-many-file-formats">
 <h3>✨ New: Read and write light curves in many file formats<a class="headerlink" href="#✨-New:-Read-and-write-light-curves-in-many-file-formats" title="Permalink to this headline">¶</a></h3>
 <p>Because light curves act like tables, they now have easy <code class="docutils literal notranslate"><span class="pre">read()</span></code> and <code class="docutils literal notranslate"><span class="pre">write()</span></code> methods which allow a <a class="reference external" href="https://docs.astropy.org/en/stable/io/unified.html#built-in-readers-writers">variety of data formats</a> to be used. For example, it is now much easier to store a light curve to a human-readable text file:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -672,14 +752,40 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+|   time | flux | flux_err | color |
+| 2000.0 |  1.0 |      0.1 |   red |
+| 2000.1 |  1.0 |      0.1 | green |
+| 2000.2 |  1.0 |      0.1 |  blue |
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">LightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;/tmp/lightcurve.txt&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;ascii.fixed_width&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<i>LightCurve length=3</i>
+<table id="table6310895040" class="table-striped table-bordered table-condensed">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th></tr></thead>
+<thead><tr><th>object</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
+<tr><td>2000.0</td><td>1.0</td><td>0.1</td><td>red</td></tr>
+<tr><td>2000.1</td><td>1.0</td><td>0.1</td><td>green</td></tr>
+<tr><td>2000.2</td><td>1.0</td><td>0.1</td><td>blue</td></tr>
+</table></div>
 </div>
 </section>
 </section>
@@ -689,8 +795,8 @@ div.rendered_html tbody tr:hover {
 <section id="✨-New:-Search-operations-support-different-TESS-pipelines">
 <h3>✨ New: Search operations support different TESS pipelines<a class="headerlink" href="#✨-New:-Search-operations-support-different-TESS-pipelines" title="Permalink to this headline">¶</a></h3>
 <p>The search operations now support all the Kepler &amp; TESS light curves available from the data archive at MAST, including community-contributed light curves. A new <code class="docutils literal notranslate"><span class="pre">author</span></code> column in the search results identifies the pipeline (click on a pipeline name for details). As an added bonus, the search and download operations are now <em>much</em> faster owing to improved caching.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -699,12 +805,30 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+SearchResult containing 6 data products.
+
+<table id="table6311015568">
+<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
+<tr><td>0</td><td>TESS Sector 19</td><td>2019</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>303256075</td><td>0.0</td></tr>
+<tr><td>1</td><td>TESS Sector 19</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
+<tr><td>2</td><td>TESS Sector 19</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
+<tr><td>3</td><td>TESS Sector 20</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
+<tr><td>4</td><td>TESS Sector 25</td><td>2020</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
+<tr><td>5</td><td>TESS Sector 26</td><td>2020</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
+</table></div>
+</div>
 </section>
 <section id="✨-New:-Download-TESS-fast-cadence-data">
 <h3>✨ New: Download TESS fast cadence data<a class="headerlink" href="#✨-New:-Download-TESS-fast-cadence-data" title="Permalink to this headline">¶</a></h3>
 <p>The TESS mission recently introduced a new 20-second exposure time mode and decreased the exposure time of its Full Frame Images to 10 minutes. In response, Lightkurve now allows user to specify the exact exposure time via the optional <code class="docutils literal notranslate"><span class="pre">exptime</span></code> argument and column.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -712,15 +836,44 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+SearchResult containing 1 data products.
+
+<table id="table6311902272">
+<thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
+<thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
+<tr><td>0</td><td>TESS Sector 27</td><td>2020</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>441420236</td><td>0.0</td></tr>
+</table></div>
+</div>
 <p>You can also filter search results after the fact via attribute access, e.g. via <code class="docutils literal notranslate"><span class="pre">search.exptime</span></code>:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">search</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;AU Mic&quot;</span><span class="p">)</span>
 <span class="n">search</span><span class="p">[</span><span class="n">search</span><span class="o">.</span><span class="n">exptime</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/whats-new-v2_22_1.png" src="_images/whats-new-v2_22_1.png" />
 </div>
 </div>
 </section>
@@ -730,8 +883,8 @@ div.rendered_html tbody tr:hover {
 <section id="✨-New:-Remove-systematics-using-Cotrending-Basis-Vectors">
 <h3>✨ New: Remove systematics using Cotrending Basis Vectors<a class="headerlink" href="#✨-New:-Remove-systematics-using-Cotrending-Basis-Vectors" title="Permalink to this headline">¶</a></h3>
 <p>Lightkurve 2 adds a new <code class="docutils literal notranslate"><span class="pre">CotrendingBasisVectors</span></code> class to provide a convenient interface to work with the official TESS and Kepler basis vector data products. We also re-implemented the <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> class from scratch to perform the correction in a way that is more similar to the official Kepler/TESS pipeline. This work was led by one of the authors of the official pipeline, Jeff Smith.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -743,9 +896,19 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Optimized Over-fitting metric: 0.8480384023008358
+Optimized Under-fitting metric: 0.9707309973017421
+Optimized Alpha: 3.077e-01
+</pre></div></div>
+</div>
 <p>The corrector now produces detailed diagnostic plots showing the light curve before (grey) and after (black) the noise (blue) was removed:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -753,12 +916,30 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
+       &lt;AxesSubplot:title={&#39;center&#39;:&#39;Alpha = 3.077e-01&#39;}, xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
+      dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/whats-new-v2_27_1.png" src="_images/whats-new-v2_27_1.png" />
+</div>
+</div>
 </section>
 <section id="✨-New:-Remove-systematics-by-optimizing-under--and-over-fitting-metrics">
 <h3>✨ New: Remove systematics by optimizing under- and over-fitting metrics<a class="headerlink" href="#✨-New:-Remove-systematics-by-optimizing-under--and-over-fitting-metrics" title="Permalink to this headline">¶</a></h3>
 <p>A <code class="docutils literal notranslate"><span class="pre">lightkurve.correctors.metrics</span></code> module was added to provide functions which can estimate the degree of over- and under-fitting of a corrected light curve. The new <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> utilizes these metrics to find an appropriate, user-tuneable tradeoff. You can learn more about this new feature in the <a class="reference external" href="tutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector.html">new CBVCorrector tutorial</a>.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -766,18 +947,50 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;Goodness Metrics vs. L2-Norm Penalty (alpha)&#39;}, xlabel=&#39;Regularization Factor Alpha&#39;, ylabel=&#39;Goodness Metric&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/whats-new-v2_29_1.png" src="_images/whats-new-v2_29_1.png" />
+</div>
+</div>
 </section>
 <section id="✨-New:-Inspect-pixel-by-pixel-light-curves-using-plot_pixels()">
 <h3>✨ New: Inspect pixel-by-pixel light curves using <em>plot_pixels()</em><a class="headerlink" href="#✨-New:-Inspect-pixel-by-pixel-light-curves-using-plot_pixels()" title="Permalink to this headline">¶</a></h3>
 <p>A new <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.plot_pixels()</span></code> method has been added which enables the light curves and periodograms of individual pixels to be inspected within a pixel file. This is very useful for investigating the location of specific signals. A <a class="reference external" href="tutorials/3-science-examples/periodograms-verifying-the-location-of-a-signal.html">dedicated tutorial</a> explains this new feature in detail.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">pixelfile</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;KIC 2435971&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">pixelfile</span><span class="o">.</span><span class="n">plot_pixels</span><span class="p">();</span>
 </pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2435971, 808.52 - 905.93 [BKJD days]&#39;}, xlabel=&#39;Time / Column (pixel)&#39;, ylabel=&#39;Flux / Row (pixel)&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/whats-new-v2_31_1.png" src="_images/whats-new-v2_31_1.png" />
 </div>
 </div>
 </section>

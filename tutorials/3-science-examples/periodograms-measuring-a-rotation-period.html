@@ -503,7 +503,7 @@ div.rendered_html tbody tr:hover {
 <h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
 <p>This tutorial only requires <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> and <a class="reference external" href="https://numpy.org/">NumPy</a>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -525,8 +525,8 @@ div.rendered_html tbody tr:hover {
 <p>In an accompanying tutorial, we looked at an eclipsing binary system, in which two stars eclipsed each other periodically. Now, let’s look at a different kind of oscillator — a rotating star — and see how that signal appears in the time series brightness data.</p>
 <p>We’re going to explore a star named KIC 2157356, which is part of the cohort of rotating stars that were studied by <em>Kepler</em> and analyzed in a research paper by <a class="reference external" href="https://arxiv.org/abs/1402.5694">McQuillan et al. (2014)</a>.</p>
 <p>Because rotation variability tends to happen on relatively long time scales (for instance, the Sun rotates every 25 days), we will start by downloading three ~90-day long quarters of <em>Kepler</em> data and then combine them using Lightkurve’s <code class="docutils literal notranslate"><span class="pre">`stitch()</span></code> &lt;<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection.stitch">https://docs.lightkurve.org/reference/api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection.stitch</a>&gt;`__ feature.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -539,14 +539,30 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_8_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_8_1.png" />
+</div>
+</div>
 <p>This looks quite different from the light curve we studied in the eclipsing binary tutorial. Here, the brightness modulation from the spots rotating in and out of view is significantly larger, with an overall <span class="math notranslate nohighlight">\(2\%\)</span> change in the brightness of the star! Compare this with asteroseismic oscillations (see the accompanying tutorials), which occur on the parts per million scale instead. (Note: 1 part per million equals 0.0001%).</p>
 </section>
 <section id="3.-Plotting-the-Periodogram-of-a-Rotating-Star">
 <h2>3. Plotting the Periodogram of a Rotating Star<a class="headerlink" href="#3.-Plotting-the-Periodogram-of-a-Rotating-Star" title="Permalink to this headline">¶</a></h2>
 <p>Next, we’ll convert the light curve to the frequency domain. Based on the plot we created above, we expect to see a high-power peak associated with the rotation period. We may also expect to see some smaller peaks, such as alias harmonics.</p>
 <p>For clarity, we will truncate the periodogram to <code class="docutils literal notranslate"><span class="pre">maximum_period=100</span></code>, because we can infer from the light curve that the rotation period is much shorter than that. We also set <code class="docutils literal notranslate"><span class="pre">view=period</span></code> to make sure the x-axis uses period rather than frequency units. This is helpful because it is more natural to think about rotation rates in units of <em>days</em> rather than <em>Hertz</em> (1/s).</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -555,16 +571,40 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Period [$\\mathrm{d}$]&#39;, ylabel=&#39;Power&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_11_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_11_1.png" />
+</div>
+</div>
 <p>Here we can see a strong peak near 13 days, which is consistent with the sinusoidal trend we saw in the time-domain plot earlier. The reason there are so few aliases in this periodogram is most likely because the star we’ve chosen has a variability that is very close to sinusoidal, which is not always the case.</p>
 <p>To obtain an estimate of the rotation period, we can now access the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.period_at_max_power.html?highlight=period_at_max_power">period_at_max_power</a> property:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$13.670865 \; \mathrm{d}$</div></div>
 </div>
 <p>Success! We established that the highest peak in the periodogram appears to align with the expected rotation signal in our time series, and we used a periodogram to obtain an estimate of the rotation period.</p>
 <p>Next, we will use additional features of the Lomb-Scargle periodogram to model the rotational signal in the time domain.</p>
@@ -574,8 +614,8 @@ div.rendered_html tbody tr:hover {
 <p>Lightkurve uses the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve.html?highlight=lombscargle">Lomb-Scargle</a> method to make periodograms. For more information on Lomb-Scargle periodograms, read <a class="reference external" href="https://arxiv.org/pdf/1703.09824.pdf">Vanderplas (2017)</a>. Without delving into the fine details here, Lomb-Scargle works by fitting a sinusoidal curve at each of the frequencies in the periodogram, and uses this fit to determine the value of
 power each frequency has in the periodogram. These model fits are stored in the periodogram object and can be extracted.</p>
 <p>In the graph below, we visualize the Lomb-Scargle model associated with the highest peak by extracting it and then plotting it on top of our time series data. We need to pass in the <code class="docutils literal notranslate"><span class="pre">time</span></code> range we want the model for, as well as the specific <code class="docutils literal notranslate"><span class="pre">frequency</span></code> for which we want the model returned.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -588,6 +628,22 @@ power each frequency has in the periodogram. These model fits are stored in the 
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_17_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_17_1.png" />
+</div>
+</div>
 <p>Looking at the plot above, we can see that the Lomb-Scargle model fits the rotation signal relatively well. This is expected; it corresponds to the highest peak in the periodogram, after all. It is not perfect, however. There are deviations in amplitude, and also in phase towards the right hand side of the graph.</p>
 <p>The periodogram will only ever be able to approximate the exact oscillation frequency, and there will always be some associated error (in fact if you look at the periodogram higher up, you’ll see that the peak is relatively broad). This uncertainty reflects the fact that the rotation signal is <em>not</em> a perfect sinusoid, and that there is additional noise from the star to deal with on top of that. It’s for this reason that studies of stellar rotation often use multiple independent methods to
 estimate a rotation period.</p>
@@ -596,8 +652,8 @@ estimate a rotation period.</p>
 <h2>5. Removing Periodic Signals Using Iterative Sine Fitting<a class="headerlink" href="#5.-Removing-Periodic-Signals-Using-Iterative-Sine-Fitting" title="Permalink to this headline">¶</a></h2>
 <p>We’re not always interested in the rotation signal — sometimes, we want it removed! This is the case, for example, when studying the small signals of a transiting planet in a star which also shows a strong rotation signal. Using the tools we described above, we can model and remove the rotation signal from the time series to help us study the planet transits.</p>
 <p>This process, called <em>iterative sine fitting</em>, has a limited range of applications, but is useful to know for quick analysis. Let’s apply it to KIC 8197761, a star known to host a planet embedded within stellar noise.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -611,15 +667,47 @@ estimate a rotation period.</p>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_20_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_20_1.png" />
+</div>
+</div>
 <p>Despite these data being folded on the period of a known planet, we are unable to see the planet transits within the noise. Let’s have a look at the periodogram.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span>
 <span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">);</span>
 </pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\frac{1}{d}}$]&#39;, ylabel=&#39;Power&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_22_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_22_1.png" />
 </div>
 </div>
 <p>As we can see in this periodogram, the star appears to include multiple high-amplitude oscillation signals. Using the Lomb-Scargle <code class="docutils literal notranslate"><span class="pre">model()</span></code> method we used earlier, we can remove these signals from the time series data. We’ll do this as follows:</p>
@@ -630,8 +718,8 @@ estimate a rotation period.</p>
 <li><p>Repeat using the new light curve.</p></li>
 </ol>
 <p>In this example, we will apply this procedure 50 times, that is, we’re going to remove the signals associated with the 50 highest peaks in the periodogram from the time series.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -648,15 +736,47 @@ estimate a rotation period.</p>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_24_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_24_1.png" />
+</div>
+</div>
 <p>In the graph above, we can observe that the new light curve displays less variations. Let’s go ahead and fold it to find out if we can see the planet transit this time around. We’ll also plot a binned version of our reduced light curve on top, just to make things clearer.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">newlc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">planet_period</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Unbinned&#39;</span><span class="p">)</span>
 <span class="n">newlc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">planet_period</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Binned&#39;</span><span class="p">);</span>
 </pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_26_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_26_1.png" />
 </div>
 </div>
 <p>Now we can see that a “dip” consistent with a planet transit has appeared, which makes it clearer to study!</p>
@@ -672,14 +792,199 @@ imperfect data manipulation operations have been applied.</p>
 <section id="Citing-Lightkurve-and-Astropy">
 <h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+<style>
+    button {
+        border: 1px solid;
+        padding: 0.2em;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 0.8em;
+        margin: 0.2em;
+        cursor: pointer;
+    }
+
+    .citation-button-1 {background-color: #4CAF50;} /* Green */
+    .citation-button-2 {background-color: #008CBA;} /* Blue */
+</style>
+
+<script type="text/javascript">
+    function copyBibtex(package) {
+        var copyText = document.getElementById(package + "Text");
+        copyText.select();
+        document.execCommand("copy");
+        alert("BibTex has been copied to your clipboard")
+    }
+</script>
+</head>
+
+<body>
+    <textarea id="lightkurveText" style="position: absolute; left: -9999px; z-index: -9999;">
+@MISC{2018ascl.soft12013L,
+    author = {{Lightkurve Collaboration} and {Cardoso}, J.~V.~d.~M. and
+                {Hedges}, C. and {Gully-Santiago}, M. and {Saunders}, N. and
+                {Cody}, A.~M. and {Barclay}, T. and {Hall}, O. and
+                {Sagear}, S. and {Turtelboom}, E. and {Zhang}, J. and
+                {Tzanidakis}, A. and {Mighell}, K. and {Coughlin}, J. and
+                {Bell}, K. and {Berta-Thompson}, Z. and {Williams}, P. and
+                {Dotson}, J. and {Barentsen}, G.},
+    title = "{Lightkurve: Kepler and TESS time series analysis in Python}",
+    keywords = {Software, NASA},
+howpublished = {Astrophysics Source Code Library},
+        year = 2018,
+    month = dec,
+archivePrefix = "ascl",
+    eprint = {1812.013},
+    adsurl = {http://adsabs.harvard.edu/abs/2018ascl.soft12013L},
+}
+    </textarea>
+    <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
+@ARTICLE{2018AJ....156..123T,
+   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
+    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
+    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
+    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
+    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
+    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
+    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
+    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
+    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
+    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
+    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
+    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
+    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
+    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
+    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
+    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
+    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
+    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
+    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
+    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
+    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
+    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
+    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
+    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
+    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
+    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
+    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
+    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
+    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
+    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
+    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
+    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
+    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
+    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
+    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
+    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
+    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
+    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
+    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
+    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
+    {Zabalza}, V. and {Contributors}, (.},
+    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
+  journal = {\aj},
+archivePrefix = "arXiv",
+   eprint = {1801.02634},
+ primaryClass = "astro-ph.IM",
+ keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
+     year = 2018,
+    month = sep,
+   volume = 156,
+      eid = {123},
+    pages = {123},
+      doi = {10.3847/1538-3881/aabc4f},
+   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+
+    </textarea>
+    <textarea id="astroqueryText" style="position: absolute; left: -9999px; z-index: -9999;">
+@ARTICLE{2019AJ....157...98G,
+   author = {{Ginsburg}, A. and {Sip{\H o}cz}, B.~M. and {Brasseur}, C.~E. and
+    {Cowperthwaite}, P.~S. and {Craig}, M.~W. and {Deil}, C. and
+    {Guillochon}, J. and {Guzman}, G. and {Liedtke}, S. and {Lian Lim}, P. and
+    {Lockhart}, K.~E. and {Mommert}, M. and {Morris}, B.~M. and
+    {Norman}, H. and {Parikh}, M. and {Persson}, M.~V. and {Robitaille}, T.~P. and
+    {Segovia}, J.-C. and {Singer}, L.~P. and {Tollerud}, E.~J. and
+    {de Val-Borro}, M. and {Valtchanov}, I. and {Woillez}, J. and
+    {The Astroquery collaboration} and {a subset of the astropy collaboration}
+    },
+    title = "{astroquery: An Astronomical Web-querying Package in Python}",
+  journal = {\aj},
+archivePrefix = "arXiv",
+   eprint = {1901.04520},
+ primaryClass = "astro-ph.IM",
+ keywords = {astronomical databases: miscellaneous, virtual observatory tools},
+     year = 2019,
+    month = mar,
+   volume = 157,
+      eid = {98},
+    pages = {98},
+      doi = {10.3847/1538-3881/aafc33},
+   adsurl = {http://adsabs.harvard.edu/abs/2019AJ....157...98G},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+    </textarea>
+    <textarea id="tesscutText" style="position: absolute; left: -9999px; z-index: -9999;">
+@MISC{2019ascl.soft05007B,
+        author = {{Brasseur}, C.~E. and {Phillip}, Carlita and {Fleming}, Scott W. and
+          {Mullally}, S.~E. and {White}, Richard L.},
+         title = "{Astrocut: Tools for creating cutouts of TESS images}",
+      keywords = {Software},
+          year = 2019,
+         month = may,
+           eid = {ascl:1905.007},
+         pages = {ascl:1905.007},
+ archivePrefix = {ascl},
+        eprint = {1905.007},
+        adsurl = {https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B},
+       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+ }
+    </textarea>
+
+    <p>
+        When using Lightkurve, we kindly request that you cite the following packages:
+        <ul>
+            <li>
+                <a href="https://docs.lightkurve.org">lightkurve</a>
+                <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            </li>
+            <li>
+                <a href="https://astropy.org">astropy</a>
+                <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            </li>
+            <li>
+                <a href="https://astroquery.readthedocs.io">astroquery</a>
+                <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+                —  if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
+            </li>
+            <li>
+                <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
+                <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+                — if you are using <i>search_tesscut()</i>.
+            </li>
+        </ul>
+    </p>
+</body></div>
 </div>
 <p><img alt="Space Telescope Logo" class="no-scaled-link" src="https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png" style="width: 200px;" /></p>
 </section>
