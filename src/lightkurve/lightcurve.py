@@ -2200,7 +2200,7 @@ class LightCurve(QTimeSeries):
         return Seismology.from_lightcurve(self, **kwargs)
 
     def to_fits(
-        self, path=None, overwrite=False, flux_column_name="FLUX", extra_data=None
+        self, path=None, overwrite=False, flux_column_name="FLUX", extra_data={}
     ):
         """Converts the light curve to a FITS file in the Kepler/TESS file format.
 
@@ -2966,7 +2966,7 @@ class KeplerLightCurve(LightCurve):
         overwrite=False,
         flux_column_name="FLUX",
         aperture_mask=None,
-        extra_data=None,
+        extra_data={},
     ):
         """Writes the KeplerLightCurve to a FITS file.
 
@@ -3086,7 +3086,7 @@ class TessLightCurve(LightCurve):
         overwrite=False,
         flux_column_name="FLUX",
         aperture_mask=None,
-        extra_data=None,
+        extra_data={},
     ):
         """Writes the KeplerLightCurve to a FITS file.
 
