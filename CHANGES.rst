@@ -1,18 +1,9 @@
-benjaminpope Updates (unreleased)
-===================
+2.1.0 (unreleased)
+==================
+
 - Added the option to use local CBV files in ``cbvcorrector.py`` using
-``load_kepler_cbvs`` and ``load_tess_cbvs``; the old functions 
-``download_kepler_cbvs`` and ``download_tess_cbvs`` are now deprecated.
-
-- Added unit tests related to the above changes. 
-
-- Updated docs to reflect these changes.
-
-- Fixed typos and URL access issue.
-
-
-2.0.12 (unreleased)
-===================
+  ``load_kepler_cbvs`` and ``load_tess_cbvs``; the old functions 
+  ``download_kepler_cbvs`` and ``download_tess_cbvs`` are now deprecated.
 
 
 
