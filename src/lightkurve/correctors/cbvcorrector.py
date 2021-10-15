@@ -12,6 +12,7 @@ from astropy.table import Table
 from astropy.time import Time
 from astropy.timeseries import TimeSeries
 from astropy.units import Quantity, Unit
+from astropy.utils.decorators import deprecated
 
 from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
@@ -29,13 +30,12 @@ from .regressioncorrector import RegressionCorrector
 from ..collections import LightCurveCollection
 from .metrics import overfit_metric_lombscargle, underfit_metric_neighbors, MinTargetsError
 
-from astropy.utils.decorators import deprecated
-
 
 log = logging.getLogger(__name__)
 
 __all__ = ['CBVCorrector', 'CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
-        'TessCotrendingBasisVectors', 'load_kepler_cbvs','load_tess_cbvs']
+           'TessCotrendingBasisVectors', 'load_kepler_cbvs','load_tess_cbvs',
+           'download_kepler_cbvs', 'download_tess_cbvs']
 
 #*******************************************************************************
 # CBV Corrector Class
