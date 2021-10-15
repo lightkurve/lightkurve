@@ -11,19 +11,23 @@ benjaminpope Updates (unreleased)
 - Fixed typos and URL access issue.
 
 
-2.0.11 (unreleased)
+2.0.12 (unreleased)
 ===================
 
-- Fixed bugs in ``TargetPixelFile.interact_sky()`` when a `TargetPixelFile`
-  does not have the target's proper motion / coordinate; or it is from
-  `tpf.cutout()` call. [#1088]
+
+
+2.0.11 (2021-09-22)
+===================
+
+- Modified ``TargetPixelFile.interact_sky()`` to enable it to work with
+  pixel files which lack proper motion or coordinate information. [#1088]
 
 - Fixed excessive memory usage by ``LightCurve.bin()``. [#1096]
 
 - Various improvements to the online documentation. [#1102]
 
-- Fixed a bug in ``TargetPixelFile.estimate_centroids`` which caused the column
-  and row coordinates reported to be off by 0.5. [#1103]
+- Fixed a bug in ``TargetPixelFile.estimate_centroids()`` which caused the column
+  and row coordinates to be off by 0.5. [#1103]
 
 - Fixed a bug which caused a light curve's meta data to be lost after
   calling ``LightCurve.bin()``. [#1041]
@@ -32,9 +36,9 @@ benjaminpope Updates (unreleased)
   Dynamical Time (TDB) scale by default. [#1112]
 
 - Modified ``LightCurve.create_transit_mask()`` to accept AstroPy ``Quantity``
-  objects for the ``period`` and ``duration`` parameters. [#1119]
+  objects for ``period``, ``transit_time``, and ``duration``. [#1119, #1141]
 
-- Modified ``CBVCorrector`` to issue a warning message of the CBVs are
+- Modified ``CBVCorrector`` to issue a warning message if the CBVs are
   poorly aligned to the input light curve. [#1113]
 
 - Fixed a bug in ``underfit_metric_neighbors()`` which caused the alignment
@@ -42,6 +46,14 @@ benjaminpope Updates (unreleased)
 
 - Removed an unnecessary warning triggered when ``LightCurve.normalize()`` is called
   on an already-normalized light curve. [#1128]
+
+- Fixed an AstroPy warning ("dropping mask in Quantity column") which was encountered
+  when opening a light curve with AstroPy v4.3 installed.
+
+- Fixed a bug in ``TargetPixelFile.animate()`` which caused a ``ModuleNotFoundError``
+  to be raised when using older versions of matplotlib. [#1139]
+
+- Added a ``column`` parameter to ``LightCurve.truncate()``. [#1116]
 
 
 2.0.10 (2021-06-04)

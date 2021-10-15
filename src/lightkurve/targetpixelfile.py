@@ -22,6 +22,7 @@ from astropy.units import Quantity
 import astropy.units as u
 
 import matplotlib
+from matplotlib import animation
 from matplotlib import patches
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -1495,6 +1496,10 @@ class TargetPixelFile(object):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             for idx, datacol in enumerate(self.hdu[1].columns):
+                # We exclude Kepler's obscure "RB_LEVEL" column from cutouts
+                # for now because it has an awkward shape
+                if datacol.name == "RB_LEVEL":
+                    continue
                 # If the column is 3D
                 if len(self.hdu[1].data[datacol.name].shape) == 3:
                     # Make a copy, trim it and change the format
@@ -1514,9 +1519,6 @@ class TargetPixelFile(object):
                         datacol.array.shape[1:]
                     ).replace(" ", "")
                     hdr["TDIM9"] = "{}".format(datacol.array.shape[1:]).replace(" ", "")
-                    hdr["TDIM13"] = "{}".format((0, datacol.array.shape[1])).replace(
-                        " ", ""
-                    )
                 else:
                     data_columns.append(datacol)
 
