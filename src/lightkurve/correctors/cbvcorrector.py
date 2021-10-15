@@ -23,15 +23,13 @@ from scipy.optimize import minimize_scalar
 from .designmatrix import DesignMatrix, DesignMatrixCollection
 from .. import MPLSTYLE
 from ..lightcurve import LightCurve
-from ..utils import channel_to_module_output, validate_method
+from ..utils import channel_to_module_output, validate_method, LightkurveDeprecationWarning
 from ..search import search_lightcurve
 from .regressioncorrector import RegressionCorrector
 from ..collections import LightCurveCollection
 from .metrics import overfit_metric_lombscargle, underfit_metric_neighbors, MinTargetsError
 
 from astropy.utils.decorators import deprecated
-
-from .utils import LightkurveDeprecationWarning
 
 
 log = logging.getLogger(__name__)
