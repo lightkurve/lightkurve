@@ -1713,7 +1713,6 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
 
 @deprecated("2.1", alternative="load_kepler_cbvs", warning_type=LightkurveDeprecationWarning)
 def download_kepler_cbvs(*args, **kwargs):
-
     return load_kepler_cbvs(*args, **kwargs)
 
 
@@ -1768,7 +1767,7 @@ def load_kepler_cbvs(cbv_dir=None,mission=None, quarter=None, campaign=None,
         assert  isinstance(campaign, int), 'campaign must be passed for K2 mission'
         assert  quarter is None,  'quarter must not be passed for K2 mission'
     else:
-        raise Exception('Unknown mission type')
+        raise ValueError('Unknown mission type')
 
     # CBV FITS files use module/output, not channel
     # So if channel is passed, convert to module/output
@@ -1781,57 +1780,44 @@ def load_kepler_cbvs(cbv_dir=None,mission=None, quarter=None, campaign=None,
         assert  module is not None, 'module must be passed'
         assert  output is not None, 'output must be passed'
 
-    if (mission == 'Kepler'):
+    if cbv_dir:
+        cbvBaseUrl = ""
+    elif (mission == 'Kepler'):
         cbvBaseUrl = "http://archive.stsci.edu/missions/kepler/cbv/"
     elif (mission == 'K2'):
         cbvBaseUrl = "http://archive.stsci.edu/missions/k2/cbv/"
 
     try:
         kepler_cbv_fname = None
-        if cbv_dir is not None:
+        if cbv_dir:
             cbv_files = glob.glob(os.path.join(cbv_dir,'*.fits'))
-
-            if mission == 'Kepler':
-                quarter = 'q{:02}'.format(quarter)
-                for cbv_file in cbv_files:
-                    if quarter + '-d25' in cbv_file:
-                        kepler_cbv_fname = cbv_file
-                        break
-            elif mission == 'K2':
-                campaign = 'c{:02}'.format(campaign)
-                for cbv_file in cbv_files:
-                    if campaign in cbv_file:
-                        kepler_cbv_fname = cbv_file
-                        break
         else:
             soup = BeautifulSoup(requests.get(cbvBaseUrl).text, 'html.parser')
             cbv_files = [fn['href'] for fn in soup.find_all('a') if fn['href'].endswith('fits')]
 
-            if mission == 'Kepler':
-                quarter = 'q{:02}'.format(quarter)
-                for cbv_file in cbv_files:
-                    if quarter + '-d25' in cbv_file:
-                        break
-            elif mission == 'K2':
-                campaign = 'c{:02}'.format(campaign)
-                for cbv_file in cbv_files:
-                    if campaign in cbv_file:
-                        break
+        if mission == 'Kepler':
+            quarter = 'q{:02}'.format(quarter)
+            for cbv_file in cbv_files:
+                if quarter + '-d25' in cbv_file:
+                    break
+        elif mission == 'K2':
+            campaign = 'c{:02}'.format(campaign)
+            for cbv_file in cbv_files:
+                if campaign in cbv_file:
+                    break
 
-            
-            kepler_cbv_fname = cbvBaseUrl + cbv_file
+        kepler_cbv_fname = cbvBaseUrl + cbv_file
         hdu = pyfits.open(kepler_cbv_fname)
-
         return KeplerCotrendingBasisVectors.from_hdu(hdu=hdu, module=module, output=output)
 
-    except:
-        raise Exception('CBVS were not found')
+    except Exception as e:
+        raise Exception('CBVS were not found') from e
 
 
 @deprecated("2.1", alternative="load_tess_cbvs", warning_type=LightkurveDeprecationWarning)
 def download_tess_cbvs(*args, **kwargs):
-
     return load_tess_cbvs(*args, **kwargs)
+
 
 def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
         ccd=None, cbv_type='SingleScale', band=None):
