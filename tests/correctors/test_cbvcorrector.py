@@ -23,13 +23,14 @@ from lightkurve import search_lightcurve
 from lightkurve import LightkurveWarning
 from lightkurve.correctors.designmatrix import DesignMatrix
 from lightkurve.correctors.cbvcorrector import (
-    download_kepler_cbvs,
-    download_tess_cbvs,
+    load_kepler_cbvs,
+    load_tess_cbvs,
     CotrendingBasisVectors,
     KeplerCotrendingBasisVectors,
     TessCotrendingBasisVectors,
 )
 from lightkurve.correctors.cbvcorrector import CBVCorrector
+from .. import TESTDATA
 
 
 # *******************************************************************************
@@ -204,7 +205,7 @@ def test_cbv_retrieval():
 
     """
 
-    cbvs = download_tess_cbvs(sector=10, camera=2, ccd=4, cbv_type="SingleScale")
+    cbvs = load_tess_cbvs(sector=10, camera=2, ccd=4, cbv_type="SingleScale")
     assert isinstance(cbvs, TessCotrendingBasisVectors)
     ax = cbvs.plot([1, 2, 4, 6, 8])
     assert isinstance(ax, matplotlib.axes.Axes)
@@ -215,32 +216,32 @@ def test_cbv_retrieval():
     assert cbvs.camera == 2
     assert cbvs.ccd == 4
 
-    cbvs = download_tess_cbvs(sector=10, camera=2, ccd=4, cbv_type="MultiScale", band=2)
+    cbvs = load_tess_cbvs(sector=10, camera=2, ccd=4, cbv_type="MultiScale", band=2)
     assert isinstance(cbvs, TessCotrendingBasisVectors)
     ax = cbvs.plot("all")
     assert isinstance(ax, matplotlib.axes.Axes)
     assert cbvs.band == 2
 
-    cbvs = download_tess_cbvs(sector=8, camera=3, ccd=1, cbv_type="Spike")
+    cbvs = load_tess_cbvs(sector=8, camera=3, ccd=1, cbv_type="Spike")
     assert isinstance(cbvs, TessCotrendingBasisVectors)
     ax = cbvs.plot("all")
     assert isinstance(ax, matplotlib.axes.Axes)
 
     # No band specified for MultiScale, this should error
     with pytest.raises(AssertionError):
-        cbvs = download_tess_cbvs(sector=10, camera=2, ccd=4, cbv_type="MultiScale")
+        cbvs = load_tess_cbvs(sector=10, camera=2, ccd=4, cbv_type="MultiScale")
     # Band specified for SingleScale, this should also error
     with pytest.raises(AssertionError):
-        cbvs = download_tess_cbvs(
+        cbvs = load_tess_cbvs(
             sector=10, camera=2, ccd=4, cbv_type="SingleScale", band=2
         )
     # Improper CBV type request
     with pytest.raises(Exception):
-        cbvs = download_tess_cbvs(
+        cbvs = load_tess_cbvs(
             sector=10, camera=2, ccd=4, cbv_type="SuperSingleScale"
         )
 
-    cbvs = download_kepler_cbvs(mission="Kepler", quarter=8, module=16, output=4)
+    cbvs = load_kepler_cbvs(mission="Kepler", quarter=8, module=16, output=4)
     assert isinstance(cbvs, KeplerCotrendingBasisVectors)
     ax = cbvs.plot("all")
     assert isinstance(ax, matplotlib.axes.Axes)
@@ -251,7 +252,7 @@ def test_cbv_retrieval():
     assert cbvs.module == 16
     assert cbvs.output == 4
 
-    cbvs = download_kepler_cbvs(mission="K2", campaign=15, channel=24)
+    cbvs = load_kepler_cbvs(mission="K2", campaign=15, channel=24)
     assert isinstance(cbvs, KeplerCotrendingBasisVectors)
     ax = cbvs.plot("all")
     assert isinstance(ax, matplotlib.axes.Axes)
@@ -262,6 +263,72 @@ def test_cbv_retrieval():
     assert cbvs.module == 8
     assert cbvs.output == 4
 
+
+def test_cbv_local():
+    """Tests loading local CBVs as above
+
+    This indirectly tests the classes KeplerCotrendingBasisVectors and
+    TessCotrendingBasisVectors
+
+    """
+    cbv_dir = TESTDATA
+    cbvs = load_tess_cbvs(cbv_dir=cbv_dir,sector=10, camera=2, ccd=4, cbv_type="SingleScale")
+    assert isinstance(cbvs, TessCotrendingBasisVectors)
+    ax = cbvs.plot([1, 2, 4, 6, 8])
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert cbvs.mission == "TESS"
+    assert cbvs.cbv_type == "SingleScale"
+    assert cbvs.band is None
+    assert cbvs.sector == 10
+    assert cbvs.camera == 2
+    assert cbvs.ccd == 4
+
+    cbvs = load_tess_cbvs(cbv_dir=cbv_dir,sector=10, camera=2, ccd=4, cbv_type="MultiScale", band=2)
+    assert isinstance(cbvs, TessCotrendingBasisVectors)
+    ax = cbvs.plot("all")
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert cbvs.band == 2
+
+    cbvs = load_tess_cbvs(cbv_dir=cbv_dir,sector=10, camera=2, ccd=4, cbv_type="Spike")
+    assert isinstance(cbvs, TessCotrendingBasisVectors)
+    ax = cbvs.plot("all")
+    assert isinstance(ax, matplotlib.axes.Axes)
+
+    # No band specified for MultiScale, this should error
+    with pytest.raises(AssertionError):
+        cbvs = load_tess_cbvs(sector=10, camera=2, ccd=4, cbv_type="MultiScale")
+    # Band specified for SingleScale, this should also error
+    with pytest.raises(AssertionError):
+        cbvs = load_tess_cbvs(
+            sector=10, camera=2, ccd=4, cbv_type="SingleScale", band=2
+        )
+    # Improper CBV type request
+    with pytest.raises(Exception):
+        cbvs = load_tess_cbvs(
+            sector=10, camera=2, ccd=4, cbv_type="SuperSingleScale"
+        )
+
+    cbvs = load_kepler_cbvs(cbv_dir=cbv_dir,mission="Kepler", quarter=8, module=16, output=4)
+    assert isinstance(cbvs, KeplerCotrendingBasisVectors)
+    ax = cbvs.plot("all")
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert cbvs.mission == "Kepler"
+    assert cbvs.cbv_type == "SingleScale"
+    assert cbvs.quarter == 8
+    assert cbvs.campaign is None
+    assert cbvs.module == 16
+    assert cbvs.output == 4
+
+    cbvs = load_kepler_cbvs(cbv_dir=cbv_dir,mission="K2", campaign=15, channel=24)
+    assert isinstance(cbvs, KeplerCotrendingBasisVectors)
+    ax = cbvs.plot("all")
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert cbvs.mission == "K2"
+    assert cbvs.cbv_type == "SingleScale"
+    assert cbvs.quarter is None
+    assert cbvs.campaign == 15
+    assert cbvs.module == 8
+    assert cbvs.output == 4
 
 # *******************************************************************************
 # *******************************************************************************
