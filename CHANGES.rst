@@ -4,6 +4,9 @@ benjaminpope Updates (unreleased)
 ``load_kepler_cbvs`` and ``load_tess_cbvs``; the old functions 
 ``download_kepler_cbvs`` and ``download_tess_cbvs`` are now deprecated.
 
+- Fixed a problem where ``extra_data`` did not save correctly with ``lc.to_fits()`` 
+method.
+
 - Added unit tests related to the above changes. 
 
 - Updated docs to reflect these changes.
