@@ -29,6 +29,11 @@ from .regressioncorrector import RegressionCorrector
 from ..collections import LightCurveCollection
 from .metrics import overfit_metric_lombscargle, underfit_metric_neighbors, MinTargetsError
 
+from astropy.utils.decorators import deprecated
+
+from .utils import LightkurveDeprecationWarning
+
+
 log = logging.getLogger(__name__)
 
 __all__ = ['CBVCorrector', 'CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
@@ -1703,6 +1708,17 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
 #*******************************************************************************
 # Functions
 
+
+
+
+
+
+@deprecated("2.1", alternative="load_kepler_cbvs", warning_type=LightkurveDeprecationWarning)
+def download_kepler_cbvs(*args, **kwargs):
+
+    return load_kepler_cbvs(*args, **kwargs)
+
+
 def load_kepler_cbvs(cbv_dir=None,mission=None, quarter=None, campaign=None,
         channel=None, module=None, output=None):
     """Loads Kepler or K2 cotrending basis vectors, either from a local directory cbv_dir 
@@ -1813,6 +1829,11 @@ def load_kepler_cbvs(cbv_dir=None,mission=None, quarter=None, campaign=None,
     except:
         raise Exception('CBVS were not found')
 
+
+@deprecated("2.1", alternative="load_tess_cbvs", warning_type=LightkurveDeprecationWarning)
+def download_tess_cbvs(*args, **kwargs):
+
+    return load_tess_cbvs(*args, **kwargs)
 
 def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
         ccd=None, cbv_type='SingleScale', band=None):
