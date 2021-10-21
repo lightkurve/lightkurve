@@ -2305,7 +2305,7 @@ class LightCurve(QTimeSeries):
                         name=flux_column_name, format="E", unit="e-/s", array=self.flux
                     )
                 )
-            if "flux_err" in dir(self):
+            if hasattr(self,'flux_err'):
                 if ~(flux_column_name.upper() + "_ERR" in extra_data.keys()):
                     cols.append(
                         fits.Column(
@@ -2315,7 +2315,7 @@ class LightCurve(QTimeSeries):
                             array=self.flux_err,
                         )
                     )
-            if "cadenceno" in dir(self):
+            if hasattr(self,'cadenceno'):
                 if ~np.asarray(
                     ["CADENCENO" in k.upper() for k in extra_data.keys()]
                 ).any():

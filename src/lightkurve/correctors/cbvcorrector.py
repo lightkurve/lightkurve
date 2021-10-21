@@ -4,12 +4,15 @@ import logging
 import copy
 import requests
 import urllib.request
+import glob
+import os
 
 from astropy.io import fits as pyfits
 from astropy.table import Table
 from astropy.time import Time
 from astropy.timeseries import TimeSeries
 from astropy.units import Quantity, Unit
+from astropy.utils.decorators import deprecated
 
 from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
@@ -21,17 +24,18 @@ from scipy.optimize import minimize_scalar
 from .designmatrix import DesignMatrix, DesignMatrixCollection
 from .. import MPLSTYLE
 from ..lightcurve import LightCurve
-from ..utils import channel_to_module_output, validate_method
+from ..utils import channel_to_module_output, validate_method, LightkurveDeprecationWarning
 from ..search import search_lightcurve
 from .regressioncorrector import RegressionCorrector
 from ..collections import LightCurveCollection
 from .metrics import overfit_metric_lombscargle, underfit_metric_neighbors, MinTargetsError
 
+
 log = logging.getLogger(__name__)
 
 __all__ = ['CBVCorrector', 'CotrendingBasisVectors', 'KeplerCotrendingBasisVectors',
-        'TessCotrendingBasisVectors', 'download_kepler_cbvs',
-        'download_tess_cbvs']
+           'TessCotrendingBasisVectors', 'load_kepler_cbvs','load_tess_cbvs',
+           'download_kepler_cbvs', 'download_tess_cbvs']
 
 #*******************************************************************************
 # CBV Corrector Class
@@ -40,7 +44,7 @@ class CBVCorrector(RegressionCorrector):
     """Class for removing systematics using Cotrending Basis Vectors (CBVs)
     from Kepler/K2/TESS.
 
-    On construction of this object, the relevent CBVs will be downloaded from
+    On construction of this object, the relevant CBVs will be downloaded from
     MAST appropriate for the lightcurve object passed to the constructor.
 
     For TESS there are multiple CBV types. All are loaded and the user must
@@ -89,7 +93,8 @@ class CBVCorrector(RegressionCorrector):
         Equivalent to: designmatrix prior sigma = np.median(self.lc.flux_err) / np.sqrt(alpha)
     """
 
-    def __init__(self, lc, interpolate_cbvs=False, extrapolate_cbvs=False, do_not_load_cbvs=False):
+    def __init__(self, lc, interpolate_cbvs=False, extrapolate_cbvs=False, do_not_load_cbvs=False,
+        cbv_dir=None):
         """Constructor
 
         This constructor will retrieve all relevant CBVs from MAST and then
@@ -110,6 +115,9 @@ class CBVCorrector(RegressionCorrector):
             If True then the CBVs will NOT be loaded from MAST. 
             Use this option if you wish to use the CBV corrector methods with only a 
             custom design matrix (via the ext_dm argument in the corrector methods)
+        cbv_dir : str
+            Path to specific directory holding TESS CBVs. If this is None, will query
+            MAST by default.
         """
         if not isinstance(lc, LightCurve):
             raise Exception('<lc> must be a LightCurve class')
@@ -127,20 +135,20 @@ class CBVCorrector(RegressionCorrector):
         super(CBVCorrector, self).__init__(lc)
 
         #***
-        # Retrieve all relevant CBVs from MAST
+        # Retrieve all relevant CBVs from either MAST or a local directory
         cbvs = []
 
         if (not do_not_load_cbvs):
             if self.lc.mission == 'Kepler':
-                cbvs.append(download_kepler_cbvs(mission=self.lc.mission, quarter=self.lc.quarter,
+                cbvs.append(load_kepler_cbvs(cbv_dir=cbv_dir,mission=self.lc.mission, quarter=self.lc.quarter,
                         channel=self.lc.channel))
             elif self.lc.mission == 'K2':
-                cbvs.append(download_kepler_cbvs(mission=self.lc.mission, campaign=self.lc.campaign,
+                cbvs.append(load_kepler_cbvs(cbv_dir=cbv_dir,mission=self.lc.mission, campaign=self.lc.campaign,
                         channel=self.lc.channel))
             elif self.lc.mission == 'TESS':
                 # For TESS we load multiple CBV types
                 # Single-Scale
-                cbvs.append(download_tess_cbvs(sector=self.lc.sector,
+                cbvs.append(load_tess_cbvs(cbv_dir=cbv_dir,sector=self.lc.sector,
                     camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='SingleScale'))
             
                 # Multi-Scale
@@ -150,7 +158,7 @@ class CBVCorrector(RegressionCorrector):
                 moreData = True
                 while moreData:
                     iBand += 1
-                    cbvObj = download_tess_cbvs(sector=self.lc.sector,
+                    cbvObj = load_tess_cbvs(cbv_dir=cbv_dir,sector=self.lc.sector,
                         camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='MultiScale',
                         band=iBand)
                     if (cbvObj.band == iBand):
@@ -159,7 +167,7 @@ class CBVCorrector(RegressionCorrector):
                         moreData = False
             
                 # Spike
-                cbvs.append(download_tess_cbvs(sector=self.lc.sector,
+                cbvs.append(load_tess_cbvs(cbv_dir=cbv_dir,sector=self.lc.sector,
                     camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='Spike'))
             
             else:
@@ -750,7 +758,7 @@ class CBVCorrector(RegressionCorrector):
         """
 
         if (isinstance(sigma, list)):
-            raise Exception("Seperate widths is not yet implemented")
+            raise Exception("separate widths is not yet implemented")
 
         for dm in self.design_matrix_collection:
             nCBVs = len(dm.prior_sigma)
@@ -1144,6 +1152,10 @@ class CotrendingBasisVectors(TimeSeries):
 
             # Plot gaps as NaN
             timeArray = np.array(self.time.copy().value)
+            try:
+                timeArray[~self.time.value.mask] = np.nan # kepler cbvs are masked arrays and do not support item assignment
+            except:
+                pass
             timeArray[np.nonzero(self.gap_indicators)[0]] = np.nan
 
             # Get the CBV arrays that were requested
@@ -1560,7 +1572,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
         """Class method to instantiate a TessCotrendingBasisVectors object
         from a CBV FITS HDU.
 
-        TESS CBVs are in seperate FITS files for each camera.CCD, so camera.CCD
+        TESS CBVs are in separate FITS files for each camera.CCD, so camera.CCD
         is already specified in the HDU, here we need to specify
         which CBV type and band is desired.
 
@@ -1694,10 +1706,20 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
 #*******************************************************************************
 # Functions
 
-def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
+
+
+
+
+
+@deprecated("2.1", alternative="load_kepler_cbvs", warning_type=LightkurveDeprecationWarning)
+def download_kepler_cbvs(*args, **kwargs):
+    return load_kepler_cbvs(*args, **kwargs)
+
+
+def load_kepler_cbvs(cbv_dir=None,mission=None, quarter=None, campaign=None,
         channel=None, module=None, output=None):
-    """Searches the public data archive at MAST <https://archive.stsci.edu>
-    for Kepler or K2 cotrending basis vectors.
+    """Loads Kepler or K2 cotrending basis vectors, either from a local directory cbv_dir 
+    or searches the public data archive at MAST <https://archive.stsci.edu>.
 
     This function fetches the Cotrending Basis Vectors FITS HDU for the desired
     mission, quarter/campaign and channel or module/output, etc...
@@ -1711,6 +1733,8 @@ def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
 
     Parameters
     ----------
+    cbv_dir : str
+        Path to specific directory holding Kepler CBVs. If None, queries MAST.
     mission : str, list of str
         'Kepler' or 'K2'
     quarter or campaign : int
@@ -1729,7 +1753,7 @@ def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
     This example will read in the CBVs for Kepler quarter 8,
     and then extract the first 8 CBVs for module.output 16.4
 
-        >>> cbvs = download_kepler_cbvs(mission='Kepler', quarter=8, module=16, output=4) # doctest: +SKIP
+        >>> cbvs = load_kepler_cbvs(mission='Kepler', quarter=8, module=16, output=4) # doctest: +SKIP
 
     """
 
@@ -1743,7 +1767,7 @@ def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
         assert  isinstance(campaign, int), 'campaign must be passed for K2 mission'
         assert  quarter is None,  'quarter must not be passed for K2 mission'
     else:
-        raise Exception('Unknown mission type')
+        raise ValueError('Unknown mission type')
 
     # CBV FITS files use module/output, not channel
     # So if channel is passed, convert to module/output
@@ -1756,14 +1780,20 @@ def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
         assert  module is not None, 'module must be passed'
         assert  output is not None, 'output must be passed'
 
-    if (mission == 'Kepler'):
+    if cbv_dir:
+        cbvBaseUrl = ""
+    elif (mission == 'Kepler'):
         cbvBaseUrl = "http://archive.stsci.edu/missions/kepler/cbv/"
     elif (mission == 'K2'):
         cbvBaseUrl = "http://archive.stsci.edu/missions/k2/cbv/"
 
     try:
-        soup = BeautifulSoup(requests.get(cbvBaseUrl).text, 'html.parser')
-        cbv_files = [fn['href'] for fn in soup.find_all('a') if fn['href'].endswith('fits')]
+        kepler_cbv_fname = None
+        if cbv_dir:
+            cbv_files = glob.glob(os.path.join(cbv_dir,'*.fits'))
+        else:
+            soup = BeautifulSoup(requests.get(cbvBaseUrl).text, 'html.parser')
+            cbv_files = [fn['href'] for fn in soup.find_all('a') if fn['href'].endswith('fits')]
 
         if mission == 'Kepler':
             quarter = 'q{:02}'.format(quarter)
@@ -1776,31 +1806,38 @@ def download_kepler_cbvs(mission=None, quarter=None, campaign=None,
                 if campaign in cbv_file:
                     break
 
-        kepler_cbv_url = cbvBaseUrl + cbv_file
-        hdu = pyfits.open(kepler_cbv_url)
-
+        kepler_cbv_fname = cbvBaseUrl + cbv_file
+        hdu = pyfits.open(kepler_cbv_fname)
         return KeplerCotrendingBasisVectors.from_hdu(hdu=hdu, module=module, output=output)
 
-    except:
-        raise Exception('CBVS were not found')
+    except Exception as e:
+        raise Exception('CBVS were not found') from e
 
 
-def download_tess_cbvs(sector=None, camera=None,
+@deprecated("2.1", alternative="load_tess_cbvs", warning_type=LightkurveDeprecationWarning)
+def download_tess_cbvs(*args, **kwargs):
+    return load_tess_cbvs(*args, **kwargs)
+
+
+def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
         ccd=None, cbv_type='SingleScale', band=None):
-    """Searches the `public data archive at MAST <https://archive.stsci.edu>`
-    for TESS cotrending basis vectors.
+    """Loads TESS cotrending basis vectors, either from a directory of 
+    CBV files already saved locally if cbv_dir is passed, or else 
+    will retrieve the relevant files programmatically from MAST. 
 
     This function fetches the Cotrending Basis Vectors FITS HDU for the desired
     cotrending basis vectors.
 
-    For TESS, each CCD CBVs are stored in a seperate FITS files.
+    For TESS, each CCD CBVs are stored in a separate FITS files.
 
-    For now, this function will only download 2-minute cadence CBVs. Once other
+    For now, this function will only load 2-minute cadence CBVs. Once other
     cadence CBVs become available this function will be updated to support
     their downloads.
 
     Parameters
     ----------
+    cbv_dir   : str
+        Path to specific directory holding TESS CBVs. If None, queries MAST.
     sector : int, list of ints
         TESS Sector number.
     camera and ccd : int
@@ -1816,10 +1853,10 @@ def download_tess_cbvs(sector=None, camera=None,
 
     Examples
     --------
-    This example will read in the CBVs for TESS Sector 10 Camera.CCD 2.4
+    This example will load presaved CBVs from directory '.' for TESS Sector 10 Camera.CCD 2.4
     Multi-Scale band 2
 
-        >>> cbvs = download_tess_cbvs(sector=10, camera=2, ccd=4, # doctest: +SKIP
+        >>> cbvs = load_tess_cbvs('.',sector=10, camera=2, ccd=4, # doctest: +SKIP
         >>>     cbv_type='MultiScale', band=2) # doctest: +SKIP
     """
 
@@ -1849,48 +1886,61 @@ def download_tess_cbvs(sector=None, camera=None,
     else:
         assert  band is None,  'band must NOT be passed for single-scale or spike CBVs'
 
-    curlBaseUrl = 'https://archive.stsci.edu/missions/tess/download_scripts/sector/tesscurl_sector_'
-    curlEndUrl = '_cbv.sh'
-    curlUrl = curlBaseUrl + str(sector) + curlEndUrl
-
     # This is the string to search for in the curl script file
     # Pad the sector number with a first '0' if less than 10
     # TODO: figure out a way to pad an integer number with forward zeros
     # without needing a conditional
     sector = int(sector)
-    if (sector < 10):
-        curlSearchString = 's000' + str(sector) + '-' + str(camera) + '-' + str(ccd) + '-'
-    elif (sector >= 10 and sector < 100):
-        curlSearchString = 's00' + str(sector) + '-' + str(camera) + '-' + str(ccd) + '-'
-    elif (sector >= 100 and sector < 1000):
-        curlSearchString = 's0' + str(sector) + '-' + str(camera) + '-' + str(ccd) + '-'
-    elif (sector > 999):
-        # TESS will be truly blessed if it gets to more than 999 sectors!
-        raise Exception('Only up to 999 Sectors is currently supported')
-    else:
+
+    try:
+        SearchString = 's%04d-%s-%s-' % (sector, str(camera),str(ccd))
+    except:
         raise Exception('Error parsing sector string when getting TESS CBV FITS files')
 
     try:
+        if cbv_dir is not None:
+            # Read in the relevant curl script file and find the line for the CBV
+            # data we are looking for
+            data = glob.glob(os.path.join(cbv_dir,'*.fits'))
+            fname = None
+            for line in data:
+                strLine = str(line)
+                if SearchString in strLine:
+                    fname = strLine
+                    break
+            if (fname is None):
+                raise Exception('CBV FITS file not found')
 
-        # Read in the relevent curl script file and find the line for the CBV
-        # data we are looking for
-        data = urllib.request.urlopen(curlUrl)
-        foundIndex = None
-        for line in data:
-            strLine = str(line)
-            if curlSearchString in strLine:
-                foundIndex = strLine.index(curlSearchString)
-                break
-        if (foundIndex is None):
-            raise Exception('CBV FITS file not found')
+            # Extract url from strLine
 
-        # Extract url from strLine
-        htmlStartIndex = strLine.find('https:')
-        htmlEndIndex = strLine.rfind('fits')
-        # Add 4 for length of 'fits' string
-        tess_cbv_url  = strLine[htmlStartIndex:htmlEndIndex+4]
+            hdu = pyfits.open(fname)
 
-        hdu = pyfits.open(tess_cbv_url)
+        else:
+            curlBaseUrl = 'https://archive.stsci.edu/missions/tess/download_scripts/sector/tesscurl_sector_'
+            curlEndUrl = '_cbv.sh'
+            curlUrl = curlBaseUrl + str(sector) + curlEndUrl
+
+            # This is the string to search for in the curl script file
+
+            # Read in the relevant curl script file and find the line for the CBV
+            # data we are looking for
+            data = urllib.request.urlopen(curlUrl)
+            foundIndex = None
+            for line in data:
+                strLine = str(line)
+                if SearchString in strLine:
+                    foundIndex = strLine.index(SearchString)
+                    break
+            if (foundIndex is None):
+                raise Exception('CBV FITS file not found')
+
+            # Extract url from strLine
+            htmlStartIndex = strLine.find('https:')
+            htmlEndIndex = strLine.rfind('fits')
+            # Add 4 for length of 'fits' string
+            tess_cbv_url  = strLine[htmlStartIndex:htmlEndIndex+4]
+
+            hdu = pyfits.open(tess_cbv_url)
 
         # Check that this is a TESS CBV FITS file
         mission = hdu['Primary'].header['TELESCOP']
