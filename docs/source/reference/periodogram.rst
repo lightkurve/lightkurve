@@ -39,7 +39,9 @@ Methods
 
   Periodogram.bin
   Periodogram.copy
+  Periodogram.compute_stats
   Periodogram.flatten
+  Periodogram.get_transit_model
   Periodogram.plot
   Periodogram.show_properties
   Periodogram.smooth
