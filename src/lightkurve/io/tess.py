@@ -59,23 +59,23 @@ def get_tess_cadence_type(exptime):
     The options are:
     if   exptime < 60   : "fast"  (i.e. 20-second)
     elif exptime < 300  : "short" (i.e. 2-minute)
-    else                : "long"  (i.e. 30 or 10 minute FFI)
+    else                : "ffi"  (i.e. 30 or 10 minute FFI)
 
     Parameters
     ----------
-    exptime : 'long', 'short', 'fast', or float
+    exptime : 'ffi', 'short', 'fast', or float
         Exposure time for cadence in seconds
         Or a string containing the cadence type
-        'long' selects 10-min and 30-min cadence products;
+        'ffi' selects 10-min and 30-min cadence products;
         'short' selects 2-min products;
         'fast' selects 20-sec products.
 
     Returns
     -------
     cadence_type : str
-        one of: ('long', 'short', 'fast')
+        one of: ('ffi', 'short', 'fast')
     """
-    valid_str_options = ('long', 'short', 'fast')
+    valid_str_options = ('ffi', 'short', 'fast')
 
     if isinstance(exptime, str):
         if valid_str_options.count(exptime.lower()) != 1:
@@ -90,4 +90,4 @@ def get_tess_cadence_type(exptime):
     elif exptime < 300:
         return 'short'
     else:
-        return 'long'
+        return 'ffi'

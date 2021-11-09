@@ -1883,8 +1883,8 @@ def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
         'SingleScale' or 'MultiScale' or 'Spike'
     band : int
         Multi-scale band number
-    exptime : 'long', 'short', 'fast', or float
-        'long' selects 10-min and 30-min cadence products;
+    exptime : 'ffi', 'short', 'fast', or float
+        'ffi' selects 10-min and 30-min cadence FFI products;
         'short' selects 2-min products;
         'fast' selects 20-sec products.
         Alternatively, you can pass the exact exposure time in seconds as
@@ -1940,8 +1940,8 @@ def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
 
     # Get cadence type
     cadence_type = get_tess_cadence_type(exptime)
-    if cadence_type == 'long':
-        raise Exception('load_tess_cbvs does not yet handle long exposure cadence CBVs.')
+    if cadence_type == 'ffi':
+        raise Exception('load_tess_cbvs does not yet handle FFI cadence CBVs.')
         cbv_cadence_str = 'FTL'
     elif cadence_type == 'short':
         cbv_cadence_str = ''
@@ -2010,7 +2010,7 @@ def _determine_exptime_from_lc(lc):
 
     if lc.meta['CADENCE_TYPE'] exists then that value is used.
 
-    Otherwise, the cadence type is determeind from the median cadence length.
+    Otherwise, the cadence type is determined from the median cadence length.
     This latter method requires lc.mission to be set (because the cadence type 
     is dependent on the mission)
 
@@ -2022,7 +2022,8 @@ def _determine_exptime_from_lc(lc):
     Returns
     -------
     exptime : str
-        one of: ('long', 'short', 'fast')
+        one of: ('ffi', 'short', 'fast') for TESS or 
+                ('ffi', 'long', 'short') for Kepler/K2
     """
     # Determine the cadence type (exposure time) for this light curve
     # Cadence type is not necessarily available if this is a custom light curve
@@ -2034,8 +2035,8 @@ def _determine_exptime_from_lc(lc):
         if hasattr(lc, 'mission'):
             if lc.mission == 'TESS':
                 exptime = get_tess_cadence_type(cadence_len)
-                # long cadence TESS CBVs not yet suppored, load short cadence
-                if exptime == 'long':
+                # FFI cadence TESS CBVs not yet suppored, load short cadence
+                if exptime == 'ffi':
                     exptime = 'short'
             else:
                 exptime = get_kepler_cadence_type(cadence_len)
