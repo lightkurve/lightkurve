@@ -43,11 +43,11 @@ def test_underfit_metric_neighbors():
     )
     assert underfit_metric_neighbors(lc_pdcsap, min_targets=3, max_targets=3) > 0.99
 
-    # SAP_FLUX has a worse score (<0.9) because it hasn't been corrected
+    # SAP_FLUX has a worse score (<0.95) because it hasn't been corrected
     lc_sap = lc_pdcsap.copy()
     lc_sap.flux = lc_pdcsap.sap_flux
     lc_sap.flux_err = lc_pdcsap.sap_flux_err
-    assert underfit_metric_neighbors(lc_sap, min_targets=3, max_targets=3) < 0.9
+    assert underfit_metric_neighbors(lc_sap, min_targets=3, max_targets=3) < 0.95
 
     # A flat light curve should have a perfect score (1)
     notnan = ~np.isnan(lc_sap.flux)
