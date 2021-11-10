@@ -499,7 +499,7 @@ def test_bin():
         assert_allclose(binned_lc.flux, 2 * np.ones(5))
         # stderr changed since with the initial workaround for `binsize` in 2.x
         # the first bin gets 3, the last only a single point!
-        if _HAS_VAR_BINS:  # With Astropy 4.3 check the exact numbers again
+        if _HAS_VAR_BINS:  # With Astropy 5.0 check the exact numbers again
             assert_allclose(binned_lc.flux_err, np.ones(5))
         else:
             assert_allclose(binned_lc.flux_err, np.sqrt([2./3, 1, 1, 1, 2]))
@@ -570,7 +570,7 @@ def test_bins_kwarg():
 
     # The `bins=`` kwarg cannot support a list or array with aggregate_downsample < #11266
     time_bin_edges = [0, 10, 20, 30, 40, 50, 60, 70, 80]
-    if not _HAS_VAR_BINS:  # Need Astropy 4.3 for those
+    if not _HAS_VAR_BINS:  # Need Astropy 5.0 for those
         with pytest.raises(ValueError, match="Sequence or method for ``bins`` requires Astropy"):
             binned_lc = lc.bin(bins=time_bin_edges)
     else:
@@ -588,7 +588,7 @@ def test_bins_kwarg():
         assert len(binned_lc) == (len(time_bin_edges) - 1)
 
     # The `bins=`` kwarg also supports the methods from astropy.stats.histogram
-    if not _HAS_VAR_BINS:  # Need Astropy 4.3 for those
+    if not _HAS_VAR_BINS:  # Need Astropy 5.0 for those
         with pytest.raises(ValueError, match="Sequence or method for ``bins`` requires Astropy"):
             for special_bins in ["blocks", "knuth", "scott", "freedman"]:
                 binned_lc = lc.bin(bins=special_bins)
@@ -635,7 +635,20 @@ def test_bin_quality():
         assert_allclose(binned_lc.centroid_col, [1./3, 1])   # Expect mean
         assert_allclose(binned_lc.centroid_row, [2./3, 2])   # Expect mean
 
-    pytest.skip("aggregate_downsample does not handle bitwise binning correctly")
+
+# TEMPORARILY SKIPPED, cf. https://github.com/lightkurve/lightkurve/issues/663
+@pytest.mark.xfail  # pytest.xfail("aggregate_downsample does not handle bitwise binning correctly")
+def test_binned_quality():
+    """Binning must also revise the quality and centroid columns."""
+    lc = KeplerLightCurve(
+        time=[1, 2, 3, 4],
+        flux=[1, 1, 1, 1],
+        quality=[0, 1, 2, 3],
+        centroid_col=[0., 1, 0, 1],
+        centroid_row=[0., 2, 0, 2],
+    )
+    binned_lc = lc.bin(binsize=2)
+
     assert_allclose(binned_lc.quality, [1, 3])               # Expect bitwise or
 
 # BEGIN codes for lc.bin memory usage test
@@ -1618,7 +1631,7 @@ def test_columns_have_value_accessor(new_col_val):
     """Ensure resulting column has ``.value`` accessor to raw data, irrespective of type of input.
 
     The test won't be needed once https://github.com/astropy/astropy/pull/10962 is in astropy
-    release and Lightkurve requires the corresponding astropy release (4.3).
+    release and Lightkurve requires the corresponding astropy release (5.0).
     """
     expected_raw_value = new_col_val
     if hasattr(new_col_val, "value"):

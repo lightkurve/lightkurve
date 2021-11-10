@@ -1355,7 +1355,7 @@ class LightCurve(QTimeSeries):
             bin. If ``time_bin_end`` is an array, the time bins do not need to be
             contiguous. If this argument is provided, ``time_bin_size`` should not
             be provided. This option, like the iterable form of ``time_bin_start``,
-            requires Astropy 4.3.
+            requires Astropy 5.0.
         n_bins : int, optional
             The number of bins to use. Defaults to the number needed to fit all
             the original points. Note that this will create this number of bins
@@ -1404,7 +1404,7 @@ class LightCurve(QTimeSeries):
                     np.array(bins).dtype != np.int):
                 raise TypeError("``bins`` must have integer type.")
             elif (isinstance(bins, str) or np.size(bins) != 1) and not _HAS_VAR_BINS:
-                raise ValueError("Sequence or method for ``bins`` requires Astropy 4.3.")
+                raise ValueError("Sequence or method for ``bins`` requires Astropy 5.0.")
 
         if time_bin_start is None:
             time_bin_start = self.time[0]
@@ -1429,9 +1429,13 @@ class LightCurve(QTimeSeries):
                     time_bin_start = Time(Time(bin_starts, format='mjd'), format=self.time.format)
                 elif np.size(bins) == 1:
                     warnings.warn(
-                        '"classic" `bins` require Astropy 4.3; will use constant lengths in time.',
+                        '"classic" `bins` require Astropy 5.0; will use constant lengths in time.',
                         LightkurveWarning)
-                    i = len(self.time) - np.searchsorted(self.time, time_bin_start - 1 * u.ns)
+                    # Odd memory error in np.searchsorted with pytest-memtest?
+                    if self.time[0] >= time_bin_start:
+                        i = len(self.time)
+                    else:
+                        i = len(self.time) - np.searchsorted(self.time, time_bin_start)
                     time_bin_size = ((self.time[-1] - time_bin_start) * i /
                                      ((i - 1) * bins)).to(u.day)
                 else:
@@ -1439,12 +1443,15 @@ class LightCurve(QTimeSeries):
                     kwargs['time_bin_end'] = self.time[bins[1:]]
             elif binsize is not None:
                 if _HAS_VAR_BINS:
-                    time_bin_start = self.time[::binsize] - 1 * u.ns
+                    time_bin_start = self.time[::binsize]
                 else:
                     warnings.warn(
-                        '`binsize` requires Astropy 4.3 to guarantee equal number of points; '
+                        '`binsize` requires Astropy 5.0 to guarantee equal number of points; '
                         'will use estimated time lengths for bins.', LightkurveWarning)
-                    i = np.searchsorted(self.time, time_bin_start - 1 * u.ns)
+                    if self.time[0] >= time_bin_start:
+                        i = 0
+                    else:
+                        i = np.searchsorted(self.time, time_bin_start)
                     time_bin_size = (self.time[i + binsize] - self.time[i]).to(u.day)
             else:
                 time_bin_size = 0.5 * u.day
