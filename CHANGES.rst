@@ -7,6 +7,9 @@
 - Deprecated ``download_kepler_cbvs`` and ``download_tess_cbvs`` in favor of
   ``load_kepler_cbvs`` and ``load_tess_cbvs``. [#1122]
 
+- Restored original ``bins`` functionality from v1.x in ``LightCurve.bin()`` and
+  enabled iterable inputs to ``time_bin_start``, ``time_bin_end``, ``time_bin_size``
+  for custom bin sizes (requires Astropy 5.0 or higher). [#1042]
 
 
 2.0.11 (2021-09-22)
