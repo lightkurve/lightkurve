@@ -32,7 +32,7 @@ jobs:
             python-version: 3.9
             pytest-command: poetry run pytest
           - name: 3.10
-            python-version: 3.10
+            python-version: '3.10'
             pytest-command: poetry run pytest
     steps:
     - uses: actions/checkout@v1
