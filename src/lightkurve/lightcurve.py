@@ -809,12 +809,17 @@ class LightCurve(QTimeSeries):
         else:
             # Deep copy ensures we don't change the original.
             mask = deepcopy(~mask)
-        # No NaNs
-        mask &= np.isfinite(self.flux)
-        # No outliers
-        mask &= np.nan_to_num(np.abs(self.flux - np.nanmedian(self.flux))) <= (
+        # Add NaNs & outliers to the mask
+        extra_mask = np.isfinite(self.flux)
+        extra_mask &= np.nan_to_num(np.abs(self.flux - np.nanmedian(self.flux))) <= (
             np.nanstd(self.flux) * sigma
         )
+        # In astropy>=5.0, extra_mask is a masked array
+        if hasattr(extra_mask, 'mask'):
+            mask &= extra_mask.filled(False)
+        else:  # support astropy<5.0
+            mask &= extra_mask
+
         for iter in np.arange(0, niters):
             if break_tolerance is None:
                 break_tolerance = np.nan
@@ -862,7 +867,11 @@ class LightCurve(QTimeSeries):
                 fill_value="extrapolate",
             )
             trend_signal = Quantity(f(self.time.value), self.flux.unit)
-            mask[mask] &= mask1
+            # In astropy>=5.0, mask1 is a masked array
+            if hasattr(mask1, 'mask'):
+                mask[mask] &= mask1.filled(False)
+            else:  # support astropy<5.0
+                mask[mask] &= mask1
 
         flatten_lc = self.copy()
         with warnings.catch_warnings():
