@@ -309,7 +309,7 @@ def make_lightcurve_figure_elements(
     else:
         fig.xaxis.axis_label = "Time (days)"
     ylims = [np.nanmin(lc.flux.value), np.nanmax(lc.flux.value)]
-    fig.y_range = Range1d(start=ylims[0], end=ylims[1])
+    fig.y_range = Range1d(start=float(ylims[0]), end=float(ylims[1]))
 
     # Add light curve
     fig.circle(
