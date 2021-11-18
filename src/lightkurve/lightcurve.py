@@ -1808,6 +1808,11 @@ class LightCurve(QTimeSeries):
         if "label" not in kwargs:
             kwargs["label"] = self.meta.get("LABEL")
 
+        # Temporary workaround for AstroPy v5.0rc2 issue #12481: the 'c' argument
+        # in matplotlib's scatter does not work with masked quantities.
+        if "c" in kwargs and hasattr(kwargs["c"], 'mask'):
+            kwargs["c"] = kwargs["c"].unmasked
+
         flux = self[column]
         try:
             flux_err = self[f"{column}_err"]
