@@ -169,6 +169,12 @@ class SFFCorrector(RegressionCorrector):
                 ar = np.copy(self.arclength.value)
             else:
                 ar = np.copy(self.arclength)
+
+            # Temporary workaround for issue #1161: AstroPy v5.0
+            # Masked arrays cannot be passed to `np.in1d` below
+            if hasattr(self.arclength, 'mask'):
+                ar = ar.unmasked
+
             knots = list(np.percentile(ar[a:b], np.linspace(0, 100, bins + 1)[1:-1]))
             ar[~np.in1d(ar, ar[a:b])] = 0
 
