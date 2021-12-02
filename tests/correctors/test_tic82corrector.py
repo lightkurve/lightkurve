@@ -36,7 +36,7 @@ def test_search_tic():
 
 
 def test_TIC82Corrector_priors():
-    """This test will check that correction to the SAP flux is being calculated
+    """This test will check that correction to the PDCSAP flux is being calculated
     corectly
     """
 
@@ -54,7 +54,7 @@ def test_TIC82Corrector_priors():
      
     #Get the mag of the duplicate
     pos = np.where(table_join['disposition']=="DUPLICATE")
-    mag_dup = table_join['Tmag'][pos]
+    mag_dup = table_join['Tmag'][pos][0]
 
     #Calculate the fluxes
     F2m = 10**(4-0.4*mag_obj)
@@ -71,17 +71,17 @@ def test_TIC82Corrector_priors():
     ratio = F2m/comb_flux
     assert_almost_equal(ratio,0.514318175036499)
 
-    flux_new = lcf.sap_flux.value * ratio
-    flux_err_new =  lcf.sap_flux_err.value * ratio
+    flux_new = lcf.flux.value / ratio
+    flux_err_new =  lcf.flux_err.value / ratio
     check1 = flux_new[1]
 
-    assert_almost_equal(int(check1),15910)
+    assert_almost_equal(int(check1),26118)
 
     #Now lets use the actual corrector
     join = TIC82Corrector(table_join, lcf)
     corrected_lc = join.correct()
 
-    check2 = corrected_lc.sap_flux.value[1]
+    check2 = corrected_lc.flux.value[1]
 
     assert_almost_equal(int(check2),int(check1))
      
@@ -94,7 +94,7 @@ def test_TIC82Corrector_priors():
     #For their object of interest they will need to download the light curve
     #You might have more than one sector and so will have to do each one at a time
     lcf_split = lk.search_lightcurve('TIC 158324245', mission='TESS', author="SPOC", sector=26).download()
-    print(lcf_split.sap_flux.value[0])
+    print(lcf_split.flux.value[0])
     
     #Get the mag of your object from the lcf
     mag_obj_split = lcf_split.meta['TESSMAG']
@@ -103,13 +103,13 @@ def test_TIC82Corrector_priors():
     
     #Get the mag of the duplicate
     pos_dup = np.where(table_split['disposition']=="DUPLICATE")
-    mag_dup2 = table_split['Tmag'][pos_dup]
+    mag_dup2 = table_split['Tmag'][pos_dup][0]
     
     
     #Get the location of the faint objects in the array
     t = np.arange(0,len(table_split['disposition']),1,dtype=int)
     pos_faint = np.delete(t,[pos_split[0],pos_dup[0]])
-    mag_faint = table_split['Tmag'][pos_faint]
+    mag_faint = table_split['Tmag'][pos_faint][0]
 
     #Calculate the fluxes
     Fs = 10**(4-0.4*mag_obj_split)
@@ -120,22 +120,19 @@ def test_TIC82Corrector_priors():
     assert_almost_equal(np.round(Fd,3),np.round(0.8086486316572605,3))
     assert_almost_equal(np.round(Ff,3),np.round(0.6396170440617517,3))
     
-    #Sum up flux values of all except split
-    comb_flux2 = Fd + Ff
-
     #Calculate the flux ratio
-    ratio2 = Fd/comb_flux2
+    ratio2 = ((Fs+Fd+Ff)/Fs)*(Fd/(Fd+Ff))
     
-    flux_new2 = lcf_split.sap_flux.value * ratio2
-    flux_err_new2 =  lcf_split.sap_flux_err.value * ratio2
+    flux_new2 = lcf_split.flux.value * ratio2
+    flux_err_new2 =  lcf_split.flux_err.value * ratio2
     check3 = flux_new2[1]
 
-    assert_almost_equal(int(check3),int(11819.829))
+    assert_almost_equal(int(check3),int(12377.408))
     
     #Now lets use the actual corrector
     split = TIC82Corrector(table_split, lcf_split)
     corrected_lc2 = split.correct()
-    check4 = corrected_lc2.sap_flux.value[1]
+    check4 = corrected_lc2.flux.value[1]
 
     assert_almost_equal(int(check4),int(check3))
      

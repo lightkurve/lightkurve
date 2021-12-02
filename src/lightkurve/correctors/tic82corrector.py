@@ -134,8 +134,8 @@ class TIC82Corrector(Corrector):
         self.dupid = table['duplicate_id']
         self.lc = lc
         self.lc.mag = lc.meta['TESSMAG']
-        self.lc.flux = lc.sap_flux
-        self.lc.flux_err = lc.sap_flux_err
+        self.lc.flux = lc.flux.value
+        self.lc.flux_err = lc.flux_err.value
         self.lc.time = lc.time
         
     def correct(self):
@@ -166,23 +166,23 @@ class TIC82Corrector(Corrector):
 
             #Sum up flux values of all except split
             sumfaint = sum(Ff)
-            comb_flux = sumfaint + Fd
 
             #Calculate the flux ratio
-            ratio = Fd/comb_flux
+            ratio = ((sumfaint + Fd + Fs)/Fs) * (Fd/(Fd+sumfaint))
 
-            flux_new = self.lc.flux.value * ratio
-            flux_err_new =  self.lc.flux_err.value * ratio
+            flux_new = self.lc.flux * ratio
+            flux_err_new =  self.lc.flux_err * ratio
 
             #Make a copy of the original so we can make sure units are correct
             corrected_lc = self.lc.copy()
-            corrected_lc.sap_flux = flux_new
-            corrected_lc.sap_flux_err = flux_err_new
+            corrected_lc.flux = flux_new
+            corrected_lc.flux_err = flux_err_new
 
             return corrected_lc
 
         elif 'DUPLICATE' in self.disp:
-
+            
+            #This means it is a JOIN case.
             dp = np.where(self.disp=="DUPLICATE")
             
             #Get the duplicate mag
@@ -201,13 +201,13 @@ class TIC82Corrector(Corrector):
             #Calculate the flux ratio
             ratio = F2m/comb_flux
 
-            flux_new = self.lc.flux.value * ratio
-            flux_err_new =  self.lc.flux_err.value * ratio
+            flux_new = self.lc.flux / ratio
+            flux_err_new =  self.lc.flux_err / ratio
 
             #Make a copy of the original so we can make sure units are correct
             corrected_lc = self.lc.copy()
-            corrected_lc.sap_flux = flux_new
-            corrected_lc.sap_flux_err = flux_err_new
+            corrected_lc.flux = flux_new
+            corrected_lc.flux_err = flux_err_new
         
             return corrected_lc
             
