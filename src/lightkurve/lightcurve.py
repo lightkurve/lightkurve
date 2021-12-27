@@ -339,7 +339,7 @@ class LightCurve(QTimeSeries):
                 self.add_column(deprecated_column_kws[kw], name=kw)
 
         # Ensure flux and flux_err have the same units
-        if self["flux"].unit != self["flux"].unit:
+        if self["flux"].unit != self["flux_err"].unit:
             raise ValueError("flux and flux_err must have the same units")
 
         self._new_attributes_relax = False
