@@ -22,8 +22,6 @@ def test_search_tic():
     There is then an additional faint star. 
     This procedure should return the ID's of all associated stars. 
     """
-    #catalog_data = Catalogs.query_object("TIC 158324245", radius=0.001, catalog="TIC", version=8.2)
-    #table = catalog_data["ID", "ra", "dec", "Tmag", "disposition", "duplicate_id"]
 
     table = search_tic(tic="158324245")
 
