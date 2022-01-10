@@ -1741,3 +1741,11 @@ def test_transit_mask_with_quantities():
     mask_quantity = lc.create_transit_mask(period=2.9*u.day, transit_time=1*u.day, duration=1*u.day)
     mask_no_quantity = lc.create_transit_mask(period=2.9, transit_time=1, duration=1)
     assert all(mask_quantity == mask_no_quantity)
+
+
+@pytest.mark.skip  # expected to be resolved by the AstroPy v5.0.1 release
+def test_nbins():
+    """Regression test for #1162."""
+    lc = LightCurve(flux=[0, 0, 0])
+    # This statement raised an IndexError with Astropy v5.0rc2:
+    lc.bin(bins=2)
