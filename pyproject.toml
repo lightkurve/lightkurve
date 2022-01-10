@@ -53,7 +53,7 @@ pytest-remotedata = "^0.3.2"
 pytest-doctestplus = "^0.8.0"
 pytest-xdist = "^2.1.0"
 jupyter = "^1.0.0"
-Sphinx = "^4.2.0"
+Sphinx = ">=4.3.0"
 nbsphinx = "^0.8.7"
 numpydoc = "^1.1.0"
 sphinx-automodapi = "^0.13"
@@ -64,6 +64,7 @@ ghp-import = "^1.0.1"
 openpyxl = "^3.0.7"
 dephell = "^0.8.3"
 tox = "^3.24.5"
+mistune = "<2.0.0"
 
 [build-system]
 requires = ["setuptools", "poetry-core>=1.0.0"]
