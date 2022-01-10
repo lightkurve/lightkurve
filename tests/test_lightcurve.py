@@ -547,6 +547,7 @@ def test_bin_folded():
     assert np.round(binned_folded_lc.flux_err[0], 2) == 0.01
 
 
+@pytest.mark.skip  # expected to be resolved in AstroPy v5.0.1 via PR #12527
 def test_bins_kwarg():
     """Does binning work with user-defined bin placement?"""
     n_times = 3800
@@ -1743,7 +1744,7 @@ def test_transit_mask_with_quantities():
     assert all(mask_quantity == mask_no_quantity)
 
 
-@pytest.mark.skip  # expected to be resolved by the AstroPy v5.0.1 release
+@pytest.mark.skip  # expected to be resolved in AstroPy v5.0.1 via PR #12527
 def test_nbins():
     """Regression test for #1162."""
     lc = LightCurve(flux=[0, 0, 0])
