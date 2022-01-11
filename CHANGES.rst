@@ -1,6 +1,9 @@
 2.1.0 (unreleased)
 ==================
 
+- Made Lightkurve compatible with AstroPy v5.0 and its introduction of masked
+  quantities.  As a result, Lightkurve v2.1 requires AstroPy v5.0 or later. [#1162]
+
 - Added the ``cbv_dir`` parameter to ``CBVCorrector``, ``load_kepler_cbvs``, and
   ``load_tess_cbvs`` to enable CBVs to be loaded from a local directory. [#1122]
 
