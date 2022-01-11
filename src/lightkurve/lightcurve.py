@@ -1114,10 +1114,10 @@ class LightCurve(QTimeSeries):
             >>> lc = lk.LightCurve({'time': [1, 2, 3], 'flux': [1., np.nan, 1.]})
             >>> lc.remove_nans()
             <LightCurve length=2>
-            time    flux  flux_err
+            time   flux  flux_err
             <BLANKLINE>
-            object float64 float64
-            ------ ------- --------
+            Time float64 float64
+            ---- ------- --------
             1.0     1.0      nan
             3.0     1.0      nan
         """
