@@ -784,7 +784,7 @@ class LombScarglePeriodogram(Periodogram):
         """
         # Input validation
         normalization = validate_method(normalization, ["psd", "amplitude"])
-        if np.isnan(lc.flux).any() or (hasattr(lc, 'mask') and np.isnan(lc.flux.unmasked).any()):
+        if np.isnan(lc.flux).any() or (hasattr(lc.flux, 'unmasked') and np.isnan(lc.flux.unmasked).any()):
             lc = lc.remove_nans()
             log.debug(
                 "Lightcurve contains NaN values."
