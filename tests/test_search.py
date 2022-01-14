@@ -396,12 +396,12 @@ def test_overlapping_targets_718():
     # the requested targets, not their overlapping neighbors.
     targets = ["KIC 5112705", "KIC 10058374", "KIC 5385723"]
     for target in targets:
-        search = search_lightcurve(target, quarter=11)
+        search = search_lightcurve(target, quarter=11, author="Kepler")
         assert len(search) == 1
         assert search.target_name[0] == f"kplr{target[4:].zfill(9)}"
 
     # When using `radius=1` we should also retrieve the overlapping targets
-    search = search_lightcurve("KIC 5112705", quarter=11, radius=1 * u.arcsec)
+    search = search_lightcurve("KIC 5112705", quarter=11, author="Kepler", radius=1 * u.arcsec)
     assert len(search) > 1
 
     # Searching by `target_name` should not preven a KIC identifier to work

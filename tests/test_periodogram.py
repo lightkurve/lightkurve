@@ -8,6 +8,7 @@ from numpy.testing import assert_almost_equal, assert_array_equal
 from astropy import units as u
 from astropy.time import Time
 from astropy.stats.bls import BoxLeastSquares
+from astropy.utils.masked import Masked
 
 from lightkurve.lightcurve import LightCurve
 from lightkurve.periodogram import Periodogram
@@ -434,3 +435,18 @@ def test_bls_period():
     with pytest.raises(ValueError) as err:  # NaNs should raise a nice error message
         lc.to_periodogram(method="bls", period=[1, 2, 3, np.nan, 4])
     assert "period" in err.value.args[0]
+
+
+def test_masked_flux_nans():
+    """Do masked flux NaNs play well with astropy.timeseries.LombScargle?
+
+    This is a regression test for
+    https://github.com/lightkurve/lightkurve/pull/1162#issuecomment-983847177
+    """
+    time = [1, 2, 3, 4]
+    flux = u.Quantity([1., np.nan, 1., 1.], unit="electron/s")
+    masked_flux = Masked(flux, mask=[False, True, False, False])
+    lc = LightCurve(time=time, flux=masked_flux)
+    pg = lc.to_periodogram()
+    assert not np.isnan(pg.power).all()
+    assert (pg.power == 0).all()
