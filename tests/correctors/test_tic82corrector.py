@@ -1,4 +1,4 @@
-"""Unit tests for the `TIC82Corrector` class."""
+"""Unit tests for the `TIC82Corrector` class. This determines any duplicate or split in the data"""
 import pytest
 import warnings
 
