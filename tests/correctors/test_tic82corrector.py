@@ -79,7 +79,7 @@ def test_TIC82Corrector_priors():
     join = TIC82Corrector(table_join, lcf)
     corrected_lc = join.correct()
 
-    check2 = corrected_lc.flux.value[1]
+    check2 = corrected_lc.flux[1]
 
     assert_almost_equal(int(check2),int(check1))
      
