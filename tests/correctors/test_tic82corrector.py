@@ -130,7 +130,7 @@ def test_TIC82Corrector_priors():
     #Now lets use the actual corrector
     split = TIC82Corrector(table_split, lcf_split)
     corrected_lc2 = split.correct()
-    check4 = corrected_lc2.flux.value[1]
+    check4 = corrected_lc2.flux[1]
 
     assert_almost_equal(int(check4),int(check3))
      
