@@ -809,12 +809,17 @@ class LightCurve(QTimeSeries):
         else:
             # Deep copy ensures we don't change the original.
             mask = deepcopy(~mask)
-        # No NaNs
-        mask &= np.isfinite(self.flux)
-        # No outliers
-        mask &= np.nan_to_num(np.abs(self.flux - np.nanmedian(self.flux))) <= (
+        # Add NaNs & outliers to the mask
+        extra_mask = np.isfinite(self.flux)
+        extra_mask &= np.nan_to_num(np.abs(self.flux - np.nanmedian(self.flux))) <= (
             np.nanstd(self.flux) * sigma
         )
+        # In astropy>=5.0, extra_mask is a masked array
+        if hasattr(extra_mask, 'mask'):
+            mask &= extra_mask.filled(False)
+        else:  # support astropy<5.0
+            mask &= extra_mask
+
         for iter in np.arange(0, niters):
             if break_tolerance is None:
                 break_tolerance = np.nan
@@ -862,7 +867,11 @@ class LightCurve(QTimeSeries):
                 fill_value="extrapolate",
             )
             trend_signal = Quantity(f(self.time.value), self.flux.unit)
-            mask[mask] &= mask1
+            # In astropy>=5.0, mask1 is a masked array
+            if hasattr(mask1, 'mask'):
+                mask[mask] &= mask1.filled(False)
+            else:  # support astropy<5.0
+                mask[mask] &= mask1
 
         flatten_lc = self.copy()
         with warnings.catch_warnings():
@@ -1105,10 +1114,10 @@ class LightCurve(QTimeSeries):
             >>> lc = lk.LightCurve({'time': [1, 2, 3], 'flux': [1., np.nan, 1.]})
             >>> lc.remove_nans()
             <LightCurve length=2>
-            time    flux  flux_err
+            time   flux  flux_err
             <BLANKLINE>
-            object float64 float64
-            ------ ------- --------
+            Time float64 float64
+            ---- ------- --------
             1.0     1.0      nan
             3.0     1.0      nan
         """
@@ -1799,11 +1808,23 @@ class LightCurve(QTimeSeries):
         if "label" not in kwargs:
             kwargs["label"] = self.meta.get("LABEL")
 
+        # Workaround for AstroPy v5.0.0 issue #12481: the 'c' argument
+        # in matplotlib's scatter does not work with masked quantities.
+        if "c" in kwargs and hasattr(kwargs["c"], 'mask'):
+            kwargs["c"] = kwargs["c"].unmasked
+
         flux = self[column]
         try:
             flux_err = self[f"{column}_err"]
         except KeyError:
             flux_err = np.full(len(flux), np.nan)
+
+        # Second workaround for AstroPy v5.0.0 issue #12481:
+        # matplotlib does not work well with `MaskedNDArray` arrays.
+        if hasattr(flux, 'mask'):
+            flux = flux.filled(np.nan)
+        if hasattr(flux_err, 'mask'):
+            flux_err = flux_err.filled(np.nan)
 
         # Normalize the data if requested
         if normalize:

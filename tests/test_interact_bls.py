@@ -82,7 +82,11 @@ def test_preprocess_lc():
     from lightkurve.interact_bls import _preprocess_lc_for_bls
 
     lc = KeplerLightCurve.read(KEPLER10)
-    assert np.isnan(lc.flux).any()  # ensure the test data has nan in flux
+    # As of AstroPy v5, flux is a `MaskedQuantity` in which NaNs are masked;
+    # so the next assert would not pass.
+    if not hasattr(lc.flux, "mask"):
+        # ensure the test data has nan in flux pre-Astropy v5
+        assert np.isnan(lc.flux).any()
 
     clean = _preprocess_lc_for_bls(lc)
     assert not np.isnan(clean.flux).any()  # ensure processed lc has no nan

@@ -254,6 +254,9 @@ class RegressionCorrector(Corrector):
             )
             model = u.Quantity(model, unit=self.lc.flux.unit)
             residuals = self.lc.flux - model
+            # In Astropy>=5.0, residuals will be a MaskedQuantity
+            if hasattr(residuals, 'mask'):
+                residuals = residuals.unmasked
             self.outlier_mask |= sigma_clip(residuals, sigma=sigma).mask
             log.debug(
                 "correct(): iteration {}: clipped {} cadences"
