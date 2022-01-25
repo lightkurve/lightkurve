@@ -52,6 +52,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Jorge Martínez-Palomera <https://github.com/jorgemarpa>`_
 - `Warrick Ball <https://github.com/warrickball>`_
 - `Isaac Yong <https://github.com/isaac-yong0804>`_
+- `Gutsycat <https://github.com/Sniperq2>`_
 
 
 Community
