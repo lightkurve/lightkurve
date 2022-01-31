@@ -296,7 +296,7 @@ def channel_to_module_output(channel):
     lookup = _get_channel_lookup_array()
     lookup[:, 0] = 0
     modout = np.where(lookup == channel)
-    return (modout[0][0], modout[1][0])
+    return modout[0][0], modout[1][0]
 
 
 def module_output_to_channel(module, output):
@@ -795,6 +795,4 @@ def _get_notebook_environment():
 
 def is_notebook():
     """Returns `True` if we are running in a notebook."""
-    if _get_notebook_environment() in ["jupyter", "colab"]:
-        return True
-    return False
+    return _get_notebook_environment() in ["jupyter", "colab"]
