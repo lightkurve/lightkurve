@@ -1,8 +1,8 @@
-2.1.0 (unreleased)
+2.1.0 (2022-02-10)
 ==================
 
-- Made Lightkurve compatible with AstroPy v5.0 and its introduction of masked
-  quantities.  As a result, Lightkurve v2.1 requires AstroPy v5.0 or later. [#1162]
+- Made Lightkurve compatible with AstroPy v5.0, which introduced masked quantities.
+  Lightkurve v2.1 now requires AstroPy v5.0 and Python v3.8 or later. [#1162]
 
 - Added the ``cbv_dir`` parameter to ``CBVCorrector``, ``load_kepler_cbvs``, and
   ``load_tess_cbvs`` to enable CBVs to be loaded from a local directory. [#1122]
@@ -12,7 +12,7 @@
 
 - Restored original ``bins`` functionality from v1.x in ``LightCurve.bin()`` and
   enabled iterable inputs to ``time_bin_start``, ``time_bin_end``, ``time_bin_size``
-  for custom bin sizes (requires Astropy 5.0 or higher). [#1042]
+  for custom bin sizes. [#1042]
 
 
 2.0.11 (2021-09-22)
