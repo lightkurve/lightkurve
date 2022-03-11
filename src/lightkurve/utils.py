@@ -217,7 +217,7 @@ class KeplerQualityFlags(QualityFlags):
 class TessQualityFlags(QualityFlags):
     """
     This class encodes the meaning of the various TESS QUALITY bitmask flags,
-    as documented in the TESS Data Products Description Document (Ref. [1], Table 26).
+    as documented in the TESS Data Products Description Document (Ref. [1], Table 28).
 
     References
     ----------
