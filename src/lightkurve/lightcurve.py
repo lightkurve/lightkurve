@@ -1182,7 +1182,7 @@ class LightCurve(QTimeSeries):
         
         try:
             fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err)
-        else ValueError:
+        except ValueError:
             fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err.unmasked)
             
         if method == "gaussian_noise":
