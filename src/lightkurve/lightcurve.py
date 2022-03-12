@@ -1179,8 +1179,12 @@ class LightCurve(QTimeSeries):
         f[in_original] = np.copy(lc.flux)
         fe = np.zeros(len(ntime))
         fe[in_original] = np.copy(lc.flux_err)
-
-        fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err.unmasked)
+        
+        try:
+            fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err)
+        else ValueError:
+            fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err.unmasked)
+            
         if method == "gaussian_noise":
             try:
                 std = lc.estimate_cdpp().to(lc.flux.unit).value
