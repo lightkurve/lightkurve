@@ -2,7 +2,7 @@
 ==================
 
 - Fixed a bug in ``LightCurve.plot_river()`` which triggered a
-  `TypeError: cannot write to unmasked output`.
+  `TypeError: cannot write to unmasked output`. [#1175]
 
 
 2.1.0 (2022-02-10)

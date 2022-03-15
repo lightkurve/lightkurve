@@ -1752,7 +1752,7 @@ def test_nbins():
 
 
 def test_river_plot_with_masked_flux():
-    """Regression test."""
+    """Regression test for #1175."""
     flux = Masked(np.random.normal(loc=1, scale=0.1, size=100))
     flux_err = Masked(0.1*np.ones(100))
     lc = LightCurve(time=np.linspace(1, 100, 100), flux=flux, flux_err=flux_err)
