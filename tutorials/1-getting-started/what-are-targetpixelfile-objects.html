@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -384,7 +384,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -438,8 +438,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;https://archive.stsci.edu/pub/kepler/target_pixel_files/0069/006922244/kplr006922244-2010078095331_lpd-targ.fits.gz&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -449,8 +448,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_targetpixelfile</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_targetpixelfile</span>
 <span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 6922244&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">&quot;long&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -461,8 +459,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span>
 </pre></div>
 </div>
 </div>
@@ -480,8 +477,7 @@ KeplerTargetPixelFile Object (ID: 6922244)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;MISSION&#39;</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;MISSION&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -498,8 +494,7 @@ KeplerTargetPixelFile Object (ID: 6922244)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;QUARTER&#39;</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;QUARTER&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -518,8 +513,7 @@ KeplerTargetPixelFile Object (ID: 6922244)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span>
 </pre></div>
 </div>
 </div>
@@ -539,8 +533,7 @@ KeplerTargetPixelFile Object (ID: 6922244)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">iso</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">iso</span>
 </pre></div>
 </div>
 </div>
@@ -560,8 +553,7 @@ array([&#39;2009-12-19 21:01:54.467&#39;, &#39;2009-12-19 21:31:19.895&#39;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">iso</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">iso</span>
 </pre></div>
 </div>
 </div>
@@ -581,8 +573,7 @@ array([&#39;2009-12-19 21:00:48.284&#39;, &#39;2009-12-19 21:30:13.712&#39;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">shape</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
 </div>
@@ -600,26 +591,16 @@ array([&#39;2009-12-19 21:00:48.284&#39;, &#39;2009-12-19 21:30:13.712&#39;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frame</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 6922244, Cadence: 11914&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_21_1.png" src="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_21_1.png" />
+<img alt="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_21_0.png" src="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_21_0.png" />
 </div>
 </div>
 <p>The values shown in this image are also directly accessible as an array:</p>
@@ -627,8 +608,7 @@ array([&#39;2009-12-19 21:00:48.284&#39;, &#39;2009-12-19 21:30:13.712&#39;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -653,8 +633,7 @@ take only the pixels related to the target.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span>
 </pre></div>
 </div>
 </div>
@@ -676,25 +655,15 @@ array([[False, False, False, False, False],
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 6922244, Cadence: 11914&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_29_1.png" src="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_29_1.png" />
+<img alt="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_29_0.png" src="../../_images/tutorials_1-getting-started_what-are-targetpixelfile-objects_29_0.png" />
 </div>
 </div>
 <p>Now that we have the aperture we can create a Simple Aperture Photometry light curve in the next tutorial.</p>
@@ -703,8 +672,7 @@ array([[False, False, False, False, False],
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">get_header</span><span class="p">()[:</span><span class="mi">10</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">get_header</span><span class="p">()[:</span><span class="mi">10</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -731,8 +699,7 @@ CREATOR = &#39;917482 TargetPixelExporterPipelineModule&#39; / pipeline job and 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;TTYPE*&#39;</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;TTYPE*&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -799,7 +766,7 @@ TTYPE13 = &#39;RB_LEVEL&#39;           / column title: rolling band level
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

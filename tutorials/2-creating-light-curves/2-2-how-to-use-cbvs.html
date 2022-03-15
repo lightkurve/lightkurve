@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -426,7 +426,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -484,17 +484,16 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </section>
 <section id="Obtaining-the-CBVs">
 <h2>Obtaining the CBVs<a class="headerlink" href="#Obtaining-the-CBVs" title="Permalink to this headline">¶</a></h2>
-<p>Two tools are available to automatically download the CBVs relevent to your target of study: <code class="docutils literal notranslate"><span class="pre">download_tess_cbvs</span></code> and <code class="docutils literal notranslate"><span class="pre">download_kepler_cbvs</span></code>. Here is an example loading in the TESS Multi-Scale Band 2 CBVs for TESS target TIC 99180739, which happens to be on camera 1 and CCD 1. Note that you do not need to have a lightcurve object already loaded. One can directly request whichever CBVs one desires.</p>
+<p>Two tools are available to automatically download the CBVs relevent to your target of study: <code class="docutils literal notranslate"><span class="pre">load_tess_cbvs</span></code> and <code class="docutils literal notranslate"><span class="pre">load_kepler_cbvs</span></code>. Here is an example loading in the TESS Multi-Scale Band 2 CBVs for TESS target TIC 99180739, which happens to be on camera 1 and CCD 1. Note that you do not need to have a lightcurve object already loaded. One can directly request whichever CBVs one desires.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_lightcurve</span>
-<span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">download_tess_cbvs</span><span class="p">,</span> <span class="n">download_kepler_cbvs</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_lightcurve</span>
+<span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">load_tess_cbvs</span><span class="p">,</span> <span class="n">load_kepler_cbvs</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;TIC 99180739&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;SPOC&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">flux_column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
-<span class="n">cbvs</span> <span class="o">=</span> <span class="n">download_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">ccd</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;MultiScale&#39;</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">cbvs</span> <span class="o">=</span> <span class="n">load_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">ccd</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;MultiScale&#39;</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -503,8 +502,7 @@ transiting planet durations multi-scale performs better at preserving signals. P
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Show the head of the CBV table</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Show the head of the CBV table</span>
 <span class="n">cbvs</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -514,40 +512,30 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
-<i>TessCotrendingBasisVectors length=3</i>
-<table id="table4504850688" class="table-striped table-bordered table-condensed">
+<div><i>TessCotrendingBasisVectors length=3</i>
+<table id="table4505320320" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>CADENCENO</th><th>GAP</th><th>VECTOR_1</th><th>VECTOR_2</th><th>VECTOR_3</th><th>VECTOR_4</th><th>VECTOR_5</th><th>VECTOR_6</th><th>VECTOR_7</th><th>VECTOR_8</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr></thead>
-<thead><tr><th>object</th><th>int32</th><th>bool</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
-<tr><td>1569.43314028183</td><td>246224</td><td>False</td><td>-0.003580346703529358</td><td>-0.0025399853475391865</td><td>0.0003182471264153719</td><td>-0.005101832095533609</td><td>0.0019720413256436586</td><td>-0.002591928234323859</td><td>-0.00848366692662239</td><td>0.009498000144958496</td></tr>
-<tr><td>1569.4345291701247</td><td>246225</td><td>False</td><td>-0.003526911837980151</td><td>-0.0024424500297755003</td><td>0.00030286889523267746</td><td>-0.004837454296648502</td><td>0.002021507592871785</td><td>-0.0025524157099425793</td><td>-0.008463572710752487</td><td>0.009511380456387997</td></tr>
-<tr><td>1569.4359180584206</td><td>246226</td><td>False</td><td>-0.0034735281951725483</td><td>-0.002345119370147586</td><td>0.0002874816709663719</td><td>-0.004573645535856485</td><td>0.0020708078518509865</td><td>-0.0025129010900855064</td><td>-0.008443333208560944</td><td>0.009524472057819366</td></tr>
-</table></div>
+<thead><tr><th>Time</th><th>int32</th><th>bool</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
+<tr><td>1569.43314028183</td><td>246224</td><td>0</td><td>-0.00358</td><td>-0.00254</td><td>0.00032</td><td>-0.00510</td><td>0.00197</td><td>-0.00259</td><td>-0.00848</td><td>0.00950</td></tr>
+<tr><td>1569.4345291701247</td><td>246225</td><td>0</td><td>-0.00353</td><td>-0.00244</td><td>0.00030</td><td>-0.00484</td><td>0.00202</td><td>-0.00255</td><td>-0.00846</td><td>0.00951</td></tr>
+<tr><td>1569.4359180584206</td><td>246226</td><td>0</td><td>-0.00347</td><td>-0.00235</td><td>0.00029</td><td>-0.00457</td><td>0.00207</td><td>-0.00251</td><td>-0.00844</td><td>0.00952</td></tr>
+</table></div></div>
 </div>
 <p>All data contained in the MAST CBV FITS files is downloaded. The <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code> and <code class="docutils literal notranslate"><span class="pre">GAP</span></code> columns can be used to select which cadences you desire. Extra information is in the <code class="docutils literal notranslate"><span class="pre">cbvs.meta</span></code> dict. The CBVS are interpolated accross the gaps and so should be used in gapped cadences with extreme caution. Below we will plot the first 4 CBVs. Note: <em>CBVs use 1-based indexing!</em></p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">cbvs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cbv_indices</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">));</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cbvs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cbv_indices</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">));</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;TESS CBVs (Sector.Camera.CCD : 10.1.1, CBVType.Band : MultiScale.2)&#39;}, xlabel=&#39;Time [btjd]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_10_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_10_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_10_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_10_0.png" />
 </div>
 </div>
 <p>As further examples, below we will request both Kepler and K2 CBVs.</p>
@@ -555,9 +543,8 @@ transiting planet durations multi-scale performs better at preserving signals. P
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">cbvsKepler</span> <span class="o">=</span> <span class="n">download_kepler_cbvs</span><span class="p">(</span><span class="n">mission</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-<span class="n">cbvsK2</span> <span class="o">=</span> <span class="n">download_kepler_cbvs</span><span class="p">(</span><span class="n">mission</span><span class="o">=</span><span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cbvsKepler</span> <span class="o">=</span> <span class="n">load_kepler_cbvs</span><span class="p">(</span><span class="n">mission</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">cbvsK2</span> <span class="o">=</span> <span class="n">load_kepler_cbvs</span><span class="p">(</span><span class="n">mission</span><span class="o">=</span><span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -569,8 +556,7 @@ transiting planet durations multi-scale performs better at preserving signals. P
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">cbv_designmatrix</span> <span class="o">=</span> <span class="n">cbvs</span><span class="o">.</span><span class="n">to_designmatrix</span><span class="p">(</span><span class="n">cbv_indices</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;10.1.1.SingleScale&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cbv_designmatrix</span> <span class="o">=</span> <span class="n">cbvs</span><span class="o">.</span><span class="n">to_designmatrix</span><span class="p">(</span><span class="n">cbv_indices</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;10.1.1.SingleScale&#39;</span><span class="p">)</span>
 <span class="n">cbv_designmatrix</span>
 </pre></div>
 </div>
@@ -588,25 +574,15 @@ transiting planet durations multi-scale performs better at preserving signals. P
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">cbv_designmatrix</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cbv_designmatrix</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;10.1.1.SingleScale&#39;}, xlabel=&#39;Component&#39;, ylabel=&#39;X&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_16_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_16_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_16_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_16_0.png" />
 </div>
 </div>
 </section>
@@ -618,8 +594,7 @@ CBVs. All cadence numbers that exist in the light curve but not in the CBVs will
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Take a cut of the LC loaded above</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Take a cut of the LC loaded above</span>
 <span class="n">lc_short</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="mi">501</span><span class="p">:</span><span class="mi">1501</span><span class="p">]</span>
 <span class="c1"># Take a different cut of the CBVs</span>
 <span class="n">cbvs_short</span> <span class="o">=</span> <span class="n">cbvs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
@@ -641,8 +616,7 @@ False
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Align the cuts</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Align the cuts</span>
 <span class="n">cbvs_aligned</span> <span class="o">=</span> <span class="n">cbvs_short</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">lc_short</span><span class="p">)</span>
 <span class="c1"># They now fully overlap</span>
 <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">lc_short</span><span class="o">.</span><span class="n">cadenceno</span> <span class="o">==</span> <span class="n">cbvs_aligned</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">)</span>
@@ -669,14 +643,13 @@ True
 </section>
 <section id="Interpolating-the-CBVs-to-an-arbitrary-light-curve">
 <h2>Interpolating the CBVs to an arbitrary light curve<a class="headerlink" href="#Interpolating-the-CBVs-to-an-arbitrary-light-curve" title="Permalink to this headline">¶</a></h2>
-<p>The above <code class="docutils literal notranslate"><span class="pre">align</span></code> method will only keep cadences that line up exactly between the CBVs and the light curve based on the cadence numbers. What if you have a light curve with cadence times not exactly lining up with the CBV cadences? For example, what if you want to use the 2-minute CBVs for cotrending against the 30-minute FFIs? A more general method is <code class="docutils literal notranslate"><span class="pre">inteprolate</span></code>, which uses PCHIP interpolation to generate CBVs at the cadence times of an arbitrary light curve. If the light curve has
+<p>The above <code class="docutils literal notranslate"><span class="pre">align</span></code> method will only keep cadences that line up exactly between the CBVs and the light curve based on the cadence numbers. What if you have a light curve with cadence times not exactly lining up with the CBV cadences? For example, what if you want to use the 2-minute CBVs for cotrending against the 30-minute FFIs? A more general method is <code class="docutils literal notranslate"><span class="pre">interpolate</span></code>, which uses PCHIP interpolation to generate CBVs at the cadence times of an arbitrary light curve. If the light curve has
 cadences past either end of the cadences in the CBVs then one must extrapolate. An optional argument, <code class="docutils literal notranslate"><span class="pre">extrapolate</span></code>, can be used to also extrapolate the CBV values to the light curve cadences. If <code class="docutils literal notranslate"><span class="pre">extrapolate=False</span></code> then the exterior values are set to zeros, which will probably result is a very poor fit.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Get a light curve from a TESS FFI</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get a light curve from a TESS FFI</span>
 <span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_tesscut</span>
 <span class="n">search_result</span> <span class="o">=</span> <span class="n">search_tesscut</span><span class="p">(</span><span class="s1">&#39;HAT-P-11&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
 <span class="n">tpf</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">cutout_size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
@@ -689,9 +662,8 @@ cadences past either end of the cadences in the CBVs then one must extrapolate. 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Get the Single-Scale CBVs for this light curve</span>
-<span class="n">cbvs</span> <span class="o">=</span> <span class="n">download_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">ccd</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get the Single-Scale CBVs for this light curve</span>
+<span class="n">cbvs</span> <span class="o">=</span> <span class="n">load_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">ccd</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -699,8 +671,7 @@ cadences past either end of the cadences in the CBVs then one must extrapolate. 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Interpolate the CBVs to the FFI cadence times</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Interpolate the CBVs to the FFI cadence times</span>
 <span class="n">cbvs_interpolated</span> <span class="o">=</span> <span class="n">cbvs</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">ffi_lc</span><span class="p">,</span> <span class="n">extrapolate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -709,8 +680,7 @@ cadences past either end of the cadences in the CBVs then one must extrapolate. 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># All cadence times agree</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># All cadence times agree</span>
 <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">cbvs_interpolated</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -728,8 +698,7 @@ True
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># The CBVs are now interpolated to this FFI-derived light curve</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The CBVs are now interpolated to this FFI-derived light curve</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ffi_lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ffi_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;.b&#39;</span><span class="p">)</span>
@@ -738,20 +707,11 @@ True
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;TESS CBVs (Sector.Camera.CCD : 14.2.4, CBVType : SingleScale)&#39;}, xlabel=&#39;Time [btjd]&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_27_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_27_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_27_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_27_0.png" />
 </div>
 </div>
 <section id="Some-notes-about-interpolating-Cotrending-Basis-Vectors">
@@ -807,7 +767,7 @@ True
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

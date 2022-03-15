@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -1183,7 +1183,7 @@
 <h1>lightkurve.correctors.DesignMatrix<a class="headerlink" href="#lightkurve-correctors-designmatrix" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lightkurve.correctors.DesignMatrix">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lightkurve.correctors.</span></span><span class="sig-name descname"><span class="pre">DesignMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unnamed_matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/designmatrix.html#DesignMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.DesignMatrix" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightkurve.correctors.</span></span><span class="sig-name descname"><span class="pre">DesignMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unnamed_matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/designmatrix.html#DesignMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.DesignMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>A matrix of column vectors for use in linear regression.</p>
 <p>The purpose of this class is to provide a convenient method to interact
 with a set of one or more regressors which are known to correlate with
@@ -1193,8 +1193,8 @@ for use by Lightkurve’s <a class="reference internal" href="lightkurve.correct
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>df</strong><span class="classifier">dict, array, or <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> object</span></dt><dd><p>Columns to include in the design matrix.  If this object is not a
-<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> then it will be passed to the DataFrame constructor.</p>
+<dt><strong>df</strong><span class="classifier">dict, array, or <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> object</span></dt><dd><p>Columns to include in the design matrix.  If this object is not a
+<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> then it will be passed to the DataFrame constructor.</p>
 </dd>
 <dt><strong>columns</strong><span class="classifier">iterable of str (optional)</span></dt><dd><p>Column names, if not already provided via <code class="docutils literal notranslate"><span class="pre">df</span></code>.</p>
 </dd>
@@ -1275,7 +1275,7 @@ column in a linear regression problem.</p>
 <td><p>Design matrix &quot;X&quot; to be used in RegressionCorrector objects</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrix.rank.html#lightkurve.correctors.DesignMatrix.rank" title="lightkurve.correctors.DesignMatrix.rank"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rank</span></code></a></p></td>
-<td><p>Matrix rank computed using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v1.21)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank</span></code></a>.</p></td>
+<td><p>Matrix rank computed using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v1.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrix.shape.html#lightkurve.correctors.DesignMatrix.shape" title="lightkurve.correctors.DesignMatrix.shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code></a></p></td>
 <td><p>Tuple specifying the shape of the matrix as (n_rows, n_columns).</p></td>
@@ -1329,7 +1329,7 @@ column in a linear regression problem.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

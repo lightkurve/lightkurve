@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -1183,7 +1183,7 @@
 <h1>lightkurve.LightCurve.bin<a class="headerlink" href="#lightkurve-lightcurve-bin" title="Permalink to this headline">¶</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.LightCurve.bin">
-<span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_bin_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_bin_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.bin" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_bin_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_bin_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_bin_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.bin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bins a lightcurve in equally-spaced bins in time.</p>
 <p>If the original light curve contains flux uncertainties (<code class="docutils literal notranslate"><span class="pre">flux_err</span></code>),
 the binned lightcurve will report the root-mean-square error.
@@ -1192,11 +1192,29 @@ standard deviation of the data.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>time_bin_size</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>, float</span></dt><dd><p>The time interval for the binned time series.
+<dt><strong>time_bin_size</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.TimeDelta.html#astropy.time.TimeDelta" title="(in Astropy v5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeDelta</span></code></a>, optional</span></dt><dd><p>The time interval for the binned time series - this is either a scalar
+value (in which case all time bins will be assumed to have the same
+duration) or as an array of values (in which case each time bin can
+have a different duration). If this argument is provided,
+<code class="docutils literal notranslate"><span class="pre">time_bin_end</span></code> should not be provided.
 (Default: 0.5 days; default unit: days.)</p>
 </dd>
-<dt><strong>time_bin_start</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a>, optional</span></dt><dd><p>The start time for the binned time series. Defaults to the first
+<dt><strong>time_bin_start</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable, optional</span></dt><dd><p>The start time for the binned time series - this can be either given
+directly as a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that
+initializes the <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class. This can also be a scalar
+value if <code class="docutils literal notranslate"><span class="pre">time_bin_size</span></code> is provided. Defaults to the first
 time in the sampled time series.</p>
+</dd>
+<dt><strong>time_bin_end</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable, optional</span></dt><dd><p>The times of the end of each bin - this can be either given directly as
+a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that initializes the
+<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class. This can only be given if <code class="docutils literal notranslate"><span class="pre">time_bin_start</span></code>
+is an array of values. If <code class="docutils literal notranslate"><span class="pre">time_bin_end</span></code> is a scalar, time bins are
+assumed to be contiguous, such that the end of each bin is the start
+of the next one, and <code class="docutils literal notranslate"><span class="pre">time_bin_end</span></code> gives the end time for the last
+bin. If <code class="docutils literal notranslate"><span class="pre">time_bin_end</span></code> is an array, the time bins do not need to be
+contiguous. If this argument is provided, <code class="docutils literal notranslate"><span class="pre">time_bin_size</span></code> should not
+be provided. This option, like the iterable form of <code class="docutils literal notranslate"><span class="pre">time_bin_start</span></code>,
+requires Astropy 5.0.</p>
 </dd>
 <dt><strong>n_bins</strong><span class="classifier">int, optional</span></dt><dd><p>The number of bins to use. Defaults to the number needed to fit all
 the original points. Note that this will create this number of bins
@@ -1205,8 +1223,14 @@ of length <code class="docutils literal notranslate"><span class="pre">time_bin_
 <dt><strong>aggregate_func</strong><span class="classifier">callable, optional</span></dt><dd><p>The function to use for combining points in the same bin. Defaults
 to np.nanmean.</p>
 </dd>
-<dt><strong>bins</strong><span class="classifier">int</span></dt><dd><p>The number of bins to divide the lightkurve into. In contrast to
-<code class="docutils literal notranslate"><span class="pre">n_bins</span></code> this sets the length of <code class="docutils literal notranslate"><span class="pre">time_bin_size</span></code> accordingly.</p>
+<dt><strong>bins</strong><span class="classifier">int, iterable or str, optional</span></dt><dd><p>If an int, this gives the number of bins to divide the lightkurve into.
+In contrast to <code class="docutils literal notranslate"><span class="pre">n_bins</span></code> this adjusts the length of <code class="docutils literal notranslate"><span class="pre">time_bin_size</span></code>
+to accommodate the input time series length.
+If it is an iterable of ints, it specifies the indices of the bin edges.
+If a string, it must be one of  ‘blocks’, ‘knuth’, ‘scott’ or ‘freedman’
+defining a method of automatically determining an optimal bin size.
+See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.histogram.html#astropy.stats.histogram" title="(in Astropy v5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">histogram</span></code></a> for a description of each method.
+Note that ‘blocks’ is not a useful method for regularly sampled data.</p>
 </dd>
 <dt><strong>binsize</strong><span class="classifier">int</span></dt><dd><p>In Lightkurve v1.x, the default behavior of <a class="reference internal" href="#lightkurve.LightCurve.bin" title="lightkurve.LightCurve.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin()</span></code></a> was to create
 bins which contained an equal number data points in each bin.
@@ -1272,7 +1296,7 @@ data points.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

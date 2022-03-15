@@ -88,6 +88,7 @@
       ~LightCurve.to_table
       ~LightCurve.to_timeseries
       ~LightCurve.truncate
+      ~LightCurve.update
       ~LightCurve.values
       ~LightCurve.values_equal
    
@@ -122,6 +123,8 @@
       ~LightCurve.mask
       ~LightCurve.masked
       ~LightCurve.meta
+      ~LightCurve.pprint_exclude_names
+      ~LightCurve.pprint_include_names
       ~LightCurve.time
       ~LightCurve.time_format
       ~LightCurve.time_scale

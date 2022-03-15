@@ -88,6 +88,7 @@
       ~FoldedLightCurve.to_table
       ~FoldedLightCurve.to_timeseries
       ~FoldedLightCurve.truncate
+      ~FoldedLightCurve.update
       ~FoldedLightCurve.values
       ~FoldedLightCurve.values_equal
    
@@ -125,6 +126,8 @@
       ~FoldedLightCurve.meta
       ~FoldedLightCurve.odd_mask
       ~FoldedLightCurve.phase
+      ~FoldedLightCurve.pprint_exclude_names
+      ~FoldedLightCurve.pprint_include_names
       ~FoldedLightCurve.time
       ~FoldedLightCurve.time_format
       ~FoldedLightCurve.time_scale

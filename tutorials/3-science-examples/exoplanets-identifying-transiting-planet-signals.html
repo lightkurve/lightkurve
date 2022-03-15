@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -448,7 +448,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -516,8 +516,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 </pre></div>
 </div>
@@ -531,8 +530,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Search for Kepler observations of Kepler-69</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Search for Kepler observations of Kepler-69</span>
 <span class="n">search_result</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;Kepler-69&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">)</span>
 <span class="c1"># Download all available Kepler light curves</span>
 <span class="n">lc_collection</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>
@@ -540,20 +538,11 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_8_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_8_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_8_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_8_0.png" />
 </div>
 </div>
 <p>Each observation has a different offset, so in order to successfully search this light curve for transits, we first need to normalize and flatten the full observation. This can be performed on a stitched light curve. For more information about combining multiple observations of the same target, please see the companion tutorial on combining multiple quarters of <em>Kepler</em> data with Lightkurve.</p>
@@ -561,8 +550,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">search_result</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">search_result</span>
 </pre></div>
 </div>
 </div>
@@ -573,7 +561,7 @@ div.rendered_html tbody tr:hover {
 <div class="output_area rendered_html docutils container">
 SearchResult containing 17 data products.
 
-<table id="table6355743504">
+<table id="table5440876560">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 01</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr008692861</td><td>0.0</td></tr>
@@ -599,27 +587,17 @@ SearchResult containing 17 data products.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Flatten the light curve</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Flatten the light curve</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">lc_collection</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">901</span><span class="p">)</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>
 <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_11_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_11_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_11_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_11_0.png" />
 </div>
 </div>
 </section>
@@ -639,8 +617,7 @@ SearchResult containing 17 data products.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="c1"># Create array of periods to search</span>
 <span class="n">period</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
 <span class="c1"># Create a BLSPeriodogram</span>
@@ -649,20 +626,11 @@ SearchResult containing 17 data products.
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Period [$\\mathrm{d}$]&#39;, ylabel=&#39;BLS Power&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_15_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_15_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_15_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_15_0.png" />
 </div>
 </div>
 <p>The plot above shows the power, or the likelihood of the BLS fit, for each of the periods in the array we passed in. This plot shows a handful of high-power peaks at discrete periods, which is a good sign that a transit has been identified. The highest power spike shows the most likely period, while the lower power spikes are fractional harmonics of the period, for example, 1/2, 1/3, 1/4, etc.</p>
@@ -671,8 +639,7 @@ SearchResult containing 17 data products.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">planet_b_period</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">period_at_max_power</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">planet_b_period</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">period_at_max_power</span>
 <span class="n">planet_b_t0</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">transit_time_at_max_power</span>
 <span class="n">planet_b_dur</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">duration_at_max_power</span>
 
@@ -694,26 +661,16 @@ $13.721772 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">planet_b_period</span><span class="p">,</span> <span class="n">epoch_time</span><span class="o">=</span><span class="n">planet_b_t0</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">planet_b_period</span><span class="p">,</span> <span class="n">epoch_time</span><span class="o">=</span><span class="n">planet_b_t0</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-(-5.0, 5.0)
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_19_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_19_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_19_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_19_0.png" />
 </div>
 </div>
 <p>The phase-folded light curve shows a strong transit signal with the identified period and transit time of maximum BLS power.</p>
@@ -726,8 +683,7 @@ $13.721772 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Create a cadence mask using the BLS parameters</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a cadence mask using the BLS parameters</span>
 <span class="n">planet_b_mask</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">get_transit_mask</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">planet_b_period</span><span class="p">,</span>
                                      <span class="n">transit_time</span><span class="o">=</span><span class="n">planet_b_t0</span><span class="p">,</span>
                                      <span class="n">duration</span><span class="o">=</span><span class="n">planet_b_dur</span><span class="p">)</span>
@@ -739,27 +695,17 @@ $13.721772 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">masked_lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="o">~</span><span class="n">planet_b_mask</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">masked_lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="o">~</span><span class="n">planet_b_mask</span><span class="p">]</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">masked_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
 <span class="n">lc</span><span class="p">[</span><span class="n">planet_b_mask</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Masked&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_25_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_25_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_25_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_25_0.png" />
 </div>
 </div>
 <p>We can also create a BLS model to visualize the transit fit. This returns a <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object with the BLS model in the flux column.</p>
@@ -767,8 +713,7 @@ $13.721772 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Create a BLS model using the BLS parameters</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a BLS model using the BLS parameters</span>
 <span class="n">planet_b_model</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">get_transit_model</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">planet_b_period</span><span class="p">,</span>
                                        <span class="n">transit_time</span><span class="o">=</span><span class="n">planet_b_t0</span><span class="p">,</span>
                                        <span class="n">duration</span><span class="o">=</span><span class="n">planet_b_dur</span><span class="p">)</span>
@@ -780,27 +725,17 @@ $13.721772 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">planet_b_period</span><span class="p">,</span> <span class="n">planet_b_t0</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">planet_b_period</span><span class="p">,</span> <span class="n">planet_b_t0</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">()</span>
 <span class="n">planet_b_model</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">planet_b_period</span><span class="p">,</span> <span class="n">planet_b_t0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-(-5.0, 5.0)
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_29_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_29_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_29_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_29_0.png" />
 </div>
 </div>
 </section>
@@ -811,27 +746,17 @@ $13.721772 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">period</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">period</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
 <span class="n">bls</span> <span class="o">=</span> <span class="n">masked_lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="s1">&#39;bls&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">frequency_factor</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 <span class="n">bls</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Period [$\\mathrm{d}$]&#39;, ylabel=&#39;BLS Power&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_32_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_32_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_32_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_32_0.png" />
 </div>
 </div>
 <p>While no peaks in this BLS periodogram display a power as high as the previous transit signal, there is a definite peak near ~240 days. We can pull out the corresponding period and transit time to check the signal.</p>
@@ -839,8 +764,7 @@ $13.721772 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">planet_c_period</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">period_at_max_power</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">planet_c_period</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">period_at_max_power</span>
 <span class="n">planet_c_t0</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">transit_time_at_max_power</span>
 <span class="n">planet_c_dur</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">duration_at_max_power</span>
 
@@ -862,28 +786,18 @@ $242.46665 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">masked_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">planet_c_period</span><span class="p">,</span> <span class="n">planet_c_t0</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">masked_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">planet_c_period</span><span class="p">,</span> <span class="n">planet_c_t0</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">()</span>
 <span class="n">masked_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">planet_c_period</span><span class="p">,</span> <span class="n">planet_c_t0</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="mf">.1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                                                           <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Binned Flux&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-(-5.0, 5.0)
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_36_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_36_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_36_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_36_0.png" />
 </div>
 </div>
 <p>This signal is lower SNR because there are fewer transits due to the longer period, and the shallower depth implies that the planet is smaller. To help see the transit more clearly, we have overplotted the binned flux, combining consecutive points taken over a span of 0.1 days.</p>
@@ -892,8 +806,7 @@ $242.46665 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">planet_c_model</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">get_transit_model</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">planet_c_period</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">planet_c_model</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">get_transit_model</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">planet_c_period</span><span class="p">,</span>
                                        <span class="n">transit_time</span><span class="o">=</span><span class="n">planet_c_t0</span><span class="p">,</span>
                                        <span class="n">duration</span><span class="o">=</span><span class="n">planet_c_dur</span><span class="p">)</span>
 </pre></div>
@@ -903,27 +816,17 @@ $242.46665 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
 <span class="n">planet_b_model</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;dodgerblue&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Planet b Transit Model&#39;</span><span class="p">);</span>
 <span class="n">planet_c_model</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Planet c Transit Model&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_39_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_39_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_39_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-identifying-transiting-planet-signals_39_0.png" />
 </div>
 </div>
 </section>
@@ -946,8 +849,7 @@ parameters with highest power are noted in the bottom right of the figure.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1180,7 +1082,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

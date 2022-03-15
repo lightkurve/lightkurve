@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -1183,7 +1183,7 @@
 <h1>lightkurve.LightCurve.remove_nans<a class="headerlink" href="#lightkurve-lightcurve-remove-nans" title="Permalink to this headline">¶</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.LightCurve.remove_nans">
-<span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">remove_nans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'flux'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.remove_nans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.remove_nans" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">remove_nans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'flux'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.remove_nans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.remove_nans" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes cadences where <code class="docutils literal notranslate"><span class="pre">column</span></code> is a NaN.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -1205,10 +1205,10 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">LightCurve</span><span class="p">({</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;flux&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span>
 <span class="go">&lt;LightCurve length=2&gt;</span>
-<span class="go">time    flux  flux_err</span>
+<span class="go">time   flux  flux_err</span>
 
-<span class="go">object float64 float64</span>
-<span class="go">------ ------- --------</span>
+<span class="go">Time float64 float64</span>
+<span class="go">---- ------- --------</span>
 <span class="go">1.0     1.0      nan</span>
 <span class="go">3.0     1.0      nan</span>
 </pre></div>
@@ -1257,7 +1257,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

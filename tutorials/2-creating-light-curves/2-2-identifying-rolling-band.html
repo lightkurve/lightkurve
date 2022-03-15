@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -384,7 +384,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -440,8 +440,7 @@ shown in the video below. You can see the band move through the superstamp at th
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_targetpixelfile</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="kn">import</span> <span class="n">search_targetpixelfile</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
@@ -452,8 +451,7 @@ shown in the video below. You can see the band move through the superstamp at th
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 7691027&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 7691027&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -461,25 +459,15 @@ shown in the video below. You can see the band move through the superstamp at th
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 7691027, Cadence: 66713&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_6_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_6_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_6_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_6_0.png" />
 </div>
 </div>
 <p>This looks like a fairly normal Target Pixel File. Let’s take a look at the light curve.</p>
@@ -487,8 +475,7 @@ shown in the video below. You can see the band move through the superstamp at th
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Flux in Pipeline Aperture&#39;</span><span class="p">)</span>
@@ -513,27 +500,17 @@ shown in the video below. You can see the band move through the superstamp at th
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">aperture</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mi">200</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aperture</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mi">200</span>
 <span class="n">npix</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">aperture</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 7691027, Cadence: 66713&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_10_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_10_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_10_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_10_0.png" />
 </div>
 </div>
 <p>The mask avoids the center pixels. Let’s create a light curve the same way as above. However, this time we’re going to divide by the number of pixels in the aperture to give the the <strong>average background flux per pixel.</strong></p>
@@ -541,8 +518,7 @@ shown in the video below. You can see the band move through the superstamp at th
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">bkg_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bkg_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture</span><span class="p">)</span>
 <span class="n">bkg_lc</span> <span class="o">/=</span> <span class="n">npix</span>  <span class="c1"># Convert to electrons per second per pixel</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">bkg_lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
@@ -550,20 +526,11 @@ shown in the video below. You can see the band move through the superstamp at th
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Text(0.5, 1.0, &#39;Average Flux Per Background Pixel&#39;)
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_12_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_12_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_12_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_12_0.png" />
 </div>
 </div>
 <p>It looks like the signal is still there in the background pixels. Unfortunately this means the signal is not astrophysical.</p>
@@ -573,8 +540,7 @@ Text(0.5, 1.0, &#39;Average Flux Per Background Pixel&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpfs</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 7691027&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpfs</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 7691027&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -582,8 +548,7 @@ Text(0.5, 1.0, &#39;Average Flux Per Background Pixel&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpfs</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpfs</span>
 </pre></div>
 </div>
 </div>
@@ -604,8 +569,7 @@ TargetPixelFileCollection of 2 objects:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">separation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">tpfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column</span> <span class="o">-</span> <span class="n">tpfs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">column</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">tpfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">row</span> <span class="o">-</span> <span class="n">tpfs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">row</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">separation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">tpfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column</span> <span class="o">-</span> <span class="n">tpfs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">column</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">tpfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">row</span> <span class="o">-</span> <span class="n">tpfs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">row</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;TPFs are </span><span class="si">{:.02}</span><span class="s1"> Pixels Apart&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">separation</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -623,8 +587,7 @@ TPFs are 9.5 Pixels Apart
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tpfs</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
     <span class="c1"># Construct a background aperture</span>
     <span class="n">aper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">200</span>
@@ -642,20 +605,11 @@ TPFs are 9.5 Pixels Apart
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Text(0.5, 1.0, &#39;Average Flux Per Background Pixel&#39;)
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_21_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_21_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_21_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-identifying-rolling-band_21_0.png" />
 </div>
 </div>
 <p>Looks like a nearby source shows quite similar background variation. This suggests that unfortunately the signal is rolling band. Mitigating rolling band can be difficult, and we’ll discuss corrections in a different tutorial.</p>
@@ -701,7 +655,7 @@ Text(0.5, 1.0, &#39;Average Flux Per Background Pixel&#39;)
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

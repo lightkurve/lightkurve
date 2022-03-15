@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -404,7 +404,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -456,8 +456,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
@@ -470,8 +469,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">TARGET</span> <span class="o">=</span> <span class="s2">&quot;EPIC 211416749&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">TARGET</span> <span class="o">=</span> <span class="s2">&quot;EPIC 211416749&quot;</span>
 <span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="n">TARGET</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -482,25 +480,15 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 211416749, Cadence: 3215020&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_6_1.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_6_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_6_0.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_6_0.png" />
 </div>
 </div>
 <p>We can now create a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> using Simple Aperture Photometry with the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve</a> method. We can then normalize, remove NaN values and remove outliers in one easy line. We can also use the new <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.fill_gaps.html?highlight=fill_gaps">fill_gaps</a> method to fill in any gaps that are in our data using
@@ -509,8 +497,7 @@ linear interpolation of the nearest neighbours. This creates an almost perfectly
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ppm&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">fill_gaps</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -520,25 +507,15 @@ linear interpolation of the nearest neighbours. This creates an almost perfectly
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_10_1.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_10_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_10_0.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_10_0.png" />
 </div>
 </div>
 <p>Let’s take a look at the periodogram for this light curve. You can create a <code class="docutils literal notranslate"><span class="pre">periodogram</span></code> object using <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.html?highlight=periodogram#lightkurve.periodogram.Periodogram">lc.periodogram()</a>. This can be passed any array of frequencies that the user wants, but by default will create an array of frequency for you. You can also change the frequency units, depending on the range of frequencies you’re looking for. In
@@ -547,8 +524,7 @@ asteroseismology we usually use <span class="math notranslate nohighlight">\(\mu
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -557,8 +533,7 @@ asteroseismology we usually use <span class="math notranslate nohighlight">\(\mu
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
@@ -576,26 +551,16 @@ asteroseismology we usually use <span class="math notranslate nohighlight">\(\mu
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">view</span><span class="o">=</span><span class="s1">&#39;Period&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">view</span><span class="o">=</span><span class="s1">&#39;Period&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="s1">&#39;6 Hour Roll Motion&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Text(6, 2000, &#39;6 Hour Roll Motion&#39;)
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_17_1.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_17_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_17_0.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_17_0.png" />
 </div>
 </div>
 <p>We can apply our own Self Flat Fielding (SFF) correction to the light curve to remove the K2 roll motion. Below we correct with SFF using the default <code class="docutils literal notranslate"><span class="pre">correct()</span></code> method, with <code class="docutils literal notranslate"><span class="pre">windows=10</span></code>. (You can read more about SFF in our other tutorials.)</p>
@@ -603,8 +568,7 @@ Text(6, 2000, &#39;6 Hour Roll Motion&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>
 <span class="n">clc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_corrector</span><span class="p">(</span><span class="s2">&quot;sff&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">windows</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">fill_gaps</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -613,25 +577,15 @@ Text(6, 2000, &#39;6 Hour Roll Motion&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">clc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_20_1.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_20_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_20_0.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_20_0.png" />
 </div>
 </div>
 <p>Our new, corrected lightcurve looks much flatter and has a much smaller CDPP. Let’s try plotting the periodogram again.</p>
@@ -639,8 +593,7 @@ Text(6, 2000, &#39;6 Hour Roll Motion&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pg_clean</span> <span class="o">=</span> <span class="n">clc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg_clean</span> <span class="o">=</span> <span class="n">clc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">pg_clean</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -657,8 +610,7 @@ Text(6, 2000, &#39;6 Hour Roll Motion&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Loop over several windows</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Loop over several windows</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="k">for</span> <span class="n">windows</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]):</span>
     <span class="c1"># Create the light curve</span>
@@ -680,23 +632,14 @@ Text(6, 2000, &#39;6 Hour Roll Motion&#39;)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 3/3 [00:19&lt;00:00,  6.50s/it]
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.legend.Legend at 0x17cdc7370&gt;
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:20&lt;00:00,  6.89s/it]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_24_2.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_24_2.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_24_1.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_24_1.png" />
 </div>
 </div>
 <p>It looks like there is a significant effect on the oscillation modes as we vary the window size. When using K2 data for detecting these oscillations it is important to understand and mitigate the effects of detrending to ensure the modes have the highest possible signal to noise ratio.</p>
@@ -709,8 +652,7 @@ Text(6, 2000, &#39;6 Hour Roll Motion&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">aperture_small</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aperture_small</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">aperture_large</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -720,8 +662,7 @@ Text(6, 2000, &#39;6 Hour Roll Motion&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Two subplots</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Two subplots</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
 <span class="c1"># Plot pipeline aperture mask</span>
@@ -734,20 +675,11 @@ Text(6, 2000, &#39;6 Hour Roll Motion&#39;)
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Text(0.5, 1.0, &#39;Large aperture&#39;)
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_29_1.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_29_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_29_0.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_29_0.png" />
 </div>
 </div>
 <p>Now let’s create our two light curves, one with the pipeline aperture and one with the new aperture.</p>
@@ -756,8 +688,7 @@ Text(0.5, 1.0, &#39;Large aperture&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Create the light curve with the pipelien aperture.</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the light curve with the pipelien aperture.</span>
 <span class="n">lc_small</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_small</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>
 <span class="n">lc_small</span> <span class="o">=</span> <span class="n">lc_small</span><span class="o">.</span><span class="n">to_corrector</span><span class="p">(</span><span class="s1">&#39;sff&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">fill_gaps</span><span class="p">()</span>
 
@@ -772,27 +703,17 @@ Text(0.5, 1.0, &#39;Large aperture&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1">#Plot the pipeline and large aperture light curves</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Plot the pipeline and large aperture light curves</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">lc_small</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Small aperture&#39;</span><span class="p">)</span>
 <span class="n">lc_large</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Large aperture&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_33_1.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_33_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_33_0.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_33_0.png" />
 </div>
 </div>
 <p>Finally, when we plot the periodogram we can see we’ve increased the signal to noise ratio of our stellar oscillations.</p>
@@ -800,8 +721,7 @@ Text(0.5, 1.0, &#39;Large aperture&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Create the periodograms</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the periodograms</span>
 <span class="n">pg_small</span> <span class="o">=</span> <span class="n">lc_small</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 <span class="n">pg_large</span> <span class="o">=</span> <span class="n">lc_large</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 
@@ -814,20 +734,11 @@ Text(0.5, 1.0, &#39;Large aperture&#39;)
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.legend.Legend at 0x17a763c10&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_35_1.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_35_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_35_0.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_35_0.png" />
 </div>
 </div>
 <p>By increasing our aperture size and including more pixels here we have increased the signal to noise of the oscillation modes of this red giant.</p>
@@ -839,8 +750,7 @@ Text(0.5, 1.0, &#39;Large aperture&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Download the C16 TPF</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Download the C16 TPF</span>
 <span class="n">tpf_c16</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="n">TARGET</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 
 <span class="c1"># Create a new light curve for C16</span>
@@ -854,8 +764,7 @@ Text(0.5, 1.0, &#39;Large aperture&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Create a periodogram for c16 data</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a periodogram for c16 data</span>
 <span class="n">pg_c16</span> <span class="o">=</span> <span class="n">lc_c16</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">maximum_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -864,8 +773,7 @@ Text(0.5, 1.0, &#39;Large aperture&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Create subplots to plot into</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create subplots to plot into</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">pg_large</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;C5&#39;</span><span class="p">)</span>
 <span class="n">pg_c16</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;C16&#39;</span><span class="p">)</span>
 
@@ -874,20 +782,11 @@ Text(0.5, 1.0, &#39;Large aperture&#39;)
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.legend.Legend at 0x17acdc580&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_40_1.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_40_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_40_0.png" src="../../_images/tutorials_3-science-examples_periodograms-optimizing-the-snr_40_0.png" />
 </div>
 </div>
 <p>It looks like the two data sets provide similar modes, however the two campaigns have very different instrument systematics. To find the true answer, users should iterate over many different detrending parameters and aperture sizes, and combine datasets to increase signal to noise.</p>
@@ -934,7 +833,7 @@ Text(0.5, 1.0, &#39;Large aperture&#39;)
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

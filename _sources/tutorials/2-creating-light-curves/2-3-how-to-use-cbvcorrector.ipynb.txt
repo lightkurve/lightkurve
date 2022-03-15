@@ -51,7 +51,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "One can directly obtain the CBVs with `download_tess_cbvs` and `downlaod_kepler_cbvs`. However when generating a [CBVCorrector](https://docs.lightkurve.org/reference/api/lightkurve.correctors.CBVCorrector.html?highlight=cbvcorrector) object the appropriate CBVs are automatically downloaded from MAST and aligned to the lightcurve. Let's generate this object for a particularily interesting TESS variable target. We first download the SAP lightcurve."
+    "One can directly obtain the CBVs with `load_tess_cbvs` and `load_kepler_cbvs`, either from MAST by default or from a local directory `cbv_dir`. However when generating a [CBVCorrector](https://docs.lightkurve.org/reference/api/lightkurve.correctors.CBVCorrector.html?highlight=cbvcorrector) object the appropriate CBVs are automatically downloaded from MAST and aligned to the lightcurve. Let's generate this object for a particularily interesting TESS variable target. We first download the SAP lightcurve."
    ]
   },
   {
@@ -63,6 +63,9 @@
     "from lightkurve import search_lightcurve\n",
     "import numpy as np\n",
     "import matplotlib.pyplot as plt\n",
+    "import warnings\n",
+    "warnings.filterwarnings('ignore')\n",
+    "\n",
     "lc = search_lightcurve('TIC 99180739', author='SPOC', sector=10).download(flux_column='sap_flux')"
    ]
   },
@@ -356,9 +359,9 @@
    "source": [
     "pltAxis = cbvCorrector.diagnose()\n",
     "pltAxis[0].set_xlim(1360.5, 1361.1)\n",
-    "pltAxis[0].set_ylim(1.4314e7, 1.4326e7);\n",
+    "pltAxis[0].set_ylim(1.4755e7, 1.477e7);\n",
     "pltAxis[1].set_xlim(1360.5, 1361.1)\n",
-    "pltAxis[1].set_ylim(1.431e7, 1.4326e7);"
+    "pltAxis[1].set_ylim(1.475e7, 1.477e7);"
    ]
   },
   {
@@ -392,9 +395,9 @@
     "# Again, zoom in to see the detail\n",
     "pltAxis = cbvCorrector.diagnose()\n",
     "pltAxis[0].set_xlim(1360.5, 1361.1)\n",
-    "pltAxis[0].set_ylim(1.4314e7, 1.4326e7);\n",
+    "pltAxis[0].set_ylim(1.4755e7, 1.477e7);\n",
     "pltAxis[1].set_xlim(1360.5, 1361.1)\n",
-    "pltAxis[1].set_ylim(1.431e7, 1.4326e7);"
+    "pltAxis[1].set_ylim(1.475e7, 1.477e7);"
    ]
   },
   {
@@ -551,7 +554,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "That looks a lot better! Could we do a bit better by adding in a regualrization term? Let's do a goodness metric scan."
+    "That looks a lot better! Could we do a bit better by adding in a regularization term? Let's do a goodness metric scan."
    ]
   },
   {
@@ -635,7 +638,7 @@
    "source": [
     "CBVCorrector works equally across Kepler, K2 and TESS. However the Multi-Scale and Spike basis vectors are only available for TESS[<sup>1</sup>](#fn1). For K2, the [PLDCorrector](https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-3-k2-pldcorrector.html) and [SFFCorrector](https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-3-k2-sffcorrector.html) classes might work better than `CBVCorrector`.\n",
     "\n",
-    "If you want to just get the CBVs but not generate a CBVCorrector object then use the functions _download_kepler_cbvs_ and _download_tess_cbvs_ within the cbvcorrector module as explained [here](https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.html)."
+    "If you want to just get the CBVs but not generate a CBVCorrector object then use the functions _load_kepler_cbvs_ and _load_tess_cbvs_ within the cbvcorrector module as explained [here](https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.html)."
    ]
   },
   {
@@ -791,6 +794,13 @@
     "normalized_lc -= 1.0\n",
     "print('Normalized Light curve units: {} (i.e astropy.units.dimensionless_unscaled)'.format(normalized_lc.flux.unit))"
    ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
   }
  ],
  "metadata": {
@@ -809,7 +819,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.8"
+   "version": "3.8.6"
   }
  },
  "nbformat": 4,

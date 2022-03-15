@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -951,7 +951,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Input validation</span>
         <span class="n">normalization</span> <span class="o">=</span> <span class="n">validate_method</span><span class="p">(</span><span class="n">normalization</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;psd&quot;</span><span class="p">,</span> <span class="s2">&quot;amplitude&quot;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;unmasked&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unmasked</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()):</span>
             <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span>
             <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="s2">&quot;Lightcurve contains NaN values.&quot;</span>
@@ -1524,7 +1524,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

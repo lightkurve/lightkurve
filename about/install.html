@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -297,17 +297,18 @@ these dependencies will be installed automatically if needed.</p>
 <h2>Installing the development version<a class="headerlink" href="#installing-the-development-version" title="Permalink to this headline">¶</a></h2>
 <p>If you want to experiment with the latest development version of
 <em>Lightkurve</em>, you can install it straight from the main branch on GitHub:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/lightkurve/lightkurve.git
-$ cd lightkurve
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/lightkurve/lightkurve.git
+$ <span class="nb">cd</span> lightkurve
 $ python -m pip install .
 </pre></div>
 </div>
 <p>If you want to have a so-called editable install which enables the installed
 version to immediately reflect changes made in the source tree, you can use:</p>
-<blockquote>
-<div><p>$ python shim-setup.py develop</p>
-</div></blockquote>
-<p>Please see our guide on <a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">contributing to lightkurve</span></a>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python -m pip install poetry
+$ poetry install
+</pre></div>
+</div>
+<p>Please see our guide on <a class="reference internal" href="contributing.html#install-dev-env"><span class="std std-ref">Installing the development environment</span></a>
 for additional instructions.</p>
 </section>
 </section>
@@ -352,7 +353,7 @@ for additional instructions.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

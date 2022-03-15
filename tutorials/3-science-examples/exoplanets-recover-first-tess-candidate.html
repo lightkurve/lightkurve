@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -399,7 +399,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -451,8 +451,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 </pre></div>
 </div>
 </div>
@@ -460,8 +459,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;Pi Mensae&#39;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s1">&#39;TESS&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;Pi Mensae&#39;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s1">&#39;TESS&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -469,8 +467,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">search_result</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">search_result</span>
 </pre></div>
 </div>
 </div>
@@ -481,7 +478,7 @@ div.rendered_html tbody tr:hover {
 <div class="output_area rendered_html docutils container">
 SearchResult containing 2 data products.
 
-<table id="table6375711936">
+<table id="table5525684720">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 01</td><td>2018</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>261136679</td><td>0.0</td></tr>
@@ -492,8 +489,7 @@ SearchResult containing 2 data products.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -510,8 +506,7 @@ SearchResult containing 2 data products.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span>
 </pre></div>
 </div>
 </div>
@@ -529,8 +524,7 @@ TessTargetPixelFile(TICID: 261136679)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">mission</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">mission</span>
 </pre></div>
 </div>
 </div>
@@ -547,8 +541,7 @@ TessTargetPixelFile(TICID: 261136679)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">targetid</span>  <span class="c1"># TESS Input Catalog (TIC) Identifier</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">targetid</span>  <span class="c1"># TESS Input Catalog (TIC) Identifier</span>
 </pre></div>
 </div>
 </div>
@@ -565,8 +558,7 @@ TessTargetPixelFile(TICID: 261136679)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">sector</span>  <span class="c1"># TESS Observation Sector</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">sector</span>  <span class="c1"># TESS Observation Sector</span>
 </pre></div>
 </div>
 </div>
@@ -583,8 +575,7 @@ TessTargetPixelFile(TICID: 261136679)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">camera</span>  <span class="c1"># TESS Camera Number</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">camera</span>  <span class="c1"># TESS Camera Number</span>
 </pre></div>
 </div>
 </div>
@@ -601,8 +592,7 @@ TessTargetPixelFile(TICID: 261136679)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">ccd</span>  <span class="c1"># TESS CCD Number</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">ccd</span>  <span class="c1"># TESS CCD Number</span>
 </pre></div>
 </div>
 </div>
@@ -620,26 +610,16 @@ TessTargetPixelFile(TICID: 261136679)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 261136679, Cadence: 70445&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_15_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_15_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_15_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_15_0.png" />
 </div>
 </div>
 <p>If you want to access the original fits file that generated the data you can use the <code class="docutils literal notranslate"><span class="pre">hdu</span></code> attribute of the tpf. This will return an <code class="docutils literal notranslate"><span class="pre">astropy.io.fits</span></code> object, for example</p>
@@ -647,8 +627,7 @@ TessTargetPixelFile(TICID: 261136679)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">hdu</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">hdu</span>
 </pre></div>
 </div>
 </div>
@@ -658,7 +637,7 @@ TessTargetPixelFile(TICID: 261136679)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x17c266dc0&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x17c2738e0&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x17c179be0&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x181e4b1f0&gt;]
+[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x1497d5de0&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x1497d68c0&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x1496d3a30&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x14f4748b0&gt;]
 </pre></div></div>
 </div>
 <p>You can access each extension and the data inside it in the same way you’d use <a class="reference external" href="https://docs.astropy.org/en/stable/io/fits/">astropy.io.fits</a>. If you want to access data held in the TPF, such as the time of the observations, you can do that easily by using</p>
@@ -666,8 +645,7 @@ TessTargetPixelFile(TICID: 261136679)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span>
 </pre></div>
 </div>
 </div>
@@ -677,8 +655,8 @@ TessTargetPixelFile(TICID: 261136679)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;Time object: scale=&#39;tdb&#39; format=&#39;btjd&#39; value=[1325.29698328 1325.29837215 1325.29976102 ... 1353.17431099 1353.17569985
- 1353.17708871]&gt;
+&lt;Time object: scale=&#39;tdb&#39; format=&#39;btjd&#39; value=[1325.2969605  1325.29834936 1325.29973823 ... 1353.17428819 1353.17567704
+ 1353.1770659 ]&gt;
 </pre></div></div>
 </div>
 <p>This returns the time in units of days counted since <a class="reference external" href="https://en.wikipedia.org/wiki/Julian_day">Julian Day</a> 2457000.</p>
@@ -687,8 +665,7 @@ TessTargetPixelFile(TICID: 261136679)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span>
 </pre></div>
 </div>
 </div>
@@ -698,63 +675,62 @@ TessTargetPixelFile(TICID: 261136679)
 </div>
 <div class="output_area docutils container">
 <div class="math notranslate nohighlight">
-$[[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159],~
-  [-135.68407,~-125.30367,~-112.52773,~\dots,~-113.03839,~-122.92997,~-131.28302],~
-  [-147.63722,~-142.73625,~-134.99854,~\dots,~-101.33073,~-114.31767,~-121.03055],~
+$[[[146.7256,~110.36988,~56.275379,~\dots,~39.974297,~44.420666,~13.883464],~
+  [12.40297,~22.714397,~35.56646,~\dots,~34.970276,~25.019585,~16.769943],~
+  [0.44226855,~5.2752562,~13.086924,~\dots,~46.673801,~33.625275,~27.014521],~
   \dots,~
-  [-138.13503,~-137.8448,~-146.29425,~\dots,~-77.273094,~-105.22347,~-135.82652],~
-  [-142.20255,~-139.67661,~-147.65201,~\dots,~-118.81814,~-129.52805,~-130.46175],~
-  [-133.71326,~-134.32669,~-148.82013,~\dots,~-127.16725,~-90.909531,~-112.97443]],~
+  [9.5051775,~9.7198277,~1.3479111,~\dots,~70.286613,~42.281826,~11.773497],~
+  [5.480844,~7.9346728,~0.029079039,~\dots,~28.776463,~18.01915,~17.183647],~
+  [14.138475,~13.451326,~-0.96531624,~\dots,~20.603649,~56.804371,~34.841518]],~
 
- [[-3.390986,~-47.140965,~-90.537956,~\dots,~-106.87563,~-108.55464,~-136.6413],~
-  [-133.7175,~-125.38933,~-114.30842,~\dots,~-115.82087,~-125.8608,~-132.87209],~
-  [-147.48918,~-142.87836,~-138.43767,~\dots,~-103.16773,~-116.37296,~-119.86726],~
+ [[146.51241,~102.70561,~59.262955,~\dots,~42.885513,~41.133427,~13.1896],~
+  [16.164961,~24.440937,~35.480656,~\dots,~33.928349,~23.814917,~16.947351],~
+  [2.3862846,~6.945066,~11.343194,~\dots,~46.577034,~33.296593,~29.945692],~
   \dots,~
-  [-138.81976,~-138.86803,~-146.27737,~\dots,~-78.085899,~-107.27506,~-136.54706],~
-  [-139.40416,~-141.56799,~-148.46045,~\dots,~-122.45605,~-127.82529,~-132.05716],~
-  [-131.66135,~-135.35051,~-150.45163,~\dots,~-128.91386,~-88.854477,~-111.71629]],~
+  [10.620657,~10.516301,~3.0659428,~\dots,~71.220596,~41.962044,~12.826224],~
+  [10.079242,~7.8618164,~0.92223197,~\dots,~26.886044,~21.453985,~17.361023],~
+  [17.991547,~14.24785,~-0.89504874,~\dots,~20.604334,~60.592606,~37.873325]],~
 
- [[-3.5488758,~-47.508862,~-95.015564,~\dots,~-110.71706,~-108.88274,~-137.5612],~
-  [-137.84918,~-126.03129,~-115.64336,~\dots,~-114.72093,~-126.24343,~-133.79109],~
-  [-147.31683,~-145.31314,~-137.13574,~\dots,~-105.02615,~-116.6999,~-122.60661],~
+ [[147.11113,~103.21112,~55.811832,~\dots,~40.107876,~42.042709,~13.124676],~
+  [12.790492,~24.672497,~35.172104,~\dots,~36.092194,~24.669579,~16.882807],~
+  [3.3153291,~5.3842049,~13.671597,~\dots,~45.781773,~34.207008,~28.059145],~
   \dots,~
-  [-141.17563,~-140.43784,~-149.25896,~\dots,~-78.849335,~-108.58714,~-138.34416],~
-  [-140.01288,~-142.26175,~-148.14075,~\dots,~-126.20568,~-129.13695,~-132.04318],~
-  [-132.21141,~-138.6819,~-146.84227,~\dots,~-131.71007,~-93.296257,~-116.47916]],~
+  [9.0220547,~9.8164053,~1.1087129,~\dots,~71.519043,~41.883968,~11.880278],~
+  [10.229019,~8.0392551,~2.2663257,~\dots,~24.198313,~21.375395,~18.227297],~
+  [18.198311,~11.786104,~3.7386706,~\dots,~18.869574,~57.385891,~33.9618]],~
 
  \dots,~
 
- [[18.095486,~-34.987282,~-91.177933,~\dots,~-99.494095,~-93.221954,~-128.76079],~
-  [-124.04631,~-116.41686,~-102.98042,~\dots,~-107.50661,~-119.95467,~-127.54848],~
-  [-142.71834,~-138.71126,~-129.78357,~\dots,~-98.722206,~-112.27363,~-119.09576],~
+ [[161.15787,~108.03804,~51.858047,~\dots,~43.581772,~49.806713,~14.164904],~
+  [18.993103,~26.591282,~40.043686,~\dots,~35.556953,~23.060726,~15.365005],~
+  [0.31335491,~4.2895284,~13.231918,~\dots,~44.335342,~30.73526,~23.809629],~
   \dots,~
-  [-131.34,~-131.13364,~-141.24506,~\dots,~-71.290329,~-98.112328,~-129.48041],~
-  [-134.56529,~-136.50882,~-140.93579,~\dots,~-114.41215,~-122.87399,~-129.40953],~
-  [-126.63847,~-132.90179,~-142.17902,~\dots,~-123.72011,~-89.907639,~-108.07525]],~
+  [11.251328,~11.421753,~1.3267132,~\dots,~71.324409,~44.457657,~12.979733],~
+  [8.0688171,~6.0919147,~1.6751376,~\dots,~28.238346,~19.737053,~13.095853],~
+  [16.164452,~9.866703,~0.60539889,~\dots,~19.105186,~52.871838,~34.6008]],~
 
- [[14.83668,~-38.491974,~-89.118706,~\dots,~-104.50926,~-98.43293,~-133.46823],~
-  [-129.66971,~-120.57146,~-107.0652,~\dots,~-110.49043,~-121.10995,~-126.84483],~
-  [-146.30688,~-139.21913,~-132.79062,~\dots,~-99.678925,~-112.38672,~-118.37381],~
+ [[160.29982,~106.82688,~56.284225,~\dots,~40.847317,~46.883755,~11.852956],~
+  [15.770498,~24.730665,~38.325031,~\dots,~34.854435,~24.194151,~18.465128],~
+  [-0.87357336,~6.0762038,~12.59219,~\dots,~45.660442,~32.911388,~26.929564],~
   \dots,~
-  [-133.21715,~-132.51721,~-141.62198,~\dots,~-73.295105,~-100.20323,~-132.46454],~
-  [-138.18147,~-138.76511,~-144.78239,~\dots,~-116.42126,~-125.88614,~-129.6993],~
-  [-126.65554,~-130.70747,~-144.31444,~\dots,~-124.7908,~-86.733917,~-112.15379]],~
+  [11.781666,~12.340034,~3.3242891,~\dots,~71.608543,~44.662857,~12.400381],~
+  [6.859838,~6.1376705,~0.20367658,~\dots,~28.518646,~19.021349,~15.210475],~
+  [18.555952,~14.363894,~0.84527528,~\dots,~20.324306,~58.342983,~32.927376]],~
 
- [[16.255512,~-31.703304,~-88.936218,~\dots,~-96.801964,~-88.440536,~-128.90186],~
-  [-123.1205,~-115.64475,~-102.82777,~\dots,~-105.91277,~-116.54301,~-125.83007],~
-  [-143.50493,~-135.33545,~-131.39301,~\dots,~-96.049698,~-111.65795,~-116.42823],~
+ [[159.06865,~111.19041,~53.964203,~\dots,~45.936127,~54.400459,~13.901671],~
+  [19.670254,~27.231472,~40.060177,~\dots,~36.812996,~26.284605,~16.961464],~
+  [-0.7221055,~7.5333309,~11.48659,~\dots,~46.671589,~31.16301,~26.355782],~
   \dots,~
-  [-130.41649,~-130.36017,~-142.79881,~\dots,~-68.483612,~-99.568924,~-132.27666],~
-  [-134.51385,~-135.7366,~-139.90646,~\dots,~-111.81407,~-125.02898,~-127.74584],~
-  [-122.92239,~-129.48557,~-142.0298,~\dots,~-121.2471,~-87.20575,~-107.23206]]] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
+  [11.926732,~12.063825,~-0.36293313,~\dots,~73.793037,~42.813068,~10.06179],~
+  [7.8724666,~6.7322803,~2.5688095,~\dots,~30.497356,~17.394106,~14.637597],~
+  [19.632471,~13.151638,~0.61876702,~\dots,~21.240358,~55.385933,~35.322235]]] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
 </div>
 <p>Flux is a <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> with a shape of (TIME x PIXELS x PIXELS). If you want to access just the first frame you can use</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -764,13 +740,13 @@ $[[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.1815
 </div>
 <div class="output_area docutils container">
 <div class="math notranslate nohighlight">
-$[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159],~
- [-135.68407,~-125.30367,~-112.52773,~\dots,~-113.03839,~-122.92997,~-131.28302],~
- [-147.63722,~-142.73625,~-134.99854,~\dots,~-101.33073,~-114.31767,~-121.03055],~
+$[[146.7256,~110.36988,~56.275379,~\dots,~39.974297,~44.420666,~13.883464],~
+ [12.40297,~22.714397,~35.56646,~\dots,~34.970276,~25.019585,~16.769943],~
+ [0.44226855,~5.2752562,~13.086924,~\dots,~46.673801,~33.625275,~27.014521],~
  \dots,~
- [-138.13503,~-137.8448,~-146.29425,~\dots,~-77.273094,~-105.22347,~-135.82652],~
- [-142.20255,~-139.67661,~-147.65201,~\dots,~-118.81814,~-129.52805,~-130.46175],~
- [-133.71326,~-134.32669,~-148.82013,~\dots,~-127.16725,~-90.909531,~-112.97443]] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
+ [9.5051775,~9.7198277,~1.3479111,~\dots,~70.286613,~42.281826,~11.773497],~
+ [5.480844,~7.9346728,~0.029079039,~\dots,~28.776463,~18.01915,~17.183647],~
+ [14.138475,~13.451326,~-0.96531624,~\dots,~20.603649,~56.804371,~34.841518]] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
 </div>
 <p>These values are in units electrons per second.</p>
 <section id="Building-Light-Curves-from-TPFs">
@@ -781,8 +757,7 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -791,25 +766,15 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_28_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_28_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_28_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_28_0.png" />
 </div>
 </div>
 <p>This looks pretty good, but maybe we can improve things by creating a new aperture.</p>
@@ -817,36 +782,25 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
 <span class="c1"># Plot that aperture</span>
 <span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 261136679, Cadence: 70445&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_30_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_30_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_30_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_30_0.png" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -854,25 +808,15 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_32_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_32_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_32_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_32_0.png" />
 </div>
 </div>
 <p>There’s a long term trend in this dataset, which we can remove with a simple smoothing filter. You can use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.flatten.html?highlight=flatten#lightkurve.LightCurve.flatten">lc.flatten()</a> method to apply and divide the <a class="reference external" href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky-Golay smoothing filter</a>. Here we’ll use a <code class="docutils literal notranslate"><span class="pre">window_length</span></code> of 1001 cadences, which is roughly a 5% of the full length of the light curve.</p>
@@ -880,8 +824,7 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Number of cadences in the full light curve</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of cadences in the full light curve</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -891,33 +834,23 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(18104,)
+(18279,)
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">flat_lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">flat_lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
 <span class="n">flat_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_35_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_35_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_35_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_35_0.png" />
 </div>
 </div>
 <p>The light curve looks much flatter. Unfortunately there is a portion of the light curve that is very noisy, due to a jitter in the TESS spacecraft. We can remove this simply by masking the light curve. First we’ll select the times that had the jitter.</p>
@@ -925,8 +858,7 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Flag the times that are good quality</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Flag the times that are good quality</span>
 <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat_lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">flat_lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -936,26 +868,16 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">masked_lc</span> <span class="o">=</span> <span class="n">flat_lc</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">masked_lc</span> <span class="o">=</span> <span class="n">flat_lc</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
 <span class="n">masked_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_39_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_39_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_39_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_39_0.png" />
 </div>
 </div>
 <p>We can use <em>Lightkurve</em> to plot these two light curves over each other to see the difference.</p>
@@ -963,8 +885,7 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># First define the `matplotlib.pyplot.axes`</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># First define the `matplotlib.pyplot.axes`</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">flat_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">()</span>
 
 <span class="c1"># Pass that axis to the next plot</span>
@@ -972,20 +893,11 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_41_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_41_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_41_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_41_0.png" />
 </div>
 </div>
 <p>This looks much better. Now we might want to clip out some outliers from the light curve. We can do that with a simple lightkurve function <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.remove_outliers.html?highlight=remove_outliers">remove_outliers()</a>.</p>
@@ -993,26 +905,16 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">clipped_lc</span> <span class="o">=</span> <span class="n">masked_lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clipped_lc</span> <span class="o">=</span> <span class="n">masked_lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
 <span class="n">clipped_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_43_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_43_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_43_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_43_0.png" />
 </div>
 </div>
 <p>It’s a little hard to see these data because of the plotting style. Let’s use a scatter plot instead. We can do this with the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.scatter.html?highlight=scatter#lightkurve.LightCurve.scatter">lc.scatter()</a> method. This method works in the same way that <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html">matplotlib.pyplot.scatter</a> works, and takes in the same keyword arguments.</p>
@@ -1020,25 +922,15 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">clipped_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clipped_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_45_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_45_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_45_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_45_0.png" />
 </div>
 </div>
 <p>We can also add errorbars using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.errorbar.html?highlight=errorbar#lightkurve.LightCurve.errorbar">lc.errorbar()</a> method.</p>
@@ -1046,26 +938,16 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">clipped_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">clipped_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 <span class="n">clipped_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">);</span>  <span class="c1"># alpha determines the transparency</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_47_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_47_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_47_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_47_0.png" />
 </div>
 </div>
 <p>Finally let’s use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to fold the data at the exoplanet orbital period and see if we can see the transit.</p>
@@ -1073,26 +955,16 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">folded_lc</span> <span class="o">=</span> <span class="n">clipped_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">epoch_time</span><span class="o">=</span><span class="mf">1325.504</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">folded_lc</span> <span class="o">=</span> <span class="n">clipped_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">epoch_time</span><span class="o">=</span><span class="mf">1325.504</span><span class="p">)</span>
 <span class="n">folded_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_49_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_49_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_49_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_49_0.png" />
 </div>
 </div>
 <p>It looks like there’s something there, but it’s hard to see. Let’s bin the light curve to reduce the number of points, but also reduce the uncertainty of those points.</p>
@@ -1100,27 +972,17 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
 <span class="n">binned_lc</span> <span class="o">=</span> <span class="n">folded_lc</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="n">time_bin_size</span><span class="o">=</span><span class="mi">5</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span>
 <span class="n">binned_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_51_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_51_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_51_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_51_0.png" />
 </div>
 </div>
 <p>And now we can see the transit of Pi Men c!</p>
@@ -1129,27 +991,17 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)]</span>
 <span class="n">lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">epoch_time</span><span class="o">=</span><span class="mf">1325.504</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="n">time_bin_size</span><span class="o">=</span><span class="mi">5</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_53_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_53_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_53_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_53_0.png" />
 </div>
 </div>
 </section>
@@ -1160,8 +1012,7 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Use the default</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use the default</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)]</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">epoch_time</span><span class="o">=</span><span class="mf">1325.504</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span>
 
@@ -1175,26 +1026,16 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Default aperture&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Default aperture&#39;</span><span class="p">)</span>
 <span class="n">custom_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Custom aperture&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_56_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_56_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_56_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-recover-first-tess-candidate_56_0.png" />
 </div>
 </div>
 <p>The importance of using different aperture masks is clearly visible in the figure above. Note however that the data archive at MAST also contains lightcurve products which have more advanced systematics removal methods applied. We will explore those in a future tutorial!</p>
@@ -1241,7 +1082,7 @@ $[[-1.3825388,~-37.665329,~-91.830536,~\dots,~-108.04645,~-103.54175,~-134.18159
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

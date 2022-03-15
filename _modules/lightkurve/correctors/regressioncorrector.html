@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -421,6 +421,9 @@
             <span class="p">)</span>
             <span class="n">model</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
             <span class="n">residuals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">-</span> <span class="n">model</span>
+            <span class="c1"># In Astropy&gt;=5.0, residuals will be a MaskedQuantity</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+                <span class="n">residuals</span> <span class="o">=</span> <span class="n">residuals</span><span class="o">.</span><span class="n">unmasked</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span> <span class="o">|=</span> <span class="n">sigma_clip</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">mask</span>
             <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="s2">&quot;correct(): iteration </span><span class="si">{}</span><span class="s2">: clipped </span><span class="si">{}</span><span class="s2"> cadences&quot;</span>
@@ -605,7 +608,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -336,6 +336,12 @@
                 <span class="n">ar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arclength</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arclength</span><span class="p">)</span>
+
+            <span class="c1"># Temporary workaround for issue #1161: AstroPy v5.0</span>
+            <span class="c1"># Masked arrays cannot be passed to `np.in1d` below</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arclength</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+                <span class="n">ar</span> <span class="o">=</span> <span class="n">ar</span><span class="o">.</span><span class="n">unmasked</span>
+
             <span class="n">knots</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">ar</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
             <span class="n">ar</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">ar</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -694,7 +700,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -171,12 +171,15 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span> <span class="k">as</span> <span class="n">pyfits</span>
 <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
 <span class="kn">from</span> <span class="nn">astropy.time</span> <span class="kn">import</span> <span class="n">Time</span>
 <span class="kn">from</span> <span class="nn">astropy.timeseries</span> <span class="kn">import</span> <span class="n">TimeSeries</span>
 <span class="kn">from</span> <span class="nn">astropy.units</span> <span class="kn">import</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">Unit</span>
+<span class="kn">from</span> <span class="nn">astropy.utils.decorators</span> <span class="kn">import</span> <span class="n">deprecated</span>
 
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -188,17 +191,18 @@
 <span class="kn">from</span> <span class="nn">.designmatrix</span> <span class="kn">import</span> <span class="n">DesignMatrix</span><span class="p">,</span> <span class="n">DesignMatrixCollection</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">MPLSTYLE</span>
 <span class="kn">from</span> <span class="nn">..lightcurve</span> <span class="kn">import</span> <span class="n">LightCurve</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">channel_to_module_output</span><span class="p">,</span> <span class="n">validate_method</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">channel_to_module_output</span><span class="p">,</span> <span class="n">validate_method</span><span class="p">,</span> <span class="n">LightkurveDeprecationWarning</span>
 <span class="kn">from</span> <span class="nn">..search</span> <span class="kn">import</span> <span class="n">search_lightcurve</span>
 <span class="kn">from</span> <span class="nn">.regressioncorrector</span> <span class="kn">import</span> <span class="n">RegressionCorrector</span>
 <span class="kn">from</span> <span class="nn">..collections</span> <span class="kn">import</span> <span class="n">LightCurveCollection</span>
 <span class="kn">from</span> <span class="nn">.metrics</span> <span class="kn">import</span> <span class="n">overfit_metric_lombscargle</span><span class="p">,</span> <span class="n">underfit_metric_neighbors</span><span class="p">,</span> <span class="n">MinTargetsError</span>
 
+
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CBVCorrector&#39;</span><span class="p">,</span> <span class="s1">&#39;CotrendingBasisVectors&#39;</span><span class="p">,</span> <span class="s1">&#39;KeplerCotrendingBasisVectors&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;TessCotrendingBasisVectors&#39;</span><span class="p">,</span> <span class="s1">&#39;download_kepler_cbvs&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;download_tess_cbvs&#39;</span><span class="p">]</span>
+           <span class="s1">&#39;TessCotrendingBasisVectors&#39;</span><span class="p">,</span> <span class="s1">&#39;load_kepler_cbvs&#39;</span><span class="p">,</span><span class="s1">&#39;load_tess_cbvs&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;download_kepler_cbvs&#39;</span><span class="p">,</span> <span class="s1">&#39;download_tess_cbvs&#39;</span><span class="p">]</span>
 
 <span class="c1">#*******************************************************************************</span>
 <span class="c1"># CBV Corrector Class</span>
@@ -207,7 +211,7 @@
     <span class="sd">&quot;&quot;&quot;Class for removing systematics using Cotrending Basis Vectors (CBVs)</span>
 <span class="sd">    from Kepler/K2/TESS.</span>
 
-<span class="sd">    On construction of this object, the relevent CBVs will be downloaded from</span>
+<span class="sd">    On construction of this object, the relevant CBVs will be downloaded from</span>
 <span class="sd">    MAST appropriate for the lightcurve object passed to the constructor.</span>
 
 <span class="sd">    For TESS there are multiple CBV types. All are loaded and the user must</span>
@@ -256,7 +260,8 @@
 <span class="sd">        Equivalent to: designmatrix prior sigma = np.median(self.lc.flux_err) / np.sqrt(alpha)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CBVCorrector.__init__"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.CBVCorrector.html#lightkurve.correctors.CBVCorrector.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lc</span><span class="p">,</span> <span class="n">interpolate_cbvs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">extrapolate_cbvs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_not_load_cbvs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="CBVCorrector.__init__"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.CBVCorrector.html#lightkurve.correctors.CBVCorrector.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lc</span><span class="p">,</span> <span class="n">interpolate_cbvs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">extrapolate_cbvs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_not_load_cbvs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">cbv_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor</span>
 
 <span class="sd">        This constructor will retrieve all relevant CBVs from MAST and then</span>
@@ -277,6 +282,9 @@
 <span class="sd">            If True then the CBVs will NOT be loaded from MAST. </span>
 <span class="sd">            Use this option if you wish to use the CBV corrector methods with only a </span>
 <span class="sd">            custom design matrix (via the ext_dm argument in the corrector methods)</span>
+<span class="sd">        cbv_dir : str</span>
+<span class="sd">            Path to specific directory holding TESS CBVs. If this is None, will query</span>
+<span class="sd">            MAST by default.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="n">LightCurve</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;&lt;lc&gt; must be a LightCurve class&#39;</span><span class="p">)</span>
@@ -294,20 +302,20 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">CBVCorrector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">lc</span><span class="p">)</span>
 
         <span class="c1">#***</span>
-        <span class="c1"># Retrieve all relevant CBVs from MAST</span>
+        <span class="c1"># Retrieve all relevant CBVs from either MAST or a local directory</span>
         <span class="n">cbvs</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">do_not_load_cbvs</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;Kepler&#39;</span><span class="p">:</span>
-                <span class="n">cbvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">download_kepler_cbvs</span><span class="p">(</span><span class="n">mission</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">mission</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">quarter</span><span class="p">,</span>
+                <span class="n">cbvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">load_kepler_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="n">cbv_dir</span><span class="p">,</span><span class="n">mission</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">mission</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">quarter</span><span class="p">,</span>
                         <span class="n">channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">channel</span><span class="p">))</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;K2&#39;</span><span class="p">:</span>
-                <span class="n">cbvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">download_kepler_cbvs</span><span class="p">(</span><span class="n">mission</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">mission</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">campaign</span><span class="p">,</span>
+                <span class="n">cbvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">load_kepler_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="n">cbv_dir</span><span class="p">,</span><span class="n">mission</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">mission</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">campaign</span><span class="p">,</span>
                         <span class="n">channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">channel</span><span class="p">))</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;TESS&#39;</span><span class="p">:</span>
                 <span class="c1"># For TESS we load multiple CBV types</span>
                 <span class="c1"># Single-Scale</span>
-                <span class="n">cbvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">download_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span>
+                <span class="n">cbvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">load_tess_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="n">cbv_dir</span><span class="p">,</span><span class="n">sector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span>
                     <span class="n">camera</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">ccd</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">))</span>
             
                 <span class="c1"># Multi-Scale</span>
@@ -317,7 +325,7 @@
                 <span class="n">moreData</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">while</span> <span class="n">moreData</span><span class="p">:</span>
                     <span class="n">iBand</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="n">cbvObj</span> <span class="o">=</span> <span class="n">download_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span>
+                    <span class="n">cbvObj</span> <span class="o">=</span> <span class="n">load_tess_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="n">cbv_dir</span><span class="p">,</span><span class="n">sector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span>
                         <span class="n">camera</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">ccd</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;MultiScale&#39;</span><span class="p">,</span>
                         <span class="n">band</span><span class="o">=</span><span class="n">iBand</span><span class="p">)</span>
                     <span class="k">if</span> <span class="p">(</span><span class="n">cbvObj</span><span class="o">.</span><span class="n">band</span> <span class="o">==</span> <span class="n">iBand</span><span class="p">):</span>
@@ -326,7 +334,7 @@
                         <span class="n">moreData</span> <span class="o">=</span> <span class="kc">False</span>
             
                 <span class="c1"># Spike</span>
-                <span class="n">cbvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">download_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span>
+                <span class="n">cbvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">load_tess_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="n">cbv_dir</span><span class="p">,</span><span class="n">sector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span>
                     <span class="n">camera</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">ccd</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;Spike&#39;</span><span class="p">))</span>
             
             <span class="k">else</span><span class="p">:</span>
@@ -917,7 +925,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Seperate widths is not yet implemented&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;separate widths is not yet implemented&quot;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">dm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">design_matrix_collection</span><span class="p">:</span>
             <span class="n">nCBVs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">)</span>
@@ -1311,6 +1319,10 @@
 
             <span class="c1"># Plot gaps as NaN</span>
             <span class="n">timeArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">timeArray</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># kepler cbvs are masked arrays and do not support item assignment</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
             <span class="n">timeArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gap_indicators</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
             <span class="c1"># Get the CBV arrays that were requested</span>
@@ -1727,7 +1739,7 @@
         <span class="sd">&quot;&quot;&quot;Class method to instantiate a TessCotrendingBasisVectors object</span>
 <span class="sd">        from a CBV FITS HDU.</span>
 
-<span class="sd">        TESS CBVs are in seperate FITS files for each camera.CCD, so camera.CCD</span>
+<span class="sd">        TESS CBVs are in separate FITS files for each camera.CCD, so camera.CCD</span>
 <span class="sd">        is already specified in the HDU, here we need to specify</span>
 <span class="sd">        which CBV type and band is desired.</span>
 
@@ -1861,10 +1873,20 @@
 <span class="c1">#*******************************************************************************</span>
 <span class="c1"># Functions</span>
 
-<span class="k">def</span> <span class="nf">download_kepler_cbvs</span><span class="p">(</span><span class="n">mission</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+
+
+
+
+
+<span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;2.1&quot;</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;load_kepler_cbvs&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">download_kepler_cbvs</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">load_kepler_cbvs</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">load_kepler_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">mission</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Searches the public data archive at MAST &lt;https://archive.stsci.edu&gt;</span>
-<span class="sd">    for Kepler or K2 cotrending basis vectors.</span>
+    <span class="sd">&quot;&quot;&quot;Loads Kepler or K2 cotrending basis vectors, either from a local directory cbv_dir </span>
+<span class="sd">    or searches the public data archive at MAST &lt;https://archive.stsci.edu&gt;.</span>
 
 <span class="sd">    This function fetches the Cotrending Basis Vectors FITS HDU for the desired</span>
 <span class="sd">    mission, quarter/campaign and channel or module/output, etc...</span>
@@ -1878,6 +1900,8 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    cbv_dir : str</span>
+<span class="sd">        Path to specific directory holding Kepler CBVs. If None, queries MAST.</span>
 <span class="sd">    mission : str, list of str</span>
 <span class="sd">        &#39;Kepler&#39; or &#39;K2&#39;</span>
 <span class="sd">    quarter or campaign : int</span>
@@ -1896,7 +1920,7 @@
 <span class="sd">    This example will read in the CBVs for Kepler quarter 8,</span>
 <span class="sd">    and then extract the first 8 CBVs for module.output 16.4</span>
 
-<span class="sd">        &gt;&gt;&gt; cbvs = download_kepler_cbvs(mission=&#39;Kepler&#39;, quarter=8, module=16, output=4) # doctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; cbvs = load_kepler_cbvs(mission=&#39;Kepler&#39;, quarter=8, module=16, output=4) # doctest: +SKIP</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1910,7 +1934,7 @@
         <span class="k">assert</span>  <span class="nb">isinstance</span><span class="p">(</span><span class="n">campaign</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;campaign must be passed for K2 mission&#39;</span>
         <span class="k">assert</span>  <span class="n">quarter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>  <span class="s1">&#39;quarter must not be passed for K2 mission&#39;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unknown mission type&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown mission type&#39;</span><span class="p">)</span>
 
     <span class="c1"># CBV FITS files use module/output, not channel</span>
     <span class="c1"># So if channel is passed, convert to module/output</span>
@@ -1923,14 +1947,20 @@
         <span class="k">assert</span>  <span class="n">module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;module must be passed&#39;</span>
         <span class="k">assert</span>  <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;output must be passed&#39;</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;Kepler&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">cbv_dir</span><span class="p">:</span>
+        <span class="n">cbvBaseUrl</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;Kepler&#39;</span><span class="p">):</span>
         <span class="n">cbvBaseUrl</span> <span class="o">=</span> <span class="s2">&quot;http://archive.stsci.edu/missions/kepler/cbv/&quot;</span>
     <span class="k">elif</span> <span class="p">(</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;K2&#39;</span><span class="p">):</span>
         <span class="n">cbvBaseUrl</span> <span class="o">=</span> <span class="s2">&quot;http://archive.stsci.edu/missions/k2/cbv/&quot;</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cbvBaseUrl</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
-        <span class="n">cbv_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">fn</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">fn</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">)]</span>
+        <span class="n">kepler_cbv_fname</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">cbv_dir</span><span class="p">:</span>
+            <span class="n">cbv_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cbv_dir</span><span class="p">,</span><span class="s1">&#39;*.fits&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cbvBaseUrl</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+            <span class="n">cbv_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">fn</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">fn</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">)]</span>
 
         <span class="k">if</span> <span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;Kepler&#39;</span><span class="p">:</span>
             <span class="n">quarter</span> <span class="o">=</span> <span class="s1">&#39;q</span><span class="si">{:02}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">quarter</span><span class="p">)</span>
@@ -1943,31 +1973,38 @@
                 <span class="k">if</span> <span class="n">campaign</span> <span class="ow">in</span> <span class="n">cbv_file</span><span class="p">:</span>
                     <span class="k">break</span>
 
-        <span class="n">kepler_cbv_url</span> <span class="o">=</span> <span class="n">cbvBaseUrl</span> <span class="o">+</span> <span class="n">cbv_file</span>
-        <span class="n">hdu</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">kepler_cbv_url</span><span class="p">)</span>
-
+        <span class="n">kepler_cbv_fname</span> <span class="o">=</span> <span class="n">cbvBaseUrl</span> <span class="o">+</span> <span class="n">cbv_file</span>
+        <span class="n">hdu</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">kepler_cbv_fname</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">KeplerCotrendingBasisVectors</span><span class="o">.</span><span class="n">from_hdu</span><span class="p">(</span><span class="n">hdu</span><span class="o">=</span><span class="n">hdu</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
 
-    <span class="k">except</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;CBVS were not found&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;CBVS were not found&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
 
-<span class="k">def</span> <span class="nf">download_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;2.1&quot;</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;load_tess_cbvs&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">download_tess_cbvs</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">load_tess_cbvs</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">load_tess_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">ccd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Searches the `public data archive at MAST &lt;https://archive.stsci.edu&gt;`</span>
-<span class="sd">    for TESS cotrending basis vectors.</span>
+    <span class="sd">&quot;&quot;&quot;Loads TESS cotrending basis vectors, either from a directory of </span>
+<span class="sd">    CBV files already saved locally if cbv_dir is passed, or else </span>
+<span class="sd">    will retrieve the relevant files programmatically from MAST. </span>
 
 <span class="sd">    This function fetches the Cotrending Basis Vectors FITS HDU for the desired</span>
 <span class="sd">    cotrending basis vectors.</span>
 
-<span class="sd">    For TESS, each CCD CBVs are stored in a seperate FITS files.</span>
+<span class="sd">    For TESS, each CCD CBVs are stored in a separate FITS files.</span>
 
-<span class="sd">    For now, this function will only download 2-minute cadence CBVs. Once other</span>
+<span class="sd">    For now, this function will only load 2-minute cadence CBVs. Once other</span>
 <span class="sd">    cadence CBVs become available this function will be updated to support</span>
 <span class="sd">    their downloads.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    cbv_dir   : str</span>
+<span class="sd">        Path to specific directory holding TESS CBVs. If None, queries MAST.</span>
 <span class="sd">    sector : int, list of ints</span>
 <span class="sd">        TESS Sector number.</span>
 <span class="sd">    camera and ccd : int</span>
@@ -1983,10 +2020,10 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    This example will read in the CBVs for TESS Sector 10 Camera.CCD 2.4</span>
+<span class="sd">    This example will load presaved CBVs from directory &#39;.&#39; for TESS Sector 10 Camera.CCD 2.4</span>
 <span class="sd">    Multi-Scale band 2</span>
 
-<span class="sd">        &gt;&gt;&gt; cbvs = download_tess_cbvs(sector=10, camera=2, ccd=4, # doctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; cbvs = load_tess_cbvs(&#39;.&#39;,sector=10, camera=2, ccd=4, # doctest: +SKIP</span>
 <span class="sd">        &gt;&gt;&gt;     cbv_type=&#39;MultiScale&#39;, band=2) # doctest: +SKIP</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -2016,48 +2053,61 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span>  <span class="n">band</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>  <span class="s1">&#39;band must NOT be passed for single-scale or spike CBVs&#39;</span>
 
-    <span class="n">curlBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://archive.stsci.edu/missions/tess/download_scripts/sector/tesscurl_sector_&#39;</span>
-    <span class="n">curlEndUrl</span> <span class="o">=</span> <span class="s1">&#39;_cbv.sh&#39;</span>
-    <span class="n">curlUrl</span> <span class="o">=</span> <span class="n">curlBaseUrl</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sector</span><span class="p">)</span> <span class="o">+</span> <span class="n">curlEndUrl</span>
-
     <span class="c1"># This is the string to search for in the curl script file</span>
     <span class="c1"># Pad the sector number with a first &#39;0&#39; if less than 10</span>
     <span class="c1"># TODO: figure out a way to pad an integer number with forward zeros</span>
     <span class="c1"># without needing a conditional</span>
     <span class="n">sector</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sector</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">sector</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">):</span>
-        <span class="n">curlSearchString</span> <span class="o">=</span> <span class="s1">&#39;s000&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sector</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ccd</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">sector</span> <span class="o">&gt;=</span> <span class="mi">10</span> <span class="ow">and</span> <span class="n">sector</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">):</span>
-        <span class="n">curlSearchString</span> <span class="o">=</span> <span class="s1">&#39;s00&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sector</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ccd</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">sector</span> <span class="o">&gt;=</span> <span class="mi">100</span> <span class="ow">and</span> <span class="n">sector</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">):</span>
-        <span class="n">curlSearchString</span> <span class="o">=</span> <span class="s1">&#39;s0&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sector</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ccd</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">sector</span> <span class="o">&gt;</span> <span class="mi">999</span><span class="p">):</span>
-        <span class="c1"># TESS will be truly blessed if it gets to more than 999 sectors!</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Only up to 999 Sectors is currently supported&#39;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">SearchString</span> <span class="o">=</span> <span class="s1">&#39;s</span><span class="si">%04d</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sector</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="n">ccd</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Error parsing sector string when getting TESS CBV FITS files&#39;</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cbv_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Read in the relevant curl script file and find the line for the CBV</span>
+            <span class="c1"># data we are looking for</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cbv_dir</span><span class="p">,</span><span class="s1">&#39;*.fits&#39;</span><span class="p">))</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="n">strLine</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">SearchString</span> <span class="ow">in</span> <span class="n">strLine</span><span class="p">:</span>
+                    <span class="n">fname</span> <span class="o">=</span> <span class="n">strLine</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;CBV FITS file not found&#39;</span><span class="p">)</span>
 
-        <span class="c1"># Read in the relevent curl script file and find the line for the CBV</span>
-        <span class="c1"># data we are looking for</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">curlUrl</span><span class="p">)</span>
-        <span class="n">foundIndex</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-            <span class="n">strLine</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">curlSearchString</span> <span class="ow">in</span> <span class="n">strLine</span><span class="p">:</span>
-                <span class="n">foundIndex</span> <span class="o">=</span> <span class="n">strLine</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">curlSearchString</span><span class="p">)</span>
-                <span class="k">break</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">foundIndex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;CBV FITS file not found&#39;</span><span class="p">)</span>
+            <span class="c1"># Extract url from strLine</span>
 
-        <span class="c1"># Extract url from strLine</span>
-        <span class="n">htmlStartIndex</span> <span class="o">=</span> <span class="n">strLine</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;https:&#39;</span><span class="p">)</span>
-        <span class="n">htmlEndIndex</span> <span class="o">=</span> <span class="n">strLine</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">)</span>
-        <span class="c1"># Add 4 for length of &#39;fits&#39; string</span>
-        <span class="n">tess_cbv_url</span>  <span class="o">=</span> <span class="n">strLine</span><span class="p">[</span><span class="n">htmlStartIndex</span><span class="p">:</span><span class="n">htmlEndIndex</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span>
+            <span class="n">hdu</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
 
-        <span class="n">hdu</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">tess_cbv_url</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">curlBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://archive.stsci.edu/missions/tess/download_scripts/sector/tesscurl_sector_&#39;</span>
+            <span class="n">curlEndUrl</span> <span class="o">=</span> <span class="s1">&#39;_cbv.sh&#39;</span>
+            <span class="n">curlUrl</span> <span class="o">=</span> <span class="n">curlBaseUrl</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sector</span><span class="p">)</span> <span class="o">+</span> <span class="n">curlEndUrl</span>
+
+            <span class="c1"># This is the string to search for in the curl script file</span>
+
+            <span class="c1"># Read in the relevant curl script file and find the line for the CBV</span>
+            <span class="c1"># data we are looking for</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">curlUrl</span><span class="p">)</span>
+            <span class="n">foundIndex</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="n">strLine</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">SearchString</span> <span class="ow">in</span> <span class="n">strLine</span><span class="p">:</span>
+                    <span class="n">foundIndex</span> <span class="o">=</span> <span class="n">strLine</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">SearchString</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">foundIndex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;CBV FITS file not found&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Extract url from strLine</span>
+            <span class="n">htmlStartIndex</span> <span class="o">=</span> <span class="n">strLine</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;https:&#39;</span><span class="p">)</span>
+            <span class="n">htmlEndIndex</span> <span class="o">=</span> <span class="n">strLine</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">)</span>
+            <span class="c1"># Add 4 for length of &#39;fits&#39; string</span>
+            <span class="n">tess_cbv_url</span>  <span class="o">=</span> <span class="n">strLine</span><span class="p">[</span><span class="n">htmlStartIndex</span><span class="p">:</span><span class="n">htmlEndIndex</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span>
+
+            <span class="n">hdu</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">tess_cbv_url</span><span class="p">)</span>
 
         <span class="c1"># Check that this is a TESS CBV FITS file</span>
         <span class="n">mission</span> <span class="o">=</span> <span class="n">hdu</span><span class="p">[</span><span class="s1">&#39;Primary&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;TELESCOP&#39;</span><span class="p">]</span>
@@ -2094,7 +2144,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

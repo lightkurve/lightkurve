@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -429,7 +429,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -496,8 +496,7 @@ variation in spectra.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 </pre></div>
 </div>
@@ -513,8 +512,7 @@ variation in spectra.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 6185476&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 6185476&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -522,25 +520,15 @@ variation in spectra.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_9_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_9_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_9_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_9_0.png" />
 </div>
 </div>
 <p>When we plot the data, we see that there is a long-term trend, likely from starspots. We can remove this with a Savitzky-Golay filter using Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.flatten.html?highlight=flatten#lightkurve.LightCurve.flatten">flatten</a> method.</p>
@@ -548,26 +536,16 @@ variation in spectra.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">clc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">21</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">21</span><span class="p">)</span>
 <span class="n">clc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_11_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_11_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_11_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_11_0.png" />
 </div>
 </div>
 <p>The light curve is now flat. Let’s fold the light curve and plot it.</p>
@@ -575,28 +553,18 @@ variation in spectra.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Period (p) and and reference transit time (t0) are taken from the NASA Exoplanet Archive</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Period (p) and and reference transit time (t0) are taken from the NASA Exoplanet Archive</span>
 <span class="n">p</span><span class="p">,</span> <span class="n">t0</span> <span class="o">=</span> <span class="mf">17.660114</span><span class="p">,</span> <span class="mf">136.57258</span>
 <span class="n">folded_lc</span> <span class="o">=</span> <span class="n">clc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">epoch_time</span><span class="o">=</span><span class="n">t0</span><span class="p">)</span>
 <span class="n">folded_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_13_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_13_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_13_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_13_0.png" />
 </div>
 </div>
 <p>It looks like there is a concentration of points that are around phase of <code class="docutils literal notranslate"><span class="pre">0</span></code>, but they don’t seem to line up nicely. This is caused by the transit of the planet occurring slightly before or after you would predict using a constant period. Cases of planets with meaningful TTVs are well suited for further analysis using a river plot.</p>
@@ -608,25 +576,15 @@ variation in spectra.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">folded_lc</span><span class="o">.</span><span class="n">plot_river</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">folded_lc</span><span class="o">.</span><span class="n">plot_river</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;KIC 6185476&#39;}, xlabel=&#39;Phase&#39;, ylabel=&#39;Cycle&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_17_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_17_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_17_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_17_0.png" />
 </div>
 </div>
 <p>The river plot shows the same plot as the <code class="docutils literal notranslate"><span class="pre">fold</span></code> method, but each time the light curve is folded, a new row is started in the plot. The colorbar then shows the flux in each part of the light curve.</p>
@@ -635,25 +593,15 @@ variation in spectra.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">folded_lc</span><span class="o">.</span><span class="n">plot_river</span><span class="p">(</span><span class="n">bin_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">folded_lc</span><span class="o">.</span><span class="n">plot_river</span><span class="p">(</span><span class="n">bin_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;KIC 6185476&#39;}, xlabel=&#39;Phase&#39;, ylabel=&#39;Cycle&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_19_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_19_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_19_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_19_0.png" />
 </div>
 </div>
 </section>
@@ -664,25 +612,15 @@ variation in spectra.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">folded_lc</span><span class="o">.</span><span class="n">plot_river</span><span class="p">(</span><span class="n">bin_points</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;sigma&#39;</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">folded_lc</span><span class="o">.</span><span class="n">plot_river</span><span class="p">(</span><span class="n">bin_points</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;sigma&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;KIC 6185476&#39;}, xlabel=&#39;Phase&#39;, ylabel=&#39;Cycle&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_22_1.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_22_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_22_0.png" src="../../_images/tutorials_3-science-examples_exoplanets-visualizing-periodic-signals-using-a-river-plot_22_0.png" />
 </div>
 </div>
 <p>We see in the above river plot that there is a signal around phase of <code class="docutils literal notranslate"><span class="pre">0</span></code> (our planet candidate) that has a clear deviation from the mean, showing that it is a significant detection.</p>
@@ -699,8 +637,7 @@ variation in spectra.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -933,7 +870,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

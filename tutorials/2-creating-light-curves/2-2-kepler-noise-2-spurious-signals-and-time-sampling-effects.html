@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -479,7 +479,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -544,8 +544,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 </pre></div>
@@ -572,8 +571,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf_fc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 2436365&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf_fc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 2436365&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">one_pixel_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">tpf_fc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tpf_fc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;bool&#39;</span><span class="p">)</span>
 <span class="n">one_pixel_mask</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">tpf_fc</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">one_pixel_mask</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
@@ -582,20 +580,11 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-(2677.930224609375, 3100.0)
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_9_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_9_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_9_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_9_0.png" />
 </div>
 </div>
 <p>Notice the jagged pattern which repeats around five times every day. This is the signal introduced by focus changes. KIC 2436365 is a non-variable star, which means that this pattern is the only variable signal present, and there is no confusion as to what we’re looking at. In variable stars, this pattern could cause an effect similar to signal dilution, where actual stellar variability or transit events are attenuated by the presence of another signal.</p>
@@ -609,8 +598,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_fgs</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 2436676&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_fgs</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 2436676&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">lc_fgs</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
@@ -618,20 +606,11 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.lines.Line2D at 0x1787327c0&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_12_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_12_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_12_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_12_0.png" />
 </div>
 </div>
 <p>The signal of the variable FGS star is present around 0.35 cycles per day, and has a harmonic where you’d expect it at 0.7 c/d. Because of the way this signal is introduced into the data, it remains low amplitude, and is unlikely to have an effect on the majority of <em>Kepler</em> analysis. In fact, when studying a star with its own strong signal, and/or all 17 quarters of data, the variable FGS signal is unlikely to show up at all.</p>
@@ -640,8 +619,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_no_fgs</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 2436676&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_no_fgs</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 2436676&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">lc_no_fgs</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
@@ -649,20 +627,11 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.lines.Line2D at 0x10c25d5e0&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_14_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_14_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_14_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_14_0.png" />
 </div>
 </div>
 </section>
@@ -676,26 +645,16 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_k2gs</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;EPIC 212592841&quot;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_k2gs</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;EPIC 212592841&quot;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">lc_k2gs</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">0.6046</span><span class="p">)</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="n">time_bin_size</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_16_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_16_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_16_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_16_0.png" />
 </div>
 </div>
 </section>
@@ -709,8 +668,7 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_pdca</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;KIC 7624629&quot;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_pdca</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;KIC 7624629&quot;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">lc_pdca</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -736,25 +694,15 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_pdca</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;sap_flux&quot;</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_pdca</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;sap_flux&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;sap_flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_20_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_20_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_20_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_20_0.png" />
 </div>
 </div>
 <p>This looks like a smooth curve, but that’s because this is such high amplitude variation; note the scale of the y-axis. Zooming in reveals a noisier curve, though small-scale structure is generally of less interest when studying such stars.</p>
@@ -770,8 +718,7 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf_scrq</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 11182716&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf_scrq</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 11182716&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">one_pixel_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">tpf_scrq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">tpf_scrq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;bool&#39;</span><span class="p">)</span>
 <span class="n">one_pixel_mask</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">lc_scrq</span> <span class="o">=</span> <span class="n">tpf_scrq</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">one_pixel_mask</span><span class="p">)</span>
@@ -779,20 +726,11 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_24_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_24_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_24_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_24_0.png" />
 </div>
 </div>
 </section>
@@ -804,8 +742,7 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_scsf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 11182716&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_scsf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 11182716&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">lc_scsf</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
@@ -829,8 +766,7 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_scsf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 2303576&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_scsf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 2303576&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">lc_scsf</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">):</span>
@@ -859,26 +795,16 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_k2</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;EPIC 211414081&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_k2</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;EPIC 211414081&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">lc_k2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;sap_flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_31_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_31_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_31_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_31_0.png" />
 </div>
 </div>
 <p>The PDCSAP time series for this target shows the effect of the six-hour systematics as regular spikes and occasional dramatic outliers:</p>
@@ -886,25 +812,15 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_k2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_k2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_33_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_33_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_33_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_33_0.png" />
 </div>
 </div>
 <p>The <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19116-002.pdf">K2 Handbook</a> cautions that no detrending method can 100% remove the effects of thruster firing, even in Long Cadence data. However, as Short Cadence data are harder to correct than Long Cadence, some Short Cadence targets may be better suited to custom aperture photometry than using PDCSAP.</p>
@@ -913,25 +829,15 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_k2</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_k2</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\frac{1}{d}}$]&#39;, ylabel=&#39;Power [$\\mathrm{\\frac{e^{-}}{s}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_35_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_35_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_35_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_35_0.png" />
 </div>
 </div>
 <p>We can see a series of high-amplitude spikes at four cycles/day, or a six-hour period. Two harmonics of the Long Cadence sampling frequency are also present, as above. Comparing the scale of these two sets of spurious frequencies, we can see the negative impact of the six-hour drift on <em>K2</em> Short Cadence data.</p>
@@ -951,8 +857,7 @@ its ability to probe higher frequencies.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1185,7 +1090,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

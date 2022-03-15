@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -1183,7 +1183,7 @@
 <h1>lightkurve.LightCurve.search_neighbors<a class="headerlink" href="#lightkurve-lightcurve-search-neighbors" title="Permalink to this headline">¶</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.LightCurve.search_neighbors">
-<span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">search_neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">3600.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">search_criteria</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.search_neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.search_neighbors" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">search_neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3600.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">search_criteria</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.search_neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.search_neighbors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search the data archive at MAST for the most nearby light curves.</p>
 <p>By default, the 10 nearest neighbors located within 3600 arcseconds
 are returned. You can override these defaults by changing the <code class="xref py py-obj docutils literal notranslate"><span class="pre">limit</span></code>
@@ -1202,7 +1202,7 @@ list of search parameters accepted.</p>
 <dd class="field-odd"><dl>
 <dt><strong>limit</strong><span class="classifier">int</span></dt><dd><p>Maximum number of results to return.</p>
 </dd>
-<dt><strong>radius</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt><dd><p>Conesearch radius.  If a float is given it will be assumed to be in
+<dt><strong>radius</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt><dd><p>Conesearch radius.  If a float is given it will be assumed to be in
 units of arcseconds.</p>
 </dd>
 <dt><strong>**search_criteria</strong><span class="classifier">kwargs</span></dt><dd><p>Extra criteria to be passed to <a class="reference internal" href="lightkurve.search_lightcurve.html#lightkurve.search_lightcurve" title="lightkurve.search_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurve</span></code></a>.</p>
@@ -1261,7 +1261,7 @@ distance from the current light curve.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -472,7 +472,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -543,8 +543,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 </pre></div>
 </div>
@@ -562,26 +561,16 @@ ultimately causes different flux levels to be detected as the target’s Point S
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;K2-199&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;K2-199&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 212779596, Cadence: 111362&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_7_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_7_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_7_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_7_0.png" />
 </div>
 </div>
 <p>There are two ways to create a <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> object. The first is to create an instance of the class directly and pass in the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code>.</p>
@@ -589,8 +578,7 @@ ultimately causes different flux levels to be detected as the target’s Point S
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">PLDCorrector</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">PLDCorrector</span>
 <span class="n">pld</span> <span class="o">=</span> <span class="n">PLDCorrector</span><span class="p">(</span><span class="n">tpf</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">pld</span><span class="p">)</span>
 </pre></div>
@@ -609,8 +597,7 @@ PLDCorrector (ID: EPIC 212779596)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pld</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_corrector</span><span class="p">(</span><span class="s1">&#39;pld&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pld</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_corrector</span><span class="p">(</span><span class="s1">&#39;pld&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">pld</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -628,8 +615,7 @@ PLDCorrector (ID: EPIC 212779596)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">pld</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">pld</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -639,8 +625,7 @@ PLDCorrector (ID: EPIC 212779596)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Create and plot an uncorrected light curve using Simple Aperture Photometry</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create and plot an uncorrected light curve using Simple Aperture Photometry</span>
 <span class="n">uncorrected_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Uncorrected Light Curve&#39;</span><span class="p">);</span>
 <span class="c1"># Plot the PLD-corrected light curve in black on top</span>
@@ -648,20 +633,11 @@ PLDCorrector (ID: EPIC 212779596)
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_15_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_15_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_15_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_15_0.png" />
 </div>
 </div>
 <p>The uncorrected light curve is dominated by a short period (about six hours) sawtooth-shaped pattern caused by the <em>Kepler</em> spacecraft thruster firings. PLD captures this trend in the noise model and has subtracted it, leaving the much more accurate light curve in black.</p>
@@ -670,8 +646,7 @@ PLDCorrector (ID: EPIC 212779596)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">uncorrected_cdpp</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">uncorrected_cdpp</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span>
 <span class="n">corrected_cdpp</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Uncorrected CDPP = </span><span class="si">{</span><span class="n">uncorrected_cdpp</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Corrected CDPP = </span><span class="si">{</span><span class="n">corrected_cdpp</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -698,28 +673,15 @@ Corrected CDPP = 106 ppm
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pld</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pld</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
-       &lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
-       &lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
-      dtype=object)
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_20_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_20_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_20_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_20_0.png" />
 </div>
 </div>
 <p>The diagnostic plot is composed of the following panels: - <strong>Top panel</strong>: The uncorrected light curve (<code class="docutils literal notranslate"><span class="pre">original</span></code>) is shown in black, with the Combined Differential Photometric Precision (CDPP), a measurement of the light curve’s scatter, noted in the legend. - <strong>Middle panel</strong>: The PLD-corrected light curve (<code class="docutils literal notranslate"><span class="pre">corrected</span></code>) is plotted in gray with the noise model created by the combination of pixel values (<code class="docutils literal notranslate"><span class="pre">pixel_series</span></code>) in blue, the estimated background trend (<code class="docutils literal notranslate"><span class="pre">background</span></code>) in red, and
@@ -731,28 +693,15 @@ the CDPP of each light curve in the legend. This panel also indicates which cade
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pld</span><span class="o">.</span><span class="n">diagnose_masks</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pld</span><span class="o">.</span><span class="n">diagnose_masks</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;,
-       &lt;AxesSubplot:title={&#39;center&#39;:&#39;pld_aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;,
-       &lt;AxesSubplot:title={&#39;center&#39;:&#39;background_aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;],
-      dtype=object)
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_23_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_23_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_23_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_23_0.png" />
 </div>
 </div>
 <p>The panels in the figure visualize the following pixel masks:</p>
@@ -776,8 +725,7 @@ array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;aperture_mask&#39;}, xlabel=
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">transit_mask</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">create_transit_mask</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="p">[</span><span class="mf">3.2277</span><span class="p">,</span> <span class="mf">7.3745</span><span class="p">],</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">transit_mask</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">create_transit_mask</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="p">[</span><span class="mf">3.2277</span><span class="p">,</span> <span class="mf">7.3745</span><span class="p">],</span>
                                                 <span class="n">duration</span><span class="o">=</span><span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">],</span>
                                                 <span class="n">transit_time</span><span class="o">=</span><span class="p">[</span><span class="mf">2385.6635</span><span class="p">,</span> <span class="mf">2389.9635</span><span class="p">])</span>
 </pre></div>
@@ -788,26 +736,16 @@ array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;aperture_mask&#39;}, xlabel=
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Corrected Light Curve&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Corrected Light Curve&#39;</span><span class="p">)</span>
 <span class="n">corrected_lc</span><span class="p">[</span><span class="n">transit_mask</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;transit_mask&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_28_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_28_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_28_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_28_0.png" />
 </div>
 </div>
 <p>The red points appear to match the in-transit cadences for both of the planets around K2-199.</p>
@@ -817,29 +755,16 @@ array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;aperture_mask&#39;}, xlabel=
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">pld</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">cadence_mask</span><span class="o">=~</span><span class="n">transit_mask</span><span class="p">,</span> <span class="n">restore_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">pld</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">cadence_mask</span><span class="o">=~</span><span class="n">transit_mask</span><span class="p">,</span> <span class="n">restore_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">pld</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
-       &lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
-       &lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
-      dtype=object)
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_30_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_30_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_30_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_30_0.png" />
 </div>
 </div>
 <p>Now, only points that are greater than five standard deviations above or below the light curve but not in-transit will be marked as outliers, and the in-transit points (marked in blue in the bottom panel) will not be used to fit the spline.</p>
@@ -848,26 +773,16 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Corrected Light Curve&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Corrected Light Curve&#39;</span><span class="p">)</span>
 <span class="n">corrected_lc</span><span class="p">[</span><span class="n">transit_mask</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;transit_mask&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_32_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_32_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_32_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_32_0.png" />
 </div>
 </div>
 <p>This correction looks great! We have demonstrated that PLD is effective at removing systematic trends in <em>K2</em> data. Now, let’s apply PLD to <em>TESS</em> observations.</p>
@@ -883,8 +798,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_tesscut</span><span class="p">(</span><span class="s1">&#39;WR40&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_tesscut</span><span class="p">(</span><span class="s1">&#39;WR40&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">search_result</span>
 </pre></div>
 </div>
@@ -896,7 +810,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6396633040">
+<table id="table5489630400">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 10</td><td>2019</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>WR40</td><td>0.0</td></tr>
@@ -908,26 +822,16 @@ SearchResult containing 1 data products.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">cutout_size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">cutout_size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: WR40, Cadence: 0&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_38_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_38_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_38_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_38_0.png" />
 </div>
 </div>
 <p>We can create an uncorrected SAP light curve from this target pixel file using a threshold mask.</p>
@@ -935,26 +839,16 @@ SearchResult containing 1 data products.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">uncorrected_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;threshold&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">uncorrected_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;threshold&#39;</span><span class="p">)</span>
 <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_40_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_40_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_40_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_40_0.png" />
 </div>
 </div>
 <p>The dominant trend in the SAP light curve above is the dramatic ramp up in flux due to the scattered light background on the <em>TESS</em> detector. The pulsation signal of WR 40 can also be seen clearly, with some additional long-period variability.</p>
@@ -963,30 +857,17 @@ SearchResult containing 1 data products.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pld</span> <span class="o">=</span> <span class="n">PLDCorrector</span><span class="p">(</span><span class="n">tpf</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pld</span> <span class="o">=</span> <span class="n">PLDCorrector</span><span class="p">(</span><span class="n">tpf</span><span class="p">)</span>
 <span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">pld</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span>
 <span class="n">pld</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
-       &lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
-       &lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
-      dtype=object)
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_42_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_42_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_42_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_42_0.png" />
 </div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">background</span></code> component of the PLD model (shown in blue in the middle panel) has successfully isolated the large spikes without fitting out the pulsations of WR 40.</p>
@@ -995,28 +876,15 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pld</span><span class="o">.</span><span class="n">diagnose_masks</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pld</span><span class="o">.</span><span class="n">diagnose_masks</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;,
-       &lt;AxesSubplot:title={&#39;center&#39;:&#39;pld_aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;,
-       &lt;AxesSubplot:title={&#39;center&#39;:&#39;background_aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;],
-      dtype=object)
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_44_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_44_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_44_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_44_0.png" />
 </div>
 </div>
 </section>
@@ -1075,8 +943,7 @@ error.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1309,7 +1176,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

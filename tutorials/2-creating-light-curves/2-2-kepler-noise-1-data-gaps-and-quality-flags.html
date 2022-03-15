@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -488,7 +488,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -553,8 +553,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
@@ -576,8 +575,7 @@ which are expressed as an integer. A handy reference document for <em>Kepler</em
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 2436365&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 2436365&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -587,8 +585,7 @@ which are expressed as an integer. A handy reference document for <em>Kepler</em
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 2436365&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 2436365&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -599,8 +596,7 @@ which are expressed as an integer. A handy reference document for <em>Kepler</em
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -622,8 +618,7 @@ array([     0,      1,     16,     64,    128,    144,    256,   4160,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span><span class="p">):</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">lk</span><span class="o">.</span><span class="n">KeplerQualityFlags</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">flag</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -666,8 +661,7 @@ array([     0,      1,     16,     64,    128,    144,    256,   4160,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">[(</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span> <span class="o">&amp;</span> <span class="mi">64</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># cadence numbers flagged for &quot;Argabrightening&quot; (flag 64)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">[(</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span> <span class="o">&amp;</span> <span class="mi">64</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># cadence numbers flagged for &quot;Argabrightening&quot; (flag 64)</span>
 </pre></div>
 </div>
 </div>
@@ -700,28 +694,18 @@ Handbook</a>, Section 5.5.)</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">225</span><span class="p">,</span> <span class="mi">238</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">5300</span><span class="p">,</span> <span class="mi">5600</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">(),</span> <span class="mf">230.3</span><span class="p">,</span> <span class="mf">231.4</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x17cea31c0&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_20_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_20_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_20_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_20_0.png" />
 </div>
 </div>
 </section>
@@ -733,28 +717,18 @@ Handbook</a>, Section 5.5.)</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">170</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">5450</span><span class="p">,</span> <span class="mi">5800</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">(),</span> <span class="mf">181.5</span><span class="p">,</span> <span class="mf">183.8</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x17d0a3700&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_22_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_22_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_22_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_22_0.png" />
 </div>
 </div>
 </section>
@@ -767,8 +741,7 @@ with NaNs.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">215</span><span class="p">,</span><span class="mi">260</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymax</span><span class="o">=</span><span class="mi">5550</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">(),</span> <span class="mf">223.5</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
@@ -776,20 +749,11 @@ with NaNs.</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x17d21d1c0&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_24_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_24_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_24_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_24_0.png" />
 </div>
 </div>
 <p>Let’s also look at a TPF cadence affected by a loss of fine pointing:</p>
@@ -797,8 +761,7 @@ with NaNs.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">((</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span> <span class="o">&amp;</span> <span class="mi">32804</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)][</span><span class="mi">0</span><span class="p">])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">((</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span> <span class="o">&amp;</span> <span class="mi">32804</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)][</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cadenceno</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span> <span class="o">==</span> <span class="mi">32804</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]);</span>
 </pre></div>
 </div>
@@ -814,20 +777,11 @@ with NaNs.</p>
   [nan nan nan nan nan]]] electron / s
 </pre></div></div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: 2436365, Cadence: 5624&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_26_2.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_26_2.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_26_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_26_1.png" />
 </div>
 </div>
 <p>As you can see, there’s no data available for this cadence at the TPF level. The vast majority of data affected by a loss of fine pointing/coarse pointing during the <em>Kepler</em> and <em>K2</em> missions is “gapped” like this. When performing photometry or light curve corrections, it’s important to pay attention to the data on either side of these gaps and make sure you don’t overcorrect it.</p>
@@ -845,8 +799,7 @@ short-term events.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">243</span><span class="p">,</span> <span class="mi">257</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymax</span><span class="o">=</span><span class="mi">6540</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">(),</span> <span class="mi">250</span><span class="p">,</span> <span class="mf">250.8</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
@@ -859,7 +812,7 @@ short-term events.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x17d3229d0&gt;
+&lt;matplotlib.collections.PolyCollection at 0x14964f340&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -879,8 +832,7 @@ Argabrightening is the result of physical illumination.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[(</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span> <span class="o">&amp;</span> <span class="mi">4160</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[(</span><span class="n">tpf</span><span class="o">.</span><span class="n">quality</span> <span class="o">&amp;</span> <span class="mi">4160</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -899,28 +851,18 @@ array([191.8960099 , 226.77612309, 240.36418455, 247.80180137,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">235</span><span class="p">,</span><span class="mi">245</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">5250</span><span class="p">,</span><span class="mi">5600</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">(),</span> <span class="mf">240.1</span><span class="p">,</span> <span class="mf">240.6</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x17cfed250&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_34_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_34_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_34_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_34_0.png" />
 </div>
 </div>
 </section>
@@ -933,28 +875,18 @@ Guidance Sensor (FGS) system (see the <a class="reference external" href="https:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">241</span><span class="p">,</span> <span class="mi">251</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">5300</span><span class="p">,</span> <span class="mi">5400</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">(),</span> <span class="mi">246</span><span class="p">,</span> <span class="mf">246.5</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x17d363e20&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_36_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_36_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_36_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_36_0.png" />
 </div>
 </div>
 </section>
@@ -975,8 +907,7 @@ Notes</a>, Section 12.2). Further solar flares and coronal mass ejections led to
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_12</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 8805616&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_12</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 8805616&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">lc_12</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">47200</span><span class="p">,</span><span class="mi">48200</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">(),</span> <span class="mf">1116.2</span><span class="p">,</span> <span class="mf">1118.7</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
@@ -985,20 +916,11 @@ Notes</a>, Section 12.2). Further solar flares and coronal mass ejections led to
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x17d62f520&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_39_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_39_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_39_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_39_0.png" />
 </div>
 </div>
 </section>
@@ -1012,8 +934,7 @@ thruster firing.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_k2</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;EPIC 211414081&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_k2</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;EPIC 211414081&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1022,8 +943,7 @@ thruster firing.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">lc_k2</span><span class="o">.</span><span class="n">quality</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]:</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">lc_k2</span><span class="o">.</span><span class="n">quality</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]:</span>
   <span class="nb">print</span><span class="p">(</span><span class="n">lc_k2</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">((</span><span class="n">val</span> <span class="o">&amp;</span> <span class="mi">20</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">val</span> <span class="o">&amp;</span> <span class="mi">21</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)])</span>
 </pre></div>
 </div>
@@ -1050,25 +970,15 @@ thruster firing.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_k2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_k2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;sap_flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_45_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_45_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_45_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_45_0.png" />
 </div>
 </div>
 <p>Fortunately, this systematic is well-represented by the cotrending basis vectors (CBVs) used in the PDC pipeline:</p>
@@ -1076,25 +986,15 @@ thruster firing.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_k2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc_k2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_47_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_47_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_47_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-1-data-gaps-and-quality-flags_47_0.png" />
 </div>
 </div>
 <p>The <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19116-002.pdf">K2 Handbook</a> cautions that these effects can never be fully corrected — you can see this particularly to the left of the plot above. But overall, PDC successfully removes the six-hour drift from <em>K2</em> Long Cadence data, providing high-quality time series data for all targets.</p>
@@ -1112,8 +1012,7 @@ thruster firing.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1346,7 +1245,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

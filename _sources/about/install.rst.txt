@@ -59,7 +59,9 @@ Installing the development version
 ==================================
 
 If you want to experiment with the latest development version of
-*Lightkurve*, you can install it straight from the main branch on GitHub::
+*Lightkurve*, you can install it straight from the main branch on GitHub:
+
+.. code-block:: bash
 
     $ git clone https://github.com/lightkurve/lightkurve.git
     $ cd lightkurve
@@ -68,7 +70,10 @@ If you want to experiment with the latest development version of
 If you want to have a so-called editable install which enables the installed
 version to immediately reflect changes made in the source tree, you can use:
 
-    $ python shim-setup.py develop
+.. code-block:: bash
 
-Please see our guide on :ref:`contributing to lightkurve<contributing>`
+    $ python -m pip install poetry
+    $ poetry install
+
+Please see our guide on :ref:`Installing the development environment<install-dev-env>`
 for additional instructions.

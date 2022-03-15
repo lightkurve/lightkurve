@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -478,7 +478,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -539,8 +539,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
@@ -556,8 +555,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">target</span> <span class="o">=</span> <span class="s2">&quot;KIC 8462852&quot;</span>  <span class="c1"># Boyajian&#39;s Star</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">target</span> <span class="o">=</span> <span class="s2">&quot;KIC 8462852&quot;</span>  <span class="c1"># Boyajian&#39;s Star</span>
 <span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_tesscut</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">cutout_size</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -566,8 +564,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span>
 </pre></div>
 </div>
 </div>
@@ -586,8 +583,7 @@ TessTargetPixelFile(TICID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">aper</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aper</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -596,25 +592,15 @@ TessTargetPixelFile(TICID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;Target ID: KIC 8462852, Cadence: 0&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_12_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_12_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_12_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_12_0.png" />
 </div>
 </div>
 <p>Looks good. We can sum up the pixels in this aperture, and create an uncorrected light curve.</p>
@@ -622,8 +608,7 @@ TessTargetPixelFile(TICID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">uncorrected_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">uncorrected_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -631,25 +616,15 @@ TessTargetPixelFile(TICID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_15_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_15_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_15_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_15_0.png" />
 </div>
 </div>
 </section>
@@ -663,8 +638,7 @@ TessTargetPixelFile(TICID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">regressors</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[:,</span> <span class="o">~</span><span class="n">aper</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">regressors</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[:,</span> <span class="o">~</span><span class="n">aper</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -672,8 +646,7 @@ TessTargetPixelFile(TICID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">regressors</span><span class="o">.</span><span class="n">shape</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">regressors</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
 </div>
@@ -691,54 +664,15 @@ TessTargetPixelFile(TICID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">regressors</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">30</span><span class="p">]);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">regressors</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">30</span><span class="p">]);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-[&lt;matplotlib.lines.Line2D at 0x1802a01f0&gt;,
- &lt;matplotlib.lines.Line2D at 0x180519ac0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805baaf0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805babb0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805baca0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805bad90&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805bae80&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805baf70&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c00a0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0190&gt;,
- &lt;matplotlib.lines.Line2D at 0x1804aa460&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0340&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0430&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0520&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0610&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0700&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c07f0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c08e0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c09d0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0ac0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0bb0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0ca0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0d90&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0e80&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c0f70&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c30a0&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c3190&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c3280&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c3370&gt;,
- &lt;matplotlib.lines.Line2D at 0x1805c3460&gt;]
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_21_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_21_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_21_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_21_0.png" />
 </div>
 </div>
 <p>In linear regression problems, it is common to refer to the matrix of regressors as the design matrix (also known as model matrix or regressor matrix). Lightkurve provides a convenient <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> class which is designed to help you work with detrending vectors.</p>
@@ -747,8 +681,7 @@ TessTargetPixelFile(TICID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">DesignMatrix</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">DesignMatrix</span>
 <span class="n">dm</span> <span class="o">=</span> <span class="n">DesignMatrix</span><span class="p">(</span><span class="n">regressors</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;regressors&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -757,8 +690,7 @@ TessTargetPixelFile(TICID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dm</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dm</span>
 </pre></div>
 </div>
 </div>
@@ -782,8 +714,7 @@ regressors DesignMatrix (1190, 2491)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dm</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dm</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -791,8 +722,7 @@ regressors DesignMatrix (1190, 2491)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dm</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dm</span>
 </pre></div>
 </div>
 </div>
@@ -810,29 +740,15 @@ regressors DesignMatrix (1190, 5)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dm</span><span class="o">.</span><span class="n">values</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="mf">0.2</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dm</span><span class="o">.</span><span class="n">values</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="mf">0.2</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-[&lt;matplotlib.lines.Line2D at 0x18267c6d0&gt;,
- &lt;matplotlib.lines.Line2D at 0x18267c730&gt;,
- &lt;matplotlib.lines.Line2D at 0x18267c790&gt;,
- &lt;matplotlib.lines.Line2D at 0x18267c850&gt;,
- &lt;matplotlib.lines.Line2D at 0x18267c910&gt;]
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_29_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_29_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_29_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_29_0.png" />
 </div>
 </div>
 <p>Note: the <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> object provides a convenient <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method to visualize the vectors:</p>
@@ -840,25 +756,15 @@ regressors DesignMatrix (1190, 5)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dm</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dm</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:title={&#39;center&#39;:&#39;regressors&#39;}, xlabel=&#39;Component&#39;, ylabel=&#39;X&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_31_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_31_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_31_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_31_0.png" />
 </div>
 </div>
 <p>We can now detrend the uncorrected light curve against these vectors. Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector#lightkurve.correctors.RegressionCorrector">RegressionCorrector</a> will use linear algebra to find the combination of vectors that makes the input light curve <strong>closest to zero</strong>. To do this, we need one more component; we need an “offset” term, to be able to fit the mean level of the light
@@ -867,8 +773,7 @@ curve. We can do this by appending a “constant” to our design matrix.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dm</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">append_constant</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dm</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">append_constant</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -881,8 +786,7 @@ the vectors we’ve built.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">RegressionCorrector</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">RegressionCorrector</span>
 <span class="n">corrector</span> <span class="o">=</span> <span class="n">RegressionCorrector</span><span class="p">(</span><span class="n">uncorrected_lc</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -891,8 +795,7 @@ the vectors we’ve built.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">corrector</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corrector</span>
 </pre></div>
 </div>
 </div>
@@ -910,8 +813,7 @@ RegressionCorrector (ID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">dm</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">dm</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -920,26 +822,16 @@ RegressionCorrector (ID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Original light curve&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Original light curve&#39;</span><span class="p">)</span>
 <span class="n">corrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Corrected light curve&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_41_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_41_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_41_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_41_0.png" />
 </div>
 </div>
 <p>As shown above, the scattered light from the background has been removed. If we want to take a more in-depth look at the correction, we can use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.diagnose.html?highlight=diagnose#lightkurve.correctors.RegressionCorrector.diagnose">diagnose()</a> method to see what the <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> found as the best fitting solution.</p>
@@ -950,27 +842,15 @@ RegressionCorrector (ID: KIC 8462852)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">corrector</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corrector</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
-       &lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
-      dtype=object)
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_44_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_44_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_44_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_44_0.png" />
 </div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> has clipped out some outliers during the fit of the trend. You can read more about the outlier removal, how to pass a cadence mask, and error propagation in the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector">docs</a>.</p>
@@ -981,8 +861,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">corrector</span><span class="o">.</span><span class="n">model_lc</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corrector</span><span class="o">.</span><span class="n">model_lc</span>
 </pre></div>
 </div>
 </div>
@@ -991,57 +870,66 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
-<i>LightCurve length=1190</i>
-<table id="table6448869328" class="table-striped table-bordered table-condensed">
+<div><i>LightCurve length=1190</i>
+<table id="table5589824368" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th></tr></thead>
-<thead><tr><th>object</th><th>float64</th><th>float64</th></tr></thead>
-<tr><td>1711.3882446289062</td><td>-341.1881606893048</td><td>0.0</td></tr>
-<tr><td>1711.4090576171875</td><td>-341.21407886442285</td><td>0.0</td></tr>
+<thead><tr><th>Time</th><th>float64</th><th>float64</th></tr></thead>
+<tr><td>1711.3882446289062</td><td>-341.18816068929937</td><td>0.0</td></tr>
+<tr><td>1711.4090576171875</td><td>-341.2140788644283</td><td>0.0</td></tr>
 <tr><td>1711.4298706054688</td><td>-341.96344397030225</td><td>0.0</td></tr>
-<tr><td>1711.4507446289062</td><td>-341.8382280404139</td><td>0.0</td></tr>
-<tr><td>1711.4715576171875</td><td>-342.1986575923311</td><td>0.0</td></tr>
-<tr><td>1711.4923706054688</td><td>-342.1091946303977</td><td>0.0</td></tr>
-<tr><td>1711.5132446289062</td><td>-345.8799031162316</td><td>0.0</td></tr>
-<tr><td>1711.5340576171875</td><td>-347.9538232386385</td><td>0.0</td></tr>
-<tr><td>1711.5548706054688</td><td>-344.85160661691134</td><td>0.0</td></tr>
+<tr><td>1711.4507446289062</td><td>-341.83822804042757</td><td>0.0</td></tr>
+<tr><td>1711.4715576171875</td><td>-342.1986575923447</td><td>0.0</td></tr>
+<tr><td>1711.4923706054688</td><td>-342.1091946304032</td><td>0.0</td></tr>
+<tr><td>1711.5132446289062</td><td>-345.879903116248</td><td>0.0</td></tr>
+<tr><td>1711.5340576171875</td><td>-347.9538232386685</td><td>0.0</td></tr>
+<tr><td>1711.5548706054688</td><td>-344.8516066169168</td><td>0.0</td></tr>
+<tr><td>1711.5757446289062</td><td>-340.77795750821133</td><td>0.0</td></tr>
+<tr><td>1711.5965576171875</td><td>-338.8841991927511</td><td>0.0</td></tr>
+<tr><td>1711.6173706054688</td><td>-343.1037257015505</td><td>0.0</td></tr>
+<tr><td>1711.6382446289062</td><td>-343.114070004116</td><td>0.0</td></tr>
+<tr><td>1711.6590576171875</td><td>-341.30432137093976</td><td>0.0</td></tr>
+<tr><td>1711.6798706054688</td><td>-339.718686667934</td><td>0.0</td></tr>
+<tr><td>1711.7007446289062</td><td>-343.17521507113634</td><td>0.0</td></tr>
+<tr><td>1711.7215576171875</td><td>-340.9123053595422</td><td>0.0</td></tr>
+<tr><td>1711.7423706054688</td><td>-338.0889101611956</td><td>0.0</td></tr>
+<tr><td>1711.7632446289062</td><td>-339.9355218982155</td><td>0.0</td></tr>
 <tr><td>...</td><td>...</td><td>...</td></tr>
-<tr><td>1737.2003784179688</td><td>546.2058623584262</td><td>0.0</td></tr>
-<tr><td>1737.2212524414062</td><td>467.26536951096386</td><td>0.0</td></tr>
-<tr><td>1737.2420654296875</td><td>386.19737784154586</td><td>0.0</td></tr>
-<tr><td>1737.2628784179688</td><td>307.61742929044794</td><td>0.0</td></tr>
-<tr><td>1737.2837524414062</td><td>218.354822532855</td><td>0.0</td></tr>
-<tr><td>1737.3045654296875</td><td>109.60592441129302</td><td>0.0</td></tr>
-<tr><td>1737.3253784179688</td><td>2.488369893847448</td><td>0.0</td></tr>
-<tr><td>1737.3462524414062</td><td>-92.91965046689529</td><td>0.0</td></tr>
-<tr><td>1737.3670654296875</td><td>-179.75423736149605</td><td>0.0</td></tr>
-<tr><td>1737.3878784179688</td><td>-238.60812425256609</td><td>0.0</td></tr>
-</table></div>
+<tr><td>1737.0128784179688</td><td>1383.3697160235542</td><td>0.0</td></tr>
+<tr><td>1737.0337524414062</td><td>1300.0225797940711</td><td>0.0</td></tr>
+<tr><td>1737.0545654296875</td><td>1205.8211897224019</td><td>0.0</td></tr>
+<tr><td>1737.0753784179688</td><td>1104.2348007203063</td><td>0.0</td></tr>
+<tr><td>1737.0962524414062</td><td>1002.1220143236997</td><td>0.0</td></tr>
+<tr><td>1737.1170654296875</td><td>901.2487317019804</td><td>0.0</td></tr>
+<tr><td>1737.1378784179688</td><td>804.4742956020254</td><td>0.0</td></tr>
+<tr><td>1737.1587524414062</td><td>709.71287804239</td><td>0.0</td></tr>
+<tr><td>1737.1795654296875</td><td>619.7658175306042</td><td>0.0</td></tr>
+<tr><td>1737.2003784179688</td><td>546.2058623584444</td><td>0.0</td></tr>
+<tr><td>1737.2212524414062</td><td>467.26536951097387</td><td>0.0</td></tr>
+<tr><td>1737.2420654296875</td><td>386.19737784154495</td><td>0.0</td></tr>
+<tr><td>1737.2628784179688</td><td>307.61742929044976</td><td>0.0</td></tr>
+<tr><td>1737.2837524414062</td><td>218.35482253284772</td><td>0.0</td></tr>
+<tr><td>1737.3045654296875</td><td>109.60592441128301</td><td>0.0</td></tr>
+<tr><td>1737.3253784179688</td><td>2.4883698938238012</td><td>0.0</td></tr>
+<tr><td>1737.3462524414062</td><td>-92.91965046691894</td><td>0.0</td></tr>
+<tr><td>1737.3670654296875</td><td>-179.75423736152516</td><td>0.0</td></tr>
+<tr><td>1737.3878784179688</td><td>-238.608124252607</td><td>0.0</td></tr>
+</table></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">model</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">model_lc</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">model_lc</span>
 <span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_48_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_48_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_48_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_48_0.png" />
 </div>
 </div>
 <p>As you can see above, the model drops below zero flux. This is impossible; the scattered light can’t be removing flux from our target!</p>
@@ -1050,8 +938,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Normalize to the 5th percentile of model flux</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Normalize to the 5th percentile of model flux</span>
 <span class="n">model</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1060,25 +947,15 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_51_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_51_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_51_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_51_0.png" />
 </div>
 </div>
 <p>This looks better. Now we can remove this model from our uncorrected light curve.</p>
@@ -1086,8 +963,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">uncorrected_lc</span> <span class="o">-</span> <span class="n">model</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">uncorrected_lc</span> <span class="o">-</span> <span class="n">model</span>
 </pre></div>
 </div>
 </div>
@@ -1095,26 +971,16 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Original light curve&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Original light curve&#39;</span><span class="p">)</span>
 <span class="n">corrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Corrected light curve&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_54_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_54_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_54_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_54_0.png" />
 </div>
 </div>
 <p>This looks great. As a final test, let’s investigate how the light curve we obtained using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> compares against a light curve obtained using a more basic median background removal method.</p>
@@ -1122,8 +988,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">bkg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">regressors</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bkg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">regressors</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">bkg</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bkg</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
 <span class="n">npix</span> <span class="o">=</span> <span class="n">aper</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -1134,20 +999,11 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_56_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_56_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_56_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_56_0.png" />
 </div>
 </div>
 <p>Lastly, let’s show how you can do all of the above in a single cell.</p>
@@ -1155,8 +1011,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Make an aperture mask and an uncorrected light curve</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make an aperture mask and an uncorrected light curve</span>
 <span class="n">aper</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">()</span>
 <span class="n">uncorrected_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="p">)</span>
 
@@ -1174,26 +1029,16 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Original light curve&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Original light curve&#39;</span><span class="p">)</span>
 <span class="n">corrected_ffi_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Corrected light curve&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_59_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_59_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_59_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_59_0.png" />
 </div>
 </div>
 </section>
@@ -1205,8 +1050,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Download a 2-minute cadence Target Pixel File (TPF)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Download a 2-minute cadence Target Pixel File (TPF)</span>
 <span class="n">tpf_2min</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;SPOC&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1215,8 +1059,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf_2min</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tpf_2min</span>
 </pre></div>
 </div>
 </div>
@@ -1234,8 +1077,7 @@ TessTargetPixelFile(TICID: 185336364)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Use the pipeline aperture and an uncorrected light curve</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use the pipeline aperture and an uncorrected light curve</span>
 <span class="n">aper</span> <span class="o">=</span> <span class="n">tpf_2min</span><span class="o">.</span><span class="n">pipeline_mask</span>
 <span class="n">uncorrected_lc</span> <span class="o">=</span> <span class="n">tpf_2min</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
 
@@ -1252,26 +1094,16 @@ TessTargetPixelFile(TICID: 185336364)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Original light curve&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Original light curve&#39;</span><span class="p">)</span>
 <span class="n">corrected_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Corrected light curve&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_65_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_65_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_65_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_65_0.png" />
 </div>
 </div>
 <p>As you can see, the corrected light curve has removed long-term trends and some motion noise, for example, see time around 1720 Barycentric <em>TESS</em> Julian Date (BTJD). We can use the same <code class="docutils literal notranslate"><span class="pre">diagnose()</span></code> method to understand the model that has been fit and subtracted by <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>.</p>
@@ -1279,27 +1111,15 @@ TessTargetPixelFile(TICID: 185336364)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">reg</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reg</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
-       &lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
-      dtype=object)
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_67_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_67_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_67_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_67_0.png" />
 </div>
 </div>
 <p>To show the corrected version has improved, we can use the Combined Differential Photometric Precision (CDPP) metric. As shown below, the corrected light curve has a lower CDPP, showing it is less noisy.</p>
@@ -1307,8 +1127,7 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">uncorrected_lc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1324,8 +1143,7 @@ $880.81385 \; \mathrm{ppm}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">corrected_lc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corrected_lc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1335,7 +1153,7 @@ $880.81385 \; \mathrm{ppm}$</div></div>
 </div>
 <div class="output_area docutils container">
 <div class="math notranslate nohighlight">
-$825.54849 \; \mathrm{ppm}$</div></div>
+$825.56947 \; \mathrm{ppm}$</div></div>
 </div>
 </section>
 <section id="6.-Should-I-use-RegressionCorrector-or-PLDCorrector?">
@@ -1348,31 +1166,18 @@ $825.54849 \; \mathrm{ppm}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">PLDCorrector</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">PLDCorrector</span>
 <span class="n">pld</span> <span class="o">=</span> <span class="n">PLDCorrector</span><span class="p">(</span><span class="n">tpf</span><span class="p">)</span>
 <span class="n">pld_corrected_lc</span> <span class="o">=</span> <span class="n">pld</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">restore_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pca_components</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">pld</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
-       &lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
-       &lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;],
-      dtype=object)
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_72_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_72_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_72_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_72_0.png" />
 </div>
 </div>
 <p>And there we go!</p>
@@ -1381,26 +1186,16 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">corrected_ffi_lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;RegressionCorrector&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">corrected_ffi_lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;RegressionCorrector&#39;</span><span class="p">)</span>
 <span class="n">pld_corrected_lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;PLDCorrector&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2457000 [BTJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_74_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_74_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_74_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_74_0.png" />
 </div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> offers an additional diagnostic plot, named <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.diagnose_masks.html?highlight=diagnose_masks#lightkurve.correctors.PLDCorrector.diagnose_masks">diagnose_masks</a>. This allows you to inspect the pixels that were used to create your design matrix.</p>
@@ -1408,28 +1203,15 @@ array([&lt;AxesSubplot:ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pld</span><span class="o">.</span><span class="n">diagnose_masks</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pld</span><span class="o">.</span><span class="n">diagnose_masks</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-array([&lt;AxesSubplot:title={&#39;center&#39;:&#39;aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;,
-       &lt;AxesSubplot:title={&#39;center&#39;:&#39;pld_aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;,
-       &lt;AxesSubplot:title={&#39;center&#39;:&#39;background_aperture_mask&#39;}, xlabel=&#39;Pixel Column Number&#39;, ylabel=&#39;Pixel Row Number&#39;&gt;],
-      dtype=object)
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_76_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_76_1.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_76_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-removing-scattered-light-using-regressioncorrector_76_0.png" />
 </div>
 </div>
 <p>While it is more convenient to apply to light curves and generally works well with default parameters, the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> is less flexible than the <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>, which allows you to create your own custom design matrix. However, the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> also allows you to create “higher order” PLD regressors by taking the products of existing pixel regressors, which improves the performance of corrections to <em>K2</em> data (see the paper by <a class="reference external" href="https://arxiv.org/abs/1607.00524">Luger et
@@ -1448,8 +1230,7 @@ al. 2016</a> for more information).</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1682,7 +1463,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

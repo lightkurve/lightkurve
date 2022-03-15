@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -439,7 +439,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -506,8 +506,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 </pre></div>
@@ -529,8 +528,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Search Kepler data for Quarters 6, 7, and 8.</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Search Kepler data for Quarters 6, 7, and 8.</span>
 <span class="n">search_result</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 2157356&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
 <span class="c1"># Download and stitch the data together</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
@@ -539,20 +537,11 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_8_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_8_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_8_0.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_8_0.png" />
 </div>
 </div>
 <p>This looks quite different from the light curve we studied in the eclipsing binary tutorial. Here, the brightness modulation from the spots rotating in and out of view is significantly larger, with an overall <span class="math notranslate nohighlight">\(2\%\)</span> change in the brightness of the star! Compare this with asteroseismic oscillations (see the accompanying tutorials), which occur on the parts per million scale instead. (Note: 1 part per million equals 0.0001%).</p>
@@ -565,26 +554,16 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">maximum_period</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">maximum_period</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 <span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">view</span><span class="o">=</span><span class="s1">&#39;period&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Period [$\\mathrm{d}$]&#39;, ylabel=&#39;Power&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_11_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_11_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_11_0.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_11_0.png" />
 </div>
 </div>
 <p>Here we can see a strong peak near 13 days, which is consistent with the sinusoidal trend we saw in the time-domain plot earlier. The reason there are so few aliases in this periodogram is most likely because the star we’ve chosen has a variability that is very close to sinusoidal, which is not always the case.</p>
@@ -593,8 +572,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span>
 </pre></div>
 </div>
 </div>
@@ -618,8 +596,7 @@ power each frequency has in the periodogram. These model fits are stored in the 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Create a model light curve for the highest peak in the periodogram</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a model light curve for the highest peak in the periodogram</span>
 <span class="n">lc_model</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="n">pg</span><span class="o">.</span><span class="n">frequency_at_max_power</span><span class="p">)</span>
 <span class="c1"># Plot the light curve</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
@@ -628,20 +605,11 @@ power each frequency has in the periodogram. These model fits are stored in the 
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_17_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_17_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_17_0.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_17_0.png" />
 </div>
 </div>
 <p>Looking at the plot above, we can see that the Lomb-Scargle model fits the rotation signal relatively well. This is expected; it corresponds to the highest peak in the periodogram, after all. It is not perfect, however. There are deviations in amplitude, and also in phase towards the right hand side of the graph.</p>
@@ -656,8 +624,7 @@ estimate a rotation period.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Download the light curve data</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Download the light curve data</span>
 <span class="n">search</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 8197761&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">&quot;long&quot;</span><span class="p">)</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
 
@@ -667,20 +634,11 @@ estimate a rotation period.</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_20_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_20_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_20_0.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_20_0.png" />
 </div>
 </div>
 <p>Despite these data being folded on the period of a known planet, we are unable to see the planet transits within the noise. Let’s have a look at the periodogram.</p>
@@ -688,26 +646,16 @@ estimate a rotation period.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span>
 <span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\frac{1}{d}}$]&#39;, ylabel=&#39;Power&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_22_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_22_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_22_0.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_22_0.png" />
 </div>
 </div>
 <p>As we can see in this periodogram, the star appears to include multiple high-amplitude oscillation signals. Using the Lomb-Scargle <code class="docutils literal notranslate"><span class="pre">model()</span></code> method we used earlier, we can remove these signals from the time series data. We’ll do this as follows:</p>
@@ -722,8 +670,7 @@ estimate a rotation period.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Remove the signals associated with the 50 highest peaks</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Remove the signals associated with the 50 highest peaks</span>
 <span class="n">newlc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
   <span class="n">pg</span> <span class="o">=</span> <span class="n">newlc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span>
@@ -736,20 +683,11 @@ estimate a rotation period.</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_24_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_24_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_24_0.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_24_0.png" />
 </div>
 </div>
 <p>In the graph above, we can observe that the new light curve displays less variations. Let’s go ahead and fold it to find out if we can see the planet transit this time around. We’ll also plot a binned version of our reduced light curve on top, just to make things clearer.</p>
@@ -757,26 +695,16 @@ estimate a rotation period.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">newlc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">planet_period</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Unbinned&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">newlc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">planet_period</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Unbinned&#39;</span><span class="p">)</span>
 <span class="n">newlc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">planet_period</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Binned&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Normalized Flux&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_26_1.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_26_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_26_0.png" src="../../_images/tutorials_3-science-examples_periodograms-measuring-a-rotation-period_26_0.png" />
 </div>
 </div>
 <p>Now we can see that a “dip” consistent with a planet transit has appeared, which makes it clearer to study!</p>
@@ -796,8 +724,7 @@ imperfect data manipulation operations have been applied.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1030,7 +957,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     

@@ -33,7 +33,7 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.0</p>
+<p class="title">Lightkurve v2.1</p>
 </a>
 
     
@@ -442,7 +442,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -512,8 +512,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 </pre></div>
 </div>
@@ -547,26 +546,16 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 10264202&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;KIC 10264202&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_10_1.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_10_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_10_0.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_10_0.png" />
 </div>
 </div>
 <p>An eclipsing binary is a pair of stars which orbit one another in such a way that they periodically eclipse each other with respect to us, the observers. The eclipse produces a repeating pattern of two “dips” per orbit, creating a rich pattern of ups and downs in the light curve. These stars <a class="reference external" href="https://iopscience.iop.org/article/10.3847/0004-6256/151/3/68">show up frequently</a> in <em>Kepler</em> observations. From looking at this light curve, we might expect two strong peaks in the periodogram, namely:
@@ -577,8 +566,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ppm&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ppm&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">()</span>
 <span class="n">pg</span>
 </pre></div>
 </div>
@@ -598,25 +586,15 @@ LombScarglePeriodogram(ID: KIC 10264202)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\frac{1}{d}}$]&#39;, ylabel=&#39;Power [$\\mathrm{ppm}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_15_1.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_15_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_15_0.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_15_0.png" />
 </div>
 </div>
 <p>While at first glance it may look like there are lots of different signals, the repeating, evenly spaced peaks in this instance are likely <em>alias harmonics</em> of the true oscillation frequency. Harmonics are integer multiples of the oscillation frequency. They occur when a light curve is finite in duration or contains gaps, in which case it is common for a DFT to identify integer multiples as additional candidate signals. For example, an eclipse with a period of 10 days can easily be mistaken for
@@ -627,25 +605,15 @@ an eclipse with a period of 20 days, in particular when the data contains gaps n
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Frequency [$\\mathrm{\\frac{1}{d}}$]&#39;, ylabel=&#39;Power [$\\mathrm{ppm}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_18_1.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_18_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_18_0.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_18_0.png" />
 </div>
 </div>
 <p>The low-frequency peak can be seen around <span class="math notranslate nohighlight">\(0.09\)</span> cycles per day.</p>
@@ -658,8 +626,7 @@ can be accessed through the <a class="reference external" href="https://docs.lig
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pg</span><span class="o">.</span><span class="n">show_properties</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span><span class="o">.</span><span class="n">show_properties</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -693,8 +660,7 @@ oscillation frequency that can be reliably determined from a time series signal.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">period</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">period</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span>
 <span class="n">period</span>
 </pre></div>
 </div>
@@ -711,25 +677,15 @@ $0.51774916 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Period = </span><span class="si">{</span><span class="n">period</span><span class="o">.</span><span class="n">value</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> d&#39;</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Period = </span><span class="si">{</span><span class="n">period</span><span class="o">.</span><span class="n">value</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> d&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_25_1.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_25_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_25_0.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_25_0.png" />
 </div>
 </div>
 <p>This doesn’t look quite right — it seems like there are two transits of different depths overlapping. The largest peak in the spectrum must be a harmonic of the true period. In fact, what seems to be happening here is that both transits are being interpreted as resulting from the same signal, when in reality the two transits will have slightly different depths and shapes.</p>
@@ -738,25 +694,15 @@ $0.51774916 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">period</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">fr</span><span class="s1">&#39;Period = </span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">period</span><span class="o">.</span><span class="n">value</span><span class="si">:</span><span class="s1">.5f</span><span class="si">}</span><span class="s1"> d&#39;</span><span class="p">);</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">period</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">fr</span><span class="s1">&#39;Period = </span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">period</span><span class="o">.</span><span class="n">value</span><span class="si">:</span><span class="s1">.5f</span><span class="si">}</span><span class="s1"> d&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_27_1.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_27_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_27_0.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_27_0.png" />
 </div>
 </div>
 <p>This looks much more sensible! We can see that the two different transits have separated out, and that their differences are clearly visible.</p>
@@ -771,8 +717,7 @@ $0.51774916 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1">#pg = lc.to_periodogram(minimum_period = ...,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#pg = lc.to_periodogram(minimum_period = ...,</span>
 <span class="c1">#                       maximum_period = ...,</span>
 <span class="c1">#                       oversample_factor = ...)</span>
 </pre></div>
@@ -782,8 +727,7 @@ $0.51774916 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1">#Solution:</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Solution:</span>
 <span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">minimum_period</span> <span class="o">=</span> <span class="mf">1.02</span><span class="p">,</span>
                       <span class="n">maximum_period</span> <span class="o">=</span> <span class="mf">1.05</span><span class="p">,</span>
                       <span class="n">oversample_factor</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
@@ -791,46 +735,27 @@ $0.51774916 \; \mathrm{d}$</div></div>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Period [$\\mathrm{d}$]&#39;, ylabel=&#39;Power [$\\mathrm{\\frac{e^{-}}{s}}$]&#39;&gt;
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_31_1.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_31_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_31_0.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_31_0.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">new_period</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_period</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span>
 <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">new_period</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">rf</span><span class="s1">&#39;Period = </span><span class="si">{</span><span class="n">new_period</span><span class="o">.</span><span class="n">value</span><span class="si">:</span><span class="s1">.5f</span><span class="si">}</span><span class="s1"> d&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Phase [JD]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_32_1.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_32_1.png" />
+<img alt="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_32_0.png" src="../../_images/tutorials_3-science-examples_periodograms-creating-periodograms_32_0.png" />
 </div>
 </div>
 </section>
@@ -846,8 +771,7 @@ $0.51774916 \; \mathrm{d}$</div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lk</span><span class="o">.</span><span class="n">show_citation_instructions</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1080,7 +1004,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     
