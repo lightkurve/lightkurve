@@ -510,9 +510,8 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <div style="float:right; margin-bottom:1em;">
-    <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
-    <a href=" https://colab.research.google.com/github/lightkurve/lightkurve/blob/main/docs/source/tutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
-    <a href="https://mybinder.org/v2/gh/lightkurve/lightkurve/main?filepath=docs/source/tutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+    <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
+    <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Removing-noise-from-Kepler,-K2,-and-TESS-light-curves-using-Cotrending-Basis-Vectors-(CBVCorrector)">
 <h1>Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (<code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>)<a class="headerlink" href="#Removing-noise-from-Kepler,-K2,-and-TESS-light-curves-using-Cotrending-Basis-Vectors-(CBVCorrector)" title="Permalink to this headline">¶</a></h1>
@@ -670,7 +669,7 @@ Kepler and TESS lightcurves. Let’s look at the CBVCorrector goodness metrics t
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.7701418096536327
+Over fitting Metric: 0.770419116681801
 Under fitting Metric: 0.998861504673248
 </pre></div></div>
 </div>
@@ -711,9 +710,9 @@ probably injected signals into our lightcurve and we should not trust this reall
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996917363019228
-Optimized Under-fitting metric: 0.8256122767990377
-Optimized Alpha: 9.644e+03
+Optimized Over-fitting metric: 0.9996924822630925
+Optimized Under-fitting metric: 0.8256121147796244
+Optimized Alpha: 9.787e+03
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -750,9 +749,9 @@ more interested in. Below we more greatly emphasize improving the over-fitting m
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996935525791087
-Optimized Under-fitting metric: 0.8256120264211814
-Optimized Alpha: 9.868e+03
+Optimized Over-fitting metric: 0.9996924227344174
+Optimized Under-fitting metric: 0.8256121000894387
+Optimized Alpha: 9.800e+03
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -810,7 +809,7 @@ Optimized Alpha: 9.868e+03
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.36932896005261673
+Over fitting Metric: 0.36957593370870895
 Under fitting Metric: 0.9998238120367
 </pre></div></div>
 </div>
@@ -862,9 +861,9 @@ you are only looking at the low frequency signals in the data then perhaps you d
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.7990421976783335
-Optimized Under-fitting metric: 0.477464493315342
-Optimized Alpha: 2.823e+00
+Optimized Over-fitting metric: 0.7996058191379994
+Optimized Under-fitting metric: 0.47736341299894824
+Optimized Alpha: 2.827e+00
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -969,7 +968,7 @@ ideal fit.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting Metric: 0.6734063377708963
+Over-fitting Metric: 0.6741662707569795
 Under-fitting Metric: 0.8283914619415863
 </pre></div></div>
 </div>
@@ -1025,8 +1024,8 @@ the CBVCorrector object the CBVs will be downloaded, but the CBVs are for 2-minu
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting metric: 0.07928911035289435
-CDPP: 230.75800274217823 ppm
+Over-fitting metric: 0.07965517479951628
+CDPP: 230.75800271228832 ppm
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1056,8 +1055,8 @@ CDPP: 230.75800274217823 ppm
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting metric: 0.31542380309201745
-CDPP: 55.83742644002937 ppm
+Over-fitting metric: 0.31812307752341795
+CDPP: 55.83742643124594 ppm
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1105,9 +1104,9 @@ we do see the under-fitting metric degrades slightly beginning at alpha=1e-1.</p
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.3502847809074801
-Optimized Alpha: 8.784e-04
-CDPP: 68.51886968421978 ppm
+Optimized Over-fitting metric: 0.35035502013750475
+Optimized Alpha: 7.530e-04
+CDPP: 66.23675590473148 ppm
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">

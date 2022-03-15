@@ -22,6 +22,8 @@ Cotrending Basis Vectors (CBV)
 .. autosummary::
   :toctree: api/
 
+  load_tess_cbvs
+  load_kepler_cbvs
   CBVCorrector
   CBVCorrector.correct
   CBVCorrector.diagnose

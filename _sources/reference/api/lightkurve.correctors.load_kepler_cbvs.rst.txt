@@ -1,0 +1,6 @@
+﻿lightkurve.correctors.load\_kepler\_cbvs
+========================================
+
+.. currentmodule:: lightkurve.correctors
+
+.. autofunction:: load_kepler_cbvs

@@ -91,12 +91,6 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../tutorials/index.html">
-  Tutorials
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../reference/index.html">
   API
  </a>
@@ -1883,7 +1877,7 @@
     <span class="k">return</span> <span class="n">load_kepler_cbvs</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">load_kepler_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">mission</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="load_kepler_cbvs"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.load_kepler_cbvs.html#lightkurve.correctors.load_kepler_cbvs">[docs]</a><span class="k">def</span> <span class="nf">load_kepler_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">mission</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Loads Kepler or K2 cotrending basis vectors, either from a local directory cbv_dir </span>
 <span class="sd">    or searches the public data archive at MAST &lt;https://archive.stsci.edu&gt;.</span>
@@ -1978,7 +1972,7 @@
         <span class="k">return</span> <span class="n">KeplerCotrendingBasisVectors</span><span class="o">.</span><span class="n">from_hdu</span><span class="p">(</span><span class="n">hdu</span><span class="o">=</span><span class="n">hdu</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
 
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;CBVS were not found&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;CBVS were not found&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
 
 
 <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;2.1&quot;</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;load_tess_cbvs&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">)</span>
@@ -1986,7 +1980,7 @@
     <span class="k">return</span> <span class="n">load_tess_cbvs</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">load_tess_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="load_tess_cbvs"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.load_tess_cbvs.html#lightkurve.correctors.load_tess_cbvs">[docs]</a><span class="k">def</span> <span class="nf">load_tess_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">ccd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Loads TESS cotrending basis vectors, either from a directory of </span>
 <span class="sd">    CBV files already saved locally if cbv_dir is passed, or else </span>
@@ -2116,7 +2110,7 @@
         <span class="k">return</span> <span class="n">TessCotrendingBasisVectors</span><span class="o">.</span><span class="n">from_hdu</span><span class="p">(</span><span class="n">hdu</span><span class="o">=</span><span class="n">hdu</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="n">cbv_type</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="n">band</span><span class="p">)</span>
 
     <span class="k">except</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;CBVS were not found&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;CBVS were not found&#39;</span><span class="p">)</span></div>
 </pre></div>
 
               </div>
