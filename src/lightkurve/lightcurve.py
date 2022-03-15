@@ -2616,7 +2616,10 @@ class LightCurve(QTimeSeries):
 
         # If the method is average we need to denormalize the plot
         if method in ["mean", "median"]:
-            ar *= np.nanmedian(self.flux.value)
+            median = np.nanmedian(self.flux.value)
+            if hasattr(median, 'mask'):
+                median = median.filled(np.nan)
+            ar *= median
 
         d = np.max(
             [
