@@ -1,7 +1,6 @@
-from __future__ import division, print_function
-
 from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
+from astropy.utils.masked import Masked
 from astropy import units as u
 from astropy.table import Table, Column, MaskedColumn
 from astropy.time import Time, TimeDelta
@@ -1750,3 +1749,11 @@ def test_nbins():
     lc = LightCurve(flux=[0, 0, 0])
     # This statement raised an IndexError with Astropy v5.0rc2:
     lc.bin(bins=2)
+
+
+def test_river_plot_with_masked_flux():
+    """Regression test for #1175."""
+    flux = Masked(np.random.normal(loc=1, scale=0.1, size=100))
+    flux_err = Masked(0.1*np.ones(100))
+    lc = LightCurve(time=np.linspace(1, 100, 100), flux=flux, flux_err=flux_err)
+    lc.plot_river(period=10.)
