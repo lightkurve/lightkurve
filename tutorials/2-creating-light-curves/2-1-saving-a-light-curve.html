@@ -542,7 +542,7 @@ NEXTEND =                    2 / number of standard extensions
 EXTNAME = &#39;PRIMARY &#39;           / name of extension
 EXTVER  =                    1 / extension version number (not format version)
 ORIGIN  = &#39;Unofficial data product&#39; / institution responsible for file
-DATE    = &#39;2022-03-15&#39;         / file creation date.
+DATE    = &#39;2022-03-16&#39;         / file creation date.
 CREATOR = &#39;lightkurve.LightCurve.to_fits()&#39; / pipeline job and program used t
 TELESCOP= &#39;KEPLER  &#39;           / telescope
 INSTRUME= &#39;Kepler Photometer&#39;  / detector type
@@ -558,8 +558,8 @@ MISSION = &#39;Kepler  &#39;
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;DJJiFHGhDHGhDHGh&#39;   / HDU checksum updated 2022-03-15T14:05:05
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2022-03-15T14:05:05
+CHECKSUM= &#39;CGGgFFGfCFGfCFGf&#39;   / HDU checksum updated 2022-03-16T08:14:48
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2022-03-16T08:14:48
 </pre></div></div>
 </div>
 <p>Looks like it has all the correct information about the target. What about the second extension?</p>
@@ -603,8 +603,8 @@ TFORM6  = &#39;D       &#39;
 TTYPE7  = &#39;MOM_CENTR2&#39;
 TFORM7  = &#39;D       &#39;
 EXTNAME = &#39;LIGHTCURVE&#39;
-CHECKSUM= &#39;BFgABDe7BDeABDe7&#39;   / HDU checksum updated 2022-03-15T14:05:05
-DATASUM = &#39;390244549&#39;          / data unit checksum updated 2022-03-15T14:05:05
+CHECKSUM= &#39;ADgABBd3ABdAABd3&#39;   / HDU checksum updated 2022-03-16T08:14:48
+DATASUM = &#39;390244549&#39;          / data unit checksum updated 2022-03-16T08:14:48
 </pre></div></div>
 </div>
 <p>This extension has 7 columns, <code class="docutils literal notranslate"><span class="pre">TIME</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX_ERR</span></code>, <code class="docutils literal notranslate"><span class="pre">SAP_QUALITY</span></code>, <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code>, <code class="docutils literal notranslate"><span class="pre">MOM_CENTR1</span></code>, and <code class="docutils literal notranslate"><span class="pre">MOM_CENTR2</span></code>. What if we wanted to add new keywords to our fits file? HLSP products require some extra keywords. Let’s add some keywords to explain who made the data, and what our HLSP is.</p>
@@ -650,7 +650,7 @@ NEXTEND =                    2 / number of standard extensions
 EXTNAME = &#39;PRIMARY &#39;           / name of extension
 EXTVER  =                    1 / extension version number (not format version)
 ORIGIN  = &#39;Unofficial data product&#39; / institution responsible for file
-DATE    = &#39;2022-03-15&#39;         / file creation date.
+DATE    = &#39;2022-03-16&#39;         / file creation date.
 CREATOR = &#39;lightkurve.LightCurve.to_fits()&#39; / pipeline job and program used t
 TELESCOP= &#39;KEPLER  &#39;           / telescope
 INSTRUME= &#39;Kepler Photometer&#39;  / detector type
@@ -669,8 +669,8 @@ MISSION = &#39;Kepler  &#39;
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;Z4dAg4b6Z4bAf4b5&#39;   / HDU checksum updated 2022-03-15T14:05:05
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2022-03-15T14:05:05
+CHECKSUM= &#39;Z4dAf1a2Z1a9d1a9&#39;   / HDU checksum updated 2022-03-16T08:14:48
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2022-03-16T08:14:48
 </pre></div></div>
 </div>
 <p>Now our new keywords are included in the primary header! What about if we want to add more <strong>data columns</strong> to our fits file? We can simply add data columns in the same way. Let’s add the data quality to our fits file.</p>
