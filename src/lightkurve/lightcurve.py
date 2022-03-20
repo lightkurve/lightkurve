@@ -1691,7 +1691,10 @@ class LightCurve(QTimeSeries):
             raise ValueError("the `cadence_mask` argument is missing or invalid")
         # Avoid searching times with NaN flux; this is necessary because e.g.
         # `remove_outliers` includes NaNs in its mask.
-        cadence_mask &= ~np.isnan(self.flux)
+        if hasattr(self.flux, 'mask'):
+            cadence_mask &= ~np.isnan(self.flux.unmasked)
+        else:
+            cadence_mask &= ~np.isnan(self.flux)
 
         # Validate `location`
         if location is None:
