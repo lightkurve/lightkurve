@@ -1064,17 +1064,19 @@ def test_fill_gaps():
     assert np.any(nlc.time.value == 5)
     assert np.all(nlc.flux == 1)
     assert np.all(np.isfinite(nlc.flux))
-    
+
+    # Regression test for https://github.com/lightkurve/lightkurve/pull/1172
     lc_mask = [False, False, True, False, False, False, False]
     lc = LightCurve(
-        time=[1, 2, 3, 4, 6, 7, 8], 
-        flux=Masked([1, 1, np.nan, 1, 1, 1, 1], mask=lc_mask), 
+        time=[1, 2, 3, 4, 6, 7, 8],
+        flux=Masked([1, 1, np.nan, 1, 1, 1, 1], mask=lc_mask),
         flux_err=Masked([0, 0, np.nan, 0, 0, 0, 0], mask=lc_mask)
     )
     nlc = lc.fill_gaps()
     assert len(lc.time) < len(nlc.time)
     assert np.any(nlc.time.value == 5)
     assert np.all(nlc.flux == 1)
+    assert np.all(nlc.flux_err == 0)
     assert np.all(np.isfinite(nlc.flux))
 
     # Because fill_gaps() uses pandas, check that it works regardless of endianness
