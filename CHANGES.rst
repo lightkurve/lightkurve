@@ -7,8 +7,8 @@
 - Fixed a bug in `search_tesscut(...).download()` which caused TESSCut
   downloads to fail when Astroquery v0.4.6 or later is installed. [#1176]
 
-- Fixed a bug in ``LightCurve.fill_gaps()`` which triggered a
-  ``ValueError`` in the presence of masked data. [#1172]
+- Fixed a bug in ``LightCurve.fill_gaps()`` which caused incorrect
+  results in the presence of masked data. [#1172]
 
 
 
