@@ -503,7 +503,7 @@ class SearchResult(object):
 
         # build path string name and check if it exists
         # this is necessary to ensure cutouts are not downloaded multiple times
-        sec = TesscutClass().get_sectors(coords)
+        sec = TesscutClass().get_sectors(coordinates=coords)
         sector_name = sec[sec["sector"] == sector]["sectorName"][0]
         if isinstance(cutout_size, int):
             size_str = str(int(cutout_size)) + "x" + str(int(cutout_size))
@@ -529,7 +529,7 @@ class SearchResult(object):
         # otherwise the file will be downloaded
         else:
             cutout_path = TesscutClass().download_cutouts(
-                coords, size=cutout_size, sector=sector, path=tesscut_dir
+                coordinates=coords, size=cutout_size, sector=sector, path=tesscut_dir
             )
             path = cutout_path[0][0]  # the cutoutpath already contains testcut_dir
             log.debug("Finished downloading.")

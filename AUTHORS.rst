@@ -53,6 +53,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Warrick Ball <https://github.com/warrickball>`_
 - `Isaac Yong <https://github.com/isaac-yong0804>`_
 - `Gutsycat <https://github.com/Sniperq2>`_
+- `Jennifer V Medina <https://github.com/jaymedina>`_
 
 
 Community
