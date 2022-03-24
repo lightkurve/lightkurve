@@ -54,6 +54,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Isaac Yong <https://github.com/isaac-yong0804>`_
 - `Gutsycat <https://github.com/Sniperq2>`_
 - `Jennifer V Medina <https://github.com/jaymedina>`_
+- `Keyu Xing <https://github.com/keyuxing>`_
 
 
 Community

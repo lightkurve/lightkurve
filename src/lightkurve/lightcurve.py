@@ -1180,7 +1180,13 @@ class LightCurve(QTimeSeries):
         fe = np.zeros(len(ntime))
         fe[in_original] = np.copy(lc.flux_err)
 
-        fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err)
+        # Temporary workaround for issue #1172.  TODO: remove the `if`` statement
+        # below once we adopt AstroPy >=5.0.3 as a minimum dependency.
+        if hasattr(lc.flux_err, 'mask'):
+            fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err.unmasked)
+        else:
+            fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err)
+
         if method == "gaussian_noise":
             try:
                 std = lc.estimate_cdpp().to(lc.flux.unit).value
@@ -1687,7 +1693,12 @@ class LightCurve(QTimeSeries):
             raise ValueError("the `cadence_mask` argument is missing or invalid")
         # Avoid searching times with NaN flux; this is necessary because e.g.
         # `remove_outliers` includes NaNs in its mask.
-        cadence_mask &= ~np.isnan(self.flux)
+        if hasattr(self.flux, 'mask'):
+            # Temporary workaround for issue #1172. TODO: remove this `if`` statement
+            # once we adopt AstroPy >=5.0.3 as a minimum dependency
+            cadence_mask &= ~np.isnan(self.flux.unmasked)
+        else:
+            cadence_mask &= ~np.isnan(self.flux)
 
         # Validate `location`
         if location is None:
