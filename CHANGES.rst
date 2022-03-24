@@ -4,6 +4,9 @@
 - Fixed a bug in ``LightCurve.plot_river()`` which triggered a
   `TypeError: cannot write to unmasked output`. [#1175]
 
+- Fixed a bug in `search_tesscut(...).download()` which caused TESSCut
+  downloads to fail when Astroquery v0.4.6 or later is installed.
+
 
 2.1.0 (2022-02-10)
 ==================
