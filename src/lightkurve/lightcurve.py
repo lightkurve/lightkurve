@@ -505,6 +505,17 @@ class LightCurve(QTimeSeries):
                 lc["flux_err"][:] = np.nan
 
         lc.meta['FLUX_ORIGIN'] = flux_column
+        normalized_new_flux = lc["flux"].unit is None or lc["flux"].unit is u.dimensionless_unscaled
+        # Note: here we assume unitless flux means it's normalized
+        # it's not exactly true in many constructed lightcurves in unit test
+        # but the assumption should hold for any real world use cases, e.g. TESS QLP
+        if normalized_new_flux:
+            lc.meta["NORMALIZED"] = normalized_new_flux
+        else:
+            # remove it altogether.
+            # Setting to False would suffice;
+            # but in typical non-normalized LC, the header will not be there at all.
+            lc.meta.pop("NORMALIZED", None)
         return lc
 
     # Define deprecated attributes for compatibility with Lightkurve v1.x:
