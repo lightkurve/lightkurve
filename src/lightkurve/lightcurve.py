@@ -1025,7 +1025,7 @@ class LightCurve(QTimeSeries):
         """Returns a normalized version of the light curve.
 
         The normalized light curve is obtained by dividing the ``flux`` and
-        ``flux_err`` object attributes by the by the median flux.
+        ``flux_err`` object attributes by the median flux.
         Optionally, the result will be multiplied by 1e2 (if `unit='percent'`),
         1e3 (`unit='ppt'`), or 1e6 (`unit='ppm'`).
 
