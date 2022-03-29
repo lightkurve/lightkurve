@@ -1,6 +1,9 @@
 2.1.2 (unreleased)
 ==================
 
+- Fixed a bug in ``LightCurve.select_flux()`` to ensure ``NORMALIZED`` header
+  is set based on the new ``flux`` column. [#1094]
+
 
 
 2.1.1 (2022-03-24)
