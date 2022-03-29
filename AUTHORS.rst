@@ -55,6 +55,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Gutsycat <https://github.com/Sniperq2>`_
 - `Jennifer V Medina <https://github.com/jaymedina>`_
 - `Keyu Xing <https://github.com/keyuxing>`_
+- `Lieven Govaerts <https://github.com/lgov>`_
 
 
 Community
