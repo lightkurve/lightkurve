@@ -46,6 +46,8 @@ try:
         Range1d,
         LinearColorMapper,
         BasicTicker,
+        Arrow,
+        VeeHead,
     )
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
@@ -487,9 +489,9 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         size="size",
         line_color=None,
         selection_color="firebrick",
-        nonselection_fill_alpha=0.0,
+        nonselection_fill_alpha=0.3,
         nonselection_line_color=None,
-        nonselection_line_alpha=0.0,
+        nonselection_line_alpha=1.0,
         fill_color="firebrick",
         hover_fill_color="firebrick",
         hover_alpha=0.9,
@@ -507,14 +509,77 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 
     # mark the target's position too
     target_ra, target_dec, pm_corrected = _get_corrected_coordinate(tpf)
+    target_x, target_y = None, None
     if target_ra is not None and target_dec is not None:
-        target_x, target_y = tpf.wcs.all_world2pix([(target_ra, target_dec)], 0)[0]
-        fig.cross(x=tpf.column + target_x, y=tpf.row + target_y, size=20, color="black", line_width=1)
+        pix_x, pix_y = tpf.wcs.all_world2pix([(target_ra, target_dec)], 0)[0]
+        target_x, target_y = tpf.column + pix_x, tpf.row + pix_y
+        fig.cross(x=target_x, y=target_y, size=20, color="black", line_width=1)
         if not pm_corrected:
             warnings.warn(("Proper motion correction cannot be applied to the target, as none is available. "
                            "Thus the target (the cross) might be noticeably away from its actual position, "
                            "if it has large proper motion."),
                            category=LightkurveWarning)
+
+    # display an arrow on the selected target
+    arrow_head = VeeHead(size=16)
+    arrow_4_selected = Arrow(end=arrow_head, line_color="red", line_width=4,
+                             x_start=0, y_start=0, x_end=0, y_end=0, tags=["selected"],
+                             visible=False)
+    fig.add_layout(arrow_4_selected)
+
+    def show_arrow_at_target(attr, old, new):
+        if len(new) > 0:
+            x, y = source.data["x"][new[0]], source.data["y"][new[0]]
+
+            # workaround: the arrow_head color should have been specified once
+            # in its creation, but it seems to hit a bokeh bug, resulting in an error
+            # of the form  ValueError("expected ..., got {'value': 'red'}")
+            # in actual websocket call, it seems that the color value is
+            # sent as "{'value': 'red'}", but they are expdecting "red" instead.
+            # somehow the error is bypassed if I specify it later in here.
+            #
+            # The issue is present in bokeh 2.2.3 / 2.1.1, but  not in bokeh 2.3.1
+            # I cannot identify a specific issue /PR on github about it though.
+            arrow_head.fill_color = "red"
+            arrow_head.line_color = "black"
+
+            # place the arrow near (x,y), taking care of boundary cases (at the edge of the plot)
+            if x < fig.x_range.start + 1:
+                # boundary case: the point is at the left edge of the plot
+                arrow_4_selected.x_start = x + 0.85
+                arrow_4_selected.x_end = x + 0.2
+            elif x > fig.x_range.end - 1:
+                # boundary case: the point is at the right edge of the plot
+                arrow_4_selected.x_start = x - 0.85
+                arrow_4_selected.x_end = x - 0.2
+            elif target_x is None or x < target_x:
+                # normal case 1 : point is to the left of the target
+                arrow_4_selected.x_start = x - 0.85
+                arrow_4_selected.x_end = x - 0.2
+            else:
+                # normal case 2 : point is to the right of the target
+                # flip arrow's direction so that it won't overlap with the target
+                arrow_4_selected.x_start = x + 0.85
+                arrow_4_selected.x_end = x + 0.2
+
+            if y > fig.y_range.end - 0.5:
+                # boundary case: the point is at near the top of the plot
+                arrow_4_selected.y_start = y - 0.4
+                arrow_4_selected.y_end = y - 0.1
+            elif y < fig.y_range.start + 0.5:
+                # boundary case: the point is at near the top of the plot
+                arrow_4_selected.y_start = y + 0.4
+                arrow_4_selected.y_end = y + 0.1
+            else:  # normal case
+                arrow_4_selected.y_start = y
+                arrow_4_selected.y_end = y
+
+            arrow_4_selected.visible = True
+        else:
+            arrow_4_selected.visible = False
+
+    source.selected.on_change("indices", show_arrow_at_target)
+
 
     # a widget that displays some of the selected star's metadata
     # so that they can be copied (e.g., GAIA ID).
@@ -568,14 +633,29 @@ SIMBAD by coordinate</a></td></tr>
             message_selected_target.text = msg
         # else do nothing (not clearing the widget) for now.
 
+    def on_selected_change(*args):
+        show_arrow_at_target(*args)
+        show_target_info(*args)
+
     source.selected.on_change("indices", show_target_info)
 
     return fig, r, message_selected_target
 
 
+def to_selected_pixels_source(tpf_source):
+    xx = tpf_source.data["xx"].flatten()
+    yy = tpf_source.data["yy"].flatten()
+    selected_indices = tpf_source.selected.indices
+    return ColumnDataSource(dict(
+        xx=xx[selected_indices],
+        yy=yy[selected_indices],
+    ))
+
+
 def make_tpf_figure_elements(
     tpf,
     tpf_source,
+    tpf_source_selectable=True,
     pedestal=None,
     fiducial_frame=None,
     plot_width=370,
@@ -594,6 +674,9 @@ def make_tpf_figure_elements(
         TPF to show.
     tpf_source : bokeh.plotting.ColumnDataSource
         TPF data source.
+    tpf_source_selectable : boolean
+        True if the tpf_source is selectable. False to show the selected pixels
+        in the tpf_source only. Default is True.
     pedestal: float
         A scalar value to be added to the TPF flux values, often to avoid
         taking the log of a negative number in colorbars.
@@ -700,16 +783,33 @@ def make_tpf_figure_elements(
     color_bar.formatter = PrintfTickFormatter(format="%14i")
 
     if tpf_source is not None:
-        fig.rect(
-            "xx",
-            "yy",
-            1,
-            1,
-            source=tpf_source,
-            fill_color="gray",
-            fill_alpha=0.4,
-            line_color="white",
-        )
+        if tpf_source_selectable:
+            fig.rect(
+                "xx",
+                "yy",
+                1,
+                1,
+                source=tpf_source,
+                fill_color="gray",
+                fill_alpha=0.4,
+                line_color="white",
+                )
+        else:
+            # Paint the selected pixels such that they cannot be selected / deselected.
+            # Used to show specified aperture pixels without letting users to
+            # change them in ``interact_sky```
+            selected_pixels_source = to_selected_pixels_source(tpf_source)
+            r_selected = fig.rect(
+                "xx",
+                "yy",
+                1,
+                1,
+                source=selected_pixels_source,
+                fill_color="gray",
+                fill_alpha=0.0,
+                line_color="white",
+                )
+            r_selected.nonselection_glyph = None
 
     # Configure the stretch slider and its callback function
     if scale == "log":
@@ -1088,7 +1188,7 @@ def show_interact_widget(
     return show(create_interact_ui, notebook_url=notebook_url)
 
 
-def show_skyview_widget(tpf, notebook_url="localhost:8888", magnitude_limit=18):
+def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty",  magnitude_limit=18):
     """skyview
 
     Parameters
@@ -1104,6 +1204,9 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", magnitude_limit=18):
         will need to supply this value for the application to display
         properly. If no protocol is supplied in the URL, e.g. if it is
         of the form "localhost:8888", then "http" will be used.
+    aperture_mask : array-like, 'pipeline', 'threshold', 'default', 'background', or 'empty'
+        Highlight pixels selected by aperture_mask.
+        Default is 'empty': no pixel is highlighted.
     magnitude_limit : float
         A value to limit the results in based on Gaia Gmag. Default, 18.
     """
@@ -1130,17 +1233,22 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", magnitude_limit=18):
     else:
         fiducial_frame = 0
 
+    aperture_mask = tpf._parse_aperture_mask(aperture_mask)
+
     def create_interact_ui(doc):
+        tpf_source = prepare_tpf_datasource(tpf, aperture_mask)
+
         # The data source includes metadata for hover-over tooltips
-        tpf_source = None
 
         # Create the TPF figure and its stretch slider
         fig_tpf, stretch_slider = make_tpf_figure_elements(
             tpf,
             tpf_source,
+            tpf_source_selectable=False,
             fiducial_frame=fiducial_frame,
             plot_width=640,
             plot_height=600,
+            tools="tap,box_zoom,wheel_zoom,reset"
         )
         fig_tpf, r, message_selected_target = add_gaia_figure_elements(
             tpf, fig_tpf, magnitude_limit=magnitude_limit
