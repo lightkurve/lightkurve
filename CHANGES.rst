@@ -1,5 +1,8 @@
-2.1.2 (unreleased)
+2.2.0 (unreleased)
 ==================
+
+- Improved ``TargetPixelFile.interact_sky()`` by using an arrow to highlight selected
+  stars, adding an ``aperture_mask`` argument, and defaulting to box zoom. [#1082]
 
 - Fixed a bug in ``LightCurve.select_flux()`` to ensure ``NORMALIZED`` header
   is set based on the new ``flux`` column. [#1094]

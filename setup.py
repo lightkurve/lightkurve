@@ -33,7 +33,7 @@ if os.path.exists(readme_path):
 setup(
     long_description=readme,
     name='lightkurve',
-    version='2.1.2dev',
+    version='2.2.0dev',
     description='A friendly package for Kepler & TESS time series analysis in Python.',
     python_requires='>=3.6.1',
     project_urls={"homepage": "https://docs.lightkurve.org", "repository": "https://github.com/lightkurve/lightkurve"},
