@@ -7,6 +7,9 @@
 - Fixed a bug in ``LightCurve.select_flux()`` to ensure ``NORMALIZED`` header
   is set based on the new ``flux`` column. [#1094]
 
+- Fixed a bug in ``LightCurveCollection.stitch()`` which triggered a ``ValueError``
+  when a mix of normal and masked columns was encountered. [#1182]
+
 
 
 2.1.1 (2022-03-24)
