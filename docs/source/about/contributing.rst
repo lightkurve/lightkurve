@@ -90,7 +90,9 @@ environment in Lightkurve's `Makefile <https://github.com/lightkurve/lightkurve/
         $ python -m pip install .
 
     In this scenario, you will have to re-run `pip install .` every time you make changes
-    to the source code.  To avoid this extra step, you have the option of creating a symbolic
+    to the source code.
+
+    To avoid this extra step, you have the option of creating a symbolic
     link from your environment's `site-packages` directory to the lightkurve source code tree
     as follows:
 
@@ -99,11 +101,12 @@ environment in Lightkurve's `Makefile <https://github.com/lightkurve/lightkurve/
         $ python -m pip uninstall lightkurve
         $ python -m pip install --editable .  # creates the symbolic link
 
+    This "editable install" method requires `pip` version `21.3` or higher.
     While this method of installing Lightkurve is not usually recommended, it can be useful
     when you wish to modify and test multiple different packages in a single environment.
 
 
-4. Add a link to the main repository to your git enviroment
+4. Add a link to the main repository to your git environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To be able to pull in any recent changes, we need to tell your copy of lightkurve
