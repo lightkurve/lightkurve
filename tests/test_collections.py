@@ -3,6 +3,7 @@ import warnings
 import pytest
 from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
+from astropy.utils.masked import Masked
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -60,6 +61,22 @@ def test_collection_stitch():
     assert len(lc_stitched.flux) == 15
     lc_stitched2 = lcc.stitch(corrector_func=lambda x: x * 2)
     assert_array_equal(lc_stitched.flux * 2, lc_stitched2.flux)
+
+
+def test_collection_stitch_with_masked_values():
+    """Test https://github.com/lightkurve/lightkurve/issues/1178 """
+    lc = LightCurve(time=np.arange(1, 5), flux=np.ones(4))
+    lc2 = LightCurve(
+        time=np.arange(5, 9),
+        flux=Masked([11, 11, np.nan, 11], mask=[False, False, True, False]),
+    )
+    lc_stitched = LightCurveCollection([lc, lc2]).stitch()
+    assert len(lc_stitched.flux) == 8
+
+    # ensure order (whether the first lc is masked or not) does not matter
+    lc3 = LightCurve(time=np.arange(9, 13), flux=np.ones(4))
+    lc_stitched = LightCurveCollection([lc2, lc3]).stitch()
+    assert len(lc_stitched.flux) == 8
 
 
 def test_collection_getitem():
