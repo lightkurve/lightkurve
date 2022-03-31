@@ -53,7 +53,7 @@ If you install *Lightkurve* using ``pip`` as explained above,
 these dependencies will be installed automatically if needed.
 
 Refer to ``[tool.poetry.dependencies]`` section of
-`pyproject.toml <https://github.com/lightkurve/lightkurve/blob/main/pyproject.toml>`_
+`pyproject.toml <../pyproject.toml>`_
 for the minimum versions of the packages required.
 
 
