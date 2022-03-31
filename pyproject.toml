@@ -65,17 +65,12 @@ pydata-sphinx-theme = ">=0.7.1"
 pylint = ">=2.6.0"
 ghp-import = ">=1.0.1"
 openpyxl = ">=3.0.7"
-dephell = ">=0.8.3"
 tox = ">=3.24.5"
 mistune = "<2.0.0"  # Workaround for #1162 (not a true dependency)
 
 [build-system]
 requires = ["setuptools", "poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.dephell.main]  # config for `dephell deps convert`
-from = {format = "poetry", path = "pyproject.toml"}
-to = {format = "setuppy", path = "setup.py"}
 
 [tool.pytest.ini_options]
 testpaths = [
