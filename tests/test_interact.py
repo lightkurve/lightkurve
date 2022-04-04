@@ -3,6 +3,7 @@ import warnings
 
 from astropy.utils.data import get_pkg_data_filename
 import numpy as np
+from numpy.testing import assert_array_equal
 import pytest
 
 from lightkurve import LightkurveWarning, LightkurveError
@@ -123,6 +124,7 @@ def test_interact_functions():
     from lightkurve.interact import (
         prepare_tpf_datasource,
         prepare_lightcurve_datasource,
+        aperture_mask_from_selected_indices,
         get_lightcurve_y_limits,
         make_lightcurve_figure_elements,
         make_tpf_figure_elements,
@@ -131,7 +133,23 @@ def test_interact_functions():
 
     tpf = TessTargetPixelFile(example_tpf)
     mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
+    # make the mask a bit more realistic
+    mask[0, 0] = False
+    mask[1, 2] = False
+
     tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
+
+    # https://github.com/lightkurve/lightkurve/issues/990
+    # ensure proper 2D - 1D conversion
+    assert tpf_source.data["xx"].ndim == 1
+    assert tpf_source.data["yy"].ndim == 1
+    assert tpf_source.selected.indices.ndim == 1
+
+    # the lower-level function aperture_mask_from_selected_indices() is used in
+    # callback _create_lightcurve_from_pixels(), which cannot be easily tested.
+    # So we directly test it instead.
+    assert_array_equal(aperture_mask_from_selected_indices(tpf_source.selected.indices, tpf), mask)
+
     lc = tpf.to_lightcurve(aperture_mask=mask)
     lc_source = prepare_lightcurve_datasource(lc)
     get_lightcurve_y_limits(lc_source)
