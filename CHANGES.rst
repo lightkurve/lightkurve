@@ -10,6 +10,8 @@
 - Fixed a bug in ``LightCurveCollection.stitch()`` which triggered a ``ValueError``
   when a mix of normal and masked columns was encountered. [#1182]
 
+- Removed the ``QColumn``, ``QMaskedColumn``, and ``QTimeSeries`` classes which were
+  temporarily added in Lightkurve v2.0 to support AstroPy v4.2 and earlier. [#1188]
 
 
 2.1.1 (2022-03-24)
