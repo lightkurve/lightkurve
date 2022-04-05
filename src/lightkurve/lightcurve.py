@@ -48,78 +48,8 @@ def _to_unitless_day(data):
     else:
         return data
 
-class QColumn(Column):
-    """(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``.
-    """
 
-    @property
-    def value(self):
-        return self.data
-
-
-class QMaskedColumn(MaskedColumn):
-    """(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``.
-    """
-
-    @property
-    def value(self):
-        return self.data
-
-
-class QTimeSeries(TimeSeries):
-    def _convert_col_for_table(self, col):
-        """
-        Ensure resulting column has  ``.value`` accessor to raw data, irrespective of type of input.
-
-        It won't be needed once https://github.com/astropy/astropy/pull/10962 is in astropy release
-        and Lightkurve requires the corresponding astropy release (4.3).
-        """
-        # string-typed columns should not have a unit, or it will make convert_col_for_table crash!
-        # see https://github.com/lightkurve/lightkurve/pull/980#issuecomment-806178939
-        if hasattr(col, 'dtype'):
-            if hasattr(col, 'unit') and col.dtype.kind in {'U', 'S'}:
-                del col.unit
-
-        # ignore "dropping mask in Quantity column" warning issued up until AstroPy v4.3.1
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", message=".*dropping mask.*")
-            col = super()._convert_col_for_table(col)
-
-        if (
-            isinstance(col, Column)
-            and getattr(col, "unit", None) is None
-            and (not hasattr(col, "value"))
-        ):
-            # the logic is similar to those in the grandparent QTable for Quantity
-            if isinstance(col, MaskedColumn):
-                qcol = QMaskedColumn(
-                    data=col.data,
-                    name=col.name,
-                    dtype=col.dtype,
-                    description=col.description,
-                    mask=col.mask,
-                    fill_value=col.fill_value,
-                    format=col.format,
-                    meta=col.meta,
-                    copy=False,
-                )
-            else:
-                qcol = QColumn(
-                    data=col.data,
-                    name=col.name,
-                    dtype=col.dtype,
-                    description=col.description,
-                    format=col.format,
-                    meta=col.meta,
-                    copy=False,
-                )
-            qcol.info = col.info
-            qcol.info.indices = col.info.indices
-            col = qcol
-        return col
-
-
-class LightCurve(QTimeSeries):
+class LightCurve(TimeSeries):
     """
     Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.
 
