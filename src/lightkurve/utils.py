@@ -739,7 +739,7 @@ def _query_solar_system_objects(
             if df is None:
                 df = res
             else:
-                df = df.append(res)
+                df = pd.concat([df, res])
     if df is not None:
         df.reset_index(drop=True)
     return df
