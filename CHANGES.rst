@@ -13,6 +13,10 @@
 - Removed the ``QColumn``, ``QMaskedColumn``, and ``QTimeSeries`` classes which were
   temporarily added in Lightkurve v2.0 to support AstroPy v4.2 and earlier. [#1188]
 
+- Fixed a ``FutureWarning`` triggered by the ``query_solar_system_objects()``
+  feature. [#1189]
+
+
 
 2.1.1 (2022-03-24)
 ==================
