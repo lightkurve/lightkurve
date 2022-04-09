@@ -193,6 +193,22 @@ def prepare_lightcurve_datasource(lc):
     return lc_source
 
 
+def aperture_mask_to_selected_indices(aperture_mask):
+    """Convert the 2D aperture mask to 1D selection indices, for the use with bokeh ColumnDataSource."""
+    npix = aperture_mask.size
+    pixel_index_array = np.arange(0, npix, 1)
+    return pixel_index_array[aperture_mask.reshape(-1)]
+
+
+def aperture_mask_from_selected_indices(selected_pixel_indices, tpf):
+    """Convert an aperture mask in 1D selection indices back to 2D (in the shape of the given TPF)."""
+    npix = tpf.flux[0, :, :].size
+    pixel_index_array = np.arange(0, npix, 1).reshape(tpf.flux[0].shape)
+    selected_indices = np.array(selected_pixel_indices)
+    selected_mask_1d = np.isin(pixel_index_array, selected_indices)
+    return selected_mask_1d.reshape(tpf.flux[0].shape)
+
+
 def prepare_tpf_datasource(tpf, aperture_mask):
     """Prepare a bokeh DataSource object for selection glyphs
 
@@ -208,13 +224,16 @@ def prepare_tpf_datasource(tpf, aperture_mask):
     tpf_source : bokeh.plotting.ColumnDataSource
         Bokeh object to be shown.
     """
-    npix = tpf.flux[0, :, :].size
-    pixel_index_array = np.arange(0, npix, 1).reshape(tpf.flux[0].shape)
-    xx = tpf.column + np.arange(tpf.shape[2])
-    yy = tpf.row + np.arange(tpf.shape[1])
+    _, ny, nx = tpf.shape
+    # (xa, ya) pair enumerates all pixels of the tpf
+    xx = tpf.column + np.arange(nx)
+    yy = tpf.row + np.arange(ny)
     xa, ya = np.meshgrid(xx, yy)
+    # flatten them, as column data source requires 1d data
+    xa = xa.flatten()
+    ya = ya.flatten()
     tpf_source = ColumnDataSource(data=dict(xx=xa.astype(float), yy=ya.astype(float)))
-    tpf_source.selected.indices = pixel_index_array[aperture_mask].reshape(-1).tolist()
+    tpf_source.selected.indices = aperture_mask_to_selected_indices(aperture_mask)
     return tpf_source
 
 
@@ -986,9 +1005,6 @@ def show_interact_widget(
     if transform_func is not None:
         lc = transform_func(lc)
 
-    npix = tpf.flux[0, :, :].size
-    pixel_index_array = np.arange(0, npix, 1).reshape(tpf.flux[0].shape)
-
     # Bokeh cannot handle many data points
     # https://github.com/bokeh/bokeh/issues/7490
     n_cadences = len(lc.cadenceno)
@@ -1058,8 +1074,7 @@ def show_interact_widget(
             tpf, selected_pixel_indices, transform_func=transform_func
         ):
             """Create the lightcurve from the selected pixel index list"""
-            selected_indices = np.array(selected_pixel_indices)
-            selected_mask = np.isin(pixel_index_array, selected_indices)
+            selected_mask = aperture_mask_from_selected_indices(selected_pixel_indices, tpf)
             lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
             lc_new.meta["APERTURE_MASK"] = selected_mask
             if transform_func is not None:
