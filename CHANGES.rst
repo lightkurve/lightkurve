@@ -1,6 +1,9 @@
 2.2.0 (unreleased)
 ==================
 
+- Fixed a bug in ``TargetPixelFile.interact()`` which prevented custom pixels
+  from being selected with Bokeh v2.3.x and later. [#1177]
+
 - Improved ``TargetPixelFile.interact_sky()`` by using an arrow to highlight selected
   stars, adding an ``aperture_mask`` argument, and defaulting to box zoom. [#1082]
 
