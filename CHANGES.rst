@@ -19,6 +19,9 @@
 - Fixed a ``FutureWarning`` triggered by the ``query_solar_system_objects()``
   feature. [#1189]
 
+- Removed ``setup.py`` because ``pip>=21.3`` now enables editable installs to
+  be executed using the ``pyproject.toml`` file. [#1185]
+
 
 
 2.1.1 (2022-03-24)
