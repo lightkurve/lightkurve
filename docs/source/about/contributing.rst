@@ -107,7 +107,7 @@ environment in Lightkurve's `Makefile <https://github.com/lightkurve/lightkurve/
 
 
 4. Add a link to the main repository to your git environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To be able to pull in any recent changes, we need to tell your copy of lightkurve
 where the upstream repository is located:
