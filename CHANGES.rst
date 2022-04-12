@@ -1,11 +1,12 @@
-2.2.0 (unreleased)
+2.2.0 (2022-04-12)
 ==================
 
 - Fixed a bug in ``TargetPixelFile.interact()`` which prevented custom pixels
   from being selected with Bokeh v2.3.x and later. [#1177]
 
-- Improved ``TargetPixelFile.interact_sky()`` by using an arrow to highlight selected
-  stars, adding an ``aperture_mask`` argument, and defaulting to box zoom. [#1082]
+- Improved ``TargetPixelFile.interact_sky()`` by introducing an arrow to
+  highlight selected stars, adding an ``aperture_mask`` argument, and
+  defaulting to box zoom. [#1082]
 
 - Fixed a bug in ``LightCurve.select_flux()`` to ensure ``NORMALIZED`` header
   is set based on the new ``flux`` column. [#1094]
@@ -16,11 +17,10 @@
 - Removed the ``QColumn``, ``QMaskedColumn``, and ``QTimeSeries`` classes which were
   temporarily added in Lightkurve v2.0 to support AstroPy v4.2 and earlier. [#1188]
 
-- Fixed a ``FutureWarning`` triggered by the ``query_solar_system_objects()``
-  feature. [#1189]
+- Fixed a ``FutureWarning`` triggered by ``query_solar_system_objects()``. [#1189]
 
 - Removed ``setup.py`` because ``pip>=21.3`` now enables editable installs to
-  be executed using the ``pyproject.toml`` file. [#1185]
+  be executed using the ``pyproject.toml`` file instead. [#1185]
 
 
 
