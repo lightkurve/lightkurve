@@ -30,6 +30,7 @@ if errorlevel 9009 (
 )
 
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS%
+copy ..\pyproject.toml %BUILDDIR%\html
 goto end
 
 :clean
