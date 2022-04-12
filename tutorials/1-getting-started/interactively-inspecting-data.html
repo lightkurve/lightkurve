@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.1</p>
+<p class="title">Lightkurve v2.2</p>
 </a>
 
     
@@ -547,13 +547,14 @@ light curve as a FITS file by clicking on the <code class="docutils literal notr
 <p>Interaction modes:</p>
 <ul class="simple">
 <li><p>Clicking on a single pixel shows the time series light curve of that pixel alone.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on multiple pixels shows the light curve using that pixel mask.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on an already selected pixel will <em>de</em>select that pixel.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on multiple pixels shows the light curve using that pixel mask. (*)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shift</span></code>-<code class="docutils literal notranslate"><span class="pre">ctrl</span></code>-clicking on an already selected pixel will <em>de</em>select that pixel. (May only work on Windows systems.)</p></li>
 <li><p>Clicking and dragging a box will make a rectangular aperture mask — individual pixels can be deselected from this mask by shift-clicking (box deselecting does not work).</p></li>
 <li><p>The screen stretch high and low limits can be changed independently by clicking and dragging each end, or simultaneously by clicking and dragging in the middle.</p></li>
 <li><p>The cadence slider updates the postage stamp image at the position of the vertical red bar in the light curve.</p></li>
 <li><p>Clicking on a position in the light curve automatically seeks to that cadence number.</p></li>
 <li><p>The left and right arrows can be clicked to increment the cadence number by one.</p></li>
+<li><p>(*) <code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking does not work on Jupyter Lab as of this writing, due to conflicts between Bokeh and Jupyter Lab. Refer to the <a class="reference external" href="https://github.com/bokeh/bokeh/issues/11324">tracking issue</a> for current status.</p></li>
 </ul>
 <p>The <code class="docutils literal notranslate"><span class="pre">interact()</span></code> tool works for <em>Kepler</em>/<em>K2</em> or <em>TESS</em> data. Here we show an example using <em>Kepler</em> data — KOI 6.01 (KIC 3248033) sits four pixels away from eclipsing binary KOI 1759.01 (KIC 3248019). An unwise choice of pixels can give rise to a spurious exoplanet signal.</p>
 <div class="nbinput nblast docutils container">

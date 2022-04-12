@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.1</p>
+<p class="title">Lightkurve v2.2</p>
 </a>
 
     
@@ -370,6 +370,7 @@
                 <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">lc</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
                         <span class="nb">issubclass</span><span class="p">(</span><span class="n">lcs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">lc</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">lc</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">lcs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
                         <span class="ow">or</span> <span class="n">lcs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">info</span> <span class="ow">is</span> <span class="n">lc</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">info</span>
                     <span class="p">):</span>
                         <span class="n">columns_to_remove</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>

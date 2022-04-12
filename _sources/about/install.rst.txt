@@ -39,20 +39,22 @@ To verify which version of *Lightkurve* you have installed, run::
 Requirements
 ============
 
-*Lightkurve* has the following minimum requirements:
+*Lightkurve* requires the following packages:
 
-- Python: 3.6 or later.
-- Astropy: 4.1 or later.
-- Numpy: 1.11 or later.
-- Scipy: 0.19 or later.
-- Matplotlib: 1.5.3 or later.
-- Astroquery: 0.3.10 or later.
-- Bokeh: 1.0 or later (for interactive widgets).
+- Astropy
+- Numpy
+- Scipy
+- Matplotlib
+- Astroquery
+- Bokeh (for interactive widgets).
 - Pandas.
 
 If you install *Lightkurve* using ``pip`` as explained above,
 these dependencies will be installed automatically if needed.
 
+Refer to ``[tool.poetry.dependencies]`` section of
+`pyproject.toml <../pyproject.toml>`_
+for the minimum versions of the packages required.
 
 
 Installing the development version

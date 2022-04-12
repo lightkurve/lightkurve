@@ -64,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.1</p>
+<p class="title">Lightkurve v2.2</p>
 </a>
 
     
@@ -235,8 +235,7 @@
 <p>The procedure requires the following steps:</p>
 <ol class="arabic simple">
 <li><p>Add any new contributors to <code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTHORS.rst</span></code>.</p></li>
-<li><p>If there have been changes in the dependencies, update the <code class="xref py py-obj docutils literal notranslate"><span class="pre">setup.py</span></code> file using <code class="xref py py-obj docutils literal notranslate"><span class="pre">dephell</span> <span class="pre">deps</span> <span class="pre">convert</span></code>.</p></li>
-<li><p>Remove the suffix <code class="xref py py-obj docutils literal notranslate"><span class="pre">dev</span></code> from the version number in <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyproject.toml</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">setup.py</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve/version.py</span></code>, and commit this change to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code> branch. Note that Lightkurve follows a <a class="reference external" href="https://semver.org">semantic versioning scheme</a>.</p></li>
+<li><p>Remove the suffix <code class="xref py py-obj docutils literal notranslate"><span class="pre">dev</span></code> from the version number in <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve/version.py</span></code>, and commit this change to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code> branch. Note that Lightkurve follows a <a class="reference external" href="https://semver.org">semantic versioning scheme</a>.</p></li>
 <li><p>Ensure the latest version of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code> branch has been checked out, and verify that all unit tests pass:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git checkout main
@@ -244,7 +243,7 @@ $ git pull
 $ pytest --remote-data
 </pre></div>
 </div>
-<ol class="arabic simple" start="5">
+<ol class="arabic simple" start="4">
 <li><p>Verify that the docs and all tutorial notebooks can be compiled without failure (see <em>Building documentation</em> above), and upload them to the webserver.</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> docs
@@ -252,14 +251,14 @@ $ make html
 $ make upload
 </pre></div>
 </div>
-<ol class="arabic simple" start="6">
+<ol class="arabic simple" start="5">
 <li><p>Edit the CHANGES.rst file by changing the date for the version you are about to release from “unreleased” to today’s date. Also be sure to make sure the change log is complete and accurate. Then add and commit those changes with:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git add CHANGES.rst
 $ git commit -m <span class="s2">&quot;Finalizing changelog for v&lt;version&gt;&quot;</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="7">
+<ol class="arabic simple" start="6">
 <li><p>Make a new release branch in GitHub using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Draft</span> <span class="pre">a</span> <span class="pre">new</span> <span class="pre">release</span> <span class="pre">button</span></code> at <a class="reference external" href="https://github.com/lightkurve/lightkurve/releases">https://github.com/lightkurve/lightkurve/releases</a>.</p></li>
 <li><p>Create and upload the new package to PyPI:</p></li>
 </ol>
@@ -269,10 +268,10 @@ $ poetry publish
 </pre></div>
 </div>
 </div></blockquote>
-<ol class="arabic simple" start="9">
+<ol class="arabic simple" start="8">
 <li><p>Update the version number on the <a class="reference external" href="https://github.com/conda-forge/lightkurve-feedstock">Lightkurve conda feedstock</a>.
 A friendly robot will tend to open a PR to make this change within 1-2 hours, so all we need to do is review any necessary changes in the dependencies and make sure the PR is merged.</p></li>
-<li><p>Edit <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyproject.toml</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">setup.py</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve/version.py</span></code> to contain the next version number with suffix <code class="xref py py-obj docutils literal notranslate"><span class="pre">dev</span></code>.</p></li>
+<li><p>Edit <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve/version.py</span></code> to contain the next version number with suffix <code class="xref py py-obj docutils literal notranslate"><span class="pre">dev</span></code>.</p></li>
 </ol>
 </section>
 

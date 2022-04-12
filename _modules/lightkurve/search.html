@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.1</p>
+<p class="title">Lightkurve v2.2</p>
 </a>
 
     
@@ -670,7 +670,7 @@
 
         <span class="c1"># build path string name and check if it exists</span>
         <span class="c1"># this is necessary to ensure cutouts are not downloaded multiple times</span>
-        <span class="n">sec</span> <span class="o">=</span> <span class="n">TesscutClass</span><span class="p">()</span><span class="o">.</span><span class="n">get_sectors</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+        <span class="n">sec</span> <span class="o">=</span> <span class="n">TesscutClass</span><span class="p">()</span><span class="o">.</span><span class="n">get_sectors</span><span class="p">(</span><span class="n">coordinates</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
         <span class="n">sector_name</span> <span class="o">=</span> <span class="n">sec</span><span class="p">[</span><span class="n">sec</span><span class="p">[</span><span class="s2">&quot;sector&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">sector</span><span class="p">][</span><span class="s2">&quot;sectorName&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cutout_size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="n">size_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">cutout_size</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;x&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">cutout_size</span><span class="p">))</span>
@@ -696,7 +696,7 @@
         <span class="c1"># otherwise the file will be downloaded</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cutout_path</span> <span class="o">=</span> <span class="n">TesscutClass</span><span class="p">()</span><span class="o">.</span><span class="n">download_cutouts</span><span class="p">(</span>
-                <span class="n">coords</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">cutout_size</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="n">sector</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tesscut_dir</span>
+                <span class="n">coordinates</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">cutout_size</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="n">sector</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tesscut_dir</span>
             <span class="p">)</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">cutout_path</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># the cutoutpath already contains testcut_dir</span>
             <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Finished downloading.&quot;</span><span class="p">)</span>

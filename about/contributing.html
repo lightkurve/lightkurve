@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.1</p>
+<p class="title">Lightkurve v2.2</p>
 </a>
 
     
@@ -235,8 +235,8 @@
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#add-a-link-to-the-main-repository-to-your-git-enviroment">
-     4. Add a link to the main repository to your git enviroment
+    <a class="reference internal nav-link" href="#add-a-link-to-the-main-repository-to-your-git-environment">
+     4. Add a link to the main repository to your git environment
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
@@ -340,19 +340,21 @@ $ python -m pip install .
 </pre></div>
 </div>
 <p>In this scenario, you will have to re-run <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code> every time you make changes
-to the source code.  To avoid this extra step, you have the option of creating a symbolic
+to the source code.</p>
+<p>To avoid this extra step, you have the option of creating a symbolic
 link from your environment’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">site-packages</span></code> directory to the lightkurve source code tree
 as follows:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python -m pip uninstall lightkurve
 $ python -m pip install --editable .  <span class="c1"># creates the symbolic link</span>
 </pre></div>
 </div>
-<p>While this method of installing Lightkurve is not usually recommended, it can be useful
+<p>This “editable install” method requires <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span></code> version <code class="xref py py-obj docutils literal notranslate"><span class="pre">21.3</span></code> or higher.
+While this method of installing Lightkurve is not usually recommended, it can be useful
 when you wish to modify and test multiple different packages in a single environment.</p>
 </div>
 </section>
-<section id="add-a-link-to-the-main-repository-to-your-git-enviroment">
-<h3>4. Add a link to the main repository to your git enviroment<a class="headerlink" href="#add-a-link-to-the-main-repository-to-your-git-enviroment" title="Permalink to this headline">¶</a></h3>
+<section id="add-a-link-to-the-main-repository-to-your-git-environment">
+<h3>4. Add a link to the main repository to your git environment<a class="headerlink" href="#add-a-link-to-the-main-repository-to-your-git-environment" title="Permalink to this headline">¶</a></h3>
 <p>To be able to pull in any recent changes, we need to tell your copy of lightkurve
 where the upstream repository is located:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git remote add upstream https://github.com/lightkurve/lightkurve.git

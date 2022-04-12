@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.1</p>
+<p class="title">Lightkurve v2.2</p>
 </a>
 
     
@@ -215,78 +215,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">data</span>
 
-<span class="k">class</span> <span class="nc">QColumn</span><span class="p">(</span><span class="n">Column</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-
-
-<span class="k">class</span> <span class="nc">QMaskedColumn</span><span class="p">(</span><span class="n">MaskedColumn</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;(Temporary) workaround to provide ``.value`` alias to raw data, so as to match ``Quantity``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-
-
-<span class="k">class</span> <span class="nc">QTimeSeries</span><span class="p">(</span><span class="n">TimeSeries</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">_convert_col_for_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Ensure resulting column has  ``.value`` accessor to raw data, irrespective of type of input.</span>
-
-<span class="sd">        It won&#39;t be needed once https://github.com/astropy/astropy/pull/10962 is in astropy release</span>
-<span class="sd">        and Lightkurve requires the corresponding astropy release (4.3).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># string-typed columns should not have a unit, or it will make convert_col_for_table crash!</span>
-        <span class="c1"># see https://github.com/lightkurve/lightkurve/pull/980#issuecomment-806178939</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="s1">&#39;unit&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">col</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">}:</span>
-                <span class="k">del</span> <span class="n">col</span><span class="o">.</span><span class="n">unit</span>
-
-        <span class="c1"># ignore &quot;dropping mask in Quantity column&quot; warning issued up until AstroPy v4.3.1</span>
-        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;.*dropping mask.*&quot;</span><span class="p">)</span>
-            <span class="n">col</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_convert_col_for_table</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">Column</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">))</span>
-        <span class="p">):</span>
-            <span class="c1"># the logic is similar to those in the grandparent QTable for Quantity</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">MaskedColumn</span><span class="p">):</span>
-                <span class="n">qcol</span> <span class="o">=</span> <span class="n">QMaskedColumn</span><span class="p">(</span>
-                    <span class="n">data</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-                    <span class="n">name</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                    <span class="n">dtype</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
-                    <span class="n">description</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-                    <span class="n">mask</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span>
-                    <span class="n">fill_value</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
-                    <span class="nb">format</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
-                    <span class="n">meta</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
-                    <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">qcol</span> <span class="o">=</span> <span class="n">QColumn</span><span class="p">(</span>
-                    <span class="n">data</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-                    <span class="n">name</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                    <span class="n">dtype</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
-                    <span class="n">description</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-                    <span class="nb">format</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
-                    <span class="n">meta</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
-                    <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="n">qcol</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">info</span>
-            <span class="n">qcol</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">indices</span>
-            <span class="n">col</span> <span class="o">=</span> <span class="n">qcol</span>
-        <span class="k">return</span> <span class="n">col</span>
-
-
-<div class="viewcode-block" id="LightCurve"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.html#lightkurve.LightCurve">[docs]</a><span class="k">class</span> <span class="nc">LightCurve</span><span class="p">(</span><span class="n">QTimeSeries</span><span class="p">):</span>
+<div class="viewcode-block" id="LightCurve"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.html#lightkurve.LightCurve">[docs]</a><span class="k">class</span> <span class="nc">LightCurve</span><span class="p">(</span><span class="n">TimeSeries</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.</span>
 
@@ -672,6 +602,17 @@
                 <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;flux_err&quot;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
         <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;FLUX_ORIGIN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flux_column</span>
+        <span class="n">normalized_new_flux</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;flux&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;flux&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="ow">is</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span>
+        <span class="c1"># Note: here we assume unitless flux means it&#39;s normalized</span>
+        <span class="c1"># it&#39;s not exactly true in many constructed lightcurves in unit test</span>
+        <span class="c1"># but the assumption should hold for any real world use cases, e.g. TESS QLP</span>
+        <span class="k">if</span> <span class="n">normalized_new_flux</span><span class="p">:</span>
+            <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;NORMALIZED&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">normalized_new_flux</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># remove it altogether.</span>
+            <span class="c1"># Setting to False would suffice;</span>
+            <span class="c1"># but in typical non-normalized LC, the header will not be there at all.</span>
+            <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;NORMALIZED&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">lc</span></div>
 
     <span class="c1"># Define deprecated attributes for compatibility with Lightkurve v1.x:</span>
@@ -1181,7 +1122,7 @@
         <span class="sd">&quot;&quot;&quot;Returns a normalized version of the light curve.</span>
 
 <span class="sd">        The normalized light curve is obtained by dividing the ``flux`` and</span>
-<span class="sd">        ``flux_err`` object attributes by the by the median flux.</span>
+<span class="sd">        ``flux_err`` object attributes by the median flux.</span>
 <span class="sd">        Optionally, the result will be multiplied by 1e2 (if `unit=&#39;percent&#39;`),</span>
 <span class="sd">        1e3 (`unit=&#39;ppt&#39;`), or 1e6 (`unit=&#39;ppm&#39;`).</span>
 
@@ -1347,7 +1288,13 @@
         <span class="n">fe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ntime</span><span class="p">))</span>
         <span class="n">fe</span><span class="p">[</span><span class="n">in_original</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)</span>
 
-        <span class="n">fe</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">ntime</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">],</span> <span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)</span>
+        <span class="c1"># Temporary workaround for issue #1172.  TODO: remove the `if`` statement</span>
+        <span class="c1"># below once we adopt AstroPy &gt;=5.0.3 as a minimum dependency.</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+            <span class="n">fe</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">ntime</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">],</span> <span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="o">.</span><span class="n">unmasked</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fe</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">ntime</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">],</span> <span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;gaussian_noise&quot;</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">std</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
@@ -1854,7 +1801,12 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;the `cadence_mask` argument is missing or invalid&quot;</span><span class="p">)</span>
         <span class="c1"># Avoid searching times with NaN flux; this is necessary because e.g.</span>
         <span class="c1"># `remove_outliers` includes NaNs in its mask.</span>
-        <span class="n">cadence_mask</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+            <span class="c1"># Temporary workaround for issue #1172. TODO: remove this `if`` statement</span>
+            <span class="c1"># once we adopt AstroPy &gt;=5.0.3 as a minimum dependency</span>
+            <span class="n">cadence_mask</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unmasked</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cadence_mask</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
 
         <span class="c1"># Validate `location`</span>
         <span class="k">if</span> <span class="n">location</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

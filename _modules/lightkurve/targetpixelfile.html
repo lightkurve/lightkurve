@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.1</p>
+<p class="title">Lightkurve v2.2</p>
 </a>
 
     
@@ -1512,7 +1512,7 @@
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">interact_sky</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="s2">&quot;localhost:8888&quot;</span><span class="p">,</span> <span class="n">magnitude_limit</span><span class="o">=</span><span class="mi">18</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">interact_sky</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="s2">&quot;localhost:8888&quot;</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s2">&quot;empty&quot;</span><span class="p">,</span> <span class="n">magnitude_limit</span><span class="o">=</span><span class="mi">18</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</span>
 
 <span class="sd">        Parameters</span>
@@ -1526,13 +1526,16 @@
 <span class="sd">            will need to supply this value for the application to display</span>
 <span class="sd">            properly. If no protocol is supplied in the URL, e.g. if it is</span>
 <span class="sd">            of the form &quot;localhost:8888&quot;, then &quot;http&quot; will be used.</span>
+<span class="sd">        aperture_mask : array-like, &#39;pipeline&#39;, &#39;threshold&#39;, &#39;default&#39;, &#39;background&#39;, or &#39;empty&#39;</span>
+<span class="sd">            Highlight pixels selected by aperture_mask.</span>
+<span class="sd">            Default is &#39;empty&#39;: no pixel is highlighted.</span>
 <span class="sd">        magnitude_limit : float</span>
 <span class="sd">            A value to limit the results in based on Gaia Gmag. Default, 18.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">.interact</span> <span class="kn">import</span> <span class="n">show_skyview_widget</span>
 
         <span class="k">return</span> <span class="n">show_skyview_widget</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="n">notebook_url</span><span class="p">,</span> <span class="n">magnitude_limit</span><span class="o">=</span><span class="n">magnitude_limit</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="n">notebook_url</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="n">magnitude_limit</span><span class="o">=</span><span class="n">magnitude_limit</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_corrector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;pld&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
