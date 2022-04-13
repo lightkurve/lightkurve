@@ -1021,8 +1021,8 @@ def test_flatten_returns_normalized():
     )
     flat_lc, trend_lc = lc.flatten(window_length=3, polyorder=1, return_trend=True)
 
-    assert flat_lc.flux.unit is lc_flux_unit
-    assert flat_lc.flux_err.unit is lc_flux_unit
+    assert flat_lc.flux.unit == u.dimensionless_unscaled
+    assert flat_lc.flux_err.unit == u.dimensionless_unscaled
     assert trend_lc.flux.unit is lc_flux_unit
     assert trend_lc.flux_err.unit is lc_flux_unit
 

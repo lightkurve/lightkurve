@@ -818,8 +818,8 @@ class LightCurve(TimeSeries):
         with warnings.catch_warnings():
             # ignore invalid division warnings
             warnings.simplefilter("ignore", RuntimeWarning)
-            flatten_lc.flux = flatten_lc.flux / trend_signal.value
-            flatten_lc.flux_err = flatten_lc.flux_err / trend_signal.value
+            flatten_lc.flux = flatten_lc.flux / trend_signal
+            flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
         if return_trend:
             trend_lc = self.copy()
             trend_lc.flux = trend_signal
