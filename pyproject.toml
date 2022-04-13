@@ -42,7 +42,7 @@ fbpca = ">=1.0"
 #  https://github.com/bokeh/bokeh/issues/6508
 bokeh = ">=1.1"
 memoization = { version = ">=0.3.1", python = ">=3.8,<4.0" }
-diskcache = ">=5.2.1"
+diskcache = "==5.2.1"
 scikit-learn = ">=0.24.0"
 
 [tool.poetry.dev-dependencies]
