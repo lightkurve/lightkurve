@@ -134,6 +134,8 @@ class SearchResult(object):
         columns = REPR_COLUMNS_BASE
         if self.display_extra_columns is not None:
             columns = REPR_COLUMNS_BASE + self.display_extra_columns
+        # search_tesscut() has fewer columns, ensure we don't try to display columns that do not exist
+        columns = [c for c in columns if c in self.table.colnames]
 
         self.table["#"] = [idx for idx in range(len(self.table))]
         out += "\n\n" + "\n".join(self.table[columns].pformat(max_width=300, html=html))
@@ -143,7 +145,11 @@ class SearchResult(object):
                 out = out.replace(f">{author}<", f"><a href='{url}'>{author}</a><")
             # special HTML formating for TESS proposal_id
             tess_table = self.table[self.table["project"] == "TESS"]
-            for p_ids in np.unique(tess_table["proposal_id"]):
+            if "proposal_id" in tess_table.colnames:
+                proposal_id_col = np.unique(tess_table["proposal_id"])
+            else:
+                proposal_id_col = []
+            for p_ids in proposal_id_col:
                 # for CDIPS products, proposal_id is a np MaskedConstant, not a string
                 if p_ids == "N/A" or (not isinstance(p_ids, str)):
                     continue
