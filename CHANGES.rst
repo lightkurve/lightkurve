@@ -1,6 +1,7 @@
 2.2.1 (unreleased)
 ==================
-
+- Fixed a bug in ``LightCurve.flatten()`` which caused the flux unit of flatten 
+  light curve is not dimensionless. [#1195]
 
 
 
