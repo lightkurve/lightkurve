@@ -820,6 +820,9 @@ class LightCurve(TimeSeries):
             warnings.simplefilter("ignore", RuntimeWarning)
             flatten_lc.flux = flatten_lc.flux / trend_signal
             flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
+            
+        flatten_lc.meta["NORMALIZED"] = True
+            
         if return_trend:
             trend_lc = self.copy()
             trend_lc.flux = trend_signal
