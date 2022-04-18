@@ -102,7 +102,7 @@ We run our unit tests using `pytest <https://docs.pytest.org/en/stable/>`_. This
 
 
 How to generate an HTML report?
-----------------------------
+-------------------------------
 
 Use `pytest-html <https://pytest-html.readthedocs.io/>`_ extension. Install it by::
 
