@@ -56,6 +56,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Jennifer V Medina <https://github.com/jaymedina>`_
 - `Keyu Xing <https://github.com/keyuxing>`_
 - `Lieven Govaerts <https://github.com/lgov>`_
+- `DeepekshGupta <https://github.com/DeepekshGupta>`_
 
 
 Community
