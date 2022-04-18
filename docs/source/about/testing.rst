@@ -42,7 +42,7 @@ If the tests are successful, you should see a green success message such as
 Why are some of the tests marked "s"/ Why are some tests skipped?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Running some of our tests requires external data, e.g. some require data to be downloaded from MAST. These tests take a little longer, and so we skip them by default. In order to run all the tests simply use::
+Running some of our tests requires external data, e.g. some require data to be downloaded from MAST. These tests take a little longer, so we skip them by default. To run all the tests simply use::
 
     poetry run pytest test_targetpixelfile.py --remote-data
 
@@ -92,7 +92,7 @@ Before you open a PR to *Lightkurve*, ideally you should run these tests locally
 Can I write my own test?
 ------------------------
 
-Ideally, any PR opened to *Lightkurve* with new functionality should include some tests. These tests check that the basic functionality of your PR works. That way, if in future people create new features that break your PR, we will be alerted. Read through the `pytest` documentation and take a look at our existing tests to get an idea of how to write your own.
+Ideally, any PR opened to *Lightkurve* with new functionality should include some tests. These tests check that the basic functionality of your PR works. That way, if in the future, people create new features that break your PR, we will be alerted. Read through the `pytest` documentation and take a look at our existing tests to get an idea of how to write your own.
 
 
 I can't run any tests.
@@ -101,8 +101,8 @@ I can't run any tests.
 We run our unit tests using `pytest <https://docs.pytest.org/en/stable/>`_. This should have been installed when you installed *Lightkurve*. However, if your tests don't run, you may want to check all the test dependencies are installed. See our guide on on :ref:`Installing the development environment<install-dev-env>`.
 
 
-How to generate HTML report?
-----------------------------
+How to generate an HTML report?
+-------------------------------
 
 Use `pytest-html <https://pytest-html.readthedocs.io/>`_ extension. Install it by::
 
