@@ -1087,7 +1087,7 @@ def test_flatten_returns_normalized():
     assert flat_lc.flux.unit == u.dimensionless_unscaled
     assert flat_lc.flux_err.unit == u.dimensionless_unscaled
     assert flat_lc.meta["NORMALIZED"]
-    
+
     assert trend_lc.flux.unit is lc_flux_unit
     assert trend_lc.flux_err.unit is lc_flux_unit
 
@@ -1732,6 +1732,21 @@ def test_support_non_numeric_columns():
     lc["col1"] = ["a", "b", "c"]
     lc_copy = lc.copy()
     assert_array_equal(lc_copy["col1"], lc["col1"])
+
+
+def test_select_columns_as_lightcurve():
+    """Select a subset of columns as a lightcurve object. #1194 """
+    lc = LightCurve(time=[1, 2, 3], flux=[2, 3, 4])
+    lc["col1"] = ["a", "b", "c"]
+    lc["col2"] = [7, 8, 9]
+
+    # subset of columns inclding "time" works
+    lc_subset = lc["time", "flux", "col2"]
+    # the subset should still be an instance of LightCurve (rather than just QTable)
+    assert(isinstance(lc_subset, type(lc)))
+
+    # TODO: similar test for other LightCurve variants (BinnedLightCurve, etc.)
+    # TODO: test LightCurve constructor for `data` with various types
 
 
 def test_timedelta():

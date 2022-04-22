@@ -4,6 +4,7 @@ import datetime
 import logging
 import warnings
 import collections
+from collections.abc import Sequence
 
 import numpy as np
 from scipy.signal import savgol_filter
@@ -14,7 +15,7 @@ from copy import deepcopy
 
 from astropy.table import Table, Column, MaskedColumn
 from astropy.io import fits
-from astropy.time import Time, TimeDelta
+from astropy.time import TimeBase, Time, TimeDelta
 from astropy import units as u
 from astropy.units import Quantity
 from astropy.timeseries import TimeSeries, aggregate_downsample
@@ -151,6 +152,48 @@ class LightCurve(TimeSeries):
     __array_priority__ = 100_000
 
     def __init__(self, data=None, *args, time=None, flux=None, flux_err=None, **kwargs):
+
+        # the ` {has,get,set}_time_in(data)`: helpers to handle `data` of different types
+        def has_time_in(data):
+            """Check if the data has a column with the name"""
+            if hasattr(data, "keys") and callable(getattr(data, "keys")):
+                # data is a dict-like object with keys
+                return "time" in data.keys()
+            elif isinstance(data, Sequence) and not isinstance(data, str):
+                # data is a list-like object (a list of columns, etc.)
+                # https://stackoverflow.com/a/37842328
+                # for the purpose here, the first item MUST be time
+                if len(data) > 0:
+                    return isinstance(data[0], TimeBase)  # Time or TimeDelta
+                else:
+                    return False
+            else:
+                raise AssertionError("TODO")  # TODO:
+
+        def get_time_in(data):
+            if hasattr(data, "keys") and callable(getattr(data, "keys")):
+                # data is a dict-like object with keys
+                return data["time"]
+            elif isinstance(data, Sequence) and not isinstance(data, str):
+                if len(data) > 0:
+                    return data[0]
+                else:
+                    return None
+            else:
+                raise AssertionError("TODO")  # TODO:
+
+        def set_time_in(data, value):
+            if hasattr(data, "keys") and callable(getattr(data, "keys")):
+                # data is a dict-like object with keys
+                data["time"] = value
+            elif isinstance(data, Sequence) and not isinstance(data, str):
+                if len(data) > 0:
+                    data[0] = value
+                else:
+                    raise AssertionError("TODO")  # TODO:
+            else:
+                raise AssertionError("TODO")  # TODO:
+
         # Delay checking for required columns until the end
         self._required_columns_relax = True
 
@@ -181,7 +224,7 @@ class LightCurve(TimeSeries):
                 deprecated_column_kws[kw] = kwargs.pop(kw)
 
         # If `time` is passed as keyword argument, we populate it with integer numbers
-        if data is None or "time" not in data.keys():
+        if data is None or not has_time_in(data):
             if time is None and flux is not None:
                 time = np.arange(len(flux))
             # We are tolerant of missing time format
@@ -195,13 +238,13 @@ class LightCurve(TimeSeries):
                 )
 
         # Also be tolerant of missing time format if time is passed via `data`
-        if data and "time" in data.keys():
-            if not isinstance(data["time"], (Time, TimeDelta)):
-                data["time"] = Time(
+        if data and has_time_in(data):
+            if not isinstance(get_time_in(data), (Time, TimeDelta)):
+                set_time_in(data, Time(
                     data["time"],
                     format=deprecated_kws.get("time_format", self._default_time_format),
                     scale=deprecated_kws.get("time_scale", self._default_time_scale),
-                )
+                ))
 
         # Allow overriding the required columns
         self._required_columns = kwargs.pop("_required_columns", self._required_columns)
@@ -820,9 +863,9 @@ class LightCurve(TimeSeries):
             warnings.simplefilter("ignore", RuntimeWarning)
             flatten_lc.flux = flatten_lc.flux / trend_signal
             flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
-            
+
         flatten_lc.meta["NORMALIZED"] = True
-            
+
         if return_trend:
             trend_lc = self.copy()
             trend_lc.flux = trend_signal
