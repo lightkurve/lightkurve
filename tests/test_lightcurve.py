@@ -9,7 +9,7 @@ from astropy.timeseries import aggregate_downsample
 import matplotlib.pyplot as plt
 import numpy as np
 
-from numpy.testing import assert_almost_equal, assert_array_equal, assert_allclose
+from numpy.testing import assert_almost_equal, assert_array_equal, assert_allclose, assert_equal
 import pytest
 import tempfile
 import warnings
@@ -1380,6 +1380,48 @@ def test_combine_kepler_tess():
     assert len(lc) == len(lc_kplr) + len(lc_tess)
 
 
+# Test initialization with `data`` in various form
+# - adapated from: https://github.com/astropy/astropy/blob/v5.0.4/astropy/timeseries/tests/test_sampled.py
+# - the goal is not to repeat the tests, but to ensure LightCurve supports the same type variants.
+
+INPUT_TIME = Time(['2016-03-22T12:30:31',
+                   '2015-01-21T12:30:32',
+                   '2016-03-22T12:30:40'])
+PLAIN_TABLE = Table([[1, 2, 11], [3, 4, 1], [1, 1, 1]], names=['flux', 'flux_err', 'c'])
+
+
+def test_initialization_with_data():
+    lc = LightCurve(time=INPUT_TIME, data=[[10, 2, 3], [4, 5, 6]], names=['flux', 'flux_err'])
+    assert_equal(lc.time.isot, INPUT_TIME.isot)
+    assert_equal(lc['flux'], [10, 2, 3])
+    assert_equal(lc['flux_err'], [4, 5, 6])
+
+
+def test_initialization_with_table():
+    lc = LightCurve(time=INPUT_TIME, data=PLAIN_TABLE)
+    assert lc.colnames == ['time', 'flux', 'flux_err', 'c']
+
+
+def test_initialization_with_time_in_data():
+    data = PLAIN_TABLE.copy()
+    data['time'] = INPUT_TIME
+
+    lc1 = LightCurve(data=data)
+
+    assert set(lc1.colnames) == set(['time', 'flux', 'flux_err', 'c'])
+    assert all(lc1.time == INPUT_TIME)
+
+    # flux / flux_err is not required in input, but will be automatically generated
+    lc2 = LightCurve(data=[[10, 2, 3], INPUT_TIME], names=['a', 'time'])
+    assert set(lc2.colnames) == set(['time', 'a', 'flux', 'flux_err'])
+    assert all(lc2.time == INPUT_TIME)
+
+    # `LightCurve.__init__()` also needs to support `data` in a list of (Time, Column/Column Mix-ins) without `names`
+    # used internally by `Table.__getitem__()``:
+    # https://github.com/astropy/astropy/blob/326435449ad8d859f1abf36800c3fb88d49c27ea/astropy/table/table.py#L1888
+    # It is not a public API code path, and is implicitly tested in `test_select_columns_as_lightcurve()`.
+
+
 def test_mixed_instantiation():
     """Can a LightCurve be instantianted using a mix of keywords and colums?"""
     LightCurve(flux=[4, 5, 6], flux_err=[7, 8, 9], data={"time": [1, 2, 3]})
@@ -1746,7 +1788,6 @@ def test_select_columns_as_lightcurve():
     assert(isinstance(lc_subset, type(lc)))
 
     # TODO: similar test for other LightCurve variants (BinnedLightCurve, etc.)
-    # TODO: test LightCurve constructor for `data` with various types
 
 
 def test_timedelta():
