@@ -1387,6 +1387,7 @@ def test_combine_kepler_tess():
 INPUT_TIME = Time(['2016-03-22T12:30:31',
                    '2015-01-21T12:30:32',
                    '2016-03-22T12:30:40'])
+INPUT_RAW_TIME = [25800000.0, 25800000.1, 25800000.2]  # raw time in JD
 PLAIN_TABLE = Table([[1, 2, 11], [3, 4, 1], [1, 1, 1]], names=['flux', 'flux_err', 'c'])
 
 
@@ -1420,6 +1421,15 @@ def test_initialization_with_time_in_data():
     # used internally by `Table.__getitem__()``:
     # https://github.com/astropy/astropy/blob/326435449ad8d859f1abf36800c3fb88d49c27ea/astropy/table/table.py#L1888
     # It is not a public API code path, and is implicitly tested in `test_select_columns_as_lightcurve()`.
+
+
+def test_initialization_with_raw_time_in_data():
+    """Variant of `test_initialization_with_time_in_data() that is Lightcurve-specific.
+       Time can be raw values in default format
+    """
+    lc = LightCurve(data=[[10, 2, 3], [4, 5, 6], INPUT_RAW_TIME], names=['flux', 'flux_err', 'time'])
+    assert set(lc.colnames) == set(['time', 'flux', 'flux_err'])
+    assert_array_equal(lc.time, Time(INPUT_RAW_TIME, format=lc.time.format, scale=lc.time.scale))
 
 
 def test_mixed_instantiation():

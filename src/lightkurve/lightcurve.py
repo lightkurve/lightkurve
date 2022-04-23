@@ -154,19 +154,47 @@ class LightCurve(TimeSeries):
     def __init__(self, data=None, *args, time=None, flux=None, flux_err=None, **kwargs):
 
         # the ` {has,get,set}_time_in(data)`: helpers to handle `data` of different types
+
+        def get_time_in_list(data):
+            if len(data) < 1:
+                return None
+            names = kwargs.get("names")
+            if names is None:
+                # the first item MUST be time if no names specified
+                if isinstance(data[0], TimeBase):  # Time or TimeDelta
+                    return data[0]
+                else:
+                    return None
+            else:
+                time_indices = np.argwhere(np.asarray(names) == "time")
+                if len(time_indices) > 0:
+                    return data[time_indices[0][0]]
+                else:
+                    return None
+
+        def set_time_in_list(data, value):
+            if len(data) < 1:
+                raise AssertionError("data should be non-empty")
+            names = kwargs.get("names")
+            if names is None:
+                # the first item MUST be time if no names specified
+                data[0] = value
+            else:
+                time_indices = np.argwhere(np.asarray(names) == "time")
+                if len(time_indices) > 0:
+                    data[time_indices[0][0]] = value
+                else:
+                    raise AssertionError("data should have time column")
+
         def has_time_in(data):
             """Check if the data has a column with the name"""
             if hasattr(data, "keys") and callable(getattr(data, "keys")):
                 # data is a dict-like object with keys
                 return "time" in data.keys()
             elif isinstance(data, Sequence) and not isinstance(data, str):
-                # data is a list-like object (a list of columns, etc.)
+                # case data is a list-like object (a list of columns, etc.)
                 # https://stackoverflow.com/a/37842328
-                # for the purpose here, the first item MUST be time
-                if len(data) > 0:
-                    return isinstance(data[0], TimeBase)  # Time or TimeDelta
-                else:
-                    return False
+                return get_time_in_list(data) is not None
             else:
                 raise AssertionError("TODO")  # TODO:
 
@@ -175,10 +203,7 @@ class LightCurve(TimeSeries):
                 # data is a dict-like object with keys
                 return data["time"]
             elif isinstance(data, Sequence) and not isinstance(data, str):
-                if len(data) > 0:
-                    return data[0]
-                else:
-                    return None
+                return get_time_in_list(data)
             else:
                 raise AssertionError("TODO")  # TODO:
 
@@ -187,10 +212,7 @@ class LightCurve(TimeSeries):
                 # data is a dict-like object with keys
                 data["time"] = value
             elif isinstance(data, Sequence) and not isinstance(data, str):
-                if len(data) > 0:
-                    data[0] = value
-                else:
-                    raise AssertionError("TODO")  # TODO:
+                set_time_in_list(data, value)
             else:
                 raise AssertionError("TODO")  # TODO:
 
@@ -241,7 +263,7 @@ class LightCurve(TimeSeries):
         if data and has_time_in(data):
             if not isinstance(get_time_in(data), (Time, TimeDelta)):
                 set_time_in(data, Time(
-                    data["time"],
+                    get_time_in(data),
                     format=deprecated_kws.get("time_format", self._default_time_format),
                     scale=deprecated_kws.get("time_scale", self._default_time_scale),
                 ))
