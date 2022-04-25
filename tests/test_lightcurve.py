@@ -1432,6 +1432,29 @@ def test_initialization_with_raw_time_in_data():
     assert_array_equal(lc.time, Time(INPUT_RAW_TIME, format=lc.time.format, scale=lc.time.scale))
 
 
+# case multiple time columns: handled by the base TimeSeries
+
+
+def test_initialization_with_ndarray():
+    # test init with ndarray does not exist in astropy `test_sampled.py`, and is added
+    # for completeness sake
+    data = np.array([(1.0, 0.2, 0),
+                     (3.0, 0.4, 4),
+                     (5.0, 0.6, 2)],
+                    dtype=[('flux', 'f8'), ('flux_err', 'f8'), ('c', 'i4')])
+    lc = LightCurve(time=INPUT_TIME, data=data)
+    assert lc.colnames == ['time', 'flux', 'flux_err', 'c']
+
+
+def test_initialization_with_time_in_ndarray():
+    data = np.array([(1.0, 0.2, 0, INPUT_RAW_TIME[0]),
+                     (3.0, 0.4, 4, INPUT_RAW_TIME[1]),
+                     (5.0, 0.6, 2, INPUT_RAW_TIME[2])],
+                    dtype=[('flux', 'f8'), ('flux_err', 'f8'), ('c', 'i4'), ('time', 'f8')])
+    lc = LightCurve(data=data)
+    assert lc.colnames == ['time', 'flux', 'flux_err', 'c']
+
+
 def test_mixed_instantiation():
     """Can a LightCurve be instantianted using a mix of keywords and colums?"""
     LightCurve(flux=[4, 5, 6], flux_err=[7, 8, 9], data={"time": [1, 2, 3]})

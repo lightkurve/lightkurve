@@ -154,6 +154,8 @@ class LightCurve(TimeSeries):
     def __init__(self, data=None, *args, time=None, flux=None, flux_err=None, **kwargs):
 
         # the ` {has,get,set}_time_in(data)`: helpers to handle `data` of different types
+        # TODO: change helpers to remove data from argument
+        # TODO: refactor to create helper `get_time_idx_in_data(must_be_time_type)`
 
         def get_time_in_list(data):
             if len(data) < 1:
@@ -186,17 +188,36 @@ class LightCurve(TimeSeries):
                 else:
                     raise AssertionError("data should have time column")
 
+        def get_time_in_np_structured_array(data):
+            if data.dtype.names is None: # no labeled filed, not a structured array
+                return None
+            if "time" not in data.dtype.names:
+                return None
+            return data["time"]
+
+        def remove_time_from_np_structured_array(data):
+            if data.dtype.names is None:
+                raise AssertionError("data should be a numpy structured array")
+            if "time" not in data.dtype.names:
+                raise AssertionError("data should have a time field")
+            filtered_names = [n for n in data.dtype.names if n != "time"]
+            return data[filtered_names]
+
         def has_time_in(data):
             """Check if the data has a column with the name"""
-            if hasattr(data, "keys") and callable(getattr(data, "keys")):
+            if data is None:
+                return False
+            elif hasattr(data, "keys") and callable(getattr(data, "keys")):
                 # data is a dict-like object with keys
                 return "time" in data.keys()
             elif isinstance(data, Sequence) and not isinstance(data, str):
                 # case data is a list-like object (a list of columns, etc.)
                 # https://stackoverflow.com/a/37842328
                 return get_time_in_list(data) is not None
+            elif isinstance(data, np.ndarray) and data.dtype.names is not None:
+                return get_time_in_np_structured_array(data) is not None
             else:
-                raise AssertionError("TODO")  # TODO:
+                raise ValueError(f"Unsupported type for time in data: {type(data)}")
 
         def get_time_in(data):
             if hasattr(data, "keys") and callable(getattr(data, "keys")):
@@ -204,8 +225,11 @@ class LightCurve(TimeSeries):
                 return data["time"]
             elif isinstance(data, Sequence) and not isinstance(data, str):
                 return get_time_in_list(data)
+            elif isinstance(data, np.ndarray) and data.dtype.names is not None:
+                return get_time_in_np_structured_array(data)
             else:
-                raise AssertionError("TODO")  # TODO:
+                # should never reach here. It'd have been caught by `has_time_in()``
+                raise AssertionError("Unsupported type for time in data")
 
         def set_time_in(data, value):
             if hasattr(data, "keys") and callable(getattr(data, "keys")):
@@ -213,8 +237,12 @@ class LightCurve(TimeSeries):
                 data["time"] = value
             elif isinstance(data, Sequence) and not isinstance(data, str):
                 set_time_in_list(data, value)
+            elif isinstance(data, np.ndarray) and data.dtype.names is not None:
+                # astropy Time cannot be assigned to a column in np structured array
+                raise AssertionError("Setting Time instances to np structured array is not supported")
             else:
-                raise AssertionError("TODO")  # TODO:
+                # should never reach here. It'd have been caught by `has_time_in()``
+                raise AssertionError("Unsupported type for time in data")
 
         # Delay checking for required columns until the end
         self._required_columns_relax = True
@@ -260,13 +288,21 @@ class LightCurve(TimeSeries):
                 )
 
         # Also be tolerant of missing time format if time is passed via `data`
-        if data and has_time_in(data):
+        if data is not None and has_time_in(data):
             if not isinstance(get_time_in(data), (Time, TimeDelta)):
-                set_time_in(data, Time(
+                tmp_time = Time(
                     get_time_in(data),
                     format=deprecated_kws.get("time_format", self._default_time_format),
                     scale=deprecated_kws.get("time_scale", self._default_time_scale),
-                ))
+                )
+                if isinstance(data, np.ndarray) and data.dtype.names is not None:
+                    # special case for np structured array:
+                    # one cannot set a `Time` instance to it
+                    # so we set the time to the `time` param, and take it out of data
+                    time = tmp_time
+                    data = remove_time_from_np_structured_array(data)
+                else:
+                    set_time_in(data, tmp_time)
 
         # Allow overriding the required columns
         self._required_columns = kwargs.pop("_required_columns", self._required_columns)
