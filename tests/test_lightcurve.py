@@ -1811,16 +1811,31 @@ def test_support_non_numeric_columns():
 
 def test_select_columns_as_lightcurve():
     """Select a subset of columns as a lightcurve object. #1194 """
-    lc = LightCurve(time=[1, 2, 3], flux=[2, 3, 4])
-    lc["col1"] = ["a", "b", "c"]
-    lc["col2"] = [7, 8, 9]
+    lc = LightCurve(time=np.arange(0, 12))
+    lc["flux"] = np.ones_like(lc.time, dtype="f8") - 0.01
+    lc["flux_err"] = np.ones_like(lc.time, dtype="f8") * 0.0001
+    lc["col1"] = np.zeros_like(lc.time, dtype="i4")
+    lc["col2"] = np.zeros_like(lc.time, dtype="i4")
 
-    # subset of columns inclding "time" works
-    lc_subset = lc["time", "flux", "col2"]
+    # subset of columns including "time" works
+    lc_subset = lc['time', 'flux', 'col2']
+    # columns flux / flux_err are always there as part of a LightCurve object
+    assert set(lc_subset.colnames) == set(['time', 'flux', 'flux_err', 'col2'])
+    # the flux_err in the subset, as it is not specified requested,
+    # is one with `nan`, rather than rather than the original lc.flux_err.
+    assert np.isnan(lc_subset.flux_err).all()
     # the subset should still be an instance of LightCurve (rather than just QTable)
     assert(isinstance(lc_subset, type(lc)))
 
-    # TODO: similar test for other LightCurve variants (BinnedLightCurve, etc.)
+    lc_b = lc.bin(time_bin_size=3*u.day)
+    lc_b_subset = lc_b['time', 'flux', 'flux_err', 'col1']
+    assert set(lc_b_subset.colnames) == set(['time', 'flux', 'flux_err', 'col1'])
+    assert(isinstance(lc_b_subset, type(lc_b)))
+
+    lc_f = lc.fold(period=3)
+    lc_f_subset = lc_f['time', 'flux', 'flux_err']
+    assert set(lc_f_subset.colnames) == set(['time', 'flux', 'flux_err'])
+    assert(isinstance(lc_f_subset, type(lc_f)))
 
 
 def test_timedelta():
