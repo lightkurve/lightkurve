@@ -199,6 +199,9 @@ class LightCurve(TimeSeries):
             names = kwargs.get("names")
             if names is None:
                 # the first item MUST be time if no names specified
+                # this is to support base Table's select columns
+                # in __getitem__()
+                # https://github.com/astropy/astropy/blob/326435449ad8d859f1abf36800c3fb88d49c27ea/astropy/table/table.py#L1888
                 data[0] = value
             else:
                 time_idx = get_time_idx_in(names)
