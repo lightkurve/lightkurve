@@ -388,6 +388,8 @@ def _add_tics_with_matching_gaia_ids_to(result, tab, gaia_ids):
     result['separation'] = col_separation
     return result
 
+# use case: signify Gaia ID (Source, int type) as missing
+_MISSING_INT_VAL = 0
 
 def _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limit):
     def _add_to(data_dict, dest_colname, src):
@@ -398,7 +400,7 @@ def _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limi
     def _dummy_like(ary, dtype):
         dummy_val = None
         if np.issubdtype(dtype, np.integer):
-            dummy_val = 0
+            dummy_val = _MISSING_INT_VAL
         elif np.issubdtype(dtype, np.float):
             dummy_val = np.nan
         return [dummy_val for i in range(len(ary))]
@@ -467,6 +469,15 @@ def _add_nearby_tics_if_tess(tpf, magnitude_limit, result):
     source_colnames_extras = ['tic', 'TESSmag', 'separation']
     tooltips_extras = [("TIC", "@tic"), ("TESS Mag", "@TESSmag"), ("Separation (\")", "@separation")]
     return result, source_colnames_extras, tooltips_extras
+
+
+def _to_display(series):
+    def _format(val):
+        if val == _MISSING_INT_VAL or np.isnan(val):
+            return ""
+        else:
+            return str(val)
+    return pd.Series(data=[_format(v) for v in series], dtype=str)
 
 
 def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
@@ -542,7 +553,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
             dec=result["DE_ICRS"],
             pmra=result["pmRA"],
             pmde=result["pmDE"],
-            source=result["Source"].astype(str),
+            source=_to_display(result["Source"]),
             Gmag=result["Gmag"],
             plx=result["Plx"],
             one_over_plx=one_over_parallax,
