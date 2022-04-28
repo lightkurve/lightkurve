@@ -499,11 +499,16 @@ def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
     from astroquery.vizier import Vizier
 
     Vizier.ROW_LIMIT = -1
-    result = Vizier.query_region(
-        c1,
-        catalog=["I/345/gaia2"],
-        radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
-    )
+    with warnings.catch_warnings():
+        # suppress useless warning to workaround  https://github.com/astropy/astroquery/issues/2352
+        warnings.filterwarnings(
+            "ignore", category=u.UnitsWarning, message="Unit 'e' not supported by the VOUnit standard"
+        )
+        result = Vizier.query_region(
+            c1,
+            catalog=["I/345/gaia2"],
+            radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
+        )
     no_targets_found_message = ValueError(
         "Either no sources were found in the query region " "or Vizier is unavailable"
     )
