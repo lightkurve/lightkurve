@@ -66,9 +66,9 @@ def _search_nearby_of_tess_target(tic_id):
                       format="csv",
                       fast_reader=False,
                       converters={
-                          "GAIA DR2": [ascii.convert_numpy(np.str)],
-                          "TIC ID": [ascii.convert_numpy(np.str)],
-                          "TOI": [ascii.convert_numpy(np.str)],
+                          "GAIA DR2": [ascii.convert_numpy(str)],
+                          "TIC ID": [ascii.convert_numpy(str)],
+                          "TOI": [ascii.convert_numpy(str)],
                           })
 
 
@@ -377,11 +377,11 @@ def _add_tics_with_matching_gaia_ids_to(result, tab, gaia_ids):
     # empty string will be used as the value. bokeh's tooltip template can correctly render it as empty string
 
     col_tic_id = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TIC ID', "") for id in gaia_ids],
-                        dtype=np.str)
+                        dtype=str)
     col_tess_mag = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TESS Mag', "") for id in gaia_ids],
-                          dtype=np.str)
+                          dtype=str)
     col_separation = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'Separation (arcsec)', "") for id in gaia_ids],
-                            dtype=np.str)
+                            dtype=str)
 
     result['tic'] = col_tic_id
     result['TESSmag'] = col_tess_mag
@@ -401,7 +401,7 @@ def _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limi
         dummy_val = None
         if np.issubdtype(dtype, np.integer):
             dummy_val = _MISSING_INT_VAL
-        elif np.issubdtype(dtype, np.float):
+        elif np.issubdtype(dtype, float):
             dummy_val = np.nan
         return [dummy_val for i in range(len(ary))]
 

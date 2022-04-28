@@ -226,7 +226,7 @@ def test_interact_sky_functions_add_nearby_tics():
     )
     # This TIC's nearby report has a mix of stars with Gaia and without Gaia IDs.
     # https://exofop.ipac.caltech.edu/tess/nearbytarget.php?id=233087860
-    tpf = search_targetpixelfile("TIC233087860", mission="TESS").download()
+    tpf = search_targetpixelfile("TIC233087860", mission="TESS")[0].download()
     magnitude_limit = 17
 
     df_before = _get_nearby_gaia_objects(tpf, magnitude_limit)
