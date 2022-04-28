@@ -480,8 +480,9 @@ def _to_display(series):
     return pd.Series(data=[_format(v) for v in series], dtype=str)
 
 
-def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
-    """Make the Gaia Figure Elements"""
+def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
+    """Get nearby objects (of the target defined in tpf) from Gaia.
+    The result is formatted for the use of plot."""
     # Get the positions of the Gaia sources
     try:
         c1 = SkyCoord(tpf.ra, tpf.dec, frame="icrs", unit="deg")
@@ -520,6 +521,13 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     # drop all the filtered rows, it makes subsequent TESS-specific processing easier (to add rows/columns)
     result.reset_index(drop=True, inplace=True)
     result['magForSize'] = result['Gmag']  # to be used as the basis for sizing the dots in plots
+    return result
+
+
+def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
+    """Make the Gaia Figure Elements"""
+
+    result = _get_nearby_gaia_objects(tpf, magnitude_limit)
 
     source_colnames_extras = []
     tooltips_extras = []
