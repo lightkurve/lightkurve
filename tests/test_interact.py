@@ -7,6 +7,7 @@ from numpy.testing import assert_array_equal
 import pytest
 
 from lightkurve import LightkurveWarning, LightkurveError
+from lightkurve.search import search_targetpixelfile
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from .test_targetpixelfile import filename_tpf_tabby_lite
 from lightkurve.interact import get_lightcurve_y_limits
@@ -214,6 +215,29 @@ def test_interact_sky_functions_case_no_target_coordinate():
     fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source)
     with pytest.raises(LightkurveError, match=r".* no valid coordinate.*"):
         add_gaia_figure_elements(tpf, fig1)
+
+
+@pytest.mark.remote_data
+def test_interact_sky_functions_add_nearby_tics():
+    """Test the backend of interact_sky() that combine Nearby TIC report with Gaia result."""
+    from lightkurve.interact import (
+        _get_nearby_gaia_objects,
+        _add_nearby_tics_if_tess,
+    )
+    # This TIC's nearby report has a mix of stars with Gaia and without Gaia IDs.
+    # https://exofop.ipac.caltech.edu/tess/nearbytarget.php?id=233087860
+    tpf = search_targetpixelfile("TIC233087860", mission="TESS")[0].download()
+    magnitude_limit = 17
+
+    df_before = _get_nearby_gaia_objects(tpf, magnitude_limit)
+    df, source_colnames_extras, tooltips_extras = _add_nearby_tics_if_tess(tpf, magnitude_limit, df_before)
+
+    # based on what we know about the nearby report of the specific TIC,
+    # some existing Gaia entries are added with tic data
+    assert len(df[(df['Source'] > 0) & (df['tic'] != '')]) > 0
+
+    # Some new entries with data only from TIC nearby report are added (hence no Gaia info)
+    assert len(df[(df['Source'] == 0) & (df['tic'] != '')]) > 0
 
 
 @pytest.mark.remote_data

@@ -25,6 +25,7 @@ from astropy.stats import sigma_clip
 from astropy.time import Time
 import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
+import pandas as pd
 from pandas import Series
 
 from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError
@@ -65,9 +66,9 @@ def _search_nearby_of_tess_target(tic_id):
                       format="csv",
                       fast_reader=False,
                       converters={
-                          "GAIA DR2": [ascii.convert_numpy(np.str)],
-                          "TIC ID": [ascii.convert_numpy(np.str)],
-                          "TOI": [ascii.convert_numpy(np.str)],
+                          "GAIA DR2": [ascii.convert_numpy(str)],
+                          "TIC ID": [ascii.convert_numpy(str)],
+                          "TOI": [ascii.convert_numpy(str)],
                           })
 
 
@@ -366,14 +367,89 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     return fig, vertical_line
 
 
-def _add_nearby_tics_if_tess(tpf, source, tooltips):
+def _add_tics_with_matching_gaia_ids_to(result, tab, gaia_ids):
+    # use pandas Series rather than plain list, so they look like the existing columns in the source
+    #
+    # Note: we convert all the data to string to better handles cases when a star has no TIC
+    # In such cases, if we supply None as a value in a pandas Series,
+    # bokeh's tooltip template will render it as NaN (rather than empty string)
+    # To avoid NaN display, we force the Series to use string dtype, and for stars with missing TICs,
+    # empty string will be used as the value. bokeh's tooltip template can correctly render it as empty string
+
+    col_tic_id = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TIC ID', "") for id in gaia_ids],
+                        dtype=str)
+    col_tess_mag = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TESS Mag', "") for id in gaia_ids],
+                          dtype=str)
+    col_separation = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'Separation (arcsec)', "") for id in gaia_ids],
+                            dtype=str)
+
+    result['tic'] = col_tic_id
+    result['TESSmag'] = col_tess_mag
+    result['separation'] = col_separation
+    return result
+
+# use case: signify Gaia ID (Source, int type) as missing
+_MISSING_INT_VAL = 0
+
+def _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limit):
+    def _add_to(data_dict, dest_colname, src):
+        # the data_dict should ultimately have the same columns/dtype as the result,
+        # as it will be appended to the result at the end
+        data_dict[dest_colname] = Series(data=src, dtype=result[dest_colname].dtype)
+
+    def _dummy_like(ary, dtype):
+        dummy_val = None
+        if np.issubdtype(dtype, np.integer):
+            dummy_val = _MISSING_INT_VAL
+        elif np.issubdtype(dtype, float):
+            dummy_val = np.nan
+        return [dummy_val for i in range(len(ary))]
+
+    # filter out those with matching gaia ids
+    # (handled in `_add_tics_with_matching_gaia_ids_to()`)
+    gaia_str_ids = [str(id) for id in gaia_ids]
+    tab = tab[np.isin(tab['GAIA DR2'], gaia_str_ids, invert=True)]
+
+    # filter out those with gaia ids, but Gaia Mag is smaller than magnitude_limit
+    # (they won't appear in the given gaia_ids list)
+    tab = tab[tab['GAIA Mag'] < magnitude_limit]
+
+    # apply magnitude_limit filter for those with no Gaia data using TESS mag
+    tab = tab[tab['TESS Mag'] < magnitude_limit]
+
+    # convert the filtered tab to a dataframe, so as to append to the existing result
+    data = dict()
+    _add_to(data, 'tic', tab['TIC ID'])
+    _add_to(data, 'TESSmag', tab['TESS Mag'])
+    _add_to(data, 'magForSize', tab['TESS Mag'])
+    _add_to(data, 'separation', tab['Separation (arcsec)'])
+    # convert the string Ra/Dec to float
+    # we assume the equinox is the same as those from Gaia DR2
+    coords = SkyCoord(tab['RA'], tab['Dec'], unit=(u.hourangle, u.deg), frame='icrs')
+    _add_to(data, 'RA_ICRS', coords.ra.value)
+    _add_to(data, 'DE_ICRS', coords.dec.value)
+    _add_to(data, 'pmRA', tab['PM RA (mas/yr)'])
+    _add_to(data, 'e_pmRA', tab['PM RA Err (mas/yr)'])
+    _add_to(data, 'pmDE', tab['PM Dec (mas/yr)'])
+    _add_to(data, 'e_pmDE', tab['PM Dec Err (mas/yr)'])
+
+    # add dummy columns so that the resulting data frame would match the existing one
+    nontic_colnames = [c for c in result.keys() if c not in data.keys()]
+    for c in nontic_colnames:
+        data[c] = Series(data=_dummy_like(tab, result[c].dtype), dtype=result[c].dtype)
+
+    # finally, append the entries to existing result dataframe
+    return pd.concat([result, pd.DataFrame(data)])
+
+
+def _add_nearby_tics_if_tess(tpf, magnitude_limit, result):
     tic_id = tpf.meta.get('TICID', None)
     # handle 3 cases:
     # - TESS tpf has a valid id, type integer
     # - Some TESSCut has empty string while and some others has None
     # - Kepler tpf does not have the header
     if tic_id is None or tic_id == "":
-        return source, tooltips
+        return result, []
 
     if isinstance(tic_id, str):
         # for cases tpf is from tpf.cutout() call in #1089
@@ -382,36 +458,31 @@ def _add_nearby_tics_if_tess(tpf, source, tooltips):
     # nearby TICs from ExoFOP
     tab = _search_nearby_of_tess_target(tic_id)
 
-    col_gaia_id = source.data['source']
-    # use pandas Series rather than plain list, so they look like the existing columns in the source
-    #
-    # Note: we convert all the data to string to better handles cases when a star has no TIC
-    # In such cases, if we supply None as a value in a pandas Series,
-    # bokeh's tooltip template will render it as NaN (rather than empty string)
-    # To avoid NaN display, we force the Series to use string dtype, and for stars with missing TICs,
-    # empty string will be used as the value. bokeh's tooltip template can correctly render it as empty string
-    gaia_ids = col_gaia_id.array
-    col_tic_id = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TIC ID', "") for id in gaia_ids],
-                        dtype=np.str)
-    col_tess_mag = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TESS Mag', "") for id in gaia_ids],
-                          dtype=np.str)
-    col_separation = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'Separation (arcsec)', "") for id in gaia_ids],
-                            dtype=np.str)
+    gaia_ids = result['Source'].array
 
-    source.data['tic'] = col_tic_id
-    source.data['TESSmag'] = col_tess_mag
-    source.data['separation'] = col_separation
+    # merge the TICs with matching Gaia entries
+    result = _add_tics_with_matching_gaia_ids_to(result, tab, gaia_ids)
 
-    # issue: if tic / TESSmag of a star is None, the tooltip will show NaN as value, it might be too distracting
-    # A potential workaround is to set dtype of the pandas Series to panda native "Int64", "Float64" that treats
-    # the Series as None as N/A. But it does not work yet, as bokeh cannot handle such series, complaining
-    #  AttributeError: 'IntegerArray' object has no attribute 'tolist'
-    tooltips = [("TIC", "@tic"), ("TESS Mag", "@TESSmag"), ("Separation (\")", "@separation")] + tooltips
-    return source, tooltips
+    # add new entries for the TICs with no matching Gaia ones
+    result = _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limit)
+
+    source_colnames_extras = ['tic', 'TESSmag', 'separation']
+    tooltips_extras = [("TIC", "@tic"), ("TESS Mag", "@TESSmag"), ("Separation (\")", "@separation")]
+    return result, source_colnames_extras, tooltips_extras
 
 
-def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
-    """Make the Gaia Figure Elements"""
+def _to_display(series):
+    def _format(val):
+        if val == _MISSING_INT_VAL or np.isnan(val):
+            return ""
+        else:
+            return str(val)
+    return pd.Series(data=[_format(v) for v in series], dtype=str)
+
+
+def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
+    """Get nearby objects (of the target defined in tpf) from Gaia.
+    The result is formatted for the use of plot."""
     # Get the positions of the Gaia sources
     try:
         c1 = SkyCoord(tpf.ra, tpf.dec, frame="icrs", unit="deg")
@@ -428,11 +499,16 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     from astroquery.vizier import Vizier
 
     Vizier.ROW_LIMIT = -1
-    result = Vizier.query_region(
-        c1,
-        catalog=["I/345/gaia2"],
-        radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
-    )
+    with warnings.catch_warnings():
+        # suppress useless warning to workaround  https://github.com/astropy/astroquery/issues/2352
+        warnings.filterwarnings(
+            "ignore", category=u.UnitsWarning, message="Unit 'e' not supported by the VOUnit standard"
+        )
+        result = Vizier.query_region(
+            c1,
+            catalog=["I/345/gaia2"],
+            radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
+        )
     no_targets_found_message = ValueError(
         "Either no sources were found in the query region " "or Vizier is unavailable"
     )
@@ -447,6 +523,26 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     result = result[result.Gmag < magnitude_limit]
     if len(result) == 0:
         raise no_targets_found_message
+    # drop all the filtered rows, it makes subsequent TESS-specific processing easier (to add rows/columns)
+    result.reset_index(drop=True, inplace=True)
+    result['magForSize'] = result['Gmag']  # to be used as the basis for sizing the dots in plots
+    return result
+
+
+def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
+    """Make the Gaia Figure Elements"""
+
+    result = _get_nearby_gaia_objects(tpf, magnitude_limit)
+
+    source_colnames_extras = []
+    tooltips_extras = []
+    try:
+        result, source_colnames_extras, tooltips_extras = _add_nearby_tics_if_tess(tpf, magnitude_limit, result)
+    except Exception as err:
+        warnings.warn(
+            f"interact_sky() - cannot obtain nearby TICs. Skip it. The error: {err}",
+            LightkurveWarning,
+        )
 
     ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
             np.nan_to_num(np.asarray(result.RA_ICRS)) * u.deg, np.nan_to_num(np.asarray(result.DE_ICRS)) * u.deg,
@@ -462,7 +558,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     coords = tpf.wcs.all_world2pix(radecs, 0)
 
     # Gently size the points by their Gaia magnitude
-    sizes = 64.0 / 2 ** (result["Gmag"] / 5.0)
+    sizes = 64.0 / 2 ** (result["magForSize"] / 5.0)
     one_over_parallax = 1.0 / (result["Plx"] / 1000.0)
     source = ColumnDataSource(
         data=dict(
@@ -470,7 +566,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
             dec=result["DE_ICRS"],
             pmra=result["pmRA"],
             pmde=result["pmDE"],
-            source=result["Source"].astype(str),
+            source=_to_display(result["Source"]),
             Gmag=result["Gmag"],
             plx=result["Plx"],
             one_over_plx=one_over_parallax,
@@ -479,6 +575,8 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
             size=sizes,
         )
     )
+    for c in source_colnames_extras:
+        source.data[c] = result[c]
 
     tooltips = [
         ("Gaia source", "@source"),
@@ -491,14 +589,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         ("column", "@x{0.0}"),
         ("row", "@y{0.0}"),
         ]
-
-    try:
-        source, tooltips = _add_nearby_tics_if_tess(tpf, source, tooltips)
-    except Exception as err:
-        warnings.warn(
-            f"interact_sky() - cannot obtain nearby TICs. Skip it. The error: {err}",
-            LightkurveWarning,
-        )
+    tooltips = tooltips_extras + tooltips
 
     r = fig.circle(
         "x",
