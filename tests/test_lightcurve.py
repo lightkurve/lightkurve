@@ -258,15 +258,77 @@ def test_lightcurve_fold():
     assert "Phase" in ax.get_xlabel()
     plt.close("all")
 
-    odd = fold.odd_mask
-    even = fold.even_mask
-    assert len(odd) == len(fold.time)
-    assert np.all(odd == ~even)
-    assert np.sum(odd) == np.sum(even)
     # bad transit midpoint should give a warning
     # if user tries a t0 in JD but time is in BKJD
     with pytest.warns(LightkurveWarning, match="appears to be given in JD"):
         lc.fold(10, 2456600)
+
+
+@pytest.mark.parametrize(
+    "normalize_phase", [False, True]
+)
+def test_lightcurve_fold_odd_even_masks(normalize_phase):
+    """Test for FoldedLightCurve odd/even mask. See #1104. """
+
+    # a sine curve with 4-day period, with minimum at day 3, 7, ...
+    epoch_time, period = 3, 4
+    lc = LightCurve(
+        time=np.linspace(0, 10, 100),
+        targetid=999,
+        label="mystar",
+        meta={"CCD": 2},
+    )
+
+    lc.flux = np.sin((period * 0.75 + lc.time.value - epoch_time) * 2 * np.pi / period)
+
+    # epoch_phase should only shift how the folded lightcurve,
+    # but not the actual odd/even mask calculation
+    fold = lc.fold(period=period, epoch_time=epoch_time, epoch_phase=0.5, normalize_phase=normalize_phase)
+    odd = fold.odd_mask
+    even = fold.even_mask
+    assert len(odd) == len(fold.time)
+    assert np.all(odd == ~even)
+
+    # cycle 0: time [0, 1)
+    # cycle 1: time [1, 5)
+    # cycle 2: time [5, 9)
+    # cycle 3: time [9, 10]
+    def create_expected_even(times):
+        def _mask(t):
+            if t < 1 or (5 <= t and t < 9):
+                return True
+            return False
+        return np.array([_mask(t) for t in fold.time_original.value])
+
+    def create_expected_cycle(times):
+        def _cycle(t):
+            if t < 1:
+                return 0
+            elif 1 <= t < 5:
+                return 1
+            elif 5 <= t < 9:
+                return 2
+            else:
+                return 3
+        return np.array([_cycle(t) for t in fold.time_original.value])
+
+    even_expected = create_expected_even(fold)
+    assert_array_equal(even, even_expected)
+
+    assert_array_equal(fold.cycle, create_expected_cycle(fold))
+
+    # the following plot is only useful for visualizing the result,
+    # say, when someone copies the test to Jupyter notebook to run
+    ax = lc.plot()
+    fold_e = fold[fold.even_mask]
+    ax.scatter(fold_e.time_original.value, fold_e.flux, label="actual")
+    ax.legend()
+
+    ax = lc.plot()
+    fold_e = fold[even_expected]
+    ax.scatter(fold_e.time_original.value, fold_e.flux, label="expected")
+    ax.legend()
+    plt.close("all")
 
 
 def test_lightcurve_fold_issue520():
