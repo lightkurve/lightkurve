@@ -7,6 +7,7 @@ by consensus. If you believe you meet the criteria to be added as a core
 developer, please open an issue!
 
 - `Geert Barentsen <https://github.com/barentsen>`_ (lead maintainer)
+- `Sam Lee <https://github.com/orionlee>`_
 - `Christina Hedges <https://github.com/christinahedges>`_
 - `José Vinícius de Miranda Cardoso <https://github.com/mirca>`_
 - `Thomas Barclay <https://github.com/mrtommyb>`_
@@ -42,7 +43,6 @@ The following GitHub members directly contributed code and bugfixes:
 - `Isabel Coleman <https://github.com/astrobel>`_
 - `Colin J. Burke <https://github.com/burke86>`_
 - `Andrew Vanderburg <https://github.com/avanderburg>`_
-- `Sam Lee <https://github.com/orionlee>`_
 - `Stephanie Douglas <https://github.com/stephtdouglas>`_
 - `Kaiming Cui <https://github.com/ckm3>`_
 - `Nuno Ramos Carvalho <https://github.com/nunorc>`_
