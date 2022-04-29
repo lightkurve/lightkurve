@@ -1,7 +1,12 @@
 2.2.1 (unreleased)
 ==================
-- Fixed a bug in ``LightCurve.flatten()`` which caused the flux unit of flatten 
-  light curve is not dimensionless. [#1195]
+- Fixed a bug in ``LightCurve.flatten()`` which caused the flux unit of
+  flattened light curves to be non-dimensionless. [#1195]
+
+- Improved ``TargetPixelFile.interact_sky()`` to include TIC information
+  even when the TICs are not found in Gaia. [#1204]
+
+- Removed extraneous warnings from ``TargetPixelFile.interact_sky()``. [#1204]
 
 
 
