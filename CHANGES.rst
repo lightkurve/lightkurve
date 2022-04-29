@@ -8,6 +8,10 @@
 
 - Removed extraneous warnings from ``TargetPixelFile.interact_sky()``. [#1204]
 
+- Fixed a bug in ``FoldedLightCurve.odd_mask`` and ``.even_mask`` which caused
+  the mask to be incorrect when the phase is literal time. [#1105]
+
+- Added a new ``FoldedLightCurve.cycle`` attribute. [#1105]
 
 
 2.2.0 (2022-04-12)
