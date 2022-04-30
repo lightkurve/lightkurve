@@ -13,6 +13,12 @@
 
 - Added a new ``FoldedLightCurve.cycle`` attribute. [#1105]
 
+- Fixed a bug in ``LightCurve['time', '<some-column>']``, which triggered an
+  ``AttributeError`` when selecting a subset of columns including ``time``. [#1199]
+  
+- Fixed a bug in ``LightCurve()`` constructor, which triggered an 
+  ``AttributeError`` when `data` parameter is a ``list`` or ``ndarray`` [#1199]
+
 
 2.2.0 (2022-04-12)
 ==================
