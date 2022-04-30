@@ -9,7 +9,7 @@ from astropy.timeseries import aggregate_downsample
 import matplotlib.pyplot as plt
 import numpy as np
 
-from numpy.testing import assert_almost_equal, assert_array_equal, assert_allclose
+from numpy.testing import assert_almost_equal, assert_array_equal, assert_allclose, assert_equal
 import pytest
 import tempfile
 import warnings
@@ -1087,7 +1087,7 @@ def test_flatten_returns_normalized():
     assert flat_lc.flux.unit == u.dimensionless_unscaled
     assert flat_lc.flux_err.unit == u.dimensionless_unscaled
     assert flat_lc.meta["NORMALIZED"]
-    
+
     assert trend_lc.flux.unit is lc_flux_unit
     assert trend_lc.flux_err.unit is lc_flux_unit
 
@@ -1378,6 +1378,81 @@ def test_combine_kepler_tess():
     coll = LightCurveCollection((lc_kplr, lc_tess))
     lc = coll.stitch()
     assert len(lc) == len(lc_kplr) + len(lc_tess)
+
+
+# Test initialization with `data`` in various form
+# - adapated from: https://github.com/astropy/astropy/blob/v5.0.4/astropy/timeseries/tests/test_sampled.py
+# - the goal is not to repeat the tests, but to ensure LightCurve supports the same type variants.
+
+INPUT_TIME = Time(['2016-03-22T12:30:31',
+                   '2015-01-21T12:30:32',
+                   '2016-03-22T12:30:40'])
+INPUT_RAW_TIME = [25800000.0, 25800000.1, 25800000.2]  # raw time in JD
+PLAIN_TABLE = Table([[1, 2, 11], [3, 4, 1], [1, 1, 1]], names=['flux', 'flux_err', 'c'])
+
+
+def test_initialization_with_data():
+    lc = LightCurve(time=INPUT_TIME, data=[[10, 2, 3], [4, 5, 6]], names=['flux', 'flux_err'])
+    assert_equal(lc.time.isot, INPUT_TIME.isot)
+    assert_equal(lc['flux'], [10, 2, 3])
+    assert_equal(lc['flux_err'], [4, 5, 6])
+
+
+def test_initialization_with_table():
+    lc = LightCurve(time=INPUT_TIME, data=PLAIN_TABLE)
+    assert lc.colnames == ['time', 'flux', 'flux_err', 'c']
+
+
+def test_initialization_with_time_in_data():
+    data = PLAIN_TABLE.copy()
+    data['time'] = INPUT_TIME
+
+    lc1 = LightCurve(data=data)
+
+    assert set(lc1.colnames) == set(['time', 'flux', 'flux_err', 'c'])
+    assert all(lc1.time == INPUT_TIME)
+
+    # flux / flux_err is not required in input, but will be automatically generated
+    lc2 = LightCurve(data=[[10, 2, 3], INPUT_TIME], names=['a', 'time'])
+    assert set(lc2.colnames) == set(['time', 'a', 'flux', 'flux_err'])
+    assert all(lc2.time == INPUT_TIME)
+
+    # `LightCurve.__init__()` also needs to support `data` in a list of (Time, Column/Column Mix-ins) without `names`
+    # used internally by `Table.__getitem__()``:
+    # https://github.com/astropy/astropy/blob/326435449ad8d859f1abf36800c3fb88d49c27ea/astropy/table/table.py#L1888
+    # It is not a public API code path, and is implicitly tested in `test_select_columns_as_lightcurve()`.
+
+
+def test_initialization_with_raw_time_in_data():
+    """Variant of `test_initialization_with_time_in_data() that is Lightcurve-specific.
+       Time can be raw values in default format
+    """
+    lc = LightCurve(data=[[10, 2, 3], [4, 5, 6], INPUT_RAW_TIME], names=['flux', 'flux_err', 'time'])
+    assert set(lc.colnames) == set(['time', 'flux', 'flux_err'])
+    assert_array_equal(lc.time, Time(INPUT_RAW_TIME, format=lc.time.format, scale=lc.time.scale))
+
+
+# case multiple time columns: handled by the base TimeSeries
+
+
+def test_initialization_with_ndarray():
+    # test init with ndarray does not exist in astropy `test_sampled.py`, and is added
+    # for completeness sake
+    data = np.array([(1.0, 0.2, 0),
+                     (3.0, 0.4, 4),
+                     (5.0, 0.6, 2)],
+                    dtype=[('flux', 'f8'), ('flux_err', 'f8'), ('c', 'i4')])
+    lc = LightCurve(time=INPUT_TIME, data=data)
+    assert lc.colnames == ['time', 'flux', 'flux_err', 'c']
+
+
+def test_initialization_with_time_in_ndarray():
+    data = np.array([(1.0, 0.2, 0, INPUT_RAW_TIME[0]),
+                     (3.0, 0.4, 4, INPUT_RAW_TIME[1]),
+                     (5.0, 0.6, 2, INPUT_RAW_TIME[2])],
+                    dtype=[('flux', 'f8'), ('flux_err', 'f8'), ('c', 'i4'), ('time', 'f8')])
+    lc = LightCurve(data=data)
+    assert lc.colnames == ['time', 'flux', 'flux_err', 'c']
 
 
 def test_mixed_instantiation():
@@ -1732,6 +1807,35 @@ def test_support_non_numeric_columns():
     lc["col1"] = ["a", "b", "c"]
     lc_copy = lc.copy()
     assert_array_equal(lc_copy["col1"], lc["col1"])
+
+
+def test_select_columns_as_lightcurve():
+    """Select a subset of columns as a lightcurve object. #1194 """
+    lc = LightCurve(time=np.arange(0, 12))
+    lc["flux"] = np.ones_like(lc.time, dtype="f8") - 0.01
+    lc["flux_err"] = np.ones_like(lc.time, dtype="f8") * 0.0001
+    lc["col1"] = np.zeros_like(lc.time, dtype="i4")
+    lc["col2"] = np.zeros_like(lc.time, dtype="i4")
+
+    # subset of columns including "time" works
+    lc_subset = lc['time', 'flux', 'col2']
+    # columns flux / flux_err are always there as part of a LightCurve object
+    assert set(lc_subset.colnames) == set(['time', 'flux', 'flux_err', 'col2'])
+    # the flux_err in the subset, as it is not specified requested,
+    # is one with `nan`, rather than rather than the original lc.flux_err.
+    assert np.isnan(lc_subset.flux_err).all()
+    # the subset should still be an instance of LightCurve (rather than just QTable)
+    assert(isinstance(lc_subset, type(lc)))
+
+    lc_b = lc.bin(time_bin_size=3*u.day)
+    lc_b_subset = lc_b['time', 'flux', 'flux_err', 'col1']
+    assert set(lc_b_subset.colnames) == set(['time', 'flux', 'flux_err', 'col1'])
+    assert(isinstance(lc_b_subset, type(lc_b)))
+
+    lc_f = lc.fold(period=3)
+    lc_f_subset = lc_f['time', 'flux', 'flux_err']
+    assert set(lc_f_subset.colnames) == set(['time', 'flux', 'flux_err'])
+    assert(isinstance(lc_f_subset, type(lc_f)))
 
 
 def test_timedelta():
