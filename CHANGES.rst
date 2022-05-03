@@ -19,6 +19,10 @@
 - Fixed a bug in ``LightCurve()`` constructor, which triggered an 
   ``AttributeError`` when `data` parameter is a ``list`` or ``ndarray`` [#1199]
 
+- Fixed a bug in ``LightCurve.query_solar_system_objects`` which caused an
+  excessive search radius to be used for TESS light curves. [#1208]
+
+
 
 2.2.0 (2022-04-12)
 ==================
