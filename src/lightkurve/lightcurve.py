@@ -1783,7 +1783,7 @@ class LightCurve(TimeSeries):
             if (location == "kepler") | (location == "k2"):
                 radius = (4 * 15) * u.arcsecond.to(u.deg)
             elif location == "tess":
-                radius = (27 * 15) * u.arcsecond.to(u.deg)
+                radius = (21 * 15) * u.arcsecond.to(u.deg)
             else:
                 radius = 15 * u.arcsecond.to(u.deg)
 
