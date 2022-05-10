@@ -241,6 +241,28 @@ def test_interact_sky_functions_add_nearby_tics():
 
 
 @pytest.mark.remote_data
+def test_interact_sky_functions_add_nearby_tics_weird_dtype():
+    """Test the backend of interact_sky() that combine Nearby TIC report with Gaia result.
+    Case the dtype from Gaia result dataframe is weird.
+    """
+    from lightkurve.interact import (
+        _get_nearby_gaia_objects,
+        _add_nearby_tics_if_tess,
+    )
+    # For this TIC, the dataframe from Gaia search has weird DType:
+    # df['Source'].dtype is an instance of pd.Int64Dtype, not the type class itself.
+    # existing type check logic with np.issubdtype() fails with TypeError: Cannot interpret 'Int64Dtype()' as a data type
+    tpf = search_targetpixelfile("TIC135100529", mission="TESS")[0].download()
+    magnitude_limit = 18
+
+    df_before = _get_nearby_gaia_objects(tpf, magnitude_limit)
+    df, source_colnames_extras, tooltips_extras = _add_nearby_tics_if_tess(tpf, magnitude_limit, df_before)
+
+    # some TICs are added successfully, without any error raised.
+    assert len(df['tic'] != '') > 0
+
+
+@pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_sky_functions_case_nearby_tics_failed(monkeypatch):
     """Test to ensure in case Nearby TIC service from ExoFOP not available,
