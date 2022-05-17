@@ -56,6 +56,17 @@ For example, a search result can be filtered by exposure time using
   SearchResult.table
 
 
+Customizing search results display
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Users can optionally include a list of extra columns in the default display of `SearchResult` objects.
+
+.. autosummary::
+  :toctree: api/
+
+  SearchResult.display_extra_columns
+
+
 Data products collection
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

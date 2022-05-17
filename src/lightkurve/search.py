@@ -81,6 +81,30 @@ class SearchResult(object):
     table = None
     """`~astropy.table.Table` containing the full search results returned by the MAST API."""
 
+    display_extra_columns = []
+    """A list of extra columns to be included in the default display of the search result.
+    It can be configured in a few different ways.
+
+    For example, to include ``proposal_id`` in the default display, users can set it:
+
+    1. in the user's ``lightkurve.cfg`` file::
+
+        [search]
+        # The extra comma at the end is needed for a single extra column
+        search_result_display_extra_columns = proposal_id,
+
+    2. at run time::
+
+        import lightkurve as lk
+        lk.conf.search_result_display_extra_columns = ['proposal_id']
+
+    3. for a specific `SearchResult` object instance::
+
+        result.display_extra_columns = ['proposal_id']
+
+    See configuration for more information.
+    """
+
     def __init__(self, table=None):
         if table is None:
             self.table = Table()
