@@ -46,7 +46,7 @@ import logging
 log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
 
-from astropy import config as _config
+from . import config as _config
 
 
 class Conf(_config.ConfigNamespace):
