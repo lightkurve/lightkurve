@@ -53,11 +53,12 @@ class Conf(_config.ConfigNamespace):
     """
     Configuration parameters for `lightkurve`.
     """
-    # OPEN: when using list or string_list datatype
-    # astropy's parsing of the config file value is somewhat unexpected,
+    # Note: when using list or string_list datatype,
+    # the behavior of astropy's parsing of the config file value:
     # - it does not accept python list literal
     # - it accepts a comma-separated list of string
     #   - for a single value, it needs to be ended with a comma
+    # see: https://configobj.readthedocs.io/en/latest/configobj.html#the-config-file-format
     search_result_display_extra_columns = _config.ConfigItem(
         [],
         "List of extra columns to be included when displaying a SearchResult object.",
