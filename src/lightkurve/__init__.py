@@ -52,6 +52,11 @@ from . import config as _config
 class Conf(_config.ConfigNamespace):
     """
     Configuration parameters for `lightkurve`.
+
+    Refer to `astropy.config.ConfigNamespace` for API details.
+
+    Refer to `Astropy documentation <https://docs.astropy.org/en/stable/config/index.html#accessing-values>`_
+    for usage.
     """
     # Note: when using list or string_list datatype,
     # the behavior of astropy's parsing of the config file value:
