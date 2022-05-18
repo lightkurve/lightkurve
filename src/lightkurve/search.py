@@ -102,7 +102,7 @@ class SearchResult(object):
 
         result.display_extra_columns = ['proposal_id']
 
-    See configuration for more information.
+    See :ref:`configuration <api.config>` for more information.
     """
 
     def __init__(self, table=None):
