@@ -399,9 +399,9 @@ def _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limi
 
     def _dummy_like(ary, dtype):
         dummy_val = None
-        if np.issubdtype(dtype, np.integer):
+        if pd.api.types.is_integer_dtype(dtype):
             dummy_val = _MISSING_INT_VAL
-        elif np.issubdtype(dtype, float):
+        elif pd.api.types.is_float_dtype(dtype):
             dummy_val = np.nan
         return [dummy_val for i in range(len(ary))]
 
