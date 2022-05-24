@@ -45,3 +45,5 @@ Methods
   Periodogram.smooth
   Periodogram.to_seismology
   Periodogram.to_table
+  BoxLeastSquaresPeriodogram.compute_stats
+  BoxLeastSquaresPeriodogram.get_transit_model
