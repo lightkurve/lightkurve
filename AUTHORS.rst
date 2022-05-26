@@ -57,6 +57,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Keyu Xing <https://github.com/keyuxing>`_
 - `Lieven Govaerts <https://github.com/lgov>`_
 - `DeepekshGupta <https://github.com/DeepekshGupta>`_
+- `vvilhelmus <https://github.com/vvilhelmus>`_
 
 
 Community
