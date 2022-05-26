@@ -1186,7 +1186,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
     def compute_stats(self, period=None, duration=None, transit_time=None):
         """Computes commonly used vetting statistics for a transit model.
 
-        See astropy.stats.bls docs for further details.
+        See `~astropy.timeseries.BoxLeastSquares` docs for further details.
 
         Parameters
         ----------
@@ -1223,7 +1223,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
     def get_transit_model(self, period=None, duration=None, transit_time=None):
         """Computes the transit model using the BLS, returns a lightkurve.LightCurve
 
-        See astropy.stats.bls docs for further details.
+        See `~astropy.timeseries.BoxLeastSquares` docs for further details.
 
         Parameters
         ----------
