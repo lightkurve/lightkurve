@@ -2526,7 +2526,7 @@ class LightCurve(TimeSeries):
             Currently, "sff" and "cbv" are supported.  This will return a
             `~correctors.SFFCorrector` and `~correctors.CBVCorrector`
             class instance respectively.
-         **kwargs : dict
+        **kwargs : dict
             Extra keyword arguments to be passed to the corrector class.
 
         Returns
@@ -2924,7 +2924,7 @@ class LightCurve(TimeSeries):
         """Truncates the light curve before and after some time value.
 
         Parameters
-        ---------_
+        ----------
         before : float
             Truncate all rows before this time value.
         after : float

@@ -80,8 +80,9 @@ class Corrector(ABC):
         """Constructor method.
 
         The constructor shall:
+
         * accept all data required to run the correction (e.g. light curves,
-        target pixel files, engineering data).
+          target pixel files, engineering data).
         * instantiate the `original_lc` property.
         """
         self.original_lc = original_lc
@@ -93,10 +94,13 @@ class Corrector(ABC):
         """Returns a `LightCurve` from which systematic noise has been removed.
 
         This method shall:
+
         * accept meaningful parameters that can be used to tune the correction,
           including:
-          - `optimize`: should an optimizer be used to tune the parameters?
-          - `cadence_mask`: flags cadences to be used to fit the noise model.
+
+          * `optimize`: should an optimizer be used to tune the parameters?
+          * `cadence_mask`: flags cadences to be used to fit the noise model.
+
         * store all parameters as object attributes (e.g. `self.optimize`, `self.cadence_mask`);
         * store helpful diagnostic information as object attributes;
         * store the result in the `self.corrected_lc` attribute;
