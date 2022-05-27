@@ -522,6 +522,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.cycle.html">
+     lightkurve.FoldedLightCurve.cycle
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -860,6 +865,16 @@
      lightkurve.periodogram.Periodogram.to_table
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toctree-l1 has-children">
@@ -1195,21 +1210,19 @@
 <dt class="sig sig-object py" id="lightkurve.LightCurve.truncate">
 <span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">truncate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">before</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">after</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'time'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.truncate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.truncate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Truncates the light curve before and after some time value.</p>
-<p>Parameters
-———_
-before : float</p>
-<blockquote>
-<div><p>Truncate all rows before this time value.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>after<span class="classifier">float</span></dt><dd><p>Truncate all rows after this time value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>before</strong><span class="classifier">float</span></dt><dd><p>Truncate all rows before this time value.</p>
 </dd>
-<dt>column<span class="classifier">str, optional</span></dt><dd><p>The name of the column on which the truncation is based. Defaults to ‘time’.</p>
+<dt><strong>after</strong><span class="classifier">float</span></dt><dd><p>Truncate all rows after this time value.</p>
+</dd>
+<dt><strong>column</strong><span class="classifier">str, optional</span></dt><dd><p>The name of the column on which the truncation is based. Defaults to ‘time’.</p>
 </dd>
 </dl>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt><strong>truncated_lc</strong><span class="classifier">LightCurve</span></dt><dd><p>The truncated light curve.</p>
 </dd>
 </dl>

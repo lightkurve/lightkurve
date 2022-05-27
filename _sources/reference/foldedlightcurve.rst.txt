@@ -30,6 +30,7 @@ Extra attributes
    :toctree: api/
 
    FoldedLightCurve.phase
+   FoldedLightCurve.cycle
    FoldedLightCurve.odd_mask
    FoldedLightCurve.even_mask
 

@@ -1350,10 +1350,10 @@
             <span class="n">time_unit</span><span class="o">=</span><span class="n">time_unit</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BoxLeastSquaresPeriodogram.compute_stats"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes commonly used vetting statistics for a transit model.</span>
 
-<span class="sd">        See astropy.stats.bls docs for further details.</span>
+<span class="sd">        See `~astropy.timeseries.BoxLeastSquares` docs for further details.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1385,12 +1385,12 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BLS_object</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">(</span>
             <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">period</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">transit_time</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">get_transit_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BoxLeastSquaresPeriodogram.get_transit_model"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_transit_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the transit model using the BLS, returns a lightkurve.LightCurve</span>
 
-<span class="sd">        See astropy.stats.bls docs for further details.</span>
+<span class="sd">        See `~astropy.timeseries.BoxLeastSquares` docs for further details.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1429,7 +1429,7 @@
             <span class="n">transit_time</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">model_flux</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Transit Model Flux&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">model</span>
+        <span class="k">return</span> <span class="n">model</span></div>
 
     <span class="k">def</span> <span class="nf">get_transit_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a boolean array that is ``True`` during transits and</span>

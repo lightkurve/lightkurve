@@ -105,6 +105,7 @@
       ~FoldedLightCurve.SAP_FLUX
       ~FoldedLightCurve.astropy_time
       ~FoldedLightCurve.colnames
+      ~FoldedLightCurve.cycle
       ~FoldedLightCurve.dtype
       ~FoldedLightCurve.even_mask
       ~FoldedLightCurve.flux

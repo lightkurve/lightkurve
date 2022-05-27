@@ -522,6 +522,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.cycle.html">
+     lightkurve.FoldedLightCurve.cycle
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -858,6 +863,16 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.periodogram.Periodogram.to_table.html">
      lightkurve.periodogram.Periodogram.to_table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model
     </a>
    </li>
   </ul>
@@ -1236,10 +1251,12 @@ By default, the cadence mask is True across all cadences.</p>
 <dt class="sig sig-object py" id="lightkurve.correctors.corrector.Corrector.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_lc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><span class="pre">lightkurve.lightcurve.LightCurve</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/lightkurve/correctors/corrector.html#Corrector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.corrector.Corrector.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor method.</p>
-<p>The constructor shall:
-* accept all data required to run the correction (e.g. light curves,
-target pixel files, engineering data).
-* instantiate the <code class="xref py py-obj docutils literal notranslate"><span class="pre">original_lc</span></code> property.</p>
+<p>The constructor shall:</p>
+<ul class="simple">
+<li><p>accept all data required to run the correction (e.g. light curves,
+target pixel files, engineering data).</p></li>
+<li><p>instantiate the <code class="xref py py-obj docutils literal notranslate"><span class="pre">original_lc</span></code> property.</p></li>
+</ul>
 </dd></dl>
 
 <p class="rubric">Methods</p>

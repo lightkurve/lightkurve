@@ -8,7 +8,7 @@ Using pip
 =========
 
 The easiest way to install *Lightkurve* and all of its dependencies is to use the ``pip`` command,
-which which is a standard part of all Python distributions.
+which is a standard part of all Python distributions.
 To install *Lightkurve*, run the following command in a terminal window::
 
     $ python -m pip install lightkurve --upgrade

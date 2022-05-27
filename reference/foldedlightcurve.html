@@ -522,6 +522,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.FoldedLightCurve.cycle.html">
+     lightkurve.FoldedLightCurve.cycle
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -858,6 +863,16 @@
    <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.periodogram.Periodogram.to_table.html">
      lightkurve.periodogram.Periodogram.to_table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model
     </a>
    </li>
   </ul>
@@ -1243,10 +1258,13 @@ suitable for plotting phase-folded data.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.phase.html#lightkurve.FoldedLightCurve.phase" title="lightkurve.FoldedLightCurve.phase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.phase</span></code></a></p></td>
 <td><p>Alias for <a class="reference internal" href="api/lightkurve.LightCurve.time.html#lightkurve.LightCurve.time" title="lightkurve.LightCurve.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.time</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.odd_mask.html#lightkurve.FoldedLightCurve.odd_mask" title="lightkurve.FoldedLightCurve.odd_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.odd_mask</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.cycle.html#lightkurve.FoldedLightCurve.cycle" title="lightkurve.FoldedLightCurve.cycle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.cycle</span></code></a></p></td>
+<td><p>The cycle of the correspond <code class="xref py py-obj docutils literal notranslate"><span class="pre">time_original</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.odd_mask.html#lightkurve.FoldedLightCurve.odd_mask" title="lightkurve.FoldedLightCurve.odd_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.odd_mask</span></code></a></p></td>
 <td><p>Boolean mask which flags the odd-numbered cycles (1, 3, 5, etc).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.even_mask.html#lightkurve.FoldedLightCurve.even_mask" title="lightkurve.FoldedLightCurve.even_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.even_mask</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.even_mask.html#lightkurve.FoldedLightCurve.even_mask" title="lightkurve.FoldedLightCurve.even_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.even_mask</span></code></a></p></td>
 <td><p>Boolean mask which flags the even-numbered cycles (2, 4, 6, etc).</p></td>
 </tr>
 </tbody>
@@ -1261,13 +1279,13 @@ suitable for plotting phase-folded data.</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.plot.html#lightkurve.FoldedLightCurve.plot" title="lightkurve.FoldedLightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.plot</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
+<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.scatter.html#lightkurve.FoldedLightCurve.scatter" title="lightkurve.FoldedLightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.scatter</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
+<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.errorbar.html#lightkurve.FoldedLightCurve.errorbar" title="lightkurve.FoldedLightCurve.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.errorbar</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.5.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
+<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.plot_river.html#lightkurve.FoldedLightCurve.plot_river" title="lightkurve.FoldedLightCurve.plot_river"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.plot_river</span></code></a>(**kwargs)</p></td>
 <td><p>Plot the folded light curve in a river style.</p></td>

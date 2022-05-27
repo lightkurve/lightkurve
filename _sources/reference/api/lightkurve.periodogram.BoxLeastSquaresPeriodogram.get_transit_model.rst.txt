@@ -1,0 +1,6 @@
+﻿lightkurve.periodogram.BoxLeastSquaresPeriodogram.get\_transit\_model
+=====================================================================
+
+.. currentmodule:: lightkurve.periodogram
+
+.. automethod:: BoxLeastSquaresPeriodogram.get_transit_model

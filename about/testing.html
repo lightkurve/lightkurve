@@ -252,8 +252,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#how-to-generate-html-report">
-   How to generate HTML report?
+  <a class="reference internal nav-link" href="#how-to-generate-an-html-report">
+   How to generate an HTML report?
   </a>
  </li>
 </ul>
@@ -301,7 +301,7 @@
 <a class="reference internal image-reference" href="https://user-images.githubusercontent.com/14965634/53127264-e770e900-3516-11e9-8bfa-07284f499eef.png"><img alt="https://user-images.githubusercontent.com/14965634/53127264-e770e900-3516-11e9-8bfa-07284f499eef.png" src="https://user-images.githubusercontent.com/14965634/53127264-e770e900-3516-11e9-8bfa-07284f499eef.png" style="width: 500px;" /></a>
 <section id="why-are-some-of-the-tests-marked-s-why-are-some-tests-skipped">
 <h3>Why are some of the tests marked “s”/ Why are some tests skipped?<a class="headerlink" href="#why-are-some-of-the-tests-marked-s-why-are-some-tests-skipped" title="Permalink to this headline">¶</a></h3>
-<p>Running some of our tests requires external data, e.g. some require data to be downloaded from MAST. These tests take a little longer, and so we skip them by default. In order to run all the tests simply use:</p>
+<p>Running some of our tests requires external data, e.g. some require data to be downloaded from MAST. These tests take a little longer, so we skip them by default. To run all the tests simply use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">run</span> <span class="n">pytest</span> <span class="n">test_targetpixelfile</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">remote</span><span class="o">-</span><span class="n">data</span>
 </pre></div>
 </div>
@@ -331,14 +331,14 @@
 </section>
 <section id="can-i-write-my-own-test">
 <h2>Can I write my own test?<a class="headerlink" href="#can-i-write-my-own-test" title="Permalink to this headline">¶</a></h2>
-<p>Ideally, any PR opened to <em>Lightkurve</em> with new functionality should include some tests. These tests check that the basic functionality of your PR works. That way, if in future people create new features that break your PR, we will be alerted. Read through the <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytest</span></code> documentation and take a look at our existing tests to get an idea of how to write your own.</p>
+<p>Ideally, any PR opened to <em>Lightkurve</em> with new functionality should include some tests. These tests check that the basic functionality of your PR works. That way, if in the future, people create new features that break your PR, we will be alerted. Read through the <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytest</span></code> documentation and take a look at our existing tests to get an idea of how to write your own.</p>
 </section>
 <section id="i-can-t-run-any-tests">
 <h2>I can’t run any tests.<a class="headerlink" href="#i-can-t-run-any-tests" title="Permalink to this headline">¶</a></h2>
 <p>We run our unit tests using <a class="reference external" href="https://docs.pytest.org/en/stable/">pytest</a>. This should have been installed when you installed <em>Lightkurve</em>. However, if your tests don’t run, you may want to check all the test dependencies are installed. See our guide on on <a class="reference internal" href="contributing.html#install-dev-env"><span class="std std-ref">Installing the development environment</span></a>.</p>
 </section>
-<section id="how-to-generate-html-report">
-<h2>How to generate HTML report?<a class="headerlink" href="#how-to-generate-html-report" title="Permalink to this headline">¶</a></h2>
+<section id="how-to-generate-an-html-report">
+<h2>How to generate an HTML report?<a class="headerlink" href="#how-to-generate-an-html-report" title="Permalink to this headline">¶</a></h2>
 <p>Use <a class="reference external" href="https://pytest-html.readthedocs.io/">pytest-html</a> extension. Install it by:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">pytest</span><span class="o">-</span><span class="n">html</span>
 </pre></div>

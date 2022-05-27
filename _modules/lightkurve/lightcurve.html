@@ -171,6 +171,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">savgol_filter</span>
@@ -181,7 +182,7 @@
 
 <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">MaskedColumn</span>
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
-<span class="kn">from</span> <span class="nn">astropy.time</span> <span class="kn">import</span> <span class="n">Time</span><span class="p">,</span> <span class="n">TimeDelta</span>
+<span class="kn">from</span> <span class="nn">astropy.time</span> <span class="kn">import</span> <span class="n">TimeBase</span><span class="p">,</span> <span class="n">Time</span><span class="p">,</span> <span class="n">TimeDelta</span>
 <span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">astropy.units</span> <span class="kn">import</span> <span class="n">Quantity</span>
 <span class="kn">from</span> <span class="nn">astropy.timeseries</span> <span class="kn">import</span> <span class="n">TimeSeries</span><span class="p">,</span> <span class="n">aggregate_downsample</span>
@@ -214,6 +215,19 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">_to_unitless_day</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span> <span class="nf">_is_dict_like</span><span class="p">(</span><span class="n">data1</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="s2">&quot;keys&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="s2">&quot;keys&quot;</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_is_list_like</span><span class="p">(</span><span class="n">data1</span><span class="p">):</span>
+    <span class="c1"># https://stackoverflow.com/a/37842328</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_is_np_structured_array</span><span class="p">(</span><span class="n">data1</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data1</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
 
 <div class="viewcode-block" id="LightCurve"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.html#lightkurve.LightCurve">[docs]</a><span class="k">class</span> <span class="nc">LightCurve</span><span class="p">(</span><span class="n">TimeSeries</span><span class="p">):</span>
@@ -318,6 +332,109 @@
     <span class="n">__array_priority__</span> <span class="o">=</span> <span class="mi">100_000</span>
 
 <div class="viewcode-block" id="LightCurve.__init__"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.html#lightkurve.LightCurve.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="c1"># the ` {has,get,set}_time_in_data()`: helpers to handle `data` of different types</span>
+        <span class="c1"># in some cases, they also need to access kwargs[&quot;names&quot;] as well</span>
+
+        <span class="k">def</span> <span class="nf">get_time_idx_in</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+            <span class="n">time_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;time&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">time_indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">time_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">def</span> <span class="nf">get_time_in_data_list</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;names&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># the first item MUST be time if no names specified</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">TimeBase</span><span class="p">):</span>  <span class="c1"># Time or TimeDelta</span>
+                    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">time_idx</span> <span class="o">=</span> <span class="n">get_time_idx_in</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">time_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">time_idx</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">def</span> <span class="nf">set_time_in_data_list</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;data should be non-empty&quot;</span><span class="p">)</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;names&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># the first item MUST be time if no names specified</span>
+                <span class="c1"># this is to support base Table&#39;s select columns</span>
+                <span class="c1"># in __getitem__()</span>
+                <span class="c1"># https://github.com/astropy/astropy/blob/326435449ad8d859f1abf36800c3fb88d49c27ea/astropy/table/table.py#L1888</span>
+                <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">time_idx</span> <span class="o">=</span> <span class="n">get_time_idx_in</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">time_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">time_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;data should have time column&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">get_time_in_data_np_structured_array</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># no labeled filed, not a structured array</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">remove_time_from_data_np_structured_array</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;data should be a numpy structured array&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;data should have a time field&quot;</span><span class="p">)</span>
+            <span class="n">filtered_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span> <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="s2">&quot;time&quot;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">filtered_names</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">has_time_in_data</span><span class="p">():</span>
+            <span class="sd">&quot;&quot;&quot;Check if the data has a column with the name&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="n">_is_dict_like</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="c1"># data is a dict-like object with keys</span>
+                <span class="k">return</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">_is_list_like</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="c1"># case data is a list-like object (a list of columns, etc.)</span>
+                <span class="k">return</span> <span class="n">get_time_in_data_list</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">_is_np_structured_array</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="c1"># case numpy structured array (supported by base TimeSeries)</span>
+                <span class="c1"># https://numpy.org/doc/stable/user/basics.rec.html</span>
+                <span class="k">return</span> <span class="n">get_time_in_data_np_structured_array</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported type for time in data: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">get_time_in_data</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">_is_dict_like</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="c1"># data is a dict-like object with keys</span>
+                <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">_is_list_like</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">get_time_in_data_list</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">_is_np_structured_array</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">get_time_in_data_np_structured_array</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># should never reach here. It&#39;d have been caught by `has_time_in()``</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Unsupported type for time in data&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">set_time_in_data</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">_is_dict_like</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="c1"># data is a dict-like object with keys</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">elif</span> <span class="n">_is_list_like</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="n">set_time_in_data_list</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">_is_np_structured_array</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="c1"># astropy Time cannot be assigned to a column in np structured array</span>
+                <span class="c1"># we have special codepath handling it outside this function</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Setting Time instances to np structured array is not supported&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># should never reach here. It&#39;d have been caught by `has_time_in()``</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Unsupported type for time in data&quot;</span><span class="p">)</span>
+
         <span class="c1"># Delay checking for required columns until the end</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_required_columns_relax</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -348,7 +465,7 @@
                 <span class="n">deprecated_column_kws</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
 
         <span class="c1"># If `time` is passed as keyword argument, we populate it with integer numbers</span>
-        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">has_time_in_data</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">flux</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flux</span><span class="p">))</span>
             <span class="c1"># We are tolerant of missing time format</span>
@@ -362,13 +479,21 @@
                 <span class="p">)</span>
 
         <span class="c1"># Also be tolerant of missing time format if time is passed via `data`</span>
-        <span class="k">if</span> <span class="n">data</span> <span class="ow">and</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span> <span class="p">(</span><span class="n">Time</span><span class="p">,</span> <span class="n">TimeDelta</span><span class="p">)):</span>
-                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span>
-                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">has_time_in_data</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">get_time_in_data</span><span class="p">(),</span> <span class="p">(</span><span class="n">Time</span><span class="p">,</span> <span class="n">TimeDelta</span><span class="p">)):</span>
+                <span class="n">tmp_time</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span>
+                    <span class="n">get_time_in_data</span><span class="p">(),</span>
                     <span class="nb">format</span><span class="o">=</span><span class="n">deprecated_kws</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time_format&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_time_format</span><span class="p">),</span>
                     <span class="n">scale</span><span class="o">=</span><span class="n">deprecated_kws</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time_scale&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_time_scale</span><span class="p">),</span>
                 <span class="p">)</span>
+                <span class="k">if</span> <span class="n">_is_np_structured_array</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                    <span class="c1"># special case for np structured array</span>
+                    <span class="c1"># one cannot set a `Time` instance to it</span>
+                    <span class="c1"># so we set the time to the `time` param, and take it out of data</span>
+                    <span class="n">time</span> <span class="o">=</span> <span class="n">tmp_time</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">remove_time_from_data_np_structured_array</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">set_time_in_data</span><span class="p">(</span><span class="n">tmp_time</span><span class="p">)</span>
 
         <span class="c1"># Allow overriding the required columns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_required_columns</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_required_columns&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_required_columns</span><span class="p">)</span>
@@ -985,8 +1110,11 @@
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
             <span class="c1"># ignore invalid division warnings</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
-            <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">/</span> <span class="n">trend_signal</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">/</span> <span class="n">trend_signal</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">/</span> <span class="n">trend_signal</span>
+            <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">/</span> <span class="n">trend_signal</span>
+
+        <span class="n">flatten_lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;NORMALIZED&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
         <span class="k">if</span> <span class="n">return_trend</span><span class="p">:</span>
             <span class="n">trend_lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">trend_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">trend_signal</span>
@@ -1822,7 +1950,7 @@
             <span class="k">if</span> <span class="p">(</span><span class="n">location</span> <span class="o">==</span> <span class="s2">&quot;kepler&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">location</span> <span class="o">==</span> <span class="s2">&quot;k2&quot;</span><span class="p">):</span>
                 <span class="n">radius</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="mi">15</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">arcsecond</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">location</span> <span class="o">==</span> <span class="s2">&quot;tess&quot;</span><span class="p">:</span>
-                <span class="n">radius</span> <span class="o">=</span> <span class="p">(</span><span class="mi">27</span> <span class="o">*</span> <span class="mi">15</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">arcsecond</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">)</span>
+                <span class="n">radius</span> <span class="o">=</span> <span class="p">(</span><span class="mi">21</span> <span class="o">*</span> <span class="mi">15</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">arcsecond</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">radius</span> <span class="o">=</span> <span class="mi">15</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">arcsecond</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">)</span>
 
@@ -2565,7 +2693,7 @@
 <span class="sd">            Currently, &quot;sff&quot; and &quot;cbv&quot; are supported.  This will return a</span>
 <span class="sd">            `~correctors.SFFCorrector` and `~correctors.CBVCorrector`</span>
 <span class="sd">            class instance respectively.</span>
-<span class="sd">         **kwargs : dict</span>
+<span class="sd">        **kwargs : dict</span>
 <span class="sd">            Extra keyword arguments to be passed to the corrector class.</span>
 
 <span class="sd">        Returns</span>
@@ -2963,7 +3091,7 @@
         <span class="sd">&quot;&quot;&quot;Truncates the light curve before and after some time value.</span>
 
 <span class="sd">        Parameters</span>
-<span class="sd">        ---------_</span>
+<span class="sd">        ----------</span>
 <span class="sd">        before : float</span>
 <span class="sd">            Truncate all rows before this time value.</span>
 <span class="sd">        after : float</span>
@@ -3003,6 +3131,16 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The cycle of the correspond `time_original`.</span>
+<span class="sd">        The first cycle is cycle 0, irrespective of whether it is a complete one or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cycle_epoch_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">time_original</span> <span class="o">-</span> <span class="n">cycle_epoch_start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">-</span> <span class="n">result</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">odd_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Boolean mask which flags the odd-numbered cycles (1, 3, 5, etc).</span>
 
@@ -3022,10 +3160,7 @@
 <span class="sd">            &gt;&gt;&gt; f[f.odd_mask].scatter()  # doctest: +SKIP</span>
 <span class="sd">            &gt;&gt;&gt; f[f.even_mask].scatter()  # doctest: +SKIP</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cycle</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">time_original</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">*</span> <span class="mf">0.5</span>
-        <span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">cycle</span><span class="o">.</span><span class="n">value</span> <span class="o">%</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.5</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cycle</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">even_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

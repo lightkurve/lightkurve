@@ -522,6 +522,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.cycle.html">
+     lightkurve.FoldedLightCurve.cycle
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -860,6 +865,16 @@
      lightkurve.periodogram.Periodogram.to_table
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toctree-l1 has-children">
@@ -1195,14 +1210,15 @@
 <dt class="sig sig-object py" id="lightkurve.correctors.corrector.Corrector.correct">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Corrector.</span></span><span class="sig-name descname"><span class="pre">correct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cadence_mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><span class="pre">lightkurve.lightcurve.LightCurve</span></a></span></span><a class="reference internal" href="../../_modules/lightkurve/correctors/corrector.html#Corrector.correct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.corrector.Corrector.correct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> from which systematic noise has been removed.</p>
-<p>This method shall:
-* accept meaningful parameters that can be used to tune the correction,</p>
-<blockquote>
-<div><p>including:
-- <code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code>: should an optimizer be used to tune the parameters?
-- <code class="xref py py-obj docutils literal notranslate"><span class="pre">cadence_mask</span></code>: flags cadences to be used to fit the noise model.</p>
-</div></blockquote>
+<p>This method shall:</p>
 <ul class="simple">
+<li><p>accept meaningful parameters that can be used to tune the correction,
+including:</p>
+<ul>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code>: should an optimizer be used to tune the parameters?</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadence_mask</span></code>: flags cadences to be used to fit the noise model.</p></li>
+</ul>
+</li>
 <li><p>store all parameters as object attributes (e.g. <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.optimize</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.cadence_mask</span></code>);</p></li>
 <li><p>store helpful diagnostic information as object attributes;</p></li>
 <li><p>store the result in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.corrected_lc</span></code> attribute;</p></li>

@@ -65,7 +65,7 @@ A key advantage of the development environment is that any changes you make to t
 code will be reflected right away, i.e., there is no need to re-install Lightkurve or the environment
 after every change.
 
-To run code in the development environment, you will need to prefix ever Python command with
+To run code in the development environment, you will need to prefix every Python command with
 `poetry run`. For example:
 
 .. code-block:: bash
@@ -142,7 +142,7 @@ of the source code as follows:
 .. code-block:: bash
 
     $ git checkout main
-    $ pull upstream main
+    $ git pull upstream main
 
 You are now ready to create your own branch with a name of your choice:
 
@@ -176,5 +176,5 @@ Finally, send the changes to the fork of Lightkurve that resides in your GitHub 
     $ git push origin name-of-your-branch
 
 Head to https://github.com/lightkurve/lightkurve after issuing the `git push`
-command above. You should automatically see a button that say "Compare and open a pull request".
+command above. You should automatically see a button that says "Compare and open a pull request".
 Click the button and submit your pull request!

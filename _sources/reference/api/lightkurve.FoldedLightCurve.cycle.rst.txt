@@ -1,0 +1,6 @@
+﻿lightkurve.FoldedLightCurve.cycle
+=================================
+
+.. currentmodule:: lightkurve
+
+.. autoproperty:: FoldedLightCurve.cycle

@@ -522,6 +522,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.cycle.html">
+     lightkurve.FoldedLightCurve.cycle
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -858,6 +863,16 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.periodogram.Periodogram.to_table.html">
      lightkurve.periodogram.Periodogram.to_table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model
     </a>
    </li>
   </ul>
@@ -1197,16 +1212,12 @@
 <dd><p>Returns a corrector object to remove instrument systematics.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>methods</strong><span class="classifier">string</span></dt><dd><blockquote>
-<div><p>Currently, “sff” and “cbv” are supported.  This will return a
+<dd class="field-odd"><dl class="simple">
+<dt><strong>methods</strong><span class="classifier">string</span></dt><dd><p>Currently, “sff” and “cbv” are supported.  This will return a
 <a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a> and <a class="reference internal" href="lightkurve.correctors.CBVCorrector.html#lightkurve.correctors.CBVCorrector" title="lightkurve.correctors.CBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBVCorrector</span></code></a>
 class instance respectively.</p>
-</div></blockquote>
-<dl class="simple">
-<dt><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs<span class="classifier">dict</span></dt><dd><p>Extra keyword arguments to be passed to the corrector class.</p>
 </dd>
-</dl>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Extra keyword arguments to be passed to the corrector class.</p>
 </dd>
 </dl>
 </dd>

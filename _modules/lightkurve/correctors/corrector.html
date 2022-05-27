@@ -247,8 +247,9 @@
         <span class="sd">&quot;&quot;&quot;Constructor method.</span>
 
 <span class="sd">        The constructor shall:</span>
+
 <span class="sd">        * accept all data required to run the correction (e.g. light curves,</span>
-<span class="sd">        target pixel files, engineering data).</span>
+<span class="sd">          target pixel files, engineering data).</span>
 <span class="sd">        * instantiate the `original_lc` property.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">original_lc</span> <span class="o">=</span> <span class="n">original_lc</span></div>
@@ -260,10 +261,13 @@
         <span class="sd">&quot;&quot;&quot;Returns a `LightCurve` from which systematic noise has been removed.</span>
 
 <span class="sd">        This method shall:</span>
+
 <span class="sd">        * accept meaningful parameters that can be used to tune the correction,</span>
 <span class="sd">          including:</span>
-<span class="sd">          - `optimize`: should an optimizer be used to tune the parameters?</span>
-<span class="sd">          - `cadence_mask`: flags cadences to be used to fit the noise model.</span>
+
+<span class="sd">          * `optimize`: should an optimizer be used to tune the parameters?</span>
+<span class="sd">          * `cadence_mask`: flags cadences to be used to fit the noise model.</span>
+
 <span class="sd">        * store all parameters as object attributes (e.g. `self.optimize`, `self.cadence_mask`);</span>
 <span class="sd">        * store helpful diagnostic information as object attributes;</span>
 <span class="sd">        * store the result in the `self.corrected_lc` attribute;</span>
