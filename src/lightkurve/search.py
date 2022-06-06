@@ -506,7 +506,9 @@ class SearchResult(object):
         download_dir : str
             Path to location of `mastDownload` folder where data downloaded from MAST are stored
         """
-        download_dir = os.path.join(os.path.expanduser("~"), ".lightkurve-cache")
+        download_dir = conf.search_result_download_dir
+        if download_dir is None or download_dir == "":
+            download_dir = os.path.join(os.path.expanduser("~"), ".lightkurve", "cache")
         if os.path.isdir(download_dir):
             return download_dir
         else:

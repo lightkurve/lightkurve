@@ -613,3 +613,29 @@ def test_customize_search_result_display_case_nonexistent_column():
     search = search_lightcurve("TIC390021728")
     search.display_extra_columns = ['foo_col']
     assert 'foo_col' not in search.__repr__()
+
+
+def test_customize_default_download_dir():
+    search = SearchResult()
+
+    # Test default download dir
+    actual_dir = search._default_download_dir()
+    assert os.path.join(os.path.expanduser("~"), ".lightkurve", "cache") == actual_dir
+    assert os.path.isdir(actual_dir)
+
+    # Test customized default download dir
+    with tempfile.TemporaryDirectory() as expected_base:
+        try:
+            # I want to test that the impl would create a dir if not there
+            expected_dir = os.path.join(expected_base, "some_subdir")
+            lk.conf.search_result_download_dir = expected_dir
+            actual_dir = search._default_download_dir()
+            assert expected_dir == actual_dir
+            assert os.path.isdir(actual_dir)
+
+            # repeated calls would work
+            # (e.g., it won't raise errors in attempting to mkdir for an existing dir)
+            actual_dir = search._default_download_dir()
+            assert expected_dir == actual_dir
+        finally:
+            lk.conf.search_result_download_dir = None

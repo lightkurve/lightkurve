@@ -71,6 +71,13 @@ class Conf(_config.ConfigNamespace):
         module="lightkurve.search"
     )
 
+    search_result_download_dir = _config.ConfigItem(
+        None,
+        "Default download directory for data files",
+        cfgtype="string",
+        module="lightkurve.search"
+    )
+
 
 conf = Conf()
 
