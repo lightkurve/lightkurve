@@ -620,7 +620,7 @@ def test_customize_default_download_dir():
 
     # Test default download dir
     actual_dir = search._default_download_dir()
-    assert os.path.join(os.path.expanduser("~"), ".lightkurve", "cache") == actual_dir
+    assert lk.config.get_cache_dir() == actual_dir
     assert os.path.isdir(actual_dir)
 
     # Test customized default download dir

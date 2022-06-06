@@ -21,6 +21,7 @@ from .collections import TargetPixelFileCollection, LightCurveCollection
 from .utils import LightkurveError, suppress_stdout, LightkurveWarning, LightkurveDeprecationWarning
 from .io import read
 from . import conf
+from . import config
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
@@ -508,7 +509,7 @@ class SearchResult(object):
         """
         download_dir = conf.search_result_download_dir
         if download_dir is None or download_dir == "":
-            download_dir = os.path.join(os.path.expanduser("~"), ".lightkurve", "cache")
+            download_dir = config.get_cache_dir()
         if os.path.isdir(download_dir):
             return download_dir
         else:
