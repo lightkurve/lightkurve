@@ -1,3 +1,6 @@
+import os
+import tempfile
+
 import pytest
 
 
@@ -38,3 +41,9 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         if 'memtest' in item.keywords:
             item.add_marker(skip_memtest)
+
+# Make sure we use temporary directories for the config
+# so that the tests are insensitive to local configuration.
+
+os.environ['XDG_CONFIG_HOME'] = tempfile.mkdtemp('lightkurve_config')
+os.mkdir(os.path.join(os.environ['XDG_CONFIG_HOME'], 'lightkurve'))

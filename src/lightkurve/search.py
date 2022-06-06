@@ -20,6 +20,7 @@ from .targetpixelfile import TargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveCollection
 from .utils import suppress_stdout, LightkurveWarning, LightkurveDeprecationWarning
 from .io import read
+from . import conf
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
@@ -48,6 +49,16 @@ AUTHOR_LINKS = {
     "TESScut": "https://mast.stsci.edu/tesscut/",
 }
 
+REPR_COLUMNS_BASE = [
+    "#",
+    "mission",
+    "year",
+    "author",
+    "exptime",
+    "target_name",
+    "distance",
+]
+
 
 class SearchError(Exception):
     pass
@@ -70,6 +81,30 @@ class SearchResult(object):
     table = None
     """`~astropy.table.Table` containing the full search results returned by the MAST API."""
 
+    display_extra_columns = []
+    """A list of extra columns to be included in the default display of the search result.
+    It can be configured in a few different ways.
+
+    For example, to include ``proposal_id`` in the default display, users can set it:
+
+    1. in the user's ``lightkurve.cfg`` file::
+
+        [search]
+        # The extra comma at the end is needed for a single extra column
+        search_result_display_extra_columns = proposal_id,
+
+    2. at run time::
+
+        import lightkurve as lk
+        lk.conf.search_result_display_extra_columns = ['proposal_id']
+
+    3. for a specific `SearchResult` object instance::
+
+        result.display_extra_columns = ['proposal_id']
+
+    See :ref:`configuration <api.config>` for more information.
+    """
+
     def __init__(self, table=None):
         if table is None:
             self.table = Table()
@@ -78,6 +113,7 @@ class SearchResult(object):
             if len(table) > 0:
                 self._add_columns()
                 self._sort_table()
+        self.display_extra_columns = conf.search_result_display_extra_columns
 
     def _sort_table(self):
         """Sort the table of search results by distance, author, and filename.
@@ -119,21 +155,33 @@ class SearchResult(object):
         out = "SearchResult containing {} data products.".format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = [
-            "#",
-            "mission",
-            "year",
-            "author",
-            "exptime",
-            "target_name",
-            "distance",
-        ]
+        columns = REPR_COLUMNS_BASE
+        if self.display_extra_columns is not None:
+            columns = REPR_COLUMNS_BASE + self.display_extra_columns
+        # search_tesscut() has fewer columns, ensure we don't try to display columns that do not exist
+        columns = [c for c in columns if c in self.table.colnames]
+
         self.table["#"] = [idx for idx in range(len(self.table))]
         out += "\n\n" + "\n".join(self.table[columns].pformat(max_width=300, html=html))
         # Make sure author names show up as clickable links
         if html:
             for author, url in AUTHOR_LINKS.items():
                 out = out.replace(f">{author}<", f"><a href='{url}'>{author}</a><")
+            # special HTML formating for TESS proposal_id
+            tess_table = self.table[self.table["project"] == "TESS"]
+            if "proposal_id" in tess_table.colnames:
+                proposal_id_col = np.unique(tess_table["proposal_id"])
+            else:
+                proposal_id_col = []
+            for p_ids in proposal_id_col:
+                # for CDIPS products, proposal_id is a np MaskedConstant, not a string
+                if p_ids == "N/A" or (not isinstance(p_ids, str)):
+                    continue
+                # e.g., handle cases with multiple proposals, e.g.,  G12345_G67890
+                p_id_links = [f"""\
+<a href='https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs.html#:~:text={p_id}'>{p_id}</a>\
+""" for p_id in p_ids.split("_")]
+                out = out.replace(f">{p_ids}<", f">{' , '.join(p_id_links)}<")
         return out
 
     def _repr_html_(self):

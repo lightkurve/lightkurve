@@ -1,3 +1,12 @@
+2.3.0 (unreleased)
+==================
+
+- Allow users to include more columns in ``SearchResult`` display via a new
+  ``SearchResult.display_extra_columns`` attribute, with defaults set by an
+  Astropy-based configuration system. [#1134]
+
+
+
 2.2.1 (2022-05-26)
 ==================
 - Fixed a bug in ``LightCurve.flatten()`` which caused the flux unit of

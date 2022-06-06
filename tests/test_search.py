@@ -16,6 +16,8 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astropy.table import Table
 
+import lightkurve as lk
+
 from lightkurve.utils import LightkurveWarning, LightkurveError
 from lightkurve.search import (
     search_lightcurve,
@@ -30,6 +32,8 @@ from lightkurve import (
     TessTargetPixelFile,
     TargetPixelFileCollection,
 )
+
+from .test_conf import use_custom_config_file, remove_custom_config
 
 
 @pytest.mark.remote_data
@@ -522,3 +526,54 @@ def test_split_k2_campaigns():
     search_c11 = search_targetpixelfile("EPIC 203830112", cadence="long", campaign=11)
     assert search_c11.table["mission"][0] == "K2 Campaign 11a"
     assert search_c11.table["mission"][1] == "K2 Campaign 11b"
+
+
+@pytest.mark.remote_data
+def test_customize_search_result_display():
+    search = search_lightcurve("TIC390021728")
+    # default display does not have proposal id
+    assert 'proposal_id' not in search.__repr__()
+
+    # custom config: has proposal_id in display
+    try:
+        use_custom_config_file("data/lightkurve_sr_cols_added.cfg")
+        # Note: here a *different* TIC is used for search to avoid the complication
+        # of caching.
+        # if the same TIC is used, the cached result would be returned, without
+        # consiering the customization specified.
+        # the TIC used is in multiple sectors, with some rows having proposal_id and some rows
+        # have none. So it's also a sanity test the for the actual proposal_id display logic.
+        search = search_lightcurve("TIC298734307")
+        assert 'proposal_id' in search.__repr__()
+    finally:
+        remove_custom_config()  # restore default to avoid side effects
+
+    # test changing config at runtime
+    try:
+        lk.conf.search_result_display_extra_columns = ['sequence_number']
+
+        search = search_lightcurve("TIC169175503")  # again use a different TIC to avoid caching complication
+        assert 'sequence_number' in search.__repr__()
+    finally:
+        lk.conf.search_result_display_extra_columns = []  # restore default to avoid side effects
+
+    # Test per-object customization
+    search.display_extra_columns = []
+    assert 'proposal_id' not in search.__repr__()
+    search.display_extra_columns = ['sequence_number', 'proposal_id']  # also support multiple columns
+    assert 'proposal_id' in search.__repr__()
+    assert 'sequence_number' in search.__repr__()
+
+
+@pytest.mark.remote_data
+def test_customize_search_result_display_case_nonexistent_column():
+
+    # Ensure that if an extra column specified are not in search result
+    # the extra column will not be shown (and it does not generate error)
+    #
+    # One typical case is that some columns are in the result of
+    # search_lightcurve() / search_targetpixelfile(), but not in those of search_tesscut()
+
+    search = search_lightcurve("TIC390021728")
+    search.display_extra_columns = ['foo_col']
+    assert 'foo_col' not in search.__repr__()

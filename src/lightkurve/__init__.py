@@ -46,6 +46,35 @@ import logging
 log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
 
+from . import config as _config
+
+
+class Conf(_config.ConfigNamespace):
+    """
+    Configuration parameters for `lightkurve`.
+
+    Refer to `astropy.config.ConfigNamespace` for API details.
+
+    Refer to `Astropy documentation <https://docs.astropy.org/en/stable/config/index.html#accessing-values>`_
+    for usage.
+    """
+    # Note: when using list or string_list datatype,
+    # the behavior of astropy's parsing of the config file value:
+    # - it does not accept python list literal
+    # - it accepts a comma-separated list of string
+    #   - for a single value, it needs to be ended with a comma
+    # see: https://configobj.readthedocs.io/en/latest/configobj.html#the-config-file-format
+    search_result_display_extra_columns = _config.ConfigItem(
+        [],
+        "List of extra columns to be included when displaying a SearchResult object.",
+        cfgtype="string_list",
+        module="lightkurve.search"
+    )
+
+
+conf = Conf()
+
+
 from .version import __version__
 from . import units  # enable ppt and ppm as units
 from .time import *
