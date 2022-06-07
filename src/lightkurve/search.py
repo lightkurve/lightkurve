@@ -377,7 +377,8 @@ class SearchResult(object):
             See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` or :class:`TessQualityFlags <lightkurve.utils.TessQualityFlags>` class for details on the bitmasks.
         download_dir : str, optional
             Location where the data files will be stored.
-            Defaults to "~/.lightkurve-cache" if `None` is passed.
+            If `None` is passed, the value from `search_result_download_dir` configuration parameter is used,
+            with "~/.lightkurve/cache" as the default.
         cutout_size : int, float or tuple, optional
             Side length of cutout in pixels. Tuples should have dimensions (y, x).
             Default size is (5, 5)
@@ -398,6 +399,22 @@ class SearchResult(object):
             If the TESSCut service times out (i.e. returns HTTP status 504).
         SearchError
             If any other error occurs.
+
+        Examples
+        --------
+        To configure "/my_research/data" as the default `download_dir`, users can set it:
+
+        1. in the user's ``lightkurve.cfg`` file::
+
+            [search]
+            search_result_download_dir = /my_research/data
+
+        2. at run time::
+
+            import lightkurve as lk
+            lk.conf.search_result_download_dir = '/my_research/data'
+
+        See :ref:`configuration <api.config>` for more information.
         """
         if len(self.table) == 0:
             warnings.warn(
@@ -448,7 +465,8 @@ class SearchResult(object):
             See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` or :class:`TessQualityFlags <lightkurve.utils.TessQualityFlags>` class for details on the bitmasks.
         download_dir : str, optional
             Location where the data files will be stored.
-            Defaults to "~/.lightkurve-cache" if `None` is passed.
+            If `None` is passed, the value from `search_result_download_dir` configuration parameter is used,
+            with "~/.lightkurve/cache" as the default.
         cutout_size : int, float or tuple, optional
             Side length of cutout in pixels. Tuples should have dimensions (y, x).
             Default size is (5, 5)
@@ -471,6 +489,22 @@ class SearchResult(object):
             If the TESSCut service times out (i.e. returns HTTP status 504).
         SearchError
             If any other error occurs.
+
+        Examples
+        --------
+        To configure "/my_research/data" as the default `download_dir`, users can set it:
+
+        1. in the user's ``lightkurve.cfg`` file::
+
+            [search]
+            search_result_download_dir = /my_research/data
+
+        2. at run time::
+
+            import lightkurve as lk
+            lk.conf.search_result_download_dir = '/my_research/data'
+
+        See :ref:`configuration <api.config>` for more information.
         """
         if len(self.table) == 0:
             warnings.warn(

@@ -57,6 +57,17 @@ class Conf(_config.ConfigNamespace):
 
     Refer to `Astropy documentation <https://docs.astropy.org/en/stable/config/index.html#accessing-values>`_
     for usage.
+
+    The attributes listed below are the available configuration parameters.
+
+    Attributes
+    ----------
+    search_result_display_extra_columns
+        List of extra columns to be included when displaying a SearchResult object.
+
+    search_result_download_dir
+        Default download directory for data files. Defaults to ``~/.lightkurve/cache`` if not specified.
+
     """
     # Note: when using list or string_list datatype,
     # the behavior of astropy's parsing of the config file value:

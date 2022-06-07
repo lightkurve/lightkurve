@@ -22,4 +22,5 @@ Access configuration values
   :toctree: api/
 
   conf
+  config.get_cache_dir
   config.get_config_dir
