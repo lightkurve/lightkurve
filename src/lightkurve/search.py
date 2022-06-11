@@ -47,6 +47,7 @@ AUTHOR_LINKS = {
     "K2SFF": "https://archive.stsci.edu/hlsp/k2sff",
     "EVEREST": "https://archive.stsci.edu/hlsp/everest",
     "TESScut": "https://mast.stsci.edu/tesscut/",
+    "GSFC-ELEANOR-LITE": "https://archive.stsci.edu/hlsp/gsfc-eleanor-lite",
 }
 
 REPR_COLUMNS_BASE = [

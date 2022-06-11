@@ -2,7 +2,7 @@
 from .detect import *
 from .read import *
 
-from . import kepler, tess, qlp, k2sff, everest, pathos, tasoc, kepseismic
+from . import kepler, tess, qlp, k2sff, everest, pathos, tasoc, kepseismic, eleanorlite
 from . import cdips
 from .. import LightCurve
 
@@ -18,6 +18,7 @@ try:
     registry.register_reader("kepler", LightCurve, kepler.read_kepler_lightcurve)
     registry.register_reader("tess", LightCurve, tess.read_tess_lightcurve)
     registry.register_reader("qlp", LightCurve, qlp.read_qlp_lightcurve)
+    registry.register_reader("eleanorlite", LightCurve, eleanorlite.read_gsfc_eleanor_lite_lightcurve)
     registry.register_reader("k2sff", LightCurve, k2sff.read_k2sff_lightcurve)
     registry.register_reader("everest", LightCurve, everest.read_everest_lightcurve)
     registry.register_reader("pathos", LightCurve, pathos.read_pathos_lightcurve)

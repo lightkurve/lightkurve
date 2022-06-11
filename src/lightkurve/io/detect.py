@@ -23,6 +23,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'K2SC'`
         * `'K2VARCAT'`
         * `'QLP'`
+        * `'GSFC-ELEANOR-LITE'`
         * `'PATHOS'`
         * `'TASOC'`
         * `'KEPSEISMIC'`
@@ -46,6 +47,10 @@ def detect_filetype(hdulist: HDUList) -> str:
     # cf. http://archive.stsci.edu/hlsp/qlp
     if "mit/qlp" in hdulist[0].header.get("origin", "").lower():
         return "QLP"
+
+    # Is it a GSFC-ELEANOR-LITE light curve?
+    if (hdulist[0].header.get("AUTHOR") == 'Adina D. Feinstein') and (hdulist[0].header.get("LITE") == True):
+        return "GSFC-ELEANOR-LITE"
 
     # Is it a PATHOS TESS light curve?
     # cf. http://archive.stsci.edu/hlsp/pathos
