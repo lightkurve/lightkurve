@@ -761,7 +761,6 @@ def show_citation_instructions():
     # because we can assume it is installed when notebook-specific features are called
     try:
         from IPython.display import HTML
-
         ipython_installed = True
     except ModuleNotFoundError:
         ipython_installed = False
