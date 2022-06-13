@@ -5,7 +5,7 @@ from ..utils import TessQualityFlags
 
 from .generic import read_generic_lightcurve
 
-def read_gsfc_eleanor_lite_lightcurve(filename,
+def read_eleanorlite_lightcurve(filename,
     time_column="TIME",
     flux_column="CORR_FLUX", 
     flux_err_column="FLUX_ERR", 
