@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 
 from lightkurve import search_lightcurve
-from lightkurve.io.eleanorlite import read_gsfc_eleanor_lite_lightcurve
+from lightkurve.io.eleanorlite import read_eleanorlite_lightcurve
 from lightkurve.io.detect import detect_filetype
 
 
@@ -17,7 +17,7 @@ def test_eleanor_lite():
         # Can we auto-detect a QLP file?
         assert detect_filetype(hdulist) == "GSFC-ELEANOR-LITE"
         # Are the correct fluxes read in?
-        lc = read_gsfc_eleanor_lite_lightcurve(url, quality_bitmask=0)
+        lc = read_eleanorlite_lightcurve(url, quality_bitmask=0)
         assert lc.meta["FLUX_ORIGIN"] == "corr_flux"
         assert_array_equal(lc.flux.value, hdulist[1].data["CORR_FLUX"])
 
