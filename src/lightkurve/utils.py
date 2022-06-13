@@ -770,7 +770,7 @@ def show_citation_instructions():
         print(__citation__)
     else:
         from pathlib import Path  # local import to speed up `import lightkurve`
-        import astroquery  # local import to speed up `import lightkurve`
+        import astroquery         # local import to speed up `import lightkurve`
 
         templatefile = Path(PACKAGEDIR, "data", "show_citation_instructions.html")
         template = open(templatefile, "r").read()
