@@ -11,7 +11,7 @@ from lightkurve.io.detect import detect_filetype
 
 @pytest.mark.remote_data
 def test_eleanor_lite():
-    """Can we read in QLP light curves?"""
+    """Can we read in GSFC-ELEANOR-LITE light curves?"""
     url = "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HLSP/gsfc-eleanor-lite/s0001/0000/0001/4006/8425/hlsp_gsfc-eleanor-lite_tess_ffi_s0001-0000000140068425_tess_v1.0_lc.fits"    
     with fits.open(url, mode="readonly") as hdulist:
         # Can we auto-detect a QLP file?
@@ -23,7 +23,7 @@ def test_eleanor_lite():
 
 @pytest.mark.remote_data
 def test_search_eleanorlite():
-    """Can we search and download QLP light curves from MAST?"""
+    """Can we search and download GSFC-ELEANOR-LITE light curves from MAST?"""
     search = search_lightcurve("TIC 140068425", author="GSFC-ELEANOR-LITE", sector=1)
     assert len(search) == 1
     assert search.table["author"][0] == "GSFC-ELEANOR-LITE"
