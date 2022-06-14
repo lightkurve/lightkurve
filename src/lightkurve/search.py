@@ -406,6 +406,7 @@ class SearchResult(object):
 
         1. in the user's ``lightkurve.cfg`` file::
 
+            [config]
             cache_dir = /my_research/data
 
         2. at run time::
@@ -495,6 +496,7 @@ class SearchResult(object):
 
         1. in the user's ``lightkurve.cfg`` file::
 
+            [config]
             cache_dir = /my_research/data
 
         2. at run time::

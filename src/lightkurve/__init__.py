@@ -86,7 +86,7 @@ class Conf(_config.ConfigNamespace):
         None,
         "Default cache directory for data files downloaded, etc.",
         cfgtype="string",
-        module="lightkurve"
+        module="lightkurve.config"
     )
 
 
