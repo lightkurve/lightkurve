@@ -65,8 +65,8 @@ class Conf(_config.ConfigNamespace):
     search_result_display_extra_columns
         List of extra columns to be included when displaying a SearchResult object.
 
-    search_result_download_dir
-        Default download directory for data files. Defaults to ``~/.lightkurve/cache`` if not specified.
+    cache_dir
+        Default cache directory for data files downloaded, etc. Defaults to ``~/.lightkurve/cache`` if not specified.
 
     """
     # Note: when using list or string_list datatype,
@@ -82,11 +82,11 @@ class Conf(_config.ConfigNamespace):
         module="lightkurve.search"
     )
 
-    search_result_download_dir = _config.ConfigItem(
+    cache_dir = _config.ConfigItem(
         None,
-        "Default download directory for data files",
+        "Default cache directory for data files downloaded, etc.",
         cfgtype="string",
-        module="lightkurve.search"
+        module="lightkurve"
     )
 
 

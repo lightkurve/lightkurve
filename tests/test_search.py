@@ -628,7 +628,7 @@ def test_customize_default_download_dir():
         try:
             # I want to test that the impl would create a dir if not there
             expected_dir = os.path.join(expected_base, "some_subdir")
-            lk.conf.search_result_download_dir = expected_dir
+            lk.conf.cache_dir = expected_dir
             actual_dir = search._default_download_dir()
             assert expected_dir == actual_dir
             assert os.path.isdir(actual_dir)
@@ -638,4 +638,4 @@ def test_customize_default_download_dir():
             actual_dir = search._default_download_dir()
             assert expected_dir == actual_dir
         finally:
-            lk.conf.search_result_download_dir = None
+            lk.conf.cache_dir = None

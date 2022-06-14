@@ -377,7 +377,7 @@ class SearchResult(object):
             See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` or :class:`TessQualityFlags <lightkurve.utils.TessQualityFlags>` class for details on the bitmasks.
         download_dir : str, optional
             Location where the data files will be stored.
-            If `None` is passed, the value from `search_result_download_dir` configuration parameter is used,
+            If `None` is passed, the value from `cache_dir` configuration parameter is used,
             with "~/.lightkurve/cache" as the default.
         cutout_size : int, float or tuple, optional
             Side length of cutout in pixels. Tuples should have dimensions (y, x).
@@ -406,13 +406,12 @@ class SearchResult(object):
 
         1. in the user's ``lightkurve.cfg`` file::
 
-            [search]
-            search_result_download_dir = /my_research/data
+            cache_dir = /my_research/data
 
         2. at run time::
 
             import lightkurve as lk
-            lk.conf.search_result_download_dir = '/my_research/data'
+            lk.conf.cache_dir = '/my_research/data'
 
         See :ref:`configuration <api.config>` for more information.
         """
@@ -465,7 +464,7 @@ class SearchResult(object):
             See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` or :class:`TessQualityFlags <lightkurve.utils.TessQualityFlags>` class for details on the bitmasks.
         download_dir : str, optional
             Location where the data files will be stored.
-            If `None` is passed, the value from `search_result_download_dir` configuration parameter is used,
+            If `None` is passed, the value from `cache_dir` configuration parameter is used,
             with "~/.lightkurve/cache" as the default.
         cutout_size : int, float or tuple, optional
             Side length of cutout in pixels. Tuples should have dimensions (y, x).
@@ -496,13 +495,12 @@ class SearchResult(object):
 
         1. in the user's ``lightkurve.cfg`` file::
 
-            [search]
-            search_result_download_dir = /my_research/data
+            cache_dir = /my_research/data
 
         2. at run time::
 
             import lightkurve as lk
-            lk.conf.search_result_download_dir = '/my_research/data'
+            lk.conf.cache_dir = '/my_research/data'
 
         See :ref:`configuration <api.config>` for more information.
         """
@@ -541,7 +539,7 @@ class SearchResult(object):
         download_dir : str
             Path to location of `mastDownload` folder where data downloaded from MAST are stored
         """
-        download_dir = conf.search_result_download_dir
+        download_dir = conf.cache_dir
         if download_dir is None or download_dir == "":
             download_dir = config.get_cache_dir()
         if os.path.isdir(download_dir):
