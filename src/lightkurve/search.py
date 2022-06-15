@@ -44,6 +44,7 @@ AUTHOR_LINKS = {
     "TASOC": "https://archive.stsci.edu/hlsp/tasoc",
     "PATHOS": "https://archive.stsci.edu/hlsp/pathos",
     "CDIPS": "https://archive.stsci.edu/hlsp/cdips",
+    "GSFC-ELEANOR-LITE": "https://archive.stsci.edu/hlsp/gsfc-eleanor-lite",
     "K2SFF": "https://archive.stsci.edu/hlsp/k2sff",
     "EVEREST": "https://archive.stsci.edu/hlsp/everest",
     "TESScut": "https://mast.stsci.edu/tesscut/",
