@@ -19,7 +19,8 @@ def read_eleanorlite_lightcurve(filename,
     """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline.
 
     By default, eleanor's `CORR_FLUX` column is used to populate the `flux` values,
-    and 'FLUX_ERR' is used to populate `flux_err`. 
+    and 'FLUX_ERR' is used to populate `flux_err`. Please note that the "FLUX_ERR" column in Eleanor FITS file is referred 
+    to the uncertainty of "RAW_FLUX", not "CORR_FLUX"
 
     Parameters
     ----------
