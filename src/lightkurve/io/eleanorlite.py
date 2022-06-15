@@ -1,4 +1,5 @@
-"""Reader for GSFC-ELEANOR-LITE light curve files. Details can be found at https://archive.stsci.edu/hlsp/eleanor
+"""Reader for GSFC-ELEANOR-LITE light curve files. 
+Details can be found at https://archive.stsci.edu/hlsp/eleanor
 """
 from ..lightcurve import TessLightCurve
 from ..utils import TessQualityFlags
