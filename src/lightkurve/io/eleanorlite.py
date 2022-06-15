@@ -19,8 +19,7 @@ def read_eleanorlite_lightcurve(filename,
     """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline.
 
     By default, eleanor's `CORR_FLUX` column is used to populate the `flux` values,
-    and 'FLUX_ERR' is used to populate `flux_err`. Please note that the "FLUX_ERR" column in Eleanor FITS file is referred 
-    to the uncertainty of "RAW_FLUX", not "CORR_FLUX"
+    and 'FLUX_ERR' is used to populate `flux_err`. 
 
     Parameters
     ----------
@@ -31,6 +30,7 @@ def read_eleanorlite_lightcurve(filename,
         By default the "Corrected Flux" flux (CORR_FLUX) is used.
     flux_err_column: 'FLUX_ERR'
       Which column in the FITS file contains the preferred flux_err data?
+      Please note that the "FLUX_ERR" column in Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX"
     quality_bitmask : str or int
         Bitmask (integer) which identifies the quality flag bitmask that should
         be used to mask out bad cadences. If a string is passed, it has the
