@@ -14,7 +14,7 @@ def test_eleanor_lite():
     """Can we read in GSFC-ELEANOR-LITE light curves?"""
     url = "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HLSP/gsfc-eleanor-lite/s0001/0000/0001/4006/8425/hlsp_gsfc-eleanor-lite_tess_ffi_s0001-0000000140068425_tess_v1.0_lc.fits"    
     with fits.open(url, mode="readonly") as hdulist:
-        # Can we auto-detect a QLP file?
+        # Can we auto-detect a GSFC-ELEANOR-LITE file?
         assert detect_filetype(hdulist) == "GSFC-ELEANOR-LITE"
         # Are the correct fluxes read in?
         lc = read_eleanorlite_lightcurve(url, quality_bitmask=0)
