@@ -2,7 +2,7 @@
 from .detect import *
 from .read import *
 
-from . import kepler, tess, qlp, k2sff, everest, pathos, tasoc, kepseismic
+from . import kepler, tess, qlp, k2sff, everest, pathos, tasoc, eleanor, kepseismic
 from . import cdips
 from .. import LightCurve
 
@@ -23,6 +23,7 @@ try:
     registry.register_reader("pathos", LightCurve, pathos.read_pathos_lightcurve)
     registry.register_reader('cdips', LightCurve, cdips.read_cdips_lightcurve)
     registry.register_reader("tasoc", LightCurve, tasoc.read_tasoc_lightcurve)
+    registry.register_reader("eleanor", LightCurve, eleanor.read_eleanor_lightcurve)
     registry.register_reader("kepseismic", LightCurve, kepseismic.read_kepseismic_lightcurve)
 except registry.IORegistryError:
     pass  # necessary to enable autoreload during debugging

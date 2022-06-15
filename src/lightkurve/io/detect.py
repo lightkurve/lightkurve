@@ -27,6 +27,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'TASOC'`
         * `'KEPSEISMIC'`
         * `'CDIPS'`
+        * `'ELEANOR'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -73,6 +74,13 @@ def detect_filetype(hdulist: HDUList) -> str:
     # cf. http://archive.stsci.edu/hlsp/cdips
     if "cdips" in hdulist[0].header.get("ORIGIN","").lower():
         return "CDIPS"
+
+    # Is it a ELEANOR / GSFC-ELEANOR-LITE light curve?
+    # cf. https://github.com/afeinstein20/eleanor , used by
+    # https://archive.stsci.edu/hlsp/gsfc-eleanor-lite
+    # OPEN: One can't really distinguish GSFC-ELEANOR-LITE from fits from regular eleanor
+    if hdulist[0].header.get("GITHUB") == "https://github.com/afeinstein20/eleanor":
+        return "ELEANOR"
 
     # Is it a K2VARCAT file?
     # There are no self-identifying keywords in the header, so go by filename.
