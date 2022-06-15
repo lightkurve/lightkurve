@@ -1,5 +1,5 @@
 """Reader for GSFC-ELEANOR-LITE light curve files. 
-Details can be found at https://archive.stsci.edu/hlsp/eleanor
+Details can be found at https://archive.stsci.edu/hlsp/eleanor and https://archive.stsci.edu/hlsp/gsfc-eleanor-lite
 """
 from ..lightcurve import TessLightCurve
 from ..utils import TessQualityFlags
@@ -14,7 +14,7 @@ def read_eleanorlite_lightcurve(filename,
     centroid_col_column="X_CENTROID",
     centroid_row_column="Y_CENTROID",
     quality_column="QUALITY",
-    quality_bitmask="default", 
+    quality_bitmask="none", 
     **kwargs):
     """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline.
 
