@@ -9,6 +9,7 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy.signal import find_peaks
 
 import astropy
 from astropy.table import Table
@@ -1330,3 +1331,68 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         raise NotImplementedError(
             "`smooth` is not implemented for `BoxLeastSquaresPeriodogram`. "
         )
+    
+    def perror(self, **kwargs):
+        """Calculates the lower & upper error of the periodicity of the first peak found,
+        that is higher than 90% the period's maximum power discovered in the periodogram,
+        using the Half Width at Half Maximum method, and plots the peak with the results
+        in a Matplotlib plot.
+        See scipy.signal.find_peaks documentation for more details.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments to be passed to `Periodogram.plot`.
+
+        Returns
+        -------
+        plot : `~matplotlib.pyplot.Plot`
+            The matplotlib plot object.
+        """
+        peaks, stats = find_peaks(self.power,
+                                  prominence=float(self.max_power)*0.9,
+                                  width=1)
+        peak = self.period[peaks][0].to_value(unit=None)
+        lower_error_period_int_down = self.period[math.floor(stats["left_ips"][0])].to_value(unit=None)
+        lower_error_period_int_up = self.period[math.ceil(stats["left_ips"][0])].to_value(unit=None)
+        lower_error_int_remainder = stats["left_ips"][0] - math.floor(stats["left_ips"][0])
+        lower_error_period = lower_error_period_int_down + lower_error_int_remainder * (lower_error_period_int_up - lower_error_period_int_down)
+        lower_period_error = peak - lower_error_period
+        upper_error_period_int_down = self.period[math.floor(stats["right_ips"][0])].to_value(unit=None)
+        upper_error_period_int_up = self.period[math.ceil(stats["right_ips"][0])].to_value(unit=None)
+        upper_error_int_remainder = stats["right_ips"][0] - math.floor(stats["right_ips"][0])
+        upper_error_period = upper_error_period_int_down + upper_error_int_remainder * (upper_error_period_int_up - upper_error_period_int_down)
+        upper_period_error = upper_error_period - peak
+        plt.plot(self.period,
+                 self.power)
+        plt.hlines(y = stats["width_heights"][0],
+                   xmin = lower_error_period,
+                   xmax = upper_error_period,
+                   ls=":")
+        plt.vlines(x=self.period[peaks][0].to_value(unit=None),
+                   ymin=(self.power[peaks][0]-stats["prominences"][0]),
+                   ymax=self.power[peaks][0],
+                   ls=":")
+        plt.xlim(peak - 5*(peak - lower_error_period),
+                 peak + 5*(upper_error_period - peak))
+        plt.text(peak,
+                 self.power[peaks][0],
+                 'Period at maximum power: ',
+                 ha='right',
+                 va='center')
+        plt.text(peak,
+                 self.power[peaks][0],
+                 f'   {peak} days',
+                 ha='left',
+                 va='center')
+        plt.text(lower_error_period,
+                 stats["width_heights"][0],
+                 f'Lower error:\n- {lower_period_error:.5g}',
+                 ha='right',
+                 va='bottom')
+        plt.text(upper_error_period,
+                 stats["width_heights"][0],
+                 f'Upper error:\n+ {upper_period_error:.5g}',
+                 ha='left',
+                 va='bottom')
+        return plt.show()
