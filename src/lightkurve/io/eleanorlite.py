@@ -19,7 +19,8 @@ def read_eleanorlite_lightcurve(filename,
     """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline.
 
     By default, eleanor's `CORR_FLUX` column is used to populate the `flux` values,
-    and 'FLUX_ERR' is used to populate `flux_err`. 
+    and 'FLUX_ERR' is used to populate `flux_err`. Note that the "FLUX_ERR" column in the 
+    Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX"
 
     Parameters
     ----------
@@ -30,7 +31,7 @@ def read_eleanorlite_lightcurve(filename,
         By default the "Corrected Flux" flux (CORR_FLUX) is used.
     flux_err_column: 'FLUX_ERR'
       Which column in the FITS file contains the preferred flux_err data?
-      Please note that the "FLUX_ERR" column in Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX"
+      Note that the "FLUX_ERR" column in the Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX"
     quality_bitmask : Not used
     """
     lc = read_generic_lightcurve(
@@ -44,15 +45,6 @@ def read_eleanorlite_lightcurve(filename,
         centroid_row_column = centroid_row_column.lower(),
         cadenceno_column = cadenceno_column.lower()
     )
-
-    # Filter out poor-quality data
-    # NOTE: Unfortunately Astropy Table masking does not yet work for columns
-    # that are Quantity objects, so for now we remove poor-quality data instead
-    # of masking. Details: https://github.com/astropy/astropy/issues/10119
-    quality_mask = TessQualityFlags.create_quality_mask(
-        quality_array=lc["quality"], bitmask=quality_bitmask
-    )
-    lc = lc[quality_mask]
 
     lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
     lc.meta["TARGETID"] = lc.meta.get("TIC_ID")
