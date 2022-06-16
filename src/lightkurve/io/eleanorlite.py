@@ -31,20 +31,7 @@ def read_eleanorlite_lightcurve(filename,
     flux_err_column: 'FLUX_ERR'
       Which column in the FITS file contains the preferred flux_err data?
       Please note that the "FLUX_ERR" column in Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX"
-    quality_bitmask : str or int
-        Bitmask (integer) which identifies the quality flag bitmask that should
-        be used to mask out bad cadences. If a string is passed, it has the
-        following meaning:
-
-            * "none": no cadences will be ignored (`quality_bitmask=0`).
-            * "default": cadences with severe quality issues will be ignored
-              (`quality_bitmask=1130799`).
-            * "hard": more conservative choice of flags to ignore
-              (`quality_bitmask=1664431`). This is known to remove good data.
-            * "hardest": removes all data that has been flagged
-              (`quality_bitmask=2096639`). This mask is not recommended.
-
-        See the :class:`TessQualityFlags` class for details on the bitmasks.
+    quality_bitmask : Not used
     """
     lc = read_generic_lightcurve(
         filename,
