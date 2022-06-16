@@ -1,9 +1,11 @@
 """Read a generic FITS table containing a light curve."""
 import logging
+import warnings
 
 from astropy.io import fits
 from astropy.table import Table
 from astropy.time import Time
+from astropy.units import UnitsWarning
 import numpy as np
 
 from ..utils import validate_method
@@ -37,7 +39,9 @@ def read_generic_lightcurve(
     # Raise an exception if the requested extension is invalid
     if isinstance(ext, str):
         validate_method(ext, supported_methods=[hdu.name.lower() for hdu in hdulist])
-    tab = Table.read(hdulist[ext], format="fits")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=UnitsWarning)
+        tab = Table.read(hdulist[ext], format="fits")
 
     # Make sure the meta data also includes header fields from extension #0
     tab.meta.update(hdulist[0].header)
