@@ -48,8 +48,6 @@ def read_eleanorlite_lightcurve(filename,
 
     lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
     lc.meta["TARGETID"] = lc.meta.get("TIC_ID")
-    lc.meta["QUALITY_BITMASK"] = quality_bitmask
-    lc.meta["QUALITY_MASK"] = quality_mask
 
     # Eleanor light curves are not normalized by default
     lc.meta["NORMALIZED"] = False
