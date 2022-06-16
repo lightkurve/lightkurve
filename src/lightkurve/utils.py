@@ -255,7 +255,7 @@ class TessQualityFlags(QualityFlags):
         DEFAULT_BITMASK | ApertureCosmic | CollateralCosmic | Straylight | Straylight2
     )
     #: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.
-    HARDEST_BITMASK = 8191
+    HARDEST_BITMASK = 65535
 
     #: Dictionary which provides friendly names for the various bitmasks.
     OPTIONS = {
@@ -761,6 +761,7 @@ def show_citation_instructions():
     # because we can assume it is installed when notebook-specific features are called
     try:
         from IPython.display import HTML
+
         ipython_installed = True
     except ModuleNotFoundError:
         ipython_installed = False
@@ -769,7 +770,7 @@ def show_citation_instructions():
         print(__citation__)
     else:
         from pathlib import Path  # local import to speed up `import lightkurve`
-        import astroquery         # local import to speed up `import lightkurve`
+        import astroquery  # local import to speed up `import lightkurve`
 
         templatefile = Path(PACKAGEDIR, "data", "show_citation_instructions.html")
         template = open(templatefile, "r").read()
