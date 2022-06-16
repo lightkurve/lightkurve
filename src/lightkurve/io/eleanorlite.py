@@ -50,8 +50,12 @@ def read_eleanorlite_lightcurve(filename,
         filename,
         time_column=time_column.lower(),
         flux_column=flux_column.lower(),
+        flux_err_column = flux_err_column.lower(),
         time_format="btjd",
-        quality_column= quality_column.lower()   
+        quality_column= quality_column.lower(),
+        centroid_col_column = centroid_col_column.lower(),
+        centroid_row_column = centroid_row_column.lower(),
+        cadenceno_column = cadenceno_column.lower()
     )
 
     # Filter out poor-quality data
