@@ -14,7 +14,7 @@ def read_eleanorlite_lightcurve(filename,
     centroid_col_column="X_CENTROID",
     centroid_row_column="Y_CENTROID",
     quality_column="QUALITY",
-    quality_bitmask="none", 
+    quality_bitmask=None, 
     **kwargs):
     """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline.
 
