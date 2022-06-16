@@ -68,6 +68,8 @@ class Conf(_config.ConfigNamespace):
     cache_dir
         Default cache directory for data files downloaded, etc. Defaults to ``~/.lightkurve/cache`` if not specified.
 
+    warn_legacy_cache_dir
+        If set to True, issue warning if the legacy default cache directory exists. Default is True.
     """
     # Note: when using list or string_list datatype,
     # the behavior of astropy's parsing of the config file value:
@@ -89,6 +91,12 @@ class Conf(_config.ConfigNamespace):
         module="lightkurve.config"
     )
 
+    warn_legacy_cache_dir = _config.ConfigItem(
+        True,
+        "If set to True, issue warning if the legacy default cache directory exists.",
+        cfgtype="boolean",
+        module="lightkurve.config"
+    )
 
 conf = Conf()
 
@@ -105,3 +113,6 @@ from .convenience import *
 from .collections import *
 from .io import *
 from .search import *
+
+from . import config
+config.warn_if_default_cache_dir_migration_needed()
