@@ -57,6 +57,14 @@ def read_eleanorlite_lightcurve(filename,
             else:
                 lc[colname].unit = "electron/s"
 
+    for colname in ["flux_bkg"]:
+        if colname in lc.colnames:
+            lc[colname].unit = u.percent
+
+    for colname in ["centroid_col", "centroid_row", "x_centroid", "y_centroid", "x_com", "y_com"]:
+        if colname in lc.colnames:
+            lc[colname].unit = "pixels"
+
     for colname in ["barycorr"]:
         if colname in lc.colnames:
             lc[colname].unit = u.day
@@ -66,12 +74,22 @@ def read_eleanorlite_lightcurve(filename,
     # the original raw_flux's error is added as a "raw_flux_err" column
     lc["raw_flux_err"] = lc["flux_err"]
     if flux_column.lower() != 'raw_flux':
-        lc["flux_err"] = lc[flux_column.lower()]*lc["flux_err"]/lc["raw_flux"]
+        lc["flux_err"] = lc[flux_column.lower()]*lc["raw_flux_err"]/lc["raw_flux"]
 
     lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
     lc.meta["TARGETID"] = lc.meta.get("TIC_ID")
 
     # Eleanor light curves are not normalized by default
     lc.meta["NORMALIZED"] = False
+
+    tic = lc.meta.get("TIC_ID")
+    if tic is not None:
+        # compatibility with SPOC, QLP, etc.
+        lc.meta["TARGETID"] = tic
+        lc.meta["TICID"] = tic
+        lc.meta["OBJECT"] = f"TIC {tic}"
+        # for Lightkurve's plotting methods
+        lc.meta["LABEL"] = f"TIC {tic}"
+
 
     return TessLightCurve(data=lc, **kwargs)
