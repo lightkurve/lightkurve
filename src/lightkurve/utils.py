@@ -672,7 +672,7 @@ def centroid_quadratic(data, mask=None):
 
 
 def _query_solar_system_objects(
-    ra, dec, times, radius=0.1, location="kepler", cache=True
+    ra, dec, times, radius=0.1, location="kepler", cache=True, show_progress=True
 ):
     """Returns a list of asteroids/comets given a position and time.
 
@@ -693,6 +693,8 @@ def _query_solar_system_objects(
         Spacecraft location. Options include `'kepler'` and `'tess'`.
     cache : bool
         Whether to cache the search result. Default is True.
+    show_progress : bool
+        Whether to display a progress bar during the download. Default is True.
 
     Returns
     -------
@@ -718,9 +720,9 @@ def _query_solar_system_objects(
 
     df = None
     times = np.atleast_1d(times)
-    for time in tqdm(times, desc="Querying for SSOs"):
+    for time in tqdm(times, desc="Querying for SSOs", disable=~show_progress):
         url_queried = url + "EPOCH={}".format(time)
-        response = download_file(url_queried, cache=cache)
+        response = download_file(url_queried, cache=cache, show_progress=show_progress)
         if open(response).read(10) == "# Flag: -1":  # error code detected?
             raise IOError(
                 "SkyBot Solar System query failed.\n"
