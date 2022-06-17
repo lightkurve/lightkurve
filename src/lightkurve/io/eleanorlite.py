@@ -63,6 +63,7 @@ def read_eleanorlite_lightcurve(filename,
 
     # In Eleanor fits file, raw_flux's error is in flux_err, which breaks Lightkurve convention.
     # To account for this, the corr_flux error is calculated by corr_flux_err = corr_flux*raw_flux_err/raw_flux
+    lc["raw_flux_err"] = lc["flux_err"]
     lc["flux_err"] = lc["corr_flux"]*lc["flux_err"]/lc["raw_flux"]
 
     lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
