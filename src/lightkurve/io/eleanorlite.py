@@ -65,7 +65,8 @@ def read_eleanorlite_lightcurve(filename,
     # To account for this, the corr_flux error is calculated from corr_flux_err = corr_flux*raw_flux_err/raw_flux. For completeness, 
     # the original raw_flux's error is added as a "raw_flux_err" column
     lc["raw_flux_err"] = lc["flux_err"]
-    lc["flux_err"] = lc["corr_flux"]*lc["flux_err"]/lc["raw_flux"]
+    if flux_column.lower() != 'raw_flux':
+        lc["flux_err"] = lc["corr_flux"]*lc["flux_err"]/lc["raw_flux"]
 
     lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
     lc.meta["TARGETID"] = lc.meta.get("TIC_ID")
