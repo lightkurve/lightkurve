@@ -1672,6 +1672,7 @@ class LightCurve(TimeSeries):
         location=None,
         cache=True,
         return_mask=False,
+        show_progress=True,
     ):
         """Returns a list of asteroids or comets which affected the light curve.
 
@@ -1722,6 +1723,8 @@ class LightCurve(TimeSeries):
             to request the search again.
         return_mask: optional, bool
             If True will return a boolean mask in time alongside the result
+        show_progress: optional, bool
+            If True will display a progress bar during the download
 
         Returns
         -------
@@ -1794,6 +1797,7 @@ class LightCurve(TimeSeries):
             location=location,
             radius=radius,
             cache=cache,
+            show_progress=show_progress,
         )
         if return_mask:
             return res, np.in1d(self.time.jd, res.epoch)
