@@ -5,6 +5,9 @@
   ``SearchResult.display_extra_columns`` attribute, with defaults set by an
   Astropy-based configuration system. [#1134]
 
+- Added a ``show_progress`` parameter to ``query_solar_system_objects()``,
+  which shows the download progress by default. [#1225]
+
 
 
 2.2.1 (2022-05-26)
