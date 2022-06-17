@@ -3,6 +3,7 @@ Details can be found at https://archive.stsci.edu/hlsp/eleanor and https://archi
 """
 from ..lightcurve import TessLightCurve
 from ..utils import TessQualityFlags
+from astropy import units as u
 
 from .generic import read_generic_lightcurve
 
@@ -45,6 +46,24 @@ def read_eleanorlite_lightcurve(filename,
         centroid_row_column = centroid_row_column.lower(),
         cadenceno_column = cadenceno_column.lower()
     )
+
+    # Eleanor FITS file do not have units specified. re-add them.
+    for colname in ["flux", "flux_err", "raw_flux", "corr_flux", "pca_flux", "psf_flux"]:
+        if colname in lc.colnames:
+            if lc[colname].unit is not None:
+                # for case flux, flux_err, lightkurve has forced it to be u.dimensionless_unscaled
+                # can't reset a unit, so we create a new column
+                lc[colname] = u.Quantity(lc[colname].value, "electron/s")
+            else:
+                lc[colname].unit = "electron/s"
+
+    for colname in ["barycorr"]:
+        if colname in lc.colnames:
+            lc[colname].unit = u.day
+
+    # In Eleanor fits file, raw_flux's error is in flux_err, which breaks Lightkurve convention.
+    # To account for this, the corr_flux error is calculated by corr_flux_err = corr_flux*raw_flux_err/raw_flux
+    lc["flux_err"] = lc["corr_flux"]*lc["flux_err"]/lc["raw_flux"]
 
     lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
     lc.meta["TARGETID"] = lc.meta.get("TIC_ID")
