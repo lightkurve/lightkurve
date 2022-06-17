@@ -66,7 +66,7 @@ def read_eleanorlite_lightcurve(filename,
     # the original raw_flux's error is added as a "raw_flux_err" column
     lc["raw_flux_err"] = lc["flux_err"]
     if flux_column.lower() != 'raw_flux':
-        lc["flux_err"] = lc["corr_flux"]*lc["flux_err"]/lc["raw_flux"]
+        lc["flux_err"] = lc[flux_column.lower()]*lc["flux_err"]/lc["raw_flux"]
 
     lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
     lc.meta["TARGETID"] = lc.meta.get("TIC_ID")
