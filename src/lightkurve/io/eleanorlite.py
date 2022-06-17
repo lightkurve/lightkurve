@@ -77,7 +77,6 @@ def read_eleanorlite_lightcurve(filename,
         lc["flux_err"] = lc[flux_column.lower()]*lc["raw_flux_err"]/lc["raw_flux"]
 
     lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
-    lc.meta["TARGETID"] = lc.meta.get("TIC_ID")
 
     # Eleanor light curves are not normalized by default
     lc.meta["NORMALIZED"] = False
