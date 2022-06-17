@@ -240,6 +240,11 @@ class TessQualityFlags(QualityFlags):
     Straylight = 2048
     #: The second stray light flag is set automatically by Ames/SPOC based on background level thresholds.
     Straylight2 = 4096
+    # See TESS Science Data Products Description Document
+    PlanetSearchExclude = 8192
+    BadCalibrationExclude = 16384
+    # Set in the sector 20 data release notes
+    InsufficientTargets = 32768
 
     #: DEFAULT bitmask identifies all cadences which are definitely useless.
     DEFAULT_BITMASK = (
@@ -250,7 +255,7 @@ class TessQualityFlags(QualityFlags):
         DEFAULT_BITMASK | ApertureCosmic | CollateralCosmic | Straylight | Straylight2
     )
     #: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.
-    HARDEST_BITMASK = 8191
+    HARDEST_BITMASK = 65535
 
     #: Dictionary which provides friendly names for the various bitmasks.
     OPTIONS = {
@@ -275,6 +280,9 @@ class TessQualityFlags(QualityFlags):
         1024: "Cosmic ray in collateral data",
         2048: "Straylight",
         4096: "Straylight2",
+        8192: "Planet Search Exclude",
+        16384: "Bad Calibration Exclude",
+        32768: "Insufficient Targets for Error Correction Exclude",
     }
 
 
@@ -755,6 +763,7 @@ def show_citation_instructions():
     # because we can assume it is installed when notebook-specific features are called
     try:
         from IPython.display import HTML
+
         ipython_installed = True
     except ModuleNotFoundError:
         ipython_installed = False
@@ -763,7 +772,7 @@ def show_citation_instructions():
         print(__citation__)
     else:
         from pathlib import Path  # local import to speed up `import lightkurve`
-        import astroquery         # local import to speed up `import lightkurve`
+        import astroquery  # local import to speed up `import lightkurve`
 
         templatefile = Path(PACKAGEDIR, "data", "show_citation_instructions.html")
         template = open(templatefile, "r").read()
