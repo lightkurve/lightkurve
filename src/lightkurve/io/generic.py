@@ -40,6 +40,11 @@ def read_generic_lightcurve(
     if isinstance(ext, str):
         validate_method(ext, supported_methods=[hdu.name.lower() for hdu in hdulist])
     with warnings.catch_warnings():
+        # By default, AstroPy emits noisy warnings about units commonly used
+        # in archived TESS data products (e.g., "e-/s" and "pixels").
+        # We ignore them here because they don't affect Lightkurve's features.
+        # Inconsistencies between TESS data products and the FITS standard
+        # out to be addressed at the archive level. (See issue #1216.)
         warnings.simplefilter("ignore", category=UnitsWarning)
         tab = Table.read(hdulist[ext], format="fits")
 
