@@ -8,6 +8,8 @@
 - Added a ``show_progress`` parameter to ``query_solar_system_objects()``,
   which shows the download progress by default. [#1225]
 
+- Added the new TESS quality flag bits 13-15 to ``TessQualityFlags``. [#1218]
+
 
 
 2.2.1 (2022-05-26)
