@@ -19,9 +19,8 @@ def read_eleanorlite_lightcurve(filename,
     **kwargs):
     """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline.
 
-    By default, eleanor's `CORR_FLUX` column is used to populate the `flux` values,
-    and 'FLUX_ERR' is used to populate `flux_err`. Note that the "FLUX_ERR" column in the 
-    Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX"
+    By default, eleanor's `CORR_FLUX` column is used to populate the `flux` values. Note that the "FLUX_ERR" column in the 
+    Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX". Thus the uncertainty reported in the 'flux_err' column here is calculated as follows: corr_flux_err = corr_flux*raw_flux_err/raw_flux. For completeness, the original raw_flux's error is added as a "raw_flux_err" column.
 
     Parameters
     ----------
@@ -32,7 +31,7 @@ def read_eleanorlite_lightcurve(filename,
         By default the "Corrected Flux" flux (CORR_FLUX) is used.
     flux_err_column: 'FLUX_ERR'
       Which column in the FITS file contains the preferred flux_err data?
-      Note that the "FLUX_ERR" column in the Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX"
+      The corr_flux error is calculated from corr_flux_err = corr_flux*raw_flux_err/raw_flux. For completeness, the original raw_flux's error is added as a "raw_flux_err" column
     quality_bitmask : Not used
     """
     lc = read_generic_lightcurve(
