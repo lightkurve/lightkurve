@@ -63,7 +63,7 @@ def read_eleanorlite_lightcurve(filename,
 
     for colname in ["centroid_col", "centroid_row", "x_centroid", "y_centroid", "x_com", "y_com"]:
         if colname in lc.colnames:
-            lc[colname].unit = "pixels"
+            lc[colname].unit = u.pix
 
     for colname in ["barycorr"]:
         if colname in lc.colnames:
