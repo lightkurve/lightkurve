@@ -346,11 +346,18 @@ def test_issue_472():
 
 
 @pytest.mark.remote_data
-def test_corrupt_download_handling():
+def test_corrupt_download_handling_case_empty():
     """When a corrupt file exists in the cache, make sure the user receives
     a helpful error message.
 
-    This is a regression test for #511.
+    This is a regression test for #511 and #1184.
+
+    For case the file is truncated, see test_read.py::test_file_corrupted
+    It cannot be done easily here because on Windows,
+    a similar test would result in PermissionError when `tempfile`
+    tries to do cleanup.
+    Some low level codes (probably astropy.fits) still hold a file handle
+    of the corrupted FIS file.
     """
     with tempfile.TemporaryDirectory() as tmpdirname:
         # Pretend a corrupt file exists at the expected cache location
@@ -367,6 +374,7 @@ def test_corrupt_download_handling():
                 download_dir=tmpdirname
             )
         assert "may be corrupt" in err.value.args[0]
+        assert expected_fn in err.value.args[0]
 
 
 @pytest.mark.remote_data

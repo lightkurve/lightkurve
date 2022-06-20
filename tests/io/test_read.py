@@ -65,8 +65,22 @@ def test_open():
 
 def test_filenotfound():
     """Regression test for #540; ensure lk.read() yields `FileNotFoundError`."""
-    with pytest.raises(FileNotFoundError):
-        read("DOESNOTEXIST")
+    filename = "some/path/DOESNOTEXIST"
+    with pytest.raises(FileNotFoundError) as excinfo:
+        read(filename)
+    # ensure the filepath is in the exception
+    assert filename in str(excinfo.value)
+
+
+@pytest.mark.filterwarnings("ignore:.*been truncated.*")  # ignore AstropyUserWarning: File may have been truncated
+def test_file_corrupted():
+    """Regression test for #1184; ensure lk.read() yields an error that includes the filename."""
+    # fits source: mast:TESS/product/tess2018206045859-s0001-0000000261136679-0120-s_lc.fits
+    filename_lc_pimen_corrupted = os.path.join(TESTDATA, "test-lc-tess-pimen-100-cadences-corrupted.fits")
+    with pytest.raises(BaseException) as excinfo:
+        read(filename_lc_pimen_corrupted)
+    # ensure the filepath is in the exception
+    assert filename_lc_pimen_corrupted in str(excinfo.value)
 
 
 def test_basic_ascii_io():
