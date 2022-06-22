@@ -11,7 +11,7 @@
 - Added the new TESS quality flag bits 13-15 to ``TessQualityFlags``. [#1218]
   
 - Fixed an issue which caused unnecessary ``UnitsWarning`` being raised when
-  reading light curve files with AstroPy v5.1 installed. [#1126]
+  reading light curve files and CBV files with AstroPy v5.1 installed. [#1226, #1229]
 
 
 

@@ -6,12 +6,13 @@ import requests
 import urllib.request
 import glob
 import os
+import warnings
 
 from astropy.io import fits as pyfits
 from astropy.table import Table
 from astropy.time import Time
 from astropy.timeseries import TimeSeries
-from astropy.units import Quantity, Unit
+from astropy.units import Quantity, Unit, UnitsWarning
 from astropy.utils.decorators import deprecated
 
 from bs4 import BeautifulSoup
@@ -1441,7 +1442,14 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
 
         try:
             # Read the columns and meta data
-            dataTbl = Table.read(hdu[extName], format="fits")
+            with warnings.catch_warnings():
+                # By default, AstroPy emits noisy warnings about units commonly used
+                # in archived TESS data products (e.g., "e-/s" and "pixels").
+                # We ignore them here because they don't affect Lightkurve's features.
+                # Inconsistencies between TESS data products and the FITS standard
+                # out to be addressed at the archive level. (See issue #1216.)
+                warnings.simplefilter("ignore", category=UnitsWarning)
+                dataTbl = Table.read(hdu[extName], format="fits")
             dataTbl.meta.update(hdu[0].header)
             dataTbl.meta.update(hdu[extName].header)
 
@@ -1619,7 +1627,14 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
         try:
 
             # Read the columns and meta data
-            dataTbl = Table.read(hdu[extName], format="fits")
+            with warnings.catch_warnings():
+                # By default, AstroPy emits noisy warnings about units commonly used
+                # in archived TESS data products (e.g., "e-/s" and "pixels").
+                # We ignore them here because they don't affect Lightkurve's features.
+                # Inconsistencies between TESS data products and the FITS standard
+                # out to be addressed at the archive level. (See issue #1216.)
+                warnings.simplefilter("ignore", category=UnitsWarning)
+                dataTbl = Table.read(hdu[extName], format="fits")
             dataTbl.meta.update(hdu[0].header)
             dataTbl.meta.update(hdu[extName].header)
 
