@@ -29,7 +29,7 @@ def read_eleanorlite_lightcurve(filename,
     Parameters
     ----------
     filename : str
-        Local path or remote url of a QLP light curve FITS file.
+        Local path or remote url of a GSFC-ELEANOR-LITE light curve FITS file.
     flux_column : 'RAW_FLUX', 'CORR_FLUX', 'PCA_FLUX', or 'FLUX_BKG'
         Which column in the FITS file contains the preferred flux data?
         By default the "Corrected Flux" flux (CORR_FLUX) is used.
