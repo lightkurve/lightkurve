@@ -10,7 +10,7 @@ from .generic import read_generic_lightcurve
 import numpy as np
 
 def read_eleanorlite_lightcurve(filename,
-    flux_column="CORR_FLUX"
+    flux_column="CORR_FLUX",
     quality_bitmask="default", 
     **kwargs):
     """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline (https://archive.stsci.edu/hlsp/gsfc-eleanor-lite).
