@@ -19,12 +19,13 @@ def read_eleanorlite_lightcurve(filename,
     quality_column="QUALITY",
     quality_bitmask="default", 
     **kwargs):
-    """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline.
+    """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline (https://archive.stsci.edu/hlsp/gsfc-eleanor-lite).
 
     By default, eleanor's `CORR_FLUX` column is used to populate the `flux` values. Note that the "FLUX_ERR" column in the 
     Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX". 
     Thus the uncertainty reported in the 'flux_err' column here is calculated as follows: corr_flux_err = corr_flux*raw_flux_err/raw_flux. 
     For completeness, the original raw_flux's error is added as a "raw_flux_err" column.
+    In terms of quality flags, eleanor copies TESS SPOC quality flags by identifying short-cadence targets that fall on each camera-CCD pairing for a given sector. However, eleanor, also adds two new quality flags -- bits 17 and 18. 
 
     Parameters
     ----------
@@ -44,7 +45,7 @@ def read_eleanorlite_lightcurve(filename,
             * "none": no cadences will be ignored (`quality_bitmask=0`).
             * "default": cadences with flags indicating AttitudeTweak, SafeMode, CoarsePoint, EarthPoint, Desat, or ManualExclude will be ignored
             * "hard": cadences with default flags, ApertureCosmic, CollateralCosmic, Straylight, or Straylight2 will be ignored
-            * "hardest": cadences with all the above flags will be ignored, in addition to cadences with GSFC-ELEANOR-LITE bit flags of 17 or 18. This is done by setting both of these flags to be equal to ManualExclude = 128
+            * "hardest": TBD: cadences with all the above flags will be ignored, in addition to cadences with GSFC-ELEANOR-LITE bit flags of 17 or 18. This is done by setting both of these flags to be equal to ManualExclude = 128
     """
     lc = read_generic_lightcurve(
         filename,
