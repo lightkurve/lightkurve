@@ -10,13 +10,6 @@ from .generic import read_generic_lightcurve
 import numpy as np
 
 def read_eleanorlite_lightcurve(filename,
-    time_column="TIME",
-    flux_column="CORR_FLUX", 
-    flux_err_column="FLUX_ERR", 
-    cadenceno_column="FFIINDEX",
-    centroid_col_column="X_CENTROID",
-    centroid_row_column="Y_CENTROID",
-    quality_column="QUALITY",
     quality_bitmask="default", 
     **kwargs):
     """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline (https://archive.stsci.edu/hlsp/gsfc-eleanor-lite).
@@ -47,6 +40,15 @@ def read_eleanorlite_lightcurve(filename,
             * "hard": cadences with default flags, ApertureCosmic, CollateralCosmic, Straylight, or Straylight2 will be ignored
             * "hardest": TBD: cadences with all the above flags will be ignored, in addition to cadences with GSFC-ELEANOR-LITE bit flags of 17 or 18. This is done by setting both of these flags to be equal to ManualExclude = 128
     """
+
+    time_column="TIME"
+    flux_column="CORR_FLUX"
+    flux_err_column="FLUX_ERR"
+    cadenceno_column="FFIINDEX"
+    centroid_col_column="X_CENTROID"
+    centroid_row_column="Y_CENTROID"
+    quality_column="QUALITY"
+
     lc = read_generic_lightcurve(
         filename,
         time_column=time_column.lower(),
