@@ -7,6 +7,8 @@ from astropy import units as u
 
 from .generic import read_generic_lightcurve
 
+import numpy as np
+
 def read_eleanorlite_lightcurve(filename,
     time_column="TIME",
     flux_column="CORR_FLUX", 
@@ -15,7 +17,7 @@ def read_eleanorlite_lightcurve(filename,
     centroid_col_column="X_CENTROID",
     centroid_row_column="Y_CENTROID",
     quality_column="QUALITY",
-    quality_bitmask=None, 
+    quality_bitmask="default", 
     **kwargs):
     """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline.
 
@@ -35,7 +37,14 @@ def read_eleanorlite_lightcurve(filename,
       Which column in the FITS file contains the preferred flux_err data?
       The corr_flux error is calculated from corr_flux_err = corr_flux*raw_flux_err/raw_flux. 
       For completeness, the original raw_flux's error is added as a "raw_flux_err" column
-    quality_bitmask : Not used
+    quality_bitmask : str or int
+        Bitmask (integer) which identifies the quality flag bitmask that should
+        be used to mask out bad cadences. If a string is passed, it has the
+        following meaning:
+            * "none": no cadences will be ignored (`quality_bitmask=0`).
+            * "default": cadences with flags indicating AttitudeTweak, SafeMode, CoarsePoint, EarthPoint, Desat, or ManualExclude will be ignored
+            * "hard": cadences with default flags, ApertureCosmic, CollateralCosmic, Straylight, or Straylight2 will be ignored
+            * "hardest": cadences with all the above flags will be ignored, in addition to cadences with GSFC-ELEANOR-LITE bit flags of 17 or 18. This is done by setting both of these flags to be equal to ManualExclude = 128
     """
     lc = read_generic_lightcurve(
         filename,
@@ -48,6 +57,15 @@ def read_eleanorlite_lightcurve(filename,
         centroid_row_column = centroid_row_column.lower(),
         cadenceno_column = cadenceno_column.lower()
     )
+
+    if quality_bitmask == "hardest":
+        lc["quality"][np.logical_or(lc["quality"] == 2**17, lc["quality"] == 2**18)] = 128
+
+    quality_mask = TessQualityFlags.create_quality_mask(
+        quality_array=lc["quality"], bitmask=quality_bitmask
+    )
+    
+    lc = lc[quality_mask]
 
     # Eleanor FITS file do not have units specified. re-add them.
     for colname in ["flux", "flux_err", "raw_flux", "corr_flux", "pca_flux", "psf_flux"]:
