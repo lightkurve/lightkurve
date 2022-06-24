@@ -20,6 +20,11 @@ def test_eleanor_lite():
         lc = read_eleanorlite_lightcurve(url, quality_bitmask=0)
         assert lc.meta["FLUX_ORIGIN"] == "corr_flux"
         assert_array_equal(lc.flux.value, hdulist[1].data["CORR_FLUX"])
+        # Are the correct quality flags read in?
+        lc = read_eleanorlite_lightcurve(url, quality_bitmask='default')
+        assert 2**16 and 2**17 in lc["quality"]
+        lc = read_eleanorlite_lightcurve(url, quality_bitmask='hardest')
+        assert 2**16 and 2**17 not in lc["quality"]
 
 @pytest.mark.remote_data
 def test_search_eleanorlite():
