@@ -42,23 +42,16 @@ def read_eleanorlite_lightcurve(filename,
             * "hardest": cadences with all the above flags will be ignored, in addition to cadences with GSFC-ELEANOR-LITE bit flags of 17 or 18.
     """
 
-    time_column="TIME"    
-    flux_err_column="FLUX_ERR"
-    cadenceno_column="FFIINDEX"
-    centroid_col_column="X_CENTROID"
-    centroid_row_column="Y_CENTROID"
-    quality_column="QUALITY"
-
     lc = read_generic_lightcurve(
         filename,
-        time_column=time_column.lower(),
+        time_column="TIME".lower(),
         flux_column=flux_column.lower(),
-        flux_err_column = flux_err_column.lower(),
+        flux_err_column = "FLUX_ERR".lower(),
         time_format="btjd",
-        quality_column= quality_column.lower(),
-        centroid_col_column = centroid_col_column.lower(),
-        centroid_row_column = centroid_row_column.lower(),
-        cadenceno_column = cadenceno_column.lower()
+        quality_column= "QUALITY".lower(),
+        centroid_col_column = "X_CENTROID".lower(),
+        centroid_row_column = "Y_CENTROID".lower(),
+        cadenceno_column = "FFIINDEX".lower()
     )
 
     if quality_bitmask == "hardest":
