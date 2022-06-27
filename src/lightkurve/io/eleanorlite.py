@@ -19,7 +19,7 @@ def read_eleanorlite_lightcurve(filename,
     Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX". 
     Thus the uncertainty reported in the 'flux_err' column here is calculated as follows: corr_flux_err = corr_flux*raw_flux_err/raw_flux. 
     For completeness, the original raw_flux's error is added as a "raw_flux_err" column.
-    In terms of quality flags, eleanor uses the TESS SPOC quality flags by identifying short-cadence targets that fall on each camera-CCD pairing for a given sector. However, eleanor, also adds two new quality flags -- bit 17 (decimal value 65536)) and bit 18 (decimal value 131072). 
+    In terms of quality flags, eleanor uses the TESS SPOC quality flags by identifying short-cadence targets that fall on each camera-CCD pairing for a given sector. However, eleanor, also adds two new quality flags -- bit 17 (decimal value 131072)) and bit 18 (decimal value 262144). 
 
     Parameters
     ----------
@@ -64,7 +64,7 @@ def read_eleanorlite_lightcurve(filename,
     if quality_bitmask == "hardest":
         # Eleanor has 2 additional bits on top of the 16 TESS SPOC bits
         # they are excluded when hardest is specified.
-        quality_bitmask = TessQualityFlags.HARDEST_BITMASK | 2** 16 | 2**17
+        quality_bitmask = TessQualityFlags.HARDEST_BITMASK | 2** 17 | 2**18
 
     quality_mask = TessQualityFlags.create_quality_mask(
         quality_array=lc["quality"], bitmask=quality_bitmask
