@@ -75,6 +75,8 @@ def get_cache_dir():
         cache_dir = astropyconfig.get_cache_dir(ROOTNAME)
     cache_dir = _ensure_cache_dir_exists(cache_dir)
     cache_dir = os.path.abspath(cache_dir)
+
+    warn_if_default_cache_dir_migration_needed()
     return cache_dir
 
 
@@ -104,6 +106,11 @@ def warn_if_default_cache_dir_migration_needed():
 
     cache_dir = conf.cache_dir
     if not(cache_dir is None or cache_dir == ""):
+        # If an user has specified a custom cache dir, the check won't be performed.
+        # Not only is the check somewhat irrelevant, the behavior is also required
+        # to support the case that the user configures the legacy `~/.lightkure-cache`
+        # as the cache dir (e.g., to support running other apps/packages that require
+        # older lightkurve, especially lightkurve v1.x.)
         return
 
     # migration check done only if default is used
