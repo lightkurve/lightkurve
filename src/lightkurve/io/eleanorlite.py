@@ -1,4 +1,4 @@
-"""Reader for GSFC-ELEANOR-LITE light curve files. 
+"""Reader for GSFC-ELEANOR-LITE light curve files.
 Details can be found at https://archive.stsci.edu/hlsp/eleanor and https://archive.stsci.edu/hlsp/gsfc-eleanor-lite
 """
 from ..lightcurve import TessLightCurve
@@ -11,15 +11,20 @@ import numpy as np
 
 def read_eleanorlite_lightcurve(filename,
     flux_column="CORR_FLUX",
-    quality_bitmask="default", 
-    **kwargs):
-    """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline (https://archive.stsci.edu/hlsp/gsfc-eleanor-lite).
+    quality_bitmask="default"
+    ):
+    """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline
+    (see https://archive.stsci.edu/hlsp/gsfc-eleanor-lite for more details).
 
-    By default, eleanor's `CORR_FLUX` column is used to populate the `flux` values. Note that the "FLUX_ERR" column in the 
-    Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX". 
-    Thus the uncertainty reported in the 'flux_err' column here is calculated as follows: corr_flux_err = corr_flux*raw_flux_err/raw_flux. 
+    By default, eleanor's `CORR_FLUX` column is used to populate the `flux` values. Note that the "FLUX_ERR"
+    column in the Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX". Thus the
+    uncertainty reported in the 'flux_err' column here is calculated as follows:
+    corr_flux_err = corr_flux*raw_flux_err/raw_flux.
     For completeness, the original raw_flux's error is added as a "raw_flux_err" column.
-    In terms of quality flags, eleanor uses the TESS SPOC quality flags by identifying short-cadence targets that fall on each camera-CCD pairing for a given sector. However, eleanor, also adds two new quality flags -- bit 17 (decimal value 131072)) and bit 18 (decimal value 262144). 
+
+    In terms of quality flags, eleanor uses the TESS SPOC quality flags by identifying short-cadence targets that
+    fall on each camera-CCD pairing for a given sector. However, eleanor, also adds two new quality flags -- bit 17
+    (decimal value 131072)) and bit 18 (decimal value 262144).
 
     Parameters
     ----------
@@ -28,18 +33,17 @@ def read_eleanorlite_lightcurve(filename,
     flux_column : 'RAW_FLUX', 'CORR_FLUX', 'PCA_FLUX', or 'FLUX_BKG'
         Which column in the FITS file contains the preferred flux data?
         By default the "Corrected Flux" flux (CORR_FLUX) is used.
-    flux_err_column: 'FLUX_ERR'
-      Which column in the FITS file contains the preferred flux_err data?
-      The corr_flux error is calculated from corr_flux_err = corr_flux*raw_flux_err/raw_flux. 
-      For completeness, the original raw_flux's error is added as a "raw_flux_err" column
     quality_bitmask : str or int
         Bitmask (integer) which identifies the quality flag bitmask that should
         be used to mask out bad cadences. If a string is passed, it has the
         following meaning:
             * "none": no cadences will be ignored (`quality_bitmask=0`).
-            * "default": cadences with flags indicating AttitudeTweak, SafeMode, CoarsePoint, EarthPoint, Desat, or ManualExclude will be ignored.
-            * "hard": cadences with default flags, ApertureCosmic, CollateralCosmic, Straylight, or Straylight2 will be ignored.
-            * "hardest": cadences with all the above flags will be ignored, in addition to cadences with GSFC-ELEANOR-LITE bit flags of 17 or 18.
+            * "default": cadences with flags indicating AttitudeTweak, SafeMode, CoarsePoint, EarthPoint, Desat, or
+            ManualExclude will be ignored.
+            * "hard": cadences with default flags, ApertureCosmic, CollateralCosmic, Straylight, or Straylight2 will be
+            ignored.
+            * "hardest": cadences with all the above flags will be ignored, in addition to cadences with GSFC-ELEANOR-LITE
+            bit flags of 17 (decimal value 131072) and 18 (decimal value 262144).
     """
 
     lc = read_generic_lightcurve(
@@ -62,7 +66,7 @@ def read_eleanorlite_lightcurve(filename,
     quality_mask = TessQualityFlags.create_quality_mask(
         quality_array=lc["quality"], bitmask=quality_bitmask
     )
-    
+
     lc = lc[quality_mask]
 
     # Eleanor FITS file do not have units specified. re-add them.
@@ -88,7 +92,7 @@ def read_eleanorlite_lightcurve(filename,
             lc[colname].unit = u.day
 
     # In Eleanor fits file, raw_flux's error is in flux_err, which breaks Lightkurve convention.
-    # To account for this, the corr_flux error is calculated from corr_flux_err = corr_flux*raw_flux_err/raw_flux. For completeness, 
+    # To account for this, the corr_flux error is calculated from corr_flux_err = corr_flux*raw_flux_err/raw_flux. For completeness,
     # the original raw_flux's error is added as a "raw_flux_err" column
     lc["raw_flux_err"] = lc["flux_err"]
     if flux_column.lower() != 'raw_flux':
@@ -107,6 +111,5 @@ def read_eleanorlite_lightcurve(filename,
         lc.meta["OBJECT"] = f"TIC {tic}"
         # for Lightkurve's plotting methods
         lc.meta["LABEL"] = f"TIC {tic}"
-
 
     return TessLightCurve(data=lc, **kwargs)
