@@ -112,4 +112,4 @@ def read_eleanorlite_lightcurve(filename,
         # for Lightkurve's plotting methods
         lc.meta["LABEL"] = f"TIC {tic}"
 
-    return TessLightCurve(data=lc, **kwargs)
+    return TessLightCurve(data=lc)
