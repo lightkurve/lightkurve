@@ -1030,9 +1030,12 @@ def _search_products(
                 for half,letter in zip([1,2],['a','b']):
                     if f"c{tmp_seqno}{half}" in result["productFilename"][idx]:
                         obs_seqno = f"{int(tmp_seqno):02d}{letter}"
-            result["mission"][idx] = "{} {} {}".format(
-                obs_project, obs_prefix.get(obs_project, ""), obs_seqno
-            )
+            if obs_seqno != "":
+                result["mission"][idx] = "{} {} {}".format(
+                    obs_project, obs_prefix.get(obs_project, ""), obs_seqno
+                )
+            else:
+                result["mission"][idx] = obs_project
 
         masked_result = _filter_products(
             result,
