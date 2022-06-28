@@ -18,6 +18,7 @@ methods.
    periodogram
    seismology
    correctors
+   io
    config
    misc
 
