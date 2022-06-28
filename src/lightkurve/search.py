@@ -47,6 +47,7 @@ AUTHOR_LINKS = {
     "K2SFF": "https://archive.stsci.edu/hlsp/k2sff",
     "EVEREST": "https://archive.stsci.edu/hlsp/everest",
     "TESScut": "https://mast.stsci.edu/tesscut/",
+    "KEPSEISMIC": "https://archive.stsci.edu/prepds/kepseismic/",
 }
 
 REPR_COLUMNS_BASE = [
@@ -1041,7 +1042,6 @@ def _search_products(
             quarter=quarter,
             exptime=exptime,
             project=mission,
-            provenance_name=provenance_name,
             month=month,
             sector=sector,
             limit=limit,
@@ -1221,7 +1221,6 @@ def _filter_products(
     exptime=None,
     limit=None,
     project=("Kepler", "K2", "TESS"),
-    provenance_name=None,
     filetype="Target Pixel",
 ):
     """Helper function which filters a SearchResult's products table by one or
@@ -1252,24 +1251,28 @@ def _filter_products(
     products : `astropy.table.Table` object
         Masked astropy table containing desired data products
     """
-    if provenance_name is None:  # apply all filters
-        provenance_lower = ("kepler", "k2", "spoc")
-    else:
-        provenance_lower = [p.lower() for p in np.atleast_1d(provenance_name)]
-
     mask = np.ones(len(products), dtype=bool)
 
-    # Kepler data needs a special filter for quarter and month
+    # Kepler data products need special filtering for the following reasons:
+    # 1) `sequence_no` has not been populated with Quarter number in the MAST portal
+    # 2) short cadence light curves were split into separate months
+    
+    # Kepler filter step 1: Disable all Kepler products by default
     mask &= ~np.array(
         [prov.lower() == "kepler" for prov in products["provenance_name"]]
     )
-    if "kepler" in provenance_lower and campaign is None and sector is None:
-        mask |= _mask_kepler_products(products, quarter=quarter, month=month)
+    # Kepler filter step 2: re-enable Kepler products if they belong to the right quarter/month
+    if campaign is None and sector is None:
+        mask |= _mask_official_kepler_products(products, quarter=quarter, month=month)
+    # Kepler filter step 3: for HLSP products, rely on sequence number to filter by quarter 
+    if quarter:
+        mask |= [False if hasattr(seqno, 'mask') else seqno == quarter for seqno in products['sequence_number']]
 
-    # HLSP products need to be filtered by extension
     if filetype.lower() == "lightcurve":
+        # Filter out target pixel files; they are not light curves!
+        # Also filter out KEPSEISMIC power spectrum density files; they are not light curves!
         mask &= np.array(
-            [uri.lower().endswith("lc.fits") for uri in products["productFilename"]]
+            [not uri.lower().endswith(("tp.fits", "targ.fits.gz", "cor-psd-filt-inp.fits")) for uri in products['productFilename']]
         )
     elif filetype.lower() == "target pixel":
         mask &= np.array(
@@ -1300,7 +1303,7 @@ def _filter_products(
     return products
 
 
-def _mask_kepler_products(products, quarter=None, month=None):
+def _mask_official_kepler_products(products, quarter=None, month=None):
     """Returns a mask flagging the Kepler products that match the criteria."""
     mask = np.array([proj.lower() == "kepler" for proj in products["provenance_name"]])
     if mask.sum() == 0:
