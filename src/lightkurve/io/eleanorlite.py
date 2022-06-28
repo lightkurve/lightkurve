@@ -39,11 +39,11 @@ def read_eleanorlite_lightcurve(filename,
         following meaning:
             * "none": no cadences will be ignored (`quality_bitmask=0`).
             * "default": cadences with flags indicating AttitudeTweak, SafeMode, CoarsePoint, EarthPoint, Desat, or
-               ManualExclude will be ignored.
+              ManualExclude will be ignored.
             * "hard": cadences with default flags, ApertureCosmic, CollateralCosmic, Straylight, or Straylight2 will be
-               ignored.
+              ignored.
             * "hardest": cadences with all the above flags will be ignored, in addition to cadences with GSFC-ELEANOR-LITE
-               bit flags of 17 (decimal value 131072) and 18 (decimal value 262144).
+              bit flags of 17 (decimal value 131072) and 18 (decimal value 262144).
     """
 
     lc = read_generic_lightcurve(
