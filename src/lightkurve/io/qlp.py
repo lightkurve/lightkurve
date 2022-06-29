@@ -10,11 +10,13 @@ from .generic import read_generic_lightcurve
 
 
 def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column="kspsap_flux_err", quality_bitmask="default"):
-    """Returns a `TessLightCurve` object given a light curve file from the MIT Quicklook Pipeline (QLP).
+    """Returns a `~lightkurve.lightcurve.LightCurve` object given a light curve file from the MIT Quicklook Pipeline (QLP).
 
     By default, QLP's `sap_flux` column is used to populate the `flux` values,
     and 'kspsap_flux_err' is used to populate `flux_err`. For a discussion
     related to this choice, see https://github.com/lightkurve/lightkurve/issues/1083
+
+    More information: https://archive.stsci.edu/hlsp/qlp
 
     Parameters
     ----------
@@ -30,15 +32,14 @@ def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column="kspsa
         be used to mask out bad cadences. If a string is passed, it has the
         following meaning:
 
-            * "none": no cadences will be ignored (`quality_bitmask=0`).
-            * "default": cadences with severe quality issues will be ignored
-              (`quality_bitmask=1130799`).
-            * "hard": more conservative choice of flags to ignore
-              (`quality_bitmask=1664431`). This is known to remove good data.
-            * "hardest": removes all data that has been flagged
-              (`quality_bitmask=2096639`). This mask is not recommended.
+            * "none": no cadences will be ignored.
+            * "default": cadences with severe quality issues will be ignored.
+            * "hard": more conservative choice of flags to ignore.
+              This is known to remove good data.
+            * "hardest": removes all data that has been flagged.
+              This mask is not recommended.
 
-        See the :class:`TessQualityFlags` class for details on the bitmasks.
+        See the `~lightkurve.utils.TessQualityFlags` class for details on the bitmasks.
     """
     lc = read_generic_lightcurve(filename, flux_column=flux_column, flux_err_column=flux_err_column, time_format="btjd")
 

@@ -8,7 +8,7 @@ from .generic import read_generic_lightcurve
 def read_kepler_lightcurve(
     filename, flux_column="pdcsap_flux", quality_bitmask="default"
 ):
-    """Returns a KeplerLightCurve.
+    """Returns a Kepler `~lightkurve.lightcurve.LightCurve`.
 
     Parameters
     ----------
@@ -29,7 +29,7 @@ def read_kepler_lightcurve(
             * "hardest": removes all data that has been flagged
               (`quality_bitmask=2096639`). This mask is not recommended.
 
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
+        See the `~lightkurve.utils.KeplerQualityFlags` class for details on the bitmasks.
     """
     lc = read_generic_lightcurve(
         filename,

@@ -12,7 +12,9 @@ from .generic import read_generic_lightcurve
 def read_pathos_lightcurve(
     filename, flux_column="PSF_FLUX_COR", quality_bitmask="default"
 ):
-    """Returns a `TessLightCurve`.
+    """Returns a TESS PATHOS `~lightkurve.lightcurve.LightCurve`.
+
+    More information: https://archive.stsci.edu/hlsp/pathos
 
     Parameters
     ----------
@@ -26,15 +28,14 @@ def read_pathos_lightcurve(
         be used to mask out bad cadences. If a string is passed, it has the
         following meaning:
 
-            * "none": no cadences will be ignored (`quality_bitmask=0`).
-            * "default": cadences with severe quality issues will be ignored
-              (`quality_bitmask=1130799`).
-            * "hard": more conservative choice of flags to ignore
-              (`quality_bitmask=1664431`). This is known to remove good data.
-            * "hardest": removes all data that has been flagged
-              (`quality_bitmask=2096639`). This mask is not recommended.
+            * "none": no cadences will be ignored.
+            * "default": cadences with severe quality issues will be ignored.
+            * "hard": more conservative choice of flags to ignore.
+              This is known to remove good data.
+            * "hardest": removes all data that has been flagged.
+              This mask is not recommended.
 
-        See the :class:`TessQualityFlags` class for details on the bitmasks.
+        See the `~lightkurve.utils.TessQualityFlags` class for details on the bitmasks.
     """
     lc = read_generic_lightcurve(
         filename,

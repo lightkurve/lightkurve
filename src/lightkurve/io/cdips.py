@@ -16,7 +16,7 @@ def read_cdips_lightcurve(filename,
                             flux_column="IRM1",
                             include_inst_errs=False,
                             quality_bitmask=None):
-    """Returns a `TessLightCurve`.
+    """Returns a TESS CDIPS `~lightkurve.lightcurve.LightCurve`.
 
     Note: CDIPS light curves have already had quality filtering applied, and
     do not provide the bitflags necessary for a user to apply a new bitmask.
@@ -24,6 +24,8 @@ def read_cdips_lightcurve(filename,
     are removed according to Bouma et al. 2019, and no other quality filtering
     is allowed. The `quality_bitmask` parameter is ignored but accepted for
     compatibility with other data format readers.
+
+    More information: https://archive.stsci.edu/hlsp/cdips
 
     Parameters
     ----------
