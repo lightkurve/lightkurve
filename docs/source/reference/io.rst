@@ -11,12 +11,16 @@ Reading Data Products
 
     read
 
-In general, users only need to call `read` function, also available as ``lightkurve.read``,
-to read all supported Kepler / TESS data products.
+In general, users only need to call the `read` function, also available as
+``lightkurve.read``.  This function will auto-detect the type of data product
+being opened and pass it on to a product-specific reader function.
 
-The data product-specific functions below **should not** be called directly.
-They do, however, contain information pertaining to specific products, as well as
-optional parameters that can be passed to the generic `read()`.
+Below we list the product-specific reader functions.  These functions
+are not intended to be called directly because it is much easier to
+simply call the `read` function.  We include the functions here because
+their documentation lists the optional parameters that can be passed to
+the generic `read()` function, and because they document information
+pertaining to specific products.
 
 
 Kepler Data Products
