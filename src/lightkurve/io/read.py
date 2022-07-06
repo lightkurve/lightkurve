@@ -88,26 +88,34 @@ def read(path_or_url, **kwargs):
         if "No such file" in str(e):
             raise e
 
-    if filetype == "KeplerLightCurve":
-        return KeplerLightCurve.read(path_or_url, format="kepler", **kwargs)
-    elif filetype == "TessLightCurve":
-        return TessLightCurve.read(path_or_url, format="tess", **kwargs)
-    elif filetype == "QLP":
-        return TessLightCurve.read(path_or_url, format="qlp", **kwargs)
-    elif filetype == "GSFC-ELEANOR-LITE":
-        return TessLightCurve.read(path_or_url, format="eleanorlite", **kwargs)
-    elif filetype == "PATHOS":
-        return TessLightCurve.read(path_or_url, format="pathos", **kwargs)
-    elif filetype == "CDIPS":
-        return TessLightCurve.read(path_or_url, format='cdips', **kwargs)
-    elif filetype == "TASOC":
-        return TessLightCurve.read(path_or_url, format="tasoc", **kwargs)
-    elif filetype == "K2SFF":
-        return KeplerLightCurve.read(path_or_url, format="k2sff", **kwargs)
-    elif filetype == "EVEREST":
-        return KeplerLightCurve.read(path_or_url, format="everest", **kwargs)
-    elif filetype == "KEPSEISMIC":
-        return KeplerLightCurve.read(path_or_url, format="kepseismic", **kwargs)
+    try:
+        if filetype == "KeplerLightCurve":
+            return KeplerLightCurve.read(path_or_url, format="kepler", **kwargs)
+        elif filetype == "TessLightCurve":
+            return TessLightCurve.read(path_or_url, format="tess", **kwargs)
+        elif filetype == "QLP":
+            return TessLightCurve.read(path_or_url, format="qlp", **kwargs)
+        elif filetype == "GSFC-ELEANOR-LITE":
+            return TessLightCurve.read(path_or_url, format="eleanorlite", **kwargs)
+        elif filetype == "PATHOS":
+            return TessLightCurve.read(path_or_url, format="pathos", **kwargs)
+        elif filetype == "CDIPS":
+            return TessLightCurve.read(path_or_url, format='cdips', **kwargs)
+        elif filetype == "TASOC":
+            return TessLightCurve.read(path_or_url, format="tasoc", **kwargs)
+        elif filetype == "K2SFF":
+            return KeplerLightCurve.read(path_or_url, format="k2sff", **kwargs)
+        elif filetype == "EVEREST":
+            return KeplerLightCurve.read(path_or_url, format="everest", **kwargs)
+        elif filetype == "KEPSEISMIC":
+            return KeplerLightCurve.read(path_or_url, format="kepseismic", **kwargs)
+    except BaseException as exc:
+        # ensure path_or_url is in the error
+        raise LightkurveError(
+            f"Error in reading Data product {path_or_url} of type {filetype} .\n"
+            "This file may be corrupt due to an interrupted download. "
+            "Please remove it from your disk and try again."
+            ) from exc
 
     # Official data products;
     # if the filetype is recognized, instantiate a class of that name
@@ -116,7 +124,7 @@ def read(path_or_url, **kwargs):
             return getattr(__import__("lightkurve"), filetype)(path_or_url, **kwargs)
         except AttributeError as exc:
             raise LightkurveError(
-                f"{filetype} files are not supported " "in this version of Lightkurve."
+                f"Data product f{path_or_url} of type {filetype} is not supported " "in this version of Lightkurve."
             ) from exc
     else:
         # if these keywords don't exist, raise `ValueError`

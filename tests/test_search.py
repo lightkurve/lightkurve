@@ -346,11 +346,18 @@ def test_issue_472():
 
 
 @pytest.mark.remote_data
-def test_corrupt_download_handling():
+def test_corrupt_download_handling_case_empty():
     """When a corrupt file exists in the cache, make sure the user receives
     a helpful error message.
 
-    This is a regression test for #511.
+    This is a regression test for #511 and #1184.
+
+    For case the file is truncated, see test_read.py::test_file_corrupted
+    It cannot be done easily here because on Windows,
+    a similar test would result in PermissionError when `tempfile`
+    tries to do cleanup.
+    Some low level codes (probably astropy.fits) still hold a file handle
+    of the corrupted FIS file.
     """
     with tempfile.TemporaryDirectory() as tmpdirname:
         # Pretend a corrupt file exists at the expected cache location
@@ -367,6 +374,35 @@ def test_corrupt_download_handling():
                 download_dir=tmpdirname
             )
         assert "may be corrupt" in err.value.args[0]
+        assert expected_fn in err.value.args[0]
+
+
+@pytest.mark.remote_data
+def test_mast_http_error_handling(monkeypatch):
+    """Regression test for #1211; ensure downloads yields an error when MAST download result in an error."""
+    from astroquery.mast import Observations
+
+    result = search_lightcurve("TIC 273985862", mission="TESS")
+    remote_url = result.table[0]["dataURL"]
+
+    def mock_http_error_response(*args, **kwargs):
+        """Mock the `download_product()` response to simulate MAST returns HTTP error"""
+        print("DBG mock_http_error_response called")
+        return Table(data={
+            "Local Path": ["./mastDownload/acme_lc.fits"],
+            "Status": ["ERROR"],
+            "Message": ["HTTP Error 500: Internal Server Error"],
+            "URL": [remote_url],
+            })
+
+    monkeypatch.setattr(Observations, "download_products", mock_http_error_response)
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        # ensure the we don't hit cache so that it'll always download from MAST
+        with pytest.raises(LightkurveError) as excinfo:
+            result[0].download(download_dir=tmpdirname)
+        assert "HTTP Error 500" in str(excinfo.value)
+        assert remote_url in str(excinfo.value)
 
 
 @pytest.mark.remote_data

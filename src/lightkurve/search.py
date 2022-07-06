@@ -18,7 +18,7 @@ from astropy.time import Time
 
 from .targetpixelfile import TargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveCollection
-from .utils import suppress_stdout, LightkurveWarning, LightkurveDeprecationWarning
+from .utils import LightkurveError, suppress_stdout, LightkurveWarning, LightkurveDeprecationWarning
 from .io import read
 from . import conf
 from . import PACKAGEDIR
@@ -336,11 +336,17 @@ class SearchResult(object):
                 log.debug("File found in local cache.")
             else:
                 from astroquery.mast import Observations
-
-                log.debug("Started downloading {}.".format(table[:1]["dataURL"][0]))
-                path = Observations.download_products(
+                download_url = table[:1]["dataURL"][0]
+                log.debug("Started downloading {}.".format(download_url))
+                download_response = Observations.download_products(
                     table[:1], mrp_only=False, download_dir=download_dir
-                )["Local Path"][0]
+                )[0]
+                if download_response["Status"] != "COMPLETE":
+                    raise LightkurveError(
+                        f"Download of {download_url} failed. "
+                        f"MAST returns {download_response['Status']}: {download_response['Message']}"
+                        )
+                path = download_response["Local Path"]
                 log.debug("Finished downloading.")
             return read(path, quality_bitmask=quality_bitmask, **kwargs)
 
