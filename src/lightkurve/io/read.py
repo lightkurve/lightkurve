@@ -92,6 +92,8 @@ def read(path_or_url, **kwargs):
         return TessLightCurve.read(path_or_url, format="tess", **kwargs)
     elif filetype == "QLP":
         return TessLightCurve.read(path_or_url, format="qlp", **kwargs)
+    elif filetype == "GSFC-ELEANOR-LITE":
+        return TessLightCurve.read(path_or_url, format="eleanorlite", **kwargs)
     elif filetype == "PATHOS":
         return TessLightCurve.read(path_or_url, format="pathos", **kwargs)
     elif filetype == "CDIPS":
