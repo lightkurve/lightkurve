@@ -153,6 +153,12 @@ class SearchResult(object):
             )[0]
 
     def __repr__(self, html=False):
+        def to_tess_gi_url(proposal_id):
+            if re.match("^G0[12].+", proposal_id) is not None:
+                return f"https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs-primary.html#:~:text={proposal_id}"
+            else:
+                return f"https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs.html#:~:text={proposal_id}"
+
         out = "SearchResult containing {} data products.".format(len(self.table))
         if len(self.table) == 0:
             return out
@@ -180,7 +186,7 @@ class SearchResult(object):
                     continue
                 # e.g., handle cases with multiple proposals, e.g.,  G12345_G67890
                 p_id_links = [f"""\
-<a href='https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs.html#:~:text={p_id}'>{p_id}</a>\
+<a href='{to_tess_gi_url(p_id)}'>{p_id}</a>\
 """ for p_id in p_ids.split("_")]
                 out = out.replace(f">{p_ids}<", f">{' , '.join(p_id_links)}<")
         return out
