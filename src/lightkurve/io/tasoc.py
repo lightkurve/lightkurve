@@ -1,5 +1,5 @@
 """TESS Asteroseismic Science Operations Center - https://tasoc.dk
-   TESS Data For Asteroseismology Lightcurves - https://archive.stsci.edu/hlsp/tasoc 
+   TESS Data For Asteroseismology Lightcurves - https://archive.stsci.edu/hlsp/tasoc
    Data provided with this release have been extracted using the TASOC Photometry pipeline. The TASOC
    pipeline used to generate the data is open source and available on GitHub - https://github.com/tasoc
 """
@@ -10,7 +10,9 @@ from .generic import read_generic_lightcurve
 
 
 def read_tasoc_lightcurve(filename, flux_column="FLUX_RAW", quality_bitmask=None):
-    """Returns a `TessLightCurve`.
+    """Returns a TESS TASOC `~lightkurve.lightcurve.LightCurve`.
+
+    More information: https://archive.stsci.edu/hlsp/tasoc
 
     Parameters
     ----------

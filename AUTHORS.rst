@@ -58,6 +58,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `Lieven Govaerts <https://github.com/lgov>`_
 - `DeepekshGupta <https://github.com/DeepekshGupta>`_
 - `vvilhelmus <https://github.com/vvilhelmus>`_
+- `vbkostov <https://github.com/vbkostov>`_
 
 
 Community

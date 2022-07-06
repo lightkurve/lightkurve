@@ -27,7 +27,7 @@ def open(path_or_url, **kwargs):
 def read(path_or_url, **kwargs):
     """Reads any valid Kepler or TESS data file and returns an instance of
     `~lightkurve.lightcurve.LightCurve` or
-    :class:`TargetPixelFile <lightkurve.targetpixelfile>`
+    `TargetPixelFile <../targetpixelfile.html>`_
 
     This function will automatically detect the type of the data product, and return the
     appropriate object. File types currently supported include::
@@ -57,10 +57,12 @@ def read(path_or_url, **kwargs):
     flux_column : str, optional
         (Applicable to LightCurve products only) The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
         Typically 'pdcsap_flux' or 'sap_flux'.
+    **kwargs : dict
+        Dictionary of arguments to be passed to underlying data product type specific reader.
 
     Returns
     -------
-    data : a subclass of :class:`TargetPixelFile <lightkurve.targetpixelfile>` or `~lightkurve.lightcurve.LightCurve`
+    data : a subclass of `~lightkurve.lightcurve.LightCurve` or `TargetPixelFile <../targetpixelfile.html>`_
            depending on the detected file type.
 
     Raises

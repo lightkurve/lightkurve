@@ -1,6 +1,11 @@
 2.3.0 (unreleased)
 ==================
 
+- Added support for reading in GSFC-ELEANOR-LITE High Level Science Product
+  light curves. [#1217]
+
+- Provide data product specific documentation. [#1233]
+
 - Allow users to include more columns in ``SearchResult`` display via a new
   ``SearchResult.display_extra_columns`` attribute, with defaults set by an
   Astropy-based configuration system. [#1134]
@@ -9,7 +14,7 @@
   which shows the download progress by default. [#1225]
 
 - Added the new TESS quality flag bits 13-15 to ``TessQualityFlags``. [#1218]
-  
+
 - Fixed an issue which caused unnecessary ``UnitsWarning`` being raised when
   reading light curve files and CBV files with AstroPy v5.1 installed. [#1226, #1229]
 
