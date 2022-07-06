@@ -76,7 +76,6 @@ def get_cache_dir():
     cache_dir = _ensure_cache_dir_exists(cache_dir)
     cache_dir = os.path.abspath(cache_dir)
 
-    warn_if_default_cache_dir_migration_needed()
     return cache_dir
 
 
@@ -108,7 +107,7 @@ def warn_if_default_cache_dir_migration_needed():
     if not(cache_dir is None or cache_dir == ""):
         # If an user has specified a custom cache dir, the check won't be performed.
         # Not only is the check somewhat irrelevant, the behavior is also required
-        # to support the case that the user configures the legacy `~/.lightkure-cache`
+        # to support the case that the user configures the legacy `~/.lightkurve-cache`
         # as the cache dir (e.g., to support running other apps/packages that require
         # older lightkurve, especially lightkurve v1.x.)
         return
@@ -118,7 +117,7 @@ def warn_if_default_cache_dir_migration_needed():
     new_cache_dir = os.path.join(os.path.expanduser("~"), ".lightkurve", "cache")
     if os.path.isdir(old_cache_dir):
         warnings.warn(
-            f"The default Lightkurve cache directory has been moved to {new_cache_dir}. "
+            f"The default Lightkurve cache directory, used by download(), etc., has been moved to {new_cache_dir}. "
             f"Please move all the files in the legacy directory {old_cache_dir} to the new location "
             f"and remove the legacy directory. "
             f"Refer to https://docs.lightkurve.org/reference/config.html#default-cache-directory-migration "

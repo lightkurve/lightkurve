@@ -113,3 +113,6 @@ from .convenience import *
 from .collections import *
 from .io import *
 from .search import *
+
+from . import config
+config.warn_if_default_cache_dir_migration_needed()
