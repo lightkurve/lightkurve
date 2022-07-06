@@ -18,6 +18,8 @@
 - Fixed an issue which caused unnecessary ``UnitsWarning`` being raised when
   reading light curve files and CBV files with AstroPy v5.1 installed. [#1226, #1229]
 
+- Provided informative error message when data products downloaded are corrupted or
+  download failed due to remote server error. [#1228]
 
 
 2.2.1 (2022-05-26)
