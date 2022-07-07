@@ -13,8 +13,8 @@ def read_eleanorlite_lightcurve(filename,
     flux_column="CORR_FLUX",
     quality_bitmask="default"
     ):
-    """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline
-    (see https://archive.stsci.edu/hlsp/gsfc-eleanor-lite for more details).
+    """Returns a `~lightkurve.lightcurve.LightCurve` object given a light curve file from
+    eleanor package or GSFC-ELEANOR-LITE Pipeline.
 
     By default, eleanor's `CORR_FLUX` column is used to populate the `flux` values. Note that the "FLUX_ERR"
     column in the Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX". Thus the
@@ -25,6 +25,10 @@ def read_eleanorlite_lightcurve(filename,
     In terms of quality flags, eleanor uses the TESS SPOC quality flags by identifying short-cadence targets that
     fall on each camera-CCD pairing for a given sector. However, eleanor, also adds two new quality flags -- bit 17
     (decimal value 131072)) and bit 18 (decimal value 262144).
+
+    More information on eleanor: https://github.com/afeinstein20/eleanor
+
+    More information on GSFC-ELEANOR-LITE Pipeline: https://archive.stsci.edu/hlsp/gsfc-eleanor-lite
 
     Parameters
     ----------
