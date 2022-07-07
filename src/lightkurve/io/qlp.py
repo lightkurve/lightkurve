@@ -9,6 +9,7 @@ from ..lightcurve import LightCurve, TessLightCurve
 from ..utils import TessQualityFlags
 
 from .generic import read_generic_lightcurve
+from .spec import ReaderSpec
 
 AUTHOR_NAME = "QLP"
 
@@ -73,7 +74,7 @@ def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column="kspsa
 
 FORMAT_NAME = "qlp"
 
-READER_SPEC = (FORMAT_NAME, LightCurve, read_qlp_lightcurve)
+READER_SPEC = ReaderSpec(FORMAT_NAME, LightCurve, read_qlp_lightcurve)
 
 
 def detect_filetype(hdulist: HDUList) -> str:

@@ -36,9 +36,9 @@ READER_SPECS = {}  # to be used by read.py
 
 def register_data_product(module):
     spec = module.READER_SPEC
-    READER_SPECS[spec[0]] = spec
+    READER_SPECS[spec.data_format] = spec
     try:
-        registry.register_reader(spec[0], spec[1], spec[2])
+        registry.register_reader(spec.data_format, spec.data_class, spec.function)
     except registry.IORegistryError:
         pass  # necessary to enable autoreload during debugging
     DETECTORS.append(module.detect_filetype)
