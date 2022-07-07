@@ -98,7 +98,22 @@ def read_eleanorlite_lightcurve(filename,
     if flux_column.lower() != 'raw_flux':
         lc["flux_err"] = lc[flux_column.lower()]*lc["raw_flux_err"]/lc["raw_flux"]
 
-    lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
+    # vanilla eleanor has cadence saved as float,
+    # convert to int to ensure we stick with the convention
+    for colname in ["ffiindex", "cadenceno"]:
+        if colname in lc.colnames:
+            if not np.issubdtype(lc[colname].dtype, np.integer):
+                lc[colname] = np.asarray(lc[colname].value, dtype=int)
+
+    if (
+        lc.meta.get("TVERSION") is not None
+        and lc.meta.get("GITHUB") == "https://github.com/afeinstein20/eleanor"
+    ):
+        # the above headers are GSFC-ELEANOR-LITE-specific, and are not present in vanilla eleanor
+        # cf. https://github.com/afeinstein20/eleanor/blob/main/eleanor/targetdata.py
+        lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
+    else:
+        lc.meta["AUTHOR"] = "ELEANOR"
 
     # Eleanor light curves are not normalized by default
     lc.meta["NORMALIZED"] = False
