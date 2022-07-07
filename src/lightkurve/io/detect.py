@@ -48,9 +48,12 @@ def detect_filetype(hdulist: HDUList) -> str:
     if "mit/qlp" in hdulist[0].header.get("origin", "").lower():
         return "QLP"
 
-    # Is it a GSFC-ELEANOR-LITE light curve?
-    if (hdulist[0].header.get("LITE") == True):
-        return "GSFC-ELEANOR-LITE"
+    # Is it a vanilla eleanor or GSFC-ELEANOR-LITE light curve?
+    if (
+        hdulist[0].header.get("LITE") is not None
+        and hdulist[0].header.get("PCORIGIN") is not None
+    ):
+        return "ELEANOR"
 
     # Is it a PATHOS TESS light curve?
     # cf. http://archive.stsci.edu/hlsp/pathos

@@ -9,12 +9,12 @@ from .generic import read_generic_lightcurve
 
 import numpy as np
 
-def read_eleanorlite_lightcurve(filename,
+def read_eleanor_lightcurve(filename,
     flux_column="CORR_FLUX",
     quality_bitmask="default"
     ):
-    """Returns a `TessLightCurve` object given a light curve file from the GSFC Eleanor-lite Pipeline
-    (see https://archive.stsci.edu/hlsp/gsfc-eleanor-lite for more details).
+    """Returns a `~lightkurve.lightcurve.LightCurve` object given a light curve file from
+    eleanor package or GSFC-ELEANOR-LITE Pipeline.
 
     By default, eleanor's `CORR_FLUX` column is used to populate the `flux` values. Note that the "FLUX_ERR"
     column in the Eleanor FITS file is referred to the uncertainty of "RAW_FLUX", not "CORR_FLUX". Thus the
@@ -25,6 +25,10 @@ def read_eleanorlite_lightcurve(filename,
     In terms of quality flags, eleanor uses the TESS SPOC quality flags by identifying short-cadence targets that
     fall on each camera-CCD pairing for a given sector. However, eleanor, also adds two new quality flags -- bit 17
     (decimal value 131072)) and bit 18 (decimal value 262144).
+
+    More information on eleanor: https://github.com/afeinstein20/eleanor
+
+    More information on GSFC-ELEANOR-LITE Pipeline: https://archive.stsci.edu/hlsp/gsfc-eleanor-lite
 
     Parameters
     ----------
@@ -98,7 +102,22 @@ def read_eleanorlite_lightcurve(filename,
     if flux_column.lower() != 'raw_flux':
         lc["flux_err"] = lc[flux_column.lower()]*lc["raw_flux_err"]/lc["raw_flux"]
 
-    lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
+    # vanilla eleanor has cadence saved as float,
+    # convert to int to ensure we stick with the convention
+    for colname in ["ffiindex", "cadenceno"]:
+        if colname in lc.colnames:
+            if not np.issubdtype(lc[colname].dtype, np.integer):
+                lc[colname] = np.asarray(lc[colname].value, dtype=int)
+
+    if (
+        lc.meta.get("TVERSION") is not None
+        and lc.meta.get("GITHUB") == "https://github.com/afeinstein20/eleanor"
+    ):
+        # the above headers are GSFC-ELEANOR-LITE-specific, and are not present in vanilla eleanor
+        # cf. https://github.com/afeinstein20/eleanor/blob/main/eleanor/targetdata.py
+        lc.meta["AUTHOR"] = "GSFC-ELEANOR-LITE"
+    else:
+        lc.meta["AUTHOR"] = "ELEANOR"
 
     # Eleanor light curves are not normalized by default
     lc.meta["NORMALIZED"] = False
