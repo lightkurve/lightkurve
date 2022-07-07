@@ -8,10 +8,10 @@ from .. import LightCurve
 
 from astropy.io import registry
 
-
 __all__ = ["read", "open"]
 
 
+# TODO: to be replaced by register_data_product call below
 # We intend the reader functions to be accessed via `LightCurve.read()`,
 # so we add them to the `astropy.io.registry`.
 try:
@@ -27,3 +27,25 @@ try:
     registry.register_reader("kepseismic", LightCurve, kepseismic.read_kepseismic_lightcurve)
 except registry.IORegistryError:
     pass  # necessary to enable autoreload during debugging
+
+
+AUTHOR_LINKS = {}  # to be used by search.py
+DETECTORS = []  # to be used by detect.py
+READER_SPECS = {}  # to be used by read.py
+
+
+def register_data_product(module):
+    spec = module.READER_SPEC
+    READER_SPECS[spec[0]] = spec
+    try:
+        registry.register_reader(spec[0], spec[1], spec[2])
+    except registry.IORegistryError:
+        pass  # necessary to enable autoreload during debugging
+    DETECTORS.append(module.detect_filetype)
+    AUTHOR_LINKS.update(module.AUTHOR_LINKS)
+
+
+#
+# Register pre-shipped data products
+#
+register_data_product(qlp)

@@ -3,10 +3,14 @@
 Website: http://archive.stsci.edu/hlsp/qlp
 Product description: https://archive.stsci.edu/hlsps/qlp/hlsp_qlp_tess_ffi_all_tess_v1_data-prod-desc.pdf
 """
-from ..lightcurve import TessLightCurve
+from astropy.io.fits import HDUList
+
+from ..lightcurve import LightCurve, TessLightCurve
 from ..utils import TessQualityFlags
 
 from .generic import read_generic_lightcurve
+
+AUTHOR_NAME = "QLP"
 
 
 def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column="kspsap_flux_err", quality_bitmask="default"):
@@ -52,7 +56,7 @@ def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column="kspsa
     )
     lc = lc[quality_mask]
 
-    lc.meta["AUTHOR"] = "QLP"
+    lc.meta["AUTHOR"] = AUTHOR_NAME
     lc.meta["TARGETID"] = lc.meta.get("TICID")
     lc.meta["QUALITY_BITMASK"] = quality_bitmask
     lc.meta["QUALITY_MASK"] = quality_mask
@@ -61,3 +65,24 @@ def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column="kspsa
     lc.meta["NORMALIZED"] = True
 
     return TessLightCurve(data=lc)
+
+
+#
+# Hooks to add the reader
+#
+
+FORMAT_NAME = "qlp"
+
+READER_SPEC = (FORMAT_NAME, LightCurve, read_qlp_lightcurve)
+
+
+def detect_filetype(hdulist: HDUList) -> str:
+    if "mit/qlp" in hdulist[0].header.get("origin", "").lower():
+        return FORMAT_NAME  # refers to the format name in the reader spec above
+
+
+# Which external links should we display in the SearchResult repr?
+AUTHOR_LINKS = {
+  AUTHOR_NAME: "https://archive.stsci.edu/hlsp/qlp",
+}
+
