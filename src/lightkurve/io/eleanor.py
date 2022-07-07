@@ -9,7 +9,7 @@ from .generic import read_generic_lightcurve
 
 import numpy as np
 
-def read_eleanorlite_lightcurve(filename,
+def read_eleanor_lightcurve(filename,
     flux_column="CORR_FLUX",
     quality_bitmask="default"
     ):

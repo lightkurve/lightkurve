@@ -6,7 +6,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 
 from lightkurve import search_lightcurve
-from lightkurve.io.eleanorlite import read_eleanorlite_lightcurve
+from lightkurve.io.eleanor import read_eleanor_lightcurve
 from lightkurve.io.detect import detect_filetype
 
 
@@ -21,14 +21,14 @@ def test_gsfc_eleanor_lite():
         # Can we auto-detect a GSFC-ELEANOR-LITE file?
         assert detect_filetype(hdulist) == "ELEANOR"
         # Are the correct fluxes read in?
-        lc = read_eleanorlite_lightcurve(url, quality_bitmask=0)
+        lc = read_eleanor_lightcurve(url, quality_bitmask=0)
         assert lc.meta["AUTHOR"] == "GSFC-ELEANOR-LITE"
         assert lc.meta["FLUX_ORIGIN"] == "corr_flux"
         assert_array_equal(lc.flux.value, hdulist[1].data["CORR_FLUX"])
         # Are the correct quality flags read in?
-        lc = read_eleanorlite_lightcurve(url, quality_bitmask='default')
+        lc = read_eleanor_lightcurve(url, quality_bitmask='default')
         assert ((lc["quality"] & 2**17) != 0).any() and ((lc["quality"] & 2**18) != 0).any()
-        lc = read_eleanorlite_lightcurve(url, quality_bitmask='hardest')
+        lc = read_eleanor_lightcurve(url, quality_bitmask='hardest')
         assert not (lc["quality"] & (2**17 | 2**18)).any()
         assert np.issubdtype(lc["cadenceno"].dtype, np.integer)
 
@@ -47,7 +47,7 @@ def test_vanilla_eleanor(url):
         # Can we auto-detect a vanilla eleanor file?
         assert detect_filetype(hdulist) == "ELEANOR"
         # Are the correct fluxes read in?
-        lc = read_eleanorlite_lightcurve(url, quality_bitmask=0)
+        lc = read_eleanor_lightcurve(url, quality_bitmask=0)
         assert lc.meta["AUTHOR"] == "ELEANOR"
         assert lc.meta["FLUX_ORIGIN"] == "corr_flux"
         assert_array_equal(lc.flux.value, hdulist[1].data["CORR_FLUX"])
@@ -62,7 +62,7 @@ def test_vanilla_eleanor(url):
 
 
 @pytest.mark.remote_data
-def test_search_eleanorlite():
+def test_search_gsfc_eleanor_lite():
     """Can we search and download GSFC-ELEANOR-LITE light curves from MAST?"""
     search = search_lightcurve("TIC 336732616", author="GSFC-ELEANOR-LITE", sector=1)
     assert len(search) == 1
