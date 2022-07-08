@@ -27,6 +27,7 @@
    
       ~SearchResult.author
       ~SearchResult.dec
+      ~SearchResult.display_extra_columns
       ~SearchResult.distance
       ~SearchResult.exptime
       ~SearchResult.mission

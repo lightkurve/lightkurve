@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.2</p>
+<p class="title">Lightkurve v2.3</p>
 </a>
 
     
@@ -230,6 +230,11 @@
    <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.SearchResult.table.html">
      lightkurve.SearchResult.table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.SearchResult.display_extra_columns.html">
+     lightkurve.SearchResult.display_extra_columns
     </a>
    </li>
    <li class="toctree-l2">
@@ -462,11 +467,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.LightCurve.to_table.html">
      lightkurve.LightCurve.to_table
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="api/lightkurve.LightCurve.read.html">
-     lightkurve.LightCurve.read
     </a>
    </li>
    <li class="toctree-l2">
@@ -1147,11 +1147,100 @@
   </ul>
  </li>
  <li class="toctree-l1 has-children">
-  <a class="reference internal" href="misc.html">
-   Miscellaneous utilities
+  <a class="reference internal" href="io.html">
+   Reading Data Products
   </a>
   <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
   <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.read.html">
+     lightkurve.io.read
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.kepler.read_kepler_lightcurve.html">
+     lightkurve.io.kepler.read_kepler_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.everest.read_everest_lightcurve.html">
+     lightkurve.io.everest.read_everest_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.kepseismic.read_kepseismic_lightcurve.html">
+     lightkurve.io.kepseismic.read_kepseismic_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.k2sff.read_k2sff_lightcurve.html">
+     lightkurve.io.k2sff.read_k2sff_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.tess.read_tess_lightcurve.html">
+     lightkurve.io.tess.read_tess_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.cdips.read_cdips_lightcurve.html">
+     lightkurve.io.cdips.read_cdips_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.eleanor.read_eleanor_lightcurve.html">
+     lightkurve.io.eleanor.read_eleanor_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.pathos.read_pathos_lightcurve.html">
+     lightkurve.io.pathos.read_pathos_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.qlp.read_qlp_lightcurve.html">
+     lightkurve.io.qlp.read_qlp_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.tasoc.read_tasoc_lightcurve.html">
+     lightkurve.io.tasoc.read_tasoc_lightcurve
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="config.html">
+   Configuration
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.conf.html">
+     lightkurve.conf
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.config.get_config_dir.html">
+     lightkurve.config.get_config_dir
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="misc.html">
+   Miscellaneous utilities
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -1372,7 +1461,7 @@ known to be effective at removing different types of noise.</p>
 <td><p>Design matrix &quot;X&quot; to be used in RegressionCorrector objects</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.rank.html#lightkurve.correctors.DesignMatrix.rank" title="lightkurve.correctors.DesignMatrix.rank"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix.rank</span></code></a></p></td>
-<td><p>Matrix rank computed using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v1.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank</span></code></a>.</p></td>
+<td><p>Matrix rank computed using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.shape.html#lightkurve.correctors.DesignMatrix.shape" title="lightkurve.correctors.DesignMatrix.shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix.shape</span></code></a></p></td>
 <td><p>Tuple specifying the shape of the matrix as (n_rows, n_columns).</p></td>

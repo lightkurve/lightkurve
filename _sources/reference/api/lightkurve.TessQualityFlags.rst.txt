@@ -28,6 +28,7 @@
       ~TessQualityFlags.ApertureCosmic
       ~TessQualityFlags.Argabrightening
       ~TessQualityFlags.AttitudeTweak
+      ~TessQualityFlags.BadCalibrationExclude
       ~TessQualityFlags.CoarsePoint
       ~TessQualityFlags.CollateralCosmic
       ~TessQualityFlags.DEFAULT_BITMASK
@@ -37,8 +38,10 @@
       ~TessQualityFlags.HARDEST_BITMASK
       ~TessQualityFlags.HARD_BITMASK
       ~TessQualityFlags.ImpulsiveOutlier
+      ~TessQualityFlags.InsufficientTargets
       ~TessQualityFlags.ManualExclude
       ~TessQualityFlags.OPTIONS
+      ~TessQualityFlags.PlanetSearchExclude
       ~TessQualityFlags.STRINGS
       ~TessQualityFlags.SafeMode
       ~TessQualityFlags.Straylight

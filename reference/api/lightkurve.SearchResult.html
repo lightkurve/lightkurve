@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.2</p>
+<p class="title">Lightkurve v2.3</p>
 </a>
 
     
@@ -230,6 +230,11 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.SearchResult.table.html">
      lightkurve.SearchResult.table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.display_extra_columns.html">
+     lightkurve.SearchResult.display_extra_columns
     </a>
    </li>
    <li class="toctree-l2">
@@ -462,11 +467,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.LightCurve.to_table.html">
      lightkurve.LightCurve.to_table
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.LightCurve.read.html">
-     lightkurve.LightCurve.read
     </a>
    </li>
    <li class="toctree-l2">
@@ -1147,11 +1147,100 @@
   </ul>
  </li>
  <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../misc.html">
-   Miscellaneous utilities
+  <a class="reference internal" href="../io.html">
+   Reading Data Products
   </a>
   <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
   <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.read.html">
+     lightkurve.io.read
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.kepler.read_kepler_lightcurve.html">
+     lightkurve.io.kepler.read_kepler_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.everest.read_everest_lightcurve.html">
+     lightkurve.io.everest.read_everest_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.kepseismic.read_kepseismic_lightcurve.html">
+     lightkurve.io.kepseismic.read_kepseismic_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.k2sff.read_k2sff_lightcurve.html">
+     lightkurve.io.k2sff.read_k2sff_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.tess.read_tess_lightcurve.html">
+     lightkurve.io.tess.read_tess_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.cdips.read_cdips_lightcurve.html">
+     lightkurve.io.cdips.read_cdips_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.eleanor.read_eleanor_lightcurve.html">
+     lightkurve.io.eleanor.read_eleanor_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.pathos.read_pathos_lightcurve.html">
+     lightkurve.io.pathos.read_pathos_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.qlp.read_qlp_lightcurve.html">
+     lightkurve.io.qlp.read_qlp_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.tasoc.read_tasoc_lightcurve.html">
+     lightkurve.io.tasoc.read_tasoc_lightcurve
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../config.html">
+   Configuration
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.conf.html">
+     lightkurve.conf
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.config.get_config_dir.html">
+     lightkurve.config.get_config_dir
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../misc.html">
+   Miscellaneous utilities
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -1258,31 +1347,34 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.SearchResult.dec.html#lightkurve.SearchResult.dec" title="lightkurve.SearchResult.dec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code></a></p></td>
 <td><p>Declination coordinate for each data product found.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.SearchResult.distance.html#lightkurve.SearchResult.distance" title="lightkurve.SearchResult.distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">distance</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.SearchResult.display_extra_columns.html#lightkurve.SearchResult.display_extra_columns" title="lightkurve.SearchResult.display_extra_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_extra_columns</span></code></a></p></td>
+<td><p>A list of extra columns to be included in the default display of the search result.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.SearchResult.distance.html#lightkurve.SearchResult.distance" title="lightkurve.SearchResult.distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">distance</span></code></a></p></td>
 <td><p>Distance from the search position for each data product found.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.SearchResult.exptime.html#lightkurve.SearchResult.exptime" title="lightkurve.SearchResult.exptime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exptime</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.SearchResult.exptime.html#lightkurve.SearchResult.exptime" title="lightkurve.SearchResult.exptime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exptime</span></code></a></p></td>
 <td><p>Exposure time for each data product found.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.SearchResult.mission.html#lightkurve.SearchResult.mission" title="lightkurve.SearchResult.mission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mission</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.SearchResult.mission.html#lightkurve.SearchResult.mission" title="lightkurve.SearchResult.mission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mission</span></code></a></p></td>
 <td><p>Kepler quarter or TESS sector names for each data product found.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">obsid</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">obsid</span></code></p></td>
 <td><p>MAST observation ID for each data product found.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.SearchResult.ra.html#lightkurve.SearchResult.ra" title="lightkurve.SearchResult.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.SearchResult.ra.html#lightkurve.SearchResult.ra" title="lightkurve.SearchResult.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></p></td>
 <td><p>Right Ascension coordinate for each data product found.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.SearchResult.table.html#lightkurve.SearchResult.table" title="lightkurve.SearchResult.table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">table</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.SearchResult.table.html#lightkurve.SearchResult.table" title="lightkurve.SearchResult.table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">table</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> containing the full search results returned by the MAST API.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.SearchResult.target_name.html#lightkurve.SearchResult.target_name" title="lightkurve.SearchResult.target_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_name</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.SearchResult.target_name.html#lightkurve.SearchResult.target_name" title="lightkurve.SearchResult.target_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_name</span></code></a></p></td>
 <td><p>Target name for each data product found.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unique_targets</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unique_targets</span></code></p></td>
 <td><p>Returns a table of targets and their RA &amp; dec values produced by search</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.SearchResult.year.html#lightkurve.SearchResult.year" title="lightkurve.SearchResult.year"><code class="xref py py-obj docutils literal notranslate"><span class="pre">year</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.SearchResult.year.html#lightkurve.SearchResult.year" title="lightkurve.SearchResult.year"><code class="xref py py-obj docutils literal notranslate"><span class="pre">year</span></code></a></p></td>
 <td><p>Year the observation was made.</p></td>
 </tr>
 </tbody>

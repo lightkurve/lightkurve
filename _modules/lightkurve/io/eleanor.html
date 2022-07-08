@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.io.eleanor &#8212; Lightkurve </title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">Lightkurve v2.3</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for lightkurve.io.eleanor</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Reader for GSFC-ELEANOR-LITE light curve files.</span>
+<span class="sd">Details can be found at https://archive.stsci.edu/hlsp/eleanor and https://archive.stsci.edu/hlsp/gsfc-eleanor-lite</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">..lightcurve</span> <span class="kn">import</span> <span class="n">TessLightCurve</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">TessQualityFlags</span>
+<span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="kn">from</span> <span class="nn">.generic</span> <span class="kn">import</span> <span class="n">read_generic_lightcurve</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="read_eleanor_lightcurve"><a class="viewcode-back" href="../../../reference/api/lightkurve.io.eleanor.read_eleanor_lightcurve.html#lightkurve.io.eleanor.read_eleanor_lightcurve">[docs]</a><span class="k">def</span> <span class="nf">read_eleanor_lightcurve</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span>
+    <span class="n">flux_column</span><span class="o">=</span><span class="s2">&quot;CORR_FLUX&quot;</span><span class="p">,</span>
+    <span class="n">quality_bitmask</span><span class="o">=</span><span class="s2">&quot;default&quot;</span>
+    <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a `~lightkurve.lightcurve.LightCurve` object given a light curve file from</span>
+<span class="sd">    eleanor package or GSFC-ELEANOR-LITE Pipeline.</span>
+
+<span class="sd">    By default, eleanor&#39;s `CORR_FLUX` column is used to populate the `flux` values. Note that the &quot;FLUX_ERR&quot;</span>
+<span class="sd">    column in the Eleanor FITS file is referred to the uncertainty of &quot;RAW_FLUX&quot;, not &quot;CORR_FLUX&quot;. Thus the</span>
+<span class="sd">    uncertainty reported in the &#39;flux_err&#39; column here is calculated as follows:</span>
+<span class="sd">    corr_flux_err = corr_flux*raw_flux_err/raw_flux.</span>
+<span class="sd">    For completeness, the original raw_flux&#39;s error is added as a &quot;raw_flux_err&quot; column.</span>
+
+<span class="sd">    In terms of quality flags, eleanor uses the TESS SPOC quality flags by identifying short-cadence targets that</span>
+<span class="sd">    fall on each camera-CCD pairing for a given sector. However, eleanor, also adds two new quality flags -- bit 17</span>
+<span class="sd">    (decimal value 131072)) and bit 18 (decimal value 262144).</span>
+
+<span class="sd">    More information on eleanor: https://github.com/afeinstein20/eleanor</span>
+
+<span class="sd">    More information on GSFC-ELEANOR-LITE Pipeline: https://archive.stsci.edu/hlsp/gsfc-eleanor-lite</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        Local path or remote url of a GSFC-ELEANOR-LITE light curve FITS file.</span>
+<span class="sd">    flux_column : &#39;RAW_FLUX&#39;, &#39;CORR_FLUX&#39;, &#39;PCA_FLUX&#39;, or &#39;FLUX_BKG&#39;</span>
+<span class="sd">        Which column in the FITS file contains the preferred flux data?</span>
+<span class="sd">        By default the &quot;Corrected Flux&quot; flux (CORR_FLUX) is used.</span>
+<span class="sd">    quality_bitmask : str or int</span>
+<span class="sd">        Bitmask (integer) which identifies the quality flag bitmask that should</span>
+<span class="sd">        be used to mask out bad cadences. If a string is passed, it has the</span>
+<span class="sd">        following meaning:</span>
+<span class="sd">            * &quot;none&quot;: no cadences will be ignored (`quality_bitmask=0`).</span>
+<span class="sd">            * &quot;default&quot;: cadences with flags indicating AttitudeTweak, SafeMode, CoarsePoint, EarthPoint, Desat, or</span>
+<span class="sd">              ManualExclude will be ignored.</span>
+<span class="sd">            * &quot;hard&quot;: cadences with default flags, ApertureCosmic, CollateralCosmic, Straylight, or Straylight2 will be</span>
+<span class="sd">              ignored.</span>
+<span class="sd">            * &quot;hardest&quot;: cadences with all the above flags will be ignored, in addition to cadences with GSFC-ELEANOR-LITE</span>
+<span class="sd">              bit flags of 17 (decimal value 131072) and 18 (decimal value 262144).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">lc</span> <span class="o">=</span> <span class="n">read_generic_lightcurve</span><span class="p">(</span>
+        <span class="n">filename</span><span class="p">,</span>
+        <span class="n">time_column</span><span class="o">=</span><span class="s2">&quot;TIME&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+        <span class="n">flux_column</span><span class="o">=</span><span class="n">flux_column</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+        <span class="n">flux_err_column</span> <span class="o">=</span> <span class="s2">&quot;FLUX_ERR&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+        <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;btjd&quot;</span><span class="p">,</span>
+        <span class="n">quality_column</span><span class="o">=</span> <span class="s2">&quot;QUALITY&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+        <span class="n">centroid_col_column</span> <span class="o">=</span> <span class="s2">&quot;X_CENTROID&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+        <span class="n">centroid_row_column</span> <span class="o">=</span> <span class="s2">&quot;Y_CENTROID&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+        <span class="n">cadenceno_column</span> <span class="o">=</span> <span class="s2">&quot;FFIINDEX&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">quality_bitmask</span> <span class="o">==</span> <span class="s2">&quot;hardest&quot;</span><span class="p">:</span>
+        <span class="c1"># Eleanor has 2 additional bits on top of the 16 TESS SPOC bits</span>
+        <span class="c1"># they are excluded when hardest is specified.</span>
+        <span class="n">quality_bitmask</span> <span class="o">=</span> <span class="n">TessQualityFlags</span><span class="o">.</span><span class="n">HARDEST_BITMASK</span> <span class="o">|</span> <span class="mi">2</span><span class="o">**</span> <span class="mi">17</span> <span class="o">|</span> <span class="mi">2</span><span class="o">**</span><span class="mi">18</span>
+
+    <span class="n">quality_mask</span> <span class="o">=</span> <span class="n">TessQualityFlags</span><span class="o">.</span><span class="n">create_quality_mask</span><span class="p">(</span>
+        <span class="n">quality_array</span><span class="o">=</span><span class="n">lc</span><span class="p">[</span><span class="s2">&quot;quality&quot;</span><span class="p">],</span> <span class="n">bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span>
+    <span class="p">)</span>
+
+    <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="n">quality_mask</span><span class="p">]</span>
+
+    <span class="c1"># Eleanor FITS file do not have units specified. re-add them.</span>
+    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;flux&quot;</span><span class="p">,</span> <span class="s2">&quot;flux_err&quot;</span><span class="p">,</span> <span class="s2">&quot;raw_flux&quot;</span><span class="p">,</span> <span class="s2">&quot;corr_flux&quot;</span><span class="p">,</span> <span class="s2">&quot;pca_flux&quot;</span><span class="p">,</span> <span class="s2">&quot;psf_flux&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">lc</span><span class="o">.</span><span class="n">colnames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">lc</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># for case flux, flux_err, lightkurve has forced it to be u.dimensionless_unscaled</span>
+                <span class="c1"># can&#39;t reset a unit, so we create a new column</span>
+                <span class="n">lc</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">lc</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;electron/s&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lc</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;electron/s&quot;</span>
+
+    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;flux_bkg&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">lc</span><span class="o">.</span><span class="n">colnames</span><span class="p">:</span>
+            <span class="n">lc</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">percent</span>
+
+    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;centroid_col&quot;</span><span class="p">,</span> <span class="s2">&quot;centroid_row&quot;</span><span class="p">,</span> <span class="s2">&quot;x_centroid&quot;</span><span class="p">,</span> <span class="s2">&quot;y_centroid&quot;</span><span class="p">,</span> <span class="s2">&quot;x_com&quot;</span><span class="p">,</span> <span class="s2">&quot;y_com&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">lc</span><span class="o">.</span><span class="n">colnames</span><span class="p">:</span>
+            <span class="n">lc</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">pix</span>
+
+    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;barycorr&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">lc</span><span class="o">.</span><span class="n">colnames</span><span class="p">:</span>
+            <span class="n">lc</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">day</span>
+
+    <span class="c1"># In Eleanor fits file, raw_flux&#39;s error is in flux_err, which breaks Lightkurve convention.</span>
+    <span class="c1"># To account for this, the corr_flux error is calculated from corr_flux_err = corr_flux*raw_flux_err/raw_flux. For completeness,</span>
+    <span class="c1"># the original raw_flux&#39;s error is added as a &quot;raw_flux_err&quot; column</span>
+    <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;raw_flux_err&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;flux_err&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">flux_column</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;raw_flux&#39;</span><span class="p">:</span>
+        <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;flux_err&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="n">flux_column</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span><span class="o">*</span><span class="n">lc</span><span class="p">[</span><span class="s2">&quot;raw_flux_err&quot;</span><span class="p">]</span><span class="o">/</span><span class="n">lc</span><span class="p">[</span><span class="s2">&quot;raw_flux&quot;</span><span class="p">]</span>
+
+    <span class="c1"># vanilla eleanor has cadence saved as float,</span>
+    <span class="c1"># convert to int to ensure we stick with the convention</span>
+    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ffiindex&quot;</span><span class="p">,</span> <span class="s2">&quot;cadenceno&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">lc</span><span class="o">.</span><span class="n">colnames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">lc</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+                <span class="n">lc</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">lc</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TVERSION&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GITHUB&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;https://github.com/afeinstein20/eleanor&quot;</span>
+    <span class="p">):</span>
+        <span class="c1"># the above headers are GSFC-ELEANOR-LITE-specific, and are not present in vanilla eleanor</span>
+        <span class="c1"># cf. https://github.com/afeinstein20/eleanor/blob/main/eleanor/targetdata.py</span>
+        <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;AUTHOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;GSFC-ELEANOR-LITE&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;AUTHOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ELEANOR&quot;</span>
+
+    <span class="c1"># Eleanor light curves are not normalized by default</span>
+    <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;NORMALIZED&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">tic</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TIC_ID&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># compatibility with SPOC, QLP, etc.</span>
+        <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;TARGETID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tic</span>
+        <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;TICID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tic</span>
+        <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;TIC </span><span class="si">{</span><span class="n">tic</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># for Lightkurve&#39;s plotting methods</span>
+        <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;LABEL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;TIC </span><span class="si">{</span><span class="n">tic</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">TessLightCurve</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lc</span><span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

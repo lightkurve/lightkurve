@@ -1,0 +1,6 @@
+﻿lightkurve.io.kepseismic.read\_kepseismic\_lightcurve
+=====================================================
+
+.. currentmodule:: lightkurve.io.kepseismic
+
+.. autofunction:: read_kepseismic_lightcurve

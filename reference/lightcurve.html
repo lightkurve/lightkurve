@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.2</p>
+<p class="title">Lightkurve v2.3</p>
 </a>
 
     
@@ -230,6 +230,11 @@
    <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.SearchResult.table.html">
      lightkurve.SearchResult.table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.SearchResult.display_extra_columns.html">
+     lightkurve.SearchResult.display_extra_columns
     </a>
    </li>
    <li class="toctree-l2">
@@ -462,11 +467,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.LightCurve.to_table.html">
      lightkurve.LightCurve.to_table
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="api/lightkurve.LightCurve.read.html">
-     lightkurve.LightCurve.read
     </a>
    </li>
    <li class="toctree-l2">
@@ -1147,11 +1147,100 @@
   </ul>
  </li>
  <li class="toctree-l1 has-children">
-  <a class="reference internal" href="misc.html">
-   Miscellaneous utilities
+  <a class="reference internal" href="io.html">
+   Reading Data Products
   </a>
   <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
   <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.read.html">
+     lightkurve.io.read
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.kepler.read_kepler_lightcurve.html">
+     lightkurve.io.kepler.read_kepler_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.everest.read_everest_lightcurve.html">
+     lightkurve.io.everest.read_everest_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.kepseismic.read_kepseismic_lightcurve.html">
+     lightkurve.io.kepseismic.read_kepseismic_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.k2sff.read_k2sff_lightcurve.html">
+     lightkurve.io.k2sff.read_k2sff_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.tess.read_tess_lightcurve.html">
+     lightkurve.io.tess.read_tess_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.cdips.read_cdips_lightcurve.html">
+     lightkurve.io.cdips.read_cdips_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.eleanor.read_eleanor_lightcurve.html">
+     lightkurve.io.eleanor.read_eleanor_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.pathos.read_pathos_lightcurve.html">
+     lightkurve.io.pathos.read_pathos_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.qlp.read_qlp_lightcurve.html">
+     lightkurve.io.qlp.read_qlp_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.tasoc.read_tasoc_lightcurve.html">
+     lightkurve.io.tasoc.read_tasoc_lightcurve
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="config.html">
+   Configuration
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.conf.html">
+     lightkurve.conf
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.config.get_config_dir.html">
+     lightkurve.config.get_config_dir
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="misc.html">
+   Miscellaneous utilities
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -1407,7 +1496,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
 <td><p>Converts the light curve to a FITS file in the Kepler/TESS file format.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_pandas.html#lightkurve.LightCurve.to_pandas" title="lightkurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_pandas</span></code></a>(**kwargs)</p></td>
-<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
+<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_periodogram.html#lightkurve.LightCurve.to_periodogram" title="lightkurve.LightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_periodogram</span></code></a>([method])</p></td>
 <td><p>Converts the light curve to a <a class="reference internal" href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</p></td>
@@ -1418,10 +1507,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_table.html#lightkurve.LightCurve.to_table" title="lightkurve.LightCurve.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_table</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.read.html#lightkurve.LightCurve.read" title="lightkurve.LightCurve.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.read</span></code></a>(filename[, time_column, ...])</p></td>
-<td><p>Read and parse a file and returns a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.write.html#lightkurve.LightCurve.write" title="lightkurve.LightCurve.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.write</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.write.html#lightkurve.LightCurve.write" title="lightkurve.LightCurve.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.write</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>

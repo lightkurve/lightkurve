@@ -1,0 +1,6 @@
+﻿lightkurve.SearchResult.display\_extra\_columns
+===============================================
+
+.. currentmodule:: lightkurve
+
+.. autoattribute:: SearchResult.display_extra_columns

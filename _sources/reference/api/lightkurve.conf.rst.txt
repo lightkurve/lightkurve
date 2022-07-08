@@ -1,0 +1,6 @@
+﻿lightkurve.conf
+===============
+
+.. currentmodule:: lightkurve
+
+.. autodata:: conf

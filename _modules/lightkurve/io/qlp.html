@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.io.qlp &#8212; Lightkurve </title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">Lightkurve v2.3</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for lightkurve.io.qlp</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Reader for MIT Quicklook Pipeline (QLP) light curve files.</span>
+
+<span class="sd">Website: http://archive.stsci.edu/hlsp/qlp</span>
+<span class="sd">Product description: https://archive.stsci.edu/hlsps/qlp/hlsp_qlp_tess_ffi_all_tess_v1_data-prod-desc.pdf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">..lightcurve</span> <span class="kn">import</span> <span class="n">TessLightCurve</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">TessQualityFlags</span>
+
+<span class="kn">from</span> <span class="nn">.generic</span> <span class="kn">import</span> <span class="n">read_generic_lightcurve</span>
+
+
+<div class="viewcode-block" id="read_qlp_lightcurve"><a class="viewcode-back" href="../../../reference/api/lightkurve.io.qlp.read_qlp_lightcurve.html#lightkurve.io.qlp.read_qlp_lightcurve">[docs]</a><span class="k">def</span> <span class="nf">read_qlp_lightcurve</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">flux_column</span><span class="o">=</span><span class="s2">&quot;sap_flux&quot;</span><span class="p">,</span> <span class="n">flux_err_column</span><span class="o">=</span><span class="s2">&quot;kspsap_flux_err&quot;</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a `~lightkurve.lightcurve.LightCurve` object given a light curve file from the MIT Quicklook Pipeline (QLP).</span>
+
+<span class="sd">    By default, QLP&#39;s `sap_flux` column is used to populate the `flux` values,</span>
+<span class="sd">    and &#39;kspsap_flux_err&#39; is used to populate `flux_err`. For a discussion</span>
+<span class="sd">    related to this choice, see https://github.com/lightkurve/lightkurve/issues/1083</span>
+
+<span class="sd">    More information: https://archive.stsci.edu/hlsp/qlp</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        Local path or remote url of a QLP light curve FITS file.</span>
+<span class="sd">    flux_column : &#39;sap_flux&#39;, &#39;kspsap_flux&#39;, &#39;kspsap_flux_sml&#39;, &#39;kspsap_flux_lag&#39;, or &#39;sap_bkg&#39;</span>
+<span class="sd">        Which column in the FITS file contains the preferred flux data?</span>
+<span class="sd">        By default the &quot;Simple Aperture Photometry&quot; flux (sap_flux) is used.</span>
+<span class="sd">    flux_err_column: &#39;kspsap_flux_err&#39;, or &#39;sap_bkg_err&#39;</span>
+<span class="sd">      Which column in the FITS file contains the preferred flux_err data?</span>
+<span class="sd">    quality_bitmask : str or int</span>
+<span class="sd">        Bitmask (integer) which identifies the quality flag bitmask that should</span>
+<span class="sd">        be used to mask out bad cadences. If a string is passed, it has the</span>
+<span class="sd">        following meaning:</span>
+
+<span class="sd">            * &quot;none&quot;: no cadences will be ignored.</span>
+<span class="sd">            * &quot;default&quot;: cadences with severe quality issues will be ignored.</span>
+<span class="sd">            * &quot;hard&quot;: more conservative choice of flags to ignore.</span>
+<span class="sd">              This is known to remove good data.</span>
+<span class="sd">            * &quot;hardest&quot;: removes all data that has been flagged.</span>
+<span class="sd">              This mask is not recommended.</span>
+
+<span class="sd">        See the `~lightkurve.utils.TessQualityFlags` class for details on the bitmasks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lc</span> <span class="o">=</span> <span class="n">read_generic_lightcurve</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">flux_column</span><span class="o">=</span><span class="n">flux_column</span><span class="p">,</span> <span class="n">flux_err_column</span><span class="o">=</span><span class="n">flux_err_column</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;btjd&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Filter out poor-quality data</span>
+    <span class="c1"># NOTE: Unfortunately Astropy Table masking does not yet work for columns</span>
+    <span class="c1"># that are Quantity objects, so for now we remove poor-quality data instead</span>
+    <span class="c1"># of masking. Details: https://github.com/astropy/astropy/issues/10119</span>
+    <span class="n">quality_mask</span> <span class="o">=</span> <span class="n">TessQualityFlags</span><span class="o">.</span><span class="n">create_quality_mask</span><span class="p">(</span>
+        <span class="n">quality_array</span><span class="o">=</span><span class="n">lc</span><span class="p">[</span><span class="s2">&quot;quality&quot;</span><span class="p">],</span> <span class="n">bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span>
+    <span class="p">)</span>
+    <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="n">quality_mask</span><span class="p">]</span>
+
+    <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;AUTHOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;QLP&quot;</span>
+    <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;TARGETID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TICID&quot;</span><span class="p">)</span>
+    <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;QUALITY_BITMASK&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">quality_bitmask</span>
+    <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;QUALITY_MASK&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">quality_mask</span>
+
+    <span class="c1"># QLP light curves are normalized by default</span>
+    <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;NORMALIZED&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">TessLightCurve</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lc</span><span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

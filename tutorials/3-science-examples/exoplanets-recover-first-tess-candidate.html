@@ -67,7 +67,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.2</p>
+<p class="title">Lightkurve v2.3</p>
 </a>
 
     
@@ -477,7 +477,7 @@ div.rendered_html tbody tr:hover {
 <div class="output_area rendered_html docutils container">
 SearchResult containing 2 data products.
 
-<table id="table5563726672">
+<table id="table5553070064">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 01</td><td>2018</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>261136679</td><td>0.0</td></tr>
@@ -497,7 +497,7 @@ SearchResult containing 2 data products.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/Users/gb/dev/lightkurve/src/lightkurve/search.py:346: LightkurveWarning: Warning: 2 files available to download. Only the first file has been downloaded. Please use `download_all()` or specify additional criteria (e.g. quarter, campaign, or sector) to limit your search.
+/Users/gb/dev/lightkurve/src/lightkurve/search.py:407: LightkurveWarning: Warning: 2 files available to download. Only the first file has been downloaded. Please use `download_all()` or specify additional criteria (e.g. quarter, campaign, or sector) to limit your search.
   warnings.warn(
 </pre></div></div>
 </div>
@@ -636,7 +636,7 @@ TessTargetPixelFile(TICID: 261136679)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x14ba75fc0&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x14ba76a40&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x14ba58370&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x1517fcd90&gt;]
+[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x14b051db0&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x14b052590&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x14b045cf0&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x150dec580&gt;]
 </pre></div></div>
 </div>
 <p>You can access each extension and the data inside it in the same way you’d use <a class="reference external" href="https://docs.astropy.org/en/stable/io/fits/">astropy.io.fits</a>. If you want to access data held in the TPF, such as the time of the observations, you can do that easily by using</p>

@@ -1,0 +1,284 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.io.cdips &#8212; Lightkurve </title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">Lightkurve v2.3</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for lightkurve.io.cdips</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Reader for A PSF-Based Approach to TESS Cluster Difference Imaging Photometric Survey (CDIPS) light curves</span>
+
+<span class="sd">Website: https://archive.stsci.edu/hlsp/cdips</span>
+<span class="sd">Product Description: https://archive.stsci.edu/hlsps/cdips/hlsp_cdips_tess_ffi_all_tess_v01_readme.md</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">..lightcurve</span> <span class="kn">import</span> <span class="n">TessLightCurve</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">TessQualityFlags</span>
+
+<span class="kn">from</span> <span class="nn">.generic</span> <span class="kn">import</span> <span class="n">read_generic_lightcurve</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="read_cdips_lightcurve"><a class="viewcode-back" href="../../../reference/api/lightkurve.io.cdips.read_cdips_lightcurve.html#lightkurve.io.cdips.read_cdips_lightcurve">[docs]</a><span class="k">def</span> <span class="nf">read_cdips_lightcurve</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span>
+                            <span class="n">flux_column</span><span class="o">=</span><span class="s2">&quot;IRM1&quot;</span><span class="p">,</span>
+                            <span class="n">include_inst_errs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">quality_bitmask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a TESS CDIPS `~lightkurve.lightcurve.LightCurve`.</span>
+
+<span class="sd">    Note: CDIPS light curves have already had quality filtering applied, and</span>
+<span class="sd">    do not provide the bitflags necessary for a user to apply a new bitmask.</span>
+<span class="sd">    Therefore, frames corresponding to &quot;momentum dumps and coarse point modes&quot;</span>
+<span class="sd">    are removed according to Bouma et al. 2019, and no other quality filtering</span>
+<span class="sd">    is allowed. The `quality_bitmask` parameter is ignored but accepted for</span>
+<span class="sd">    compatibility with other data format readers.</span>
+
+<span class="sd">    More information: https://archive.stsci.edu/hlsp/cdips</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        Local path or remote url of CDIPS light curve FITS file.</span>
+<span class="sd">    flux_column : str</span>
+<span class="sd">        &#39;IFL#&#39;, &#39;IRM#&#39;, &#39;TFA#&#39;, or &#39;PCA#&#39; (# = 1, 2, or 3)</span>
+<span class="sd">        Which column in the FITS file contains the preferred flux data?</span>
+<span class="sd">    include_inst_errs: bool</span>
+<span class="sd">        Whether to include the instrumental flux/magnitude errors</span>
+<span class="sd">        (Errors are not provided for trend-filtered magnitudes)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ap</span> <span class="o">=</span> <span class="n">flux_column</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Only the instrumental magnitudes are provided, and are not provided for</span>
+    <span class="c1"># trend-filtered light curves. User should select whether to include the</span>
+    <span class="c1"># instrumental errors or ignore them</span>
+    <span class="k">if</span> <span class="n">include_inst_errs</span><span class="p">:</span>
+        <span class="c1"># If fluxes are requested, return flux errors</span>
+        <span class="k">if</span> <span class="n">flux_column</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">==</span><span class="s2">&quot;ifl&quot;</span><span class="p">:</span>
+            <span class="n">flux_err_column</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ife</span><span class="si">{</span><span class="n">ap</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># Otherwise magnitudes are being requested, return magnitude errors</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flux_err_column</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ire</span><span class="si">{</span><span class="n">ap</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">flux_err_column</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Set the appropriate error column for this aperture</span>
+    <span class="n">quality_column</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;irq</span><span class="si">{</span><span class="n">ap</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">lc</span> <span class="o">=</span> <span class="n">read_generic_lightcurve</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span>
+                                 <span class="n">time_column</span><span class="o">=</span><span class="s2">&quot;tmid_bjd&quot;</span><span class="p">,</span>
+                                 <span class="n">flux_column</span><span class="o">=</span><span class="n">flux_column</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                                 <span class="n">flux_err_column</span><span class="o">=</span><span class="n">flux_err_column</span><span class="p">,</span>
+                                 <span class="n">quality_column</span><span class="o">=</span><span class="n">quality_column</span><span class="p">,</span>
+                                 <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;btjd&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Filter out poor-quality data</span>
+    <span class="c1"># NOTE: Unfortunately Astropy Table masking does not yet work for columns</span>
+    <span class="c1"># that are Quantity objects, so for now we remove poor-quality data instead</span>
+    <span class="c1"># of masking. Details: https://github.com/astropy/astropy/issues/10119</span>
+
+    <span class="c1"># CDIPS uses their own quality keywords instead of the default bitflags</span>
+    <span class="c1"># Based on Bouma+2019, they filter out coarse point (4) and desat (32)</span>
+    <span class="c1"># as well as other cadences flagged for particular sectors</span>
+    <span class="n">quality_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">lc</span><span class="p">[</span><span class="s1">&#39;quality&#39;</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;G&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lc</span><span class="p">[</span><span class="s1">&#39;quality&#39;</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+    <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="n">quality_mask</span><span class="p">]</span>
+
+    <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;AUTHOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;CDIPS&quot;</span>
+    <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TARGETID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TICID&#39;</span><span class="p">)</span>
+    <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;QUALITY_BITMASK&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">36</span>
+    <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;QUALITY_MASK&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">quality_mask</span>
+
+    <span class="k">return</span> <span class="n">TessLightCurve</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lc</span><span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

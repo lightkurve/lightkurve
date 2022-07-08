@@ -1,0 +1,6 @@
+﻿lightkurve.io.k2sff.read\_k2sff\_lightcurve
+===========================================
+
+.. currentmodule:: lightkurve.io.k2sff
+
+.. autofunction:: read_k2sff_lightcurve

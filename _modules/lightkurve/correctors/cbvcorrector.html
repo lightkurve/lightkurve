@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">Lightkurve v2.2</p>
+<p class="title">Lightkurve v2.3</p>
 </a>
 
     
@@ -173,12 +173,13 @@
 <span class="kn">import</span> <span class="nn">urllib.request</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span> <span class="k">as</span> <span class="n">pyfits</span>
 <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
 <span class="kn">from</span> <span class="nn">astropy.time</span> <span class="kn">import</span> <span class="n">Time</span>
 <span class="kn">from</span> <span class="nn">astropy.timeseries</span> <span class="kn">import</span> <span class="n">TimeSeries</span>
-<span class="kn">from</span> <span class="nn">astropy.units</span> <span class="kn">import</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">Unit</span>
+<span class="kn">from</span> <span class="nn">astropy.units</span> <span class="kn">import</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">UnitsWarning</span>
 <span class="kn">from</span> <span class="nn">astropy.utils.decorators</span> <span class="kn">import</span> <span class="n">deprecated</span>
 
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
@@ -1608,7 +1609,14 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Read the columns and meta data</span>
-            <span class="n">dataTbl</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="n">extName</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;fits&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+                <span class="c1"># By default, AstroPy emits noisy warnings about units commonly used</span>
+                <span class="c1"># in archived TESS data products (e.g., &quot;e-/s&quot; and &quot;pixels&quot;).</span>
+                <span class="c1"># We ignore them here because they don&#39;t affect Lightkurve&#39;s features.</span>
+                <span class="c1"># Inconsistencies between TESS data products and the FITS standard</span>
+                <span class="c1"># out to be addressed at the archive level. (See issue #1216.)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">UnitsWarning</span><span class="p">)</span>
+                <span class="n">dataTbl</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="n">extName</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;fits&quot;</span><span class="p">)</span>
             <span class="n">dataTbl</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
             <span class="n">dataTbl</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="n">extName</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
 
@@ -1786,7 +1794,14 @@
         <span class="k">try</span><span class="p">:</span>
 
             <span class="c1"># Read the columns and meta data</span>
-            <span class="n">dataTbl</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="n">extName</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;fits&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+                <span class="c1"># By default, AstroPy emits noisy warnings about units commonly used</span>
+                <span class="c1"># in archived TESS data products (e.g., &quot;e-/s&quot; and &quot;pixels&quot;).</span>
+                <span class="c1"># We ignore them here because they don&#39;t affect Lightkurve&#39;s features.</span>
+                <span class="c1"># Inconsistencies between TESS data products and the FITS standard</span>
+                <span class="c1"># out to be addressed at the archive level. (See issue #1216.)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">UnitsWarning</span><span class="p">)</span>
+                <span class="n">dataTbl</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="n">extName</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;fits&quot;</span><span class="p">)</span>
             <span class="n">dataTbl</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
             <span class="n">dataTbl</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="n">extName</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
 

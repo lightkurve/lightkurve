@@ -1,0 +1,6 @@
+﻿lightkurve.io.qlp.read\_qlp\_lightcurve
+=======================================
+
+.. currentmodule:: lightkurve.io.qlp
+
+.. autofunction:: read_qlp_lightcurve

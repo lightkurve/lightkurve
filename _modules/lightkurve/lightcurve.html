@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.2</p>
+<p class="title">Lightkurve v2.3</p>
 </a>
 
     
@@ -1839,6 +1839,7 @@
         <span class="n">location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">return_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a list of asteroids or comets which affected the light curve.</span>
 
@@ -1889,6 +1890,8 @@
 <span class="sd">            to request the search again.</span>
 <span class="sd">        return_mask: optional, bool</span>
 <span class="sd">            If True will return a boolean mask in time alongside the result</span>
+<span class="sd">        show_progress: optional, bool</span>
+<span class="sd">            If True will display a progress bar during the download</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1961,6 +1964,7 @@
             <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span>
             <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
             <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
+            <span class="n">show_progress</span><span class="o">=</span><span class="n">show_progress</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">return_mask</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">jd</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">epoch</span><span class="p">)</span>

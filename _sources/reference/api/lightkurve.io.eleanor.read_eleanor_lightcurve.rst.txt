@@ -1,0 +1,6 @@
+﻿lightkurve.io.eleanor.read\_eleanor\_lightcurve
+===============================================
+
+.. currentmodule:: lightkurve.io.eleanor
+
+.. autofunction:: read_eleanor_lightcurve

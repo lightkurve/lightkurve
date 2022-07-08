@@ -1,0 +1,6 @@
+﻿lightkurve.io.tasoc.read\_tasoc\_lightcurve
+===========================================
+
+.. currentmodule:: lightkurve.io.tasoc
+
+.. autofunction:: read_tasoc_lightcurve

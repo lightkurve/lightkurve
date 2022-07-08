@@ -103,7 +103,6 @@ Conversions
   LightCurve.to_periodogram
   LightCurve.to_seismology
   LightCurve.to_table
-  LightCurve.read
   LightCurve.write
 
 

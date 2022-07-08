@@ -1,0 +1,6 @@
+﻿lightkurve.config.get\_config\_dir
+==================================
+
+.. currentmodule:: lightkurve.config
+
+.. autofunction:: get_config_dir

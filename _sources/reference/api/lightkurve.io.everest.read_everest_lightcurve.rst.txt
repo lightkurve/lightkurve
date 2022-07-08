@@ -1,0 +1,6 @@
+﻿lightkurve.io.everest.read\_everest\_lightcurve
+===============================================
+
+.. currentmodule:: lightkurve.io.everest
+
+.. autofunction:: read_everest_lightcurve

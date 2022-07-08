@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.2</p>
+<p class="title">Lightkurve v2.3</p>
 </a>
 
     
@@ -230,6 +230,11 @@
    <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.SearchResult.table.html">
      lightkurve.SearchResult.table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.SearchResult.display_extra_columns.html">
+     lightkurve.SearchResult.display_extra_columns
     </a>
    </li>
    <li class="toctree-l2">
@@ -462,11 +467,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.LightCurve.to_table.html">
      lightkurve.LightCurve.to_table
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="api/lightkurve.LightCurve.read.html">
-     lightkurve.LightCurve.read
     </a>
    </li>
    <li class="toctree-l2">
@@ -1147,11 +1147,100 @@
   </ul>
  </li>
  <li class="toctree-l1 has-children">
-  <a class="reference internal" href="misc.html">
-   Miscellaneous utilities
+  <a class="reference internal" href="io.html">
+   Reading Data Products
   </a>
   <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
   <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.read.html">
+     lightkurve.io.read
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.kepler.read_kepler_lightcurve.html">
+     lightkurve.io.kepler.read_kepler_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.everest.read_everest_lightcurve.html">
+     lightkurve.io.everest.read_everest_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.kepseismic.read_kepseismic_lightcurve.html">
+     lightkurve.io.kepseismic.read_kepseismic_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.k2sff.read_k2sff_lightcurve.html">
+     lightkurve.io.k2sff.read_k2sff_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.tess.read_tess_lightcurve.html">
+     lightkurve.io.tess.read_tess_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.cdips.read_cdips_lightcurve.html">
+     lightkurve.io.cdips.read_cdips_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.eleanor.read_eleanor_lightcurve.html">
+     lightkurve.io.eleanor.read_eleanor_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.pathos.read_pathos_lightcurve.html">
+     lightkurve.io.pathos.read_pathos_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.qlp.read_qlp_lightcurve.html">
+     lightkurve.io.qlp.read_qlp_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.io.tasoc.read_tasoc_lightcurve.html">
+     lightkurve.io.tasoc.read_tasoc_lightcurve
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="config.html">
+   Configuration
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.conf.html">
+     lightkurve.conf
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.config.get_config_dir.html">
+     lightkurve.config.get_config_dir
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="misc.html">
+   Miscellaneous utilities
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -1201,6 +1290,11 @@
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#filtering-search-results">
    Filtering search results
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#customizing-search-results-display">
+   Customizing search results display
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -1318,12 +1412,27 @@ For example, a search result can be filtered by exposure time using
 </tbody>
 </table>
 </section>
+<section id="customizing-search-results-display">
+<h2>Customizing search results display<a class="headerlink" href="#customizing-search-results-display" title="Permalink to this headline">¶</a></h2>
+<p>Users can optionally include a list of extra columns in the default display of <a class="reference internal" href="api/lightkurve.SearchResult.html#lightkurve.SearchResult" title="lightkurve.SearchResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult</span></code></a> objects.</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.SearchResult.display_extra_columns.html#lightkurve.SearchResult.display_extra_columns" title="lightkurve.SearchResult.display_extra_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult.display_extra_columns</span></code></a></p></td>
+<td><p>A list of extra columns to be included in the default display of the search result.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="data-products-collection">
 <h2>Data products collection<a class="headerlink" href="#data-products-collection" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="api/lightkurve.SearchResult.download_all.html#lightkurve.SearchResult.download_all" title="lightkurve.SearchResult.download_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult.download_all</span></code></a> returns a <a class="reference internal" href="api/lightkurve.LightCurveCollection.html#lightkurve.LightCurveCollection" title="lightkurve.LightCurveCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveCollection</span></code></a> or a
 <a class="reference internal" href="api/lightkurve.TargetPixelFileCollection.html#lightkurve.TargetPixelFileCollection" title="lightkurve.TargetPixelFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code></a> object. They contain the data products, along with some convenience functions.</p>
 <p>A collection can also be further filtered using standard Python list syntax,
-and a subset of <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> syntax.
+and a subset of <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> syntax.
 For example, a collection can be filtered by TESS sectors using
 <code class="docutils literal notranslate"><span class="pre">lcc[(lcc.sector</span> <span class="pre">&gt;=</span> <span class="pre">13)</span> <span class="pre">&amp;</span> <span class="pre">(lcc.sector</span> <span class="pre">&lt;=</span> <span class="pre">19)]</span></code>.</p>
 <table class="longtable table autosummary">

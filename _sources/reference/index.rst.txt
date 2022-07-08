@@ -18,8 +18,10 @@ methods.
    periodogram
    seismology
    correctors
+   io
+   config
    misc
-   
+
 
 If you are looking for a specific class or function not listed here, try consulting the API index or search page:
 

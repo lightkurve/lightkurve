@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightkurve.io.read &#8212; Lightkurve </title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">Lightkurve v2.3</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../about/index.html">
+  About
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for lightkurve.io.read</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Functions for reading light curve data.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+<span class="kn">from</span> <span class="nn">astropy.utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
+
+<span class="kn">from</span> <span class="nn">.detect</span> <span class="kn">import</span> <span class="n">detect_filetype</span>
+<span class="kn">from</span> <span class="nn">..lightcurve</span> <span class="kn">import</span> <span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="n">TessLightCurve</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">LightkurveDeprecationWarning</span><span class="p">,</span> <span class="n">LightkurveError</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">]</span>
+
+
+<span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;read()&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;DEPRECATED. Please use `lk.read()` instead.</span>
+
+<span class="sd">    This function has been deprecated because its name collides with Python&#39;s</span>
+<span class="sd">    built-in `open()` function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="read"><a class="viewcode-back" href="../../../reference/api/lightkurve.io.read.html#lightkurve.io.read">[docs]</a><span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reads any valid Kepler or TESS data file and returns an instance of</span>
+<span class="sd">    `~lightkurve.lightcurve.LightCurve` or</span>
+<span class="sd">    `TargetPixelFile &lt;../targetpixelfile.html&gt;`_</span>
+
+<span class="sd">    This function will automatically detect the type of the data product, and return the</span>
+<span class="sd">    appropriate object. File types currently supported include::</span>
+
+<span class="sd">        * `KeplerTargetPixelFile` (typical suffix &quot;-targ.fits.gz&quot;);</span>
+<span class="sd">        * `KeplerLightCurve` (typical suffix &quot;llc.fits&quot;);</span>
+<span class="sd">        * `TessTargetPixelFile` (typical suffix &quot;_tp.fits&quot;);</span>
+<span class="sd">        * `TessLightCurve` (typical suffix &quot;_lc.fits&quot;).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path_or_url : str</span>
+<span class="sd">        Path or URL of a FITS file.</span>
+<span class="sd">    quality_bitmask : str or int, optional</span>
+<span class="sd">        Bitmask (integer) which identifies the quality flag bitmask that should</span>
+<span class="sd">        be used to mask out bad cadences. If a string is passed, it has the</span>
+<span class="sd">        following meaning:</span>
+
+<span class="sd">            * &quot;none&quot;: no cadences will be ignored</span>
+<span class="sd">            * &quot;default&quot;: cadences with severe quality issues will be ignored</span>
+<span class="sd">            * &quot;hard&quot;: more conservative choice of flags to ignore</span>
+<span class="sd">              This is known to remove good data.</span>
+<span class="sd">            * &quot;hardest&quot;: removes all data that has been flagged</span>
+<span class="sd">              This mask is not recommended.</span>
+
+<span class="sd">        See the :class:`KeplerQualityFlags &lt;lightkurve.utils.KeplerQualityFlags&gt;` or :class:`TessQualityFlags &lt;lightkurve.utils.TessQualityFlags&gt;` class for details on the bitmasks.</span>
+<span class="sd">    flux_column : str, optional</span>
+<span class="sd">        (Applicable to LightCurve products only) The column in the FITS file to be read as `flux`. Defaults to &#39;pdcsap_flux&#39;.</span>
+<span class="sd">        Typically &#39;pdcsap_flux&#39; or &#39;sap_flux&#39;.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Dictionary of arguments to be passed to underlying data product type specific reader.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data : a subclass of `~lightkurve.lightcurve.LightCurve` or `TargetPixelFile &lt;../targetpixelfile.html&gt;`_</span>
+<span class="sd">           depending on the detected file type.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError : raised if the data product is not recognized as a Kepler or TESS product.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    To read a target pixel file using its path or URL, simply use:</span>
+
+<span class="sd">        &gt;&gt;&gt; import lightkurve as lk</span>
+<span class="sd">        &gt;&gt;&gt; tpf = lk.read(&quot;mytpf.fits&quot;)  # doctest: +SKIP</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Opening </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">))</span>
+    <span class="c1"># pass header into `detect_filetype()`</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">)</span> <span class="k">as</span> <span class="n">temp</span><span class="p">:</span>
+            <span class="n">filetype</span> <span class="o">=</span> <span class="n">detect_filetype</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Detected filetype: &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">filetype</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Raise an explicit FileNotFoundError if file not found</span>
+        <span class="k">if</span> <span class="s2">&quot;No such file&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;KeplerLightCurve&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">KeplerLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;kepler&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;TessLightCurve&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TessLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;tess&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;QLP&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TessLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;qlp&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;ELEANOR&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TessLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;eleanor&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;PATHOS&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TessLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;pathos&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;CDIPS&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TessLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;cdips&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;TASOC&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TessLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;tasoc&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;K2SFF&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">KeplerLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;k2sff&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;EVEREST&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">KeplerLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;everest&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;KEPSEISMIC&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">KeplerLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;kepseismic&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="c1"># ensure path_or_url is in the error</span>
+        <span class="k">raise</span> <span class="n">LightkurveError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Error in reading Data product </span><span class="si">{</span><span class="n">path_or_url</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s2"> .</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;This file may be corrupt due to an interrupted download. &quot;</span>
+            <span class="s2">&quot;Please remove it from your disk and try again.&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+
+    <span class="c1"># Official data products;</span>
+    <span class="c1"># if the filetype is recognized, instantiate a class of that name</span>
+    <span class="k">if</span> <span class="n">filetype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;lightkurve&quot;</span><span class="p">),</span> <span class="n">filetype</span><span class="p">)(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LightkurveError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Data product f</span><span class="si">{</span><span class="n">path_or_url</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s2"> is not supported &quot;</span> <span class="s2">&quot;in this version of Lightkurve.&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># if these keywords don&#39;t exist, raise `ValueError`</span>
+        <span class="k">raise</span> <span class="n">LightkurveError</span><span class="p">(</span>
+            <span class="s2">&quot;Not recognized as a supported data product:</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_or_url</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;This file may be corrupt due to an interrupted download. &quot;</span>
+            <span class="s2">&quot;Please remove it from your disk and try again.&quot;</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

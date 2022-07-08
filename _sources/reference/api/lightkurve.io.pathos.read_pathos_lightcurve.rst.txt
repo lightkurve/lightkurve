@@ -1,0 +1,6 @@
+﻿lightkurve.io.pathos.read\_pathos\_lightcurve
+=============================================
+
+.. currentmodule:: lightkurve.io.pathos
+
+.. autofunction:: read_pathos_lightcurve

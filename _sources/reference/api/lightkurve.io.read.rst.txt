@@ -1,0 +1,6 @@
+﻿lightkurve.io.read
+==================
+
+.. currentmodule:: lightkurve.io
+
+.. autofunction:: read

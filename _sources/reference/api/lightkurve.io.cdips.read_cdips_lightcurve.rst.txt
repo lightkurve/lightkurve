@@ -1,0 +1,6 @@
+﻿lightkurve.io.cdips.read\_cdips\_lightcurve
+===========================================
+
+.. currentmodule:: lightkurve.io.cdips
+
+.. autofunction:: read_cdips_lightcurve

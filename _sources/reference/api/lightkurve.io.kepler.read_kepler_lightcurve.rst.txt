@@ -1,0 +1,6 @@
+﻿lightkurve.io.kepler.read\_kepler\_lightcurve
+=============================================
+
+.. currentmodule:: lightkurve.io.kepler
+
+.. autofunction:: read_kepler_lightcurve

@@ -1,0 +1,6 @@
+﻿lightkurve.io.tess.read\_tess\_lightcurve
+=========================================
+
+.. currentmodule:: lightkurve.io.tess
+
+.. autofunction:: read_tess_lightcurve
