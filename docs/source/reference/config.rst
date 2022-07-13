@@ -29,7 +29,7 @@ Access configuration values
 Default Cache Directory Migration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Starting from ``Lightkurve`` version ``2.3.0``, the default cache directory is
+Starting from ``Lightkurve`` version ``2.4.0``, the default cache directory is
 at ``~/.lightkurve/cache`` . The data files cached at the legacy location,
 ``~/.lightkurve-cache``, will not be used.
 
