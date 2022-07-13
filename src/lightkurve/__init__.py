@@ -57,6 +57,19 @@ class Conf(_config.ConfigNamespace):
 
     Refer to `Astropy documentation <https://docs.astropy.org/en/stable/config/index.html#accessing-values>`_
     for usage.
+
+    The attributes listed below are the available configuration parameters.
+
+    Attributes
+    ----------
+    search_result_display_extra_columns
+        List of extra columns to be included when displaying a SearchResult object.
+
+    cache_dir
+        Default cache directory for data files downloaded, etc. Defaults to ``~/.lightkurve/cache`` if not specified.
+
+    warn_legacy_cache_dir
+        If set to True, issue warning if the legacy default cache directory exists. Default is True.
     """
     # Note: when using list or string_list datatype,
     # the behavior of astropy's parsing of the config file value:
@@ -71,6 +84,19 @@ class Conf(_config.ConfigNamespace):
         module="lightkurve.search"
     )
 
+    cache_dir = _config.ConfigItem(
+        None,
+        "Default cache directory for data files downloaded, etc.",
+        cfgtype="string",
+        module="lightkurve.config"
+    )
+
+    warn_legacy_cache_dir = _config.ConfigItem(
+        True,
+        "If set to True, issue warning if the legacy default cache directory exists.",
+        cfgtype="boolean",
+        module="lightkurve.config"
+    )
 
 conf = Conf()
 
@@ -87,3 +113,6 @@ from .convenience import *
 from .collections import *
 from .io import *
 from .search import *
+
+from . import config
+config.warn_if_default_cache_dir_migration_needed()

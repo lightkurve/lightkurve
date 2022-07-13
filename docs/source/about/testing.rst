@@ -46,6 +46,17 @@ Running some of our tests requires external data, e.g. some require data to be d
 
     poetry run pytest test_targetpixelfile.py --remote-data
 
+.. note::
+    To speed up the tests, you can instruct the tests use a specific directory for data file cache, so that when the tests are re-run,
+    data files in the local directory will be used, instead of being downloaded over the network.
+
+    Specify the data file cache directory via `XDG_CACHE_HOME` environment variable. For example,
+
+    .. code-block:: bash
+
+        $ XDG_CACHE_HOME=/my_dev/lk-test-cache poetry run pytest test_targetpixelfile.py --remote-data
+
+    The data files will be cached at `/my_dev/lk-test-cache/lightkurve` in the above example.
 
 
 My tests passed, but I got warning messages
