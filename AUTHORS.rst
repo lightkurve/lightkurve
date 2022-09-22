@@ -15,7 +15,7 @@ developer, please open an issue!
 - `Jessie Dotson <https://github.com/jessie-dotson>`_
 - `Nicholas Saunders <https://github.com/nksaunders>`_
 - `Michael Gully-Santiago <https://github.com/gully>`_
-- `Daniel Hey <https://github.com/danielhey>`_
+- `Daniel Hey <https://github.com/danhey>`_
 - `Oliver Hall <https://github.com/ojhall94>`_
 
 
