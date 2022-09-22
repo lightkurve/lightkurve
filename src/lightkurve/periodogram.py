@@ -69,30 +69,41 @@ class Periodogram(object):
     power = None
     """The array of power values."""
 
-    def __init__(self, frequency, power, nyquist=None, label=None,
-                 targetid=None, xunit="day", yunit="",
-                 meta={}, **kwargs):
+    def __init__(
+        self,
+        frequency,
+        power,
+        nyquist=None,
+        label=None,
+        targetid=None,
+        xunit="day",
+        yunit="",
+        meta={},
+        **kwargs
+    ):
         # The `default_view` argument was removed in Lightkurve v1.10
         if "default_view" in kwargs:
-            warnings.warn("the `default_view` argument has been removed, "
-                          "please use `xunit` and `yunit` instead.",
-                          LightkurveWarning)
+            warnings.warn(
+                "the `default_view` argument has been removed, "
+                "please use `xunit` and `yunit` instead.",
+                LightkurveWarning,
+            )
 
         # Input validation
         if not isinstance(frequency, u.quantity.Quantity):
-            raise ValueError('frequency must be an `astropy.units.Quantity` object.')
+            raise ValueError("frequency must be an `astropy.units.Quantity` object.")
         if not isinstance(power, u.quantity.Quantity):
-            raise ValueError('power must be an `astropy.units.Quantity` object.')
+            raise ValueError("power must be an `astropy.units.Quantity` object.")
         # Frequency must have frequency units
         try:
             frequency.to(u.Hz)
         except u.UnitConversionError:
-            raise ValueError('Frequency must be in units of 1/time.')
+            raise ValueError("Frequency must be in units of 1/time.")
         # Frequency and power must have sensible shapes
         if frequency.shape[0] <= 1:
-            raise ValueError('frequency and power must have a length greater than 1.')
+            raise ValueError("frequency and power must have a length greater than 1.")
         if frequency.shape != power.shape:
-            raise ValueError('frequency and power must have the same length.')
+            raise ValueError("frequency and power must have the same length.")
 
         self.frequency = frequency
         self.power = power
@@ -288,8 +299,18 @@ class Periodogram(object):
             smooth_pg.power = u.Quantity(bkg, self.power.unit)
             return smooth_pg
 
-    def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
-             style='lightkurve', xunit=None, yunit=None, **kwargs):
+    def plot(
+        self,
+        scale="linear",
+        ax=None,
+        xlabel=None,
+        ylabel=None,
+        title="",
+        style="lightkurve",
+        xunit=None,
+        yunit=None,
+        **kwargs
+    ):
         """Plots the Periodogram.
         Parameters
         ----------
@@ -321,9 +342,11 @@ class Periodogram(object):
         """
         # The `view` argument was removed in Lightkurve v1.10
         if "view" in kwargs:
-            warnings.warn("the `view` argument has been removed, please use "
-                          "the `xunit` and `yunit` arguments instead.",
-                          LightkurveWarning)
+            warnings.warn(
+                "the `view` argument has been removed, please use "
+                "the `xunit` and `yunit` arguments instead.",
+                LightkurveWarning,
+            )
             if not xunit:
                 xunit = "day" if kwargs.pop("view") == "period" else "microhertz"
 
@@ -335,17 +358,17 @@ class Periodogram(object):
 
         # Set default labels
         if xlabel is None:
-            xlabel = "{} [{}]".format(xunit_type, xunit.to_string('latex'))
+            xlabel = "{} [{}]".format(xunit_type, xunit.to_string("latex"))
         if ylabel is None:
             if yunit == "":
                 ylabel = "{} [normalized]".format(yunit_type)
             else:
-                ylabel = "{} [{}]".format(yunit_type, yunit.to_string('latex'))
-        if ('label' not in kwargs):
-            kwargs['label'] = self.label
+                ylabel = "{} [{}]".format(yunit_type, yunit.to_string("latex"))
+        if "label" not in kwargs:
+            kwargs["label"] = self.label
 
         # What data to plot on X axis?
-        if xunit_type == 'Period':
+        if xunit_type == "Period":
             xdata = self.period.to(xunit)
         else:
             xdata = self.frequency.to(xunit)
@@ -354,7 +377,7 @@ class Periodogram(object):
         ydata = self.power.to(yunit)
 
         # Make the plot
-        if style is None or style == 'lightkurve':
+        if style is None or style == "lightkurve":
             style = MPLSTYLE
         with plt.style.context(style):
             if ax is None:
@@ -364,8 +387,8 @@ class Periodogram(object):
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
             legend_labels = ax.get_legend_handles_labels()
-            if (np.sum([len(a) for a in legend_labels]) != 0):
-                ax.legend(loc='best')
+            if np.sum([len(a) for a in legend_labels]) != 0:
+                ax.legend(loc="best")
             ax.set_yscale(scale)
             ax.set_xscale(scale)
             ax.set_title(title)
@@ -626,7 +649,9 @@ class LombScarglePeriodogram(Periodogram):
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
     def __repr__(self):
-        return("LombScarglePeriodogram(ID: {}, normalization: {})".format(self.label, self.normalization))
+        return "LombScarglePeriodogram(ID: {}, normalization: {})".format(
+            self.label, self.normalization
+        )
 
     @staticmethod
     def from_lightcurve(
@@ -640,7 +665,8 @@ class LombScarglePeriodogram(Periodogram):
         nterms=1,
         nyquist_factor=1,
         oversample_factor=None,
-        xunit=None, yunit=None,
+        xunit=None,
+        yunit=None,
         normalization="amplitude",
         ls_method="fast",
         **kwargs
@@ -774,7 +800,9 @@ class LombScarglePeriodogram(Periodogram):
         """
         # Input validation
         normalization = validate_method(normalization, ["psd", "amplitude"])
-        if np.isnan(lc.flux).any() or (hasattr(lc.flux, 'unmasked') and np.isnan(lc.flux.unmasked).any()):
+        if np.isnan(lc.flux).any() or (
+            hasattr(lc.flux, "unmasked") and np.isnan(lc.flux.unmasked).any()
+        ):
             lc = lc.remove_nans()
             log.debug(
                 "Lightcurve contains NaN values."
@@ -786,9 +814,10 @@ class LombScarglePeriodogram(Periodogram):
             oversample_factor = 5.0
 
         if "freq_unit" in kwargs:
-            warnings.warn("`freq_unit` keyword is deprecated, "
-                          "please use `xunit` instead.",
-                          LightkurveWarning)
+            warnings.warn(
+                "`freq_unit` keyword is deprecated, " "please use `xunit` instead.",
+                LightkurveWarning,
+            )
             if xunit is None:
                 xunit = kwargs.pop("freq_unit")
             else:
@@ -824,10 +853,10 @@ class LombScarglePeriodogram(Periodogram):
             maximum_frequency = kwargs.pop("max_frequency", None)
 
         if xunit is None:
-            xunit = "1/day" if normalization == 'amplitude' else "microhertz"
+            xunit = "1/day" if normalization == "amplitude" else "microhertz"
         if yunit is None:
             # This should default to yunit / xunit for PSD
-            yunit = lc.flux.unit if normalization == 'amplitude' else "ppm^2/uHz"
+            yunit = lc.flux.unit if normalization == "amplitude" else "ppm^2/uHz"
 
         # Validate user input
         xunit = _validate_unit(xunit)
@@ -848,16 +877,18 @@ class LombScarglePeriodogram(Periodogram):
         if xunit.physical_type == "frequency":
             freq_unit = xunit
         else:  # time unit
-            freq_unit = 1./xunit
+            freq_unit = 1.0 / xunit
         # Ensure the time stamps are in days
-        if lc.time.format in ['bkjd', 'btjd', 'd', 'days', 'day', 'jd', None]:
+        if lc.time.format in ["bkjd", "btjd", "d", "days", "day", "jd", None]:
             time = lc.time.value.copy() * u.day
         else:
-            raise NotImplementedError('time in format {} is not supported.'.format(lc.time_format))
+            raise NotImplementedError(
+                "time in format {} is not supported.".format(lc.time_format)
+            )
 
         # Approximate Nyquist Frequency and frequency bin width in terms of days
-        nyquist = (0.5 * (1./(np.median(np.diff(time))))).to(freq_unit)
-        fs = ((1./(time[-1] - time[0])) / oversample_factor).to(freq_unit)
+        nyquist = (0.5 * (1.0 / (np.median(np.diff(time))))).to(freq_unit)
+        fs = ((1.0 / (time[-1] - time[0])) / oversample_factor).to(freq_unit)
 
         # Warn if there is confusing input
         if (frequency is not None) & (
@@ -885,8 +916,8 @@ class LombScarglePeriodogram(Periodogram):
             # maximum_frequency MUST be none by this point.
             maximum_frequency = 1.0 / minimum_period
         # If the user specified a period, copy it into the frequency.
-        if (period is not None):
-            frequency = 1. / period
+        if period is not None:
+            frequency = 1.0 / period
 
         # Default frequency grid
         if frequency is None:
@@ -894,12 +925,20 @@ class LombScarglePeriodogram(Periodogram):
                 minimum_frequency = u.Quantity(minimum_frequency, freq_unit)
             if maximum_frequency is not None:
                 maximum_frequency = u.Quantity(maximum_frequency, freq_unit)
-            if minimum_period is not None and maximum_period is not None \
-                and (minimum_period > maximum_period):
-                    raise ValueError('minimum_period cannot be larger than maximum_period')
-            if minimum_frequency is not None and maximum_frequency is not None \
-                and (minimum_frequency > maximum_frequency):
-                    raise ValueError('minimum_frequency cannot be larger than maximum_frequency')
+            if (
+                minimum_period is not None
+                and maximum_period is not None
+                and (minimum_period > maximum_period)
+            ):
+                raise ValueError("minimum_period cannot be larger than maximum_period")
+            if (
+                minimum_frequency is not None
+                and maximum_frequency is not None
+                and (minimum_frequency > maximum_frequency)
+            ):
+                raise ValueError(
+                    "minimum_frequency cannot be larger than maximum_frequency"
+                )
             # If nothing has been passed in, set them to the defaults
             if minimum_frequency is None:
                 minimum_frequency = fs
@@ -907,9 +946,9 @@ class LombScarglePeriodogram(Periodogram):
                 maximum_frequency = nyquist * nyquist_factor
 
             # Create frequency grid evenly spaced in frequency
-            frequency = np.arange(minimum_frequency.value,
-                                  maximum_frequency.value,
-                                  fs.to(freq_unit).value)
+            frequency = np.arange(
+                minimum_frequency.value, maximum_frequency.value, fs.to(freq_unit).value
+            )
 
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
@@ -949,10 +988,10 @@ class LombScarglePeriodogram(Periodogram):
             LS = LombScargle(time, lc.flux, nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization="psd")
 
-        if normalization == 'psd':  # Power spectral density
-            power =  (power * 2. / (len(time) * oversample_factor * fs)).to(yunit)
+        if normalization == "psd":  # Power spectral density
+            power = (power * 2.0 / (len(time) * oversample_factor * fs)).to(yunit)
         elif normalization == "amplitude":
-            power = (np.sqrt(power) * np.sqrt(4./len(time))).to(yunit)
+            power = (np.sqrt(power) * np.sqrt(4.0 / len(time))).to(yunit)
 
         # Periodogram needs properties
         return LombScarglePeriodogram(
@@ -961,14 +1000,13 @@ class LombScarglePeriodogram(Periodogram):
             nyquist=nyquist,
             targetid=lc.meta.get("TARGETID"),
             label=lc.meta.get("LABEL"),
-            # default_view=default_view,
             ls_obj=LS,
             nterms=nterms,
             ls_method=ls_method,
-            xunit=xunit, 
+            xunit=xunit,
             yunit=yunit,
             meta=lc.meta,
-            normalization=normalization
+            normalization=normalization,
         )
 
     def model(self, time, frequency=None):
@@ -1015,10 +1053,11 @@ class LombScarglePeriodogram(Periodogram):
             The matplotlib axes object.
         """
         ax = super(LombScarglePeriodogram, self).plot(**kwargs)
-        if self.normalization == 'psd':
-            ax.set_xscale('log')
-            ax.set_yscale('log')
+        if self.normalization == "psd":
+            ax.set_xscale("log")
+            ax.set_yscale("log")
         return ax
+
 
 class BoxLeastSquaresPeriodogram(Periodogram):
     """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
@@ -1350,6 +1389,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             "`smooth` is not implemented for `BoxLeastSquaresPeriodogram`. "
         )
 
+
 def _validate_unit(unit, default=None):
     if unit is None:
         return default
@@ -1360,13 +1400,22 @@ def _validate_unit(unit, default=None):
     except ValueError as e:
         raise ValueError("invalid unit: {}".format(e))
 
+
 def _unit2label(unit):
     if unit in ["", "percent", "ppt", "ppm", "mag"]:
         return "Amplitude"
     elif unit in ["percent^2", "ppt^2", "ppm^2", "mag^2"]:
         return "Power"
-    elif unit in ["percent^2 / Hz", "ppt^2 / Hz", "ppm^2 / Hz", "mag^2 / Hz",
-                  "percent^2 / microhertz", "ppt^2 / microhertz", "ppm^2 / microhertz", "mag^2 / microhertz"]:
+    elif unit in [
+        "percent^2 / Hz",
+        "ppt^2 / Hz",
+        "ppm^2 / Hz",
+        "mag^2 / Hz",
+        "percent^2 / microhertz",
+        "ppt^2 / microhertz",
+        "ppm^2 / microhertz",
+        "mag^2 / microhertz",
+    ]:
         return "Power Spectral Density"
     elif unit.physical_type == "frequency":
         return "Frequency"
