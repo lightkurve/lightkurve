@@ -862,7 +862,7 @@ class LombScarglePeriodogram(Periodogram):
         else:  # time unit
             freq_unit = 1./xunit
         # Ensure the time stamps are in days
-        if lc.time.format in ['bkjd', 'btjd', 'd', 'days', 'day', None]:
+        if lc.time.format in ['bkjd', 'btjd', 'd', 'days', 'day', 'jd', None]:
             time = lc.time.value.copy() * u.day
         else:
             raise NotImplementedError('time in format {} is not supported.'.format(lc.time_format))
