@@ -414,6 +414,7 @@ class Periodogram(object):
             snr_pg.power,
             nyquist=self.nyquist,
             targetid=self.targetid,
+            xunit=self.xunit,
             label=self.label,
             meta=self.meta,
         )
@@ -826,8 +827,7 @@ class LombScarglePeriodogram(Periodogram):
             xunit = "1/day" if normalization == 'amplitude' else "microhertz"
         if yunit is None:
             # This should default to yunit / xunit for PSD
-            yunit = u.dimensionless_unscaled if normalization == 'amplitude' else "1/uHz"
-            # yunit = u.dimensionless_unscaled
+            yunit = u.dimensionless_unscaled if normalization == 'amplitude' else "ppm^2/uHz"
 
         # Validate user input
         xunit = _validate_unit(xunit)
@@ -838,12 +838,6 @@ class LombScarglePeriodogram(Periodogram):
         if lc.flux.unit is not None and lc.flux.unit.physical_type != 'dimensionless':
             if yunit.physical_type in ['dimensionless', 'time']:
                 lc = lc.normalize()
-
-        # Check if any values of period have been passed and set format accordingly
-        if not all(b is None for b in [period, minimum_period, maximum_period]):
-            default_view = "period"
-        else:
-            default_view = "frequency"
 
         # If period and frequency keywords have both been set, throw an error
         if (not all(b is None for b in [period, minimum_period, maximum_period])) & (
@@ -973,7 +967,7 @@ class LombScarglePeriodogram(Periodogram):
             nyquist=nyquist,
             targetid=lc.meta.get("TARGETID"),
             label=lc.meta.get("LABEL"),
-            default_view=default_view,
+            # default_view=default_view,
             ls_obj=LS,
             nterms=nterms,
             ls_method=ls_method,
@@ -1012,6 +1006,25 @@ class LombScarglePeriodogram(Periodogram):
         )
         return lc.normalize()
 
+    def plot(self, **kwargs):
+        """Plot the spectrum using matplotlib's `plot` method.
+        See `Periodogram.plot` for details on the accepted arguments.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments ot be passed to `Periodogram.plot`.
+
+        Returns
+        -------
+        ax : `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+        ax = super(LombScarglePeriodogram, self).plot(**kwargs)
+        if self.normalization == 'psd':
+            ax.set_xscale('log')
+            ax.set_yscale('log')
+        return ax
 
 class BoxLeastSquaresPeriodogram(Periodogram):
     """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
