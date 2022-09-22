@@ -69,38 +69,38 @@ class Periodogram(object):
     power = None
     """The array of power values."""
 
-    def __init__(
-        self,
-        frequency,
-        power,
-        nyquist=None,
-        label=None,
-        targetid=None,
-        default_view="frequency",
-        meta={},
-    ):
+    def __init__(self, frequency, power, nyquist=None, label=None,
+                 targetid=None, xunit="day", yunit="",
+                 meta={}, **kwargs):
+        # The `default_view` argument was removed in Lightkurve v1.10
+        if "default_view" in kwargs:
+            warnings.warn("the `default_view` argument has been removed, "
+                          "please use `xunit` and `yunit` instead.",
+                          LightkurveWarning)
+
         # Input validation
         if not isinstance(frequency, u.quantity.Quantity):
-            raise ValueError("frequency must be an `astropy.units.Quantity` object.")
+            raise ValueError('frequency must be an `astropy.units.Quantity` object.')
         if not isinstance(power, u.quantity.Quantity):
-            raise ValueError("power must be an `astropy.units.Quantity` object.")
+            raise ValueError('power must be an `astropy.units.Quantity` object.')
         # Frequency must have frequency units
         try:
             frequency.to(u.Hz)
         except u.UnitConversionError:
-            raise ValueError("Frequency must be in units of 1/time.")
+            raise ValueError('Frequency must be in units of 1/time.')
         # Frequency and power must have sensible shapes
         if frequency.shape[0] <= 1:
-            raise ValueError("frequency and power must have a length greater than 1.")
+            raise ValueError('frequency and power must have a length greater than 1.')
         if frequency.shape != power.shape:
-            raise ValueError("frequency and power must have the same length.")
+            raise ValueError('frequency and power must have the same length.')
 
         self.frequency = frequency
         self.power = power
         self.nyquist = nyquist
         self.label = label
         self.targetid = targetid
-        self.default_view = self._validate_view(default_view)
+        self.xunit = _validate_unit(xunit)
+        self.yunit = _validate_unit(yunit)
         self.meta = meta
 
     def _validate_view(self, view):
@@ -288,20 +288,9 @@ class Periodogram(object):
             smooth_pg.power = u.Quantity(bkg, self.power.unit)
             return smooth_pg
 
-    def plot(
-        self,
-        scale="linear",
-        ax=None,
-        xlabel=None,
-        ylabel=None,
-        title="",
-        style="lightkurve",
-        view=None,
-        unit=None,
-        **kwargs
-    ):
+    def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
+             style='lightkurve', xunit=None, yunit=None, **kwargs):
         """Plots the Periodogram.
-
         Parameters
         ----------
         scale: str
@@ -319,65 +308,64 @@ class Periodogram(object):
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
-        view : str
-            {'frequency', 'period'}. Default 'frequency'. If 'frequency', x-axis
-            units will be frequency. If 'period', the x-axis units will be
-            period and 'log' scale.
+        xunit : str or `~astropy.units.quantity.Quantity`
+            Unit to show on the X axis.
+        yunit : str or `~astropy.units.quantity.Quantity`
+            Unit to show on the Y axis.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
-
         Returns
         -------
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        if isinstance(unit, u.quantity.Quantity):
-            unit = unit.unit
+        # The `view` argument was removed in Lightkurve v1.10
+        if "view" in kwargs:
+            warnings.warn("the `view` argument has been removed, please use "
+                          "the `xunit` and `yunit` arguments instead.",
+                          LightkurveWarning)
+            if not xunit:
+                xunit = "day" if kwargs.pop("view") == "period" else "microhertz"
 
-        view = self._validate_view(view)
+        # Validate units
+        xunit = _validate_unit(xunit, default=self.xunit)
+        yunit = _validate_unit(yunit, default=self.yunit)
+        xunit_type = _unit2label(xunit)
+        yunit_type = _unit2label(yunit)
 
-        if unit is None:
-            unit = self.frequency.unit
-            if view == "period":
-                unit = self.period.unit
-
-        if style is None or style == "lightkurve":
-            style = MPLSTYLE
+        # Set default labels
+        if xlabel is None:
+            xlabel = "{} [{}]".format(xunit_type, xunit.to_string('latex'))
         if ylabel is None:
-            ylabel = "Power"
-            if self.power.unit.to_string() != "":
-                unit_label = self.power.unit.to_string("latex")
-                # The line below is a workaround for AstroPy bug #9218.
-                # It can be removed once the fix for that issue is widespread.
-                # See https://github.com/astropy/astropy/pull/9218
-                unit_label = re.sub(
-                    r"\^{([^}]+)}\^{([^}]+)}", r"^{\g<1>^{\g<2>}}", unit_label
-                )
-                ylabel += " [{}]".format(unit_label)
+            if yunit == "":
+                ylabel = "{} [normalized]".format(yunit_type)
+            else:
+                ylabel = "{} [{}]".format(yunit_type, yunit.to_string('latex'))
+        if ('label' not in kwargs):
+            kwargs['label'] = self.label
 
-        # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
-        if ("label" not in kwargs) and ("label" in dir(self)):
-            kwargs["label"] = self.label
+        # What data to plot on X axis?
+        if xunit_type == 'Period':
+            xdata = self.period.to(xunit)
+        else:
+            xdata = self.frequency.to(xunit)
 
+        # What data to plot on Y axis?
+        ydata = self.power.to(yunit)
+
+        # Make the plot
+        if style is None or style == 'lightkurve':
+            style = MPLSTYLE
         with plt.style.context(style):
             if ax is None:
-                fig, ax = plt.subplots()
-
-            # Plot frequency and power
-            if view == "frequency":
-                ax.plot(self.frequency.to(unit), self.power, **kwargs)
-                if xlabel is None:
-                    xlabel = "Frequency [{}]".format(unit.to_string("latex"))
-            elif view == "period":
-                ax.plot(self.period.to(unit), self.power, **kwargs)
-                if xlabel is None:
-                    xlabel = "Period [{}]".format(unit.to_string("latex"))
+                _, ax = plt.subplots()
+            ax.plot(xdata, ydata, **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
             legend_labels = ax.get_legend_handles_labels()
-            if np.sum([len(a) for a in legend_labels]) != 0:
-                ax.legend(loc="best")
+            if (np.sum([len(a) for a in legend_labels]) != 0):
+                ax.legend(loc='best')
             ax.set_yscale(scale)
             ax.set_xscale(scale)
             ax.set_title(title)
@@ -837,6 +825,7 @@ class LombScarglePeriodogram(Periodogram):
         if xunit is None:
             xunit = "1/day" if normalization == 'amplitude' else "microhertz"
         if yunit is None:
+            # This should default to yunit / xunit for PSD
             yunit = u.dimensionless_unscaled if normalization == 'amplitude' else "1/uHz"
             # yunit = u.dimensionless_unscaled
 
@@ -975,7 +964,7 @@ class LombScarglePeriodogram(Periodogram):
         if normalization == 'psd':  # Power spectral density
             power =  (power * 2. / (len(time) * oversample_factor * fs)).to(yunit)
         elif normalization == "amplitude":
-            power = (np.sqrt(power) * np.sqrt(4./len(lc.time))).to(yunit)
+            power = (np.sqrt(power) * np.sqrt(4./len(time))).to(yunit)
 
         # Periodogram needs properties
         return LombScarglePeriodogram(
@@ -988,6 +977,8 @@ class LombScarglePeriodogram(Periodogram):
             ls_obj=LS,
             nterms=nterms,
             ls_method=ls_method,
+            xunit=xunit, 
+            yunit=yunit,
             meta=lc.meta,
             normalization=normalization
         )
@@ -1361,3 +1352,16 @@ def _validate_unit(unit, default=None):
         return u.Unit(unit)
     except ValueError as e:
         raise ValueError("invalid unit: {}".format(e))
+
+def _unit2label(unit):
+    if unit in ["", "percent", "ppt", "ppm", "mag"]:
+        return "Amplitude"
+    elif unit in ["percent^2", "ppt^2", "ppm^2", "mag^2"]:
+        return "Power"
+    elif unit in ["percent^2 / Hz", "ppt^2 / Hz", "ppm^2 / Hz", "mag^2 / Hz",
+                  "percent^2 / microhertz", "ppt^2 / microhertz", "ppm^2 / microhertz", "mag^2 / microhertz"]:
+        return "Power Spectral Density"
+    elif unit.physical_type == "frequency":
+        return "Frequency"
+    elif unit.physical_type == "time":
+        return "Period"
