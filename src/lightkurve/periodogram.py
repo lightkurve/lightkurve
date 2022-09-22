@@ -633,10 +633,11 @@ class LombScarglePeriodogram(Periodogram):
         self._LS_object = kwargs.pop("ls_obj", None)
         self.nterms = kwargs.pop("nterms", 1)
         self.ls_method = kwargs.pop("ls_method", "fastchi2")
+        self.normalization = kwargs.pop("normalization")
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
     def __repr__(self):
-        return "LombScarglePeriodogram(ID: {})".format(self.label)
+        return("LombScarglePeriodogram(ID: {}, normalization: {})".format(self.label, self.normalization))
 
     @staticmethod
     def from_lightcurve(
@@ -650,7 +651,7 @@ class LombScarglePeriodogram(Periodogram):
         nterms=1,
         nyquist_factor=1,
         oversample_factor=None,
-        freq_unit=None,
+        xunit=None, yunit=None,
         normalization="amplitude",
         ls_method="fast",
         **kwargs
@@ -791,13 +792,18 @@ class LombScarglePeriodogram(Periodogram):
                 "These are removed before creating the periodogram."
             )
 
-        # Setting default frequency units
-        if freq_unit is None:
-            freq_unit = 1 / u.day if normalization == "amplitude" else u.microhertz
-
         # Default oversample factor
         if oversample_factor is None:
-            oversample_factor = 5.0 if normalization == "amplitude" else 1.0
+            oversample_factor = 5.0
+
+        if "freq_unit" in kwargs:
+            warnings.warn("`freq_unit` keyword is deprecated, "
+                          "please use `xunit` instead.",
+                          LightkurveWarning)
+            if xunit is None:
+                xunit = kwargs.pop("freq_unit")
+            else:
+                kwargs.pop("freq_unit")
 
         if "min_period" in kwargs:
             warnings.warn(
@@ -828,6 +834,22 @@ class LombScarglePeriodogram(Periodogram):
             )
             maximum_frequency = kwargs.pop("max_frequency", None)
 
+        if xunit is None:
+            xunit = "1/day" if normalization == 'amplitude' else "microhertz"
+        if yunit is None:
+            yunit = u.dimensionless_unscaled if normalization == 'amplitude' else "1/uHz"
+            # yunit = u.dimensionless_unscaled
+
+        # Validate user input
+        xunit = _validate_unit(xunit)
+        yunit = _validate_unit(yunit)
+
+        # Ensure the light curve is normalized if the requested yunit is dimensionless
+        # or 'time' (because ppm**2/hz is a unit of time)
+        if lc.flux.unit is not None and lc.flux.unit.physical_type != 'dimensionless':
+            if yunit.physical_type in ['dimensionless', 'time']:
+                lc = lc.normalize()
+
         # Check if any values of period have been passed and set format accordingly
         if not all(b is None for b in [period, minimum_period, maximum_period]):
             default_view = "period"
@@ -845,15 +867,20 @@ class LombScarglePeriodogram(Periodogram):
                 "Please only use one."
             )
 
-        time = lc.time.copy()
+        # What unit will the frequency grid be in?
+        if xunit.physical_type == "frequency":
+            freq_unit = xunit
+        else:  # time unit
+            freq_unit = 1./xunit
+        # Ensure the time stamps are in days
+        if lc.time.format in ['bkjd', 'btjd', 'd', 'days', 'day', None]:
+            time = lc.time.value.copy() * u.day
+        else:
+            raise NotImplementedError('time in format {} is not supported.'.format(lc.time_format))
 
         # Approximate Nyquist Frequency and frequency bin width in terms of days
-        nyquist = 0.5 * (1.0 / (np.median(np.diff(time.value)))) * (1 / cds.d)
-        fs = (1.0 / (time[-1] - time[0])) / oversample_factor
-
-        # Convert these values to requested frequency unit
-        nyquist = nyquist.to(freq_unit)
-        fs = fs.to(freq_unit)
+        nyquist = (0.5 * (1./(np.median(np.diff(time))))).to(freq_unit)
+        fs = ((1./(time[-1] - time[0])) / oversample_factor).to(freq_unit)
 
         # Warn if there is confusing input
         if (frequency is not None) & (
@@ -881,25 +908,21 @@ class LombScarglePeriodogram(Periodogram):
             # maximum_frequency MUST be none by this point.
             maximum_frequency = 1.0 / minimum_period
         # If the user specified a period, copy it into the frequency.
-        if period is not None:
-            frequency = 1.0 / period
+        if (period is not None):
+            frequency = 1. / period
 
-        # Do unit conversions if user input min/max frequency or period
+        # Default frequency grid
         if frequency is None:
             if minimum_frequency is not None:
                 minimum_frequency = u.Quantity(minimum_frequency, freq_unit)
             if maximum_frequency is not None:
                 maximum_frequency = u.Quantity(maximum_frequency, freq_unit)
-            if (minimum_frequency is not None) & (maximum_frequency is not None):
-                if minimum_frequency > maximum_frequency:
-                    if default_view == "frequency":
-                        raise ValueError(
-                            "minimum_frequency cannot be larger than maximum_frequency"
-                        )
-                    if default_view == "period":
-                        raise ValueError(
-                            "minimum_period cannot be larger than maximum_period"
-                        )
+            if minimum_period is not None and maximum_period is not None \
+                and (minimum_period > maximum_period):
+                    raise ValueError('minimum_period cannot be larger than maximum_period')
+            if minimum_frequency is not None and maximum_frequency is not None \
+                and (minimum_frequency > maximum_frequency):
+                    raise ValueError('minimum_frequency cannot be larger than maximum_frequency')
             # If nothing has been passed in, set them to the defaults
             if minimum_frequency is None:
                 minimum_frequency = fs
@@ -907,9 +930,9 @@ class LombScarglePeriodogram(Periodogram):
                 maximum_frequency = nyquist * nyquist_factor
 
             # Create frequency grid evenly spaced in frequency
-            frequency = np.arange(
-                minimum_frequency.value, maximum_frequency.value, fs.value
-            )
+            frequency = np.arange(minimum_frequency.value,
+                                  maximum_frequency.value,
+                                  fs.to(freq_unit).value)
 
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
@@ -949,13 +972,10 @@ class LombScarglePeriodogram(Periodogram):
             LS = LombScargle(time, lc.flux, nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization="psd")
 
-        if normalization == "psd":  # Power spectral density
-            # Rescale from the unnormalized power output by Astropy's
-            # Lomb-Scargle function to units of flux_variance / [frequency unit]
-            # that may be of more interest for asteroseismology.
-            power *= 2.0 / (len(time) * oversample_factor * fs)
+        if normalization == 'psd':  # Power spectral density
+            power =  (power * 2. / (len(time) * oversample_factor * fs)).to(yunit)
         elif normalization == "amplitude":
-            power = np.sqrt(power) * np.sqrt(4.0 / len(lc.time))
+            power = (np.sqrt(power) * np.sqrt(4./len(lc.time))).to(yunit)
 
         # Periodogram needs properties
         return LombScarglePeriodogram(
@@ -969,6 +989,7 @@ class LombScarglePeriodogram(Periodogram):
             nterms=nterms,
             ls_method=ls_method,
             meta=lc.meta,
+            normalization=normalization
         )
 
     def model(self, time, frequency=None):
@@ -1330,3 +1351,13 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         raise NotImplementedError(
             "`smooth` is not implemented for `BoxLeastSquaresPeriodogram`. "
         )
+
+def _validate_unit(unit, default=None):
+    if unit is None:
+        return default
+    if isinstance(unit, u.quantity.Quantity):
+        return unit.unit
+    try:
+        return u.Unit(unit)
+    except ValueError as e:
+        raise ValueError("invalid unit: {}".format(e))
