@@ -827,17 +827,11 @@ class LombScarglePeriodogram(Periodogram):
             xunit = "1/day" if normalization == 'amplitude' else "microhertz"
         if yunit is None:
             # This should default to yunit / xunit for PSD
-            yunit = u.dimensionless_unscaled if normalization == 'amplitude' else "ppm^2/uHz"
+            yunit = lc.flux.unit if normalization == 'amplitude' else "ppm^2/uHz"
 
         # Validate user input
         xunit = _validate_unit(xunit)
         yunit = _validate_unit(yunit)
-
-        # Ensure the light curve is normalized if the requested yunit is dimensionless
-        # or 'time' (because ppm**2/hz is a unit of time)
-        if lc.flux.unit is not None and lc.flux.unit.physical_type != 'dimensionless':
-            if yunit.physical_type in ['dimensionless', 'time']:
-                lc = lc.normalize()
 
         # If period and frequency keywords have both been set, throw an error
         if (not all(b is None for b in [period, minimum_period, maximum_period])) & (
