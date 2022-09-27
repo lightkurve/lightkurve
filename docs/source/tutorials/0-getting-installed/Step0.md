@@ -1,4 +1,4 @@
-# Introduction to "An introduction into the tools and tutorials available for the analysis of TESS data" a.k.a. Step-0
+# Step 0 - Getting your computer ready for Lightkurve tutorials
 
 ## Motivation
 
