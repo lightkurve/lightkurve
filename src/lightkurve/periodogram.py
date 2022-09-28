@@ -9,6 +9,7 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy.signal import find_peaks
 
 import astropy
 from astropy.table import Table
@@ -506,6 +507,67 @@ class Periodogram(object):
 
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
+
+    def peak_list(self, powerlimit=None):
+        """Lists in descending order the peaks found in the periodogram with 
+        the find_peaks function, which calculates the Prominence of the peak,
+        and Lower & Upper Half Width at Half Maximum (HWHM) of this Prominence.
+        For more information on this SciPy signal function, 
+        please follow the link to their documentation:
+        https://docs.scipy.org/doc//scipy/reference/generated/scipy.signal.find_peaks.html
+        Additionally final column of the list shows the ratio of the peak with
+        the top peak, where deviation from neat fractions (like 2/1, 1/2, 3/2,
+        2/3, 4/3, 3/4, etc.) is an indication of another candidate.
+
+        Parameters
+        ----------
+        powerlimit : number or ndarray or sequence, optional
+            Required power of peaks. Either a number, None, an array matching x 
+            or a 2-element sequence of the former. The first element is always 
+            interpreted as the minimal power and the second, if supplied, as the 
+            maximal required power. By default or None, 5% of the periodogram's 
+            max_power value will be used as the number for the powerlimit.
+
+        Returns
+        -------
+        Table : `astropy table` object
+            Returns a Table object extracted from the periodogram.
+        """
+        if self.default_view == 'period':
+            view = self.period
+            x = 'Periodicity'
+            y = '.1f'
+        elif self.default_view == 'frequency':
+            view = self.frequency
+            x = 'Frequency'
+            y = None
+        if powerlimit is None:
+            powerlimit = float(self.max_power)/20
+        peaks, stats = find_peaks(self.power,
+                                  height=powerlimit,
+                                  width=1)
+        lhwhm_int_down = view[np.floor(stats["left_ips"]).astype(int)]
+        lhwhm_int_up = view[np.ceil(stats["left_ips"]).astype(int)]
+        lhwhm_int_remainder = stats["left_ips"] - np.floor(stats["left_ips"])
+        lhwhm_period = lhwhm_int_down + lhwhm_int_remainder * (lhwhm_int_up - lhwhm_int_down)
+        lhwhm = lhwhm_period - view[peaks]
+        uhwhm_int_down = view[np.floor(stats["right_ips"]).astype(int)]
+        uhwhm_int_up = view[np.ceil(stats["right_ips"]).astype(int)]
+        uhwhm_int_remainder = stats["right_ips"] - np.floor(stats["right_ips"])
+        uhwhm_period = uhwhm_int_down + uhwhm_int_remainder * (uhwhm_int_up - uhwhm_int_down)
+        uhwhm = uhwhm_period - view[peaks]
+        result = Table(data=[stats['peak_heights'], view[peaks], stats['prominences'], lhwhm, uhwhm],
+                       names=('Power', x, 'Prominence', 'Lower HWHM', 'Upper HWHM'))
+        result.sort('Prominence',
+                    reverse=True)
+        result[x+' Ratio'] = result[x][0] / result[x]
+        result['Power'].format = y
+        result['Prominence'].format = y
+        result['Lower HWHM'].format = '.5g'
+        result['Upper HWHM'].format = '+.5g'
+        result[x+' Ratio'].format = '.3f'
+        result[x+' Ratio'].unit = 'top peak:peak'
+        return result
 
     def show_properties(self):
         """Prints a summary of the non-callable attributes of the Periodogram object.
