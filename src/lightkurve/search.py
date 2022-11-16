@@ -157,6 +157,8 @@ class SearchResult(object):
         def to_tess_gi_url(proposal_id):
             if re.match("^G0[12].+", proposal_id) is not None:
                 return f"https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs-primary.html#:~:text={proposal_id}"
+            elif re.match("^G0[34].+", proposal_id) is not None:
+                return f"https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs-em1.html#:~:text={proposal_id}"
             else:
                 return f"https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs.html#:~:text={proposal_id}"
 
