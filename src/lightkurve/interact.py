@@ -234,7 +234,10 @@ def prepare_tpf_datasource(tpf, aperture_mask):
     xa = xa.flatten()
     ya = ya.flatten()
     tpf_source = ColumnDataSource(data=dict(xx=xa.astype(float), yy=ya.astype(float)))
-    tpf_source.selected.indices = aperture_mask_to_selected_indices(aperture_mask)
+    # convert the ndarray from aperture_mask_to_selected_indices() to plain list
+    # because bokeh v3.0.2 does not accept ndarray (and causes js error)
+    # see https://github.com/bokeh/bokeh/issues/12624
+    tpf_source.selected.indices = list(aperture_mask_to_selected_indices(aperture_mask))
     return tpf_source
 
 
