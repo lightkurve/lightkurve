@@ -41,6 +41,7 @@ Methods
   Periodogram.copy
   Periodogram.flatten
   Periodogram.plot
+  Periodogram.peak_list
   Periodogram.show_properties
   Periodogram.smooth
   Periodogram.to_seismology
