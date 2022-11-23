@@ -38,9 +38,8 @@ pandas = ">=1.1.4"
 uncertainties = ">=3.1.4"
 patsy = ">=0.5.0"
 fbpca = ">=1.0"
-# tpf.interact_sky() tap selection requires a bug fix due to
-#  https://github.com/bokeh/bokeh/issues/6508
-bokeh = ">=1.1"
+# bokeh v2+ requirement due to https://github.com/lightkurve/lightkurve/issues/1261
+bokeh = ">=2.0.0"
 memoization = { version = ">=0.3.1", python = ">=3.8,<4.0" }
 scikit-learn = ">=0.24.0"
 

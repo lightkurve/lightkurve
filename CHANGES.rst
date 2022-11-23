@@ -3,8 +3,11 @@
 
 - Added the ability to configure the default cache directory used by
   ``SearchResult.download()`` / ``SearchResult.download_all()``. [#1214]
+
 - Moved the default cache directory from ``$HOME/.lightkurve-cache``
   to ``$HOME/.lightkurve/cache``. [#1214]
+
+- Fixed interact features, e.g. ``tpf.interact()``, to work with bokeh v3.x [#1262]
 
 
 2.3.0 (2022-07-07)
