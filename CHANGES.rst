@@ -9,6 +9,8 @@
 
 - Fixed interact features, e.g. ``tpf.interact()``, to work with bokeh v3.x [#1262]
 
+- Fixed ``SearchResult`` HTML display for links to TESS GI cycles 3/4 proposals. [#1260]
+
 
 2.3.0 (2022-07-07)
 ==================
