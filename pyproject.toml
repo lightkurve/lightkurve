@@ -25,7 +25,7 @@ include = ["AUTHORS.rst", "CHANGES.rst", "CONTRIBUTING.rst", "CITATION"]
 [tool.poetry.dependencies]
 python = ">=3.8"
 numpy = ">=1.18"
-astropy = ">=5.0"
+astropy = ">=5.2rc1"
 scipy = { version = ">=1.7", python = ">=3.8,<3.11" }
 matplotlib = ">=3.1"
 astroquery = ">=0.3.10"
