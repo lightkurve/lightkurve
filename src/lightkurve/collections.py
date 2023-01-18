@@ -51,7 +51,7 @@ class Collection(object):
         return len(self.data)
 
     def __getitem__(self, index_or_mask):
-        if isinstance(index_or_mask, (int, np.integer)):
+        if isinstance(index_or_mask, (int, np.int_)):
             return self.data[index_or_mask]
         elif isinstance(index_or_mask, slice):
             return type(self)(self.data[index_or_mask])

@@ -28,8 +28,8 @@ def test_sine_sff():
     """Can we recover a synthetic sine curve using SFF and LombScargle?"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_sine)
-    true_period = np.float(tpf.hdu[3].header["PERIOD"])
-    true_amplitude = np.float(tpf.hdu[3].header["SINE_AMP"])
+    true_period = float(tpf.hdu[3].header["PERIOD"])
+    true_amplitude = float(tpf.hdu[3].header["SINE_AMP"])
 
     # Run the SFF algorithm
     lc = tpf.to_lightcurve()
@@ -79,8 +79,8 @@ def test_transit_sff():
     """Can we recover a synthetic exoplanet signal using SFF and BLS?"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_transit)
-    true_period = np.float(tpf.hdu[3].header["PERIOD"])
-    true_rprs = np.float(tpf.hdu[3].header["RPRS"])
+    true_period = float(tpf.hdu[3].header["PERIOD"])
+    true_rprs = float(tpf.hdu[3].header["RPRS"])
     true_transit_lc = tpf.hdu[3].data["NOISELESS_INPUT"]
     max_depth = 1 - np.min(true_transit_lc)
 
@@ -121,8 +121,8 @@ def test_transit_pld():
     """Can we recover a synthetic exoplanet signal using PLD and BLS?"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_transit)
-    true_period = np.float(tpf.hdu[3].header["PERIOD"])
-    true_rprs = np.float(tpf.hdu[3].header["RPRS"])
+    true_period = float(tpf.hdu[3].header["PERIOD"])
+    true_rprs = float(tpf.hdu[3].header["RPRS"])
     true_transit_lc = tpf.hdu[3].data["NOISELESS_INPUT"]
     max_depth = 1 - np.min(true_transit_lc)
 
@@ -164,8 +164,8 @@ def test_sine_pld():
     """Can we recover a synthetic sine wave using PLD and LombScargle?"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_sine)
-    true_period = np.float(tpf.hdu[3].header["PERIOD"])
-    true_amplitude = np.float(tpf.hdu[3].header["SINE_AMP"])
+    true_period = float(tpf.hdu[3].header["PERIOD"])
+    true_amplitude = float(tpf.hdu[3].header["SINE_AMP"])
 
     # Run the PLD algorithm
     corrector = tpf.to_corrector("pld")

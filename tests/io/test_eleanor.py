@@ -30,7 +30,7 @@ def test_gsfc_eleanor_lite():
         assert ((lc["quality"] & 2**17) != 0).any() and ((lc["quality"] & 2**18) != 0).any()
         lc = read_eleanor_lightcurve(url, quality_bitmask='hardest')
         assert not (lc["quality"] & (2**17 | 2**18)).any()
-        assert np.issubdtype(lc["cadenceno"].dtype, np.integer)
+        assert np.issubdtype(lc["cadenceno"].dtype, np.int_)
 
 
 @pytest.mark.parametrize(
@@ -58,7 +58,7 @@ def test_vanilla_eleanor(url):
         # vanilla eleanor's output cadenceno (FFIINDEX) dtype in the
         # FITS file is float, breaking convention
         # ensure we compensate it.
-        assert np.issubdtype(lc["cadenceno"].dtype, np.integer)
+        assert np.issubdtype(lc["cadenceno"].dtype, np.int_)
 
 
 @pytest.mark.remote_data

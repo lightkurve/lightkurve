@@ -1248,7 +1248,7 @@ def show_interact_widget(
                     exported_filename,
                     overwrite=True,
                     flux_column_name="SAP_FLUX",
-                    aperture_mask=lc_new.meta["APERTURE_MASK"].astype(np.int),
+                    aperture_mask=lc_new.meta["APERTURE_MASK"].astype(np.int_),
                     SOURCE="lightkurve interact",
                     NOTE="custom mask",
                     MASKNPIX=np.nansum(lc_new.meta["APERTURE_MASK"]),
