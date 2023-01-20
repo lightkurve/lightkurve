@@ -13,7 +13,7 @@ from lightkurve.correctors import PLDCorrector
 
 @pytest.mark.remote_data
 def test_kepler_pld_corrector():
-    tpf = search_targetpixelfile("K2-199")[0].download()
+    tpf = search_targetpixelfile("EPIC 212779596")[0].download()
     pld = PLDCorrector(tpf)
     # Is the correct filetype returned?
     clc = pld.correct()
