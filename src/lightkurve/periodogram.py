@@ -9,10 +9,10 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.signal import find_peaks
+from scipy.signal import find_peaks as fp
 
 import astropy
-from astropy.table import Table
+from astropy.table import Table, QTable
 from astropy import units as u
 from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel
@@ -508,16 +508,17 @@ class Periodogram(object):
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
 
-    def peak_list(self, powerlimit=None):
-        """Lists in descending order the peaks found in the periodogram with 
-        the find_peaks function, which calculates the Prominence of the peak,
-        and Lower & Upper Half Width at Half Maximum (HWHM) of this Prominence.
-        For more information on this SciPy signal function, 
-        please follow the link to their documentation:
+    def find_peaks(self, powerlimit=None):
+        """Lists in a quantity table (QTable) the largest peaks of a periodogram
+        in descending order, where for every peak; the prominence, the lower & upper
+        half width at half maximum (hwhm), and full width at half maximum (fwhm) of
+        this prominence, are calculated by the find_peaks SciPy signal function.
+        For more information, please check the following link to its documentation:
         https://docs.scipy.org/doc//scipy/reference/generated/scipy.signal.find_peaks.html
-        Additionally final column of the list shows the ratio of the peak with
-        the top peak, where deviation from neat fractions (like 2/1, 1/2, 3/2,
-        2/3, 4/3, 3/4, etc.) is an indication of another candidate.
+        
+        Additionally the last column of this QTable shows the ratio of a peak with
+        the top peak, where a deviation from neat fractions (like 2/1, 1/2, 3/2,
+        2/3, 4/3, 3/4, 5/3, 3/5, etc.) is an indication of another candidate.
 
         Parameters
         ----------
@@ -530,43 +531,45 @@ class Periodogram(object):
 
         Returns
         -------
-        Table : `astropy table` object
-            Returns a Table object extracted from the periodogram.
+        QTable : `astropy quantity table` object
+            Returns a QTable object extracted from the periodogram.
         """
         if self.default_view == 'period':
             view = self.period
-            x = 'Periodicity'
-            y = '.1f'
+            x_axis_label = 'periodicity'
+            power_format = '.1f'
         elif self.default_view == 'frequency':
             view = self.frequency
-            x = 'Frequency'
-            y = None
+            x_axis_label = 'frequency'
+            power_format = None
         if powerlimit is None:
-            powerlimit = float(self.max_power)/20
-        peaks, stats = find_peaks(self.power,
-                                  height=powerlimit,
-                                  width=1)
+            powerlimit = self.max_power.value/20
+        peaks, stats = fp(self.power,
+                          height = powerlimit,
+                          width = 1)
         lhwhm_int_down = view[np.floor(stats["left_ips"]).astype(int)]
         lhwhm_int_up = view[np.ceil(stats["left_ips"]).astype(int)]
         lhwhm_int_remainder = stats["left_ips"] - np.floor(stats["left_ips"])
         lhwhm_period = lhwhm_int_down + lhwhm_int_remainder * (lhwhm_int_up - lhwhm_int_down)
-        lhwhm = lhwhm_period - view[peaks]
+        lhwhm = view[peaks] - lhwhm_period
         uhwhm_int_down = view[np.floor(stats["right_ips"]).astype(int)]
         uhwhm_int_up = view[np.ceil(stats["right_ips"]).astype(int)]
         uhwhm_int_remainder = stats["right_ips"] - np.floor(stats["right_ips"])
         uhwhm_period = uhwhm_int_down + uhwhm_int_remainder * (uhwhm_int_up - uhwhm_int_down)
         uhwhm = uhwhm_period - view[peaks]
-        result = Table(data=[stats['peak_heights'], view[peaks], stats['prominences'], lhwhm, uhwhm],
-                       names=('Power', x, 'Prominence', 'Lower HWHM', 'Upper HWHM'))
-        result.sort('Prominence',
-                    reverse=True)
-        result[x+' Ratio'] = result[x][0] / result[x]
-        result['Power'].format = y
-        result['Prominence'].format = y
-        result['Lower HWHM'].format = '.5g'
-        result['Upper HWHM'].format = '+.5g'
-        result[x+' Ratio'].format = '.3f'
-        result[x+' Ratio'].unit = 'top peak:peak'
+        fwhm = uhwhm_period - lhwhm_period
+        result = QTable(data=[stats['peak_heights'], view[peaks], stats['prominences'], lhwhm, uhwhm, fwhm],
+                        names=['power', x_axis_label, 'prominence', 'lower_hwhm', 'upper_hwhm', 'fwhm'])
+        result.sort('prominence', reverse=True)
+        result[x_axis_label+'_peak_top_peak_ratio'] = result[x_axis_label] / result[x_axis_label][0]
+        result['power'].unit = self.power.unit
+        result['prominence'].unit = self.power.unit
+        result['power'].info.format = power_format
+        result['prominence'].info.format = power_format
+        result['lower_hwhm'].info.format = '.5g'
+        result['upper_hwhm'].info.format = '.5g'
+        result['fwhm'].info.format = '.5g'
+        result[x_axis_label+'_peak_top_peak_ratio'].info.format = '.3f'
         return result
 
     def show_properties(self):
