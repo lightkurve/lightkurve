@@ -1379,7 +1379,7 @@ class LightCurve(TimeSeries):
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
             outlier_mask = sigma_clip(
-                data=self.flux,
+                data=self.flux.data,
                 sigma=sigma,
                 sigma_lower=sigma_lower,
                 sigma_upper=sigma_upper,
@@ -1485,7 +1485,7 @@ class LightCurve(TimeSeries):
             )
         elif bins is not None:
             if (bins not in ('blocks', 'knuth', 'scott', 'freedman') and
-                    np.array(bins).dtype != np.int):
+                    np.array(bins).dtype != np.integer):
                 raise TypeError("``bins`` must have integer type.")
             elif (isinstance(bins, str) or np.size(bins) != 1) and not _HAS_VAR_BINS:
                 raise ValueError("Sequence or method for ``bins`` requires Astropy 5.0.")
@@ -3359,7 +3359,7 @@ def _boolean_mask_to_bitmask(aperture_mask):
     # Masks can either be boolean input or Kepler pipeline style
     clean_mask = np.nan_to_num(aperture_mask)
 
-    contains_bit2 = (clean_mask.astype(np.int) & 2).any()
+    contains_bit2 = (clean_mask.astype(np.int_) & 2).any()
     all_zeros_or_ones = (clean_mask.dtype in ["float", "int"]) & (
         (set(np.unique(clean_mask)) - {0, 1}) == set()
     )
