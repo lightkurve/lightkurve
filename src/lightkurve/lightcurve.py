@@ -1485,7 +1485,7 @@ class LightCurve(TimeSeries):
             )
         elif bins is not None:
             if (bins not in ('blocks', 'knuth', 'scott', 'freedman') and
-                    np.array(bins).dtype != np.integer):
+                    np.array(bins).dtype != np.int_):
                 raise TypeError("``bins`` must have integer type.")
             elif (isinstance(bins, str) or np.size(bins) != 1) and not _HAS_VAR_BINS:
                 raise ValueError("Sequence or method for ``bins`` requires Astropy 5.0.")
