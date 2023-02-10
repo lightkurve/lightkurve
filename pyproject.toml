@@ -24,8 +24,8 @@ include = ["AUTHORS.rst", "CHANGES.rst", "CONTRIBUTING.rst", "CITATION"]
 
 [tool.poetry.dependencies]
 python = ">=3.8"
-numpy = "1.24.1"
-astropy = "5.2.1"
+numpy = ">=1.18"
+astropy = ">=5.0"
 scipy = { version = ">=1.7", python = ">=3.8,<3.11" }
 matplotlib = ">=3.1"
 astroquery = ">=0.3.10"
@@ -42,7 +42,6 @@ fbpca = ">=1.0"
 bokeh = ">=2.0.0"
 memoization = { version = ">=0.3.1", python = ">=3.8,<4.0" }
 scikit-learn = ">=0.24.0"
-ipython = "^8.9.0"
 
 [tool.poetry.dev-dependencies]
 jupyterlab = ">=2.0.0"
