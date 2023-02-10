@@ -651,14 +651,15 @@ class TargetPixelFile(object):
             elif aperture_mask == "empty":
                 aperture_mask = np.zeros((self.shape[1], self.shape[2]), dtype=bool)
             elif (
-                np.issubdtype(aperture_mask.dtype, np.integer)
+                np.issubdtype(aperture_mask.dtype, np.int_)
                 and ((aperture_mask & 2) == 2).any()
             ):
                 # Kepler and TESS pipeline style integer flags
                 aperture_mask = (aperture_mask & 2) == 2
-            elif isinstance(aperture_mask.flat[0], (np.integer, np.float)):
+            elif isinstance(aperture_mask.flat[0], (np.integer, np.float_)):
                 aperture_mask = aperture_mask.astype(bool)
         self._last_aperture_mask = aperture_mask
+        
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3, reference_pixel="center"):
