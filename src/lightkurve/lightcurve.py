@@ -1378,8 +1378,14 @@ class LightCurve(TimeSeries):
         # First, we create the outlier mask using AstroPy's sigma_clip function
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
+            # workaround for https://github.com/astropy/astropy/issues/14360
+            # in passing MaskedQuantity to sigma_clip
+            from astropy.utils.masked import Masked
+            flux = self.flux
+            if isinstance(flux, Masked):
+                flux = flux.filled(np.nan)
             outlier_mask = sigma_clip(
-                data=self.flux.data,
+                data=flux,
                 sigma=sigma,
                 sigma_lower=sigma_lower,
                 sigma_upper=sigma_upper,
