@@ -6,6 +6,7 @@ import warnings
 
 from astropy.stats import sigma_clip
 from astropy import units as u
+from astropy.utils.exceptions import AstropyUserWarning
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.sparse import issparse, csr_matrix
@@ -254,10 +255,14 @@ class RegressionCorrector(Corrector):
             )
             model = u.Quantity(model, unit=self.lc.flux.unit)
             residuals = self.lc.flux - model
-            # In Astropy>=5.0, residuals will be a MaskedQuantity
-            if hasattr(residuals, 'mask'):
-                residuals = residuals.unmasked
-            self.outlier_mask |= sigma_clip(residuals, sigma=sigma).mask
+            # workaround for https://github.com/astropy/astropy/issues/14360
+            # in passing MaskedQuantity to sigma_clip
+            from astropy.utils.masked import Masked
+            if isinstance(residuals, Masked):
+                residuals = residuals.filled(np.nan)
+            with warnings.catch_warnings():  # Ignore warnings due to NaNs
+                warnings.simplefilter("ignore", AstropyUserWarning)
+                self.outlier_mask |= sigma_clip(residuals, sigma=sigma).mask
             log.debug(
                 "correct(): iteration {}: clipped {} cadences"
                 "".format(count, self.outlier_mask.sum())
