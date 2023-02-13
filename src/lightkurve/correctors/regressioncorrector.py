@@ -7,6 +7,7 @@ import warnings
 from astropy.stats import sigma_clip
 from astropy import units as u
 from astropy.utils.exceptions import AstropyUserWarning
+from astropy.utils.masked import Masked
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.sparse import issparse, csr_matrix
@@ -255,10 +256,14 @@ class RegressionCorrector(Corrector):
             )
             model = u.Quantity(model, unit=self.lc.flux.unit)
             residuals = self.lc.flux - model
-            # workaround for https://github.com/astropy/astropy/issues/14360
-            # in passing MaskedQuantity to sigma_clip
-            from astropy.utils.masked import Masked
             if isinstance(residuals, Masked):
+                # Workaround for https://github.com/astropy/astropy/issues/14360
+                # in passing MaskedQuantity to sigma_clip, by converting it to Quantity.
+                # We explicitly fill masked values with `np.nan` here to ensure they are masked during sigma clipping.
+                # To handle unlikely edge case, convert int to float to ensure filing `np.nan` work.
+                # The conversion is acceptable because only the mask of the sigma_clip() result is used.
+                if np.issubdtype(residuals.dtype, np.int_):
+                    residuals = residuals.astype(float)
                 residuals = residuals.filled(np.nan)
             with warnings.catch_warnings():  # Ignore warnings due to NaNs
                 warnings.simplefilter("ignore", AstropyUserWarning)
