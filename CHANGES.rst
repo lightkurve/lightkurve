@@ -1,5 +1,10 @@
-2.4.0 (unreleased)
+2.4.1dev (unreleased)
 ==================
+
+
+2.4.0 (2023-02-14)
+==================
+
 
 - Added the ability to configure the default cache directory used by
   ``SearchResult.download()`` / ``SearchResult.download_all()``. [#1214]
