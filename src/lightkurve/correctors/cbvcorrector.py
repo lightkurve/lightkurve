@@ -14,6 +14,7 @@ from astropy.time import Time
 from astropy.timeseries import TimeSeries
 from astropy.units import Quantity, Unit, UnitsWarning
 from astropy.utils.decorators import deprecated
+from astropy.utils.masked import Masked
 
 from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
@@ -1152,11 +1153,12 @@ class CotrendingBasisVectors(TimeSeries):
                 _, ax = plt.subplots(1)
 
             # Plot gaps as NaN
-            timeArray = np.array(self.time.copy().value)
-            try:
-                timeArray[~self.time.value.mask] = np.nan # kepler cbvs are masked arrays and do not support item assignment
-            except:
-                pass
+            # time array is a Masked array so need to fill masks with nans
+            timeArray = self.time.copy().value
+            if isinstance(timeArray, (Masked, np.ma.MaskedArray)):
+                if np.issubdtype(timeArray.dtype, np.int_):
+                    timeArray = timeArray.astype(float)
+                timeArray = timeArray.filled(np.nan)
             timeArray[np.nonzero(self.gap_indicators)[0]] = np.nan
 
             # Get the CBV arrays that were requested
