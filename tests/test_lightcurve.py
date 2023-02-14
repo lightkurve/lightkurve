@@ -1365,10 +1365,11 @@ def test_fold_v2():
 @pytest.mark.remote_data
 def test_combine_kepler_tess():
     """Can we append or stitch a TESS light curve to a Kepler light curve?"""
-    lc_kplr = search_lightcurve("Kepler-10", mission="Kepler", author="Kepler")[
+    # KIC 11904151: Kepler-10
+    lc_kplr = search_lightcurve("KIC 11904151", mission="Kepler", author="Kepler")[
         0
     ].download()
-    lc_tess = search_lightcurve("Kepler-10", mission="TESS", author="SPOC")[
+    lc_tess = search_lightcurve("KIC 11904151", mission="TESS", author="SPOC")[
         0
     ].download()
     # Can we use append()?

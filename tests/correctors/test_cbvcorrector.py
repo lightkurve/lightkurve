@@ -378,7 +378,7 @@ def test_CBVCorrector():
     lc_median = np.nanmedian(lc.flux)
     assert_allclose(lc.flux, lc_median)
     ax = cbvCorrector.diagnose()
-    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
+    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes.Axes)
 
     # Now add a strong regularization term and under-fit the data
     lc = cbvCorrector.correct_gaussian_prior(
@@ -405,7 +405,7 @@ def test_CBVCorrector():
     lc_median = np.nanmedian(lc.flux)
     assert_allclose(lc.flux, lc_median, rtol=1e-3)
     ax = cbvCorrector.diagnose()
-    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
+    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes.Axes)
     # Now add a strong regularization term and under-fit the data
     lc = cbvCorrector.correct_elasticnet(
         cbv_type=None, cbv_indices=None, alpha=1e9, l1_ratio=0.5, ext_dm=dm
@@ -456,7 +456,7 @@ def test_CBVCorrector_retrieval():
     # Check that returned lightcurve is in flux units
     assert lc.flux.unit == u.Unit("electron / second")
     ax = cbvCorrector.diagnose()
-    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
+    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes.Axes)
 
     # ElasticNet corrections
     lc = cbvCorrector.correct_elasticnet(
@@ -465,7 +465,7 @@ def test_CBVCorrector_retrieval():
     assert isinstance(lc, TessLightCurve)
     assert lc.flux.unit == u.Unit("electron / second")
     ax = cbvCorrector.diagnose()
-    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
+    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes.Axes)
 
     # Correction optimizer
     lc = cbvCorrector.correct(
@@ -478,7 +478,7 @@ def test_CBVCorrector_retrieval():
     assert isinstance(lc, TessLightCurve)
     assert lc.flux.unit == u.Unit("electron / second")
     ax = cbvCorrector.diagnose()
-    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes._subplots.Axes)
+    assert len(ax) == 2 and isinstance(ax[0], matplotlib.axes.Axes)
 
     # Goodness metric scan plot
     ax = cbvCorrector.goodness_metric_scan_plot(
