@@ -547,23 +547,22 @@ class Periodogram(object):
         peaks, stats = fp(self.power,
                           height = powerlimit,
                           width = 1)
-        lhwhm_int_down = view[np.floor(stats["left_ips"]).astype(int)]
-        lhwhm_int_up = view[np.ceil(stats["left_ips"]).astype(int)]
+        lhwhm_int_down = view[np.floor(stats["left_ips"]).astype(int)].value
+        lhwhm_int_up = view[np.ceil(stats["left_ips"]).astype(int)].value
         lhwhm_int_remainder = stats["left_ips"] - np.floor(stats["left_ips"])
         lhwhm_period = lhwhm_int_down + lhwhm_int_remainder * (lhwhm_int_up - lhwhm_int_down)
-        lhwhm = view[peaks] - lhwhm_period
-        uhwhm_int_down = view[np.floor(stats["right_ips"]).astype(int)]
-        uhwhm_int_up = view[np.ceil(stats["right_ips"]).astype(int)]
+        lhwhm = view[peaks].value - lhwhm_period
+        uhwhm_int_down = view[np.floor(stats["right_ips"]).astype(int)].value
+        uhwhm_int_up = view[np.ceil(stats["right_ips"]).astype(int)].value
         uhwhm_int_remainder = stats["right_ips"] - np.floor(stats["right_ips"])
         uhwhm_period = uhwhm_int_down + uhwhm_int_remainder * (uhwhm_int_up - uhwhm_int_down)
-        uhwhm = uhwhm_period - view[peaks]
+        uhwhm = uhwhm_period - view[peaks].value
         fwhm = uhwhm_period - lhwhm_period
-        result = QTable(data=[stats['peak_heights'], view[peaks], stats['prominences'], lhwhm, uhwhm, fwhm],
-                        names=['power', x_axis_label, 'prominence', 'lower_hwhm', 'upper_hwhm', 'fwhm'])
+        result = QTable(data=[view[peaks].value, stats['peak_heights'], stats['prominences'], lhwhm, uhwhm, fwhm],
+                        names=[x_axis_label, 'power', 'prominence', 'lower_hwhm', 'upper_hwhm', 'fwhm'],
+                        units=[view.unit, self.power.unit, self.power.unit, view.unit, view.unit, view.unit])
         result.sort('prominence', reverse=True)
         result[x_axis_label+'_peak_top_peak_ratio'] = result[x_axis_label] / result[x_axis_label][0]
-        result['power'].unit = self.power.unit
-        result['prominence'].unit = self.power.unit
         result['power'].info.format = power_format
         result['prominence'].info.format = power_format
         result['lower_hwhm'].info.format = '.5g'
