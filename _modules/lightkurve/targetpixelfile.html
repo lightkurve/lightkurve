@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lightkurve.targetpixelfile &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,15 +19,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -51,7 +48,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -62,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -104,7 +101,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -119,10 +122,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -138,7 +139,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -146,6 +148,9 @@
     
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -231,7 +236,7 @@
 
 
 <span class="k">class</span> <span class="nc">HduToMetaMapping</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Provides a read-only view of HDU header in `astropy.timeseries.TimeSeries.meta` format&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provides a read-only view of HDU header in `astropy.timeseries.TimeSeries.meta` format&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdu</span><span class="p">):</span>
         <span class="c1"># use OrderedDict rather than simple dict for 2 reasons:</span>
@@ -258,7 +263,7 @@
 
 
 <span class="k">class</span> <span class="nc">TargetPixelFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Abstract class representing FITS files which contain time series imaging data.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class representing FITS files which contain time series imaging data.</span>
 
 <span class="sd">    You should probably not be using this abstract class directly;</span>
 <span class="sd">    see `KeplerTargetPixelFile` and `TessTargetPixelFile` instead.</span>
@@ -277,7 +282,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">HduToMetaMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Implements indexing and slicing.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements indexing and slicing.</span>
 
 <span class="sd">        Note: the implementation below cannot be be simplified using</span>
 <span class="sd">            `copy[1].data = copy[1].data[self.quality_mask][key]`</span>
@@ -361,7 +366,7 @@
     <span class="nd">@property</span>
     <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">astropy_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns an AstroPy Time object for all good-quality cadences.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an AstroPy Time object for all good-quality cadences.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
 
     <span class="nd">@property</span>
@@ -370,7 +375,7 @@
 
     <span class="nd">@hdu</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">hdu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;FLUX&quot;</span><span class="p">,</span> <span class="s2">&quot;QUALITY&quot;</span><span class="p">)):</span>
-        <span class="sd">&quot;&quot;&quot;Verify the file format when setting the value of `self.hdu`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify the file format when setting the value of `self.hdu`.</span>
 
 <span class="sd">        Raises a ValueError if `value` does not appear to be a Target Pixel File.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -390,7 +395,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_hdu</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span> <span class="nf">get_keyword</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">hdu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a header keyword value.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a header keyword value.</span>
 
 <span class="sd">        If the keyword is Undefined or does not exist,</span>
 <span class="sd">        then return ``default`` instead.</span>
@@ -402,11 +407,11 @@
         <span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;get_header()&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span>
     <span class="p">)</span>
     <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;DEPRECATED. Please use ``get_header()`` instead.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;DEPRECATED. Please use ``get_header()`` instead.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span>
 
     <span class="k">def</span> <span class="nf">get_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the metadata embedded in the file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the metadata embedded in the file.</span>
 
 <span class="sd">        Target Pixel Files contain embedded metadata headers spread across three</span>
 <span class="sd">        different FITS extensions:</span>
@@ -432,37 +437,37 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ra</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Right Ascension of target (&#39;RA_OBJ&#39; header keyword).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Right Ascension of target (&#39;RA_OBJ&#39; header keyword).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;RA_OBJ&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Declination of target (&#39;DEC_OBJ&#39; header keyword).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Declination of target (&#39;DEC_OBJ&#39; header keyword).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;DEC_OBJ&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">column</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;CCD pixel column number (&#39;1CRV5P&#39; header keyword).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;CCD pixel column number (&#39;1CRV5P&#39; header keyword).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;1CRV5P&quot;</span><span class="p">,</span> <span class="n">hdu</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;CCD pixel row number (&#39;2CRV5P&#39; header keyword).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;CCD pixel row number (&#39;2CRV5P&#39; header keyword).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;2CRV5P&quot;</span><span class="p">,</span> <span class="n">hdu</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pos_corr1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the column position correction.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the column position correction.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;POS_CORR1&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pos_corr2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the row position correction.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the row position correction.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;POS_CORR2&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pipeline_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the optimal aperture mask used by the pipeline.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the optimal aperture mask used by the pipeline.</span>
 
 <span class="sd">        If the aperture extension is missing from the file, a mask</span>
 <span class="sd">        composed of all `True` values will be returned.</span>
@@ -479,12 +484,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the cube dimension shape.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the cube dimension shape.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Time</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the time for all good-quality cadences.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the time for all good-quality cadences.&quot;&quot;&quot;</span>
         <span class="n">time_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;TIME&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
         <span class="c1"># Some data products have missing time values;</span>
         <span class="c1"># we need to set these to zero or `Time` cannot be instantiated.</span>
@@ -506,7 +511,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cadenceno</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the cadence number for all good-quality cadences.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the cadence number for all good-quality cadences.&quot;&quot;&quot;</span>
         <span class="n">cadenceno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;CADENCENO&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
         <span class="c1"># The TESScut service returns an array of zeros as CADENCENO.</span>
         <span class="c1"># If this is the case, return frame numbers from 0 instead.</span>
@@ -516,12 +521,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nan_time_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a boolean mask flagging cadences whose time is `nan`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a boolean mask flagging cadences whose time is `nan`.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">flux</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the flux for all good-quality cadences.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the flux for all good-quality cadences.&quot;&quot;&quot;</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TUNIT5&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;e-/s&quot;</span><span class="p">:</span>
             <span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;electron/s&quot;</span>
@@ -529,7 +534,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">flux_err</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the flux uncertainty for all good-quality cadences.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the flux uncertainty for all good-quality cadences.&quot;&quot;&quot;</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TUNIT6&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;e-/s&quot;</span><span class="p">:</span>
             <span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;electron/s&quot;</span>
@@ -537,7 +542,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">flux_bkg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the background flux for all good-quality cadences.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the background flux for all good-quality cadences.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;FLUX_BKG&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;electron/s&quot;</span>
         <span class="p">)</span>
@@ -550,12 +555,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">quality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the quality flag integer of every good cadence.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the quality flag integer of every good cadence.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;QUALITY&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WCS</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns an `astropy.wcs.WCS` object with the World Coordinate System</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an `astropy.wcs.WCS` object with the World Coordinate System</span>
 <span class="sd">        solution for the target pixel file.</span>
 
 <span class="sd">        Returns</span>
@@ -597,7 +602,7 @@
             <span class="k">return</span> <span class="n">WCS</span><span class="p">(</span><span class="n">mywcs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns two 3D arrays of RA and Dec values in decimal degrees.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns two 3D arrays of RA and Dec values in decimal degrees.</span>
 
 <span class="sd">        If cadence number is given, returns 2D arrays for that cadence. If</span>
 <span class="sd">        cadence is &#39;all&#39; returns one RA, Dec value for each pixel in every cadence.</span>
@@ -652,7 +657,7 @@
         <span class="k">return</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span>
 
     <span class="k">def</span> <span class="nf">show_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Prints a description of all non-callable attributes.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prints a description of all non-callable attributes.</span>
 
 <span class="sd">        Prints in order of type (ints, strings, lists, arrays, others).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -706,7 +711,7 @@
         <span class="n">output</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">max_lines</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_width</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;sap&quot;</span><span class="p">,</span> <span class="n">corrector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Performs photometry on the pixel data and returns a LightCurve object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs photometry on the pixel data and returns a LightCurve object.</span>
 
 <span class="sd">        The valid keyword arguments depends on the method chosen:</span>
 
@@ -752,7 +757,7 @@
             <span class="k">return</span> <span class="n">aperture_mask</span>
 
     <span class="k">def</span> <span class="nf">_parse_aperture_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Parse the `aperture_mask` parameter as given by a user.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `aperture_mask` parameter as given by a user.</span>
 
 <span class="sd">        The `aperture_mask` parameter is accepted by a number of methods.</span>
 <span class="sd">        This method ensures that the parameter is always parsed in the same way.</span>
@@ -818,18 +823,19 @@
             <span class="k">elif</span> <span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;empty&quot;</span><span class="p">:</span>
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
             <span class="k">elif</span> <span class="p">(</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">)</span>
                 <span class="ow">and</span> <span class="p">((</span><span class="n">aperture_mask</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
             <span class="p">):</span>
                 <span class="c1"># Kepler and TESS pipeline style integer flags</span>
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">aperture_mask</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)):</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">)):</span>
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span>
+        
         <span class="k">return</span> <span class="n">aperture_mask</span>
 
     <span class="k">def</span> <span class="nf">create_threshold_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">reference_pixel</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns an aperture mask creating using the thresholding method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an aperture mask creating using the thresholding method.</span>
 
 <span class="sd">        This method will identify the pixels in the TargetPixelFile which show</span>
 <span class="sd">        a median flux that is brighter than `threshold` times the standard</span>
@@ -893,7 +899,7 @@
             <span class="k">return</span> <span class="n">labels</span> <span class="o">==</span> <span class="n">closest_label</span>
 
     <span class="k">def</span> <span class="nf">estimate_background</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns an estimate of the median background level in the FLUX column.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an estimate of the median background level in the FLUX column.</span>
 
 <span class="sd">        In the case of official Kepler and TESS Target Pixel Files, the</span>
 <span class="sd">        background estimates should be close to zero because these products</span>
@@ -932,7 +938,7 @@
         <span class="k">return</span> <span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">simple_bkg</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">estimate_centroids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;moments&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the flux center of an object inside ``aperture_mask``.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the flux center of an object inside ``aperture_mask``.</span>
 
 <span class="sd">        Telescopes tend to smear out the light from a point-like star over</span>
 <span class="sd">        multiple pixels.  For this reason, it is common to estimate the position</span>
@@ -983,7 +989,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_centroids_via_quadratic</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_estimate_centroids_via_moments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Compute the &quot;center of mass&quot; of the light based on the 2D moments;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the &quot;center of mass&quot; of the light based on the 2D moments;</span>
 <span class="sd">        this is a helper method for `estimate_centroids()`.&quot;&quot;&quot;</span>
         <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_aperture_mask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
         <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">indices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
@@ -1002,7 +1008,7 @@
         <span class="k">return</span> <span class="n">col_centr</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pixel</span><span class="p">,</span> <span class="n">row_centr</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pixel</span>
 
     <span class="k">def</span> <span class="nf">_estimate_centroids_via_quadratic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Estimate centroids by fitting a 2D quadratic to the brightest pixels;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimate centroids by fitting a 2D quadratic to the brightest pixels;</span>
 <span class="sd">        this is a helper method for `estimate_centroids()`.&quot;&quot;&quot;</span>
         <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_aperture_mask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
         <span class="n">col_centr</span><span class="p">,</span> <span class="n">row_centr</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
@@ -1019,7 +1025,7 @@
     <span class="k">def</span> <span class="nf">_aperture_photometry</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">,</span> <span class="n">flux_method</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">centroid_method</span><span class="o">=</span><span class="s2">&quot;moments&quot;</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper method for ``extract_aperture photometry``.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper method for ``extract_aperture photometry``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1091,7 +1097,7 @@
         <span class="n">return_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a list of asteroids or comets which affected the target pixel files.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of asteroids or comets which affected the target pixel files.</span>
 
 <span class="sd">        Light curves of stars or galaxies are frequently affected by solar</span>
 <span class="sd">        system bodies (e.g. asteroids, comets, planets).  These objects can move</span>
@@ -1224,7 +1230,7 @@
         <span class="n">style</span><span class="o">=</span><span class="s2">&quot;lightkurve&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot the pixel data for a single frame (i.e. at a single time).</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the pixel data for a single frame (i.e. at a single time).</span>
 
 <span class="sd">        The time can be specified by frame index number (`frame=0` will show the</span>
 <span class="sd">        first frame) or absolute cadence number (`cadenceno`).</span>
@@ -1347,7 +1353,7 @@
     <span class="k">def</span> <span class="nf">_to_matplotlib_animation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_args</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;matplotlib.animation.FuncAnimation&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a `matplotlib.animation.FuncAnimation` object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a `matplotlib.animation.FuncAnimation` object.</span>
 
 <span class="sd">        The animation shows the flux values over time by calling `tpf.plot()` for multiple frames.</span>
 
@@ -1394,7 +1400,7 @@
         <span class="k">return</span> <span class="n">anim</span>
 
     <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_args</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Displays an interactive HTML matplotlib animation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Displays an interactive HTML matplotlib animation.</span>
 
 <span class="sd">        This feature requires a Jupyter notebook environment to display correctly.</span>
 
@@ -1418,7 +1424,7 @@
             <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;ipython needs to be installed for animate() to work (e.g., `pip install ipython`)&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Writes the TPF to a FITS file on disk.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Writes the TPF to a FITS file on disk.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">output_fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">output_fn</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">-targ.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">output_fn</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1433,7 +1439,7 @@
         <span class="n">ylim_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Display an interactive Jupyter Notebook widget to inspect the pixel data.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display an interactive Jupyter Notebook widget to inspect the pixel data.</span>
 
 <span class="sd">        The widget will show both the lightcurve and pixel data.  By default,</span>
 <span class="sd">        the lightcurve shown is obtained by calling the `to_lightcurve()` method,</span>
@@ -1517,7 +1523,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">interact_sky</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="s2">&quot;localhost:8888&quot;</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s2">&quot;empty&quot;</span><span class="p">,</span> <span class="n">magnitude_limit</span><span class="o">=</span><span class="mi">18</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1543,7 +1549,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_corrector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;pld&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a `~correctors.corrector.Corrector` instance to remove systematics.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a `~correctors.corrector.Corrector` instance to remove systematics.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1578,7 +1584,7 @@
             <span class="k">return</span> <span class="n">PLDCorrector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">cutout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Cut a rectangle out of the Target Pixel File.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cut a rectangle out of the Target Pixel File.</span>
 
 <span class="sd">        This methods returns a new `TargetPixelFile` object containing a</span>
 <span class="sd">        rectangle of a given ``size`` cut out around a given ``center``.</span>
@@ -1743,7 +1749,7 @@
         <span class="n">hdu0_keywords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Creates a new Target Pixel File from a set of images.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a new Target Pixel File from a set of images.</span>
 
 <span class="sd">        This method is intended to make it easy to cut out targets from</span>
 <span class="sd">        Kepler/K2 &quot;superstamp&quot; regions or TESS FFI images.</span>
@@ -1990,7 +1996,7 @@
         <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Show the light curve of each pixel in a single plot.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Show the light curve of each pixel in a single plot.</span>
 
 <span class="sd">        Note that all values are autoscaled and axis labels are not provided.</span>
 <span class="sd">        This utility is designed for by-eye inspection of signal morphology.</span>
@@ -2168,9 +2174,9 @@
                         <span class="n">gax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                         <span class="n">gax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">y</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># lower right</span>
-                        <span class="n">gax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">gax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># upper left</span>
-                        <span class="n">gax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">gax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">set_size</span><span class="p">:</span>  <span class="c1"># use default size when caller does not supply ax</span>
                 <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">((</span><span class="n">y</span> <span class="o">*</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">x</span> <span class="o">*</span> <span class="mf">1.5</span><span class="p">))</span>
@@ -2179,7 +2185,7 @@
 
 
 <div class="viewcode-block" id="KeplerTargetPixelFile"><a class="viewcode-back" href="../../reference/api/lightkurve.KeplerTargetPixelFile.html#lightkurve.KeplerTargetPixelFile">[docs]</a><span class="k">class</span> <span class="nc">KeplerTargetPixelFile</span><span class="p">(</span><span class="n">TargetPixelFile</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class to read and interact with the pixel data products</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to read and interact with the pixel data products</span>
 <span class="sd">    (&quot;Target Pixel Files&quot;) created by NASA&#39;s Kepler pipeline.</span>
 
 <span class="sd">    This class offers a user-friendly way to open a Kepler Target Pixel File</span>
@@ -2255,7 +2261,7 @@
         <span class="k">return</span> <span class="s2">&quot;KeplerTargetPixelFile Object (ID: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_prf_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns an object of KeplerPRF initialized using the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an object of KeplerPRF initialized using the</span>
 <span class="sd">        necessary metadata in the tpf object.</span>
 
 <span class="sd">        Returns</span>
@@ -2269,43 +2275,43 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">obsmode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;&#39;short cadence&#39; or &#39;long cadence&#39;. (&#39;OBSMODE&#39; header keyword)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;&#39;short cadence&#39; or &#39;long cadence&#39;. (&#39;OBSMODE&#39; header keyword)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;OBSMODE&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Kepler CCD module number. (&#39;MODULE&#39; header keyword)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Kepler CCD module number. (&#39;MODULE&#39; header keyword)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;MODULE&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Kepler CCD module output number. (&#39;OUTPUT&#39; header keyword)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Kepler CCD module output number. (&#39;OUTPUT&#39; header keyword)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;OUTPUT&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Kepler CCD channel number. (&#39;CHANNEL&#39; header keyword)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Kepler CCD channel number. (&#39;CHANNEL&#39; header keyword)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;CHANNEL&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">quarter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Kepler quarter number. (&#39;QUARTER&#39; header keyword)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Kepler quarter number. (&#39;QUARTER&#39; header keyword)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;QUARTER&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">campaign</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;K2 Campaign number. (&#39;CAMPAIGN&#39; header keyword)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;K2 Campaign number. (&#39;CAMPAIGN&#39; header keyword)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;CAMPAIGN&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mission</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;&#39;Kepler&#39; or &#39;K2&#39;. (&#39;MISSION&#39; header keyword)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;&#39;Kepler&#39; or &#39;K2&#39;. (&#39;MISSION&#39; header keyword)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;MISSION&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="KeplerTargetPixelFile.extract_aperture_photometry"><a class="viewcode-back" href="../../reference/api/lightkurve.KeplerTargetPixelFile.extract_aperture_photometry.html#lightkurve.KeplerTargetPixelFile.extract_aperture_photometry">[docs]</a>    <span class="k">def</span> <span class="nf">extract_aperture_photometry</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">flux_method</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">centroid_method</span><span class="o">=</span><span class="s2">&quot;moments&quot;</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a LightCurve obtained using aperture photometry.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a LightCurve obtained using aperture photometry.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2388,7 +2394,7 @@
         <span class="p">)</span>
 
 <div class="viewcode-block" id="KeplerTargetPixelFile.get_model"><a class="viewcode-back" href="../../reference/api/lightkurve.KeplerTargetPixelFile.get_model.html#lightkurve.KeplerTargetPixelFile.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">star_priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a default `TPFModel` object for PRF fitting.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a default `TPFModel` object for PRF fitting.</span>
 
 <span class="sd">        The default model only includes one star and only allows its flux</span>
 <span class="sd">        and position to change.  A different set of stars can be added using</span>
@@ -2452,7 +2458,7 @@
         <span class="k">return</span> <span class="n">TPFModel</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KeplerTargetPixelFile.extract_prf_photometry"><a class="viewcode-back" href="../../reference/api/lightkurve.KeplerTargetPixelFile.extract_prf_photometry.html#lightkurve.KeplerTargetPixelFile.extract_prf_photometry">[docs]</a>    <span class="k">def</span> <span class="nf">extract_prf_photometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cadences</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the results of PRF photometry applied to the pixel file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the results of PRF photometry applied to the pixel file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2504,13 +2510,13 @@
 
 
 <span class="k">class</span> <span class="nc">FactoryError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Raised if there is a problem creating a TPF.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised if there is a problem creating a TPF.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span>
 
 
 <span class="k">class</span> <span class="nc">TargetPixelFileFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class to create a TargetPixelFile.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to create a TargetPixelFile.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">n_cadences</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="n">target_id</span><span class="o">=</span><span class="s2">&quot;unnamed-target&quot;</span><span class="p">,</span> <span class="n">keywords</span><span class="o">=</span><span class="kc">None</span>
@@ -2560,7 +2566,7 @@
         <span class="n">cosmic_rays</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Populate the data for a single cadence.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate the data for a single cadence.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">frameno</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_cadences</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">FactoryError</span><span class="p">(</span>
                 <span class="s2">&quot;Can not add cadence </span><span class="si">{}</span><span class="s2">, n_cadences set to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -2604,7 +2610,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">pos_corr2</span><span class="p">[</span><span class="n">frameno</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;POS_CORR2&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_check_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check the data before writing to a TPF for any obvious errors.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the data before writing to a TPF for any obvious errors.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)):</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;The factory-created TPF contains cadences with &quot;</span>
@@ -2625,7 +2631,7 @@
             <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_tpf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdu0_keywords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ext_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a TargetPixelFile object.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a TargetPixelFile object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">hdu0_keywords</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">hdu0_keywords</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">ext_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2648,7 +2654,7 @@
         <span class="k">return</span> <span class="n">tpf</span>
 
     <span class="k">def</span> <span class="nf">_hdulist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdu0_keywords</span><span class="p">,</span> <span class="n">ext_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns an astropy.io.fits.HDUList object.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an astropy.io.fits.HDUList object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_make_primary_hdu</span><span class="p">(</span><span class="n">hdu0_keywords</span><span class="o">=</span><span class="n">hdu0_keywords</span><span class="p">),</span>
@@ -2658,14 +2664,14 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_header_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a template `fits.Header` object for a given extension.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a template `fits.Header` object for a given extension.&quot;&quot;&quot;</span>
         <span class="n">template_fn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="n">PACKAGEDIR</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;tpf-ext</span><span class="si">{}</span><span class="s2">-header.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="o">.</span><span class="n">fromtextfile</span><span class="p">(</span><span class="n">template_fn</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_make_primary_hdu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdu0_keywords</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the primary extension (#0).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the primary extension (#0).&quot;&quot;&quot;</span>
         <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">()</span>
         <span class="c1"># Copy the default keywords from a template file from the MAST archive</span>
         <span class="n">tmpl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header_template</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -2719,7 +2725,7 @@
         <span class="k">return</span> <span class="n">hdu</span>
 
     <span class="k">def</span> <span class="nf">_make_target_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create the &#39;TARGETTABLES&#39; extension (i.e. extension #1).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create the &#39;TARGETTABLES&#39; extension (i.e. extension #1).&quot;&quot;&quot;</span>
         <span class="c1"># Turn the data arrays into fits columns and initialize the HDU</span>
         <span class="n">coldim</span> <span class="o">=</span> <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_rows</span><span class="p">)</span>
         <span class="n">eformat</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">E&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_rows</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_cols</span><span class="p">)</span>
@@ -2830,7 +2836,7 @@
         <span class="k">return</span> <span class="n">hdu</span>
 
     <span class="k">def</span> <span class="nf">_make_aperture_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create the aperture mask extension (i.e. extension #2).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create the aperture mask extension (i.e. extension #2).&quot;&quot;&quot;</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_cols</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
         <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
 
@@ -2866,7 +2872,7 @@
 
 
 <div class="viewcode-block" id="TessTargetPixelFile"><a class="viewcode-back" href="../../reference/api/lightkurve.TessTargetPixelFile.html#lightkurve.TessTargetPixelFile">[docs]</a><span class="k">class</span> <span class="nc">TessTargetPixelFile</span><span class="p">(</span><span class="n">TargetPixelFile</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents pixel data products created by NASA&#39;s TESS pipeline.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents pixel data products created by NASA&#39;s TESS pipeline.</span>
 
 <span class="sd">    This class enables extraction of custom light curves and centroid positions.</span>
 
@@ -2931,7 +2937,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">background_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the background mask used by the TESS pipeline.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the background mask used by the TESS pipeline.&quot;&quot;&quot;</span>
         <span class="c1"># The TESS pipeline flags the pixels in the background aperture using</span>
         <span class="c1"># bit number 4, cf. Section 6 of the TESS Data Products documentation</span>
         <span class="c1"># (EXP-TESS-ARC-ICD-TM-0014.pdf).</span>
@@ -2944,17 +2950,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;TESS Sector number (&#39;SECTOR&#39; header keyword).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;TESS Sector number (&#39;SECTOR&#39; header keyword).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;SECTOR&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">camera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;TESS Camera number (&#39;CAMERA&#39; header keyword).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;TESS Camera number (&#39;CAMERA&#39; header keyword).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;CAMERA&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ccd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;TESS CCD number (&#39;CCD&#39; header keyword).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;TESS CCD number (&#39;CCD&#39; header keyword).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keyword</span><span class="p">(</span><span class="s2">&quot;CCD&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -2964,7 +2970,7 @@
     <span class="k">def</span> <span class="nf">extract_aperture_photometry</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">flux_method</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">centroid_method</span><span class="o">=</span><span class="s2">&quot;moments&quot;</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a LightCurve obtained using aperture photometry.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a LightCurve obtained using aperture photometry.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3058,7 +3064,8 @@
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -3070,7 +3077,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

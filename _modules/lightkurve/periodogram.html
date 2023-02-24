@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lightkurve.periodogram &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,15 +19,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -51,7 +48,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -62,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.2</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -104,7 +101,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -119,10 +122,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -138,7 +139,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -146,6 +148,9 @@
     
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -203,7 +208,7 @@
 
 
 <div class="viewcode-block" id="Periodogram"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram">[docs]</a><span class="k">class</span> <span class="nc">Periodogram</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Generic class to represent a power spectrum (frequency vs power data).</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic class to represent a power spectrum (frequency vs power data).</span>
 
 <span class="sd">    The Periodogram class represents a power spectrum, with values of</span>
 <span class="sd">    frequency on the x-axis (in any frequency units) and values of power on the</span>
@@ -231,10 +236,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">frequency</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="sd">&quot;&quot;&quot;The array of frequency values.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The array of frequency values.&quot;&quot;&quot;</span>
 
     <span class="n">power</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="sd">&quot;&quot;&quot;The array of power values.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The array of power values.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Periodogram.__init__"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -271,7 +276,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">meta</span></div>
 
     <span class="k">def</span> <span class="nf">_validate_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Verifies whether `view` is is one of {&quot;frequency&quot;, &quot;period&quot;} and</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verifies whether `view` is is one of {&quot;frequency&quot;, &quot;period&quot;} and</span>
 <span class="sd">        raises a helpful `ValueError` if not.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;default_view&quot;</span><span class="p">):</span>
@@ -279,7 +284,7 @@
         <span class="k">return</span> <span class="n">validate_method</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_is_evenly_spaced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns true if the values in ``frequency`` are evenly spaced.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns true if the values in ``frequency`` are evenly spaced.</span>
 
 <span class="sd">        This helper method exists because some features, such as ``smooth()``,</span>
 <span class="sd">        ``estimate_numax()``, and ``estimate_deltanu()``, require a grid of</span>
@@ -293,26 +298,26 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">period</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The array of periods, i.e. 1/frequency.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The array of periods, i.e. 1/frequency.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Power of the highest peak in the periodogram.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Power of the highest peak in the periodogram.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">frequency_at_max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Frequency value corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Frequency value corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">period_at_max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Period value corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Period value corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency_at_max_power</span>
 
 <div class="viewcode-block" id="Periodogram.bin"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.bin.html#lightkurve.periodogram.Periodogram.bin">[docs]</a>    <span class="k">def</span> <span class="nf">bin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Bins the power spectrum.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Bins the power spectrum.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -352,7 +357,7 @@
         <span class="k">return</span> <span class="n">binned_pg</span></div>
 
 <div class="viewcode-block" id="Periodogram.smooth"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.smooth.html#lightkurve.periodogram.Periodogram.smooth">[docs]</a>    <span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;boxkernel&quot;</span><span class="p">,</span> <span class="n">filter_width</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Smooths the power spectrum using the &#39;boxkernel&#39; or &#39;logmedian&#39; method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Smooths the power spectrum using the &#39;boxkernel&#39; or &#39;logmedian&#39; method.</span>
 
 <span class="sd">        If `method` is set to &#39;boxkernel&#39;, this method will smooth the power</span>
 <span class="sd">        spectrum by convolving with a numpy Box1DKernel with a width of</span>
@@ -467,7 +472,7 @@
         <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plots the Periodogram.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots the Periodogram.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -551,7 +556,7 @@
         <span class="k">return</span> <span class="n">ax</span></div>
 
 <div class="viewcode-block" id="Periodogram.flatten"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.flatten.html#lightkurve.periodogram.Periodogram.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;logmedian&quot;</span><span class="p">,</span> <span class="n">filter_width</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">return_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Estimates the Signal-To-Noise (SNR) spectrum by dividing out an</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimates the Signal-To-Noise (SNR) spectrum by dividing out an</span>
 <span class="sd">        estimate of the noise background.</span>
 
 <span class="sd">        This method divides the power spectrum by a background estimated</span>
@@ -601,7 +606,7 @@
         <span class="k">return</span> <span class="n">snr</span></div>
 
 <div class="viewcode-block" id="Periodogram.to_table"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.to_table.html#lightkurve.periodogram.Periodogram.to_table">[docs]</a>    <span class="k">def</span> <span class="nf">to_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Exports the Periodogram as an Astropy Table.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports the Periodogram as an Astropy Table.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -615,7 +620,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Periodogram.copy"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.copy.html#lightkurve.periodogram.Periodogram.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a copy of the Periodogram object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a copy of the Periodogram object.</span>
 
 <span class="sd">        This method uses the `copy.deepcopy` function to ensure that all</span>
 <span class="sd">        objects stored within the Periodogram are copied.</span>
@@ -675,7 +680,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Periodogram.show_properties"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.show_properties.html#lightkurve.periodogram.Periodogram.show_properties">[docs]</a>    <span class="k">def</span> <span class="nf">show_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Prints a summary of the non-callable attributes of the Periodogram object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prints a summary of the non-callable attributes of the Periodogram object.</span>
 
 <span class="sd">        Prints in order of type (ints, strings, lists, arrays and others).</span>
 <span class="sd">        Prints in alphabetical order.</span>
@@ -746,7 +751,7 @@
         <span class="n">output</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">max_lines</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_width</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Periodogram.to_seismology"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.Periodogram.to_seismology.html#lightkurve.periodogram.Periodogram.to_seismology">[docs]</a>    <span class="k">def</span> <span class="nf">to_seismology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a `~lightkurve.seismology.Seismology` object to analyze the periodogram.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a `~lightkurve.seismology.Seismology` object to analyze the periodogram.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -759,7 +764,7 @@
 
 
 <span class="k">class</span> <span class="nc">SNRPeriodogram</span><span class="p">(</span><span class="n">Periodogram</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Defines a Signal-to-Noise Ratio (SNR) Periodogram class.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a Signal-to-Noise Ratio (SNR) Periodogram class.</span>
 
 <span class="sd">    This class is nearly identical to the standard :class:`Periodogram` class,</span>
 <span class="sd">    but has different plotting defaults.</span>
@@ -772,7 +777,7 @@
         <span class="k">return</span> <span class="s2">&quot;SNRPeriodogram(ID: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot the SNR spectrum using matplotlib&#39;s `plot` method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the SNR spectrum using matplotlib&#39;s `plot` method.</span>
 <span class="sd">        See `Periodogram.plot` for details on the accepted arguments.</span>
 
 <span class="sd">        Parameters</span>
@@ -792,7 +797,7 @@
 
 
 <span class="k">class</span> <span class="nc">LombScarglePeriodogram</span><span class="p">(</span><span class="n">Periodogram</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Subclass of :class:`Periodogram &lt;lightkurve.periodogram.Periodogram&gt;`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass of :class:`Periodogram &lt;lightkurve.periodogram.Periodogram&gt;`</span>
 <span class="sd">    representing a power spectrum generated using the Lomb Scargle method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -822,7 +827,7 @@
         <span class="n">ls_method</span><span class="o">=</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Creates a `Periodogram` from a LightCurve using the Lomb-Scargle method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a `Periodogram` from a LightCurve using the Lomb-Scargle method.</span>
 
 <span class="sd">        By default, the periodogram will be created for a regular grid of</span>
 <span class="sd">        frequencies from one frequency separation to the Nyquist frequency,</span>
@@ -1139,7 +1144,7 @@
         <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Obtain the flux model for a given frequency and time</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtain the flux model for a given frequency and time</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1169,7 +1174,7 @@
 
 
 <span class="k">class</span> <span class="nc">BoxLeastSquaresPeriodogram</span><span class="p">(</span><span class="n">Periodogram</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Subclass of :class:`Periodogram &lt;lightkurve.periodogram.Periodogram&gt;`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass of :class:`Periodogram &lt;lightkurve.periodogram.Periodogram&gt;`</span>
 <span class="sd">    representing a power spectrum generated using the Box Least Squares (BLS) method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1191,7 +1196,7 @@
 
 <div class="viewcode-block" id="BoxLeastSquaresPeriodogram.from_lightcurve"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_lightcurve</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Creates a `Periodogram` from a LightCurve using the Box Least Squares (BLS) method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a `Periodogram` from a LightCurve using the Box Least Squares (BLS) method.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1351,7 +1356,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="BoxLeastSquaresPeriodogram.compute_stats"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Computes commonly used vetting statistics for a transit model.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes commonly used vetting statistics for a transit model.</span>
 
 <span class="sd">        See `~astropy.timeseries.BoxLeastSquares` docs for further details.</span>
 
@@ -1388,7 +1393,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="BoxLeastSquaresPeriodogram.get_transit_model"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_transit_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Computes the transit model using the BLS, returns a lightkurve.LightCurve</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the transit model using the BLS, returns a lightkurve.LightCurve</span>
 
 <span class="sd">        See `~astropy.timeseries.BoxLeastSquares` docs for further details.</span>
 
@@ -1432,7 +1437,7 @@
         <span class="k">return</span> <span class="n">model</span></div>
 
     <span class="k">def</span> <span class="nf">get_transit_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transit_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a boolean array that is ``True`` during transits and</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a boolean array that is ``True`` during transits and</span>
 <span class="sd">        ``False`` elsewhere.</span>
 
 <span class="sd">        Parameters</span>
@@ -1456,21 +1461,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">transit_time_at_max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the transit time corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the transit time corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transit_time</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">duration_at_max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the duration corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the duration corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">depth_at_max_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the depth corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the depth corresponding to the highest peak in the periodogram.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">)]</span>
 
     <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot the BoxLeastSquaresPeriodogram spectrum using matplotlib&#39;s `plot` method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the BoxLeastSquaresPeriodogram spectrum using matplotlib&#39;s `plot` method.</span>
 <span class="sd">        See `Periodogram.plot` for details on the accepted arguments.</span>
 
 <span class="sd">        Parameters</span>
@@ -1512,7 +1517,8 @@
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1524,7 +1530,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

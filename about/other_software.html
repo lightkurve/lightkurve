@@ -8,8 +8,9 @@
 
     <title>Other software &#8212; Lightkurve </title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,15 +20,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -35,7 +32,7 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Vision of the Lightkurve project" href="vision.html" />
+    <link rel="next" title="Developing for Lightkurve" href="../development/index.html" />
     <link rel="prev" title="Full changelog" href="changelog.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -54,7 +51,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -65,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -107,7 +104,13 @@
 
 <li class="toctree-l1 current active nav-item">
  <a class="reference internal nav-link" href="index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -122,10 +125,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -141,7 +142,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -168,36 +170,12 @@
   </a>
  </li>
 </ul>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="vision.html">
-   Vision of the Lightkurve project
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="contributing.html">
-   Reporting issues and proposing changes
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="testing.html">
-   Running the unit tests
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="documentation.html">
-   Building the documentation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="release-procedure.html">
-   Releasing a new version
-  </a>
- </li>
-</ul>
 
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -208,7 +186,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -286,13 +264,13 @@
               <div>
                 
   <section id="other-software">
-<span id="id1"></span><h1>Other software<a class="headerlink" href="#other-software" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Other software<a class="headerlink" href="#other-software" title="Permalink to this headline">#</a></h1>
 <p>Lightkurve provides general purpose tools for interacting with astronomical lightcurve data.
 Many other tools have been developed to solve related scientific and data analysis problems.
 On this page we list community-produced software that may complement lightkurve.</p>
 <p>If your software is not listed, please <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/main/docs/source/other_software.rst">open a Pull Request</a> to add it, we aim to be inclusive of all Kepler- and TESS-related tools!</p>
 <section id="detrending-analysis">
-<h2>Detrending &amp; Analysis<a class="headerlink" href="#detrending-analysis" title="Permalink to this headline">¶</a></h2>
+<h2>Detrending &amp; Analysis<a class="headerlink" href="#detrending-analysis" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.astro.princeton.edu/~jhartman/vartools.html">VARTOOLS</a> : a command line utility to analyze light curves from Hartman and Bakos (2016).</p></li>
 <li><p><a class="reference external" href="http://github.com/KeplerGO/PyKE">PyKE</a> : Kepler, K2 &amp; TESS Data Analysis Tools (the precursor to Lightkurve)</p></li>
@@ -314,7 +292,7 @@ On this page we list community-produced software that may complement lightkurve.
 </ul>
 </section>
 <section id="full-frame-images">
-<h2>Full Frame Images<a class="headerlink" href="#full-frame-images" title="Permalink to this headline">¶</a></h2>
+<h2>Full Frame Images<a class="headerlink" href="#full-frame-images" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="http://github.com/benmontet/f3">f3</a> : Full Frame Fotometry from the Kepler Full Frame Images</p></li>
 <li><p><a class="reference external" href="http://github.com/jradavenport/FFIorBUST">FFIorBUST</a> : Make really bad light curves from the Kepler Full Frame Images</p></li>
@@ -322,7 +300,7 @@ On this page we list community-produced software that may complement lightkurve.
 </ul>
 </section>
 <section id="data-access">
-<h2>Data access<a class="headerlink" href="#data-access" title="Permalink to this headline">¶</a></h2>
+<h2>Data access<a class="headerlink" href="#data-access" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="http://github.com/dfm/kplr">kplr</a> : Tools for working with Kepler data using Python</p></li>
 <li><p><a class="reference external" href="http://github.com/christinahedges/kepFGS">kepFGS</a> : Tools to use the Kepler and K2 Fine Guidance Sensor data.</p></li>
@@ -330,7 +308,7 @@ On this page we list community-produced software that may complement lightkurve.
 </ul>
 </section>
 <section id="metadata">
-<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="http://github.com/KeplerGO/kadenza">kadenza</a> : Converts raw cadence target data from the Kepler space telescope into FITS files.</p></li>
 <li><p><a class="reference external" href="http://github.com/KeplerGO/k2-quality-control">k2-quality-control</a> : Automated quality control of Kepler/K2 data products.</p></li>
@@ -339,7 +317,7 @@ On this page we list community-produced software that may complement lightkurve.
 </ul>
 </section>
 <section id="planet-search-characterization">
-<h2>Planet Search/Characterization<a class="headerlink" href="#planet-search-characterization" title="Permalink to this headline">¶</a></h2>
+<h2>Planet Search/Characterization<a class="headerlink" href="#planet-search-characterization" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/rodluger/starry">starry</a> : Analytic occultation light curves for astronomy.</p></li>
 <li><p><a class="reference external" href="http://github.com/hpparvi/PyTransit">PyTransit</a> : Fast and easy transit light curve modeling using Python and Fortran.</p></li>
@@ -358,7 +336,7 @@ On this page we list community-produced software that may complement lightkurve.
 </ul>
 </section>
 <section id="population-statistics">
-<h2>Population Statistics<a class="headerlink" href="#population-statistics" title="Permalink to this headline">¶</a></h2>
+<h2>Population Statistics<a class="headerlink" href="#population-statistics" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="http://github.com/timothydmorton/VESPA">VESPA</a> : Calculating false positive probabilities for transit signals</p></li>
 <li><p><a class="reference external" href="http://github.com/nasa/kepler-robovetter">kepler-robovetter</a> : The Kepler Prime Robovetter</p></li>
@@ -369,7 +347,7 @@ On this page we list community-produced software that may complement lightkurve.
 </ul>
 </section>
 <section id="positional">
-<h2>Positional<a class="headerlink" href="#positional" title="Permalink to this headline">¶</a></h2>
+<h2>Positional<a class="headerlink" href="#positional" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="http://github.com/KeplerGO/K2fov">K2fov</a> : Check whether targets are in the field of view of NASA’s K2 space telescope</p></li>
 <li><p><a class="reference external" href="http://github.com/KeplerGO/K2ephem">K2ephem</a> : Check whether a Solar System body is (or was) observable by NASA’s K2 mission.</p></li>
@@ -381,7 +359,7 @@ On this page we list community-produced software that may complement lightkurve.
 </ul>
 </section>
 <section id="science-astrophysics">
-<h2>Science / Astrophysics<a class="headerlink" href="#science-astrophysics" title="Permalink to this headline">¶</a></h2>
+<h2>Science / Astrophysics<a class="headerlink" href="#science-astrophysics" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="http://github.com/timothydmorton/isochrones">isochrones</a> : Pythonic stellar model grid access; easy MCMC fitting of stellar properties</p></li>
 <li><p><a class="reference external" href="http://github.com/hpparvi/ldtk">ldtk</a> : Python toolkit for calculating stellar limb darkening profiles</p></li>
@@ -396,7 +374,7 @@ On this page we list community-produced software that may complement lightkurve.
 </ul>
 </section>
 <section id="astronomical-spectroscopy-radial-velocities">
-<h2>Astronomical Spectroscopy / Radial Velocities<a class="headerlink" href="#astronomical-spectroscopy-radial-velocities" title="Permalink to this headline">¶</a></h2>
+<h2>Astronomical Spectroscopy / Radial Velocities<a class="headerlink" href="#astronomical-spectroscopy-radial-velocities" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/MNGuenther/allesfitter">allesfitter</a> : Model exoplanets, binaries, and flares from photometry and RV.</p></li>
 <li><p><a class="reference external" href="https://github.com/dfm/exoplanet">exoplanet</a> : Fast and scalable MCMC for all your exoplanet needs</p></li>
@@ -412,7 +390,7 @@ On this page we list community-produced software that may complement lightkurve.
 </ul>
 </section>
 <section id="other">
-<h2>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h2>
+<h2>Other<a class="headerlink" href="#other" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="http://github.com/natashabatalha/PandExo">PandExo</a> : A Community Tool for Transiting Exoplanet Science with the JWST &amp; HST</p></li>
 <li><p><a class="reference external" href="http://github.com/ethankruse/kepler_orrery">kepler_orrery</a> : Make a Kepler orrery gif or movie of all the Kepler multi-planet systems</p></li>
@@ -429,7 +407,7 @@ On this page we list community-produced software that may complement lightkurve.
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="changelog.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -437,10 +415,10 @@ On this page we list community-produced software that may complement lightkurve.
             <p class="prev-next-title">Full changelog</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="vision.html" title="next page">
+    <a class='right-next' id="next-link" href="../development/index.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Vision of the Lightkurve project</p>
+        <p class="prev-next-title">Developing for Lightkurve</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
@@ -452,7 +430,8 @@ On this page we list community-produced software that may complement lightkurve.
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -464,7 +443,7 @@ On this page we list community-produced software that may complement lightkurve.
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

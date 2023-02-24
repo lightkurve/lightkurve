@@ -8,8 +8,9 @@
 
     <title>How to recover the first TESS planet candidate with Lightkurve? &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,22 +20,18 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Machine learning style preprocessing with lightkurve" href="exoplanets-machine-learning-preprocessing.html" />
@@ -56,7 +53,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -67,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -109,7 +106,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -124,10 +127,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -152,7 +153,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -299,10 +300,11 @@ div.nboutput.container div.prompt > div {
     }
 }
 
-/* disable scrollbars on prompts */
+/* disable scrollbars and line breaks on prompts */
 div.nbinput.container div.prompt pre,
 div.nboutput.container div.prompt pre {
     overflow: hidden;
+    white-space: pre;
 }
 
 /* input/output area */
@@ -404,6 +406,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -412,10 +415,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -427,12 +434,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -442,7 +452,7 @@ div.rendered_html tbody tr:hover {
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/3-science-examples/exoplanets-recover-first-tess-candidate.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="How-to-recover-the-first-TESS-planet-candidate-with-Lightkurve?">
-<h1>How to recover the first TESS planet candidate with <em>Lightkurve</em>?<a class="headerlink" href="#How-to-recover-the-first-TESS-planet-candidate-with-Lightkurve?" title="Permalink to this headline">¶</a></h1>
+<h1>How to recover the first TESS planet candidate with <em>Lightkurve</em>?<a class="headerlink" href="#How-to-recover-the-first-TESS-planet-candidate-with-Lightkurve?" title="Permalink to this headline">#</a></h1>
 <p>Data from the TESS mission are <a class="reference external" href="https://archive.stsci.edu/prepds/tess-data-alerts/">available from the data archive at MAST</a>. This tutorial demonstrates how the <a class="reference external" href="http://lightkurve.keplerscience.org">Lightkurve Python package</a> can be used to read in these data and create your own TESS light curves with different aperture masks.</p>
 <p>Below is a quick tutorial on how to get started using <em>Lightkurve</em> and TESS data. We’ll use the nearby, bright target Pi Mensae (ID 261136679), around which the mission team recently discovered a short period planet candidate on a 6.27 day orbit. See the <a class="reference external" href="https://arxiv.org/abs/1809.05967">pre-print paper by Huang et al (2018)</a> for more details.</p>
 <p>TESS data is stored in a binary file format which is documented in the <a class="reference external" href="https://archive.stsci.edu/missions/tess/doc/EXP-TESS-ARC-ICD-TM-0014.pdf">TESS Science Data Products Description Document</a>. <em>Lightkurve</em> provides a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.TessTargetPixelFile.html?highlight=tesstargetpixelfile">TessTargetPixelFile</a> class which allows you to interact with the data easily.</p>
@@ -477,7 +487,7 @@ div.rendered_html tbody tr:hover {
 <div class="output_area rendered_html docutils container">
 SearchResult containing 2 data products.
 
-<table id="table5553070064">
+<table id="table6302956416">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 01</td><td>2018</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>261136679</td><td>0.0</td></tr>
@@ -497,7 +507,7 @@ SearchResult containing 2 data products.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/Users/gb/dev/lightkurve/src/lightkurve/search.py:407: LightkurveWarning: Warning: 2 files available to download. Only the first file has been downloaded. Please use `download_all()` or specify additional criteria (e.g. quarter, campaign, or sector) to limit your search.
+/Users/chedges/repos/lightkurve/src/lightkurve/search.py:414: LightkurveWarning: Warning: 2 files available to download. Only the first file has been downloaded. Please use `download_all()` or specify additional criteria (e.g. quarter, campaign, or sector) to limit your search.
   warnings.warn(
 </pre></div></div>
 </div>
@@ -636,7 +646,7 @@ TessTargetPixelFile(TICID: 261136679)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x14b051db0&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x14b052590&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x14b045cf0&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x150dec580&gt;]
+[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x177c57850&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x177c64370&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x177bd3580&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x2910851f0&gt;]
 </pre></div></div>
 </div>
 <p>You can access each extension and the data inside it in the same way you’d use <a class="reference external" href="https://docs.astropy.org/en/stable/io/fits/">astropy.io.fits</a>. If you want to access data held in the TPF, such as the time of the observations, you can do that easily by using</p>
@@ -749,7 +759,7 @@ $[[146.7256,~110.36988,~56.275379,~\dots,~39.974297,~44.420666,~13.883464],~
 </div>
 <p>These values are in units electrons per second.</p>
 <section id="Building-Light-Curves-from-TPFs">
-<h2>Building Light Curves from TPFs<a class="headerlink" href="#Building-Light-Curves-from-TPFs" title="Permalink to this headline">¶</a></h2>
+<h2>Building Light Curves from TPFs<a class="headerlink" href="#Building-Light-Curves-from-TPFs" title="Permalink to this headline">#</a></h2>
 <p>We can use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve()</a> method to turn this TPF into a light curve using <em>Simple Aperture Photometry</em>. This will put an aperture on the target, and sum up the flux in all the pixels inside the aperture.</p>
 <p>The default for <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code> is to use the mask generated by the TESS pipeline.</p>
 <div class="nbinput nblast docutils container">
@@ -1005,7 +1015,7 @@ $[[146.7256,~110.36988,~56.275379,~\dots,~39.974297,~44.420666,~13.883464],~
 </div>
 </section>
 <section id="Comparing-two-apertures">
-<h2>Comparing two apertures<a class="headerlink" href="#Comparing-two-apertures" title="Permalink to this headline">¶</a></h2>
+<h2>Comparing two apertures<a class="headerlink" href="#Comparing-two-apertures" title="Permalink to this headline">#</a></h2>
 <p>In the above tutorial we used our own aperture instead of the pipeline aperture. Let’s compare the results from using these two different apertures.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
@@ -1046,7 +1056,7 @@ $[[146.7256,~110.36988,~56.275379,~\dots,~39.974297,~44.420666,~13.883464],~
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="exoplanets-recover-a-known-planet.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1069,7 +1079,8 @@ $[[146.7256,~110.36988,~56.275379,~\dots,~39.974297,~44.420666,~13.883464],~
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1081,7 +1092,7 @@ $[[146.7256,~110.36988,~56.275379,~\dots,~39.974297,~44.420666,~13.883464],~
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

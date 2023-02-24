@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lightkurve.lightcurve &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,15 +19,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -51,7 +48,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -62,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -104,7 +101,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -119,10 +122,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -138,7 +139,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -146,6 +148,9 @@
     
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -190,6 +195,7 @@
 <span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="kn">import</span> <span class="n">calculate_bin_edges</span>
 <span class="kn">from</span> <span class="nn">astropy.utils.decorators</span> <span class="kn">import</span> <span class="n">deprecated</span><span class="p">,</span> <span class="n">deprecated_renamed_argument</span>
 <span class="kn">from</span> <span class="nn">astropy.utils.exceptions</span> <span class="kn">import</span> <span class="n">AstropyUserWarning</span>
+<span class="kn">from</span> <span class="nn">astropy.utils.masked</span> <span class="kn">import</span> <span class="n">Masked</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">PACKAGEDIR</span><span class="p">,</span> <span class="n">MPLSTYLE</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -231,7 +237,7 @@
 
 
 <div class="viewcode-block" id="LightCurve"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.html#lightkurve.LightCurve">[docs]</a><span class="k">class</span> <span class="nc">LightCurve</span><span class="p">(</span><span class="n">TimeSeries</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.</span>
 
 <span class="sd">    Compared to the generic `~astropy.timeseries.TimeSeries` class, `LightCurve`</span>
@@ -393,7 +399,7 @@
             <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">filtered_names</span><span class="p">]</span>
 
         <span class="k">def</span> <span class="nf">has_time_in_data</span><span class="p">():</span>
-            <span class="sd">&quot;&quot;&quot;Check if the data has a column with the name&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Check if the data has a column with the name&quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
             <span class="k">elif</span> <span class="n">_is_dict_like</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
@@ -569,7 +575,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_required_columns</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Expose all columns and meta keywords as attributes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Expose all columns and meta keywords as attributes.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
@@ -584,7 +590,7 @@
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;object has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;To get copied, attributes have to be stored in the meta dictionary!&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;To get copied, attributes have to be stored in the meta dictionary!&quot;&quot;&quot;</span>
         <span class="n">to_set_as_attr</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
             <span class="n">to_set_as_attr</span> <span class="o">=</span> <span class="kc">True</span>
@@ -620,7 +626,7 @@
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_repr_simple_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a simple __repr__.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a simple __repr__.</span>
 
 <span class="sd">        Used by `LightCurveCollection`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -634,7 +640,7 @@
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_base_repr_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">descr_vals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Defines the description shown by `__repr__` and `_html_repr_`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Defines the description shown by `__repr__` and `_html_repr_`.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">descr_vals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">descr_vals</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">masked</span><span class="p">:</span>
@@ -652,7 +658,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Time</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Time values stored as an AstroPy `~astropy.time.Time` object.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Time values stored as an AstroPy `~astropy.time.Time` object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span>
 
     <span class="nd">@time</span><span class="o">.</span><span class="n">setter</span>
@@ -661,7 +667,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">flux</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Brightness values stored as an AstroPy `~astropy.units.Quantity` object.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Brightness values stored as an AstroPy `~astropy.units.Quantity` object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;flux&quot;</span><span class="p">]</span>
 
     <span class="nd">@flux</span><span class="o">.</span><span class="n">setter</span>
@@ -670,7 +676,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">flux_err</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Brightness uncertainties stored as an AstroPy `~astropy.units.Quantity` object.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Brightness uncertainties stored as an AstroPy `~astropy.units.Quantity` object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;flux_err&quot;</span><span class="p">]</span>
 
     <span class="nd">@flux_err</span><span class="o">.</span><span class="n">setter</span>
@@ -678,7 +684,7 @@
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;flux_err&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flux_err</span>
 
 <div class="viewcode-block" id="LightCurve.select_flux"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.select_flux.html#lightkurve.LightCurve.select_flux">[docs]</a>    <span class="k">def</span> <span class="nf">select_flux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux_column</span><span class="p">,</span> <span class="n">flux_err_column</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Assign a different column to be the flux column.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign a different column to be the flux column.</span>
 
 <span class="sd">        This method returns a copy of the LightCurve in which the ``flux``</span>
 <span class="sd">        and ``flux_err`` columns have been replaced by the values contained</span>
@@ -785,7 +791,7 @@
     <span class="nd">@property</span>
     <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">SAP_FLUX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;A copy of the light curve in which `lc.flux = lc.sap_flux`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A copy of the light curve in which `lc.flux = lc.sap_flux`</span>
 <span class="sd">        and `lc.flux_err = lc.sap_flux_err`.  It is provided for backwards-</span>
 <span class="sd">        compatibility with Lightkurve v1.x and will be removed soon.&quot;&quot;&quot;</span>
         <span class="n">lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -796,7 +802,7 @@
     <span class="nd">@property</span>
     <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">PDCSAP_FLUX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;A copy of the light curve in which `lc.flux = lc.pdcsap_flux`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A copy of the light curve in which `lc.flux = lc.pdcsap_flux`</span>
 <span class="sd">        and `lc.flux_err = lc.pdcsap_flux_err`.  It is provided for backwards-</span>
 <span class="sd">        compatibility with Lightkurve v1.x and will be removed soon.&quot;&quot;&quot;</span>
         <span class="n">lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -902,7 +908,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">show_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Prints a description of all non-callable attributes.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prints a description of all non-callable attributes.</span>
 
 <span class="sd">        Prints in order of type (ints, strings, lists, arrays, others).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -956,7 +962,7 @@
         <span class="n">output</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">max_lines</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_width</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LightCurve.append"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.append.html#lightkurve.LightCurve.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">others</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Append one or more other `LightCurve` object(s) to this one.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Append one or more other `LightCurve` object(s) to this one.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -995,7 +1001,7 @@
         <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Removes the low frequency trend using scipy&#39;s Savitzky-Golay filter.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Removes the low frequency trend using scipy&#39;s Savitzky-Golay filter.</span>
 
 <span class="sd">        This method wraps `scipy.signal.savgol_filter`.</span>
 
@@ -1138,7 +1144,7 @@
         <span class="n">wrap_phase</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">normalize_phase</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a `FoldedLightCurve` object folded on a period and epoch.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a `FoldedLightCurve` object folded on a period and epoch.</span>
 
 <span class="sd">        This method is identical to AstroPy&#39;s `~astropy.timeseries.TimeSeries.fold()`</span>
 <span class="sd">        method, except it returns a `FoldedLightCurve` object which offers</span>
@@ -1247,7 +1253,7 @@
         <span class="k">return</span> <span class="n">lc</span></div>
 
 <div class="viewcode-block" id="LightCurve.normalize"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.normalize.html#lightkurve.LightCurve.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;unscaled&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a normalized version of the light curve.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a normalized version of the light curve.</span>
 
 <span class="sd">        The normalized light curve is obtained by dividing the ``flux`` and</span>
 <span class="sd">        ``flux_err`` object attributes by the median flux.</span>
@@ -1331,7 +1337,7 @@
         <span class="k">return</span> <span class="n">lc</span></div>
 
 <div class="viewcode-block" id="LightCurve.remove_nans"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.remove_nans.html#lightkurve.LightCurve.remove_nans">[docs]</a>    <span class="k">def</span> <span class="nf">remove_nans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flux&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Removes cadences where ``column`` is a NaN.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Removes cadences where ``column`` is a NaN.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1360,7 +1366,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">column</span><span class="p">])]</span>  <span class="c1"># This will return a sliced copy</span></div>
 
 <div class="viewcode-block" id="LightCurve.fill_gaps"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.fill_gaps.html#lightkurve.LightCurve.fill_gaps">[docs]</a>    <span class="k">def</span> <span class="nf">fill_gaps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gaussian_noise&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Fill in gaps in time.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fill in gaps in time.</span>
 
 <span class="sd">        By default, the gaps will be filled with random white Gaussian noise</span>
 <span class="sd">        distributed according to</span>
@@ -1442,7 +1448,7 @@
             <span class="n">quality</span><span class="p">[</span><span class="n">in_original</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">quality</span><span class="p">)</span>
             <span class="n">quality</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">65536</span>
             <span class="n">newdata</span><span class="p">[</span><span class="s2">&quot;quality&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">quality</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        # TODO: add support for other columns</span>
 <span class="sd">        for column in lc.columns:</span>
 <span class="sd">            if column in (&quot;time&quot;, &quot;flux&quot;, &quot;flux_err&quot;, &quot;quality&quot;):</span>
@@ -1458,7 +1464,7 @@
 <div class="viewcode-block" id="LightCurve.remove_outliers"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.remove_outliers.html#lightkurve.LightCurve.remove_outliers">[docs]</a>    <span class="k">def</span> <span class="nf">remove_outliers</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">sigma_lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma_upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Removes outlier data points using sigma-clipping.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Removes outlier data points using sigma-clipping.</span>
 
 <span class="sd">        This method returns a new `LightCurve` object from which data points</span>
 <span class="sd">        are removed if their flux values are greater or smaller than the median</span>
@@ -1545,8 +1551,18 @@
         <span class="c1"># First, we create the outlier mask using AstroPy&#39;s sigma_clip function</span>
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>  <span class="c1"># Ignore warnings due to NaNs or Infs</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+            <span class="n">flux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">Masked</span><span class="p">):</span>
+                <span class="c1"># Workaround for https://github.com/astropy/astropy/issues/14360</span>
+                <span class="c1"># in passing MaskedQuantity to sigma_clip, by converting it to Quantity.</span>
+                <span class="c1"># We explicitly fill masked values with `np.nan` here to ensure they are masked during sigma clipping.</span>
+                <span class="c1"># To handle unlikely edge case, convert int to float to ensure filing `np.nan` work.</span>
+                <span class="c1"># The conversion is acceptable because only the mask of the sigma_clip() result is used.</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">flux</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">):</span>
+                    <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
             <span class="n">outlier_mask</span> <span class="o">=</span> <span class="n">sigma_clip</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">flux</span><span class="p">,</span>
                 <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
                 <span class="n">sigma_lower</span><span class="o">=</span><span class="n">sigma_lower</span><span class="p">,</span>
                 <span class="n">sigma_upper</span><span class="o">=</span><span class="n">sigma_upper</span><span class="p">,</span>
@@ -1574,7 +1590,7 @@
         <span class="n">bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">binsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Bins a lightcurve in equally-spaced bins in time.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Bins a lightcurve in equally-spaced bins in time.</span>
 
 <span class="sd">        If the original light curve contains flux uncertainties (``flux_err``),</span>
 <span class="sd">        the binned lightcurve will report the root-mean-square error.</span>
@@ -1652,7 +1668,7 @@
             <span class="p">)</span>
         <span class="k">elif</span> <span class="n">bins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">bins</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;blocks&#39;</span><span class="p">,</span> <span class="s1">&#39;knuth&#39;</span><span class="p">,</span> <span class="s1">&#39;scott&#39;</span><span class="p">,</span> <span class="s1">&#39;freedman&#39;</span><span class="p">)</span> <span class="ow">and</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">):</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;``bins`` must have integer type.&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_HAS_VAR_BINS</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sequence or method for ``bins`` requires Astropy 5.0.&quot;</span><span class="p">)</span>
@@ -1763,7 +1779,7 @@
 <div class="viewcode-block" id="LightCurve.estimate_cdpp"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.estimate_cdpp.html#lightkurve.LightCurve.estimate_cdpp">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_cdpp</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">transit_duration</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">savgol_window</span><span class="o">=</span><span class="mi">101</span><span class="p">,</span> <span class="n">savgol_polyorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">5.0</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</span>
 
 <span class="sd">        A common estimate of the noise in a lightcurve is the scatter that</span>
 <span class="sd">        remains after all long term trends have been removed. This is the idea</span>
@@ -1841,7 +1857,7 @@
         <span class="n">return_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a list of asteroids or comets which affected the light curve.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of asteroids or comets which affected the light curve.</span>
 
 <span class="sd">        Light curves of stars or galaxies are frequently affected by solar</span>
 <span class="sd">        system bodies (e.g. asteroids, comets, planets).  These objects can move</span>
@@ -1986,7 +2002,7 @@
         <span class="n">clip_outliers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Implements `plot()`, `scatter()`, and `errorbar()` to avoid code duplication.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements `plot()`, `scatter()`, and `errorbar()` to avoid code duplication.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2140,7 +2156,7 @@
         <span class="k">return</span> <span class="n">ax</span>
 
 <div class="viewcode-block" id="LightCurve.plot"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.plot.html#lightkurve.LightCurve.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Plot the light curve using Matplotlib&#39;s `~matplotlib.pyplot.plot` method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the light curve using Matplotlib&#39;s `~matplotlib.pyplot.plot` method.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2182,7 +2198,7 @@
 <div class="viewcode-block" id="LightCurve.scatter"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.scatter.html#lightkurve.LightCurve.scatter">[docs]</a>    <span class="k">def</span> <span class="nf">scatter</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">colorbar_label</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Plots the light curve using Matplotlib&#39;s `~matplotlib.pyplot.scatter` method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots the light curve using Matplotlib&#39;s `~matplotlib.pyplot.scatter` method.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2227,7 +2243,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LightCurve.errorbar"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.errorbar.html#lightkurve.LightCurve.errorbar">[docs]</a>    <span class="k">def</span> <span class="nf">errorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Plots the light curve using Matplotlib&#39;s `~matplotlib.pyplot.errorbar` method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots the light curve using Matplotlib&#39;s `~matplotlib.pyplot.errorbar` method.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2277,7 +2293,7 @@
         <span class="n">maximum_period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">resolution</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Display an interactive Jupyter Notebook widget to find planets.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display an interactive Jupyter Notebook widget to find planets.</span>
 
 <span class="sd">        The Box Least Squares (BLS) periodogram is a statistical tool used</span>
 <span class="sd">        for detecting transiting exoplanets and eclipsing binaries in</span>
@@ -2350,7 +2366,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_timeseries</span><span class="p">(</span><span class="n">ts</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Creates a new `LightCurve` from an AstroPy</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a new `LightCurve` from an AstroPy</span>
 <span class="sd">        `~astropy.timeseries.TimeSeries` object.</span>
 
 <span class="sd">        Parameters</span>
@@ -2364,7 +2380,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_stingray</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a `stingray.Lightcurve` object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a `stingray.Lightcurve` object.</span>
 
 <span class="sd">        This feature requires `Stingray &lt;https://stingraysoftware.github.io/&gt;`_</span>
 <span class="sd">        to be installed (e.g. ``pip install stingray``).  An `ImportError` will</span>
@@ -2391,7 +2407,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_stingray</span><span class="p">(</span><span class="n">lc</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create a new `LightCurve` from a `stingray.Lightcurve`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new `LightCurve` from a `stingray.Lightcurve`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2401,7 +2417,7 @@
         <span class="k">return</span> <span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">counts</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">counts_err</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LightCurve.to_csv"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.to_csv.html#lightkurve.LightCurve.to_csv">[docs]</a>    <span class="k">def</span> <span class="nf">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_or_buf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Writes the light curve to a CSV file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Writes the light curve to a CSV file.</span>
 
 <span class="sd">        This method will convert the light curve into the Comma-Separated Values</span>
 <span class="sd">        (CSV) text format. By default this method will return the result as a</span>
@@ -2433,7 +2449,7 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="LightCurve.to_pandas"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.to_pandas.html#lightkurve.LightCurve.to_pandas">[docs]</a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Converts the light curve to a Pandas `~pandas.DataFrame` object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the light curve to a Pandas `~pandas.DataFrame` object.</span>
 
 <span class="sd">        The data frame will be indexed by `time` using values corresponding</span>
 <span class="sd">        to the light curve&#39;s time format.  This is different from the</span>
@@ -2454,7 +2470,7 @@
         <span class="k">return</span> <span class="n">df</span></div>
 
 <div class="viewcode-block" id="LightCurve.to_excel"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.to_excel.html#lightkurve.LightCurve.to_excel">[docs]</a>    <span class="k">def</span> <span class="nf">to_excel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_or_buf</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Shorthand for `to_pandas().to_excel()`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shorthand for `to_pandas().to_excel()`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2472,7 +2488,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">path_or_buf</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LightCurve.to_periodogram"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.to_periodogram.html#lightkurve.LightCurve.to_periodogram">[docs]</a>    <span class="k">def</span> <span class="nf">to_periodogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;lombscargle&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Converts the light curve to a `~lightkurve.periodogram.Periodogram`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the light curve to a `~lightkurve.periodogram.Periodogram`</span>
 <span class="sd">        power spectrum object.</span>
 
 <span class="sd">        This method will call either</span>
@@ -2519,7 +2535,7 @@
             <span class="k">return</span> <span class="n">LombScarglePeriodogram</span><span class="o">.</span><span class="n">from_lightcurve</span><span class="p">(</span><span class="n">lc</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LightCurve.to_seismology"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.to_seismology.html#lightkurve.LightCurve.to_seismology">[docs]</a>    <span class="k">def</span> <span class="nf">to_seismology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a `~lightkurve.seismology.Seismology` object for estimating</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a `~lightkurve.seismology.Seismology` object for estimating</span>
 <span class="sd">        quick-look asteroseismic quantities.</span>
 
 <span class="sd">        All `**kwargs` will be passed to the `to_periodogram()` method.</span>
@@ -2536,7 +2552,7 @@
 <div class="viewcode-block" id="LightCurve.to_fits"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.to_fits.html#lightkurve.LightCurve.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">flux_column_name</span><span class="o">=</span><span class="s2">&quot;FLUX&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_data</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Converts the light curve to a FITS file in the Kepler/TESS file format.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the light curve to a FITS file in the Kepler/TESS file format.</span>
 
 <span class="sd">        The FITS file will be returned as a `~astropy.io.fits.HDUList` object.</span>
 <span class="sd">        If a `path` is specified then the file will also be written to disk.</span>
@@ -2574,14 +2590,14 @@
         <span class="p">}</span>
 
         <span class="k">def</span> <span class="nf">_header_template</span><span class="p">(</span><span class="n">extension</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;Returns a template `fits.Header` object for a given extension.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Returns a template `fits.Header` object for a given extension.&quot;&quot;&quot;</span>
             <span class="n">template_fn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="n">PACKAGEDIR</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;lc-ext</span><span class="si">{}</span><span class="s2">-header.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="o">.</span><span class="n">fromtextfile</span><span class="p">(</span><span class="n">template_fn</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">_make_primary_hdu</span><span class="p">(</span><span class="n">extra_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;Returns the primary extension (#0).&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Returns the primary extension (#0).&quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="n">extra_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">extra_data</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">()</span>
@@ -2613,7 +2629,7 @@
             <span class="k">return</span> <span class="n">hdu</span>
 
         <span class="k">def</span> <span class="nf">_make_lightcurve_extension</span><span class="p">(</span><span class="n">extra_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;Create the &#39;LIGHTCURVE&#39; extension (i.e. extension #1).&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Create the &#39;LIGHTCURVE&#39; extension (i.e. extension #1).&quot;&quot;&quot;</span>
             <span class="c1"># Turn the data arrays into fits columns and initialize the HDU</span>
             <span class="k">if</span> <span class="n">extra_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">extra_data</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2674,7 +2690,7 @@
             <span class="k">return</span> <span class="n">hdu</span>
 
         <span class="k">def</span> <span class="nf">_hdulist</span><span class="p">(</span><span class="o">**</span><span class="n">extra_data</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;Returns an astropy.io.fits.HDUList object.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Returns an astropy.io.fits.HDUList object.&quot;&quot;&quot;</span>
             <span class="n">list_out</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">(</span>
                 <span class="p">[</span>
                     <span class="n">_make_primary_hdu</span><span class="p">(</span><span class="n">extra_data</span><span class="o">=</span><span class="n">extra_data</span><span class="p">),</span>
@@ -2689,7 +2705,7 @@
         <span class="k">return</span> <span class="n">hdu</span></div>
 
 <div class="viewcode-block" id="LightCurve.to_corrector"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.to_corrector.html#lightkurve.LightCurve.to_corrector">[docs]</a>    <span class="k">def</span> <span class="nf">to_corrector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;sff&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a corrector object to remove instrument systematics.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a corrector object to remove instrument systematics.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2736,7 +2752,7 @@
         <span class="n">method</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Plot the light curve as a river plot.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the light curve as a river plot.</span>
 
 <span class="sd">        A river plot uses colors to represent the light curve values in</span>
 <span class="sd">        chronological order, relative to the period of an interesting signal.</span>
@@ -2924,7 +2940,7 @@
         <span class="k">return</span> <span class="n">ax</span></div>
 
 <div class="viewcode-block" id="LightCurve.create_transit_mask"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.create_transit_mask.html#lightkurve.LightCurve.create_transit_mask">[docs]</a>    <span class="k">def</span> <span class="nf">create_transit_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">transit_time</span><span class="p">,</span> <span class="n">duration</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a boolean array that is ``True`` during transits and</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a boolean array that is ``True`` during transits and</span>
 <span class="sd">        ``False`` elsewhere.</span>
 
 <span class="sd">        This method supports multi-planet systems by allowing ``period``,</span>
@@ -2996,7 +3012,7 @@
 <div class="viewcode-block" id="LightCurve.search_neighbors"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.search_neighbors.html#lightkurve.LightCurve.search_neighbors">[docs]</a>    <span class="k">def</span> <span class="nf">search_neighbors</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3600.0</span><span class="p">,</span> <span class="o">**</span><span class="n">search_criteria</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Search the data archive at MAST for the most nearby light curves.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Search the data archive at MAST for the most nearby light curves.</span>
 
 <span class="sd">        By default, the 10 nearest neighbors located within 3600 arcseconds</span>
 <span class="sd">        are returned. You can override these defaults by changing the `limit`</span>
@@ -3062,7 +3078,7 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="LightCurve.head"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.head.html#lightkurve.LightCurve.head">[docs]</a>    <span class="k">def</span> <span class="nf">head</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the first n rows.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the first n rows.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3077,7 +3093,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="LightCurve.tail"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.tail.html#lightkurve.LightCurve.tail">[docs]</a>    <span class="k">def</span> <span class="nf">tail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the last n rows.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the last n rows.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3092,7 +3108,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="n">n</span><span class="p">:]</span></div>
 
 <div class="viewcode-block" id="LightCurve.truncate"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.truncate.html#lightkurve.LightCurve.truncate">[docs]</a>    <span class="k">def</span> <span class="nf">truncate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">before</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">after</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Truncates the light curve before and after some time value.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Truncates the light curve before and after some time value.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3120,7 +3136,7 @@
 
 
 <div class="viewcode-block" id="FoldedLightCurve"><a class="viewcode-back" href="../../reference/api/lightkurve.FoldedLightCurve.html#lightkurve.FoldedLightCurve">[docs]</a><span class="k">class</span> <span class="nc">FoldedLightCurve</span><span class="p">(</span><span class="n">LightCurve</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Subclass of `LightCurve` in which the ``time`` parameter represents phase values.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass of `LightCurve` in which the ``time`` parameter represents phase values.</span>
 
 <span class="sd">    Compared to the `~lightkurve.lightcurve.LightCurve` base class, this class</span>
 <span class="sd">    has extra meta data entries (``period``, ``epoch_time``, ``epoch_phase``,</span>
@@ -3131,12 +3147,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Alias for `LightCurve.time`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias for `LightCurve.time`.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The cycle of the correspond `time_original`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The cycle of the correspond `time_original`.</span>
 <span class="sd">        The first cycle is cycle 0, irrespective of whether it is a complete one or not.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cycle_epoch_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">/</span> <span class="mi">2</span>
@@ -3146,7 +3162,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">odd_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Boolean mask which flags the odd-numbered cycles (1, 3, 5, etc).</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Boolean mask which flags the odd-numbered cycles (1, 3, 5, etc).</span>
 
 <span class="sd">        This is useful for studying every second occurence of a signal.</span>
 <span class="sd">        For example, in exoplanet searches, comparisons of odd and even transits</span>
@@ -3168,14 +3184,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">even_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Boolean mask which flags the even-numbered cycles (2, 4, 6, etc).</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Boolean mask which flags the even-numbered cycles (2, 4, 6, etc).</span>
 
 <span class="sd">        See the documentation of `odd_mask` for examples.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">odd_mask</span>
 
     <span class="k">def</span> <span class="nf">_set_xlabel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper function for plot, scatter, and errorbar.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function for plot, scatter, and errorbar.</span>
 <span class="sd">        Ensures the xlabel is correctly set for folded light curves.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;xlabel&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
@@ -3185,7 +3201,7 @@
         <span class="k">return</span> <span class="n">kwargs</span>
 
 <div class="viewcode-block" id="FoldedLightCurve.plot"><a class="viewcode-back" href="../../reference/api/lightkurve.FoldedLightCurve.plot.html#lightkurve.FoldedLightCurve.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot the folded light curve using matplotlib&#39;s</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the folded light curve using matplotlib&#39;s</span>
 <span class="sd">        `~matplotlib.pyplot.plot` method.</span>
 
 <span class="sd">        See `LightCurve.plot` for details on the accepted arguments.</span>
@@ -3204,7 +3220,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FoldedLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FoldedLightCurve.scatter"><a class="viewcode-back" href="../../reference/api/lightkurve.FoldedLightCurve.scatter.html#lightkurve.FoldedLightCurve.scatter">[docs]</a>    <span class="k">def</span> <span class="nf">scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot the folded light curve using matplotlib&#39;s `~matplotlib.pyplot.scatter` method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the folded light curve using matplotlib&#39;s `~matplotlib.pyplot.scatter` method.</span>
 
 <span class="sd">        See `LightCurve.scatter` for details on the accepted arguments.</span>
 
@@ -3222,7 +3238,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FoldedLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FoldedLightCurve.errorbar"><a class="viewcode-back" href="../../reference/api/lightkurve.FoldedLightCurve.errorbar.html#lightkurve.FoldedLightCurve.errorbar">[docs]</a>    <span class="k">def</span> <span class="nf">errorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot the folded light curve using matplotlib&#39;s</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the folded light curve using matplotlib&#39;s</span>
 <span class="sd">        `~matplotlib.pyplot.errorbar` method.</span>
 
 <span class="sd">        See `LightCurve.scatter` for details on the accepted arguments.</span>
@@ -3241,7 +3257,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FoldedLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FoldedLightCurve.plot_river"><a class="viewcode-back" href="../../reference/api/lightkurve.FoldedLightCurve.plot_river.html#lightkurve.FoldedLightCurve.plot_river">[docs]</a>    <span class="k">def</span> <span class="nf">plot_river</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot the folded light curve in a river style.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the folded light curve in a river style.</span>
 
 <span class="sd">        See `~LightCurve.plot_river` for details on the accepted arguments.</span>
 
@@ -3262,7 +3278,7 @@
 
 
 <span class="k">class</span> <span class="nc">KeplerLightCurve</span><span class="p">(</span><span class="n">LightCurve</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`</span>
 <span class="sd">    to represent data from NASA&#39;s Kepler and K2 mission.&quot;&quot;&quot;</span>
 
     <span class="n">_deprecated_keywords</span> <span class="o">=</span> <span class="p">(</span>
@@ -3284,7 +3300,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a `KeplerLightCurve` by reading the given file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a `KeplerLightCurve` by reading the given file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3322,7 +3338,7 @@
         <span class="n">aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">extra_data</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Writes the KeplerLightCurve to a FITS file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Writes the KeplerLightCurve to a FITS file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3384,7 +3400,7 @@
 
 
 <span class="k">class</span> <span class="nc">TessLightCurve</span><span class="p">(</span><span class="n">LightCurve</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`</span>
 <span class="sd">    to represent data from NASA&#39;s TESS mission.&quot;&quot;&quot;</span>
 
     <span class="n">_deprecated_keywords</span> <span class="o">=</span> <span class="p">(</span>
@@ -3406,7 +3422,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a `TessLightCurve` by reading the given file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a `TessLightCurve` by reading the given file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3442,7 +3458,7 @@
         <span class="n">aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">extra_data</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Writes the KeplerLightCurve to a FITS file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Writes the KeplerLightCurve to a FITS file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3506,7 +3522,7 @@
 
 
 <span class="k">def</span> <span class="nf">_boolean_mask_to_bitmask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Takes in an aperture_mask and returns a Kepler-style bitmask</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes in an aperture_mask and returns a Kepler-style bitmask</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -3526,7 +3542,7 @@
     <span class="c1"># Masks can either be boolean input or Kepler pipeline style</span>
     <span class="n">clean_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
 
-    <span class="n">contains_bit2</span> <span class="o">=</span> <span class="p">(</span><span class="n">clean_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+    <span class="n">contains_bit2</span> <span class="o">=</span> <span class="p">(</span><span class="n">clean_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
     <span class="n">all_zeros_or_ones</span> <span class="o">=</span> <span class="p">(</span><span class="n">clean_mask</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="s2">&quot;int&quot;</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span>
         <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">clean_mask</span><span class="p">))</span> <span class="o">-</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">})</span> <span class="o">==</span> <span class="nb">set</span><span class="p">()</span>
     <span class="p">)</span>
@@ -3548,7 +3564,7 @@
 
 
 <span class="k">def</span> <span class="nf">_make_aperture_extension</span><span class="p">(</span><span class="n">hdu_list</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns an `ImageHDU` object containing the &#39;APERTURE&#39; extension</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns an `ImageHDU` object containing the &#39;APERTURE&#39; extension</span>
 <span class="sd">    of a light curve file.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">aperture_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">bitmask</span> <span class="o">=</span> <span class="n">_boolean_mask_to_bitmask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
@@ -3571,7 +3587,8 @@
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -3583,7 +3600,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

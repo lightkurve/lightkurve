@@ -8,8 +8,9 @@
 
     <title>How to open a light curve in Excel? &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,22 +20,18 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Creating your own light curves using custom aperture photometry" href="../2-creating-light-curves/2-1-custom-aperture-photometry.html" />
@@ -56,7 +53,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -67,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -109,7 +106,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -124,10 +127,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -152,7 +153,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -314,10 +315,11 @@ div.nboutput.container div.prompt > div {
     }
 }
 
-/* disable scrollbars on prompts */
+/* disable scrollbars and line breaks on prompts */
 div.nbinput.container div.prompt pre,
 div.nboutput.container div.prompt pre {
     overflow: hidden;
+    white-space: pre;
 }
 
 /* input/output area */
@@ -419,6 +421,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -427,10 +430,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -442,12 +449,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -457,9 +467,9 @@ div.rendered_html tbody tr:hover {
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/1-getting-started/how-to-open-a-lightcurve-in-excel.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="How-to-open-a-light-curve-in-Excel?">
-<h1>How to open a light curve in Excel?<a class="headerlink" href="#How-to-open-a-light-curve-in-Excel?" title="Permalink to this headline">¶</a></h1>
+<h1>How to open a light curve in Excel?<a class="headerlink" href="#How-to-open-a-light-curve-in-Excel?" title="Permalink to this headline">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Learn how to search and download TESS light curves.</p></li>
@@ -469,14 +479,14 @@ div.rendered_html tbody tr:hover {
 <p>This tutorial is aimed at first time users who may not have used <em>Lightkurve</em> before.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
 <p>First we must install and import the <a class="reference external" href="https://docs.lightkurve.org/index.html">Lightkurve</a> package. We can do this as follows:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This step is not necessary if you have already installed Lightkurve</span>
-<span class="o">!</span>pip install lightkurve --quiet
+<span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>lightkurve<span class="w"> </span>--quiet
 </pre></div>
 </div>
 </div>
@@ -491,7 +501,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </section>
 <section id="1.-Downloading-a-TESS-light-curve">
-<h2>1. Downloading a TESS light curve<a class="headerlink" href="#1.-Downloading-a-TESS-light-curve" title="Permalink to this headline">¶</a></h2>
+<h2>1. Downloading a TESS light curve<a class="headerlink" href="#1.-Downloading-a-TESS-light-curve" title="Permalink to this headline">#</a></h2>
 <p>The light curves of stars created by the TESS mission are stored at the <a class="reference external" href="https://archive.stsci.edu/tess/">Mikulksi Archive for Space Telescopes</a> (MAST) archive, along with metadata about the observations, such as which CCD channel was used at each time.</p>
 <p><em>Lightkurve’s</em> built-in tools allow us to search for light curve files in the archive, and download them and their metadata. In this example, we will start by downloading one sector of TESS data for a star named V1357 Cyg, also known as <a class="reference external" href="https://en.wikipedia.org/wiki/Cygnus_X-1">Cygnus X-1</a>. V1357 Cyg is a galactic X-ray source in the constellation Cygnus.</p>
 <p>Using Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve">search_lightcurve</a> function, we can find an itemized list of light curves produced by different data analysis pipelines:</p>
@@ -531,7 +541,7 @@ SearchResult containing 3 data products.
 </div>
 </section>
 <section id="2.-Plotting-a-light-curve">
-<h2>2. Plotting a light curve<a class="headerlink" href="#2.-Plotting-a-light-curve" title="Permalink to this headline">¶</a></h2>
+<h2>2. Plotting a light curve<a class="headerlink" href="#2.-Plotting-a-light-curve" title="Permalink to this headline">#</a></h2>
 <p>Before loading the light curve data into Excel, it can be useful to have a quick look at the data using <em>Lightkurve’s</em> <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.plot.html?highlight=plot#lightkurve.LightCurve.plot">plot</a> function:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -550,7 +560,7 @@ SearchResult containing 3 data products.
 </div>
 </section>
 <section id="3.-Download-the-light-curve-as-an-Excel-spreadsheet">
-<h2>3. Download the light curve as an Excel spreadsheet<a class="headerlink" href="#3.-Download-the-light-curve-as-an-Excel-spreadsheet" title="Permalink to this headline">¶</a></h2>
+<h2>3. Download the light curve as an Excel spreadsheet<a class="headerlink" href="#3.-Download-the-light-curve-as-an-Excel-spreadsheet" title="Permalink to this headline">#</a></h2>
 <p>If you are new to Python, it is likely that you feel more comfortable inspecting and analyzing a light curve in Excel than in Python. That is fine! We can save the light curve data as an Excel spreadsheet named “V1357Cyg.xlsx” as follows:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -561,12 +571,15 @@ SearchResult containing 3 data products.
 </div>
 </div>
 <p>This file will be available on your local drive. If you run this notebook in a Google Colab environment, you can download the file as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">google.colab</span> <span class="kn">import</span> <span class="n">files</span>
+<span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s2">&quot;V1357Cyg.xlsx&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">google.colab</span> <span class="kn">import</span> <span class="n">files</span>
-<span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s2">&quot;V1357Cyg.xlsx&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
 </div>
 </div>
@@ -578,7 +591,7 @@ SearchResult containing 3 data products.
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="interactively-inspecting-data.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -601,7 +614,8 @@ SearchResult containing 3 data products.
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -613,7 +627,7 @@ SearchResult containing 3 data products.
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

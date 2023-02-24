@@ -8,8 +8,9 @@
 
     <title>Verifying the location of a periodic signal in the pixel data &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,22 +20,18 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="How to improve the signal-to-noise of a periodogram?" href="periodograms-optimizing-the-snr.html" />
@@ -56,7 +53,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -67,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -109,7 +106,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -124,10 +127,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -152,7 +153,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -363,10 +364,11 @@ div.nboutput.container div.prompt > div {
     }
 }
 
-/* disable scrollbars on prompts */
+/* disable scrollbars and line breaks on prompts */
 div.nbinput.container div.prompt pre,
 div.nboutput.container div.prompt pre {
     overflow: hidden;
+    white-space: pre;
 }
 
 /* input/output area */
@@ -468,6 +470,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -476,10 +479,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -491,12 +498,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -506,9 +516,9 @@ div.rendered_html tbody tr:hover {
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/3-science-examples/periodograms-verifying-the-location-of-a-signal.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Verifying-the-location-of-a-periodic-signal-in-the-pixel-data">
-<h1>Verifying the location of a periodic signal in the pixel data<a class="headerlink" href="#Verifying-the-location-of-a-periodic-signal-in-the-pixel-data" title="Permalink to this headline">¶</a></h1>
+<h1>Verifying the location of a periodic signal in the pixel data<a class="headerlink" href="#Verifying-the-location-of-a-periodic-signal-in-the-pixel-data" title="Permalink to this headline">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Understand the causes of signal blending and aperture contamination in <em>Kepler</em> and <em>K2</em> data.</p></li>
@@ -517,12 +527,12 @@ div.rendered_html tbody tr:hover {
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
 <p>This tutorial is part of a series on handling <em>Kepler</em> and <em>K2</em> data with Astropy and Lightkurve. To work through this tutorial, you should be familiar with downloading and handling both <strong>light curves</strong> and <strong>target pixel files</strong> with Lightkurve, and you should have experience working with <strong>periodograms</strong>. We’ll use light curves and periodograms to detect signal, and follow that up with detailed analysis on the pixel scale to pinpoint the signal’s source.</p>
 <p>Some useful terms to keep in mind when working with signal verification are <em>contamination</em> and <em>blending</em>. These terms are often used interchangeably. Here, we’ll use blending to refer to any scenario where flux from two or more targets become visible in one target’s aperture. We use contamination to refer, more specifically, to the signal that erroneously enters the aperture.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
 <p>We’ll use <a class="reference external" href="https://docs.lightkurve.org/">Lightkurve</a> for downloading and handling <em>Kepler</em> data throughout this tutorial. We’ll also use <a class="reference external" href="https://numpy.org/">NumPy</a> to handle arrays for aperture masks, and <a class="reference external" href="https://matplotlib.org">Matplotlib</a> for visualizing data.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -537,17 +547,17 @@ div.rendered_html tbody tr:hover {
 </div>
 </section>
 <section id="1.-Background">
-<h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">¶</a></h2>
+<h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">#</a></h2>
 <p>The <em>Kepler</em> space telescope observed with 4x4 arcsecond square pixels. This means that if two stars are within the same <em>Kepler</em> pixel, it is difficult to identify which is the source of an observed signal. Fortunately, these coincidences are unlikely. But the <em>Kepler</em> mission observed areas close to the Galactic plane, and both <em>Kepler</em> and <em>K2</em> observed stellar clusters, all of which are visually crowded regions. Due to crowding, there are still many cases where the true source of a signal is
 unclear.</p>
 <p>The process of signal verification begins with a light curve: first, we must detect our signal. In the case of potential exoplanet transits, these will be evident in the light curve; for other phenomena, including binarity and stellar variability, we might need a periodogram to pick up on the signal. To make sure our transits really do belong to a planet, or if there’s any uncertainty about the source of a stellar signal (such as, is the star in a crowded region? Is there a bright star nearby?
 Are we seeing multiple signals?), we need to look at the target pixel files, which will give us a more complete picture, and help us identify nearby contaminating sources.</p>
 </section>
 <section id="2.-Pixel-Level-Analysis">
-<h2>2. Pixel Level Analysis<a class="headerlink" href="#2.-Pixel-Level-Analysis" title="Permalink to this headline">¶</a></h2>
+<h2>2. Pixel Level Analysis<a class="headerlink" href="#2.-Pixel-Level-Analysis" title="Permalink to this headline">#</a></h2>
 <p>The most basic method of signal verification is to look at the pixels. In this section, we’ll use tools included in Lightkurve to examine light curves and periodograms in individual pixels and help us identify the source of a signal.</p>
 <section id="2.1-Initial-analysis">
-<h3>2.1 Initial analysis<a class="headerlink" href="#2.1-Initial-analysis" title="Permalink to this headline">¶</a></h3>
+<h3>2.1 Initial analysis<a class="headerlink" href="#2.1-Initial-analysis" title="Permalink to this headline">#</a></h3>
 <p>KIC 2435971 is a star of <a class="reference external" href="https://keplerscience.arc.nasa.gov/the-kepler-space-telescope.html#flux-calibration">Kepler magnitude</a> Kp = 14.7, with a massive signal. It’s not impossible that this signal comes from the star, but KIC 2435971 is in the field of open cluster NGC 6791, which means it’s subject to a higher level of crowding than much of the <em>Kepler</em> field. This could be a case of contamination; to be absolutely certain, we’re going to use this star for our signal verification
 exercise. Let’s begin by downloading a light curve; then we can produce a Lomb-Scargle Periodogram to search for repeating signals.</p>
 <div class="nbinput nblast docutils container">
@@ -578,7 +588,7 @@ exercise. Let’s begin by downloading a light curve; then we can produce a Lomb
 <p>These high-amplitude, narrow peaks in the periodogram suggests a compact binary star.</p>
 </section>
 <section id="2.2-Pixel-level-analysis">
-<h3>2.2 Pixel-level analysis<a class="headerlink" href="#2.2-Pixel-level-analysis" title="Permalink to this headline">¶</a></h3>
+<h3>2.2 Pixel-level analysis<a class="headerlink" href="#2.2-Pixel-level-analysis" title="Permalink to this headline">#</a></h3>
 <p>Often, the identification of a much brighter target in the frame is enough to confirm contamination. Let’s begin by looking at the target pixel file (TPF) we’re going to be working with:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -662,7 +672,7 @@ it, and the placement of the pipeline aperture reflects this.</p>
 exclude all of this signal, as it has such a high amplitude and contaminates so many of these pixels.</p>
 </section>
 <section id="2.3-Identifying-a-contaminant">
-<h3>2.3 Identifying a contaminant<a class="headerlink" href="#2.3-Identifying-a-contaminant" title="Permalink to this headline">¶</a></h3>
+<h3>2.3 Identifying a contaminant<a class="headerlink" href="#2.3-Identifying-a-contaminant" title="Permalink to this headline">#</a></h3>
 <p>For this exercise, we’re going to switch to a different star. KIC 7024511 was flagged as a <em>Kepler</em> Object of Interest (KOI) in Quarter 6 of the mission, and given the designation KOI 311. This means that it’s a potential exoplanet host, based on transits detected. Let’s have a look at one quarter of data:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
@@ -717,7 +727,7 @@ decrease. We can look at the TPF using <code class="docutils literal notranslate
 <div class="output_area rendered_html docutils container">
 SearchResult containing 2 data products.
 
-<table id="table5490622624">
+<table id="table5635977904">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 11</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr007024511</td><td>0.0</td></tr>
@@ -745,14 +755,14 @@ SearchResult containing 2 data products.
 </section>
 </section>
 <section id="3.-Advanced:-Difference-Imaging">
-<h2>3. Advanced: Difference Imaging<a class="headerlink" href="#3.-Advanced:-Difference-Imaging" title="Permalink to this headline">¶</a></h2>
+<h2>3. Advanced: Difference Imaging<a class="headerlink" href="#3.-Advanced:-Difference-Imaging" title="Permalink to this headline">#</a></h2>
 <p>The focus of most <em>Kepler</em> and <em>K2</em> signal verification research has been in validating exoplanets. Often, this is done by measuring and tracking image centroids. A centroid is the weighted average along both axes of the image, which measures the point where most flux is concentrated. If a true transit is observed, the centroid of the image will shift in time with it (<a class="reference external" href="https://iopscience.iop.org/article/10.1088/2041-8205/713/2/L103/pdf">Batalha et al., 2010</a>). Another technique, and the focus
 of this section, is difference imaging (<a class="reference external" href="https://iopscience.iop.org/article/10.1086/671767/pdf">Bryson et al., 2013</a>). Difference imaging has been used to validate signals from exocomets (<a class="reference external" href="https://arxiv.org/pdf/1708.06069.pdf">Rappaport et al., 2018</a>), flaring stars (<a class="reference external" href="https://iopscience.iop.org/article/10.3847/1538-4357/aa8ea2/pdf">Yang et al., 2017</a>), and binary systems (<a class="reference external" href="https://arxiv.org/pdf/1705.00621.pdf">Colman et al., 2017</a>).</p>
 <p>For vetting exoplanet candidates, difference imaging begins with a selection of flux measurements, both in- and out-of-phase with the transit. Using the frames from TPF images, we take an average of each collection of frames and subtract the in-phase fluxes from the out-of-phase fluxes, resulting in a <em>difference image</em>. We can then measure the centroid of the difference image, which will move outside of the optimal aperture if the star is contaminated. We can also visually identify the pixel
 where the variable flux is “brightest.”</p>
 <p>We’re going to work through a basic case here, which is applicable to a broad variety of stellar signals. For any periodic and quasi-sinusoidal signal, difference imaging works by selecting flux frames at timestamps around the maxima and minima of the signal, which is equivalent to working in- and out-of-phase with a transit. The result is a pixel image where the brightest pixels are those where the periodic signal is strongest.</p>
 <section id="3.1-Determining-the-signal-period">
-<h3>3.1 Determining the signal period<a class="headerlink" href="#3.1-Determining-the-signal-period" title="Permalink to this headline">¶</a></h3>
+<h3>3.1 Determining the signal period<a class="headerlink" href="#3.1-Determining-the-signal-period" title="Permalink to this headline">#</a></h3>
 <p>Let’s go back to KIC 2435971. We’re going to use the TPF we downloaded above for difference imaging; as it’s a pixel-level method, we can only use one quarter or campaign of <em>Kepler</em> data at a time. But for difference imaging to work well, we need as much data as possible to extract the period for differencing, so we’ll use the stitched light curve we prepared earlier. We’ve already downloaded the data above, so let’s remind ourselves of what the periodogram looks like:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -791,7 +801,7 @@ Period: 0.136 d
 </div>
 </section>
 <section id="3.2-Determining-the-maximum-and-minimum-phase-times">
-<h3>3.2 Determining the maximum and minimum phase times<a class="headerlink" href="#3.2-Determining-the-maximum-and-minimum-phase-times" title="Permalink to this headline">¶</a></h3>
+<h3>3.2 Determining the maximum and minimum phase times<a class="headerlink" href="#3.2-Determining-the-maximum-and-minimum-phase-times" title="Permalink to this headline">#</a></h3>
 <p>To find our maxima and minima, we’re going to start by phase-folding the light curve. This will help us identify the maxima and minima of the periodic signal.</p>
 <p>Note that when we phase-fold the curve below, we use the <code class="docutils literal notranslate"><span class="pre">epoch_time</span></code> argument to shift the phase curve’s zero position. This helps us pick out the maxima and minima of the phase curve more clearly; however, it’s a matter of trial and error to choose a suitable epoch time for any given target. In many cases, it will suffice not to set the argument at all. An alternative to experimenting with the epoch time is appending the phased light curve to itself, which guarantees at least one clear
 maximum and one clear minimum. This is a better method for an automated difference imaging pipeline, but is more complicated to implement.</p>
@@ -831,7 +841,7 @@ maximum and one clear minimum. This is a better method for an automated differen
 <p>We’re going to identify the maxima and minima using the binned phase curve. Once we have identified two ranges in phase space, we’ll collect the timestamps within those ranges from the original phase curve. Then we’ll compare those timestamps to our TPF data to pick out the corresponding flux frames for each range.</p>
 <p>It can be tricky to decide how much flux to collect on either side of the maxima and minima. A good value is a tolerance of 5% of the phase curve, which means that we end up using 10% of the light curve at maximum phase and 10% of the light curve at minimum phase for the difference image. This ensures that we’re using enough to get a reliable difference image, given some uncertainty in where the maxima and minima actually are, but not so much that the difference image is meaningless.</p>
 <p>This next part uses some Python tricks to help us quickly determine which timestamps to use in calculating our difference image. If you find the code below unfamiliar, it might be helpful to read up on <cite>NumPy ``where()`</cite> &lt;<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.where.html">https://numpy.org/doc/stable/reference/generated/numpy.where.html</a>&gt;`__ and <a class="reference external" href="https://www.pythonforbeginners.com/basics/list-comprehensions-in-python">list comprehension</a>.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
@@ -847,6 +857,14 @@ maximum and one clear minimum. This is a better method for an automated differen
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+WARNING: TimeDeltaMissingUnitWarning: Numerical value without unit or explicit format passed to TimeDelta, assuming days [astropy.time.core]
+</pre></div></div>
+</div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
@@ -858,7 +876,7 @@ maximum and one clear minimum. This is a better method for an automated differen
 </div>
 </section>
 <section id="3.3-Computing-the-difference-image">
-<h3>3.3 Computing the difference image<a class="headerlink" href="#3.3-Computing-the-difference-image" title="Permalink to this headline">¶</a></h3>
+<h3>3.3 Computing the difference image<a class="headerlink" href="#3.3-Computing-the-difference-image" title="Permalink to this headline">#</a></h3>
 <p>Now that we have identified the maximum and minimum phase timestamps to use, we can calculate our difference image! We’re also going to calculate an average of the whole quarter, and we can use Matplotlib to display them side by side for clear comparison. Note that we’re also flipping the images, so that they have the same orientation as the Lightkurve TPF plots.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
@@ -896,12 +914,12 @@ where it’s strongest; this is particularly evident in the case of KIC 2435971.
 </section>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
 <p><strong>Author:</strong> <a class="reference external" href="http://orcid.org/0000-0001-8196-516X">Isabel Colman</a> (<code class="docutils literal notranslate"><span class="pre">isabel.colman&#64;sydney.edu.au</span></code>)</p>
 <p><strong>Updated on:</strong> 2020-09-15</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
@@ -966,62 +984,65 @@ archivePrefix = "ascl",
 }
     </textarea>
     <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
-@ARTICLE{2018AJ....156..123T,
-   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
-    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
-    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
-    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
-    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
-    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
-    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
-    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
-    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
-    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
-    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
-    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
-    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
-    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
-    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
-    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
-    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
-    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
-    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
-    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
-    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
-    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
-    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
-    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
-    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
-    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
-    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
-    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
-    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
-    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
-    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
-    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
-    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
-    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
-    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
-    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
-    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
-    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
-    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
-    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
-    {Zabalza}, V. and {Contributors}, (.},
-    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
-  journal = {\aj},
-archivePrefix = "arXiv",
-   eprint = {1801.02634},
- primaryClass = "astro-ph.IM",
- keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
-     year = 2018,
-    month = sep,
-   volume = 156,
-      eid = {123},
-    pages = {123},
-      doi = {10.3847/1538-3881/aabc4f},
-   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+@ARTICLE{astropy:2022,
+       author = {{Astropy Collaboration} and {Price-Whelan}, Adrian M. and {Lim}, Pey
+       Lian and {Earl}, Nicholas and {Starkman}, Nathaniel and {Bradley}, Larry and
+       {Shupe}, David L. and {Patil}, Aarya A. and {Corrales}, Lia and {Brasseur}, C.~E.
+       and {N{\"o}the}, Maximilian and {Donath}, Axel and {Tollerud}, Erik and {Morris},
+       Brett M. and {Ginsburg}, Adam and {Vaher}, Eero and {Weaver}, Benjamin A. and
+       {Tocknell}, James and {Jamieson}, William and {van Kerkwijk}, Marten H. and
+       {Robitaille}, Thomas P. and {Merry}, Bruce and {Bachetti}, Matteo and
+       {G{\"u}nther}, H. Moritz and {Aldcroft}, Thomas L. and {Alvarado-Montes}, Jaime
+       A. and {Archibald}, Anne M. and {B{\'o}di}, Attila and {Bapat}, Shreyas and
+       {Barentsen}, Geert and {Baz{\'a}n}, Juanjo and {Biswas}, Manish and {Boquien},
+       M{\'e}d{\'e}ric and {Burke}, D.~J. and {Cara}, Daria and {Cara}, Mihai and
+       {Conroy}, Kyle E. and {Conseil}, Simon and {Craig}, Matthew W. and {Cross},
+       Robert M. and {Cruz}, Kelle L. and {D'Eugenio}, Francesco and {Dencheva}, Nadia
+       and {Devillepoix}, Hadrien A.~R. and {Dietrich}, J{\"o}rg P. and {Eigenbrot},
+       Arthur Davis and {Erben}, Thomas and {Ferreira}, Leonardo and {Foreman-Mackey},
+       Daniel and {Fox}, Ryan and {Freij}, Nabil and {Garg}, Suyog and {Geda}, Robel and
+       {Glattly}, Lauren and {Gondhalekar}, Yash and {Gordon}, Karl D. and {Grant},
+       David and {Greenfield}, Perry and {Groener}, Austen M. and {Guest}, Steve and
+       {Gurovich}, Sebastian and {Handberg}, Rasmus and {Hart}, Akeem and
+       {Hatfield-Dodds}, Zac and {Homeier}, Derek and {Hosseinzadeh}, Griffin and
+       {Jenness}, Tim and {Jones}, Craig K. and {Joseph}, Prajwel and {Kalmbach}, J.
+       Bryce and {Karamehmetoglu}, Emir and {Ka{\l}uszy{\'n}ski}, Miko{\l}aj and
+       {Kelley}, Michael S.~P. and {Kern}, Nicholas and {Kerzendorf}, Wolfgang E. and
+       {Koch}, Eric W. and {Kulumani}, Shankar and {Lee}, Antony and {Ly}, Chun and
+       {Ma}, Zhiyuan and {MacBride}, Conor and {Maljaars}, Jakob M. and {Muna}, Demitri
+       and {Murphy}, N.~A. and {Norman}, Henrik and {O'Steen}, Richard and {Oman}, Kyle
+       A. and {Pacifici}, Camilla and {Pascual}, Sergio and {Pascual-Granado}, J. and
+       {Patil}, Rohit R. and {Perren}, Gabriel I. and {Pickering}, Timothy E. and
+       {Rastogi}, Tanuj and {Roulston}, Benjamin R. and {Ryan}, Daniel F. and {Rykoff},
+       Eli S. and {Sabater}, Jose and {Sakurikar}, Parikshit and {Salgado}, Jes{\'u}s
+       and {Sanghi}, Aniket and {Saunders}, Nicholas and {Savchenko}, Volodymyr and
+       {Schwardt}, Ludwig and {Seifert-Eckert}, Michael and {Shih}, Albert Y. and
+       {Jain}, Anany Shrey and {Shukla}, Gyanendra and {Sick}, Jonathan and {Simpson},
+       Chris and {Singanamalla}, Sudheesh and {Singer}, Leo P. and {Singhal}, Jaladh and
+       {Sinha}, Manodeep and {Sip{\H{o}}cz}, Brigitta M. and {Spitler}, Lee R. and
+       {Stansby}, David and {Streicher}, Ole and {{\v{S}}umak}, Jani and {Swinbank},
+       John D. and {Taranu}, Dan S. and {Tewary}, Nikita and {Tremblay}, Grant R. and
+       {Val-Borro}, Miguel de and {Van Kooten}, Samuel J. and {Vasovi{\'c}}, Zlatan and
+       {Verma}, Shresth and {de Miranda Cardoso}, Jos{\'e} Vin{\'\i}cius and {Williams},
+       Peter K.~G. and {Wilson}, Tom J. and {Winkel}, Benjamin and {Wood-Vasey}, W.~M.
+       and {Xue}, Rui and {Yoachim}, Peter and {Zhang}, Chen and {Zonca}, Andrea and
+       {Astropy Project Contributors}}, title = "{The Astropy Project: Sustaining and
+       Growing a Community-oriented Open-source Project and the Latest Major Release
+       (v5.0) of the Core Package}",
+      journal = {\apj},
+     keywords = {Astronomy software, Open source software, Astronomy data analysis, 1855, 1866, 1858, Astrophysics - Instrumentation and Methods for Astrophysics},
+         year = 2022,
+        month = aug,
+       volume = {935},
+       number = {2},
+          eid = {167},
+        pages = {167},
+          doi = {10.3847/1538-4357/ac7c74},
+archivePrefix = {arXiv},
+       eprint = {2206.14220},
+ primaryClass = {astro-ph.IM},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2022ApJ...935..167A},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
 
@@ -1105,7 +1126,7 @@ archivePrefix = "arXiv",
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="periodograms-measuring-a-rotation-period.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1128,7 +1149,8 @@ archivePrefix = "arXiv",
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1140,7 +1162,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

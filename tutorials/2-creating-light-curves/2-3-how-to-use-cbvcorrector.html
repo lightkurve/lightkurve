@@ -8,8 +8,9 @@
 
     <title>Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (CBVCorrector) &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,22 +20,18 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Removing scattered light from TESS light curves using linear regression (RegressionCorrector)" href="2-3-removing-scattered-light-using-regressioncorrector.html" />
@@ -56,7 +53,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -67,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -109,7 +106,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -124,10 +127,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -152,7 +153,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -371,10 +372,11 @@ div.nboutput.container div.prompt > div {
     }
 }
 
-/* disable scrollbars on prompts */
+/* disable scrollbars and line breaks on prompts */
 div.nbinput.container div.prompt pre,
 div.nboutput.container div.prompt pre {
     overflow: hidden;
+    white-space: pre;
 }
 
 /* input/output area */
@@ -476,6 +478,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -484,10 +487,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -499,12 +506,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -514,13 +524,13 @@ div.rendered_html tbody tr:hover {
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Removing-noise-from-Kepler,-K2,-and-TESS-light-curves-using-Cotrending-Basis-Vectors-(CBVCorrector)">
-<h1>Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (<code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>)<a class="headerlink" href="#Removing-noise-from-Kepler,-K2,-and-TESS-light-curves-using-Cotrending-Basis-Vectors-(CBVCorrector)" title="Permalink to this headline">¶</a></h1>
+<h1>Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (<code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>)<a class="headerlink" href="#Removing-noise-from-Kepler,-K2,-and-TESS-light-curves-using-Cotrending-Basis-Vectors-(CBVCorrector)" title="Permalink to this headline">#</a></h1>
 <p>Cotrending Basis Vectors (CBVs) are generated in the PDC component of the Kepler/K2/TESS pipeline and are used to remove systematic trends in light curves. They are built from the most common systematic trends observed in each PDC Unit of Work (Quarter for Kepler, Campaign for K2 and Sector for TESS). Each Kepler and K2 module output and each TESS CCD has its own set of CBVs. You can read an introduction to the CBVs in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Demystifying Kepler Data</a> or to
 greater detail in the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19081-003-KDPH.pdf">Kepler Data Processing Handbook</a>. The same basic method to generate CBVs is used for all three missions.</p>
 <p>This tutorial provides examples of how to utilize the various CBVs to clean lightcurves of common trends experienced by all targets. The technique exploits two goodness metrics that characterize the performance of the fit. <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.CBVCorrector.html">CBVCorrector</a> inherits the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector">RegressionCorrector</a> class in
 LightKurve. It is recommend to first read the tutorial on <a class="reference external" href="https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.html">obtaining the CBVs</a> before reading this tutorial.</p>
 <section id="Cotrending-Basis-Vector-Types">
-<h2>Cotrending Basis Vector Types<a class="headerlink" href="#Cotrending-Basis-Vector-Types" title="Permalink to this headline">¶</a></h2>
+<h2>Cotrending Basis Vector Types<a class="headerlink" href="#Cotrending-Basis-Vector-Types" title="Permalink to this headline">#</a></h2>
 <p>There are three basic types of CBVs:</p>
 <ul class="simple">
 <li><p><strong>Single-Scale</strong> contains all systematic trends combined in a single set of basis vectors.</p></li>
@@ -532,7 +542,7 @@ to transiting planet durations multi-scale performs better at preserving signals
 <p>For an individual’s research needs, the mission supplied PDC lightcurves might not be ideal and so the CBVs are provided to the user to perform their own correction. All three CBV types are provided at MAST for TESS, however only Single-Scale is provided at MAST for Kepler and K2. Also for Kepler and K2, Cotrending Basis Vectors are supplied for only the 30-minute target cadence.</p>
 </section>
 <section id="Obtaining-the-CBVs">
-<h2>Obtaining the CBVs<a class="headerlink" href="#Obtaining-the-CBVs" title="Permalink to this headline">¶</a></h2>
+<h2>Obtaining the CBVs<a class="headerlink" href="#Obtaining-the-CBVs" title="Permalink to this headline">#</a></h2>
 <p>One can directly obtain the CBVs with <code class="docutils literal notranslate"><span class="pre">load_tess_cbvs</span></code> and <code class="docutils literal notranslate"><span class="pre">load_kepler_cbvs</span></code>, either from MAST by default or from a local directory <code class="docutils literal notranslate"><span class="pre">cbv_dir</span></code>. However when generating a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.CBVCorrector.html?highlight=cbvcorrector">CBVCorrector</a> object the appropriate CBVs are automatically downloaded from MAST and aligned to the lightcurve. Let’s generate this object for a particularily interesting TESS variable target. We first download the
 SAP lightcurve.</p>
 <div class="nbinput nblast docutils container">
@@ -600,7 +610,7 @@ SAP lightcurve.</p>
 <p>The first several CBVs contain most of the systematics. The latter CBVs pose a greater risk of injecting more noise than helping. The default behavior in CBVCorrector is to use the first 8 CBVs.</p>
 </section>
 <section id="Assessing-Over--and-Under-Fitting-with-the-Goodness-Metrics">
-<h2>Assessing Over- and Under-Fitting with the Goodness Metrics<a class="headerlink" href="#Assessing-Over--and-Under-Fitting-with-the-Goodness-Metrics" title="Permalink to this headline">¶</a></h2>
+<h2>Assessing Over- and Under-Fitting with the Goodness Metrics<a class="headerlink" href="#Assessing-Over--and-Under-Fitting-with-the-Goodness-Metrics" title="Permalink to this headline">#</a></h2>
 <p>Two very common issues when fitting a model to a data set it over-fitting and under-fitting.</p>
 <p>Over-fitting occurs when the model has too many degrees of freedom and fits the data <em>at all costs</em>, instead of just modelling the physical process it is attempting to model. This can exhibit itself in different ways, depending on the system and application. In the case of fitting systematic trend basis vectors to a time series, over-fitting can result in the basis vectors removing intrinsic signals in the times series instead of just the systematics. It can also result in introduced broad-band
 noise. This can be particularily prominant in an unconstrained least-squares fit. A least-squares fit only cares about minimizing it’s loss function, which is the Root Mean Square error. In the course of minimizing the RMS, narrow-band power representing the systematic trends are exchanged for broad-band noise intrinsic in the basis vectors. This results in the overall RMS decreasing but the noise in the time series increasing, resulting in the obscuration of the signals under interest. A very
@@ -617,7 +627,7 @@ such that a metric value of 0.5 means the introduced noise due to over-fitting i
 <p>The Goodness Metrics are part of the <code class="docutils literal notranslate"><span class="pre">lightkurve.correctors.metrics</span></code> module and can be computed directly with calls to <code class="docutils literal notranslate"><span class="pre">overfit_metric_lombscargle</span></code> and <code class="docutils literal notranslate"><span class="pre">underfit_metric_neighbors</span></code>. The ‘CBVCorrector’ has convenience wrappers for the two metrics and so they do not need to be called directly, as we will show below.</p>
 </section>
 <section id="Example-Correction-with-CBVCorrector-to-Inhibit-Over-Fitting">
-<h2>Example Correction with CBVCorrector to Inhibit Over-Fitting<a class="headerlink" href="#Example-Correction-with-CBVCorrector-to-Inhibit-Over-Fitting" title="Permalink to this headline">¶</a></h2>
+<h2>Example Correction with CBVCorrector to Inhibit Over-Fitting<a class="headerlink" href="#Example-Correction-with-CBVCorrector-to-Inhibit-Over-Fitting" title="Permalink to this headline">#</a></h2>
 <p>There are four correction methods within <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>:</p>
 <ul class="simple">
 <li><p><strong>correct</strong>: Performs a numerical correction using the LightKurve <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.correct.html?highlight=regressioncorrector%20correct#lightkurve.correctors.RegressionCorrector.correct">RegressionCorrector.correct</a> method while optimizing the L2-Norm regularization penalty term using the goodness metrics as the Loss Function.</p></li>
@@ -629,7 +639,7 @@ such that a metric value of 0.5 means the introduced noise due to over-fitting i
 reference</a>.</p>
 <p>The default method is <code class="docutils literal notranslate"><span class="pre">correct</span></code> and generally speaking, one can use just this method to obtain a good fit. The other methods are for advanced usage.</p>
 <p>We’ll start with <code class="docutils literal notranslate"><span class="pre">correct_gaussian_prior</span></code> in order to introduce the concepts. Doing so will allow us to force a very weak regularization term (alpha=1e-4) as an illustration.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
@@ -642,13 +652,6 @@ reference</a>.</p>
 <span class="n">cbvCorrector</span><span class="o">.</span><span class="n">correct_gaussian_prior</span><span class="p">(</span><span class="n">cbv_type</span><span class="o">=</span><span class="n">cbv_type</span><span class="p">,</span> <span class="n">cbv_indices</span><span class="o">=</span><span class="n">cbv_indices</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
 <span class="n">cbvCorrector</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_19_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_19_0.png" />
 </div>
 </div>
 <p>First note that CBVCorrector always fits a constant term in the model, but the constant is never subtracted in the resultant corrected flux. The median flux value of the light curve is always preserved.</p>
@@ -669,29 +672,22 @@ Kepler and TESS lightcurves. Let’s look at the CBVCorrector goodness metrics t
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.7692996521570672
-Under fitting Metric: 0.998861504673248
+Over fitting Metric: 0.7118268280576449
+Under fitting Metric: 0.9703478826925148
 </pre></div></div>
 </div>
 <p>The first time you run the under-fitting goodness metric it will download the SPOC SAP light curves of targets in the neighborhood around the target under study in order to estimate the residual systematics (they are stored in the CBVCorrector object for subsequent computations). A goodness metric of 0.8 or above is generally considered good. In this case, it looks like we over-fitted (over-fitting metric = 0.71). Even though the corrected light curve looks better, our metric is telling us we
 probably injected signals into our lightcurve and we should not trust this really nice looking curve. Perhaps we can do better if we <em>regularize</em> the fit.</p>
 </section>
 <section id="Using-the-Goodness-Metrics-to-Optimize-the-Fit">
-<h2>Using the Goodness Metrics to Optimize the Fit<a class="headerlink" href="#Using-the-Goodness-Metrics-to-Optimize-the-Fit" title="Permalink to this headline">¶</a></h2>
+<h2>Using the Goodness Metrics to Optimize the Fit<a class="headerlink" href="#Using-the-Goodness-Metrics-to-Optimize-the-Fit" title="Permalink to this headline">#</a></h2>
 <p>We will start by performing a scan of the over- and under-fit goodness metrics as a function of the L2-Norm regularization term, alpha.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cbvCorrector</span><span class="o">.</span><span class="n">goodness_metric_scan_plot</span><span class="p">(</span><span class="n">cbv_type</span><span class="o">=</span><span class="n">cbv_type</span><span class="p">,</span> <span class="n">cbv_indices</span><span class="o">=</span><span class="n">cbv_indices</span><span class="p">);</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_25_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_25_0.png" />
 </div>
 </div>
 <p>This scan also plots the last used alpha parameter as a vertical black line (alpha=1e-4 in our case). We are clearly not optimizing this fit for both over- and under-fitting. Let’s use the <code class="docutils literal notranslate"><span class="pre">correct</span></code> numerical optimizer to try to optimize the fit.</p>
@@ -705,29 +701,15 @@ probably injected signals into our lightcurve and we should not trust this reall
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996909604891119
-Optimized Under-fitting metric: 0.8256122682852867
-Optimized Alpha: 9.651e+03
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_27_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_27_1.png" />
-</div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_27_2.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_27_2.png" />
-</div>
+<div class="highlight"><pre>
+Optimized Over-fitting metric: 0.9996566643790988
+Optimized Under-fitting metric: 0.8255781307442777
+Optimized Alpha: 9.651e+03
+</pre></div></div>
 </div>
 <p>Much better! We see the thermal settling systematic is still being removed, but the stellar variabity is better preserved. Note that the optimizer did not set the alpha parameter at exactly the red and blue curve intersection point. The default target goodness scores is 0.8 or above, which is fulfilled at alpha=1.45e-1. If we want to optimize the fit even more, by perhaps ensuring we are not over-fitting at all, then we can adjust the target over and under scores to emphasize which metric we are
 more interested in. Below we more greatly emphasize improving the over-fitting metric by setting the target to 0.9.</p>
@@ -744,36 +726,22 @@ more interested in. Below we more greatly emphasize improving the over-fitting m
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996905319162014
-Optimized Under-fitting metric: 0.8256124222674841
-Optimized Alpha: 9.521e+03
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_29_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_29_1.png" />
-</div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_29_2.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_29_2.png" />
-</div>
+<div class="highlight"><pre>
+Optimized Over-fitting metric: 0.9996594408230401
+Optimized Under-fitting metric: 0.8255781846196377
+Optimized Alpha: 9.870e+03
+</pre></div></div>
 </div>
 <p>We are now perhaps biasing too far towards under-fitting, but depending on your research interests, this might be best.</p>
 </section>
 <section id="No-Single-Best-Answer-Example">
-<h2>No Single Best Answer Example<a class="headerlink" href="#No-Single-Best-Answer-Example" title="Permalink to this headline">¶</a></h2>
+<h2>No Single Best Answer Example<a class="headerlink" href="#No-Single-Best-Answer-Example" title="Permalink to this headline">#</a></h2>
 <p>Let’s now look at another example, this time where there is no clear single best answer. Again, we will use the Single-Scale and Spike basis vectors for the correction and begin with low regularization.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
@@ -784,13 +752,6 @@ Optimized Alpha: 9.521e+03
 <span class="n">cbvCorrector</span><span class="o">.</span><span class="n">correct_gaussian_prior</span><span class="p">(</span><span class="n">cbv_type</span><span class="o">=</span><span class="n">cbv_type</span><span class="p">,</span> <span class="n">cbv_indices</span><span class="o">=</span><span class="n">cbv_indices</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
 <span class="n">cbvCorrector</span><span class="o">.</span><span class="n">diagnose</span><span class="p">();</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_33_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_33_0.png" />
 </div>
 </div>
 <p>At first sight, this looks good. The long term trends have been removed and the periodic noisy bits have been removed with the spike basis vectors. But did we really do a good job?</p>
@@ -804,24 +765,17 @@ Optimized Alpha: 9.521e+03
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Over fitting Metric: 0.3687835772043196
-Under fitting Metric: 0.9998238120367
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_35_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_35_1.png" />
-</div>
+<div class="highlight"><pre>
+Over fitting Metric: 0.2632956811464706
+Under fitting Metric: 0.9995877972880245
+</pre></div></div>
 </div>
 <p>Hmm… The over-fitting goodness metric says we are severely over-fitting. Not only that, there appears to not be an Alpha parameter that brings both goodness metrics above 0.8. And yet, the fit looks really good. What’s going on here? Let’s zoom in on the correction.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
@@ -831,13 +785,6 @@ Under fitting Metric: 0.9998238120367
 <span class="n">pltAxis</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mf">1360.5</span><span class="p">,</span> <span class="mf">1361.1</span><span class="p">)</span>
 <span class="n">pltAxis</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">1.475e7</span><span class="p">,</span> <span class="mf">1.477e7</span><span class="p">);</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_37_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_37_0.png" />
 </div>
 </div>
 <p>We see in the top plot that the <em>SingleScale</em> correction has comperable noise to the <em>original</em> light curve. This means the correction is injecting high frequency noise at comperable amplitude to the original signal. We have indeed over-fitted! The goodness metrics perform a <em>broad-band</em> analysis of over- and under-fitting. Even though our eyes did not see the high frequency noise injection, the goodness metrics did. So, what should be done? It depends on what you are trying to investigate. If
@@ -856,31 +803,17 @@ you are only looking at the low frequency signals in the data then perhaps you d
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Optimized Over-fitting metric: 0.8002650536806266
-Optimized Under-fitting metric: 0.4768232898066877
-Optimized Alpha: 2.843e+00
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_39_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_39_1.png" />
-</div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_39_2.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_39_2.png" />
+<div class="highlight"><pre>
+Optimized Over-fitting metric: 0.7982190392178491
+Optimized Under-fitting metric: 0.46985435511948
+Optimized Alpha: 3.297e+00
+</pre></div></div>
 </div>
-</div>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
@@ -893,21 +826,14 @@ Optimized Alpha: 2.843e+00
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_40_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_40_0.png" />
-</div>
-</div>
 <p>We see now that the high frequency noise injection is small compared to the original amplitudes in the lightkurve. We barely removed any of the systematics and are now under-fitting, but that might be the best we can do if we want to ensure low noise injection.</p>
 </section>
 <section id="…Or-Can-We-Still-Do-Better?">
-<h2>…Or Can We Still Do Better?<a class="headerlink" href="#…Or-Can-We-Still-Do-Better?" title="Permalink to this headline">¶</a></h2>
+<h2>…Or Can We Still Do Better?<a class="headerlink" href="#…Or-Can-We-Still-Do-Better?" title="Permalink to this headline">#</a></h2>
 <p>Perhaps we are using the incorrect CBVs for this target. Below is a tuned multi-step fit where we first fit the multi-scale Band 2 CBVs then the Spike CBVs. The multi-scale band 2 CBVs contain intermediate frequency systematic signals. They should not inject high frequency noise. We also utilize the <code class="docutils literal notranslate"><span class="pre">correct_elasticnet</span></code> corrector, which allows us to add in a L1-Norm term (Lasso Regularization). L1-Norm helps snap some basis vector fit coefficients to zero and can result in a more stable, less
 noisy fit. The result is a much better compromise between over- and under-fitting. The spikes are not well removed but increasing the weight on the Spike CBV removal results in over-fitting. We can also try the multi-scale band 3 CBVs, which contain high frequency systematics, but the over-fitting metric indicates using them results in even greater over-fitting. The resultant is now much better than what we achieved above but more tuning and optimization could possibly get us even closer to an
 ideal fit.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
@@ -926,20 +852,6 @@ ideal fit.</p>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">cbvCorrectorIter2</span><span class="o">.</span><span class="n">diagnose</span><span class="p">()</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Result of Second Correction to Spike CBVs&#39;</span><span class="p">);</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_44_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_44_0.png" />
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_44_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_44_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -963,26 +875,19 @@ ideal fit.</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Over-fitting Metric: 0.6729692468371844
-Under-fitting Metric: 0.8283914619415863
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_45_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_45_1.png" />
-</div>
+<div class="highlight"><pre>
+Over-fitting Metric: 0.6267616705608123
+Under-fitting Metric: 0.880152175383505
+</pre></div></div>
 </div>
 <p>So, which CBVs are best to use? There is no one single answer, but generally speaking, the Multi-Scale Basis vectors are more versatile. The trade-off is there are also more of them, which means more degrees of freedom in your fit. More degrees of freedom can result in more over-fitting without proper regularization. It is recommened the user tries different combinations of CBVs and use objective metrics to decide which fit is the best for their particular needs.</p>
 </section>
 <section id="Using-the-Goodness-Metrics-and-CBVCorrector-with-other-Design-Matrices">
-<h2>Using the Goodness Metrics and CBVCorrector with other Design Matrices<a class="headerlink" href="#Using-the-Goodness-Metrics-and-CBVCorrector-with-other-Design-Matrices" title="Permalink to this headline">¶</a></h2>
+<h2>Using the Goodness Metrics and CBVCorrector with other Design Matrices<a class="headerlink" href="#Using-the-Goodness-Metrics-and-CBVCorrector-with-other-Design-Matrices" title="Permalink to this headline">#</a></h2>
 <p>The Goodness Metrics and CBVCorrector can also be used in conjunction with other external design matrices. Let’s work on a famous planet example to show how the CBVCorrector can be utilized to imporove the generated light curve. We will begin by using <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_tesscut.html?highlight=search_tesscut">search_tesscut</a> to extract an FFI light curve for HAT-P 11 and then create a DesignMatrix using the background pixels.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
@@ -1019,21 +924,14 @@ the CBVCorrector object the CBVs will be downloaded, but the CBVs are for 2-minu
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Over-fitting metric: 0.07857215613435904
-CDPP: 230.7580025767041 ppm
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_51_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_51_1.png" />
-</div>
+<div class="highlight"><pre>
+Over-fitting metric: 0.0797877956453702
+CDPP: 230.7580053423158 ppm
+</pre></div></div>
 </div>
 <p>The least-squares fit did remove the background flux trend and at first sight the resultant might look good, but the over-fitting goodness metric is <code class="docutils literal notranslate"><span class="pre">0.08</span></code>. That’s not very good! It looks like we are dramatically over-fitting. We can see this in the bottom plot where the corrected curve has more high-frequency noise than the original. Let’s now add in the multi-scale basis vectors and see if we can do better. Note that we are joint fitting the CBVs and the external pixel-derived design matrix.</p>
 <div class="nbinput docutils container">
@@ -1050,36 +948,22 @@ CDPP: 230.7580025767041 ppm
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Over-fitting metric: 0.31594568270665513
-CDPP: 55.83742644222388 ppm
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_53_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_53_1.png" />
-</div>
+<div class="highlight"><pre>
+Over-fitting metric: 0.31494931132464826
+CDPP: 55.83742647811467 ppm
+</pre></div></div>
 </div>
 <p>That looks a lot better! Could we do a bit better by adding in a regularization term? Let’s do a goodness metric scan.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cbvcorrector</span><span class="o">.</span><span class="n">goodness_metric_scan_plot</span><span class="p">(</span><span class="n">cbv_type</span><span class="o">=</span><span class="n">cbv_type</span><span class="p">,</span> <span class="n">cbv_indices</span><span class="o">=</span><span class="n">cbv_indices</span><span class="p">,</span> <span class="n">ext_dm</span><span class="o">=</span><span class="n">dm</span><span class="p">);</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_55_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_55_0.png" />
 </div>
 </div>
 <p>There are a couple observations to make here.</p>
@@ -1099,25 +983,18 @@ we do see the under-fitting metric degrades slightly beginning at alpha=1e-1.</p
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Optimized Over-fitting metric: 0.32163160976932875
-Optimized Alpha: 1.858e-03
-CDPP: 81.34190540258156 ppm
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_57_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_57_1.png" />
-</div>
+<div class="highlight"><pre>
+Optimized Over-fitting metric: 0.3524386637571877
+Optimized Alpha: 7.595e-04
+CDPP: 66.34199535684708 ppm
+</pre></div></div>
 </div>
 <p>This is looking like a pretty good light curve. However, the CDPP increased a little as we optimized the over-fitting metric. Which correction to use may depend on your application. Since we are interested in the transiting planet, we will choose the corrected light curve with the lowest CDPP. Below we compare the light curve between just using the pixel-derived design matrix to also adding in the CBVs as a joint, regularized fit.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
@@ -1129,47 +1006,40 @@ CDPP: 81.34190540258156 ppm
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_59_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_59_0.png" />
-</div>
-</div>
 <p>The superiority of the bottom curve is blatantly obvious. We can clearly see HAT-P 11b on it’s 4.9 day period orbit. Our over-fitting metric settled at about 0.35 indicating we might still be over-fitting and should keep that in mind. However the low CDPP indicates the over-fitting is probably not over transit time-scales.</p>
 </section>
 <section id="Some-final-comments-on-CBVCorrector">
-<h2>Some final comments on CBVCorrector<a class="headerlink" href="#Some-final-comments-on-CBVCorrector" title="Permalink to this headline">¶</a></h2>
+<h2>Some final comments on CBVCorrector<a class="headerlink" href="#Some-final-comments-on-CBVCorrector" title="Permalink to this headline">#</a></h2>
 <section id="Application-to-Kepler-vs-K2-vs-TESS">
-<h3>Application to Kepler vs K2 vs TESS<a class="headerlink" href="#Application-to-Kepler-vs-K2-vs-TESS" title="Permalink to this headline">¶</a></h3>
+<h3>Application to Kepler vs K2 vs TESS<a class="headerlink" href="#Application-to-Kepler-vs-K2-vs-TESS" title="Permalink to this headline">#</a></h3>
 <p>CBVCorrector works equally across Kepler, K2 and TESS. However the Multi-Scale and Spike basis vectors are only available for TESS<a class="reference external" href="#fn1">1</a>. For K2, the <a class="reference external" href="https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-3-k2-pldcorrector.html">PLDCorrector</a> and <a class="reference external" href="https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-3-k2-sffcorrector.html">SFFCorrector</a> classes might work better than <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>.</p>
 <p>If you want to just get the CBVs but not generate a CBVCorrector object then use the functions <em>load_kepler_cbvs</em> and <em>load_tess_cbvs</em> within the cbvcorrector module as explained <a class="reference external" href="https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.html">here</a>.</p>
-<p>1Unfortunately, the Multi-Scale and Spike CBVs are not archived at MAST for Kepler/K2.</p>
+<p>1 Unfortunately, the Multi-Scale and Spike CBVs are not archived at MAST for Kepler/K2.</p>
 </section>
 <section id="Applicability-of-the-Over--and-Under-fitting-Goodness-Metrics">
-<h3>Applicability of the Over- and Under-fitting Goodness Metrics<a class="headerlink" href="#Applicability-of-the-Over--and-Under-fitting-Goodness-Metrics" title="Permalink to this headline">¶</a></h3>
+<h3>Applicability of the Over- and Under-fitting Goodness Metrics<a class="headerlink" href="#Applicability-of-the-Over--and-Under-fitting-Goodness-Metrics" title="Permalink to this headline">#</a></h3>
 <p>The under-fitting metric computes the correlation between the corrected light curve and a selection of neighboring SPOC SAP light curves. If the light curve you are trying to correct was not generated by the SPOC pipeline (I.e. not a SAP light curve), then the neighboring SAP light curves might not contain the same instrumental systematics and the under-fitting metric might not properly measure when under-fitting is occuring.</p>
 <p>The over-fitting metric examines the periodogram of the light curve before and after the correction and is therefore indifferent to how the light curve was generated. It simply looks to see if noise was injected into the light curve. The over-fitting metric is therefore much more generally applicable.</p>
 <p>The Goodness Metrics are part of the <code class="docutils literal notranslate"><span class="pre">lightkurve.correctors.metrics</span></code> module and can be computed directly with calls to <code class="docutils literal notranslate"><span class="pre">overfit_metric_lombscargle</span></code> and <code class="docutils literal notranslate"><span class="pre">underfit_metric_neighbors</span></code>. A savvy expert user can use these and other quality metrics to generate their own Loss Function for optimizing a fit.</p>
 </section>
 <section id="Aligning-versus-Interpolating-CBVs">
-<h3>Aligning versus Interpolating CBVs<a class="headerlink" href="#Aligning-versus-Interpolating-CBVs" title="Permalink to this headline">¶</a></h3>
+<h3>Aligning versus Interpolating CBVs<a class="headerlink" href="#Aligning-versus-Interpolating-CBVs" title="Permalink to this headline">#</a></h3>
 <p>By default, all loaded CBVS in <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> are “aligned” to the light curve cadence numbers (<code class="docutils literal notranslate"><span class="pre">CBVCorrector.lc.cadenceno</span></code>). This means only cadence numbers that exist in both the CBVs and the light curve will have values in the returned CBVs. All cadence numbers that exist in the light curve but not in the CBVs will have NaNs returned for the CBVs on those cadences and the Gap Indicator set to True. Any cadences in the CBVs not in the light curve will be removed from the CBVs.</p>
 <p>If the light curve cadences do not overlap well with the CBVs then you can set <code class="docutils literal notranslate"><span class="pre">interpolate_cbvs=True</span></code> when generating the <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> object. Doing so will generate interpolated CBV values for all cadences in the light curve. If the light curve has cadences past either end of the cadences in the CBVs then one must extrapolate. A second argument, <code class="docutils literal notranslate"><span class="pre">extrapolate_cbvs</span></code>, can be used to also extrapolate the CBV values to the light curve cadences. If <code class="docutils literal notranslate"><span class="pre">extrapolate_cbvs=False</span></code> then the
 exterior values are set to NaNs, which will probably result is a very poor fit.</p>
 <p><strong>Warning</strong>: <em>The safest method is to align</em>. This will not generate any new values for the CBVs. Interpolation can be potentially dangerous. Interpolation uses Piecewise Cubic Hermite Interpolating Polynomial (PCHIP), which can be more stable than a simple spline, but no interpolation method works in all situations. Extrapolation is even more dangerious, which is why an extra parameter must be set if one desires to extrapolate. <em>Be sure to manually examine the extrapolated CBVs before use!</em></p>
 </section>
 <section id="Joint-Fitting">
-<h3>Joint Fitting<a class="headerlink" href="#Joint-Fitting" title="Permalink to this headline">¶</a></h3>
+<h3>Joint Fitting<a class="headerlink" href="#Joint-Fitting" title="Permalink to this headline">#</a></h3>
 <p>By including the <code class="docutils literal notranslate"><span class="pre">ext_dm=</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">correct_*</span></code> methods we allow for joint fitting between the CBVs and other design matrices. Generally speaking, if fitting a collection of different models to a system, joint fitting is ideal. For example, if performing transit analysis one could add in a transit model to the joint fit to get the best transit recovery. The fit coefficient to the transit model is stored in the <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> object after fitting and can be recovered.</p>
 </section>
 <section id="Hyperparameter-Optimization">
-<h3>Hyperparameter Optimization<a class="headerlink" href="#Hyperparameter-Optimization" title="Permalink to this headline">¶</a></h3>
+<h3>Hyperparameter Optimization<a class="headerlink" href="#Hyperparameter-Optimization" title="Permalink to this headline">#</a></h3>
 <p>Any model fitting should include a hyperparameter optimization step. The <code class="docutils literal notranslate"><span class="pre">correct_optimizer</span></code> is essentially a 1-dimensional optimizer and is very fast. More advanced hypterparameter optimization can be performed by tuning the <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">l1_ratio</span></code> parameters in <code class="docutils literal notranslate"><span class="pre">correct_elasticnet</span></code> plus the number and type of CBVs, along with an external design matrix. The optimization Loss Function can use a combination of the <code class="docutils literal notranslate"><span class="pre">under_fitting_metric</span></code>, <code class="docutils literal notranslate"><span class="pre">over_fitting_metric</span></code> and <code class="docutils literal notranslate"><span class="pre">lc.estimate_cdpp</span></code>
 methods. Writing such an optimzer is left as an exercise to the reader and to be tuned to the reader’s particular application.</p>
 </section>
 <section id="More-Generalized-Design-Matrix-Priors">
-<h3>More Generalized Design Matrix Priors<a class="headerlink" href="#More-Generalized-Design-Matrix-Priors" title="Permalink to this headline">¶</a></h3>
+<h3>More Generalized Design Matrix Priors<a class="headerlink" href="#More-Generalized-Design-Matrix-Priors" title="Permalink to this headline">#</a></h3>
 <p>The main <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.CBVCorrector.html?highlight=cbvcorrector%20correc#lightkurve.correctors.CBVCorrector">CBVCorrector.correct*</a> methods utilize a similar prior for all design matrix vectors as is typically used in L1-Norm and L2-Norm regularization. However you can perform fine tuning to the correction using more sophisticated priors. After performing a fit with one of the <code class="docutils literal notranslate"><span class="pre">CBVCorrector.correct*</span></code> methods,
 <code class="docutils literal notranslate"><span class="pre">CBVCorrector.design_matrix_collection</span></code> will have the priors set. One can then manually adjust the priors and use <code class="docutils literal notranslate"><span class="pre">CBVCorrector.correct_regressioncorrector</span></code> to perform the standard <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.correct.html?highlight=regressioncorrector%20correct#lightkurve.correctors.RegressionCorrector.correct">RegressionCorrector.correct</a> correction. An illustration is below:</p>
 <div class="nbinput nblast docutils container">
@@ -1191,7 +1061,7 @@ methods. Writing such an optimzer is left as an exercise to the reader and to be
 <p>The <code class="docutils literal notranslate"><span class="pre">cbvCorrector.corrected_lc</span></code> will now be the result of the fit using whatever <code class="docutils literal notranslate"><span class="pre">cbvCorrector.design_matrix_collection</span></code> you had just provided.</p>
 </section>
 <section id="NaNs,-Units-and-Normalization">
-<h3>NaNs, Units and Normalization<a class="headerlink" href="#NaNs,-Units-and-Normalization" title="Permalink to this headline">¶</a></h3>
+<h3>NaNs, Units and Normalization<a class="headerlink" href="#NaNs,-Units-and-Normalization" title="Permalink to this headline">#</a></h3>
 <p>NaNs are removed from the light curve when used to generate the <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> object and is stored in <code class="docutils literal notranslate"><span class="pre">CBVCorrector.lc</span></code>.</p>
 <p>The CBVCorrector performs its corrections in absolute flux units (typically electrons per second). The returned corrected light curve <code class="docutils literal notranslate"><span class="pre">corrected_lc</span></code> is also in absolute units and the median flux of the light curve is preserved.</p>
 <div class="nbinput docutils container">
@@ -1248,7 +1118,7 @@ Normalized Light curve units:  (i.e astropy.units.dimensionless_unscaled)
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="2-2-how-to-use-cbvs.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1271,7 +1141,8 @@ Normalized Light curve units:  (i.e astropy.units.dimensionless_unscaled)
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1283,7 +1154,7 @@ Normalized Light curve units:  (i.e astropy.units.dimensionless_unscaled)
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

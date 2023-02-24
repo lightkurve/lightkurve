@@ -8,8 +8,9 @@
 
     <title>How to save a LightCurve in FITS format? &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,22 +20,18 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Instrumental Noise in Kepler and K2 #1: Data Gaps and Quality Flags" href="2-2-kepler-noise-1-data-gaps-and-quality-flags.html" />
@@ -56,7 +53,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -67,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -109,7 +106,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -124,10 +127,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -152,7 +153,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -294,10 +295,11 @@ div.nboutput.container div.prompt > div {
     }
 }
 
-/* disable scrollbars on prompts */
+/* disable scrollbars and line breaks on prompts */
 div.nbinput.container div.prompt pre,
 div.nboutput.container div.prompt pre {
     overflow: hidden;
+    white-space: pre;
 }
 
 /* input/output area */
@@ -399,6 +401,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -407,10 +410,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -422,12 +429,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -437,13 +447,13 @@ div.rendered_html tbody tr:hover {
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-1-saving-a-light-curve.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="How-to-save-a-LightCurve-in-FITS-format?">
-<h1>How to save a LightCurve in FITS format?<a class="headerlink" href="#How-to-save-a-LightCurve-in-FITS-format?" title="Permalink to this headline">¶</a></h1>
+<h1>How to save a LightCurve in FITS format?<a class="headerlink" href="#How-to-save-a-LightCurve-in-FITS-format?" title="Permalink to this headline">#</a></h1>
 <p>Once you have detrended or altered a lightcurve in some way, you may want to save it as a FITS file. This allows you to easily share the file with your collaborators or submit your lightcurves as a <a class="reference external" href="https://archive.stsci.edu/hlsp/hlsp_guidelines.html">MAST High Level Science Product</a> (HLSP). Lightkurve provides a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.to_fits.html?highlight=to_fits#lightkurve.LightCurve.to_fits">to_fits()</a> method which will easily convert your
 <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.html?highlight=lightcurve#lightkurve.LightCurve">LightCurve</a> object into a fits file.</p>
 <p>Below is a brief demostration showing how <code class="docutils literal notranslate"><span class="pre">to_fits()</span></code> works.</p>
 <p>Note: if you are considering contributing a HLSP you may want to read the <a class="reference external" href="https://archive.stsci.edu/hlsp/hlsp_guidelines_timeseries.html">guidelines</a> for contributing fits files. These include which fits headers are required/suggested for your HLSP to be accepted.</p>
 <section id="Example:-editing-and-writing-a-lightcurve">
-<h2>Example: editing and writing a lightcurve<a class="headerlink" href="#Example:-editing-and-writing-a-lightcurve" title="Permalink to this headline">¶</a></h2>
+<h2>Example: editing and writing a lightcurve<a class="headerlink" href="#Example:-editing-and-writing-a-lightcurve" title="Permalink to this headline">#</a></h2>
 <p>First we’ll obtain a random Kepler lightcurve from MAST.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -472,13 +482,21 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <p>Now we can use the <code class="docutils literal notranslate"><span class="pre">to_fits</span></code> method to save the lightcurve to a file called <em>output.fits</em>.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span><span class="o">.</span><span class="n">to_fits</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;demo-lightcurve.fits&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+WARNING: TimeDeltaMissingUnitWarning: Numerical value without unit or explicit format passed to TimeDelta, assuming days [astropy.time.core]
+</pre></div></div>
 </div>
 <p>Let’s take a look at the file and check that it behaved as we expect</p>
 <div class="nbinput docutils container">
@@ -542,7 +560,7 @@ NEXTEND =                    2 / number of standard extensions
 EXTNAME = &#39;PRIMARY &#39;           / name of extension
 EXTVER  =                    1 / extension version number (not format version)
 ORIGIN  = &#39;Unofficial data product&#39; / institution responsible for file
-DATE    = &#39;2022-07-08&#39;         / file creation date.
+DATE    = &#39;2023-02-24&#39;         / file creation date.
 CREATOR = &#39;lightkurve.LightCurve.to_fits()&#39; / pipeline job and program used t
 TELESCOP= &#39;KEPLER  &#39;           / telescope
 INSTRUME= &#39;Kepler Photometer&#39;  / detector type
@@ -553,13 +571,13 @@ RADESYS = &#39;ICRS    &#39;           / reference frame of celestial coordinate
 RA_OBJ  =            291.03872 / [deg] right ascension
 DEC_OBJ =             36.59813 / [deg] declination
 EQUINOX =                 2000 / equinox of celestial coordinate system
-PROCVER = &#39;2.3.1dev&#39;
+PROCVER = &#39;2.4.1dev&#39;
 MISSION = &#39;Kepler  &#39;
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;CGFiCGDgCGDgCGDg&#39;   / HDU checksum updated 2022-07-08T12:17:26
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2022-07-08T12:17:26
+CHECKSUM= &#39;DGHgEGGfDGGfDGGf&#39;   / HDU checksum updated 2023-02-24T16:14:19
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2023-02-24T16:14:19
 </pre></div></div>
 </div>
 <p>Looks like it has all the correct information about the target. What about the second extension?</p>
@@ -603,8 +621,8 @@ TFORM6  = &#39;D       &#39;
 TTYPE7  = &#39;MOM_CENTR2&#39;
 TFORM7  = &#39;D       &#39;
 EXTNAME = &#39;LIGHTCURVE&#39;
-CHECKSUM= &#39;9FfAHCc69CcAGCc5&#39;   / HDU checksum updated 2022-07-08T12:17:26
-DATASUM = &#39;390244549&#39;          / data unit checksum updated 2022-07-08T12:17:26
+CHECKSUM= &#39;BEgABBe4BBeABBe3&#39;   / HDU checksum updated 2023-02-24T16:14:19
+DATASUM = &#39;390244549&#39;          / data unit checksum updated 2023-02-24T16:14:19
 </pre></div></div>
 </div>
 <p>This extension has 7 columns, <code class="docutils literal notranslate"><span class="pre">TIME</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX_ERR</span></code>, <code class="docutils literal notranslate"><span class="pre">SAP_QUALITY</span></code>, <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code>, <code class="docutils literal notranslate"><span class="pre">MOM_CENTR1</span></code>, and <code class="docutils literal notranslate"><span class="pre">MOM_CENTR2</span></code>. What if we wanted to add new keywords to our fits file? HLSP products require some extra keywords. Let’s add some keywords to explain who made the data, and what our HLSP is.</p>
@@ -650,7 +668,7 @@ NEXTEND =                    2 / number of standard extensions
 EXTNAME = &#39;PRIMARY &#39;           / name of extension
 EXTVER  =                    1 / extension version number (not format version)
 ORIGIN  = &#39;Unofficial data product&#39; / institution responsible for file
-DATE    = &#39;2022-07-08&#39;         / file creation date.
+DATE    = &#39;2023-02-24&#39;         / file creation date.
 CREATOR = &#39;lightkurve.LightCurve.to_fits()&#39; / pipeline job and program used t
 TELESCOP= &#39;KEPLER  &#39;           / telescope
 INSTRUME= &#39;Kepler Photometer&#39;  / detector type
@@ -661,7 +679,7 @@ RADESYS = &#39;ICRS    &#39;           / reference frame of celestial coordinate
 RA_OBJ  =            291.03872 / [deg] right ascension
 DEC_OBJ =             36.59813 / [deg] declination
 EQUINOX =                 2000 / equinox of celestial coordinate system
-PROCVER = &#39;2.3.1dev&#39;
+PROCVER = &#39;2.4.1dev&#39;
 HLSPLEAD= &#39;Kepler/K2 GO office&#39;
 HLSPNAME= &#39;TUTORIAL&#39;
 CITATION= &#39;HEDGES2018&#39;
@@ -669,8 +687,8 @@ MISSION = &#39;Kepler  &#39;
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;Z4eAe2Z5Z2dAb2Z3&#39;   / HDU checksum updated 2022-07-08T12:17:26
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2022-07-08T12:17:26
+CHECKSUM= &#39;Z4bAf2b2Z2b9f2b9&#39;   / HDU checksum updated 2023-02-24T16:14:19
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2023-02-24T16:14:19
 </pre></div></div>
 </div>
 <p>Now our new keywords are included in the primary header! What about if we want to add more <strong>data columns</strong> to our fits file? We can simply add data columns in the same way. Let’s add the data quality to our fits file.</p>
@@ -748,7 +766,7 @@ ColDefs(
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="2-1-cutting-out-tpfs.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -771,7 +789,8 @@ ColDefs(
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -783,7 +802,7 @@ ColDefs(
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

@@ -8,8 +8,9 @@
 
     <title>Using Target Pixel Files with Lightkurve &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,22 +20,18 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Plotting Target Pixel Files with Lightkurve" href="plotting-target-pixel-files.html" />
@@ -56,7 +53,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -67,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -109,7 +106,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -124,10 +127,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -152,7 +153,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -341,10 +342,11 @@ div.nboutput.container div.prompt > div {
     }
 }
 
-/* disable scrollbars on prompts */
+/* disable scrollbars and line breaks on prompts */
 div.nbinput.container div.prompt pre,
 div.nboutput.container div.prompt pre {
     overflow: hidden;
+    white-space: pre;
 }
 
 /* input/output area */
@@ -446,6 +448,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -454,10 +457,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -469,12 +476,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -484,9 +494,9 @@ div.rendered_html tbody tr:hover {
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/1-getting-started/using-target-pixel-file-products.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Using-Target-Pixel-Files-with-Lightkurve">
-<h1>Using Target Pixel Files with Lightkurve<a class="headerlink" href="#Using-Target-Pixel-Files-with-Lightkurve" title="Permalink to this headline">¶</a></h1>
+<h1>Using Target Pixel Files with Lightkurve<a class="headerlink" href="#Using-Target-Pixel-Files-with-Lightkurve" title="Permalink to this headline">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Be able to download and plot target pixel files from the data archive using <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a>.</p></li>
@@ -495,7 +505,7 @@ div.rendered_html tbody tr:hover {
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
 <p>The <a class="reference external" href="https://www.nasa.gov/mission_pages/kepler/main/index.html">Kepler</a>, <a class="reference external" href="https://www.nasa.gov/mission_pages/kepler/main/index.html">K2</a>, and <a class="reference external" href="https://tess.mit.edu/">TESS</a> telescopes observe stars for long periods of time, from just under a month to four years. By doing so they observe how the brightnesses of stars change over time.</p>
 <p><em>Kepler</em> selected certain pixels around targeted stars to be downloaded from the spacecraft. These were stored as <em>target pixel files</em> that contain data for each observed cadence. In this tutorial, we will learn how to use Lightkurve to download these raw data, plot them, and understand their properties and units.</p>
 <p>It is recommended that you first read the tutorial on how to use <em>Kepler</em> light curve products with Lightkurve. That tutorial will introduce you to some specifics of how <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> make observations, and how these are displayed as light curves. It also introduces some important terms and concepts that are referred to in this tutorial.</p>
@@ -503,7 +513,7 @@ div.rendered_html tbody tr:hover {
 <p>TPFs are an important resource when studying an astronomical object with <em>Kepler</em>, <em>K2</em>, or <em>TESS</em>. The files allow us to understand the original images that were collected, and identify potential sources of noise or instrument-induced trends which may be less obvious in derived light curves. In this tutorial, we will use the <em>Kepler</em> mission as the main example, but these tools equally work for <em>TESS</em> and <em>K2</em>.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
 <p>This tutorial requires <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a>, which in turn uses <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> for plotting.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -516,13 +526,13 @@ div.rendered_html tbody tr:hover {
 </div>
 </section>
 <section id="1.-What-is-a-Target-Pixel-File?">
-<h2>1. What is a Target Pixel File?<a class="headerlink" href="#1.-What-is-a-Target-Pixel-File?" title="Permalink to this headline">¶</a></h2>
+<h2>1. What is a Target Pixel File?<a class="headerlink" href="#1.-What-is-a-Target-Pixel-File?" title="Permalink to this headline">#</a></h2>
 <p>The target pixel file (TPF) of a star contains an image for each observing cadence, either a 30-minute Long Cadence or one-minute Short Cadence exposure in the case of <em>Kepler</em>. The files also include metadata detailing how the observation was made, as well as post-processing information such as the estimated intensity of the astronomical background in each image. (Read the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/archive_manual.pdf">Kepler Archive
 Manual</a>, Section 2.3.2 for more information.)</p>
 <p>TPFs are stored in a <a class="reference external" href="https://fits.gsfc.nasa.gov/fits_primer.html">FITS file format</a>. The Lightkurve package allows us to work with these binary files without having to worry about the details of the file structure. For examples on how to work with FITS files directly, read this tutorial on <a class="reference external" href="https://github.com/spacetelescope/notebooks/blob/master/notebooks/MAST/Kepler/Kepler_TPF/kepler_tpf.ipynb">Plotting Images from Kepler Target Pixel Files</a>.</p>
 </section>
 <section id="2.-Downloading-a-Target-Pixel-File">
-<h2>2. Downloading a Target Pixel File<a class="headerlink" href="#2.-Downloading-a-Target-Pixel-File" title="Permalink to this headline">¶</a></h2>
+<h2>2. Downloading a Target Pixel File<a class="headerlink" href="#2.-Downloading-a-Target-Pixel-File" title="Permalink to this headline">#</a></h2>
 <p>The TPFs of stars observed by the <em>Kepler</em> mission are stored on the <a class="reference external" href="https://archive.stsci.edu/kepler/">Mikulksi Archive for Space Telescopes</a> (MAST) archive, along with metadata about the observations, such as which charge-coupled device (CCD) was used at each time.</p>
 <p>Lightkurve’s built-in tools allow us to search and download TPFs from the archive. As we did in the accompanying tutorial on light curves, we will start by downloading one quarter (a <em>Kepler</em> observing period approximately 90 days in duration) of <em>Kepler</em> data for the star named <a class="reference external" href="http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/">Kepler-8</a>, a star somewhat larger than the Sun, and the host of a <a class="reference external" href="https://en.wikipedia.org/wiki/Hot_Jupiter">hot Jupiter planet</a>.</p>
 <p>Using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile</a> function, we can find an itemized list of different TPFs available for Kepler-8.</p>
@@ -542,7 +552,7 @@ Manual</a>, Section 2.3.2 for more information.)</p>
 <div class="output_area rendered_html docutils container">
 SearchResult containing 18 data products.
 
-<table id="table5533495696">
+<table id="table6046527792">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -551,11 +561,7 @@ SearchResult containing 18 data products.
 <tr><td>3</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>4</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>5</td><td>Kepler Quarter 05</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
-<tr><td>6</td><td>Kepler Quarter 06</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
-<tr><td>7</td><td>Kepler Quarter 07</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
-<tr><td>8</td><td>Kepler Quarter 08</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
-<tr><td>9</td><td>Kepler Quarter 09</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
-<tr><td>10</td><td>Kepler Quarter 10</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
 <tr><td>11</td><td>Kepler Quarter 11</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>12</td><td>Kepler Quarter 12</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>13</td><td>Kepler Quarter 13</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -563,7 +569,8 @@ SearchResult containing 18 data products.
 <tr><td>15</td><td>Kepler Quarter 15</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>16</td><td>Kepler Quarter 16</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>17</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
-</table></div>
+</table>
+Length = 18 rows</div>
 </div>
 <p>In this list, each row represents a different observing period. We find that <em>Kepler</em> recorded 18 quarters of data for this target across four years. The <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> function takes several additional arguments, such as the <code class="docutils literal notranslate"><span class="pre">quarter</span></code> number or the <code class="docutils literal notranslate"><span class="pre">mission</span></code> name. You can find examples of its use in the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">online documentation</a> for this function.</p>
 <p>The search function returns a <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> object which has several convenient operations. For example, we can select the fourth data product in the list as follows:</p>
@@ -582,7 +589,7 @@ SearchResult containing 18 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table5533988752">
+<table id="table4392173232">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -645,7 +652,7 @@ KeplerTargetPixelFile Object (ID: 6922244)
 <p>What you are seeing in this figure are pixels on the CCD camera, with which Kepler-8 was observed. The color indicates the amount of flux in each pixel, in electrons per second. The y-axis shows the pixel row, and the x-axis shows the pixel column. The title tells us the <em>Kepler</em> Input Catalogue (KIC) identification number of the target, and the observing cadence of this image. By default, <code class="docutils literal notranslate"><span class="pre">plot()</span></code> shows the first observation cadence in the quarter, but this can be changed by passing optional
 keyword arguments. You can type <code class="docutils literal notranslate"><span class="pre">help(tpf.plot)</span></code> to see a full list of those options.</p>
 <section id="Note">
-<h3>Note<a class="headerlink" href="#Note" title="Permalink to this headline">¶</a></h3>
+<h3>Note<a class="headerlink" href="#Note" title="Permalink to this headline">#</a></h3>
 <p>You can also download TPF FITS files from the archive by hand, store them on your local disk, and open them using the <code class="docutils literal notranslate"><span class="pre">lk.read(&lt;filename&gt;)</span></code> function. This function will return a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">KeplerTargetPixelFile</a> object just as in the above example. You can find out where Lightkurve stored a given TPF by typing <code class="docutils literal notranslate"><span class="pre">tpf.path</span></code>:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -661,13 +668,13 @@ keyword arguments. You can type <code class="docutils literal notranslate"><span
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&#39;/Users/gb/.lightkurve-cache/mastDownload/Kepler/kplr006922244_lc_Q111111111111111111/kplr006922244-2010078095331_lpd-targ.fits.gz&#39;
+&#39;/Users/chedges/.lightkurve/cache/mastDownload/Kepler/kplr006922244_lc_Q111111111111111111/kplr006922244-2010078095331_lpd-targ.fits.gz&#39;
 </pre></div></div>
 </div>
 </section>
 </section>
 <section id="3.-Accessing-the-Metadata">
-<h2>3. Accessing the Metadata<a class="headerlink" href="#3.-Accessing-the-Metadata" title="Permalink to this headline">¶</a></h2>
+<h2>3. Accessing the Metadata<a class="headerlink" href="#3.-Accessing-the-Metadata" title="Permalink to this headline">#</a></h2>
 <p>Our <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">KeplerTargetPixelFile</a> includes the observation’s metadata, loaded from the header of the TPF files downloaded from MAST. Many of these are similar to the metadata stored in the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code>, which are discussed in the accompanying tutorial.</p>
 <p>The headers containing the metadata can be accessed from the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">KeplerTargetPixelFile</a> through the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.get_header.html?highlight=get_header">get_header()</a> method.</p>
 <p>For example, the first extension (“extension 0”) of the file provides metadata related to the star, such as its magnitude in different passbands, its movement and position on the sky, and its location on <em>Kepler</em>’s CCD detector:</p>
@@ -777,38 +784,38 @@ CHECKSUM= &#39;HkS5JjR5HjR5HjR5&#39;   / HDU checksum updated 2015-09-23T02:52:4
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-   Attribute                                                               Description
---------------- ---------------------------------------------------------------------------------------------------------------------------------
-        channel                                                                                                                                31
-         column                                                                                                                               680
-         module                                                                                                                                10
-         output                                                                                                                                 3
-        quarter                                                                                                                                 4
-            row                                                                                                                               188
-       targetid                                                                                                                           6922244
-        mission                                                                                                                            Kepler
-        obsmode                                                                                                                      long cadence
-           path /Users/gb/.lightkurve-cache/mastDownload/Kepler/kplr006922244_lc_Q111111111111111111/kplr006922244-2010078095331_lpd-targ.fits.gz
-quality_bitmask                                                                                                                           default
-            hdu                                                                                                   PRIMARY, TARGETTABLES, APERTURE
-      cadenceno                                                                                                                     array (4116,)
-           flux                                                                                                                array (4116, 5, 5)
-       flux_bkg                                                                                                                array (4116, 5, 5)
-   flux_bkg_err                                                                                                                array (4116, 5, 5)
-       flux_err                                                                                                                array (4116, 5, 5)
-  nan_time_mask                                                                                                                     array (4116,)
-  pipeline_mask                                                                                                                      array (5, 5)
-      pos_corr1                                                                                                                     array (4116,)
-      pos_corr2                                                                                                                     array (4116,)
-        quality                                                                                                                     array (4116,)
-   quality_mask                                                                                                                     array (4397,)
-       campaign                                                                                                                &lt;class &#39;NoneType&#39;&gt;
-            dec                                                                                                                   &lt;class &#39;float&#39;&gt;
-           meta                                                                             &lt;class &#39;lightkurve.targetpixelfile.HduToMetaMapping&#39;&gt;
-             ra                                                                                                                   &lt;class &#39;float&#39;&gt;
-          shape                                                                                                                   &lt;class &#39;tuple&#39;&gt;
-           time                                                                                                  &lt;class &#39;astropy.time.core.Time&#39;&gt;
-            wcs                                                                                                               astropy.wcs.wcs.WCS
+   Attribute                                                                 Description
+--------------- --------------------------------------------------------------------------------------------------------------------------------------
+        channel                                                                                                                                     31
+         column                                                                                                                                    680
+         module                                                                                                                                     10
+         output                                                                                                                                      3
+        quarter                                                                                                                                      4
+            row                                                                                                                                    188
+       targetid                                                                                                                                6922244
+        mission                                                                                                                                 Kepler
+        obsmode                                                                                                                           long cadence
+           path /Users/chedges/.lightkurve/cache/mastDownload/Kepler/kplr006922244_lc_Q111111111111111111/kplr006922244-2010078095331_lpd-targ.fits.gz
+quality_bitmask                                                                                                                                default
+            hdu                                                                                                        PRIMARY, TARGETTABLES, APERTURE
+      cadenceno                                                                                                                          array (4116,)
+           flux                                                                                                                     array (4116, 5, 5)
+       flux_bkg                                                                                                                     array (4116, 5, 5)
+   flux_bkg_err                                                                                                                     array (4116, 5, 5)
+       flux_err                                                                                                                     array (4116, 5, 5)
+  nan_time_mask                                                                                                                          array (4116,)
+  pipeline_mask                                                                                                                           array (5, 5)
+      pos_corr1                                                                                                                          array (4116,)
+      pos_corr2                                                                                                                          array (4116,)
+        quality                                                                                                                          array (4116,)
+   quality_mask                                                                                                                          array (4397,)
+       campaign                                                                                                                     &lt;class &#39;NoneType&#39;&gt;
+            dec                                                                                                                        &lt;class &#39;float&#39;&gt;
+           meta                                                                                  &lt;class &#39;lightkurve.targetpixelfile.HduToMetaMapping&#39;&gt;
+             ra                                                                                                                        &lt;class &#39;float&#39;&gt;
+          shape                                                                                                                        &lt;class &#39;tuple&#39;&gt;
+           time                                                                                                       &lt;class &#39;astropy.time.core.Time&#39;&gt;
+            wcs                                                                                                                    astropy.wcs.wcs.WCS
 </pre></div></div>
 </div>
 <p>A new piece of metadata not included in the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> objects is the <a class="reference external" href="https://fits.gsfc.nasa.gov/fits_wcs.html">World Coordinate System</a> (WCS). The WCS contains information about how pixel positions map to celestial sky coordinates. This is important when comparing a TPF from a <em>Kepler</em>, <em>K2</em>, or <em>TESS</em> observation to an observation of the same star with a different telescope.</p>
@@ -852,7 +859,7 @@ astropy.wcs.wcs.WCS
 <p>Altogether, the metadata contains a lot of information, and you will rarely use it all, but it is important to know that it is available if you need it. For more details and a better overview of all of the metadata stored in a TPF, read the <a class="reference external" href="http://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/archive_manual.pdf">Kepler Archive Manual</a>, specifically: - Section 2.3.2 Target Pixel Data - Appendix A.1: Target Pixel File Headers</p>
 </section>
 <section id="4.-Time,-Flux,-and-Background">
-<h2>4. Time, Flux, and Background<a class="headerlink" href="#4.-Time,-Flux,-and-Background" title="Permalink to this headline">¶</a></h2>
+<h2>4. Time, Flux, and Background<a class="headerlink" href="#4.-Time,-Flux,-and-Background" title="Permalink to this headline">#</a></h2>
 <p>Finally, we have the most important properties of the TPF: the time and flux information. Just like a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object, we can access the time information as an Astropy <code class="docutils literal notranslate"><span class="pre">Time</span></code> object as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
@@ -1030,12 +1037,12 @@ background pixels contained within a TPF are used instead.</p>
 </div>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
 <p><strong>Authors:</strong> Oliver Hall (<a class="reference external" href="mailto:oliver&#46;hall&#37;&#52;&#48;esa&#46;int">oliver<span>&#46;</span>hall<span>&#64;</span>esa<span>&#46;</span>int</a>), Geert Barentsen</p>
 <p><strong>Updated On</strong>: 2020-09-15</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
@@ -1100,62 +1107,65 @@ archivePrefix = "ascl",
 }
     </textarea>
     <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
-@ARTICLE{2018AJ....156..123T,
-   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
-    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
-    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
-    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
-    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
-    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
-    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
-    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
-    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
-    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
-    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
-    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
-    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
-    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
-    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
-    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
-    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
-    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
-    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
-    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
-    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
-    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
-    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
-    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
-    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
-    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
-    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
-    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
-    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
-    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
-    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
-    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
-    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
-    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
-    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
-    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
-    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
-    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
-    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
-    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
-    {Zabalza}, V. and {Contributors}, (.},
-    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
-  journal = {\aj},
-archivePrefix = "arXiv",
-   eprint = {1801.02634},
- primaryClass = "astro-ph.IM",
- keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
-     year = 2018,
-    month = sep,
-   volume = 156,
-      eid = {123},
-    pages = {123},
-      doi = {10.3847/1538-3881/aabc4f},
-   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+@ARTICLE{astropy:2022,
+       author = {{Astropy Collaboration} and {Price-Whelan}, Adrian M. and {Lim}, Pey
+       Lian and {Earl}, Nicholas and {Starkman}, Nathaniel and {Bradley}, Larry and
+       {Shupe}, David L. and {Patil}, Aarya A. and {Corrales}, Lia and {Brasseur}, C.~E.
+       and {N{\"o}the}, Maximilian and {Donath}, Axel and {Tollerud}, Erik and {Morris},
+       Brett M. and {Ginsburg}, Adam and {Vaher}, Eero and {Weaver}, Benjamin A. and
+       {Tocknell}, James and {Jamieson}, William and {van Kerkwijk}, Marten H. and
+       {Robitaille}, Thomas P. and {Merry}, Bruce and {Bachetti}, Matteo and
+       {G{\"u}nther}, H. Moritz and {Aldcroft}, Thomas L. and {Alvarado-Montes}, Jaime
+       A. and {Archibald}, Anne M. and {B{\'o}di}, Attila and {Bapat}, Shreyas and
+       {Barentsen}, Geert and {Baz{\'a}n}, Juanjo and {Biswas}, Manish and {Boquien},
+       M{\'e}d{\'e}ric and {Burke}, D.~J. and {Cara}, Daria and {Cara}, Mihai and
+       {Conroy}, Kyle E. and {Conseil}, Simon and {Craig}, Matthew W. and {Cross},
+       Robert M. and {Cruz}, Kelle L. and {D'Eugenio}, Francesco and {Dencheva}, Nadia
+       and {Devillepoix}, Hadrien A.~R. and {Dietrich}, J{\"o}rg P. and {Eigenbrot},
+       Arthur Davis and {Erben}, Thomas and {Ferreira}, Leonardo and {Foreman-Mackey},
+       Daniel and {Fox}, Ryan and {Freij}, Nabil and {Garg}, Suyog and {Geda}, Robel and
+       {Glattly}, Lauren and {Gondhalekar}, Yash and {Gordon}, Karl D. and {Grant},
+       David and {Greenfield}, Perry and {Groener}, Austen M. and {Guest}, Steve and
+       {Gurovich}, Sebastian and {Handberg}, Rasmus and {Hart}, Akeem and
+       {Hatfield-Dodds}, Zac and {Homeier}, Derek and {Hosseinzadeh}, Griffin and
+       {Jenness}, Tim and {Jones}, Craig K. and {Joseph}, Prajwel and {Kalmbach}, J.
+       Bryce and {Karamehmetoglu}, Emir and {Ka{\l}uszy{\'n}ski}, Miko{\l}aj and
+       {Kelley}, Michael S.~P. and {Kern}, Nicholas and {Kerzendorf}, Wolfgang E. and
+       {Koch}, Eric W. and {Kulumani}, Shankar and {Lee}, Antony and {Ly}, Chun and
+       {Ma}, Zhiyuan and {MacBride}, Conor and {Maljaars}, Jakob M. and {Muna}, Demitri
+       and {Murphy}, N.~A. and {Norman}, Henrik and {O'Steen}, Richard and {Oman}, Kyle
+       A. and {Pacifici}, Camilla and {Pascual}, Sergio and {Pascual-Granado}, J. and
+       {Patil}, Rohit R. and {Perren}, Gabriel I. and {Pickering}, Timothy E. and
+       {Rastogi}, Tanuj and {Roulston}, Benjamin R. and {Ryan}, Daniel F. and {Rykoff},
+       Eli S. and {Sabater}, Jose and {Sakurikar}, Parikshit and {Salgado}, Jes{\'u}s
+       and {Sanghi}, Aniket and {Saunders}, Nicholas and {Savchenko}, Volodymyr and
+       {Schwardt}, Ludwig and {Seifert-Eckert}, Michael and {Shih}, Albert Y. and
+       {Jain}, Anany Shrey and {Shukla}, Gyanendra and {Sick}, Jonathan and {Simpson},
+       Chris and {Singanamalla}, Sudheesh and {Singer}, Leo P. and {Singhal}, Jaladh and
+       {Sinha}, Manodeep and {Sip{\H{o}}cz}, Brigitta M. and {Spitler}, Lee R. and
+       {Stansby}, David and {Streicher}, Ole and {{\v{S}}umak}, Jani and {Swinbank},
+       John D. and {Taranu}, Dan S. and {Tewary}, Nikita and {Tremblay}, Grant R. and
+       {Val-Borro}, Miguel de and {Van Kooten}, Samuel J. and {Vasovi{\'c}}, Zlatan and
+       {Verma}, Shresth and {de Miranda Cardoso}, Jos{\'e} Vin{\'\i}cius and {Williams},
+       Peter K.~G. and {Wilson}, Tom J. and {Winkel}, Benjamin and {Wood-Vasey}, W.~M.
+       and {Xue}, Rui and {Yoachim}, Peter and {Zhang}, Chen and {Zonca}, Andrea and
+       {Astropy Project Contributors}}, title = "{The Astropy Project: Sustaining and
+       Growing a Community-oriented Open-source Project and the Latest Major Release
+       (v5.0) of the Core Package}",
+      journal = {\apj},
+     keywords = {Astronomy software, Open source software, Astronomy data analysis, 1855, 1866, 1858, Astrophysics - Instrumentation and Methods for Astrophysics},
+         year = 2022,
+        month = aug,
+       volume = {935},
+       number = {2},
+          eid = {167},
+        pages = {167},
+          doi = {10.3847/1538-4357/ac7c74},
+archivePrefix = {arXiv},
+       eprint = {2206.14220},
+ primaryClass = {astro-ph.IM},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2022ApJ...935..167A},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
 
@@ -1239,7 +1249,7 @@ archivePrefix = "arXiv",
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="using-light-curve-file-products.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1262,7 +1272,8 @@ archivePrefix = "arXiv",
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1274,7 +1285,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

@@ -8,8 +8,9 @@
 
     <title>Instrumental Noise in Kepler and K2 #1: Data Gaps and Quality Flags &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,22 +20,18 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Instrumental Noise in Kepler and K2 #2: Spurious Signals and Time Sampling Effects" href="2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects.html" />
@@ -56,7 +53,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -67,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -109,7 +106,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -124,10 +127,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -152,7 +153,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -388,10 +389,11 @@ div.nboutput.container div.prompt > div {
     }
 }
 
-/* disable scrollbars on prompts */
+/* disable scrollbars and line breaks on prompts */
 div.nbinput.container div.prompt pre,
 div.nboutput.container div.prompt pre {
     overflow: hidden;
+    white-space: pre;
 }
 
 /* input/output area */
@@ -493,6 +495,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -501,10 +504,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -516,12 +523,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -531,9 +541,9 @@ div.rendered_html tbody tr:hover {
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-2-kepler-noise-1-data-gaps-and-quality-flags.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Instrumental-Noise-in-Kepler-and-K2-#1:-Data-Gaps-and-Quality-Flags">
-<h1>Instrumental Noise in <em>Kepler</em> and <em>K2</em> #1: Data Gaps and Quality Flags<a class="headerlink" href="#Instrumental-Noise-in-Kepler-and-K2-#1:-Data-Gaps-and-Quality-Flags" title="Permalink to this headline">¶</a></h1>
+<h1>Instrumental Noise in <em>Kepler</em> and <em>K2</em> #1: Data Gaps and Quality Flags<a class="headerlink" href="#Instrumental-Noise-in-Kepler-and-K2-#1:-Data-Gaps-and-Quality-Flags" title="Permalink to this headline">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Have a working knowledge of <em>Kepler</em> quality flags and be able to access them in light curve and TPF data.</p></li>
@@ -542,11 +552,11 @@ div.rendered_html tbody tr:hover {
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
 <p>This notebook is the first part of a series on identifying instrumental and systematic sources of noise in <em>Kepler</em> and <em>K2</em> data. In this tutorial, we will look at practical examples of data gaps and single-cadence quality issues in <em>Kepler</em> data, and learn to identify their causes. Assumed knowledge for this tutorial is a good familiarity with light curve and target pixel file (TPF) data products, and the ability to work with their metadata.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
 <p>We’ll use <a class="reference external" href="https://docs.lightkurve.org/">Lightkurve</a> for downloading and handling <em>Kepler</em> data throughout this tutorial. We’ll also use <a class="reference external" href="https://numpy.org/">NumPy</a> to perform a few auxiliary functions, and <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -562,11 +572,11 @@ div.rendered_html tbody tr:hover {
 <hr class="docutils" />
 </section>
 <section id="1.-Background">
-<h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">¶</a></h2>
+<h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">#</a></h2>
 <p>The <em>Kepler</em> space telescope observed the same patch of sky for four continuous years, between 2009 and 2013. Over the course of 18 observing quarters, it collected light curves and pixel data for 150,000 stars in 30-minute Long Cadence mode, and 512 stars per quarter in one-minute Short Cadence mode. Following the failure of two of the telescope’s four reaction wheels, the telescope continued as the <em>K2</em> mission, which observed along the ecliptic plane for 20 campaigns.</p>
 <p>In this tutorial, we’ll explore some quality issues that arose during both the <em>Kepler</em> and <em>K2</em> missions, and learn how to identify and mitigate them. It’s important to note that many of these issues only appear in the calibrated pixels or simple aperture photometry (SAP) data, and more still are removed by a quality masking process which we’ll discuss in the next section. If you’re working with presearch data conditioning SAP (PDCSAP) light curves, you won’t run into many of these issues.</p>
 <section id="1.1-Quality-flags">
-<h3>1.1 Quality flags<a class="headerlink" href="#1.1-Quality-flags" title="Permalink to this headline">¶</a></h3>
+<h3>1.1 Quality flags<a class="headerlink" href="#1.1-Quality-flags" title="Permalink to this headline">#</a></h3>
 <p>Before we look at some practical examples in time series data, let’s familiarize ourselves with how data gaps and single-cadence quality events are identified in <em>Kepler</em> data files. Every <em>Kepler</em> FITS file has a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.quality.html?highlight=quality#lightkurve.KeplerTargetPixelFile.quality">QUALITY</a> column, which contains a quality flag for each individual data cadence. These flags comprise of one or more binary bits,
 which are expressed as an integer. A handy reference document for <em>Kepler</em>’s quality flags is Table 2-3 in the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf">MAST Kepler Archive Manual</a>.</p>
 <p>Let’s start by downloading the data we’ll work with throughout this tutorial:</p>
@@ -678,13 +688,13 @@ array([4060, 5767, 6432, 6796, 6797], dtype=int32)
 </section>
 </section>
 <section id="2.-Common-Data-Gaps">
-<h2>2. Common Data Gaps<a class="headerlink" href="#2.-Common-Data-Gaps" title="Permalink to this headline">¶</a></h2>
+<h2>2. Common Data Gaps<a class="headerlink" href="#2.-Common-Data-Gaps" title="Permalink to this headline">#</a></h2>
 <p>The nominal <em>Kepler</em> mission observed one area continuously between 2009 and 2013 — but of course, there were various necessary breaks in that continuity. For example, the telescope rotated at the end of each quarter, which necessitated a break in data collection.</p>
 <p>We can use quality flags to identify these various events, but often it’s more convenient to check the <em>Kepler</em> Mission Timeline, from the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>:</p>
 <img alt="Kepler Mission Timeline from the Data Characteristics Handbook, a calendar showing Quarters 0–17 from 2009–13, with major events and data gaps marked." src="../../_images/kepler-mission-timeline.png" />
 <p>Throughout this section we’ll explore the most common reasons for gaps in <em>Kepler</em> data: monthly data downlinks, safe modes, and coarse pointing/loss of fine pointing. Though we’re looking at <em>Kepler</em> data here, these data gaps can also be found in <em>K2</em> mission data.</p>
 <section id="2.1-Monthly-data-downlink">
-<h3>2.1 Monthly data downlink<a class="headerlink" href="#2.1-Monthly-data-downlink" title="Permalink to this headline">¶</a></h3>
+<h3>2.1 Monthly data downlink<a class="headerlink" href="#2.1-Monthly-data-downlink" title="Permalink to this headline">#</a></h3>
 <p>During the <em>Kepler</em> mission, the telescope changed its orientation once a month to point at Earth and downlink the last month of data. This caused a gap in the time series data, as the telescope could not collect while it was downlinking. When the telescope returned to regular pointing, its motion induced what is known as a “thermal transient.” This means that the telescope components and detector electronics underwent a temperature change, and the electron count reading was temporarily
 increased. A change in temperature can slightly change the telescope focus. This manifests in the simple aperture photometry (SAP) data as a downward slope caused by “reheating,” while the flux returns to its previous level. The thermal transient is corrected in PDCSAP data; there is no quality flag for data affected by a thermal transient. (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics
 Handbook</a>, Section 5.5.)</p>
@@ -709,7 +719,7 @@ Handbook</a>, Section 5.5.)</p>
 </div>
 </section>
 <section id="2.2-Safe-modes">
-<h3>2.2 Safe modes<a class="headerlink" href="#2.2-Safe-modes" title="Permalink to this headline">¶</a></h3>
+<h3>2.2 Safe modes<a class="headerlink" href="#2.2-Safe-modes" title="Permalink to this headline">#</a></h3>
 <p>Safe modes (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 4.2) are another type of thermal transient that appears in <em>Kepler</em> data. A safe mode occured when the telescope temporarily shut off operation due to an unexpected event, usually caused by an issue with the detector electronics.</p>
 <p>There were eleven safe mode events throughout the <em>Kepler</em> mission, and three during <em>K2</em>, in Campaigns 0, 9, and 12. The following code zooms in on the Quarter 2 safe mode, in the same data we’ve used above; note the similarity in appearance between the two thermal transient events.</p>
 <div class="nbinput docutils container">
@@ -732,7 +742,7 @@ Handbook</a>, Section 5.5.)</p>
 </div>
 </section>
 <section id="2.3-Coarse-pointing-and-loss-of-fine-pointing">
-<h3>2.3 Coarse pointing and loss of fine pointing<a class="headerlink" href="#2.3-Coarse-pointing-and-loss-of-fine-pointing" title="Permalink to this headline">¶</a></h3>
+<h3>2.3 Coarse pointing and loss of fine pointing<a class="headerlink" href="#2.3-Coarse-pointing-and-loss-of-fine-pointing" title="Permalink to this headline">#</a></h3>
 <p>Running the code below, you’ll see two highlighted regions where there is no thermal transient, but still a gap in the data. Often, gaps like this are caused by a loss of fine pointing (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 4.3). Because there is lower photometric precision when this occurs, these cadences are not suggested for use in photometry, and are replaced
 with NaNs.</p>
 <p>In the <code class="docutils literal notranslate"><span class="pre">QUALITY</span></code> column, there are two flags for this situation: a 4 (bit 3) for coarse point, and 32768 (bit 16) for a loss of fine point. Coarse point is a manual flag, based on preprocessing, and coarse point cadences are removed based on an expected loss of fine pointing. Cadences marked as “no fine point” are due to unexpected events; in practice, these two quality issues manifest in the same manner as gapped data.</p>
@@ -787,10 +797,10 @@ with NaNs.</p>
 </section>
 </section>
 <section id="3.-Single-Cadence-Events">
-<h2>3. Single-Cadence Events<a class="headerlink" href="#3.-Single-Cadence-Events" title="Permalink to this headline">¶</a></h2>
+<h2>3. Single-Cadence Events<a class="headerlink" href="#3.-Single-Cadence-Events" title="Permalink to this headline">#</a></h2>
 <p>We’ve now seen some situations in <em>Kepler</em> data where you’ll observe a gap in the data — or NaN flux — and what the time series looks like on either side of those events. But there are many quality issues which can have an impact on one or more cadences at a time, which aren’t necessarily as evident as data gaps. In the following sections, we’ll look at some of the causes behind these single-cadence quality issues, where you’ll find them, and how to mitigate them in a practical context.</p>
 <section id="3.1-Cosmic-rays">
-<h3>3.1 Cosmic rays<a class="headerlink" href="#3.1-Cosmic-rays" title="Permalink to this headline">¶</a></h3>
+<h3>3.1 Cosmic rays<a class="headerlink" href="#3.1-Cosmic-rays" title="Permalink to this headline">#</a></h3>
 <p>Cosmic rays on the detector (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, Section 4.16) are an unavoidable source of quality issues in all space based data. Depending on the severity of the event, an incidence of a cosmic ray can lead to sudden pixel sensitivity dropouts (SPSD) — covered in another tutorial in this series — or even long-term damage. Here, we’ll only look at the
 short-term events.</p>
 <p>The cell below plots a section of our light curve for KIC 2436365 from above, showing a spike caused by a cosmic ray hitting the detector. Note that this is PDCSAP flux: most cosmic rays are removed by presearch data conditioning (PDC), but those that aren’t can be caught by outlier clipping or, in this case, may not be a large enough spike to cause problems.</p>
@@ -811,7 +821,7 @@ short-term events.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x14a1ea200&gt;
+&lt;matplotlib.collections.PolyCollection at 0x159d9b9d0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -823,7 +833,7 @@ short-term events.</p>
 </div>
 </section>
 <section id="3.2-Argabrightening">
-<h3>3.2 Argabrightening<a class="headerlink" href="#3.2-Argabrightening" title="Permalink to this headline">¶</a></h3>
+<h3>3.2 Argabrightening<a class="headerlink" href="#3.2-Argabrightening" title="Permalink to this headline">#</a></h3>
 <p>Argabrightening (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.8) is a single-cadence quality issue that looks similar to a cosmic ray on the detector. In fact, Argabrightening is thought to be caused by debris hitting the instrument, causing a brief increase in flux. This is distinct from the electronic event caused by a cosmic ray corrupting the pixel readout:
 Argabrightening is the result of physical illumination.</p>
 <p>Using Lightkurve’s <code class="docutils literal notranslate"><span class="pre">KeplerQualityFlags.decode()</span></code> function in <a class="reference external" href="#1.1-Quality-flags">Section 1.1</a>, we saw that a quality flag of 4160 indicates an Argabrightening event on the charge-coupled device (CCD) and in the optimal aperture used for photometry. Let’s see where that shows up in our data:</p>
@@ -866,7 +876,7 @@ array([191.8960099 , 226.77612309, 240.36418455, 247.80180137,
 </div>
 </section>
 <section id="3.3-Attitude-tweaks">
-<h3>3.3 Attitude tweaks<a class="headerlink" href="#3.3-Attitude-tweaks" title="Permalink to this headline">¶</a></h3>
+<h3>3.3 Attitude tweaks<a class="headerlink" href="#3.3-Attitude-tweaks" title="Permalink to this headline">#</a></h3>
 <p><em>Kepler</em>’s orientation, or attitude, was adjusted every few days during Quarters 0, 1, and 2 of the nominal mission. Specifically, attitude tweaks ensured that no star would ever move more than 1/100th of a pixel from its expected location in each cadence (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 4.4). From Quarter 3 onwards, changes to the telescope’s Fine
 Guidance Sensor (FGS) system (see the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, particularly sections 2.1 and 2.5.1) led to reduced drift, which meant that attitude tweaks were no longer necessary.</p>
 <p>Because the drift distances in <em>Kepler</em>’s first three quarters were so small, they’re hard to detect without checking the quality flags. Additionally, the discontinuities were for the most part corrected by the data processing pipeline, with only a few remaining:</p>
@@ -890,7 +900,7 @@ Guidance Sensor (FGS) system (see the <a class="reference external" href="https:
 </div>
 </section>
 <section id="3.4-Reaction-wheel-events">
-<h3>3.4 Reaction wheel events<a class="headerlink" href="#3.4-Reaction-wheel-events" title="Permalink to this headline">¶</a></h3>
+<h3>3.4 Reaction wheel events<a class="headerlink" href="#3.4-Reaction-wheel-events" title="Permalink to this headline">#</a></h3>
 <p><em>Kepler</em>’s attitude was controlled initially by four reaction wheels. Bits 5 and 6 are allocated to two data quality events caused by the reaction wheels: zero crossings and momentum desaturation.</p>
 <p>Zero crossings (bit 5/integer 16) occur when the reaction wheels have zero angular velocity (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.4). This caused the telescope’s point to degrade for a few minutes at a time. Because of this short timescale, reaction wheel zero crossings are mostly an issue in Short Cadence data, where they manifest as negative spikes in the
 flux data. Zero crossing events became less prominent after the failure of one of <em>Kepler</em>’s reaction wheels in Quarter 14, due to an increase in speed of the remaining reaction wheels. There were no reaction wheel zero crossings in the <em>K2</em> mission.</p>
@@ -898,7 +908,7 @@ flux data. Zero crossing events became less prominent after the failure of one o
 time.</p>
 </section>
 <section id="3.5-Manual-exclusions">
-<h3>3.5 Manual exclusions<a class="headerlink" href="#3.5-Manual-exclusions" title="Permalink to this headline">¶</a></h3>
+<h3>3.5 Manual exclusions<a class="headerlink" href="#3.5-Manual-exclusions" title="Permalink to this headline">#</a></h3>
 <p>For various reasons, some cadences were manually excluded during the data processing stage. In general, these cadences were those on either side of gaps and discontinuities, but sometimes manual exclusions were used to cover specific events that didn’t fall under any other category. For example, during Quarter 12, a series of three coronal mass ejections from the Sun led to multiple cadences being manually excluded (<a class="reference external" href="https://archive.stsci.edu/kepler/release_notes/release_notes25/KSCI-19065-002DRN25.pdf">Kepler Data Release 25
 Notes</a>, Section 12.2). Further solar flares and coronal mass ejections led to manual exclusions in Campaign 15 of <em>K2</em> (<a class="reference external" href="https://archive.stsci.edu/missions/k2/doc/drn/KSCI-19138-001_K2-DRN22_C15.pdf">K2 Data Release 22 Notes</a>, Section 2.2). On both occasions, these incidences led to increased noise and reduced accuracy in pointing.</p>
 <p>The code below plots the SAP light curve for Quarter 12 of KIC 8805616 with no quality-flagged data excluded. Here, you can clearly see the data quality issues caused by the coronal mass ejections, which are highlighted:</p>
@@ -925,7 +935,7 @@ Notes</a>, Section 12.2). Further solar flares and coronal mass ejections led to
 </section>
 </section>
 <section id="4.-K2">
-<h2>4. <em>K2</em><a class="headerlink" href="#4.-K2" title="Permalink to this headline">¶</a></h2>
+<h2>4. <em>K2</em><a class="headerlink" href="#4.-K2" title="Permalink to this headline">#</a></h2>
 <p>The <em>K2</em> mission relied on only two of <em>Kepler</em>’s reaction wheels, meaning it required an additional thruster firing every six hours to maintain pointing. This led to a six-hour drift in <em>K2</em> data; while the drift is corrected in Long Cadence data by PDC, data taken during the thruster firings is treated the same way as gaps or single-cadence quality issues in <em>Kepler</em> data. There are two quality bits allocated to thruster firings: bit 21 for a thruster firing, and bit 20 for a possible
 thruster firing.</p>
 <p>To get an idea of what the six-hour drift looks like, let’s start by downloading some <em>K2</em> data.</p>
@@ -1000,12 +1010,12 @@ thruster firing.</p>
 <p>In the next tutorial in this series, we’ll revisit EPIC 211414081, and look at how the thruster firings lead to persistent systematics in Short Cadence data.</p>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
 <p><strong>Author:</strong> <a class="reference external" href="http://orcid.org/0000-0001-8196-516X">Isabel Colman</a> (<code class="docutils literal notranslate"><span class="pre">isabel.colman&#64;sydney.edu.au</span></code>)</p>
 <p><strong>Updated on:</strong> 2020-09-29</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
@@ -1070,62 +1080,65 @@ archivePrefix = "ascl",
 }
     </textarea>
     <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
-@ARTICLE{2018AJ....156..123T,
-   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
-    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
-    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
-    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
-    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
-    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
-    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
-    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
-    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
-    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
-    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
-    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
-    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
-    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
-    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
-    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
-    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
-    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
-    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
-    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
-    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
-    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
-    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
-    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
-    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
-    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
-    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
-    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
-    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
-    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
-    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
-    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
-    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
-    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
-    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
-    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
-    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
-    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
-    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
-    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
-    {Zabalza}, V. and {Contributors}, (.},
-    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
-  journal = {\aj},
-archivePrefix = "arXiv",
-   eprint = {1801.02634},
- primaryClass = "astro-ph.IM",
- keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
-     year = 2018,
-    month = sep,
-   volume = 156,
-      eid = {123},
-    pages = {123},
-      doi = {10.3847/1538-3881/aabc4f},
-   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+@ARTICLE{astropy:2022,
+       author = {{Astropy Collaboration} and {Price-Whelan}, Adrian M. and {Lim}, Pey
+       Lian and {Earl}, Nicholas and {Starkman}, Nathaniel and {Bradley}, Larry and
+       {Shupe}, David L. and {Patil}, Aarya A. and {Corrales}, Lia and {Brasseur}, C.~E.
+       and {N{\"o}the}, Maximilian and {Donath}, Axel and {Tollerud}, Erik and {Morris},
+       Brett M. and {Ginsburg}, Adam and {Vaher}, Eero and {Weaver}, Benjamin A. and
+       {Tocknell}, James and {Jamieson}, William and {van Kerkwijk}, Marten H. and
+       {Robitaille}, Thomas P. and {Merry}, Bruce and {Bachetti}, Matteo and
+       {G{\"u}nther}, H. Moritz and {Aldcroft}, Thomas L. and {Alvarado-Montes}, Jaime
+       A. and {Archibald}, Anne M. and {B{\'o}di}, Attila and {Bapat}, Shreyas and
+       {Barentsen}, Geert and {Baz{\'a}n}, Juanjo and {Biswas}, Manish and {Boquien},
+       M{\'e}d{\'e}ric and {Burke}, D.~J. and {Cara}, Daria and {Cara}, Mihai and
+       {Conroy}, Kyle E. and {Conseil}, Simon and {Craig}, Matthew W. and {Cross},
+       Robert M. and {Cruz}, Kelle L. and {D'Eugenio}, Francesco and {Dencheva}, Nadia
+       and {Devillepoix}, Hadrien A.~R. and {Dietrich}, J{\"o}rg P. and {Eigenbrot},
+       Arthur Davis and {Erben}, Thomas and {Ferreira}, Leonardo and {Foreman-Mackey},
+       Daniel and {Fox}, Ryan and {Freij}, Nabil and {Garg}, Suyog and {Geda}, Robel and
+       {Glattly}, Lauren and {Gondhalekar}, Yash and {Gordon}, Karl D. and {Grant},
+       David and {Greenfield}, Perry and {Groener}, Austen M. and {Guest}, Steve and
+       {Gurovich}, Sebastian and {Handberg}, Rasmus and {Hart}, Akeem and
+       {Hatfield-Dodds}, Zac and {Homeier}, Derek and {Hosseinzadeh}, Griffin and
+       {Jenness}, Tim and {Jones}, Craig K. and {Joseph}, Prajwel and {Kalmbach}, J.
+       Bryce and {Karamehmetoglu}, Emir and {Ka{\l}uszy{\'n}ski}, Miko{\l}aj and
+       {Kelley}, Michael S.~P. and {Kern}, Nicholas and {Kerzendorf}, Wolfgang E. and
+       {Koch}, Eric W. and {Kulumani}, Shankar and {Lee}, Antony and {Ly}, Chun and
+       {Ma}, Zhiyuan and {MacBride}, Conor and {Maljaars}, Jakob M. and {Muna}, Demitri
+       and {Murphy}, N.~A. and {Norman}, Henrik and {O'Steen}, Richard and {Oman}, Kyle
+       A. and {Pacifici}, Camilla and {Pascual}, Sergio and {Pascual-Granado}, J. and
+       {Patil}, Rohit R. and {Perren}, Gabriel I. and {Pickering}, Timothy E. and
+       {Rastogi}, Tanuj and {Roulston}, Benjamin R. and {Ryan}, Daniel F. and {Rykoff},
+       Eli S. and {Sabater}, Jose and {Sakurikar}, Parikshit and {Salgado}, Jes{\'u}s
+       and {Sanghi}, Aniket and {Saunders}, Nicholas and {Savchenko}, Volodymyr and
+       {Schwardt}, Ludwig and {Seifert-Eckert}, Michael and {Shih}, Albert Y. and
+       {Jain}, Anany Shrey and {Shukla}, Gyanendra and {Sick}, Jonathan and {Simpson},
+       Chris and {Singanamalla}, Sudheesh and {Singer}, Leo P. and {Singhal}, Jaladh and
+       {Sinha}, Manodeep and {Sip{\H{o}}cz}, Brigitta M. and {Spitler}, Lee R. and
+       {Stansby}, David and {Streicher}, Ole and {{\v{S}}umak}, Jani and {Swinbank},
+       John D. and {Taranu}, Dan S. and {Tewary}, Nikita and {Tremblay}, Grant R. and
+       {Val-Borro}, Miguel de and {Van Kooten}, Samuel J. and {Vasovi{\'c}}, Zlatan and
+       {Verma}, Shresth and {de Miranda Cardoso}, Jos{\'e} Vin{\'\i}cius and {Williams},
+       Peter K.~G. and {Wilson}, Tom J. and {Winkel}, Benjamin and {Wood-Vasey}, W.~M.
+       and {Xue}, Rui and {Yoachim}, Peter and {Zhang}, Chen and {Zonca}, Andrea and
+       {Astropy Project Contributors}}, title = "{The Astropy Project: Sustaining and
+       Growing a Community-oriented Open-source Project and the Latest Major Release
+       (v5.0) of the Core Package}",
+      journal = {\apj},
+     keywords = {Astronomy software, Open source software, Astronomy data analysis, 1855, 1866, 1858, Astrophysics - Instrumentation and Methods for Astrophysics},
+         year = 2022,
+        month = aug,
+       volume = {935},
+       number = {2},
+          eid = {167},
+        pages = {167},
+          doi = {10.3847/1538-4357/ac7c74},
+archivePrefix = {arXiv},
+       eprint = {2206.14220},
+ primaryClass = {astro-ph.IM},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2022ApJ...935..167A},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
 
@@ -1209,7 +1222,7 @@ archivePrefix = "arXiv",
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="2-1-saving-a-light-curve.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1232,7 +1245,8 @@ archivePrefix = "arXiv",
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1244,7 +1258,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

@@ -1,0 +1,398 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Running the unit tests &#8212; Lightkurve </title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Building the documentation" href="documentation.html" />
+    <link rel="prev" title="Reporting issues and proposing changes" href="contributing.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../index.html">
+<p class="title">Lightkurve v2.4</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../about/index.html">
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Developing for Lightkurve
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="vision.html">
+   Vision of the Lightkurve project
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="contributing.html">
+   Reporting issues and proposing changes
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Running the unit tests
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation.html">
+   Building the documentation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="release-procedure.html">
+   Releasing a new version
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-do-i-run-tests-locally">
+   How do I run tests locally?
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#why-are-some-of-the-tests-marked-s-why-are-some-tests-skipped">
+     Why are some of the tests marked “s”/ Why are some tests skipped?
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#my-tests-passed-but-i-got-warning-messages">
+     My tests passed, but I got warning messages
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#my-tests-failed">
+     My tests failed
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#when-should-i-run-tests">
+   When should I run tests?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#can-i-write-my-own-test">
+   Can I write my own test?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#i-can-t-run-any-tests">
+   I can’t run any tests.
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-to-generate-an-html-report">
+   How to generate an HTML report?
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="running-the-unit-tests">
+<h1>Running the unit tests<a class="headerlink" href="#running-the-unit-tests" title="Permalink to this headline">#</a></h1>
+<p><em>Lightkurve</em> has many <a class="reference external" href="https://en.wikipedia.org/wiki/Unit_testing">unit tests</a> which check that our basic functionality works as we expect. Before we can make any changes to <em>Lightkurve</em> we have to check that these tests all pass. If you open a <a class="reference external" href="contributing">pull request</a> to <em>Lightkurve</em>, these tests will be run automatically. If they pass, your code can be reviewed and potentially merged into the <em>Lightkurve</em> main branch.</p>
+<p>However, running these tests online can take a long time. Running the tests locally on your machine is much faster, and will let you check that your work still maintains the expected <em>Lightkurve</em> behavior as you develop your code.</p>
+<section id="how-do-i-run-tests-locally">
+<h2>How do I run tests locally?<a class="headerlink" href="#how-do-i-run-tests-locally" title="Permalink to this headline">#</a></h2>
+<p><em>Lightkurve</em> uses <a class="reference external" href="https://docs.pytest.org/en/stable/">pytest</a> for testing. You should have a local development environment created. See our guide on on <a class="reference internal" href="contributing.html#install-dev-env"><span class="std std-ref">Installing the development environment</span></a>.</p>
+<p>First off, you need to find the directory that your <em>Lightkurve</em> installation is in. You can check this by looking at the <em>Lightkurve</em> path:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">__path__</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In a terminal, <code class="xref py py-obj docutils literal notranslate"><span class="pre">cd</span></code> into the <em>Lightkurve</em> directory. Yours should look something like this:</p>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/14965634/53126462-01a9c780-3515-11e9-9031-1f7cd06fcfb3.png"><img alt="https://user-images.githubusercontent.com/14965634/53126462-01a9c780-3515-11e9-9031-1f7cd06fcfb3.png" src="https://user-images.githubusercontent.com/14965634/53126462-01a9c780-3515-11e9-9031-1f7cd06fcfb3.png" style="width: 500px;" /></a>
+<p>Note that here we’re using the main branch. If you want to run the tests on a branch you are developing, switch to that branch using <code class="xref py py-obj docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">branchname</span></code>. Once you’re in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve</span></code> directory, go to the tests directory in <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve/tests</span></code>.</p>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/14965634/53126884-ff943880-3515-11e9-9c1e-e4efc10b5bc2.png"><img alt="https://user-images.githubusercontent.com/14965634/53126884-ff943880-3515-11e9-9c1e-e4efc10b5bc2.png" src="https://user-images.githubusercontent.com/14965634/53126884-ff943880-3515-11e9-9c1e-e4efc10b5bc2.png" style="width: 500px;" /></a>
+<p>In this directory you should find several tests labeled <code class="xref py py-obj docutils literal notranslate"><span class="pre">test_xxx.py</span></code>. You can run a test using <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytest</span></code>. For example, to test the <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.targetpixelfile</span></code> module you would execute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">run</span> <span class="n">pytest</span> <span class="n">test_targetpixelfile</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>If the tests are successful, you should see a green success message such as</p>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/14965634/53127264-e770e900-3516-11e9-8bfa-07284f499eef.png"><img alt="https://user-images.githubusercontent.com/14965634/53127264-e770e900-3516-11e9-8bfa-07284f499eef.png" src="https://user-images.githubusercontent.com/14965634/53127264-e770e900-3516-11e9-8bfa-07284f499eef.png" style="width: 500px;" /></a>
+<section id="why-are-some-of-the-tests-marked-s-why-are-some-tests-skipped">
+<h3>Why are some of the tests marked “s”/ Why are some tests skipped?<a class="headerlink" href="#why-are-some-of-the-tests-marked-s-why-are-some-tests-skipped" title="Permalink to this headline">#</a></h3>
+<p>Running some of our tests requires external data, e.g. some require data to be downloaded from MAST. These tests take a little longer, so we skip them by default. To run all the tests simply use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">run</span> <span class="n">pytest</span> <span class="n">test_targetpixelfile</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">remote</span><span class="o">-</span><span class="n">data</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To speed up the tests, you can instruct the tests use a specific directory for data file cache, so that when the tests are re-run,
+data files in the local directory will be used, instead of being downloaded over the network.</p>
+<p>Specify the data file cache directory via <code class="xref py py-obj docutils literal notranslate"><span class="pre">XDG_CACHE_HOME</span></code> environment variable. For example,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nv">XDG_CACHE_HOME</span><span class="o">=</span>/my_dev/lk-test-cache<span class="w"> </span>poetry<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>test_targetpixelfile.py<span class="w"> </span>--remote-data
+</pre></div>
+</div>
+<p>The data files will be cached at <code class="xref py py-obj docutils literal notranslate"><span class="pre">/my_dev/lk-test-cache/lightkurve</span></code> in the above example.</p>
+</div>
+</section>
+<section id="my-tests-passed-but-i-got-warning-messages">
+<h3>My tests passed, but I got warning messages<a class="headerlink" href="#my-tests-passed-but-i-got-warning-messages" title="Permalink to this headline">#</a></h3>
+<p>Sometimes you will get warnings in your tests, causing your result to be yellow instead of green. For example, you may get an output that looks like this:</p>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/14965634/53127518-7f6ed280-3517-11e9-97d4-ba0af724308e.png"><img alt="https://user-images.githubusercontent.com/14965634/53127518-7f6ed280-3517-11e9-97d4-ba0af724308e.png" src="https://user-images.githubusercontent.com/14965634/53127518-7f6ed280-3517-11e9-97d4-ba0af724308e.png" style="width: 500px;" /></a>
+<p>While this is not ideal, some <em>Lightkurve</em> tests do raise warnings currently. This will become less and less likely as <em>Lightkurve</em> improves.</p>
+</section>
+<section id="my-tests-failed">
+<h3>My tests failed<a class="headerlink" href="#my-tests-failed" title="Permalink to this headline">#</a></h3>
+<p>If your test fails, don’t worry, this is what tests are for. Take a look at the traceback that pytest provides for you. If your test has failed then you will see an F next to the test you’ve run, for example:</p>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/14965634/53128031-b396c300-3518-11e9-9083-d12efef46043.png"><img alt="https://user-images.githubusercontent.com/14965634/53128031-b396c300-3518-11e9-9083-d12efef46043.png" src="https://user-images.githubusercontent.com/14965634/53128031-b396c300-3518-11e9-9083-d12efef46043.png" style="width: 500px;" /></a>
+<p>Underneath, you will then see the traceback of the test that failed. For example, the traceback below shows that there is an <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AssertionError</span></code></a>.</p>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/14965634/53127788-38cda800-3518-11e9-866b-b7eee448041e.png"><img alt="https://user-images.githubusercontent.com/14965634/53127788-38cda800-3518-11e9-866b-b7eee448041e.png" src="https://user-images.githubusercontent.com/14965634/53127788-38cda800-3518-11e9-866b-b7eee448041e.png" style="width: 500px;" /></a>
+<p>In the test, we have made an assertion
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">assert_array_equal(lc_add.flux,</span> <span class="pre">lc.flux</span> <span class="pre">+</span> <span class="pre">2)</span></code>.</p>
+<p>However in the traceback we can see that these two arrays are not actually equal, and so the test is breaking.</p>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/14965634/53128140-ff496c80-3518-11e9-95ca-3c2a06eddad8.png"><img alt="https://user-images.githubusercontent.com/14965634/53128140-ff496c80-3518-11e9-95ca-3c2a06eddad8.png" src="https://user-images.githubusercontent.com/14965634/53128140-ff496c80-3518-11e9-95ca-3c2a06eddad8.png" style="width: 500px;" /></a>
+<p>Use this information to correct the code you’re developing until the tests pass. In rare cases (such as the case above) it is the test itself that is incorrect, not the lightkurve code. If you believe there is an error in one of the tests, point it out in your PR for everyone to comment and discuss.</p>
+</section>
+</section>
+<section id="when-should-i-run-tests">
+<h2>When should I run tests?<a class="headerlink" href="#when-should-i-run-tests" title="Permalink to this headline">#</a></h2>
+<p>Before you open a PR to <em>Lightkurve</em>, ideally you should run these tests locally and check that they are all passing. If they aren’t passing, and you are confused as to why they are not, you can open a PR and ask for help.</p>
+</section>
+<section id="can-i-write-my-own-test">
+<h2>Can I write my own test?<a class="headerlink" href="#can-i-write-my-own-test" title="Permalink to this headline">#</a></h2>
+<p>Ideally, any PR opened to <em>Lightkurve</em> with new functionality should include some tests. These tests check that the basic functionality of your PR works. That way, if in the future, people create new features that break your PR, we will be alerted. Read through the <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytest</span></code> documentation and take a look at our existing tests to get an idea of how to write your own.</p>
+</section>
+<section id="i-can-t-run-any-tests">
+<h2>I can’t run any tests.<a class="headerlink" href="#i-can-t-run-any-tests" title="Permalink to this headline">#</a></h2>
+<p>We run our unit tests using <a class="reference external" href="https://docs.pytest.org/en/stable/">pytest</a>. This should have been installed when you installed <em>Lightkurve</em>. However, if your tests don’t run, you may want to check all the test dependencies are installed. See our guide on on <a class="reference internal" href="contributing.html#install-dev-env"><span class="std std-ref">Installing the development environment</span></a>.</p>
+</section>
+<section id="how-to-generate-an-html-report">
+<h2>How to generate an HTML report?<a class="headerlink" href="#how-to-generate-an-html-report" title="Permalink to this headline">#</a></h2>
+<p>Use <a class="reference external" href="https://pytest-html.readthedocs.io/">pytest-html</a> extension. Install it by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">pytest</span><span class="o">-</span><span class="n">html</span>
+</pre></div>
+</div>
+<p>or in <code class="xref py py-obj docutils literal notranslate"><span class="pre">conda</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">pytest</span><span class="o">-</span><span class="n">html</span>
+</pre></div>
+</div>
+<p>Then you can generate an HTML report. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">run</span> <span class="n">pytest</span> <span class="o">--</span><span class="n">html</span><span class="o">=</span><span class="n">build</span><span class="o">/</span><span class="n">tests</span><span class="o">/</span><span class="n">report</span><span class="o">.</span><span class="n">html</span> <span class="n">test_targetpixelfile</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="contributing.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Reporting issues and proposing changes</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="documentation.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Building the documentation</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

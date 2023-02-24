@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lightkurve.search &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,15 +19,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -51,7 +48,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -62,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -104,7 +101,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -119,10 +122,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -138,7 +139,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -146,6 +148,9 @@
     
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -188,6 +193,7 @@
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">LightkurveError</span><span class="p">,</span> <span class="n">suppress_stdout</span><span class="p">,</span> <span class="n">LightkurveWarning</span><span class="p">,</span> <span class="n">LightkurveDeprecationWarning</span>
 <span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">read</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">conf</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">config</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">PACKAGEDIR</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -233,7 +239,7 @@
 
 
 <div class="viewcode-block" id="SearchResult"><a class="viewcode-back" href="../../reference/api/lightkurve.SearchResult.html#lightkurve.SearchResult">[docs]</a><span class="k">class</span> <span class="nc">SearchResult</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Container for the results returned by the search functions.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for the results returned by the search functions.</span>
 
 <span class="sd">    The purpose of this class is to provide a convenient way to inspect and</span>
 <span class="sd">    download products that have been identified using one of the data search</span>
@@ -247,10 +253,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">table</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="sd">&quot;&quot;&quot;`~astropy.table.Table` containing the full search results returned by the MAST API.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;`~astropy.table.Table` containing the full search results returned by the MAST API.&quot;&quot;&quot;</span>
 
     <span class="n">display_extra_columns</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="sd">&quot;&quot;&quot;A list of extra columns to be included in the default display of the search result.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of extra columns to be included in the default display of the search result.</span>
 <span class="sd">    It can be configured in a few different ways.</span>
 
 <span class="sd">    For example, to include ``proposal_id`` in the default display, users can set it:</span>
@@ -284,7 +290,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">display_extra_columns</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">search_result_display_extra_columns</span></div>
 
     <span class="k">def</span> <span class="nf">_sort_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sort the table of search results by distance, author, and filename.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sort the table of search results by distance, author, and filename.</span>
 
 <span class="sd">        The reason we include &quot;author&quot; in the sort criteria is that Lightkurve v1 only</span>
 <span class="sd">        showed data products created by the official pipelines (i.e. author equal to</span>
@@ -301,7 +307,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s2">&quot;distance&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="s2">&quot;mission&quot;</span><span class="p">,</span> <span class="s2">&quot;sort_order&quot;</span><span class="p">,</span> <span class="s2">&quot;exptime&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_add_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Adds a user-friendly index (``#``) column and adds column unit</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a user-friendly index (``#``) column and adds column unit</span>
 <span class="sd">        and display format information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;#&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -323,6 +329,8 @@
         <span class="k">def</span> <span class="nf">to_tess_gi_url</span><span class="p">(</span><span class="n">proposal_id</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^G0[12].+&quot;</span><span class="p">,</span> <span class="n">proposal_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs-primary.html#:~:text=</span><span class="si">{</span><span class="n">proposal_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^G0[34].+&quot;</span><span class="p">,</span> <span class="n">proposal_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs-em1.html#:~:text=</span><span class="si">{</span><span class="n">proposal_id</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs.html#:~:text=</span><span class="si">{</span><span class="n">proposal_id</span><span class="si">}</span><span class="s2">&quot;</span>
 
@@ -362,7 +370,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(</span><span class="n">html</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Implements indexing and slicing, e.g. SearchResult[2:5].&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements indexing and slicing, e.g. SearchResult[2:5].&quot;&quot;&quot;</span>
         <span class="n">selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="c1"># Indexing a Table with an integer will return a Row</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">Row</span><span class="p">):</span>
@@ -370,12 +378,12 @@
         <span class="k">return</span> <span class="n">SearchResult</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="n">selection</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the number of products in the SearchResult table.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of products in the SearchResult table.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">unique_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a table of targets and their RA &amp; dec values produced by search&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a table of targets and their RA &amp; dec values produced by search&quot;&quot;&quot;</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;target_name&quot;</span><span class="p">,</span> <span class="s2">&quot;s_ra&quot;</span><span class="p">,</span> <span class="s2">&quot;s_dec&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">Table</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
@@ -386,53 +394,53 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">obsid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;MAST observation ID for each data product found.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;MAST observation ID for each data product found.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;obsid&quot;</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ra</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Right Ascension coordinate for each data product found.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Right Ascension coordinate for each data product found.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;s_ra&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">data</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Declination coordinate for each data product found.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Declination coordinate for each data product found.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;s_dec&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">data</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mission</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Kepler quarter or TESS sector names for each data product found.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Kepler quarter or TESS sector names for each data product found.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;mission&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">year</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Year the observation was made.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Year the observation was made.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">author</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Pipeline name for each data product found.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pipeline name for each data product found.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">target_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Target name for each data product found.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Target name for each data product found.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;target_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">exptime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Exposure time for each data product found.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exposure time for each data product found.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">quantity</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Distance from the search position for each data product found.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Distance from the search position for each data product found.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">quantity</span>
 
     <span class="k">def</span> <span class="nf">_download_one</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="p">,</span> <span class="n">download_dir</span><span class="p">,</span> <span class="n">cutout_size</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Private method used by `download()` and `download_all()` to download</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Private method used by `download()` and `download_all()` to download</span>
 <span class="sd">        exactly one file from the MAST archive.</span>
 
 <span class="sd">        Always returns a `TargetPixelFile` or `LightCurve` object.</span>
@@ -521,7 +529,7 @@
     <span class="k">def</span> <span class="nf">download</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">download_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutout_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Download and open the first data product in the search result.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Download and open the first data product in the search result.</span>
 
 <span class="sd">        If multiple files are present in `SearchResult.table`, only the first</span>
 <span class="sd">        will be downloaded.</span>
@@ -543,7 +551,10 @@
 <span class="sd">            See the :class:`KeplerQualityFlags &lt;lightkurve.utils.KeplerQualityFlags&gt;` or :class:`TessQualityFlags &lt;lightkurve.utils.TessQualityFlags&gt;` class for details on the bitmasks.</span>
 <span class="sd">        download_dir : str, optional</span>
 <span class="sd">            Location where the data files will be stored.</span>
-<span class="sd">            Defaults to &quot;~/.lightkurve-cache&quot; if `None` is passed.</span>
+<span class="sd">            If `None` is passed, the value from `cache_dir` configuration parameter is used,</span>
+<span class="sd">            with &quot;~/.lightkurve/cache&quot; as the default.</span>
+
+<span class="sd">            See `~lightkurve.config.get_cache_dir()` for details.</span>
 <span class="sd">        cutout_size : int, float or tuple, optional</span>
 <span class="sd">            Side length of cutout in pixels. Tuples should have dimensions (y, x).</span>
 <span class="sd">            Default size is (5, 5)</span>
@@ -564,6 +575,7 @@
 <span class="sd">            If the TESSCut service times out (i.e. returns HTTP status 504).</span>
 <span class="sd">        SearchError</span>
 <span class="sd">            If any other error occurs.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
@@ -592,7 +604,7 @@
     <span class="k">def</span> <span class="nf">download_all</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">download_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutout_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Download and open all data products in the search result.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Download and open all data products in the search result.</span>
 
 <span class="sd">        This method will return a `~lightkurve.TargetPixelFileCollection` or</span>
 <span class="sd">        `~lightkurve.LightCurveCollection`.</span>
@@ -614,7 +626,10 @@
 <span class="sd">            See the :class:`KeplerQualityFlags &lt;lightkurve.utils.KeplerQualityFlags&gt;` or :class:`TessQualityFlags &lt;lightkurve.utils.TessQualityFlags&gt;` class for details on the bitmasks.</span>
 <span class="sd">        download_dir : str, optional</span>
 <span class="sd">            Location where the data files will be stored.</span>
-<span class="sd">            Defaults to &quot;~/.lightkurve-cache&quot; if `None` is passed.</span>
+<span class="sd">            If `None` is passed, the value from `cache_dir` configuration parameter is used,</span>
+<span class="sd">            with &quot;~/.lightkurve/cache&quot; as the default.</span>
+
+<span class="sd">            See `~lightkurve.config.get_cache_dir()` for details.</span>
 <span class="sd">        cutout_size : int, float or tuple, optional</span>
 <span class="sd">            Side length of cutout in pixels. Tuples should have dimensions (y, x).</span>
 <span class="sd">            Default size is (5, 5)</span>
@@ -662,37 +677,10 @@
             <span class="k">return</span> <span class="n">LightCurveCollection</span><span class="p">(</span><span class="n">products</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_default_download_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the default path to the directory where files will be downloaded.</span>
-
-<span class="sd">        By default, this method will return &quot;~/.lightkurve-cache&quot; and create</span>
-<span class="sd">        this directory if it does not exist.  If the directory cannot be</span>
-<span class="sd">        access or created, then it returns the local directory (&quot;.&quot;).</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        download_dir : str</span>
-<span class="sd">            Path to location of `mastDownload` folder where data downloaded from MAST are stored</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">download_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;.lightkurve-cache&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">download_dir</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">download_dir</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># if it doesn&#39;t exist, make a new cache directory</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">download_dir</span><span class="p">)</span>
-            <span class="c1"># downloads locally if OS error occurs</span>
-            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;Warning: unable to create </span><span class="si">{}</span><span class="s2">. &quot;</span>
-                    <span class="s2">&quot;Downloading MAST files to the current &quot;</span>
-                    <span class="s2">&quot;working directory instead.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">download_dir</span><span class="p">)</span>
-                <span class="p">)</span>
-                <span class="n">download_dir</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>
-
-        <span class="k">return</span> <span class="n">download_dir</span>
+        <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">get_cache_dir</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_fetch_tesscut_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">sector</span><span class="p">,</span> <span class="n">download_dir</span><span class="p">,</span> <span class="n">cutout_size</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Downloads TESS FFI cutout and returns path to local file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Downloads TESS FFI cutout and returns path to local file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -778,7 +766,7 @@
     <span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Search the `MAST data archive &lt;https://archive.stsci.edu&gt;`_ for target pixel files.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search the `MAST data archive &lt;https://archive.stsci.edu&gt;`_ for target pixel files.</span>
 
 <span class="sd">    This function fetches a data table that lists the Target Pixel Files (TPFs)</span>
 <span class="sd">    that fall within a region of sky centered around the position of `target`</span>
@@ -907,7 +895,7 @@
     <span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Search the `MAST data archive &lt;https://archive.stsci.edu&gt;`_ for light curves.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search the `MAST data archive &lt;https://archive.stsci.edu&gt;`_ for light curves.</span>
 
 <span class="sd">    This function fetches a data table that lists the Light Curve Files</span>
 <span class="sd">    that fall within a region of sky centered around the position of `target`</span>
@@ -1027,7 +1015,7 @@
 
 <div class="viewcode-block" id="search_tesscut"><a class="viewcode-back" href="../../reference/api/lightkurve.search_tesscut.html#lightkurve.search_tesscut">[docs]</a><span class="nd">@cached</span>
 <span class="k">def</span> <span class="nf">search_tesscut</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Search the `MAST TESSCut service &lt;https://mast.stsci.edu/tesscut/&gt;`_ for a region</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search the `MAST TESSCut service &lt;https://mast.stsci.edu/tesscut/&gt;`_ for a region</span>
 <span class="sd">    of sky that is available as a TESS Full Frame Image cutout.</span>
 
 <span class="sd">    This feature uses the `TESScut service &lt;https://mast.stsci.edu/tesscut/&gt;`_</span>
@@ -1075,7 +1063,7 @@
     <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">extra_query_criteria</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper function which returns a SearchResult object containing MAST</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function which returns a SearchResult object containing MAST</span>
 <span class="sd">    products that match several criteria.</span>
 
 <span class="sd">    Parameters</span>
@@ -1276,7 +1264,7 @@
     <span class="n">sequence_number</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">extra_query_criteria</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper function which wraps `astroquery.mast.Observations.query_criteria()`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function which wraps `astroquery.mast.Observations.query_criteria()`</span>
 <span class="sd">    to return a table of all Kepler/K2/TESS observations of a given target.</span>
 
 <span class="sd">    By default only the official data products are returned, but this can be</span>
@@ -1404,7 +1392,7 @@
     <span class="n">provenance_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">filetype</span><span class="o">=</span><span class="s2">&quot;Target Pixel&quot;</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper function which filters a SearchResult&#39;s products table by one or</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function which filters a SearchResult&#39;s products table by one or</span>
 <span class="sd">    more criteria.</span>
 
 <span class="sd">    Parameters</span>
@@ -1481,7 +1469,7 @@
 
 
 <span class="k">def</span> <span class="nf">_mask_kepler_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns a mask flagging the Kepler products that match the criteria.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a mask flagging the Kepler products that match the criteria.&quot;&quot;&quot;</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">proj</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;kepler&quot;</span> <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s2">&quot;provenance_name&quot;</span><span class="p">]])</span>
     <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">mask</span>
@@ -1540,7 +1528,7 @@
 
 
 <span class="k">def</span> <span class="nf">_mask_by_exptime</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">exptime</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper function to filter by exposure time.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to filter by exposure time.&quot;&quot;&quot;</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exptime</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
         <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">products</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">exptime</span>
@@ -1556,7 +1544,7 @@
 
 
 <span class="k">def</span> <span class="nf">_resolve_object</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Ask MAST to resolve an object string to a set of coordinates.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ask MAST to resolve an object string to a set of coordinates.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">astroquery.mast</span> <span class="kn">import</span> <span class="n">MastClass</span>
 
     <span class="c1"># Note: `_resolve_object` was renamed `resolve_object` in astroquery 0.3.10 (2019)</span>
@@ -1576,7 +1564,8 @@
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1588,7 +1577,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

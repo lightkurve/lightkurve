@@ -8,8 +8,9 @@
 
     <title>lightkurve.LightCurve &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,15 +20,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -54,7 +51,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -65,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -107,7 +104,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -122,10 +125,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -141,7 +142,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -1229,6 +1231,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.config.get_cache_dir.html">
+     lightkurve.config.get_cache_dir
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.config.get_config_dir.html">
      lightkurve.config.get_config_dir
     </a>
@@ -1261,6 +1268,9 @@
 
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -1294,12 +1304,12 @@
               <div>
                 
   <section id="lightkurve-lightcurve">
-<h1>lightkurve.LightCurve<a class="headerlink" href="#lightkurve-lightcurve" title="Permalink to this headline">¶</a></h1>
+<h1>lightkurve.LightCurve<a class="headerlink" href="#lightkurve-lightcurve" title="Permalink to this headline">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lightkurve.LightCurve">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightkurve.</span></span><span class="sig-name descname"><span class="pre">LightCurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve" title="Permalink to this definition">¶</a></dt>
-<dd><p>Subclass of AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> guaranteed to have <em>time</em>, <em>flux</em>, and <em>flux_err</em> columns.</p>
-<p>Compared to the generic <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> class, <a class="reference internal" href="#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightkurve.</span></span><span class="sig-name descname"><span class="pre">LightCurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve" title="Permalink to this definition">#</a></dt>
+<dd><p>Subclass of AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> guaranteed to have <em>time</em>, <em>flux</em>, and <em>flux_err</em> columns.</p>
+<p>Compared to the generic <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> class, <a class="reference internal" href="#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a>
 ensures that each object has <a class="reference internal" href="lightkurve.LightCurve.time.html#lightkurve.LightCurve.time" title="lightkurve.LightCurve.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>, <a class="reference internal" href="lightkurve.LightCurve.flux.html#lightkurve.LightCurve.flux" title="lightkurve.LightCurve.flux"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code></a>, and <a class="reference internal" href="lightkurve.LightCurve.flux_err.html#lightkurve.LightCurve.flux_err" title="lightkurve.LightCurve.flux_err"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_err</span></code></a> columns.
 These three columns are special for two reasons:
 1. they are the key columns upon which all light curve operations operate;
@@ -1309,20 +1319,20 @@ columns and meta data.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>data</strong><span class="classifier">numpy ndarray, dict, list, <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a>, or table-like object, optional</span></dt><dd><p>Data to initialize time series. This does not need to contain the times
+<dt><strong>data</strong><span class="classifier">numpy ndarray, dict, list, <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a>, or table-like object, optional</span></dt><dd><p>Data to initialize time series. This does not need to contain the times
 or fluxes, which can be provided separately, but if it does contain the
 times and fluxes they should be in columns called <code class="docutils literal notranslate"><span class="pre">'time'</span></code>,
 <code class="docutils literal notranslate"><span class="pre">'flux'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'flux_err'</span></code> to be automatically recognized.</p>
 </dd>
-<dt><strong>time</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable</span></dt><dd><p>Time values.  They can either be given directly as a
-<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that initializes the
-<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class.</p>
+<dt><strong>time</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable</span></dt><dd><p>Time values.  They can either be given directly as a
+<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that initializes the
+<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class.</p>
 </dd>
-<dt><strong>flux</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> or iterable</span></dt><dd><p>Flux values for every time point.</p>
+<dt><strong>flux</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> or iterable</span></dt><dd><p>Flux values for every time point.</p>
 </dd>
-<dt><strong>flux_err</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> or iterable</span></dt><dd><p>Uncertainty on each flux data point.</p>
+<dt><strong>flux_err</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> or iterable</span></dt><dd><p>Uncertainty on each flux data point.</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Additional keyword arguments are passed to <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.QTable.html#astropy.table.QTable" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QTable</span></code></a>.</p>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Additional keyword arguments are passed to <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.QTable.html#astropy.table.QTable" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QTable</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -1354,7 +1364,7 @@ based on a copy, e.g., <code class="docutils literal notranslate"><span class="p
 <dl class="field-list">
 <dt class="field-odd">Attributes</dt>
 <dd class="field-odd"><dl>
-<dt><strong>meta</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>meta data associated with the lightcurve. The header of the underlying FITS file (if applicable)
+<dt><strong>meta</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>meta data associated with the lightcurve. The header of the underlying FITS file (if applicable)
 is store in this dictionary. By convention, keys in this dictionary are usually in uppercase.</p>
 </dd>
 </dl>
@@ -1362,11 +1372,11 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.LightCurve.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
-<table class="longtable table autosummary">
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1376,10 +1386,10 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_column</span></code>(*args, **kwargs)</p></td>
-<td><p>See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table.add_column" title="(in Astropy v5.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_column()</span></code></a>.</p></td>
+<td><p>See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table.add_column" title="(in Astropy v5.3)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_column()</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_columns</span></code>(*args, **kwargs)</p></td>
-<td><p>See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table.add_columns" title="(in Astropy v5.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_columns()</span></code></a>.</p></td>
+<td><p>See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table.add_columns" title="(in Astropy v5.3)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_columns()</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_index</span></code>(colnames[, engine, unique])</p></td>
 <td><p>Insert a new index among one or more columns.</p></td>
@@ -1412,7 +1422,7 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 <td><p>Returns a boolean array that is <code class="docutils literal notranslate"><span class="pre">True</span></code> during transits and <code class="docutils literal notranslate"><span class="pre">False</span></code> elsewhere.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.errorbar.html#lightkurve.LightCurve.errorbar" title="lightkurve.LightCurve.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a>([linestyle])</p></td>
-<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
+<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.7.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.estimate_cdpp.html#lightkurve.LightCurve.estimate_cdpp" title="lightkurve.LightCurve.estimate_cdpp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_cdpp</span></code></a>([transit_duration, ...])</p></td>
 <td><p>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</p></td>
@@ -1433,13 +1443,13 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 <td><p>Returns a <a class="reference internal" href="lightkurve.FoldedLightCurve.html#lightkurve.FoldedLightCurve" title="lightkurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> object folded on a period and epoch.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_pandas</span></code>(df[, time_scale])</p></td>
-<td><p>Convert a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> to a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
+<td><p>Convert a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> to a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_stingray</span></code>(lc)</p></td>
 <td><p>Create a new <a class="reference internal" href="#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from a <code class="xref py py-obj docutils literal notranslate"><span class="pre">stingray.Lightcurve</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_timeseries</span></code>(ts)</p></td>
-<td><p>Creates a new <a class="reference internal" href="#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p></td>
+<td><p>Creates a new <a class="reference internal" href="#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">group_by</span></code>(keys)</p></td>
 <td><p>Group this table by the specified <code class="docutils literal notranslate"><span class="pre">keys</span></code></p></td>
@@ -1487,7 +1497,7 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 <td><p>Return a list of lines for the formatted string representation of</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.plot.html#lightkurve.LightCurve.plot" title="lightkurve.LightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
+<td><p>Plot the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.7.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.plot_river.html#lightkurve.LightCurve.plot_river" title="lightkurve.LightCurve.plot_river"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_river</span></code></a>(period[, epoch_time, ax, ...])</p></td>
 <td><p>Plot the light curve as a river plot.</p></td>
@@ -1501,8 +1511,8 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.query_solar_system_objects.html#lightkurve.LightCurve.query_solar_system_objects" title="lightkurve.LightCurve.query_solar_system_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_solar_system_objects</span></code></a>([cadence_mask, ...])</p></td>
 <td><p>Returns a list of asteroids or comets which affected the light curve.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.read.html#lightkurve.LightCurve.read" title="lightkurve.LightCurve.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>(filename[, time_column, time_format, ...])</p></td>
-<td><p>Read and parse a file and returns a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code>(filename[, time_column, time_format, ...])</p></td>
+<td><p>Read and parse a file and returns a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_column</span></code>(name)</p></td>
 <td><p>Remove a column from the table.</p></td>
@@ -1541,7 +1551,7 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 <td><p>Round numeric columns in-place to the specified number of decimals.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.scatter.html#lightkurve.LightCurve.scatter" title="lightkurve.LightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>([colorbar_label, show_colorbar])</p></td>
-<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
+<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.7.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.search_neighbors.html#lightkurve.LightCurve.search_neighbors" title="lightkurve.LightCurve.search_neighbors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_neighbors</span></code></a>([limit, radius])</p></td>
 <td><p>Search the data archive at MAST for the most nearby light curves.</p></td>
@@ -1558,7 +1568,7 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code>()</p></td>
 <td><p>Prints a description of all non-callable attributes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort</span></code>([keys, reverse])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort</span></code>([keys, kind, reverse])</p></td>
 <td><p>Sort the table according to one or more keys.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.tail.html#lightkurve.LightCurve.tail" title="lightkurve.LightCurve.tail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tail</span></code></a>([n])</p></td>
@@ -1577,7 +1587,7 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 <td><p>Converts the light curve to a FITS file in the Kepler/TESS file format.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_pandas.html#lightkurve.LightCurve.to_pandas" title="lightkurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>(**kwargs)</p></td>
-<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
+<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.to_periodogram.html#lightkurve.LightCurve.to_periodogram" title="lightkurve.LightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodogram</span></code></a>([method])</p></td>
 <td><p>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</p></td>
@@ -1612,7 +1622,7 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
-<table class="longtable table autosummary">
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1646,10 +1656,10 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.LightCurve.flux.html#lightkurve.LightCurve.flux" title="lightkurve.LightCurve.flux"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code></a></p></td>
-<td><p>Brightness values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
+<td><p>Brightness values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.flux_err.html#lightkurve.LightCurve.flux_err" title="lightkurve.LightCurve.flux_err"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_err</span></code></a></p></td>
-<td><p>Brightness uncertainties stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
+<td><p>Brightness uncertainties stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_quantity</span></code></p></td>
 <td><p><div class="deprecated">
@@ -1712,7 +1722,7 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
 <td><p>Maintain tuple that controls table column visibility for print output.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.LightCurve.time.html#lightkurve.LightCurve.time" title="lightkurve.LightCurve.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a></p></td>
-<td><p>Time values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
+<td><p>Time values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">time_format</span></code></p></td>
 <td><p><div class="deprecated">
@@ -1740,7 +1750,7 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="../lightcurve.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1763,7 +1773,8 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1775,7 +1786,7 @@ is store in this dictionary. By convention, keys in this dictionary are usually 
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lightkurve.utils &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,15 +19,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -51,7 +48,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -62,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -104,7 +101,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -119,10 +122,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -138,7 +139,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -146,6 +148,9 @@
     
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -205,14 +210,14 @@
 
 
 <span class="k">class</span> <span class="nc">QualityFlags</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Abstract class&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class&quot;&quot;&quot;</span>
 
     <span class="n">STRINGS</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">OPTIONS</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">quality</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Converts a QUALITY value into a list of human-readable strings.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts a QUALITY value into a list of human-readable strings.</span>
 
 <span class="sd">        This function takes the QUALITY bitstring that can be found for each</span>
 <span class="sd">        cadence in Kepler/K2/TESS&#39; pixel and light curve files and converts into</span>
@@ -240,7 +245,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">create_quality_mask</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">quality_array</span><span class="p">,</span> <span class="n">bitmask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a boolean array which flags good cadences given a bitmask.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a boolean array which flags good cadences given a bitmask.</span>
 
 <span class="sd">        This method is used by the readers of :class:`KeplerTargetPixelFile`</span>
 <span class="sd">        and :class:`KeplerLightCurve` to initialize their `quality_mask`</span>
@@ -293,7 +298,7 @@
 
 
 <div class="viewcode-block" id="KeplerQualityFlags"><a class="viewcode-back" href="../../reference/api/lightkurve.KeplerQualityFlags.html#lightkurve.KeplerQualityFlags">[docs]</a><span class="k">class</span> <span class="nc">KeplerQualityFlags</span><span class="p">(</span><span class="n">QualityFlags</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class encodes the meaning of the various Kepler QUALITY bitmask flags,</span>
 <span class="sd">    as documented in the Kepler Archive Manual (Ref. [1], Table 2.3).</span>
 
@@ -382,7 +387,7 @@
 
 
 <div class="viewcode-block" id="TessQualityFlags"><a class="viewcode-back" href="../../reference/api/lightkurve.TessQualityFlags.html#lightkurve.TessQualityFlags">[docs]</a><span class="k">class</span> <span class="nc">TessQualityFlags</span><span class="p">(</span><span class="n">QualityFlags</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class encodes the meaning of the various TESS QUALITY bitmask flags,</span>
 <span class="sd">    as documented in the TESS Data Products Description Document (Ref. [1], Table 28).</span>
 
@@ -454,7 +459,7 @@
 
 
 <span class="k">def</span> <span class="nf">channel_to_module_output</span><span class="p">(</span><span class="n">channel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns a (module, output) pair given a CCD channel number.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a (module, output) pair given a CCD channel number.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -475,7 +480,7 @@
 
 
 <span class="k">def</span> <span class="nf">module_output_to_channel</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the CCD channel number for a given module and output pair.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the CCD channel number for a given module and output pair.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -497,7 +502,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_channel_lookup_array</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Returns a lookup table which maps (module, output) onto channel.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a lookup table which maps (module, output) onto channel.&quot;&quot;&quot;</span>
     <span class="c1"># In the array below, channel == array[module][output]</span>
     <span class="c1"># Note: modules 1, 5, 21, 25 are the FGS guide star CCDs.</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
@@ -533,7 +538,7 @@
 
 
 <span class="k">def</span> <span class="nf">running_mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">window_size</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the moving average of an array `data`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the moving average of an array `data`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -549,7 +554,7 @@
 
 
 <span class="k">def</span> <span class="nf">bkjd_to_astropy_time</span><span class="p">(</span><span class="n">bkjd</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Time</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Converts Kepler Barycentric Julian Day (BKJD) time values to an</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts Kepler Barycentric Julian Day (BKJD) time values to an</span>
 <span class="sd">    `astropy.time.Time` object.</span>
 
 <span class="sd">    Kepler Barycentric Julian Day (BKJD) is a Julian day minus 2454833.0</span>
@@ -578,7 +583,7 @@
 
 
 <span class="k">def</span> <span class="nf">btjd_to_astropy_time</span><span class="p">(</span><span class="n">btjd</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Time</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Converts TESS Barycentric Julian Day (BTJD) values to an</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts TESS Barycentric Julian Day (BTJD) values to an</span>
 <span class="sd">    `astropy.time.Time` object.</span>
 
 <span class="sd">    TESS Barycentric Julian Day (BTJD) is a Julian day minus 2457000.0</span>
@@ -616,7 +621,7 @@
     <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Utility function to plot a 2D image</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Utility function to plot a 2D image</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -700,25 +705,25 @@
 
 
 <span class="k">class</span> <span class="nc">LightkurveError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class for Lightkurve exceptions.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for Lightkurve exceptions.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span>
 
 
 <span class="k">class</span> <span class="nc">LightkurveWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class for all Lightkurve warnings.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for all Lightkurve warnings.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span>
 
 
 <span class="k">class</span> <span class="nc">LightkurveDeprecationWarning</span><span class="p">(</span><span class="n">LightkurveWarning</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class for all Lightkurve deprecation warnings.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for all Lightkurve deprecation warnings.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span>
 
 
 <span class="k">def</span> <span class="nf">suppress_stdout</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A simple decorator to suppress function print outputs.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A simple decorator to suppress function print outputs.&quot;&quot;&quot;</span>
 
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -736,7 +741,7 @@
 
 
 <span class="k">def</span> <span class="nf">validate_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">supported_methods</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Raises a `ValueError` if a method is not supported.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raises a `ValueError` if a method is not supported.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -760,7 +765,7 @@
 
 
 <span class="k">def</span> <span class="nf">centroid_quadratic</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Computes the quadratic estimate of the centroid in a 2d-array.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the quadratic estimate of the centroid in a 2d-array.</span>
 
 <span class="sd">    This method will fit a simple 2D second-order polynomial</span>
 <span class="sd">    $P(x, y) = a + bx + cy + dx^2 + exy + fy^2$</span>
@@ -849,7 +854,7 @@
 <span class="k">def</span> <span class="nf">_query_solar_system_objects</span><span class="p">(</span>
     <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;kepler&quot;</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns a list of asteroids/comets given a position and time.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a list of asteroids/comets given a position and time.</span>
 
 <span class="sd">    This function relies on The Virtual Observatory Sky Body Tracker (SkyBot)</span>
 <span class="sd">    service which can be found at http://vo.imcce.fr/webservices/skybot/</span>
@@ -923,7 +928,7 @@
 
 
 <span class="k">def</span> <span class="nf">show_citation_instructions</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Show citation instructions.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Show citation instructions.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">PACKAGEDIR</span><span class="p">,</span> <span class="n">__citation__</span>
 
     <span class="c1"># To make installing Lightkurve easier, ipython is an optional dependency,</span>
@@ -950,7 +955,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_notebook_environment</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Returns &#39;jupyter&#39;, &#39;colab&#39;, or &#39;terminal&#39;.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns &#39;jupyter&#39;, &#39;colab&#39;, or &#39;terminal&#39;.</span>
 
 <span class="sd">    One can detect whether or not a piece of Python is running by executing</span>
 <span class="sd">    `get_ipython().__class__`, which returns the following result:</span>
@@ -972,7 +977,7 @@
 
 
 <span class="k">def</span> <span class="nf">is_notebook</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Returns `True` if we are running in a notebook.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns `True` if we are running in a notebook.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_get_notebook_environment</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;jupyter&quot;</span><span class="p">,</span> <span class="s2">&quot;colab&quot;</span><span class="p">]</span>
 </pre></div>
 
@@ -989,7 +994,8 @@
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1001,7 +1007,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

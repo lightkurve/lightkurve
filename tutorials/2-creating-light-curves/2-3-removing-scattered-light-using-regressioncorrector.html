@@ -8,8 +8,9 @@
 
     <title>Removing scattered light from TESS light curves using linear regression (RegressionCorrector) &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,22 +20,18 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Removing noise from K2 and TESS light curves using Pixel Level Decorrelation (PLDCorrector)" href="2-3-k2-pldcorrector.html" />
@@ -56,7 +53,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -67,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -109,7 +106,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -124,10 +127,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -152,7 +153,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -378,10 +379,11 @@ div.nboutput.container div.prompt > div {
     }
 }
 
-/* disable scrollbars on prompts */
+/* disable scrollbars and line breaks on prompts */
 div.nbinput.container div.prompt pre,
 div.nboutput.container div.prompt pre {
     overflow: hidden;
+    white-space: pre;
 }
 
 /* input/output area */
@@ -483,6 +485,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -491,10 +494,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -506,12 +513,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -521,18 +531,18 @@ div.rendered_html tbody tr:hover {
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-3-removing-scattered-light-using-regressioncorrector.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Removing-scattered-light-from-TESS-light-curves-using-linear-regression-(RegressionCorrector)">
-<h1>Removing scattered light from <em>TESS</em> light curves using linear regression (<code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>)<a class="headerlink" href="#Removing-scattered-light-from-TESS-light-curves-using-linear-regression-(RegressionCorrector)" title="Permalink to this headline">¶</a></h1>
+<h1>Removing scattered light from <em>TESS</em> light curves using linear regression (<code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>)<a class="headerlink" href="#Removing-scattered-light-from-TESS-light-curves-using-linear-regression-(RegressionCorrector)" title="Permalink to this headline">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
 <p>By the end of this tutorial, you will: - Be familiar with the Lightkurve <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector">RegressionCorrector</a>. - Understand how to create regressors from a <a class="reference external" href="https://docs.lightkurve.org/reference/targetpixelfile.html?highlight=targetpixelfile">TargetPixelFile</a> object. - Be able to remove the scattered light background signal from <em>TESS</em> data.</p>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
 <p>Lightkurve offers several tools to the community for removing instrument noise and systematics from data from the <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> missions. This tutorial will demonstrate the use of Lightkurve’s <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> class to remove the scattered light and spacecraft motion noise from <a class="reference external" href="https://heasarc.gsfc.nasa.gov/docs/tess/data-products.html#full-frame-images">TESS Full Frame Images (FFIs)</a>.</p>
 <p><em>TESS</em> FFIs have an additive scattered light background that has not been removed by the pipeline. This scattered light must be removed by the user. This can be done in a few ways, including a basic median subtraction. In this tutorial, we’ll show you how to use Lightkurve’s corrector tools to remove the scattered light.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
 <p>This tutorial requires the <a class="reference external" href="http://docs.lightkurve.org/">Lightkurve</a> package, and also makes use of <a class="reference external" href="https://numpy.org/">NumPy</a> and <a class="reference external" href="https://matplotlib.org/">Matplotlib</a>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -548,7 +558,7 @@ div.rendered_html tbody tr:hover {
 <hr class="docutils" />
 </section>
 <section id="1.-Using-RegressionCorrector-on-TESSCut-FFI-Cutouts">
-<h2>1. Using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> on TESSCut FFI Cutouts<a class="headerlink" href="#1.-Using-RegressionCorrector-on-TESSCut-FFI-Cutouts" title="Permalink to this headline">¶</a></h2>
+<h2>1. Using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> on TESSCut FFI Cutouts<a class="headerlink" href="#1.-Using-RegressionCorrector-on-TESSCut-FFI-Cutouts" title="Permalink to this headline">#</a></h2>
 <p>For this tutorial we will use the <em>TESS</em> Sector 15 data of <a class="reference external" href="https://en.wikipedia.org/wiki/Tabby%27s_Star">KIC 8462852</a> (also known as Boyajian’s Star). We’ll start by downloading the FFI data using MAST’s TESSCut service, querying it through Lightkurve.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -628,7 +638,7 @@ TessTargetPixelFile(TICID: KIC 8462852)
 </div>
 </section>
 <section id="2.-Creating-a-DesignMatrix-from-Pixel-Regressors">
-<h2>2. Creating a <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> from Pixel Regressors<a class="headerlink" href="#2.-Creating-a-DesignMatrix-from-Pixel-Regressors" title="Permalink to this headline">¶</a></h2>
+<h2>2. Creating a <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> from Pixel Regressors<a class="headerlink" href="#2.-Creating-a-DesignMatrix-from-Pixel-Regressors" title="Permalink to this headline">#</a></h2>
 <p>The flux in the aperture appears to be dominated by scattered light. We can tell because <em>TESS</em> orbits Earth twice in each sector, thus patterns which appear twice within a sector are typically related to the <em>TESS</em> orbit (such as the scattered light effect).</p>
 <p>To remove this light, we are going to detrend the light curve against some vectors which we think are predictive of this systematic noise.</p>
 <p>In this case, we can use the <strong>pixels outside the aperture</strong> as vectors that are highly predictive of the systematic noise, that is, we will make the assumption that these pixels do not contain any flux from our target.</p>
@@ -778,7 +788,7 @@ curve. We can do this by appending a “constant” to our design matrix.</p>
 </div>
 </section>
 <section id="3.-Removing-Background-Scattered-Light-Using-Linear-Regression">
-<h2>3. Removing Background Scattered Light Using Linear Regression<a class="headerlink" href="#3.-Removing-Background-Scattered-Light-Using-Linear-Regression" title="Permalink to this headline">¶</a></h2>
+<h2>3. Removing Background Scattered Light Using Linear Regression<a class="headerlink" href="#3.-Removing-Background-Scattered-Light-Using-Linear-Regression" title="Permalink to this headline">#</a></h2>
 <p>Now that we have a design matrix, we only need to pass it into a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.corrector.Corrector.html?highlight=lightkurve%20corrector#lightkurve.correctors.corrector.Corrector">lightkurve.Corrector</a>. To use our design matrix, we can pass it to the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector">RegressionCorrector</a>, which will detrend the input light curve against
 the vectors we’ve built.</p>
 <div class="nbinput nblast docutils container">
@@ -836,7 +846,7 @@ RegressionCorrector (ID: KIC 8462852)
 <p>As shown above, the scattered light from the background has been removed. If we want to take a more in-depth look at the correction, we can use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.diagnose.html?highlight=diagnose#lightkurve.correctors.RegressionCorrector.diagnose">diagnose()</a> method to see what the <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> found as the best fitting solution.</p>
 </section>
 <section id="4.-Diagnosing-the-Correction">
-<h2>4. Diagnosing the Correction<a class="headerlink" href="#4.-Diagnosing-the-Correction" title="Permalink to this headline">¶</a></h2>
+<h2>4. Diagnosing the Correction<a class="headerlink" href="#4.-Diagnosing-the-Correction" title="Permalink to this headline">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
@@ -870,49 +880,23 @@ RegressionCorrector (ID: KIC 8462852)
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=1190</i>
-<table id="table5654928720" class="table-striped table-bordered table-condensed">
+<table id="table6144729872" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float64</th></tr></thead>
-<tr><td>1711.3882446289062</td><td>-341.18816068924025</td><td>0.0</td></tr>
-<tr><td>1711.4090576171875</td><td>-341.2140788643974</td><td>0.0</td></tr>
-<tr><td>1711.4298706054688</td><td>-341.9634439702568</td><td>0.0</td></tr>
-<tr><td>1711.4507446289062</td><td>-341.8382280404103</td><td>0.0</td></tr>
-<tr><td>1711.4715576171875</td><td>-342.19865759232744</td><td>0.0</td></tr>
-<tr><td>1711.4923706054688</td><td>-342.1091946303677</td><td>0.0</td></tr>
-<tr><td>1711.5132446289062</td><td>-345.8799031162398</td><td>0.0</td></tr>
-<tr><td>1711.5340576171875</td><td>-347.9538232386958</td><td>0.0</td></tr>
-<tr><td>1711.5548706054688</td><td>-344.85160661688315</td><td>0.0</td></tr>
-<tr><td>1711.5757446289062</td><td>-340.7779575081868</td><td>0.0</td></tr>
-<tr><td>1711.5965576171875</td><td>-338.884199192722</td><td>0.0</td></tr>
-<tr><td>1711.6173706054688</td><td>-343.1037257015314</td><td>0.0</td></tr>
-<tr><td>1711.6382446289062</td><td>-343.1140700041233</td><td>0.0</td></tr>
-<tr><td>1711.6590576171875</td><td>-341.3043213709361</td><td>0.0</td></tr>
-<tr><td>1711.6798706054688</td><td>-339.71868666794944</td><td>0.0</td></tr>
-<tr><td>1711.7007446289062</td><td>-343.17521507118636</td><td>0.0</td></tr>
-<tr><td>1711.7215576171875</td><td>-340.9123053595704</td><td>0.0</td></tr>
-<tr><td>1711.7423706054688</td><td>-338.0889101612047</td><td>0.0</td></tr>
-<tr><td>1711.7632446289062</td><td>-339.93552189826823</td><td>0.0</td></tr>
+<tr><td>1711.3882446289062</td><td>-341.1881606892448</td><td>0.0</td></tr>
+<tr><td>1711.4090576171875</td><td>-341.21407886437737</td><td>0.0</td></tr>
+<tr><td>1711.4298706054688</td><td>-341.9634439702504</td><td>0.0</td></tr>
+<tr><td>1711.4507446289062</td><td>-341.83822804038573</td><td>0.0</td></tr>
+<tr><td>1711.4715576171875</td><td>-342.1986575923047</td><td>0.0</td></tr>
+<tr><td>1711.4923706054688</td><td>-342.10919463035407</td><td>0.0</td></tr>
 <tr><td>...</td><td>...</td><td>...</td></tr>
-<tr><td>1737.0128784179688</td><td>1383.3697160235079</td><td>0.0</td></tr>
-<tr><td>1737.0337524414062</td><td>1300.0225797940338</td><td>0.0</td></tr>
-<tr><td>1737.0545654296875</td><td>1205.8211897223591</td><td>0.0</td></tr>
-<tr><td>1737.0753784179688</td><td>1104.234800720259</td><td>0.0</td></tr>
-<tr><td>1737.0962524414062</td><td>1002.1220143236224</td><td>0.0</td></tr>
-<tr><td>1737.1170654296875</td><td>901.2487317019222</td><td>0.0</td></tr>
-<tr><td>1737.1378784179688</td><td>804.47429560199</td><td>0.0</td></tr>
-<tr><td>1737.1587524414062</td><td>709.71287804233</td><td>0.0</td></tr>
-<tr><td>1737.1795654296875</td><td>619.7658175305451</td><td>0.0</td></tr>
-<tr><td>1737.2003784179688</td><td>546.205862358398</td><td>0.0</td></tr>
-<tr><td>1737.2212524414062</td><td>467.26536951092476</td><td>0.0</td></tr>
-<tr><td>1737.2420654296875</td><td>386.19737784148947</td><td>0.0</td></tr>
-<tr><td>1737.2628784179688</td><td>307.61742929040975</td><td>0.0</td></tr>
-<tr><td>1737.2837524414062</td><td>218.35482253280588</td><td>0.0</td></tr>
-<tr><td>1737.3045654296875</td><td>109.60592441125209</td><td>0.0</td></tr>
-<tr><td>1737.3253784179688</td><td>2.4883698937765075</td><td>0.0</td></tr>
-<tr><td>1737.3462524414062</td><td>-92.91965046694895</td><td>0.0</td></tr>
-<tr><td>1737.3670654296875</td><td>-179.75423736155153</td><td>0.0</td></tr>
-<tr><td>1737.3878784179688</td><td>-238.60812425265158</td><td>0.0</td></tr>
+<tr><td>1737.2837524414062</td><td>218.35482253281953</td><td>0.0</td></tr>
+<tr><td>1737.3045654296875</td><td>109.60592441127392</td><td>0.0</td></tr>
+<tr><td>1737.3253784179688</td><td>2.4883698938247107</td><td>0.0</td></tr>
+<tr><td>1737.3462524414062</td><td>-92.91965046690257</td><td>0.0</td></tr>
+<tr><td>1737.3670654296875</td><td>-179.75423736149878</td><td>0.0</td></tr>
+<tr><td>1737.3878784179688</td><td>-238.60812425257973</td><td>0.0</td></tr>
 </table></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -1042,7 +1026,7 @@ RegressionCorrector (ID: KIC 8462852)
 </div>
 </section>
 <section id="5.-Using-RegressionCorrector-on-TESS-Two-Minute-Cadence-Target-Pixel-Files">
-<h2>5. Using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> on <em>TESS</em> Two-Minute Cadence Target Pixel Files<a class="headerlink" href="#5.-Using-RegressionCorrector-on-TESS-Two-Minute-Cadence-Target-Pixel-Files" title="Permalink to this headline">¶</a></h2>
+<h2>5. Using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> on <em>TESS</em> Two-Minute Cadence Target Pixel Files<a class="headerlink" href="#5.-Using-RegressionCorrector-on-TESS-Two-Minute-Cadence-Target-Pixel-Files" title="Permalink to this headline">#</a></h2>
 <p><em>TESS</em> releases high-time resolution TPFs of interesting targets. These higher time resolution TPFs have background removed for users by the pipeline. However, there are still common trends in TPF pixels that are not due to scattered light, but could be from, for example, spacecraft motion.</p>
 <p><code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> can be used in exactly the same way to remove these common trends.</p>
 <div class="nbinput nblast docutils container">
@@ -1152,11 +1136,11 @@ $880.81385 \; \mathrm{ppm}$</div></div>
 </div>
 <div class="output_area docutils container">
 <div class="math notranslate nohighlight">
-$825.56213 \; \mathrm{ppm}$</div></div>
+$825.56264 \; \mathrm{ppm}$</div></div>
 </div>
 </section>
 <section id="6.-Should-I-use-RegressionCorrector-or-PLDCorrector?">
-<h2>6. Should I use <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> or <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>?<a class="headerlink" href="#6.-Should-I-use-RegressionCorrector-or-PLDCorrector?" title="Permalink to this headline">¶</a></h2>
+<h2>6. Should I use <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> or <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>?<a class="headerlink" href="#6.-Should-I-use-RegressionCorrector-or-PLDCorrector?" title="Permalink to this headline">#</a></h2>
 <p>In addition to the corrector demonstrated in this tutorial, Lightkurve has a special case of <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> called <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.html?highlight=pldcorrector">PLDCorrector</a>. PLD, or Pixel Level Decorrelation, is a method of removing systematic noise from light curves using linear regression, with a design matrix constructed from a combination of pixel-level light curves.</p>
 <p>For more information about the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>, please see the tutorial specifically on removing instrumental noise from <em>K2</em> and <em>TESS</em> light curves using PLD.</p>
 <p>For <em>TESS</em>, the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> works in a very similar way to the <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>. The major difference between them is that <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> constructs its own design matrix, making it a streamlined, versatile tool to apply to any <em>TESS</em> or <em>K2</em> light curve.</p>
@@ -1218,12 +1202,12 @@ al. 2016</a> for more information).</p>
 <p>When considering which corrector to use, remember that <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> is minimal and designed to be effective at removing both background scattered light from <em>TESS</em> and motion noise from <em>K2</em>, while <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> is flexible and gives you more control over the creation of the design matrix and the correction.</p>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
 <p><strong>Authors:</strong> Christina Hedges (<a class="reference external" href="mailto:christinalouisehedges&#37;&#52;&#48;gmail&#46;com">christinalouisehedges<span>&#64;</span>gmail<span>&#46;</span>com</a>), Nicholas Saunders (<a class="reference external" href="mailto:nksaun&#37;&#52;&#48;hawaii&#46;edu">nksaun<span>&#64;</span>hawaii<span>&#46;</span>edu</a>), Geert Barentsen</p>
 <p><strong>Updated On:</strong> 2020-09-28</p>
 </section>
 <section id="Citing-Lightkurve-and-its-Dependencies">
-<h2>Citing Lightkurve and its Dependencies<a class="headerlink" href="#Citing-Lightkurve-and-its-Dependencies" title="Permalink to this headline">¶</a></h2>
+<h2>Citing Lightkurve and its Dependencies<a class="headerlink" href="#Citing-Lightkurve-and-its-Dependencies" title="Permalink to this headline">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or its dependencies for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
@@ -1288,62 +1272,65 @@ archivePrefix = "ascl",
 }
     </textarea>
     <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
-@ARTICLE{2018AJ....156..123T,
-   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
-    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
-    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
-    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
-    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
-    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
-    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
-    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
-    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
-    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
-    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
-    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
-    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
-    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
-    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
-    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
-    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
-    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
-    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
-    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
-    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
-    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
-    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
-    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
-    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
-    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
-    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
-    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
-    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
-    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
-    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
-    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
-    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
-    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
-    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
-    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
-    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
-    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
-    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
-    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
-    {Zabalza}, V. and {Contributors}, (.},
-    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
-  journal = {\aj},
-archivePrefix = "arXiv",
-   eprint = {1801.02634},
- primaryClass = "astro-ph.IM",
- keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
-     year = 2018,
-    month = sep,
-   volume = 156,
-      eid = {123},
-    pages = {123},
-      doi = {10.3847/1538-3881/aabc4f},
-   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+@ARTICLE{astropy:2022,
+       author = {{Astropy Collaboration} and {Price-Whelan}, Adrian M. and {Lim}, Pey
+       Lian and {Earl}, Nicholas and {Starkman}, Nathaniel and {Bradley}, Larry and
+       {Shupe}, David L. and {Patil}, Aarya A. and {Corrales}, Lia and {Brasseur}, C.~E.
+       and {N{\"o}the}, Maximilian and {Donath}, Axel and {Tollerud}, Erik and {Morris},
+       Brett M. and {Ginsburg}, Adam and {Vaher}, Eero and {Weaver}, Benjamin A. and
+       {Tocknell}, James and {Jamieson}, William and {van Kerkwijk}, Marten H. and
+       {Robitaille}, Thomas P. and {Merry}, Bruce and {Bachetti}, Matteo and
+       {G{\"u}nther}, H. Moritz and {Aldcroft}, Thomas L. and {Alvarado-Montes}, Jaime
+       A. and {Archibald}, Anne M. and {B{\'o}di}, Attila and {Bapat}, Shreyas and
+       {Barentsen}, Geert and {Baz{\'a}n}, Juanjo and {Biswas}, Manish and {Boquien},
+       M{\'e}d{\'e}ric and {Burke}, D.~J. and {Cara}, Daria and {Cara}, Mihai and
+       {Conroy}, Kyle E. and {Conseil}, Simon and {Craig}, Matthew W. and {Cross},
+       Robert M. and {Cruz}, Kelle L. and {D'Eugenio}, Francesco and {Dencheva}, Nadia
+       and {Devillepoix}, Hadrien A.~R. and {Dietrich}, J{\"o}rg P. and {Eigenbrot},
+       Arthur Davis and {Erben}, Thomas and {Ferreira}, Leonardo and {Foreman-Mackey},
+       Daniel and {Fox}, Ryan and {Freij}, Nabil and {Garg}, Suyog and {Geda}, Robel and
+       {Glattly}, Lauren and {Gondhalekar}, Yash and {Gordon}, Karl D. and {Grant},
+       David and {Greenfield}, Perry and {Groener}, Austen M. and {Guest}, Steve and
+       {Gurovich}, Sebastian and {Handberg}, Rasmus and {Hart}, Akeem and
+       {Hatfield-Dodds}, Zac and {Homeier}, Derek and {Hosseinzadeh}, Griffin and
+       {Jenness}, Tim and {Jones}, Craig K. and {Joseph}, Prajwel and {Kalmbach}, J.
+       Bryce and {Karamehmetoglu}, Emir and {Ka{\l}uszy{\'n}ski}, Miko{\l}aj and
+       {Kelley}, Michael S.~P. and {Kern}, Nicholas and {Kerzendorf}, Wolfgang E. and
+       {Koch}, Eric W. and {Kulumani}, Shankar and {Lee}, Antony and {Ly}, Chun and
+       {Ma}, Zhiyuan and {MacBride}, Conor and {Maljaars}, Jakob M. and {Muna}, Demitri
+       and {Murphy}, N.~A. and {Norman}, Henrik and {O'Steen}, Richard and {Oman}, Kyle
+       A. and {Pacifici}, Camilla and {Pascual}, Sergio and {Pascual-Granado}, J. and
+       {Patil}, Rohit R. and {Perren}, Gabriel I. and {Pickering}, Timothy E. and
+       {Rastogi}, Tanuj and {Roulston}, Benjamin R. and {Ryan}, Daniel F. and {Rykoff},
+       Eli S. and {Sabater}, Jose and {Sakurikar}, Parikshit and {Salgado}, Jes{\'u}s
+       and {Sanghi}, Aniket and {Saunders}, Nicholas and {Savchenko}, Volodymyr and
+       {Schwardt}, Ludwig and {Seifert-Eckert}, Michael and {Shih}, Albert Y. and
+       {Jain}, Anany Shrey and {Shukla}, Gyanendra and {Sick}, Jonathan and {Simpson},
+       Chris and {Singanamalla}, Sudheesh and {Singer}, Leo P. and {Singhal}, Jaladh and
+       {Sinha}, Manodeep and {Sip{\H{o}}cz}, Brigitta M. and {Spitler}, Lee R. and
+       {Stansby}, David and {Streicher}, Ole and {{\v{S}}umak}, Jani and {Swinbank},
+       John D. and {Taranu}, Dan S. and {Tewary}, Nikita and {Tremblay}, Grant R. and
+       {Val-Borro}, Miguel de and {Van Kooten}, Samuel J. and {Vasovi{\'c}}, Zlatan and
+       {Verma}, Shresth and {de Miranda Cardoso}, Jos{\'e} Vin{\'\i}cius and {Williams},
+       Peter K.~G. and {Wilson}, Tom J. and {Winkel}, Benjamin and {Wood-Vasey}, W.~M.
+       and {Xue}, Rui and {Yoachim}, Peter and {Zhang}, Chen and {Zonca}, Andrea and
+       {Astropy Project Contributors}}, title = "{The Astropy Project: Sustaining and
+       Growing a Community-oriented Open-source Project and the Latest Major Release
+       (v5.0) of the Core Package}",
+      journal = {\apj},
+     keywords = {Astronomy software, Open source software, Astronomy data analysis, 1855, 1866, 1858, Astrophysics - Instrumentation and Methods for Astrophysics},
+         year = 2022,
+        month = aug,
+       volume = {935},
+       number = {2},
+          eid = {167},
+        pages = {167},
+          doi = {10.3847/1538-4357/ac7c74},
+archivePrefix = {arXiv},
+       eprint = {2206.14220},
+ primaryClass = {astro-ph.IM},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2022ApJ...935..167A},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
 
@@ -1427,7 +1414,7 @@ archivePrefix = "arXiv",
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="2-3-how-to-use-cbvcorrector.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1450,7 +1437,8 @@ archivePrefix = "arXiv",
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1462,7 +1450,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

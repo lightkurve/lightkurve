@@ -8,8 +8,9 @@
 
     <title>FoldedLightCurve &#8212; Lightkurve </title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,15 +20,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -54,7 +51,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -65,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -107,7 +104,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -122,10 +125,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -141,7 +142,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -1229,6 +1231,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.config.get_cache_dir.html">
+     lightkurve.config.get_cache_dir
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.config.get_config_dir.html">
      lightkurve.config.get_config_dir
     </a>
@@ -1261,6 +1268,9 @@
 
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -1271,7 +1281,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -1314,7 +1324,7 @@
               <div>
                 
   <section id="foldedlightcurve">
-<span id="api-foldedlightcurve"></span><h1>FoldedLightCurve<a class="headerlink" href="#foldedlightcurve" title="Permalink to this headline">¶</a></h1>
+<span id="api-foldedlightcurve"></span><h1>FoldedLightCurve<a class="headerlink" href="#foldedlightcurve" title="Permalink to this headline">#</a></h1>
 <p>The <a class="reference internal" href="api/lightkurve.FoldedLightCurve.html#lightkurve.FoldedLightCurve" title="lightkurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> class extends a standard <a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object by having
 the <code class="docutils literal notranslate"><span class="pre">time</span></code> column represent phase values.
 This allows a <a class="reference internal" href="api/lightkurve.FoldedLightCurve.html#lightkurve.FoldedLightCurve" title="lightkurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> to offer a few features that are specific to
@@ -1323,8 +1333,8 @@ and <a class="reference internal" href="api/lightkurve.FoldedLightCurve.even_mas
 The class also overrides the plotting methods to provide defaults that are
 suitable for plotting phase-folded data.</p>
 <section id="constructor">
-<h2>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
+<h2>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1337,8 +1347,8 @@ suitable for plotting phase-folded data.</p>
 </table>
 </section>
 <section id="extra-attributes">
-<h2>Extra attributes<a class="headerlink" href="#extra-attributes" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
+<h2>Extra attributes<a class="headerlink" href="#extra-attributes" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1360,21 +1370,21 @@ suitable for plotting phase-folded data.</p>
 </table>
 </section>
 <section id="modified-plotting-methods">
-<h2>Modified plotting methods<a class="headerlink" href="#modified-plotting-methods" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
+<h2>Modified plotting methods<a class="headerlink" href="#modified-plotting-methods" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.plot.html#lightkurve.FoldedLightCurve.plot" title="lightkurve.FoldedLightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.plot</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
+<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.7.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.scatter.html#lightkurve.FoldedLightCurve.scatter" title="lightkurve.FoldedLightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.scatter</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
+<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.7.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.errorbar.html#lightkurve.FoldedLightCurve.errorbar" title="lightkurve.FoldedLightCurve.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.errorbar</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
+<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.7.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.FoldedLightCurve.plot_river.html#lightkurve.FoldedLightCurve.plot_river" title="lightkurve.FoldedLightCurve.plot_river"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve.plot_river</span></code></a>(**kwargs)</p></td>
 <td><p>Plot the folded light curve in a river style.</p></td>
@@ -1389,7 +1399,7 @@ suitable for plotting phase-folded data.</p>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="api/lightkurve.LightCurve.search_neighbors.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1412,7 +1422,8 @@ suitable for plotting phase-folded data.</p>
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1424,7 +1435,7 @@ suitable for plotting phase-folded data.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

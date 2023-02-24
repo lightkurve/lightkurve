@@ -8,8 +8,9 @@
 
     <title>Plotting Target Pixel Files with Lightkurve &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,22 +20,18 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Interactively inspecting Target Pixel Files" href="interactively-inspecting-data.html" />
@@ -56,7 +53,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -67,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -109,7 +106,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -124,10 +127,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -152,7 +153,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -346,10 +347,11 @@ div.nboutput.container div.prompt > div {
     }
 }
 
-/* disable scrollbars on prompts */
+/* disable scrollbars and line breaks on prompts */
 div.nbinput.container div.prompt pre,
 div.nboutput.container div.prompt pre {
     overflow: hidden;
+    white-space: pre;
 }
 
 /* input/output area */
@@ -451,6 +453,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -459,10 +462,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -474,12 +481,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -489,9 +499,9 @@ div.rendered_html tbody tr:hover {
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/1-getting-started/plotting-target-pixel-files.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Plotting-Target-Pixel-Files-with-Lightkurve">
-<h1>Plotting Target Pixel Files with Lightkurve<a class="headerlink" href="#Plotting-Target-Pixel-Files-with-Lightkurve" title="Permalink to this headline">¶</a></h1>
+<h1>Plotting Target Pixel Files with Lightkurve<a class="headerlink" href="#Plotting-Target-Pixel-Files-with-Lightkurve" title="Permalink to this headline">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Learn how to download and plot target pixel files from the data archive using <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a>.</p></li>
@@ -500,7 +510,7 @@ div.rendered_html tbody tr:hover {
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
 <p>The <a class="reference external" href="https://www.nasa.gov/mission_pages/kepler/main/index.html">Kepler</a>, <a class="reference external" href="https://www.nasa.gov/mission_pages/kepler/main/index.html">K2</a>, and <a class="reference external" href="https://tess.mit.edu/">TESS</a> telescopes observe stars for long periods of time, from just under a month to four years. By doing so they observe how the brightnesses of stars change over time.</p>
 <p>Pixels around targeted stars are cut out and stored as <em>target pixel files</em> at each observing cadence. In this tutorial, we will learn how to use Lightkurve to download and understand the different photometric data stored in a target pixel file, and how to extract flux using basic aperture photometry.</p>
 <p>It is useful to read the accompanying tutorial discussing how to use target pixel file products with Lightkurve before starting this tutorial. It is recommended that you also read the tutorial on using <em>Kepler</em> light curve products with Lightkurve, which will introduce you to some specifics on how <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> make observations, and how these are displayed as light curves. It also introduces some important terms and concepts that are referred to in this tutorial.</p>
@@ -508,7 +518,7 @@ div.rendered_html tbody tr:hover {
 <p>TPFs are typically the first port of call when studying a star with <em>Kepler</em>, <em>K2</em>, or <em>TESS</em>. They allow us to see where our data is coming from, and identify potential sources of noise or systematic trends. In this tutorial, we will use the <em>Kepler</em> mission as the main example, but these tools equally apply to <em>TESS</em> and <em>K2</em> as well.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
 <p>This tutorial requires: - <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> to work with TPF files. - <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -522,7 +532,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </section>
 <section id="1.-Downloading-a-TPF">
-<h2>1. Downloading a TPF<a class="headerlink" href="#1.-Downloading-a-TPF" title="Permalink to this headline">¶</a></h2>
+<h2>1. Downloading a TPF<a class="headerlink" href="#1.-Downloading-a-TPF" title="Permalink to this headline">#</a></h2>
 <p>A TPF contains the original imaging data from which a light curve is derived. Besides the brightness data measured by the charge-coupled device (CCD) camera, a TPF also includes post-processing information such as an estimate of the astronomical background, and a recommended pixel aperture for extracting a light curve.</p>
 <p>First, we download a target pixel file. We will use one quarter’s worth of <em>Kepler</em> data for the star named <a class="reference external" href="http://www.openexoplanetcatalogue.com/planet/Kepler-8%20b/">Kepler-8</a>, a star somewhat larger than the Sun, and the host of a <a class="reference external" href="https://en.wikipedia.org/wiki/Hot_Jupiter">hot Jupiter planet</a>. To search for TPF’s that contain our object of interest we will use the
 <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile</a> function as follows,</p>
@@ -542,7 +552,7 @@ div.rendered_html tbody tr:hover {
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table5489280624">
+<table id="table6280580496">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -577,7 +587,7 @@ KeplerTargetPixelFile Object (ID: 6922244)
 </div>
 </section>
 <section id="2.-Flux-and-Background">
-<h2>2. Flux and Background<a class="headerlink" href="#2.-Flux-and-Background" title="Permalink to this headline">¶</a></h2>
+<h2>2. Flux and Background<a class="headerlink" href="#2.-Flux-and-Background" title="Permalink to this headline">#</a></h2>
 <p>At each cadence the TPF has a number of photometry data properties. These are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">flux_bkg</span></code>: the astronomical background of the image.</p></li>
@@ -671,7 +681,7 @@ can learn more about background removal in Section 4.2 of the <a class="referenc
 <p>In this case, the background is low and the star is bright, so it doesn’t appear to make much of a difference.</p>
 </section>
 <section id="3.-Apertures">
-<h2>3. Apertures<a class="headerlink" href="#3.-Apertures" title="Permalink to this headline">¶</a></h2>
+<h2>3. Apertures<a class="headerlink" href="#3.-Apertures" title="Permalink to this headline">#</a></h2>
 <p>As part of the data processing done by the <em>Kepler</em> pipeline, each TPF includes a recommended <em>optimal aperture mask</em>. This aperture mask is optimized to ensure that the stellar signal has a high signal-to-noise ratio, with minimal contamination from the background.</p>
 <p>The optimal aperture is stored in the TPF as the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.pipeline_mask.html?highlight=pipeline_mask">pipeline_mask</a> property. We can have a look at it by calling it here:</p>
 <div class="nbinput docutils container">
@@ -715,7 +725,7 @@ array([[False, False, False, False, False],
 Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 </section>
 <section id="4.-Simple-Aperture-Photometry">
-<h2>4. Simple Aperture Photometry<a class="headerlink" href="#4.-Simple-Aperture-Photometry" title="Permalink to this headline">¶</a></h2>
+<h2>4. Simple Aperture Photometry<a class="headerlink" href="#4.-Simple-Aperture-Photometry" title="Permalink to this headline">#</a></h2>
 <p>Finally, let’s learn how to perform simple aperture photometry (SAP) using the provided optimal aperture in <code class="docutils literal notranslate"><span class="pre">pipeline_mask</span></code> and the TPF.</p>
 <p>Using the full TPF for all cadences in the quarter, we can perform aperture photometry using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve()</a> method as follows:</p>
 <div class="nbinput nblast docutils container">
@@ -741,7 +751,7 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>KeplerLightCurve length=4116 LABEL=&quot;KIC 6922244&quot; QUARTER=4 CAMPAIGN=None</i>
-<table id="table5497265248" class="table-striped table-bordered table-condensed">
+<table id="table6295342336" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>quality</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th><th>pix</th><th>pix</th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>float32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>int32</th></tr></thead>
@@ -751,33 +761,7 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 <tr><td>352.45805764463876</td><td>43698.31640625</td><td>6.631948947906494</td><td>682.6797879974883</td><td>190.07249571597706</td><td>11918</td><td>0</td></tr>
 <tr><td>352.4784908439324</td><td>43687.6484375</td><td>6.631504535675049</td><td>682.6792868410989</td><td>190.07246464783114</td><td>11919</td><td>0</td></tr>
 <tr><td>352.4989240434661</td><td>43686.4765625</td><td>6.6314263343811035</td><td>682.6797248240034</td><td>190.07284002730125</td><td>11920</td><td>0</td></tr>
-<tr><td>352.5193572433491</td><td>43692.59375</td><td>6.631662845611572</td><td>682.6797061866289</td><td>190.07275265635383</td><td>11921</td><td>0</td></tr>
-<tr><td>352.53979034345684</td><td>43712.01953125</td><td>6.6356940269470215</td><td>682.6787299772047</td><td>190.07316832254241</td><td>11922</td><td>128</td></tr>
-<tr><td>352.56022364380624</td><td>43683.98046875</td><td>6.631390571594238</td><td>682.679365411703</td><td>190.0730725082332</td><td>11923</td><td>0</td></tr>
-<tr><td>352.5806568445041</td><td>43696.76171875</td><td>6.632009029388428</td><td>682.6796517987715</td><td>190.07296984009605</td><td>11924</td><td>0</td></tr>
-<tr><td>352.6010899455432</td><td>43693.1484375</td><td>6.631709098815918</td><td>682.6794946321877</td><td>190.073062208751</td><td>11925</td><td>0</td></tr>
-<tr><td>352.6215232468239</td><td>43691.34375</td><td>6.631857395172119</td><td>682.6793119546483</td><td>190.07329265625233</td><td>11926</td><td>8192</td></tr>
-<tr><td>352.64195644845313</td><td>43703.13671875</td><td>6.632218837738037</td><td>682.6794600165127</td><td>190.07310394362827</td><td>11927</td><td>0</td></tr>
-<tr><td>352.6623896503079</td><td>43692.90625</td><td>6.631864547729492</td><td>682.6791962953619</td><td>190.07331932569323</td><td>11928</td><td>0</td></tr>
-<tr><td>352.68282285240275</td><td>43696.2734375</td><td>6.632040977478027</td><td>682.6792754510204</td><td>190.07326117409048</td><td>11929</td><td>0</td></tr>
-<tr><td>352.70325605484686</td><td>43666.19921875</td><td>6.630620956420898</td><td>682.6794975721688</td><td>190.07290799818392</td><td>11930</td><td>0</td></tr>
-<tr><td>352.7236892575165</td><td>43683.390625</td><td>6.631417751312256</td><td>682.679147977405</td><td>190.0734239489556</td><td>11931</td><td>0</td></tr>
-<tr><td>352.7441224605427</td><td>43691.4140625</td><td>6.631997585296631</td><td>682.679107402596</td><td>190.07312093294664</td><td>11932</td><td>0</td></tr>
-<tr><td>352.76455566380173</td><td>43701.4765625</td><td>6.632231712341309</td><td>682.6788244683077</td><td>190.07310037302085</td><td>11933</td><td>0</td></tr>
 <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-<tr><td>441.8152511581502</td><td>43154.4140625</td><td>6.599671363830566</td><td>682.503034387268</td><td>190.28080193887232</td><td>16291</td><td>0</td></tr>
-<tr><td>441.8356856221799</td><td>43153.21875</td><td>6.599508762359619</td><td>682.5029903397564</td><td>190.2813147419433</td><td>16292</td><td>0</td></tr>
-<tr><td>441.8561199863325</td><td>43161.00390625</td><td>6.5999755859375</td><td>682.5031149987257</td><td>190.2808494851943</td><td>16293</td><td>0</td></tr>
-<tr><td>441.87655425060075</td><td>43149.25390625</td><td>6.599336624145508</td><td>682.5033363751197</td><td>190.28077231207783</td><td>16294</td><td>0</td></tr>
-<tr><td>441.89698871497967</td><td>43157.8515625</td><td>6.600053787231445</td><td>682.503043437076</td><td>190.28114132203186</td><td>16295</td><td>128</td></tr>
-<tr><td>441.91742307953973</td><td>43154.7109375</td><td>6.599435329437256</td><td>682.5029196936422</td><td>190.28074883797223</td><td>16296</td><td>0</td></tr>
-<tr><td>441.93785734418634</td><td>43154.68359375</td><td>6.599567890167236</td><td>682.5031285134896</td><td>190.28106458358056</td><td>16297</td><td>0</td></tr>
-<tr><td>441.95829170897196</td><td>43155.34765625</td><td>6.599438190460205</td><td>682.502819166476</td><td>190.28129772456774</td><td>16298</td><td>0</td></tr>
-<tr><td>441.9991604389361</td><td>43155.49609375</td><td>6.599555492401123</td><td>682.5027229343457</td><td>190.28110987603694</td><td>16300</td><td>0</td></tr>
-<tr><td>442.01959480413643</td><td>43153.08203125</td><td>6.599308490753174</td><td>682.5027122524675</td><td>190.28150665607106</td><td>16301</td><td>0</td></tr>
-<tr><td>442.0400292694467</td><td>43162.8515625</td><td>6.5997772216796875</td><td>682.5029172042948</td><td>190.28117470942624</td><td>16302</td><td>0</td></tr>
-<tr><td>442.0604635348791</td><td>43167.78125</td><td>6.600048065185547</td><td>682.5028434809847</td><td>190.28150709323504</td><td>16303</td><td>0</td></tr>
-<tr><td>442.0808979004214</td><td>43156.33203125</td><td>6.599843978881836</td><td>682.5027064349352</td><td>190.2813695406399</td><td>16304</td><td>128</td></tr>
 <tr><td>442.1013323661464</td><td>43164.0703125</td><td>6.599811553955078</td><td>682.5025883479478</td><td>190.28110702349872</td><td>16305</td><td>0</td></tr>
 <tr><td>442.1217667319579</td><td>43160.6640625</td><td>6.599737167358398</td><td>682.5028468248179</td><td>190.28114515294416</td><td>16306</td><td>8192</td></tr>
 <tr><td>442.1422009979142</td><td>43157.625</td><td>6.5994954109191895</td><td>682.5026386061921</td><td>190.28167292648035</td><td>16307</td><td>0</td></tr>
@@ -805,7 +789,7 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 </div>
 <p>This light curve is similar to the SAP light curve we previously encountered in the light curve tutorial.</p>
 <section id="Note">
-<h3>Note<a class="headerlink" href="#Note" title="Permalink to this headline">¶</a></h3>
+<h3>Note<a class="headerlink" href="#Note" title="Permalink to this headline">#</a></h3>
 <p>The background flux can be plotted in a similar way, using the <code class="docutils literal notranslate"><span class="pre">get_bkg_lightcurve()</span></code> method. This does not require an aperture, but instead sums the flux in the TPF’s <code class="docutils literal notranslate"><span class="pre">FLUX_BKG</span></code> column at each timestamp.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
@@ -828,7 +812,7 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 </section>
 </section>
 <section id="Exercises">
-<h2>Exercises<a class="headerlink" href="#Exercises" title="Permalink to this headline">¶</a></h2>
+<h2>Exercises<a class="headerlink" href="#Exercises" title="Permalink to this headline">#</a></h2>
 <p>Some stars, such as the planet-hosting star Kepler-10, have been observed both with <em>Kepler</em> and <em>TESS</em>. In this exercise, download and plot both the <em>TESS</em> and <em>Kepler</em> TPFs, along with the optimal apertures. You can do this by either selecting the TPFs from the list returned by <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile()</a>, or by using the <code class="docutils literal notranslate"><span class="pre">mission</span></code> keyword argument when searching.</p>
 <p>Both <em>Kepler</em> and <em>TESS</em> produce target pixel file data products, but these can look different across the two missions. <em>TESS</em> is focused on brighter stars and has larger pixels, so a star that might occupy many pixels in <em>Kepler</em> may only occupy a few in <em>TESS</em>.</p>
 <p>How do light curves extracted from both of them compare?</p>
@@ -855,9 +839,9 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
-SearchResult containing 57 data products.
+SearchResult containing 65 data products.
 
-<table id="table5492697424">
+<table id="table6280579824">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
@@ -866,42 +850,16 @@ SearchResult containing 57 data products.
 <tr><td>3</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
 <tr><td>4</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
 <tr><td>5</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>6</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>7</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>8</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>9</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>10</td><td>Kepler Quarter 05</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>11</td><td>Kepler Quarter 05</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>12</td><td>Kepler Quarter 05</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>13</td><td>Kepler Quarter 05</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>14</td><td>Kepler Quarter 06</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>15</td><td>Kepler Quarter 06</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>16</td><td>Kepler Quarter 06</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>17</td><td>Kepler Quarter 06</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>18</td><td>Kepler Quarter 07</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
 <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-<tr><td>37</td><td>Kepler Quarter 13</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>38</td><td>Kepler Quarter 14</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>39</td><td>Kepler Quarter 14</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>40</td><td>Kepler Quarter 14</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>41</td><td>Kepler Quarter 14</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>42</td><td>Kepler Quarter 15</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>43</td><td>Kepler Quarter 15</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>44</td><td>Kepler Quarter 15</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>45</td><td>Kepler Quarter 15</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>46</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>47</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>48</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
-<tr><td>49</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>50</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>1800</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>51</td><td>TESS Sector 15</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>1800</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>52</td><td>TESS Sector 26</td><td>2020</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>1800</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>53</td><td>TESS Sector 40</td><td>2021</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>54</td><td>TESS Sector 40</td><td>2021</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>55</td><td>TESS Sector 41</td><td>2021</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>56</td><td>TESS Sector 41</td><td>2021</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>58</td><td>TESS Sector 41</td><td>2021</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>600</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>59</td><td>TESS Sector 53</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>60</td><td>TESS Sector 53</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>61</td><td>TESS Sector 54</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>62</td><td>TESS Sector 54</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>63</td><td>TESS Sector 55</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>64</td><td>TESS Sector 55</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
 </table>
-Length = 57 rows</div>
+Length = 65 rows</div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
@@ -959,12 +917,12 @@ Length = 57 rows</div>
 <p>If you plot the light curves for both missions side by side, you will see a stark difference. The <em>Kepler</em> data has a much smaller scatter, and repeating transits are visible. This is because <em>Kepler</em>’s pixels were smaller, and so could achieve a higher precision on fainter stars. <em>TESS</em> has larger pixels and therefore focuses on brighter stars. For stars like Kepler-10, it would be hard to detect a planet using <em>TESS</em> data alone.</p>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
 <p><strong>Authors:</strong> Oliver Hall (<a class="reference external" href="mailto:oliver&#46;hall&#37;&#52;&#48;esa&#46;int">oliver<span>&#46;</span>hall<span>&#64;</span>esa<span>&#46;</span>int</a>), Geert Barentsen</p>
 <p><strong>Updated On</strong>: 2020-09-15</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <p>lk.show_citation_instructions()</p>
 <p><img alt="Space Telescope Logo" class="no-scaled-link" src="https://raw.githubusercontent.com/spacetelescope/notebooks/master/assets/stsci_pri_combo_mark_horizonal_white_bkgd.png" style="width: 200px;" /></p>
@@ -976,7 +934,7 @@ Length = 57 rows</div>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="using-target-pixel-file-products.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -999,7 +957,8 @@ Length = 57 rows</div>
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1011,7 +970,7 @@ Length = 57 rows</div>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

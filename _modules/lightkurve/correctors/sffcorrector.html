@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lightkurve.correctors.sffcorrector &#8212; Lightkurve </title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,15 +19,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -51,7 +48,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -62,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">Lightkurve v2.2</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -104,7 +101,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -119,10 +122,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -138,7 +139,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -146,6 +148,9 @@
     
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -193,7 +198,7 @@
 
 
 <div class="viewcode-block" id="SFFCorrector"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector">[docs]</a><span class="k">class</span> <span class="nc">SFFCorrector</span><span class="p">(</span><span class="n">RegressionCorrector</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Special case of `.RegressionCorrector` where the `.DesignMatrix` includes</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Special case of `.RegressionCorrector` where the `.DesignMatrix` includes</span>
 <span class="sd">    the target&#39;s centroid positions.</span>
 
 <span class="sd">    The design matrix also contains columns representing a spline in time</span>
@@ -249,7 +254,7 @@
         <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Find the best fit correction for the light curve.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the best fit correction for the light curve.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -394,14 +399,14 @@
         <span class="k">return</span> <span class="n">clc</span></div>
 
 <div class="viewcode-block" id="SFFCorrector.diagnose"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SFFCorrector.diagnose.html#lightkurve.correctors.SFFCorrector.diagnose">[docs]</a>    <span class="k">def</span> <span class="nf">diagnose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a diagnostic plot which visualizes what happened during the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a diagnostic plot which visualizes what happened during the</span>
 <span class="sd">        most recent call to `correct()`.&quot;&quot;&quot;</span>
         <span class="n">axs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_diagnostic_plot</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_points</span><span class="p">:</span>
             <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SFFCorrector.diagnose_arclength"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SFFCorrector.diagnose_arclength.html#lightkurve.correctors.SFFCorrector.diagnose_arclength">[docs]</a>    <span class="k">def</span> <span class="nf">diagnose_arclength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a diagnostic plot which visualizes arclength vs flux</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a diagnostic plot which visualizes arclength vs flux</span>
 <span class="sd">        from most recent call to `correct()`.&quot;&quot;&quot;</span>
 
         <span class="n">max_plot</span> <span class="o">=</span> <span class="mi">5</span>
@@ -471,7 +476,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_centroid_dm</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;centroids&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns a `.DesignMatrix` containing (col, row) centroid positions</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a `.DesignMatrix` containing (col, row) centroid positions</span>
 <span class="sd">    and transformations thereof.</span>
 
 <span class="sd">    Parameters</span>
@@ -517,7 +522,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_thruster_firings</span><span class="p">(</span><span class="n">arclength</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Find locations where K2 fired thrusters</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find locations where K2 fired thrusters</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -548,7 +553,7 @@
     <span class="c1"># the point before the firing or the point after the firing.</span>
     <span class="c1"># This makes sure we always return the same value, no matter the roll orientation.</span>
     <span class="k">def</span> <span class="nf">_start_and_end</span><span class="p">(</span><span class="n">start_or_end</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Find points at the start or end of a roll.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find points at the start or end of a roll.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">start_or_end</span> <span class="o">==</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span>
             <span class="n">thrusters</span> <span class="o">=</span> <span class="p">(</span><span class="n">d2adt2</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">stddev</span> <span class="o">*</span> <span class="o">-</span><span class="mi">5</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">d2adt2</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">start_or_end</span> <span class="o">==</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span>
@@ -588,7 +593,7 @@
 <span class="k">def</span> <span class="nf">_get_window_points</span><span class="p">(</span>
     <span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">,</span> <span class="n">windows</span><span class="p">,</span> <span class="n">arclength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">breakindex</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns indices where thrusters are fired.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns indices where thrusters are fired.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -659,7 +664,7 @@
 
 
 <span class="k">def</span> <span class="nf">_estimate_arclength</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Estimate the arclength given column and row centroid positions.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate the arclength given column and row centroid positions.</span>
 
 <span class="sd">    We use the approximation that the arclength equals</span>
 
@@ -688,7 +693,8 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -700,7 +706,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

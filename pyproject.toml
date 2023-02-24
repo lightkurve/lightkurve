@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lightkurve"
-version = "2.3.1dev"
+version = "2.4.1dev"
 description = "A friendly package for Kepler & TESS time series analysis in Python."
 license = "MIT"
 authors = ["Geert Barentsen <hello@geert.io>"]
@@ -38,11 +38,11 @@ pandas = ">=1.1.4"
 uncertainties = ">=3.1.4"
 patsy = ">=0.5.0"
 fbpca = ">=1.0"
-# tpf.interact_sky() tap selection requires a bug fix due to
-#  https://github.com/bokeh/bokeh/issues/6508
-bokeh = ">=1.1"
+# bokeh v2+ requirement due to https://github.com/lightkurve/lightkurve/issues/1261
+bokeh = ">=2.0.0"
 memoization = { version = ">=0.3.1", python = ">=3.8,<4.0" }
 scikit-learn = ">=0.24.0"
+pydata-sphinx-theme = "0.8.1"
 
 [tool.poetry.dev-dependencies]
 jupyterlab = ">=2.0.0"
@@ -67,6 +67,9 @@ ghp-import = ">=1.0.1"
 openpyxl = ">=3.0.7"
 tox = ">=3.24.5"
 mistune = "<2.0.0"  # Workaround for #1162 (not a true dependency)
+
+[tool.poetry.group.dev.dependencies]
+ghp-import = "^2.1.0"
 
 [build-system]
 requires = ["setuptools", "poetry-core>=1.0.0"]

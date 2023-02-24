@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lightkurve.collections &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,15 +19,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -51,7 +48,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -62,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.2</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -104,7 +101,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -119,10 +122,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -138,7 +139,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -146,6 +148,9 @@
     
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -184,7 +189,7 @@
 
 
 <span class="k">class</span> <span class="nc">Collection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Base class for `LightCurveCollection` and `TargetPixelFileCollection`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for `LightCurveCollection` and `TargetPixelFileCollection`.</span>
 
 <span class="sd">    A collection can be indexed by standard Python list syntax.</span>
 <span class="sd">    Additionally, it can be indexed by a subset of `numpy.ndarray` syntax:</span>
@@ -247,7 +252,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
 
     <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Appends a new object to the collection.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Appends a new object to the collection.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -275,7 +280,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;(TESS-specific) the quarters of the lightcurves / target pixel files.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(TESS-specific) the quarters of the lightcurves / target pixel files.</span>
 
 <span class="sd">        Returns `numpy.nan` for data products with lack a sector meta data keyword.</span>
 <span class="sd">        The attribute is useful for filtering a collection by sector.</span>
@@ -295,7 +300,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">quarter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;(Kepler-specific) the quarters of the lightcurves / target pixel files.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(Kepler-specific) the quarters of the lightcurves / target pixel files.</span>
 
 <span class="sd">        The Kepler quarters of the lightcurves / target pixel files; `numpy.nan` for those with none.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -303,7 +308,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">campaign</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;(K2-specific) the campaigns of the lightcurves / target pixel files.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(K2-specific) the campaigns of the lightcurves / target pixel files.</span>
 
 <span class="sd">        The K2 campaigns of the lightcurves / target pixel files; `numpy.nan` for those with none.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -311,7 +316,7 @@
 
 
 <div class="viewcode-block" id="LightCurveCollection"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurveCollection.html#lightkurve.LightCurveCollection">[docs]</a><span class="k">class</span> <span class="nc">LightCurveCollection</span><span class="p">(</span><span class="n">Collection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class to hold a collection of LightCurve objects.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to hold a collection of LightCurve objects.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -325,7 +330,7 @@
     <span class="nd">@property</span>
     <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">PDCSAP_FLUX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;DEPRECATED. Replaces `LightCurveFileCollection.PDCSAP_FLUX`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;DEPRECATED. Replaces `LightCurveFileCollection.PDCSAP_FLUX`.</span>
 <span class="sd">        Provided for backwards-compatibility with Lightkurve v1.x;</span>
 <span class="sd">        will be removed soon.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">LightCurveCollection</span><span class="p">([</span><span class="n">lc</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span> <span class="k">for</span> <span class="n">lc</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
@@ -333,13 +338,13 @@
     <span class="nd">@property</span>
     <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">SAP_FLUX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;DEPRECATED. Replaces `LightCurveFileCollection.SAP_FLUX`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;DEPRECATED. Replaces `LightCurveFileCollection.SAP_FLUX`.</span>
 <span class="sd">        Provided for backwards-compatibility with Lightkurve v1.x;</span>
 <span class="sd">        will be removed soon.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">LightCurveCollection</span><span class="p">([</span><span class="n">lc</span><span class="o">.</span><span class="n">SAP_FLUX</span> <span class="k">for</span> <span class="n">lc</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
 
 <div class="viewcode-block" id="LightCurveCollection.stitch"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurveCollection.stitch.html#lightkurve.LightCurveCollection.stitch">[docs]</a>    <span class="k">def</span> <span class="nf">stitch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">corrector_func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">normalize</span><span class="p">()):</span>
-        <span class="sd">&quot;&quot;&quot;Stitch all light curves in the collection into a single `LightCurve`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stitch all light curves in the collection into a single `LightCurve`.</span>
 
 <span class="sd">        Any function passed to `corrector_func` will be applied to each light curve</span>
 <span class="sd">        before stitching. For example, passing &quot;lambda x: x.normalize().flatten()&quot;</span>
@@ -391,7 +396,7 @@
         <span class="k">return</span> <span class="n">vstack</span><span class="p">(</span><span class="n">lcs</span><span class="p">,</span> <span class="n">join_type</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">,</span> <span class="n">metadata_conflicts</span><span class="o">=</span><span class="s2">&quot;silent&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LightCurveCollection.plot"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurveCollection.plot.html#lightkurve.LightCurveCollection.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Plots all light curves in the collection on a single plot.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots all light curves in the collection on a single plot.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -421,7 +426,7 @@
                     <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">lc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LABEL&#39;</span><span class="p">,</span> <span class="s1">&#39;(missing label)&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LABEL&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(missing label)&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;C</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">idx</span> <span class="o">*</span> <span class="n">offset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="c1"># If some but not all light curves are normalized, ensure the Y label</span>
@@ -440,7 +445,7 @@
 
 
 <div class="viewcode-block" id="TargetPixelFileCollection"><a class="viewcode-back" href="../../reference/api/lightkurve.TargetPixelFileCollection.html#lightkurve.TargetPixelFileCollection">[docs]</a><span class="k">class</span> <span class="nc">TargetPixelFileCollection</span><span class="p">(</span><span class="n">Collection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class to hold a collection of `~lightkurve.targetpixelfile.TargetPixelFile` objects.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to hold a collection of `~lightkurve.targetpixelfile.TargetPixelFile` objects.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -452,7 +457,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">TargetPixelFileCollection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">tpfs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TargetPixelFileCollection.plot"><a class="viewcode-back" href="../../reference/api/lightkurve.TargetPixelFileCollection.plot.html#lightkurve.TargetPixelFileCollection.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Individually plots all TargetPixelFile objects in a single</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Individually plots all TargetPixelFile objects in a single</span>
 <span class="sd">        matplotlib axes object.</span>
 
 <span class="sd">        Parameters</span>
@@ -489,7 +494,8 @@
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -501,7 +507,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

@@ -1,0 +1,6 @@
+﻿lightkurve.config.get\_cache\_dir
+=================================
+
+.. currentmodule:: lightkurve.config
+
+.. autofunction:: get_cache_dir

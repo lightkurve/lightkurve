@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lightkurve.correctors.cbvcorrector &#8212; Lightkurve </title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,15 +19,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -51,7 +48,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -62,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -104,7 +101,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -119,10 +122,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -138,7 +139,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -146,6 +148,9 @@
     
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -181,6 +186,7 @@
 <span class="kn">from</span> <span class="nn">astropy.timeseries</span> <span class="kn">import</span> <span class="n">TimeSeries</span>
 <span class="kn">from</span> <span class="nn">astropy.units</span> <span class="kn">import</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">UnitsWarning</span>
 <span class="kn">from</span> <span class="nn">astropy.utils.decorators</span> <span class="kn">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">astropy.utils.masked</span> <span class="kn">import</span> <span class="n">Masked</span>
 
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -209,7 +215,7 @@
 <span class="c1"># CBV Corrector Class</span>
 
 <div class="viewcode-block" id="CBVCorrector"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.CBVCorrector.html#lightkurve.correctors.CBVCorrector">[docs]</a><span class="k">class</span> <span class="nc">CBVCorrector</span><span class="p">(</span><span class="n">RegressionCorrector</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class for removing systematics using Cotrending Basis Vectors (CBVs)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for removing systematics using Cotrending Basis Vectors (CBVs)</span>
 <span class="sd">    from Kepler/K2/TESS.</span>
 
 <span class="sd">    On construction of this object, the relevant CBVs will be downloaded from</span>
@@ -263,7 +269,7 @@
 
 <div class="viewcode-block" id="CBVCorrector.__init__"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.CBVCorrector.html#lightkurve.correctors.CBVCorrector.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lc</span><span class="p">,</span> <span class="n">interpolate_cbvs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">extrapolate_cbvs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_not_load_cbvs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">cbv_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Constructor</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
 
 <span class="sd">        This constructor will retrieve all relevant CBVs from MAST and then</span>
 <span class="sd">        align or interpolate them with the passed-in light curve.</span>
@@ -380,7 +386,7 @@
     <span class="k">def</span> <span class="nf">correct_gaussian_prior</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">],</span>
             <span class="n">cbv_indices</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">)],</span> 
             <span class="n">alpha</span><span class="o">=</span><span class="mf">1e-20</span><span class="p">,</span> <span class="n">ext_dm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadence_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Performs the correction using RegressionCorrector methods.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Performs the correction using RegressionCorrector methods.</span>
 
 <span class="sd">        This method will assemble the full design matrix collection composed of</span>
 <span class="sd">        cbv_design_matrix and extra_design_matrix (ext_dm). It then uses the</span>
@@ -452,7 +458,7 @@
 
     <span class="k">def</span> <span class="nf">correct_elasticnet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">,</span> <span class="n">cbv_indices</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> 
             <span class="n">alpha</span><span class="o">=</span><span class="mf">1e-20</span><span class="p">,</span> <span class="n">l1_ratio</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">ext_dm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadence_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Performs the correction using scikit-learn&#39;s ElasticNet which</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Performs the correction using scikit-learn&#39;s ElasticNet which</span>
 <span class="sd">        utilizes combined L1- and L2-Norm priors as a regularizer.</span>
 
 <span class="sd">        This method will assemble the full design matrix collection composed of</span>
@@ -557,7 +563,7 @@
             <span class="n">cbv_indices</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">)],</span> 
             <span class="n">ext_dm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadence_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha_bounds</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-4</span><span class="p">,</span><span class="mf">1e4</span><span class="p">],</span> 
             <span class="n">target_over_score</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">target_under_score</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Optimizes the correction by adjusting the L2-Norm (Ridge Regression)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Optimizes the correction by adjusting the L2-Norm (Ridge Regression)</span>
 <span class="sd">        regularization penalty term, alpha, based on the introduced noise</span>
 <span class="sd">        (over-fitting) and residual correlation (under-fitting) goodness</span>
 <span class="sd">        metrics. The numercial optimization is performed using the</span>
@@ -660,7 +666,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">corrected_lc</span></div>
 
     <span class="k">def</span> <span class="nf">correct_regressioncorrector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">design_matrix_collection</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Pass-through method to gain access to the superclass </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Pass-through method to gain access to the superclass </span>
 <span class="sd">        RegressionCorrector.correct() method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -670,7 +676,7 @@
 
     <span class="k">def</span> <span class="nf">over_fitting_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
             <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Computes the over-fitting metric using </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Computes the over-fitting metric using </span>
 <span class="sd">        metrics.overfit_metric_lombscargle</span>
 
 <span class="sd">        See that function for a description of the algorithm.</span>
@@ -705,7 +711,7 @@
             <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
             <span class="n">min_targets</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
             <span class="n">max_targets</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;  Computes the under-fitting metric using </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  Computes the under-fitting metric using </span>
 <span class="sd">        metrics.underfit_metric_neighbors</span>
 
 <span class="sd">        See that function for a description of the algorithm.</span>
@@ -797,7 +803,7 @@
 
     <span class="k">def</span> <span class="nf">_correct_initialization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">,</span> <span class="n">cbv_indices</span><span class="o">=</span><span class="s1">&#39;ALL&#39;</span><span class="p">,</span>
             <span class="n">ext_dm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Performs all the preparatory work needed before applying a &#39;correct&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Performs all the preparatory work needed before applying a &#39;correct&#39;</span>
 <span class="sd">        method.</span>
 
 <span class="sd">        This helper function is used so that multiple correct methods can be used</span>
@@ -916,7 +922,7 @@
 
 
     <span class="k">def</span> <span class="nf">_set_prior_width</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Sets the Gaussian prior in the design_matrix_collection widths to sigma</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Sets the Gaussian prior in the design_matrix_collection widths to sigma</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -938,7 +944,7 @@
 
 
     <span class="k">def</span> <span class="nf">_goodness_metric_obj_fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The objective function to minimize with</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The objective function to minimize with</span>
 <span class="sd">        scipy.optimize.minimize_scalar</span>
 
 <span class="sd">        First sets the alpha regularization penalty then runs</span>
@@ -1013,7 +1019,7 @@
         <span class="k">return</span> <span class="n">penalty</span>
 
 <div class="viewcode-block" id="CBVCorrector.diagnose"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.CBVCorrector.diagnose.html#lightkurve.correctors.CBVCorrector.diagnose">[docs]</a>    <span class="k">def</span> <span class="nf">diagnose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns diagnostic plots to assess the most recent correction.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns diagnostic plots to assess the most recent correction.</span>
 
 <span class="sd">        If a correction has not yet been fitted, a ``ValueError`` will be raised.</span>
 
@@ -1032,7 +1038,7 @@
     <span class="k">def</span> <span class="nf">goodness_metric_scan_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">],</span>
             <span class="n">cbv_indices</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">)],</span> <span class="n">alpha_range_log10</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
             <span class="n">ext_dm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadence_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns a diagnostic plot of the over and under goodness metrics as a</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns a diagnostic plot of the over and under goodness metrics as a</span>
 <span class="sd">        function of the L2-Norm regularization term, alpha.</span>
 
 <span class="sd">        alpha is scanned by default to the range 10^-4 : 10^4 in logspace</span>
@@ -1099,7 +1105,7 @@
         <span class="k">return</span> <span class="n">ax</span>
 
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a copy of this `cbvCorrector` object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a copy of this `cbvCorrector` object.</span>
 
 <span class="sd">        This method uses Python&#39;s `copy.deepcopy` function to ensure that all</span>
 <span class="sd">        objects stored within the cbvCorrector instance are fully copied.</span>
@@ -1112,7 +1118,7 @@
         <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; This will print all attributes of the class kinda like in</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This will print all attributes of the class kinda like in</span>
 <span class="sd">        self.__dict__</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dictionary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1139,7 +1145,7 @@
 <span class="c1">#*******************************************************************************</span>
 
 <span class="k">class</span> <span class="nc">CotrendingBasisVectors</span><span class="p">(</span><span class="n">TimeSeries</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Defines a CotrendingBasisVectors class, which is the Superclass for</span>
 <span class="sd">    KeplerCotrendingBasisVectors and TessCotrendingBasisVectors.</span>
 <span class="sd">    Normally, one would use these latter classes instead of instantiating</span>
@@ -1215,7 +1221,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The time values.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The time values.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
 
     <span class="nd">@time</span><span class="o">.</span><span class="n">setter</span>
@@ -1239,7 +1245,7 @@
         <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;CADENCENO&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cadenceno</span>
 
     <span class="k">def</span> <span class="nf">to_designmatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cbv_indices</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;CBVs&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a `DesignMatrix` where the columns are the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a `DesignMatrix` where the columns are the</span>
 <span class="sd">        requested CBVs.</span>
 
 <span class="sd">        Parameters</span>
@@ -1279,7 +1285,7 @@
         <span class="k">return</span> <span class="n">DesignMatrix</span><span class="p">(</span><span class="n">cbv_matrix</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">cbv_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cbv_indices</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plots the requested CBVs evenly spaced out vertically for legibility.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots the requested CBVs evenly spaced out vertically for legibility.</span>
 
 <span class="sd">        Does not plot gapped cadences</span>
 
@@ -1319,11 +1325,12 @@
                 <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
             <span class="c1"># Plot gaps as NaN</span>
-            <span class="n">timeArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">timeArray</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># kepler cbvs are masked arrays and do not support item assignment</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="k">pass</span>
+            <span class="c1"># time array is a Masked array so need to fill masks with nans</span>
+            <span class="n">timeArray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timeArray</span><span class="p">,</span> <span class="p">(</span><span class="n">Masked</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">MaskedArray</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">timeArray</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">):</span>
+                    <span class="n">timeArray</span> <span class="o">=</span> <span class="n">timeArray</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                <span class="n">timeArray</span> <span class="o">=</span> <span class="n">timeArray</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
             <span class="n">timeArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gap_indicators</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
             <span class="c1"># Get the CBV arrays that were requested</span>
@@ -1364,7 +1371,7 @@
         <span class="k">return</span> <span class="n">ax</span>
 
     <span class="k">def</span> <span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lc</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Aligns the CBVs to a light curve. The lightCurve object might not</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Aligns the CBVs to a light curve. The lightCurve object might not</span>
 <span class="sd">        have the same cadences as the CBVs. This will trim the CBVs to be</span>
 <span class="sd">        aligned with the light curve.</span>
 
@@ -1465,7 +1472,7 @@
         <span class="k">return</span> <span class="n">cbvs</span>
 
     <span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lc</span><span class="p">,</span> <span class="n">extrapolate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Interpolates the CBV to the cadence times in the given light curve</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interpolates the CBV to the cadence times in the given light curve</span>
 <span class="sd">        using Piecewise Cubic Hermite Interpolating Polynomial (PCHIP).</span>
 
 <span class="sd">        Uses scipy.interpolate.PchipInterpolator</span>
@@ -1537,7 +1544,7 @@
 
 
 <span class="k">class</span> <span class="nc">KeplerCotrendingBasisVectors</span><span class="p">(</span><span class="n">CotrendingBasisVectors</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Sub-class for Kepler/K2 cotrending basis vectors</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sub-class for Kepler/K2 cotrending basis vectors</span>
 
 <span class="sd">    See CotrendingBasisVectors for class details</span>
 
@@ -1561,7 +1568,7 @@
     <span class="c1">#***</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initiates a KeplerCotrendingBasisVectors object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initiates a KeplerCotrendingBasisVectors object.</span>
 <span class="sd">        Normally one would use KeplerCotrendingBasisVectors.from_hdu to</span>
 <span class="sd">        automatically set up the object. However, for certain functionality</span>
 <span class="sd">        one must instantiate the object directly.</span>
@@ -1574,7 +1581,7 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_hdu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Class method to instantiate a KeplerCotrendingBasisVectors object</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Class method to instantiate a KeplerCotrendingBasisVectors object</span>
 <span class="sd">        from a CBV FITS HDU.</span>
 
 <span class="sd">        Kepler/K2 CBVs are all in the same FITS file for each quarter/campaign,</span>
@@ -1710,7 +1717,7 @@
 
 
 <span class="k">class</span> <span class="nc">TessCotrendingBasisVectors</span><span class="p">(</span><span class="n">CotrendingBasisVectors</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Sub-class for TESS cotrending basis vectors</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Sub-class for TESS cotrending basis vectors</span>
 
 <span class="sd">    See CotrendingBasisVectors for class details</span>
 
@@ -1731,7 +1738,7 @@
     <span class="n">validCBVTypes</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">,</span> <span class="s1">&#39;MultiScale&#39;</span><span class="p">,</span> <span class="s1">&#39;Spike&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initiates a TessCotrendingBasisVectors object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initiates a TessCotrendingBasisVectors object.</span>
 
 <span class="sd">        Normally one would use TessCotrendingBasisVectors.from_hdu to</span>
 <span class="sd">        automatically set up the object. However, for certain functionaility</span>
@@ -1744,7 +1751,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_hdu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Class method to instantiate a TessCotrendingBasisVectors object</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Class method to instantiate a TessCotrendingBasisVectors object</span>
 <span class="sd">        from a CBV FITS HDU.</span>
 
 <span class="sd">        TESS CBVs are in separate FITS files for each camera.CCD, so camera.CCD</span>
@@ -1900,7 +1907,7 @@
 
 <div class="viewcode-block" id="load_kepler_cbvs"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.load_kepler_cbvs.html#lightkurve.correctors.load_kepler_cbvs">[docs]</a><span class="k">def</span> <span class="nf">load_kepler_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">mission</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Loads Kepler or K2 cotrending basis vectors, either from a local directory cbv_dir </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads Kepler or K2 cotrending basis vectors, either from a local directory cbv_dir </span>
 <span class="sd">    or searches the public data archive at MAST &lt;https://archive.stsci.edu&gt;.</span>
 
 <span class="sd">    This function fetches the Cotrending Basis Vectors FITS HDU for the desired</span>
@@ -2003,7 +2010,7 @@
 
 <div class="viewcode-block" id="load_tess_cbvs"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.load_tess_cbvs.html#lightkurve.correctors.load_tess_cbvs">[docs]</a><span class="k">def</span> <span class="nf">load_tess_cbvs</span><span class="p">(</span><span class="n">cbv_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">ccd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;SingleScale&#39;</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Loads TESS cotrending basis vectors, either from a directory of </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads TESS cotrending basis vectors, either from a directory of </span>
 <span class="sd">    CBV files already saved locally if cbv_dir is passed, or else </span>
 <span class="sd">    will retrieve the relevant files programmatically from MAST. </span>
 
@@ -2147,7 +2154,8 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -2159,7 +2167,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

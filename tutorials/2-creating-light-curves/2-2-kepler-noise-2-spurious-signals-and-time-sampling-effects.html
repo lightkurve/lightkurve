@@ -8,8 +8,9 @@
 
     <title>Instrumental Noise in Kepler and K2 #2: Spurious Signals and Time Sampling Effects &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,22 +20,18 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Instrumental Noise in Kepler and K2 #3: Seasonal and Detector Effects" href="2-2-kepler-noise-3-seasonal-and-detector-effects.html" />
@@ -56,7 +53,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -67,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -109,7 +106,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -124,10 +127,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -152,7 +153,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -379,10 +380,11 @@ div.nboutput.container div.prompt > div {
     }
 }
 
-/* disable scrollbars on prompts */
+/* disable scrollbars and line breaks on prompts */
 div.nbinput.container div.prompt pre,
 div.nboutput.container div.prompt pre {
     overflow: hidden;
+    white-space: pre;
 }
 
 /* input/output area */
@@ -484,6 +486,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -492,10 +495,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -507,12 +514,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -522,9 +532,9 @@ div.rendered_html tbody tr:hover {
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Instrumental-Noise-in-Kepler-and-K2-#2:-Spurious-Signals-and-Time-Sampling-Effects">
-<h1>Instrumental Noise in <em>Kepler</em> and <em>K2</em> #2: Spurious Signals and Time Sampling Effects<a class="headerlink" href="#Instrumental-Noise-in-Kepler-and-K2-#2:-Spurious-Signals-and-Time-Sampling-Effects" title="Permalink to this headline">¶</a></h1>
+<h1>Instrumental Noise in <em>Kepler</em> and <em>K2</em> #2: Spurious Signals and Time Sampling Effects<a class="headerlink" href="#Instrumental-Noise-in-Kepler-and-K2-#2:-Spurious-Signals-and-Time-Sampling-Effects" title="Permalink to this headline">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">¶</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Understand the causes behind various spurious signals in <em>Kepler</em> and <em>K2</em> data.</p></li>
@@ -533,11 +543,11 @@ div.rendered_html tbody tr:hover {
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
 <p>This tutorial is the second part of a series on identifying instrumental and systematic sources of noise in <em>Kepler</em> and <em>K2</em> data. The first tutorial in this series is suggested (but not necessary) reading for working through this one. Assumed knowledge for this tutorial is a working familiarity with <em>Kepler</em> light curve files, periodograms, and a basic understanding of aperture photometry.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
 <p>We’ll use <a class="reference external" href="https://docs.lightkurve.org/">Lightkurve</a> for downloading and handling <em>Kepler</em> data throughout this tutorial. We’ll also use <a class="reference external" href="https://numpy.org/">NumPy</a> to handle arrays for aperture masks.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -552,16 +562,16 @@ div.rendered_html tbody tr:hover {
 <hr class="docutils" />
 </section>
 <section id="1.-Background">
-<h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">¶</a></h2>
+<h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">#</a></h2>
 <p>The <em>Kepler</em> space telescope observed the same patch of sky for four continuous years, between 2009 and 2013. Over the course of 18 observing quarters, it collected light curves and pixel data for 150,000 stars in 30-minute Long Cadence mode, and 512 stars per quarter in one-minute Short Cadence mode. Following the failure of two of the telescope’s four reaction wheels, the telescope continued as the <em>K2</em> mission, which observed along the ecliptic plane for 20 observing campaigns.</p>
 <p><em>Kepler</em> and <em>K2</em> time series data have been extensively analysed, in both the time domain and the frequency domain. In this tutorial, we’ll look at spurious signals — that is, signals introduced by non-astronomical sources — in data from both missions, across simple aperture photometry (SAP) and presearch data conditioning SAP (PDCSAP), as well as in individual pixel time series from target pixel files (TPFs). Many of the effects we’ll cover were corrected by the presearch data conditioning
 (PDC) pipeline, but are still of interest to anyone working closely with pixel data or performing custom photometry.</p>
 </section>
 <section id="2.-Early-Kepler-Mission-Spurious-Signals">
-<h2>2. Early <em>Kepler</em> Mission Spurious Signals<a class="headerlink" href="#2.-Early-Kepler-Mission-Spurious-Signals" title="Permalink to this headline">¶</a></h2>
+<h2>2. Early <em>Kepler</em> Mission Spurious Signals<a class="headerlink" href="#2.-Early-Kepler-Mission-Spurious-Signals" title="Permalink to this headline">#</a></h2>
 <p>As <em>Kepler</em> data processing evolved over the course of the mission, there were issues in the first few quarters that were mitigated by various alterations to the algorithms and systems involved. In this section, we’re going to look at two spurious signals that you might come across in the first year of data from the <em>Kepler</em> mission.</p>
 <section id="2.1-Focus-changes">
-<h3>2.1 Focus changes<a class="headerlink" href="#2.1-Focus-changes" title="Permalink to this headline">¶</a></h3>
+<h3>2.1 Focus changes<a class="headerlink" href="#2.1-Focus-changes" title="Permalink to this headline">#</a></h3>
 <p>Throughout the nominal <em>Kepler</em> mission, there was a regular momentum desaturation of the reaction wheels which controlled the telescope’s pointing. In Quarters 1–3, an issue with the onboard temperature controller meant that momentum desaturation events induced non-sinusoidal variations with periods on order a few hours, reflecting a heating cycle. This was fixed at the end of Quarter 3, greatly reducing the amplitude of the focus changes, to the point that they can’t be seen at all in Quarters
 8–13. (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.2.)</p>
 <p>For a closer look at data quality events caused by the reaction wheels, see part one of this tutorial series, and the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.3.</p>
@@ -589,7 +599,7 @@ div.rendered_html tbody tr:hover {
 <p>Notice the jagged pattern which repeats around five times every day. This is the signal introduced by focus changes. KIC 2436365 is a non-variable star, which means that this pattern is the only variable signal present, and there is no confusion as to what we’re looking at. In variable stars, this pattern could cause an effect similar to signal dilution, where actual stellar variability or transit events are attenuated by the presence of another signal.</p>
 </section>
 <section id="2.2-Variable-fine-guidance-stars">
-<h3>2.2 Variable fine guidance stars<a class="headerlink" href="#2.2-Variable-fine-guidance-stars" title="Permalink to this headline">¶</a></h3>
+<h3>2.2 Variable fine guidance stars<a class="headerlink" href="#2.2-Variable-fine-guidance-stars" title="Permalink to this headline">#</a></h3>
 <p><em>Kepler</em>’s attitude was controlled by Fine Guidance Sensors (FGS). This involved measuring the centroids of 40 guide stars. In the early mission, the centroid measurement was dependent on the star’s flux. This meant that variable guide stars could influence the signal of any star they were used to calibrate. (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 4.5.)</p>
 <p>This issue was largely fixed after Quarter 1. Of the 40 FGS stars, only two used during Quarter 2 were variable: an intrinsic variable with a 2.9-day period, and an eclipsing binary with an 18.3-day period. These signals may be partially visible in the photometry of any target on the affected modules, in Quarters 0–2.</p>
 <p>As an example, let’s look at a star that shows a remnant of the 2.9-day period. We’ll only inspect the first three quarters, as the signal is significantly diluted in the full time series.</p>
@@ -636,7 +646,7 @@ div.rendered_html tbody tr:hover {
 </section>
 </section>
 <section id="3.-Variable-Guide-Stars-in-K2">
-<h2>3. Variable Guide Stars in <em>K2</em><a class="headerlink" href="#3.-Variable-Guide-Stars-in-K2" title="Permalink to this headline">¶</a></h2>
+<h2>3. Variable Guide Stars in <em>K2</em><a class="headerlink" href="#3.-Variable-Guide-Stars-in-K2" title="Permalink to this headline">#</a></h2>
 <p>Like <em>Kepler</em>, the <em>K2</em> mission used guide stars to assist with pointing as part of the FGS. Where <em>Kepler</em> used 40 guide stars throughout the whole mission, in <em>K2</em> it was harder to find suitable guide stars in <em>K2</em>’s visually crowded fields along the ecliptic plane, and so four stars were used in each campaign. This predictably reduced pointing stability, as each guide star in <em>K2</em> contributed more to the overall pointing.</p>
 <p>The majority of <em>K2</em> guide stars were stable. However, one of the Campaign 6 guide stars was an eclipsing binary with a period of 0.6046 days. By <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.fold">folding</a> an affected light curve on this period, we can see the impact of the eclipsing binary on an otherwise non-variable target.</p>
 <p>The example below is from the <a class="reference external" href="https://archive.stsci.edu/missions/k2/doc/drn/KSCI-19156-001_K2-DRN35_C6.pdf">K2 Data Release Notes 35</a> on the reprocessing of Campaign 6:</p>
@@ -658,7 +668,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </section>
 <section id="4.-PDC-Long-Period-Attenuation">
-<h2>4. PDC Long Period Attenuation<a class="headerlink" href="#4.-PDC-Long-Period-Attenuation" title="Permalink to this headline">¶</a></h2>
+<h2>4. PDC Long Period Attenuation<a class="headerlink" href="#4.-PDC-Long-Period-Attenuation" title="Permalink to this headline">#</a></h2>
 <p>The <em>Kepler</em> PDC pipeline is designed to prepare data for planet searches, which is focused on short-period transit signals; long-period signals are often instrumental systematics, such as flux variations caused by pixel-level temperature changes. To remove these systematics, the pipeline corrects variability with a period of roughly 10 days or more — or a frequency of less than 0.1 c/d (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics
 Handbook</a>, Section 5.15). Of course, this also results in the loss of any long-period stellar variability. As such, it is suggested that you perform your own photometry, such as outlined in the custom aperture photometry tutorial, if you’re searching for long periods.</p>
 <p>The star we’ll use as an example was studied by <a class="reference external" href="https://arxiv.org/pdf/2001.10878.pdf">Yu et al. 2020</a>; this paper also includes a brief discussion of the attenuation of long-period signals in PDCSAP data.</p>
@@ -678,7 +688,7 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;AxesSubplot:xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+&lt;Axes: xlabel=&#39;Time - 2454833 [BKJD days]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -707,10 +717,10 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 <p>This looks like a smooth curve, but that’s because this is such high amplitude variation; note the scale of the y-axis. Zooming in reveals a noisier curve, though small-scale structure is generally of less interest when studying such stars.</p>
 </section>
 <section id="5.-Short-Cadence-Issues">
-<h2>5. Short Cadence Issues<a class="headerlink" href="#5.-Short-Cadence-Issues" title="Permalink to this headline">¶</a></h2>
+<h2>5. Short Cadence Issues<a class="headerlink" href="#5.-Short-Cadence-Issues" title="Permalink to this headline">#</a></h2>
 <p>The spurious signals that we’ve looked at so far have been in Long Cadence <em>Kepler</em> data. These signals can also be found in Short Cadence data; however, there are two further time sampling effects that are unique to Short Cadence data, which we will explore in the following section. We’ll also look at one Short Cadence effect unique to <em>K2</em> data.</p>
 <section id="5.1-Requantization-gaps">
-<h3>5.1 Requantization gaps<a class="headerlink" href="#5.1-Requantization-gaps" title="Permalink to this headline">¶</a></h3>
+<h3>5.1 Requantization gaps<a class="headerlink" href="#5.1-Requantization-gaps" title="Permalink to this headline">#</a></h3>
 <p>As part of onboard data compression, Short Cadence data for stars at fluxes brighter than 20,000 <span class="math notranslate nohighlight">\(\rm{e^{-}s^{-1}}\)</span> is <em>requantized</em>, meaning the flux measurements settle into “bands” at preferred values. This phenomenon can be seen in single-pixel time series, but averages out over multiple pixels when performing simple aperture photometry.</p>
 <p>This star, KIC 11182716, is shown in the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.10. It has a <em>Kepler</em> magnitude of Kp = 11.994, which puts it at the lower end of stars that saturate the detector. The code below extracts the time series for one bright pixel and plots the light curve as a series of dots to show the requantization bands:</p>
 <div class="nbinput docutils container">
@@ -734,7 +744,7 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 </div>
 </section>
 <section id="5.2-Nyquist-alias-spurious-frequencies">
-<h3>5.2 Nyquist alias spurious frequencies<a class="headerlink" href="#5.2-Nyquist-alias-spurious-frequencies" title="Permalink to this headline">¶</a></h3>
+<h3>5.2 Nyquist alias spurious frequencies<a class="headerlink" href="#5.2-Nyquist-alias-spurious-frequencies" title="Permalink to this headline">#</a></h3>
 <p>The PDC pipeline uses <a class="reference external" href="https://keplerscience.arc.nasa.gov/data-products.html#cotrending-basis-vectors-cbvs">cotrending basis vectors</a> (CBVs) to correct both Long and Short Cadence data. However, as the CBVs are created based on Long Cadence data, they cannot correct for spurious signals above the Long Cadence Nyquist frequency, 283<span class="math notranslate nohighlight">\(\mu\)</span>Hz (24 c/d).</p>
 <p>The most prominent of these spurious frequencies is the Long Cadence sampling rate, introduced by onboard electronics (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.11). This frequency (566.4<span class="math notranslate nohighlight">\(\mu\)</span>Hz, or 48.94 c/d) and integer multiples show up throughout Short Cadence data. In the plot below, we’ve marked 48.94 c/d and its first eight multiples with arrows:</p>
 <div class="nbinput docutils container">
@@ -787,7 +797,7 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 <p>A list of other spurious frequencies present in Short Cadence data can be found in Table 5 of the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>.</p>
 </section>
 <section id="5.3-K2-Short-Cadence-data">
-<h3>5.3 <em>K2</em> Short Cadence data<a class="headerlink" href="#5.3-K2-Short-Cadence-data" title="Permalink to this headline">¶</a></h3>
+<h3>5.3 <em>K2</em> Short Cadence data<a class="headerlink" href="#5.3-K2-Short-Cadence-data" title="Permalink to this headline">#</a></h3>
 <p>All <em>K2</em> data is affected by the six-hour thruster firings to correct for pointing drift. The PDCSAP pipeline uses CBVs to remove this effect in Long Cadence data. As with <em>Kepler</em> Short Cadence data, applying these same corrections to Short Cadence data leaves some systematics intact. <em>K2</em> Short Cadence data is subject to the two issues noted above, as well as further spurious frequencies introduced by the six-hour drift.</p>
 <p>The following example is taken from the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19116-002.pdf">K2 Handbook</a>. First, let’s download some data for our star, EPIC 211414081, and see what the SAP data looks like. Again, we’re using some extra arguments with our plotting function to display the light curve as individual points, which makes the scale of the outliers clearer.</p>
 <div class="nbinput docutils container">
@@ -845,12 +855,12 @@ its ability to probe higher frequencies.</p>
 </section>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">¶</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
 <p><strong>Author:</strong> <a class="reference external" href="http://orcid.org/0000-0001-8196-516X">Isabel Colman</a> (<code class="docutils literal notranslate"><span class="pre">isabel.colman&#64;sydney.edu.au</span></code>)</p>
 <p><strong>Updated on:</strong> 2020-09-29</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">¶</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
@@ -915,62 +925,65 @@ archivePrefix = "ascl",
 }
     </textarea>
     <textarea id="astropyText" style="position: absolute; left: -9999px; z-index: -9999;">
-@ARTICLE{2018AJ....156..123T,
-   author = {{The Astropy Collaboration} and {Price-Whelan}, A.~M. and {Sip{\H o}cz}, B.~M. and
-    {G{\"u}nther}, H.~M. and {Lim}, P.~L. and {Crawford}, S.~M. and
-    {Conseil}, S. and {Shupe}, D.~L. and {Craig}, M.~W. and {Dencheva}, N. and
-    {Ginsburg}, A. and {VanderPlas}, J.~T. and {Bradley}, L.~D. and
-    {P{\'e}rez-Su{\'a}rez}, D. and {de Val-Borro}, M. and {Paper Contributors}, (. and
-    {Aldcroft}, T.~L. and {Cruz}, K.~L. and {Robitaille}, T.~P. and
-    {Tollerud}, E.~J. and {Coordination Committee}, (. and {Ardelean}, C. and
-    {Babej}, T. and {Bach}, Y.~P. and {Bachetti}, M. and {Bakanov}, A.~V. and
-    {Bamford}, S.~P. and {Barentsen}, G. and {Barmby}, P. and {Baumbach}, A. and
-    {Berry}, K.~L. and {Biscani}, F. and {Boquien}, M. and {Bostroem}, K.~A. and
-    {Bouma}, L.~G. and {Brammer}, G.~B. and {Bray}, E.~M. and {Breytenbach}, H. and
-    {Buddelmeijer}, H. and {Burke}, D.~J. and {Calderone}, G. and
-    {Cano Rodr{\'{\i}}guez}, J.~L. and {Cara}, M. and {Cardoso}, J.~V.~M. and
-    {Cheedella}, S. and {Copin}, Y. and {Corrales}, L. and {Crichton}, D. and
-    {D{\rsquo}Avella}, D. and {Deil}, C. and {Depagne}, {\'E}. and
-    {Dietrich}, J.~P. and {Donath}, A. and {Droettboom}, M. and
-    {Earl}, N. and {Erben}, T. and {Fabbro}, S. and {Ferreira}, L.~A. and
-    {Finethy}, T. and {Fox}, R.~T. and {Garrison}, L.~H. and {Gibbons}, S.~L.~J. and
-    {Goldstein}, D.~A. and {Gommers}, R. and {Greco}, J.~P. and
-    {Greenfield}, P. and {Groener}, A.~M. and {Grollier}, F. and
-    {Hagen}, A. and {Hirst}, P. and {Homeier}, D. and {Horton}, A.~J. and
-    {Hosseinzadeh}, G. and {Hu}, L. and {Hunkeler}, J.~S. and {Ivezi{\'c}}, {\v Z}. and
-    {Jain}, A. and {Jenness}, T. and {Kanarek}, G. and {Kendrew}, S. and
-    {Kern}, N.~S. and {Kerzendorf}, W.~E. and {Khvalko}, A. and
-    {King}, J. and {Kirkby}, D. and {Kulkarni}, A.~M. and {Kumar}, A. and
-    {Lee}, A. and {Lenz}, D. and {Littlefair}, S.~P. and {Ma}, Z. and
-    {Macleod}, D.~M. and {Mastropietro}, M. and {McCully}, C. and
-    {Montagnac}, S. and {Morris}, B.~M. and {Mueller}, M. and {Mumford}, S.~J. and
-    {Muna}, D. and {Murphy}, N.~A. and {Nelson}, S. and {Nguyen}, G.~H. and
-    {Ninan}, J.~P. and {N{\"o}the}, M. and {Ogaz}, S. and {Oh}, S. and
-    {Parejko}, J.~K. and {Parley}, N. and {Pascual}, S. and {Patil}, R. and
-    {Patil}, A.~A. and {Plunkett}, A.~L. and {Prochaska}, J.~X. and
-    {Rastogi}, T. and {Reddy Janga}, V. and {Sabater}, J. and {Sakurikar}, P. and
-    {Seifert}, M. and {Sherbert}, L.~E. and {Sherwood-Taylor}, H. and
-    {Shih}, A.~Y. and {Sick}, J. and {Silbiger}, M.~T. and {Singanamalla}, S. and
-    {Singer}, L.~P. and {Sladen}, P.~H. and {Sooley}, K.~A. and
-    {Sornarajah}, S. and {Streicher}, O. and {Teuben}, P. and {Thomas}, S.~W. and
-    {Tremblay}, G.~R. and {Turner}, J.~E.~H. and {Terr{\'o}n}, V. and
-    {van Kerkwijk}, M.~H. and {de la Vega}, A. and {Watkins}, L.~L. and
-    {Weaver}, B.~A. and {Whitmore}, J.~B. and {Woillez}, J. and
-    {Zabalza}, V. and {Contributors}, (.},
-    title = "{The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package}",
-  journal = {\aj},
-archivePrefix = "arXiv",
-   eprint = {1801.02634},
- primaryClass = "astro-ph.IM",
- keywords = {methods: data analysis, methods: miscellaneous, methods: statistical, reference systems },
-     year = 2018,
-    month = sep,
-   volume = 156,
-      eid = {123},
-    pages = {123},
-      doi = {10.3847/1538-3881/aabc4f},
-   adsurl = {https://ui.adsabs.harvard.edu/abs/2018AJ....156..123T},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+@ARTICLE{astropy:2022,
+       author = {{Astropy Collaboration} and {Price-Whelan}, Adrian M. and {Lim}, Pey
+       Lian and {Earl}, Nicholas and {Starkman}, Nathaniel and {Bradley}, Larry and
+       {Shupe}, David L. and {Patil}, Aarya A. and {Corrales}, Lia and {Brasseur}, C.~E.
+       and {N{\"o}the}, Maximilian and {Donath}, Axel and {Tollerud}, Erik and {Morris},
+       Brett M. and {Ginsburg}, Adam and {Vaher}, Eero and {Weaver}, Benjamin A. and
+       {Tocknell}, James and {Jamieson}, William and {van Kerkwijk}, Marten H. and
+       {Robitaille}, Thomas P. and {Merry}, Bruce and {Bachetti}, Matteo and
+       {G{\"u}nther}, H. Moritz and {Aldcroft}, Thomas L. and {Alvarado-Montes}, Jaime
+       A. and {Archibald}, Anne M. and {B{\'o}di}, Attila and {Bapat}, Shreyas and
+       {Barentsen}, Geert and {Baz{\'a}n}, Juanjo and {Biswas}, Manish and {Boquien},
+       M{\'e}d{\'e}ric and {Burke}, D.~J. and {Cara}, Daria and {Cara}, Mihai and
+       {Conroy}, Kyle E. and {Conseil}, Simon and {Craig}, Matthew W. and {Cross},
+       Robert M. and {Cruz}, Kelle L. and {D'Eugenio}, Francesco and {Dencheva}, Nadia
+       and {Devillepoix}, Hadrien A.~R. and {Dietrich}, J{\"o}rg P. and {Eigenbrot},
+       Arthur Davis and {Erben}, Thomas and {Ferreira}, Leonardo and {Foreman-Mackey},
+       Daniel and {Fox}, Ryan and {Freij}, Nabil and {Garg}, Suyog and {Geda}, Robel and
+       {Glattly}, Lauren and {Gondhalekar}, Yash and {Gordon}, Karl D. and {Grant},
+       David and {Greenfield}, Perry and {Groener}, Austen M. and {Guest}, Steve and
+       {Gurovich}, Sebastian and {Handberg}, Rasmus and {Hart}, Akeem and
+       {Hatfield-Dodds}, Zac and {Homeier}, Derek and {Hosseinzadeh}, Griffin and
+       {Jenness}, Tim and {Jones}, Craig K. and {Joseph}, Prajwel and {Kalmbach}, J.
+       Bryce and {Karamehmetoglu}, Emir and {Ka{\l}uszy{\'n}ski}, Miko{\l}aj and
+       {Kelley}, Michael S.~P. and {Kern}, Nicholas and {Kerzendorf}, Wolfgang E. and
+       {Koch}, Eric W. and {Kulumani}, Shankar and {Lee}, Antony and {Ly}, Chun and
+       {Ma}, Zhiyuan and {MacBride}, Conor and {Maljaars}, Jakob M. and {Muna}, Demitri
+       and {Murphy}, N.~A. and {Norman}, Henrik and {O'Steen}, Richard and {Oman}, Kyle
+       A. and {Pacifici}, Camilla and {Pascual}, Sergio and {Pascual-Granado}, J. and
+       {Patil}, Rohit R. and {Perren}, Gabriel I. and {Pickering}, Timothy E. and
+       {Rastogi}, Tanuj and {Roulston}, Benjamin R. and {Ryan}, Daniel F. and {Rykoff},
+       Eli S. and {Sabater}, Jose and {Sakurikar}, Parikshit and {Salgado}, Jes{\'u}s
+       and {Sanghi}, Aniket and {Saunders}, Nicholas and {Savchenko}, Volodymyr and
+       {Schwardt}, Ludwig and {Seifert-Eckert}, Michael and {Shih}, Albert Y. and
+       {Jain}, Anany Shrey and {Shukla}, Gyanendra and {Sick}, Jonathan and {Simpson},
+       Chris and {Singanamalla}, Sudheesh and {Singer}, Leo P. and {Singhal}, Jaladh and
+       {Sinha}, Manodeep and {Sip{\H{o}}cz}, Brigitta M. and {Spitler}, Lee R. and
+       {Stansby}, David and {Streicher}, Ole and {{\v{S}}umak}, Jani and {Swinbank},
+       John D. and {Taranu}, Dan S. and {Tewary}, Nikita and {Tremblay}, Grant R. and
+       {Val-Borro}, Miguel de and {Van Kooten}, Samuel J. and {Vasovi{\'c}}, Zlatan and
+       {Verma}, Shresth and {de Miranda Cardoso}, Jos{\'e} Vin{\'\i}cius and {Williams},
+       Peter K.~G. and {Wilson}, Tom J. and {Winkel}, Benjamin and {Wood-Vasey}, W.~M.
+       and {Xue}, Rui and {Yoachim}, Peter and {Zhang}, Chen and {Zonca}, Andrea and
+       {Astropy Project Contributors}}, title = "{The Astropy Project: Sustaining and
+       Growing a Community-oriented Open-source Project and the Latest Major Release
+       (v5.0) of the Core Package}",
+      journal = {\apj},
+     keywords = {Astronomy software, Open source software, Astronomy data analysis, 1855, 1866, 1858, Astrophysics - Instrumentation and Methods for Astrophysics},
+         year = 2022,
+        month = aug,
+       volume = {935},
+       number = {2},
+          eid = {167},
+        pages = {167},
+          doi = {10.3847/1538-4357/ac7c74},
+archivePrefix = {arXiv},
+       eprint = {2206.14220},
+ primaryClass = {astro-ph.IM},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2022ApJ...935..167A},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
 
@@ -1054,7 +1067,7 @@ archivePrefix = "arXiv",
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="2-2-kepler-noise-1-data-gaps-and-quality-flags.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1077,7 +1090,8 @@ archivePrefix = "arXiv",
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1089,7 +1103,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

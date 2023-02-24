@@ -8,8 +8,9 @@
 
     <title>How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS &#8212; Lightkurve </title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,22 +20,18 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (CBVCorrector)" href="2-3-how-to-use-cbvcorrector.html" />
@@ -56,7 +53,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -67,7 +64,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -109,7 +106,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -124,10 +127,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -152,7 +153,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -326,10 +327,11 @@ div.nboutput.container div.prompt > div {
     }
 }
 
-/* disable scrollbars on prompts */
+/* disable scrollbars and line breaks on prompts */
 div.nbinput.container div.prompt pre,
 div.nboutput.container div.prompt pre {
     overflow: hidden;
+    white-space: pre;
 }
 
 /* input/output area */
@@ -431,6 +433,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -439,10 +442,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -454,12 +461,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -469,20 +479,20 @@ div.rendered_html tbody tr:hover {
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="How-to-load-and-use-Cotrending-Basis-Vectors-for-Kepler,-K2-and-TESS">
-<h1>How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS<a class="headerlink" href="#How-to-load-and-use-Cotrending-Basis-Vectors-for-Kepler,-K2-and-TESS" title="Permalink to this headline">¶</a></h1>
+<h1>How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS<a class="headerlink" href="#How-to-load-and-use-Cotrending-Basis-Vectors-for-Kepler,-K2-and-TESS" title="Permalink to this headline">#</a></h1>
 <p>Cotrending Basis Vectors (CBVs) are generated in the PDC component of the Kepler/K2/TESS pipeline and are used to remove systematic trends in light curves. They are built from the most common systematic trends observed in each PDC Unit of Work (Quarter for Kepler, Campaign for K2 and Sector for TESS). Each Kepler and K2 module output and each CCD in TESS has its own set of CBVs. You can read an introduction to the CBVs in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Demystifying Kepler Data</a> or to
 greater detail in the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19081-003-KDPH.pdf">Kepler Data Processing Handbook</a>. The same basic method to generate CBVs is used for all three missions.</p>
 <p>This tutorial provides examples of how to load CBVs from MAST and set them up in a design matrix for use to remove systematic trends. Please consult the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix">DesignMatrix page</a> in the API docs for the full details on that class. A convenient tool has been created called
 <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.CBVCorrector.html?highlight=cbvcorrector">CBVCorrector</a> which will utilize the CBVs for the custom removal of systematic trends. See the <a class="reference external" href="https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector.html">CBVCorrector HOWTO page</a> for example usage.</p>
 <section id="Cotrending-Basis-Vector-Types">
-<h2>Cotrending Basis Vector Types<a class="headerlink" href="#Cotrending-Basis-Vector-Types" title="Permalink to this headline">¶</a></h2>
+<h2>Cotrending Basis Vector Types<a class="headerlink" href="#Cotrending-Basis-Vector-Types" title="Permalink to this headline">#</a></h2>
 <p>There are three basic types of CBVs: - <strong>Single-Scale</strong> contains all systematic trends combined in a single set of basis vectors. - <strong>Multi-Scale</strong> contains systematic trends in specific wavelet-based band passes. There are usually three sets of multi-scale basis vectors in three bands. - <strong>Spike</strong> contains only short impulsive spike systematics.</p>
 <p>There are two different correction methods in PDC: Single-Scale and Multi-Scale. Single-Scale performs the correction in a single bandpass. Multi-Scale performs the correction in three separate wavelet-based bandpasses. Both corrections are performed in PDC but we can only export a single PDC light curve for each target. So, PDC must choose which of the two on a per-target basis. Generally speaking, single-scale performs better at preserving longer period signals. But at periods close to
 transiting planet durations multi-scale performs better at preserving signals. PDC therefore mostly chooses multi-scale for use within the planet finding pipeline and for the archive. You can find in the light curve FITS header which PDC method was chosen (keyword “PDCMETHD”). Additionally, a seperate correction is alway performed to remove short impulsive systematic spikes.</p>
 <p>For an individual’s research needs, the mission supplied PDC lightcurves might not be ideal and so the CBVs are provided to the user to perform their own correction. All three CBV types are provided at MAST for TESS, however only Single-Scale is provided at MAST for Kepler and K2. For TESS, Cotrending Basis Vectors are currently only supplied at a 2-minute cadence. For Kepler/K2 only for the 30-minute target cadence.</p>
 </section>
 <section id="Obtaining-the-CBVs">
-<h2>Obtaining the CBVs<a class="headerlink" href="#Obtaining-the-CBVs" title="Permalink to this headline">¶</a></h2>
+<h2>Obtaining the CBVs<a class="headerlink" href="#Obtaining-the-CBVs" title="Permalink to this headline">#</a></h2>
 <p>Two tools are available to automatically download the CBVs relevent to your target of study: <code class="docutils literal notranslate"><span class="pre">load_tess_cbvs</span></code> and <code class="docutils literal notranslate"><span class="pre">load_kepler_cbvs</span></code>. Here is an example loading in the TESS Multi-Scale Band 2 CBVs for TESS target TIC 99180739, which happens to be on camera 1 and CCD 1. Note that you do not need to have a lightcurve object already loaded. One can directly request whichever CBVs one desires.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -512,13 +522,13 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>TessCotrendingBasisVectors length=3</i>
-<table id="table4504543312" class="table-striped table-bordered table-condensed">
+<table id="table4352634688" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>CADENCENO</th><th>GAP</th><th>VECTOR_1</th><th>VECTOR_2</th><th>VECTOR_3</th><th>VECTOR_4</th><th>VECTOR_5</th><th>VECTOR_6</th><th>VECTOR_7</th><th>VECTOR_8</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>int32</th><th>bool</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
-<tr><td>1569.43314028183</td><td>246224</td><td>0</td><td>-0.00358</td><td>-0.00254</td><td>0.00032</td><td>-0.00510</td><td>0.00197</td><td>-0.00259</td><td>-0.00848</td><td>0.00950</td></tr>
-<tr><td>1569.4345291701247</td><td>246225</td><td>0</td><td>-0.00353</td><td>-0.00244</td><td>0.00030</td><td>-0.00484</td><td>0.00202</td><td>-0.00255</td><td>-0.00846</td><td>0.00951</td></tr>
-<tr><td>1569.4359180584206</td><td>246226</td><td>0</td><td>-0.00347</td><td>-0.00235</td><td>0.00029</td><td>-0.00457</td><td>0.00207</td><td>-0.00251</td><td>-0.00844</td><td>0.00952</td></tr>
+<tr><td>1569.4331173767373</td><td>246224</td><td>0</td><td>-0.00026</td><td>0.00163</td><td>-0.00016</td><td>0.00014</td><td>0.00005</td><td>-0.00150</td><td>-0.00004</td><td>-0.00007</td></tr>
+<tr><td>1569.434506265032</td><td>246225</td><td>0</td><td>-0.00036</td><td>0.00158</td><td>-0.00025</td><td>-0.00007</td><td>0.00006</td><td>-0.00152</td><td>-0.00006</td><td>-0.00007</td></tr>
+<tr><td>1569.435895153328</td><td>246226</td><td>0</td><td>-0.00045</td><td>0.00152</td><td>-0.00034</td><td>-0.00028</td><td>0.00007</td><td>-0.00153</td><td>-0.00008</td><td>-0.00008</td></tr>
 </table></div></div>
 </div>
 <p>All data contained in the MAST CBV FITS files is downloaded. The <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code> and <code class="docutils literal notranslate"><span class="pre">GAP</span></code> columns can be used to select which cadences you desire. Extra information is in the <code class="docutils literal notranslate"><span class="pre">cbvs.meta</span></code> dict. The CBVS are interpolated accross the gaps and so should be used in gapped cadences with extreme caution. Below we will plot the first 4 CBVs. Note: <em>CBVs use 1-based indexing!</em></p>
@@ -549,7 +559,7 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </div>
 </section>
 <section id="Converting-the-CBVs-to-a-Lightkurve-DesignMatrix">
-<h2>Converting the CBVs to a Lightkurve <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code><a class="headerlink" href="#Converting-the-CBVs-to-a-Lightkurve-DesignMatrix" title="Permalink to this headline">¶</a></h2>
+<h2>Converting the CBVs to a Lightkurve <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code><a class="headerlink" href="#Converting-the-CBVs-to-a-Lightkurve-DesignMatrix" title="Permalink to this headline">#</a></h2>
 <p>You can access individual CBVs directly by referencing the column in the table (i.e. <code class="docutils literal notranslate"><span class="pre">cbvs['VECTOR_#']</span></code>) however a better way to use the CBVs for correcting your light curves is to convert the CBVs to a LightKurve DesignMatrix:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -569,7 +579,7 @@ transiting planet durations multi-scale performs better at preserving signals. P
 10.1.1.SingleScale DesignMatrix (18900, 8)
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
@@ -577,16 +587,9 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_16_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_16_0.png" />
-</div>
-</div>
 </section>
 <section id="Aligning-the-CBVs-with-your-light-curve">
-<h2>Aligning the CBVs with your light curve<a class="headerlink" href="#Aligning-the-CBVs-with-your-light-curve" title="Permalink to this headline">¶</a></h2>
+<h2>Aligning the CBVs with your light curve<a class="headerlink" href="#Aligning-the-CBVs-with-your-light-curve" title="Permalink to this headline">#</a></h2>
 <p>The CBVs obtained from MAST may not have the same cadences as the your target. A method called <code class="docutils literal notranslate"><span class="pre">align</span></code> will allow you to align your CBVs to the cadence numbers in your target lightcurve object. The method will use the cadence number (i.e. <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.cadenceno.html?highlight=cadenceno">lc.cadenceno</a>) to perform the alignment. Only cadence numbers that exist in both the CBVs and the light curve will have values in the returned
 CBVs. All cadence numbers that exist in the light curve but not in the CBVs will have NaNs returned for the CBVs on those cadences and the GAP set to True.</p>
 <div class="nbinput docutils container">
@@ -641,7 +644,7 @@ True
 </div>
 </section>
 <section id="Interpolating-the-CBVs-to-an-arbitrary-light-curve">
-<h2>Interpolating the CBVs to an arbitrary light curve<a class="headerlink" href="#Interpolating-the-CBVs-to-an-arbitrary-light-curve" title="Permalink to this headline">¶</a></h2>
+<h2>Interpolating the CBVs to an arbitrary light curve<a class="headerlink" href="#Interpolating-the-CBVs-to-an-arbitrary-light-curve" title="Permalink to this headline">#</a></h2>
 <p>The above <code class="docutils literal notranslate"><span class="pre">align</span></code> method will only keep cadences that line up exactly between the CBVs and the light curve based on the cadence numbers. What if you have a light curve with cadence times not exactly lining up with the CBV cadences? For example, what if you want to use the 2-minute CBVs for cotrending against the 30-minute FFIs? A more general method is <code class="docutils literal notranslate"><span class="pre">interpolate</span></code>, which uses PCHIP interpolation to generate CBVs at the cadence times of an arbitrary light curve. If the light curve has
 cadences past either end of the cadences in the CBVs then one must extrapolate. An optional argument, <code class="docutils literal notranslate"><span class="pre">extrapolate</span></code>, can be used to also extrapolate the CBV values to the light curve cadences. If <code class="docutils literal notranslate"><span class="pre">extrapolate=False</span></code> then the exterior values are set to zeros, which will probably result is a very poor fit.</p>
 <div class="nbinput nblast docutils container">
@@ -693,7 +696,7 @@ cadences past either end of the cadences in the CBVs then one must extrapolate. 
 True
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
@@ -706,15 +709,8 @@ True
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_27_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-how-to-use-cbvs_27_0.png" />
-</div>
-</div>
 <section id="Some-notes-about-interpolating-Cotrending-Basis-Vectors">
-<h3>Some notes about interpolating Cotrending Basis Vectors<a class="headerlink" href="#Some-notes-about-interpolating-Cotrending-Basis-Vectors" title="Permalink to this headline">¶</a></h3>
+<h3>Some notes about interpolating Cotrending Basis Vectors<a class="headerlink" href="#Some-notes-about-interpolating-Cotrending-Basis-Vectors" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p>Currently, only TESS 2-minute and Kepler/K2 30-minute CBVs are archived on MAST</p></li>
 <li><p>20-second CBVs will be available for the TESS extended mission beginning with Sector 27. Each set of 20-second CBVs will be for the entire field of view.</p></li>
@@ -731,7 +727,7 @@ True
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="2-2-identifying-rolling-band.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -754,7 +750,8 @@ True
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -766,7 +763,7 @@ True
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

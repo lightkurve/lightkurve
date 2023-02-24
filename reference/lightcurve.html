@@ -8,8 +8,9 @@
 
     <title>LightCurve &#8212; Lightkurve </title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,15 +20,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -54,7 +51,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -65,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -107,7 +104,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -122,10 +125,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -141,7 +142,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -1229,6 +1231,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.config.get_cache_dir.html">
+     lightkurve.config.get_cache_dir
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.config.get_config_dir.html">
      lightkurve.config.get_config_dir
     </a>
@@ -1261,6 +1268,9 @@
 
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -1271,7 +1281,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -1334,59 +1344,59 @@
               <div>
                 
   <section id="lightcurve">
-<span id="api-lightcurve"></span><h1>LightCurve<a class="headerlink" href="#lightcurve" title="Permalink to this headline">¶</a></h1>
-<p>The <a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> class is an extension of AstroPy’s <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a>
-object, which itself extends AstroPy’s <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a>.
+<span id="api-lightcurve"></span><h1>LightCurve<a class="headerlink" href="#lightcurve" title="Permalink to this headline">#</a></h1>
+<p>The <a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> class is an extension of AstroPy’s <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a>
+object, which itself extends AstroPy’s <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a>.
 Compared to a generic Table, LightCurve objects enforce the presence of three
 special data columns: <a class="reference internal" href="api/lightkurve.LightCurve.time.html#lightkurve.LightCurve.time" title="lightkurve.LightCurve.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>, <a class="reference internal" href="api/lightkurve.LightCurve.flux.html#lightkurve.LightCurve.flux" title="lightkurve.LightCurve.flux"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code></a>, and <a class="reference internal" href="api/lightkurve.LightCurve.flux_err.html#lightkurve.LightCurve.flux_err" title="lightkurve.LightCurve.flux_err"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_err</span></code></a>.
 This enables a LightCurve object to offer a range of methods which are specific to working
 with flux-based time series data.</p>
 <section id="constructor">
-<h2>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline">¶</a></h2>
+<h2>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline">#</a></h2>
 <p>Light curves can be instantiated by passing array-like values to the
 <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">flux</span></code>, and <code class="docutils literal notranslate"><span class="pre">flux_err</span></code> parameters.
 Additional columns can be added by passing a table-like object to the <code class="docutils literal notranslate"><span class="pre">data</span></code> parameter.</p>
-<table class="longtable table autosummary">
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a>([data, time, flux, flux_err])</p></td>
-<td><p>Subclass of AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> guaranteed to have <em>time</em>, <em>flux</em>, and <em>flux_err</em> columns.</p></td>
+<td><p>Subclass of AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> guaranteed to have <em>time</em>, <em>flux</em>, and <em>flux_err</em> columns.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h2>
-<p>Another difference with AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> is that all columns can
+<h2>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">#</a></h2>
+<p>Another difference with AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> is that all columns can
 be accessed conveniently as attributes.  For example, <code class="docutils literal notranslate"><span class="pre">LightCurve.time</span></code> is
 offered as a shorthand for <code class="docutils literal notranslate"><span class="pre">LightCurve[&quot;time&quot;]</span></code>.</p>
-<table class="longtable table autosummary">
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.time.html#lightkurve.LightCurve.time" title="lightkurve.LightCurve.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.time</span></code></a></p></td>
-<td><p>Time values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
+<td><p>Time values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.flux.html#lightkurve.LightCurve.flux" title="lightkurve.LightCurve.flux"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.flux</span></code></a></p></td>
-<td><p>Brightness values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
+<td><p>Brightness values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.flux_err.html#lightkurve.LightCurve.flux_err" title="lightkurve.LightCurve.flux_err"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.flux_err</span></code></a></p></td>
-<td><p>Brightness uncertainties stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
+<td><p>Brightness uncertainties stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="metadata">
-<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">#</a></h2>
 <p>All meta data are stored in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">meta</span></code> dictionary.
 For convenience, meta data can be accessed as object attributes,
 e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sector</span></code> is a short-hand for <code class="docutils literal notranslate"><span class="pre">LightCurve.meta[&quot;SECTOR&quot;]</span></code>.</p>
-<table class="longtable table autosummary">
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1399,21 +1409,21 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
 </table>
 </section>
 <section id="plotting">
-<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.plot.html#lightkurve.LightCurve.plot" title="lightkurve.LightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.plot</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
+<td><p>Plot the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.7.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.scatter.html#lightkurve.LightCurve.scatter" title="lightkurve.LightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.scatter</span></code></a>([colorbar_label, ...])</p></td>
-<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
+<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.7.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.errorbar.html#lightkurve.LightCurve.errorbar" title="lightkurve.LightCurve.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.errorbar</span></code></a>([linestyle])</p></td>
-<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.5.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
+<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.7.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.plot_river.html#lightkurve.LightCurve.plot_river" title="lightkurve.LightCurve.plot_river"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.plot_river</span></code></a>(period[, epoch_time, ...])</p></td>
 <td><p>Plot the light curve as a river plot.</p></td>
@@ -1425,9 +1435,9 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
 </table>
 </section>
 <section id="data-manipulation">
-<h2>Data manipulation<a class="headerlink" href="#data-manipulation" title="Permalink to this headline">¶</a></h2>
+<h2>Data manipulation<a class="headerlink" href="#data-manipulation" title="Permalink to this headline">#</a></h2>
 <p>The following methods all return a new <a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object.</p>
-<table class="longtable table autosummary">
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1476,8 +1486,8 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
 </table>
 </section>
 <section id="conversions">
-<h2>Conversions<a class="headerlink" href="#conversions" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
+<h2>Conversions<a class="headerlink" href="#conversions" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1496,7 +1506,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
 <td><p>Converts the light curve to a FITS file in the Kepler/TESS file format.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_pandas.html#lightkurve.LightCurve.to_pandas" title="lightkurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_pandas</span></code></a>(**kwargs)</p></td>
-<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
+<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_periodogram.html#lightkurve.LightCurve.to_periodogram" title="lightkurve.LightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_periodogram</span></code></a>([method])</p></td>
 <td><p>Converts the light curve to a <a class="reference internal" href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</p></td>
@@ -1514,8 +1524,8 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
 </table>
 </section>
 <section id="other-utility-methods">
-<h2>Other Utility Methods<a class="headerlink" href="#other-utility-methods" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
+<h2>Other Utility Methods<a class="headerlink" href="#other-utility-methods" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1546,7 +1556,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="api/lightkurve.TargetPixelFileCollection.sector.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1569,7 +1579,8 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1581,7 +1592,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

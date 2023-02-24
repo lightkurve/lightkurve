@@ -8,8 +8,9 @@
 
     <title>Correcting systematics &#8212; Lightkurve </title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,15 +20,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -54,7 +51,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -65,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.3</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -107,7 +104,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -122,10 +125,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -141,7 +142,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -1229,6 +1231,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.config.get_cache_dir.html">
+     lightkurve.config.get_cache_dir
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.config.get_config_dir.html">
      lightkurve.config.get_config_dir
     </a>
@@ -1261,6 +1268,9 @@
 
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -1271,7 +1281,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -1326,7 +1336,7 @@
               <div>
                 
   <section id="correcting-systematics">
-<span id="api-correctors"></span><h1>Correcting systematics<a class="headerlink" href="#correcting-systematics" title="Permalink to this headline">¶</a></h1>
+<span id="api-correctors"></span><h1>Correcting systematics<a class="headerlink" href="#correcting-systematics" title="Permalink to this headline">#</a></h1>
 <p>Telescope data is always affected by noise contributed by the instrument.
 The <code class="docutils literal notranslate"><span class="pre">lightkurve.correctors</span></code> sub-package provides classes which offer
 different strategies to remove such noise.
@@ -1337,8 +1347,8 @@ of column vectors which are known to correlate with additive noise components.</
 by providing the user with pre-configured <a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> objects which are
 known to be effective at removing different types of noise.</p>
 <section id="cotrending-basis-vectors-cbv">
-<h2>Cotrending Basis Vectors (CBV)<a class="headerlink" href="#cotrending-basis-vectors-cbv" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
+<h2>Cotrending Basis Vectors (CBV)<a class="headerlink" href="#cotrending-basis-vectors-cbv" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1363,8 +1373,8 @@ known to be effective at removing different types of noise.</p>
 </table>
 </section>
 <section id="pixel-level-decorrelation-pld">
-<h2>Pixel Level Decorrelation (PLD)<a class="headerlink" href="#pixel-level-decorrelation-pld" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
+<h2>Pixel Level Decorrelation (PLD)<a class="headerlink" href="#pixel-level-decorrelation-pld" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1386,8 +1396,8 @@ known to be effective at removing different types of noise.</p>
 </table>
 </section>
 <section id="self-flat-fielding-sff">
-<h2>Self Flat Fielding (SFF)<a class="headerlink" href="#self-flat-fielding-sff" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
+<h2>Self Flat Fielding (SFF)<a class="headerlink" href="#self-flat-fielding-sff" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1409,8 +1419,8 @@ known to be effective at removing different types of noise.</p>
 </table>
 </section>
 <section id="regression-corrector">
-<h2>Regression Corrector<a class="headerlink" href="#regression-corrector" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
+<h2>Regression Corrector<a class="headerlink" href="#regression-corrector" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1429,8 +1439,8 @@ known to be effective at removing different types of noise.</p>
 </table>
 </section>
 <section id="creating-a-design-matrix">
-<h2>Creating a design matrix<a class="headerlink" href="#creating-a-design-matrix" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
+<h2>Creating a design matrix<a class="headerlink" href="#creating-a-design-matrix" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1451,7 +1461,7 @@ known to be effective at removing different types of noise.</p>
 </tbody>
 </table>
 <p>A DesignMatrix has the following attributes:</p>
-<table class="longtable table autosummary">
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1461,7 +1471,7 @@ known to be effective at removing different types of noise.</p>
 <td><p>Design matrix &quot;X&quot; to be used in RegressionCorrector objects</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.rank.html#lightkurve.correctors.DesignMatrix.rank" title="lightkurve.correctors.DesignMatrix.rank"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix.rank</span></code></a></p></td>
-<td><p>Matrix rank computed using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank</span></code></a>.</p></td>
+<td><p>Matrix rank computed using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v1.24)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.shape.html#lightkurve.correctors.DesignMatrix.shape" title="lightkurve.correctors.DesignMatrix.shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix.shape</span></code></a></p></td>
 <td><p>Tuple specifying the shape of the matrix as (n_rows, n_columns).</p></td>
@@ -1472,7 +1482,7 @@ known to be effective at removing different types of noise.</p>
 </tbody>
 </table>
 <p>A DesignMatrix supports the following operations:</p>
-<table class="longtable table autosummary">
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1510,7 +1520,7 @@ known to be effective at removing different types of noise.</p>
 </tr>
 </tbody>
 </table>
-<table class="longtable table autosummary">
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -1535,7 +1545,7 @@ known to be effective at removing different types of noise.</p>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="api/lightkurve.seismology.Seismology.interact_echelle.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1558,7 +1568,8 @@ known to be effective at removing different types of noise.</p>
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1570,7 +1581,7 @@ known to be effective at removing different types of noise.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

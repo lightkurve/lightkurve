@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lightkurve.correctors.designmatrix &#8212; Lightkurve </title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,15 +19,11 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -51,7 +48,7 @@
                     </script>
 
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -62,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">Lightkurve v2.2</p>
+<p class="title">Lightkurve v2.4</p>
 </a>
 
     
@@ -104,7 +101,13 @@
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../about/index.html">
-  About
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../development/index.html">
+  Developing for Lightkurve
  </a>
 </li>
 
@@ -119,10 +122,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -138,7 +139,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -146,6 +148,9 @@
     
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -193,7 +198,7 @@
 
 
 <div class="viewcode-block" id="DesignMatrix"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix">[docs]</a><span class="k">class</span> <span class="nc">DesignMatrix</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;A matrix of column vectors for use in linear regression.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A matrix of column vectors for use in linear regression.</span>
 
 <span class="sd">    The purpose of this class is to provide a convenient method to interact</span>
 <span class="sd">    with a set of one or more regressors which are known to correlate with</span>
@@ -251,15 +256,15 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">X</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Design matrix &quot;X&quot; to be used in RegressionCorrector objects&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Design matrix &quot;X&quot; to be used in RegressionCorrector objects&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">values</span>
 
 <div class="viewcode-block" id="DesignMatrix.copy"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.copy.html#lightkurve.correctors.DesignMatrix.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a deepcopy of DesignMatrix&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a deepcopy of DesignMatrix&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DesignMatrix.plot"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.plot.html#lightkurve.correctors.DesignMatrix.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Visualize the design matrix values as an image.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Visualize the design matrix values as an image.</span>
 
 <span class="sd">        Uses Matplotlib&#39;s `~lightkurve.utils.plot_image` to visualize the</span>
 <span class="sd">        matrix values.</span>
@@ -297,7 +302,7 @@
         <span class="k">return</span> <span class="n">ax</span></div>
 
 <div class="viewcode-block" id="DesignMatrix.plot_priors"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.plot_priors.html#lightkurve.correctors.DesignMatrix.plot_priors">[docs]</a>    <span class="k">def</span> <span class="nf">plot_priors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Visualize the coefficient priors.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Visualize the coefficient priors.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -328,11 +333,11 @@
         <span class="k">return</span> <span class="n">ax</span></div>
 
     <span class="k">def</span> <span class="nf">_get_prior_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a random sample from the prior distribution.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a random sample from the prior distribution.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DesignMatrix.split"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.split.html#lightkurve.correctors.DesignMatrix.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` with regressors split into multiple</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` with regressors split into multiple</span>
 <span class="sd">        columns.</span>
 
 <span class="sd">        This method will return a new design matrix containing</span>
@@ -381,7 +386,7 @@
         <span class="k">return</span> <span class="n">dm</span></div>
 
 <div class="viewcode-block" id="DesignMatrix.standardize"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.standardize.html#lightkurve.correctors.DesignMatrix.standardize">[docs]</a>    <span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` in which the columns have been</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` in which the columns have been</span>
 <span class="sd">        median-subtracted and sigma-divided.</span>
 
 <span class="sd">        For each column in the matrix, this method will subtract the median of</span>
@@ -417,7 +422,7 @@
         <span class="k">return</span> <span class="n">dm</span></div>
 
 <div class="viewcode-block" id="DesignMatrix.pca"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.pca.html#lightkurve.correctors.DesignMatrix.pca">[docs]</a>    <span class="k">def</span> <span class="nf">pca</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nterms</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` with a smaller number of regressors.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` with a smaller number of regressors.</span>
 
 <span class="sd">        This method will use Principal Components Analysis (PCA) to reduce</span>
 <span class="sd">        the number of columns in the matrix.</span>
@@ -445,7 +450,7 @@
         <span class="k">return</span> <span class="n">DesignMatrix</span><span class="p">(</span><span class="n">new_values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DesignMatrix.append_constant"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.append_constant.html#lightkurve.correctors.DesignMatrix.append_constant">[docs]</a>    <span class="k">def</span> <span class="nf">append_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prior_mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">prior_sigma</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` with a column of ones appended.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` with a column of ones appended.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -467,7 +472,7 @@
         <span class="k">return</span> <span class="n">dm</span></div>
 
     <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper function for validating.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function for validating.&quot;&quot;&quot;</span>
         <span class="c1"># Matrix rank shouldn&#39;t be significantly smaller than the # of columns</span>
         <span class="k">if</span> <span class="n">rank</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
@@ -496,7 +501,7 @@
                 <span class="p">)</span>
 
 <div class="viewcode-block" id="DesignMatrix.validate"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.validate.html#lightkurve.correctors.DesignMatrix.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Emits `LightkurveWarning` if matrix has low rank or priors have incorrect shape.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Emits `LightkurveWarning` if matrix has low rank or priors have incorrect shape.</span>
 
 <span class="sd">        Note that for `SparseDesignMatrix` objects, calculating the rank will</span>
 <span class="sd">        force the design matrix to be evaluated and stored in memory, reducing</span>
@@ -508,17 +513,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rank</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Matrix rank computed using `numpy.linalg.matrix_rank`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Matrix rank computed using `numpy.linalg.matrix_rank`.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Tuple specifying the shape of the matrix as (n_rows, n_columns).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tuple specifying the shape of the matrix as (n_rows, n_columns).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;2D numpy array containing the matrix values.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;2D numpy array containing the matrix values.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">values</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
@@ -528,7 +533,7 @@
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> DesignMatrix </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DesignMatrix.to_sparse"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.to_sparse.html#lightkurve.correctors.DesignMatrix.to_sparse">[docs]</a>    <span class="k">def</span> <span class="nf">to_sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert this dense matrix object to a `SparseDesignMatrix`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert this dense matrix object to a `SparseDesignMatrix`.</span>
 
 <span class="sd">        The values of this design matrix will be converted to a</span>
 <span class="sd">        `scipy.sparse.csr_matrix`, which stores the values in a</span>
@@ -543,12 +548,12 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DesignMatrix.collect"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.collect.html#lightkurve.correctors.DesignMatrix.collect">[docs]</a>    <span class="k">def</span> <span class="nf">collect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Join two designmatrices, return a design matrix collection &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Join two designmatrices, return a design matrix collection &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DesignMatrixCollection</span><span class="p">([</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">])</span></div></div>
 
 
 <div class="viewcode-block" id="DesignMatrixCollection"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrixCollection.html#lightkurve.correctors.DesignMatrixCollection">[docs]</a><span class="k">class</span> <span class="nc">DesignMatrixCollection</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Object which stores multiple design matrices.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Object which stores multiple design matrices.</span>
 
 <span class="sd">    DesignMatrixCollection objects are useful when users want to regress against</span>
 <span class="sd">    multiple different systematics, but still keep the different systematics distinct.</span>
@@ -593,21 +598,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;2D numpy array containing the matrix values.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;2D numpy array containing the matrix values.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">values</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="p">))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">prior_mu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Coefficient prior means.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Coefficient prior means.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">prior_mu</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">prior_sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Coefficient prior standard deviations.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Coefficient prior standard deviations.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">prior_sigma</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Visualize the design matrix values as an image.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Visualize the design matrix values as an image.</span>
 
 <span class="sd">        Uses Matplotlib&#39;s `~lightkurve.utils.plot_image` to visualize the</span>
 <span class="sd">        matrix values.</span>
@@ -631,7 +636,7 @@
         <span class="k">return</span> <span class="n">ax</span>
 
     <span class="k">def</span> <span class="nf">plot_priors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Visualize the `prior_mu` and `prior_sigma` attributes.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Visualize the `prior_mu` and `prior_sigma` attributes.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -648,11 +653,11 @@
         <span class="k">return</span> <span class="n">ax</span>
 
     <span class="k">def</span> <span class="nf">_get_prior_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a random sample from the prior distribution.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a random sample from the prior distribution.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">dm</span><span class="o">.</span><span class="n">sample_priors</span><span class="p">()</span> <span class="k">for</span> <span class="n">dm</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrixCollection` with regressors split into</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrixCollection` with regressors split into</span>
 <span class="sd">        multiple columns.</span>
 
 <span class="sd">        This method will return a new design matrix collection by calling</span>
@@ -672,7 +677,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">row_indices</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrixCollection` in which all the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrixCollection` in which all the</span>
 <span class="sd">        matrices have been standardized using the `DesignMatrix.standardize`</span>
 <span class="sd">        method.</span>
 
@@ -685,7 +690,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;List of column names.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List of column names.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
@@ -704,7 +709,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_designmatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Flatten a `DesignMatrixCollection` into a `DesignMatrix`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Flatten a `DesignMatrixCollection` into a `DesignMatrix`.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_child_class</span><span class="p">(</span>
@@ -717,7 +722,7 @@
 
 
 <div class="viewcode-block" id="SparseDesignMatrix"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SparseDesignMatrix.html#lightkurve.correctors.SparseDesignMatrix">[docs]</a><span class="k">class</span> <span class="nc">SparseDesignMatrix</span><span class="p">(</span><span class="n">DesignMatrix</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A matrix of column vectors for use in linear regression.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A matrix of column vectors for use in linear regression.</span>
 
 <span class="sd">    This class is similar to the `DesignMatrix` class, but uses the</span>
 <span class="sd">    `scipy.sparse` library to improve speed in the case of sparse matrices.</span>
@@ -767,22 +772,22 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">X</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Design matrix &quot;X&quot; to be used in RegressionCorrector objects&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Design matrix &quot;X&quot; to be used in RegressionCorrector objects&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_X</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;2D numpy array containing the matrix values.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;2D numpy array containing the matrix values.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Checks if the matrix has the right shapes. Set rank to True to test matrix rank.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if the matrix has the right shapes. Set rank to True to test matrix rank.&quot;&quot;&quot;</span>
         <span class="c1"># For sparse matrices, calculating the rank is expensive, and negates</span>
         <span class="c1"># the benefits of using sparse. Validate will ignore rank by default.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` with regressors split into multiple</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` with regressors split into multiple</span>
 <span class="sd">        columns.</span>
 
 <span class="sd">        This method will return a new design matrix containing</span>
@@ -844,7 +849,7 @@
         <span class="k">return</span> <span class="n">dm</span>
 
     <span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` in which the columns have been</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` in which the columns have been</span>
 <span class="sd">        mean-subtracted and sigma-divided.</span>
 
 <span class="sd">        For each column in the matrix, this method will subtract the mean of</span>
@@ -889,7 +894,7 @@
         <span class="k">return</span> <span class="n">dm</span>
 
     <span class="k">def</span> <span class="nf">pca</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nterms</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` with a smaller number of regressors.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` with a smaller number of regressors.</span>
 
 <span class="sd">        This method will use Principal Components Analysis (PCA) to reduce</span>
 <span class="sd">        the number of columns in the matrix.</span>
@@ -907,7 +912,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">nterms</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">to_sparse</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">append_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prior_mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">prior_sigma</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` with a column of ones appended.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new `.SparseDesignMatrix` with a column of ones appended.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -934,11 +939,11 @@
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> SparseDesignMatrix </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">collect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Join two designmatrices, return a design matrix collection &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Join two designmatrices, return a design matrix collection &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">SparseDesignMatrixCollection</span><span class="p">([</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">to_dense</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert a SparseDesignMatrix object to a dense DesignMatrix</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a SparseDesignMatrix object to a dense DesignMatrix</span>
 
 <span class="sd">        The values of this design matrix will be converted to a</span>
 <span class="sd">        `numpy.ndarray`. This is not recommended for sparse matrices containing</span>
@@ -954,7 +959,7 @@
 
 
 <div class="viewcode-block" id="SparseDesignMatrixCollection"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SparseDesignMatrixCollection.html#lightkurve.correctors.SparseDesignMatrixCollection">[docs]</a><span class="k">class</span> <span class="nc">SparseDesignMatrixCollection</span><span class="p">(</span><span class="n">DesignMatrixCollection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A set of design matrices.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A set of design matrices.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SparseDesignMatrixCollection.__init__"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.SparseDesignMatrixCollection.html#lightkurve.correctors.SparseDesignMatrixCollection.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrices</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">issparse</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">X</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matrices</span><span class="p">]):</span>
@@ -980,7 +985,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Visualize the design matrix values as an image.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Visualize the design matrix values as an image.</span>
 
 <span class="sd">        Uses Matplotlib&#39;s `~lightkurve.utils.plot_image` to visualize the</span>
 <span class="sd">        matrix values.</span>
@@ -1014,7 +1019,7 @@
 <span class="c1">####################################################</span>
 
 <span class="k">def</span> <span class="nf">_spline_basis_vector</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">knots</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Recursive function to create a single spline basis vector for an input x,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursive function to create a single spline basis vector for an input x,</span>
 <span class="sd">    for the ith knot.</span>
 
 <span class="sd">    See https://en.wikipedia.org/wiki/B-spline for a definition of B-spline</span>
@@ -1057,7 +1062,7 @@
 
 
 <span class="k">def</span> <span class="nf">create_sparse_spline_matrix</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n_knots</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;spline&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Creates a piecewise polynomial function, creating a continuous, smooth function in x</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a piecewise polynomial function, creating a continuous, smooth function in x</span>
 
 <span class="sd">    See https://en.wikipedia.org/wiki/B-spline for the definitions of Basis Splines</span>
 
@@ -1115,7 +1120,7 @@
 <span class="k">def</span> <span class="nf">create_spline_matrix</span><span class="p">(</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">n_knots</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;spline&quot;</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : np.ndarray</span>
@@ -1168,7 +1173,8 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
@@ -1180,7 +1186,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     
