@@ -66,6 +66,7 @@ ghp-import = ">=1.0.1"
 openpyxl = ">=3.0.7"
 tox = ">=3.24.5"
 mistune = "<2.0.0"  # Workaround for #1162 (not a true dependency)
+papermill = "^2.4.0"
 
 [tool.poetry.group.dev.dependencies]
 ghp-import = "^2.1.0"
