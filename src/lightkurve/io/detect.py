@@ -1,7 +1,6 @@
 """Provides a function to automatically detect Kepler/TESS file types."""
-from astropy.io.fits import HDUList
 from astropy.io import fits
-
+from astropy.io.fits import HDUList
 
 __all__ = ["detect_filetype"]
 
@@ -28,6 +27,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'TASOC'`
         * `'KEPSEISMIC'`
         * `'CDIPS'`
+        * `'TGLC'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -79,7 +79,7 @@ def detect_filetype(hdulist: HDUList) -> str:
 
     # Is it a CDIPS TESS light curve?
     # cf. http://archive.stsci.edu/hlsp/cdips
-    if "cdips" in hdulist[0].header.get("ORIGIN","").lower():
+    if "cdips" in hdulist[0].header.get("ORIGIN", "").lower():
         return "CDIPS"
 
     # Is it a K2VARCAT file?
@@ -113,6 +113,10 @@ def detect_filetype(hdulist: HDUList) -> str:
     # Is it a KEPSEISMIC file?
     if hdulist[0].header.get("ORIGIN") == "CEA & SSI":
         return "KEPSEISMIC"
+
+    # Is it a TGLC file?
+    if hdulist[0].header.get("ORIGIN") == "UCSB/TGLC":
+        return "TGLC"
 
     # Is it an official data product?
     header = hdulist[0].header
