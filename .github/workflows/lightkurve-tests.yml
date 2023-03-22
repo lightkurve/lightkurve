@@ -43,6 +43,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip poetry
+        poetry config installer.modern-installation false
         poetry install
     - name: Test with ${{ matrix.pytest-command }}
       run: |
@@ -64,6 +65,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip poetry
+        poetry config installer.modern-installation false
         poetry install
     - name: Test with pytest
       run: |
@@ -84,6 +86,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip poetry
+        poetry config installer.modern-installation false
         poetry install
     - name: Test with pytest
       run: |
@@ -104,6 +107,7 @@ jobs:
     - name: Install flake8
       run: |
         python -m pip install --upgrade pip poetry
+        poetry config installer.modern-installation false
         poetry install
     - name: Lint with flake8
       run: |
