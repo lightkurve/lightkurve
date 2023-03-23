@@ -21,8 +21,18 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 	cp ../pyproject.toml $(BUILDDIR)/html
 
+execute-notebooks:
+	poetry run python pre_execute_ipynbs.py
+
+clear-notebook-cache:
+	rm -rf source/tutorials_pre_execute/*
+
+sync-notebooks:
+	# Do some rsync magic
+	rsync -av --relative --remove-source-files source/tutorials_pre_execute/./*/*.ipynb source/tutorials
+
 notebooks:
-	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O) -D nbsphinx_execute='always'
+	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O) -D nbsphinx_execute='false'
 
 # ghp-import can be installed with pip as pip install ghp-import
 upload:
