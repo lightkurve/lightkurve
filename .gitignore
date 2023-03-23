@@ -29,6 +29,11 @@ var/
 # ipython notebooks
 .ipynb_checkpoints
 
+
+# doc build: temp dir to pre-execute ipynbs
+docs/source/tutorials_pre_execute/
+docs/source/tutorials_original/
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.

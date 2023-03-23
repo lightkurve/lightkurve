@@ -1,7 +1,6 @@
 2.4.1dev (unreleased)
 =====================
 
-
 2.4.0 (2023-02-14)
 ==================
 
@@ -17,7 +16,6 @@
 - Fixed ``SearchResult`` HTML display for links to TESS GI cycles 3/4 proposals. [#1260]
 
 - Fixed references to np.int and np.float due to changes in numpy v1.24. [#1279]
-
 
 2.3.0 (2022-07-07)
 ==================
