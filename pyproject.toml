@@ -60,12 +60,14 @@ nbsphinx = ">=0.8.7"
 numpydoc = ">=1.1.0"
 sphinx-automodapi = ">=0.13"
 sphinxcontrib-rawfiles = ">=0.1.1"
+# pin the theme to v0.8.1 for now because of breaking changes in the latest version.
 pydata-sphinx-theme = "==0.8.1"
 pylint = ">=2.6.0"
 ghp-import = ">=1.0.1"
 openpyxl = ">=3.0.7"
 tox = ">=3.24.5"
 mistune = "<2.0.0"  # Workaround for #1162 (not a true dependency)
+papermill = "^2.4.0"
 
 [tool.poetry.group.dev.dependencies]
 ghp-import = "^2.1.0"

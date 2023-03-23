@@ -1,4 +1,3 @@
-#
 # Batch pre-execute ipynbs for doc build, to workaround the issue that
 # in standard nbsphinx build, when there is an error, e.g, timeout from MAST
 # it'd halt the build. One has to start from scratch again.
