@@ -19,9 +19,9 @@ def read_tglc_lightcurve(
     provided by this HLSP.
 
     Note this reader does not use the TGLC_FLAG extension to inform the bitmask for the
-    returned light curve, but can still be accessed.
+    returned light curve, but those flags can still be accessed.
 
-    More information on eleanor: https://archive.stsci.edu/hlsp/tglc
+    More information on TGLC: https://archive.stsci.edu/hlsp/tglc
 
     Parameters
     ----------
