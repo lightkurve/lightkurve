@@ -49,7 +49,7 @@ Contributing
 ------------
 
 We welcome community contributions!
-Please read the  guidelines at `https://docs.lightkurve.org/about/contributing.html <https://docs.lightkurve.org/about/contributing.html>`_.
+Please read the  guidelines at `https://docs.lightkurve.org/development/contributing.html <https://docs.lightkurve.org/development/contributing.html>`_.
 
 
 Citing
