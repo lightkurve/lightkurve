@@ -4,9 +4,9 @@ import logging
 from astropy.io import fits
 from astropy.utils import deprecated
 
-from .detect import detect_filetype
 from ..lightcurve import KeplerLightCurve, TessLightCurve
 from ..utils import LightkurveDeprecationWarning, LightkurveError
+from .detect import detect_filetype
 
 log = logging.getLogger(__name__)
 
@@ -100,7 +100,7 @@ def read(path_or_url, **kwargs):
         elif filetype == "PATHOS":
             return TessLightCurve.read(path_or_url, format="pathos", **kwargs)
         elif filetype == "CDIPS":
-            return TessLightCurve.read(path_or_url, format='cdips', **kwargs)
+            return TessLightCurve.read(path_or_url, format="cdips", **kwargs)
         elif filetype == "TASOC":
             return TessLightCurve.read(path_or_url, format="tasoc", **kwargs)
         elif filetype == "K2SFF":
@@ -109,13 +109,15 @@ def read(path_or_url, **kwargs):
             return KeplerLightCurve.read(path_or_url, format="everest", **kwargs)
         elif filetype == "KEPSEISMIC":
             return KeplerLightCurve.read(path_or_url, format="kepseismic", **kwargs)
+        elif filetype == "TGLC":
+            return TessLightCurve.read(path_or_url, format="tglc", **kwargs)
     except BaseException as exc:
         # ensure path_or_url is in the error
         raise LightkurveError(
             f"Error in reading Data product {path_or_url} of type {filetype} .\n"
             "This file may be corrupt due to an interrupted download. "
             "Please remove it from your disk and try again."
-            ) from exc
+        ) from exc
 
     # Official data products;
     # if the filetype is recognized, instantiate a class of that name
@@ -124,7 +126,8 @@ def read(path_or_url, **kwargs):
             return getattr(__import__("lightkurve"), filetype)(path_or_url, **kwargs)
         except AttributeError as exc:
             raise LightkurveError(
-                f"Data product f{path_or_url} of type {filetype} is not supported " "in this version of Lightkurve."
+                f"Data product f{path_or_url} of type {filetype} is not supported "
+                "in this version of Lightkurve."
             ) from exc
     else:
         # if these keywords don't exist, raise `ValueError`

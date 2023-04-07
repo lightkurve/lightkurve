@@ -1,28 +1,32 @@
 """Defines tools to retrieve Kepler data from the archive at MAST."""
 from __future__ import division
-import os
+
 import glob
 import logging
+import os
 import re
 import warnings
-from requests import HTTPError
 
-from memoization import cached
 import numpy as np
-from astropy.table import join, Table, Row
+from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii
-from astropy import units as u
-from astropy.utils import deprecated
+from astropy.table import Row, Table, join
 from astropy.time import Time
+from astropy.utils import deprecated
+from memoization import cached
+from requests import HTTPError
 
-from .targetpixelfile import TargetPixelFile
-from .collections import TargetPixelFileCollection, LightCurveCollection
-from .utils import LightkurveError, suppress_stdout, LightkurveWarning, LightkurveDeprecationWarning
+from . import PACKAGEDIR, conf, config
+from .collections import LightCurveCollection, TargetPixelFileCollection
 from .io import read
-from . import conf
-from . import config
-from . import PACKAGEDIR
+from .targetpixelfile import TargetPixelFile
+from .utils import (
+    LightkurveDeprecationWarning,
+    LightkurveError,
+    LightkurveWarning,
+    suppress_stdout,
+)
 
 log = logging.getLogger(__name__)
 
@@ -49,6 +53,7 @@ AUTHOR_LINKS = {
     "EVEREST": "https://archive.stsci.edu/hlsp/everest",
     "TESScut": "https://mast.stsci.edu/tesscut/",
     "GSFC-ELEANOR-LITE": "https://archive.stsci.edu/hlsp/gsfc-eleanor-lite",
+    "TGLC": "https://archive.stsci.edu/hlsp/tglc",
 }
 
 REPR_COLUMNS_BASE = [
@@ -188,9 +193,12 @@ class SearchResult(object):
                 if p_ids == "N/A" or (not isinstance(p_ids, str)):
                     continue
                 # e.g., handle cases with multiple proposals, e.g.,  G12345_G67890
-                p_id_links = [f"""\
+                p_id_links = [
+                    f"""\
 <a href='{to_tess_gi_url(p_id)}'>{p_id}</a>\
-""" for p_id in p_ids.split("_")]
+"""
+                    for p_id in p_ids.split("_")
+                ]
                 out = out.replace(f">{p_ids}<", f">{' , '.join(p_id_links)}<")
         return out
 
@@ -339,6 +347,7 @@ class SearchResult(object):
                 log.debug("File found in local cache.")
             else:
                 from astroquery.mast import Observations
+
                 download_url = table[:1]["dataURL"][0]
                 log.debug("Started downloading {}.".format(download_url))
                 download_response = Observations.download_products(
@@ -348,7 +357,7 @@ class SearchResult(object):
                     raise LightkurveError(
                         f"Download of {download_url} failed. "
                         f"MAST returns {download_response['Status']}: {download_response['Message']}"
-                        )
+                    )
                 path = download_response["Local Path"]
                 log.debug("Finished downloading.")
             return read(path, quality_bitmask=quality_bitmask, **kwargs)
@@ -1023,7 +1032,7 @@ def _search_products(
             # K2 campaigns 9, 10, and 11 were split into two sections, which are
             # listed separately in the table with suffixes "a" and "b"
             if obs_project == "K2" and result["sequence_number"][idx] in [9, 10, 11]:
-                for half,letter in zip([1,2],['a','b']):
+                for half, letter in zip([1, 2], ["a", "b"]):
                     if f"c{tmp_seqno}{half}" in result["productFilename"][idx]:
                         obs_seqno = f"{int(tmp_seqno):02d}{letter}"
             result["mission"][idx] = "{} {} {}".format(
@@ -1126,8 +1135,8 @@ def _query_mast(
         Table detailing the available observations on MAST.
     """
     # Local astroquery import because the package is not used elsewhere
+    from astroquery.exceptions import NoResultsWarning, ResolverError
     from astroquery.mast import Observations
-    from astroquery.exceptions import ResolverError, NoResultsWarning
 
     # If passed a SkyCoord, convert it to an "ra, dec" string for MAST
     if isinstance(target, SkyCoord):
