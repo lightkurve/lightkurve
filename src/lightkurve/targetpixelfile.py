@@ -1142,6 +1142,7 @@ class TargetPixelFile(object):
                 title = "Target ID: {}, Cadence: {}".format(
                     self.targetid, self.cadenceno[frame]
                 )
+            
             # We subtract -0.5 because pixel coordinates refer to the middle of
             # a pixel, e.g. (col, row) = (10.0, 20.0) is a pixel center.
             img_extent = (
@@ -1150,6 +1151,15 @@ class TargetPixelFile(object):
                 self.row - 0.5,
                 self.row + self.shape[1] - 0.5,
             )
+            
+            #If an axes is passed that used WCS projection, don't use img_extent
+            #This addresses lk issue #1095
+            try: 
+            	if hasattr(ax, "wcs"):
+            		img_extent = None
+            except NameError:
+            	pass
+            	
             ax = plot_image(
                 data_to_plot,
                 ax=ax,
