@@ -24,17 +24,6 @@ Building the *lightkurve* documentation requires `sphinx` and a few extra packag
 
     $ poetry install
 
-.. note::
-
-    If you encounter the error ``Pandoc wasn't found``, you will have to install ``pandoc`` separately as well following its `installation instruction <https://pandoc.org/installing.html>`_  .
-    For example, on Mac OS you can install ``pandoc`` using ``homebrew``::
-
-        $ brew install pandoc
-
-    An alternative method is to install pandoc using ``conda``::
-
-        $ conda install --channel=conda-forge pandoc
-
 To build the documentation in HTML format, execute::
 
     $ cd docs
@@ -51,3 +40,20 @@ Finally, if you have write permission to *lightkurve*'s GitHub repository,
 you can upload the documentation to the web server using::
 
     make upload
+
+.. note::
+
+    If you encounter the error ``Pandoc wasn't found``, you will have to install ``pandoc`` separately as well following its `installation instruction <https://pandoc.org/installing.html>`_  .
+    For example, on Mac OS you can install ``pandoc`` using ``homebrew``::
+
+        $ brew install pandoc
+
+    An alternative method is to install pandoc using ``conda``::
+
+        $ conda install --channel=conda-forge pandoc
+
+.. note::
+    
+    To build the docs on a Mac you may have to install the Xcode Command Line Tools, which you can do using
+
+        $ xcode-select --install
