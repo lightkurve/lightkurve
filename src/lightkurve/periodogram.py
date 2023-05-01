@@ -417,20 +417,23 @@ class Periodogram(object):
         # TODO: Add some intelligent decision making for the filter_width
 
         bkg = self.smooth(method=method, filter_width=filter_width)
+        bkg.meta['FLAT_METHOD'] = method
+        bkg.meta['FLAT_FILT_WIDTH'] = filter_width
+        
         snr_pg = self / bkg.power
 
         snr = SNRPeriodogram(
             snr_pg.frequency,
             snr_pg.power,
-            bkg = bkg,
+            bkg,
             nyquist=self.nyquist,
             targetid=self.targetid,
             label=self.label,
             meta=self.meta,
         )
-        if return_trend:
-            return snr, bkg
+
         return snr
+
     def to_table(self):
         """Exports the Periodogram as an Astropy Table.
 
@@ -597,8 +600,8 @@ class SNRPeriodogram(Periodogram):
     """
 
     def __init__(self, *args, **kwargs):
-        super(SNRPeriodogram, self).__init__(*args, **kwargs)
-        self.bkg = args.pop("bkg", None)
+        super(SNRPeriodogram, self).__init__(args[0], args[1], **kwargs)
+        self.bkg = args[2]
 
     def __repr__(self):
         return "SNRPeriodogram(ID: {})".format(self.label)
@@ -619,10 +622,15 @@ class SNRPeriodogram(Periodogram):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        snr = super(SNRPeriodogram, self)
-        snr *= self.bkg
-        ax = snr.plot(**kwargs)
-        bkg.plot(ax=ax)
+        pg = self * self.bkg.power.value
+        pg.power *= 1 * self.bkg.power.unit
+
+        ax = pg.plot(**kwargs)
+        self.bkg.plot(ax=ax, scale='log', label='Background',
+                    lw = 2)
+        ax.set_title(f'Method: {self.bkg.meta["FLAT_METHOD"]}, ' +  
+                     f'filter width {self.bkg.meta["FLAT_FILT_WIDTH"]}.')
+    
         return ax
 
     def plot(self, **kwargs):
