@@ -73,7 +73,7 @@ version to immediately reflect changes made in the source tree, you can use:
     $ python -m pip install poetry
     $ poetry install
 
-Please see our guide on `https://docs.lightkurve.org/development/index.html <https://docs.lightkurve.org/development/index.html>`_.
+Please see our guide on `https://docs.lightkurve.org/development/index.html <https://docs.lightkurve.org/development/index.html>`_
 for additional instructions.
 
 
