@@ -383,56 +383,6 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
-    def flatten(self, method="logmedian", filter_width=0.01, return_trend=False):
-        """Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
-        estimate of the noise background.
-
-        This method divides the power spectrum by a background estimated
-        using a moving filter in log10 space by default. For details on the
-        `method` and `filter_width` parameters, see `Periodogram.smooth()`
-
-        Dividing the power through by the noise background produces a spectrum
-        with no units of power. Since the signal is divided through by a measure
-        of the noise, we refer to this as a `Signal-To-Noise` spectrum.
-
-        Parameters
-        ----------
-        method : str, one of 'boxkernel' or 'logmedian'
-            Background estimation method passed on to `Periodogram.smooth()`.
-            Defaults to 'logmedian'.
-        filter_width : float
-            If `method` = 'boxkernel', this is the width of the smoothing filter
-            in units of frequency.
-            If method = `logmedian`, this is the width of the smoothing filter
-            in log10(frequency) space.
-        return_trend : bool
-            If True, then the background estimate, alongside the SNR spectrum,
-            will be returned.
-
-        Returns
-        -------
-        snr_spectrum : `Periodogram` object
-            Returns a periodogram object where the power is an estimate of the
-            signal-to-noise of the spectrum, creating by dividing the powers
-            with a simple estimate of the noise background using a smoothing filter.
-        bkg : `Periodogram` object
-            The estimated power spectrum of the background noise. This is only
-            returned if `return_trend = True`.
-        """
-        bkg = self.smooth(method=method, filter_width=filter_width)
-        snr_pg = self / bkg.power
-        snr = SNRPeriodogram(
-            snr_pg.frequency,
-            snr_pg.power,
-            nyquist=self.nyquist,
-            targetid=self.targetid,
-            label=self.label,
-            meta=self.meta,
-        )
-        if return_trend:
-            return snr, bkg
-        return snr
-
     def to_table(self):
         """Exports the Periodogram as an Astropy Table.
 
@@ -600,9 +550,32 @@ class SNRPeriodogram(Periodogram):
 
     def __init__(self, *args, **kwargs):
         super(SNRPeriodogram, self).__init__(*args, **kwargs)
+        self.bkg = args.pop("bkg", None)
 
     def __repr__(self):
         return "SNRPeriodogram(ID: {})".format(self.label)
+
+    def diagnose_flatten(self, **kwargs):
+        """Plot the unflattened power spectrum with the subtracted background
+        overlaid. This can help users inspect whether the .flatten() function
+        is appropriate for the signal their investigating, and adjust the
+        filter width accordingly to avoid reducing the power of their signal.
+        
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments to be passed to `Periodogram.plot`.
+        
+        Returns
+        -------
+        ax : `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+        snr = super(SNRPeriodogram, self)
+        snr *= self.bkg
+        ax = snr.plot(**kwargs)
+        bkg.plot(ax=ax)
+        return ax
 
     def plot(self, **kwargs):
         """Plot the SNR spectrum using matplotlib's `plot` method.
@@ -611,7 +584,7 @@ class SNRPeriodogram(Periodogram):
         Parameters
         ----------
         kwargs : dict
-            Dictionary of arguments ot be passed to `Periodogram.plot`.
+            Dictionary of arguments to be passed to `Periodogram.plot`.
 
         Returns
         -------
@@ -970,6 +943,55 @@ class LombScarglePeriodogram(Periodogram):
             ls_method=ls_method,
             meta=lc.meta,
         )
+
+    def flatten(self, method="logmedian", filter_width=0.01):
+        """Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
+        estimate of the noise background.
+
+        This method divides the power spectrum by a background estimated
+        using a moving filter in log10 space by default. For details on the
+        `method` and `filter_width` parameters, see `Periodogram.smooth()`
+
+        Dividing the power through by the noise background produces a spectrum
+        with no units of power. Since the signal is divided through by a measure
+        of the noise, we refer to this as a `Signal-To-Noise` spectrum.
+
+        Parameters
+        ----------
+        method : str, one of 'boxkernel' or 'logmedian'
+            Background estimation method passed on to `Periodogram.smooth()`.
+            Defaults to 'logmedian'.
+        filter_width : float
+            If `method` = 'boxkernel', this is the width of the smoothing filter
+            in units of frequency.
+            If method = `logmedian`, this is the width of the smoothing filter
+            in log10(frequency) space.
+
+        Returns
+        -------
+        snr_spectrum : `Periodogram` object
+            Returns a periodogram object where the power is an estimate of the
+            signal-to-noise of the spectrum, creating by dividing the powers
+            with a simple estimate of the noise background using a smoothing filter.
+            This object also contains information on the subtracted background.
+        """
+        # TODO: Add some intelligent decision making for the filter_width
+
+        bkg = self.smooth(method=method, filter_width=filter_width)
+        snr_pg = self / bkg.power
+
+        snr = SNRPeriodogram(
+            snr_pg.frequency,
+            snr_pg.power,
+            bkg = bkg,
+            nyquist=self.nyquist,
+            targetid=self.targetid,
+            label=self.label,
+            meta=self.meta,
+        )
+        if return_trend:
+            return snr, bkg
+        return snr
 
     def model(self, time, frequency=None):
         """Obtain the flux model for a given frequency and time
