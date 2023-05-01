@@ -1,10 +1,9 @@
-import pytest
-
-from astropy.io import fits
 import numpy as np
-
-from lightkurve.io.kepseismic import read_kepseismic_lightcurve
+import pytest
+from astropy.io import fits
 from lightkurve.io.detect import detect_filetype
+from lightkurve.io.kepseismic import read_kepseismic_lightcurve
+
 
 @pytest.mark.remote_data
 def test_detect_kepseismic():

@@ -1,9 +1,8 @@
 """Helper functions for estimating numax from periodograms."""
 import numpy as np
-from matplotlib import pyplot as plt
-
-from astropy.convolution import convolve, Gaussian1DKernel
 from astropy import units as u
+from astropy.convolution import Gaussian1DKernel, convolve
+from matplotlib import pyplot as plt
 
 from .. import MPLSTYLE
 from . import utils

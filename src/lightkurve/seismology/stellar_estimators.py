@@ -1,10 +1,11 @@
 """Functions to estimate stellar parameters (radius, mass, logg) using
 asteroseismic scaling relations.
 """
+from astropy import (
+    constants as const,
+    units as u,
+)
 from uncertainties import ufloat, umath
-
-from astropy import units as u
-from astropy import constants as const
 
 from .utils import SeismologyQuantity
 

@@ -1,13 +1,20 @@
+# ruff: noqa: B006
+# ^ This allows using mutable default arguments, which we probably do want to
+# avoid, but this is fairly widely used in this specific file, so we'll ignore
+# it here.
+
 """Defines Corrector classes that utilize Kepler/K2/TESS Cotrending Basis Vectors.
 """
-import logging
 import copy
-import requests
-import urllib.request
 import glob
+import logging
 import os
+import urllib.request
 import warnings
 
+import matplotlib.pyplot as plt
+import numpy as np
+import requests
 from astropy.io import fits as pyfits
 from astropy.table import Table
 from astropy.time import Time
@@ -15,23 +22,25 @@ from astropy.timeseries import TimeSeries
 from astropy.units import Quantity, Unit, UnitsWarning
 from astropy.utils.decorators import deprecated
 from astropy.utils.masked import Masked
-
 from bs4 import BeautifulSoup
-import matplotlib.pyplot as plt
-import numpy as np
 from scipy.interpolate import PchipInterpolator
-from sklearn import linear_model
 from scipy.optimize import minimize_scalar
+from sklearn import linear_model
 
-from .designmatrix import DesignMatrix, DesignMatrixCollection
 from .. import MPLSTYLE
 from ..lightcurve import LightCurve
-from ..utils import channel_to_module_output, validate_method, LightkurveDeprecationWarning
-from ..search import search_lightcurve
+from ..utils import (
+    LightkurveDeprecationWarning,
+    channel_to_module_output,
+    validate_method,
+)
+from .designmatrix import DesignMatrix, DesignMatrixCollection
+from .metrics import (
+    MinTargetsError,
+    overfit_metric_lombscargle,
+    underfit_metric_neighbors,
+)
 from .regressioncorrector import RegressionCorrector
-from ..collections import LightCurveCollection
-from .metrics import overfit_metric_lombscargle, underfit_metric_neighbors, MinTargetsError
-
 
 log = logging.getLogger(__name__)
 
@@ -109,13 +118,13 @@ class CBVCorrector(RegressionCorrector):
         interpolate_cbvs : bool
             By default, the cbvs will be 'aligned' to the lightcurve. If you
             wish to interpolate the cbvs instead then set this to True.
-            Uses Piecewise Cubic Hermite Interpolating Polynomial (PCHIP). 
+            Uses Piecewise Cubic Hermite Interpolating Polynomial (PCHIP).
         extrapolate_cbvs : bool
-            Set to True if the CBVs also have to be extrapolated outside their time 
+            Set to True if the CBVs also have to be extrapolated outside their time
             stamp range. (If False then those cadences are filled with NaNs.)
         do_not_load_cbvs : bool
-            If True then the CBVs will NOT be loaded from MAST. 
-            Use this option if you wish to use the CBV corrector methods with only a 
+            If True then the CBVs will NOT be loaded from MAST.
+            Use this option if you wish to use the CBV corrector methods with only a
             custom design matrix (via the ext_dm argument in the corrector methods)
         cbv_dir : str
             Path to specific directory holding TESS CBVs. If this is None, will query
@@ -125,7 +134,7 @@ class CBVCorrector(RegressionCorrector):
             raise Exception('<lc> must be a LightCurve class')
 
         assert  lc.flux.unit==Unit('electron / second'), \
-            'cbvCorrector expects light curve to be passed in e-/s units.'        
+            'cbvCorrector expects light curve to be passed in e-/s units.'
 
         if extrapolate_cbvs and (extrapolate_cbvs != interpolate_cbvs):
             raise Exception('interpolate_cbvs must be True if extrapolate_cbvs is True')
@@ -152,7 +161,7 @@ class CBVCorrector(RegressionCorrector):
                 # Single-Scale
                 cbvs.append(load_tess_cbvs(cbv_dir=cbv_dir,sector=self.lc.sector,
                     camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='SingleScale'))
-            
+
                 # Multi-Scale
                 # Although there has always been 3 bands, there could be more,
                 # continue to load more bands until no more are left to load
@@ -167,14 +176,14 @@ class CBVCorrector(RegressionCorrector):
                         cbvs.append(cbvObj)
                     else:
                         moreData = False
-            
+
                 # Spike
                 cbvs.append(load_tess_cbvs(cbv_dir=cbv_dir,sector=self.lc.sector,
                     camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='Spike'))
-            
+
             else:
                 raise ValueError('Unknown mission type')
-            
+
             for idx in np.arange(len(cbvs)):
                 if (not isinstance(cbvs[idx], CotrendingBasisVectors)):
                     raise Exception('CBVs could not be loaded. CBVCorrector must exit')
@@ -183,7 +192,7 @@ class CBVCorrector(RegressionCorrector):
             for idx in np.arange(len(cbvs)):
                 # astropy.time.Time makes this easy!
                 cbvs[idx].time.format = lc.time.format
-            
+
             # Align or interpolate the CBVs with the lightcurve flux using the cadence numbers
             for idx in np.arange(len(cbvs)):
                 if interpolate_cbvs:
@@ -212,7 +221,7 @@ class CBVCorrector(RegressionCorrector):
         self.alpha = None
 
     def correct_gaussian_prior(self, cbv_type=['SingleScale'],
-            cbv_indices=[np.arange(1,9)], 
+            cbv_indices=[np.arange(1,9)],
             alpha=1e-20, ext_dm=None, cadence_mask=None, **kwargs):
         """ Performs the correction using RegressionCorrector methods.
 
@@ -223,7 +232,7 @@ class CBVCorrector(RegressionCorrector):
         RegressionCorrector.correct to perform the correction.
 
         The relation between the L2-Norm alpha term and the Gaussian prior sigma
-        is: 
+        is:
         alpha = flux_sigma^2 / sigma^2
 
         By default this method will use the first 8 "SingleScale" basis vectors.
@@ -263,7 +272,7 @@ class CBVCorrector(RegressionCorrector):
             >>>     cbv_indices=cbv_indices, alpha=0.1, # doctest: +SKIP
             >>>     ext_dm=design_matrix ) # doctest: +SKIP
         """
-        
+
         # Perform all the preparatory stuff common to all correct methods
         self._correct_initialization(cbv_type=cbv_type,
                 cbv_indices=cbv_indices, ext_dm=ext_dm)
@@ -275,16 +284,16 @@ class CBVCorrector(RegressionCorrector):
         else:
             sigma = np.median(self.lc.flux_err.value) / np.sqrt(np.abs(alpha))
         self._set_prior_width(sigma)
-            
+
         # Use RegressionCorrector.correct for the actual fitting
-        self.correct_regressioncorrector(self.design_matrix_collection, 
+        self.correct_regressioncorrector(self.design_matrix_collection,
                 cadence_mask=cadence_mask, **kwargs)
 
         self.alpha = alpha
 
         return self.corrected_lc
 
-    def correct_elasticnet(self, cbv_type='SingleScale', cbv_indices=np.arange(1,9), 
+    def correct_elasticnet(self, cbv_type='SingleScale', cbv_indices=np.arange(1,9),
             alpha=1e-20, l1_ratio=0.01, ext_dm=None, cadence_mask=None, **kwargs):
         """ Performs the correction using scikit-learn's ElasticNet which
         utilizes combined L1- and L2-Norm priors as a regularizer.
@@ -298,7 +307,7 @@ class CBVCorrector(RegressionCorrector):
         This method will preserve the median value of the light curve flux.
 
         Note that the alpha term in scikit-learn's ElasticNet does not have the
-        same scaling as when used in CBVCorrector.correct_gaussian_prior or 
+        same scaling as when used in CBVCorrector.correct_gaussian_prior or
         CBVCorrector.correct. Do not assume similar results with a
         similar alpha value.
 
@@ -339,7 +348,7 @@ class CBVCorrector(RegressionCorrector):
             >>> corrected_lc = cbvCorrector.correct_elasticnet(cbv_type=cbv_type, # doctest: +SKIP
             >>>     cbv_indices=cbv_indices, alpha=1.0, l1_ratio=0.9) # doctest: +SKIP
         """
-        
+
         # Perform all the preparatory stuff common to all correct methods
         self._correct_initialization(cbv_type=cbv_type,
                 cbv_indices=cbv_indices, ext_dm=ext_dm)
@@ -372,9 +381,9 @@ class CBVCorrector(RegressionCorrector):
         model_flux -= np.median(model_flux)
         # TODO: Propagation of uncertainties. They really do not change much.
         model_err   = np.zeros(len(model_flux))
-        
+
         self.coefficients = self.regressor.coef_
-        
+
         self.model_lc = LightCurve(time=self.lc.time,
                 flux=model_flux*self.lc.flux.unit,
                 flux_err=model_err*self.lc.flux_err.unit)
@@ -384,12 +393,12 @@ class CBVCorrector(RegressionCorrector):
         self.diagnostic_lightcurves = self._create_diagnostic_lightcurves()
         self.cadence_mask = cadence_mask
         self.alpha = alpha
-            
+
         return self.corrected_lc
 
     def correct(self, cbv_type=['SingleScale'],
-            cbv_indices=[np.arange(1,9)], 
-            ext_dm=None, cadence_mask=None, alpha_bounds=[1e-4,1e4], 
+            cbv_indices=[np.arange(1,9)],
+            ext_dm=None, cadence_mask=None, alpha_bounds=[1e-4,1e4],
             target_over_score=0.5, target_under_score=0.5, max_iter=100):
         """ Optimizes the correction by adjusting the L2-Norm (Ridge Regression)
         regularization penalty term, alpha, based on the introduced noise
@@ -407,7 +416,7 @@ class CBVCorrector(RegressionCorrector):
         The optimization parameters used are stored in self.optimization_params
         as a record of how the optimization was performed.
 
-        The optimized correction is performed using LightKurve's 
+        The optimized correction is performed using LightKurve's
         RegressionCorrector methods. See correct_gaussian_prior for details.
 
         Parameters
@@ -494,7 +503,7 @@ class CBVCorrector(RegressionCorrector):
         return self.corrected_lc
 
     def correct_regressioncorrector(self, design_matrix_collection, **kwargs):
-        """ Pass-through method to gain access to the superclass 
+        """ Pass-through method to gain access to the superclass
         RegressionCorrector.correct() method.
         """
 
@@ -502,9 +511,9 @@ class CBVCorrector(RegressionCorrector):
         # input arguments.
         return super(CBVCorrector, self).correct(design_matrix_collection, **kwargs)
 
-    def over_fitting_metric(self, 
+    def over_fitting_metric(self,
             n_samples: int = 10):
-        """ Computes the over-fitting metric using 
+        """ Computes the over-fitting metric using
         metrics.overfit_metric_lombscargle
 
         See that function for a description of the algorithm.
@@ -535,11 +544,11 @@ class CBVCorrector(RegressionCorrector):
 
         return overfit_metric_lombscargle (orig_lc, corrected_lc, n_samples=n_samples)
 
-    def under_fitting_metric(self, 
-            radius: float = None, 
+    def under_fitting_metric(self,
+            radius: float = None,
             min_targets: int = 30,
             max_targets: int = 50):
-        """  Computes the under-fitting metric using 
+        """  Computes the under-fitting metric using
         metrics.underfit_metric_neighbors
 
         See that function for a description of the algorithm.
@@ -608,20 +617,20 @@ class CBVCorrector(RegressionCorrector):
         # Ignore masked cadences
         corrected_lc    = self.corrected_lc.copy()
         corrected_lc    = corrected_lc[self.cadence_mask]
-        
+
         # Dynamically increase radius until min_targets reached.
         continue_searching = True
         while (continue_searching):
             try:
-                metric = underfit_metric_neighbors (corrected_lc, 
-                            dynamic_search_radius, min_targets, max_targets, 
+                metric = underfit_metric_neighbors (corrected_lc,
+                            dynamic_search_radius, min_targets, max_targets,
                             interpolate, extrapolate)
-            except MinTargetsError:
+            except MinTargetsError as e:
                 # Too few targets found, try increasing search radius
                 if (dynamic_search_radius > max_search_radius):
                     # Hit the edge of the CCD, we have to give up
                     raise Exception('Not enough neighboring targets were '
-                        'found. under_fitting_metric failed')
+                        'found. under_fitting_metric failed') from e
                 # Too few found, increase search radius
                 dynamic_search_radius *= 1.5
             else:
@@ -669,38 +678,38 @@ class CBVCorrector(RegressionCorrector):
             if (ext_dm.df.shape[0] != len(self.lc.flux)):
                     raise ValueError(
                         'ext_dm must contain the same number of cadences as lc.flux')
-            
+
 
         # Create a CBV design matrix for each CBV set requested
         self.cbv_design_matrix = []
 
         if use_cbvs:
-            assert (not isinstance(cbv_type, str) and 
+            assert (not isinstance(cbv_type, str) and
                     not isinstance(cbv_indices[0], int)), \
                     'cbv_type and cbv_indices must be lists of strings'
-            
+
             if (self.lc.mission in ['Kepler', 'K2']):
                 assert len(cbv_type) == 1 , \
                     'cbv_type must be only Single-Scale for Kepler and K2 missions'
                 assert cbv_type == ['SingleScale'], \
                     'cbv_type must be Single-Scale for Kepler and K2 missions'
-            
+
             if (isinstance(cbv_type, list) and len(cbv_type) != 1):
                 assert (self.lc.mission == 'TESS'), \
                     'Multiple CBV types are only allowed for TESS'
-            
+
             assert (len(cbv_type) == len(cbv_indices)), \
                 'cbv_type and cbv_indices must be the same list length'
 
 
             # Loop through all the stored CBVs and find the ones matching the
             # requested cbv_type list
-            for idx in np.arange(len(cbv_type)): 
+            for idx in np.arange(len(cbv_type)):
                 for cbvs in self.cbvs:
-            
+
                     # Temporarily copy the cbv_indices requested
                     cbv_idx_loop = cbv_indices[idx]
-            
+
                     # If requesting 'ALL' CBVs then set to max default number
                     # Remember, cbv indices is 1-based!
                     if (isinstance(cbv_idx_loop, str) and (cbv_idx_loop == 'ALL')):
@@ -708,7 +717,7 @@ class CBVCorrector(RegressionCorrector):
                     # Trim to nCBVs in cbvs
                     cbv_idx_loop = np.array([idx for idx in cbv_idx_loop if
                         bool(np.in1d(idx, cbvs.cbv_indices))])
-            
+
                     if cbv_type[idx].find('MultiScale') >= 0:
                         # Find the correct band if this is a multi-scale CBV set
                         band = int(cbv_type[idx][-1])
@@ -728,12 +737,12 @@ class CBVCorrector(RegressionCorrector):
         # matrices (I.e 'flatten' the design matrix collection)
         if self.extra_design_matrix is not None and \
             self.cbv_design_matrix != []:
-            # Combine cbv_design_matrix and extra_design_matrix 
-            dm_to_flatten = [[cbv_dm for cbv_dm in self.cbv_design_matrix], 
+            # Combine cbv_design_matrix and extra_design_matrix
+            dm_to_flatten = [[cbv_dm for cbv_dm in self.cbv_design_matrix],
                                 [self.extra_design_matrix]]
             flattened_dm_list = [item for sublist in dm_to_flatten for item in sublist]
         elif self.cbv_design_matrix != []:
-            # Just use cbv_design_matrix 
+            # Just use cbv_design_matrix
             dm_to_flatten = [[cbv_dm for cbv_dm in self.cbv_design_matrix]]
             flattened_dm_list = [item for sublist in dm_to_flatten for item in sublist]
         else:
@@ -754,7 +763,7 @@ class CBVCorrector(RegressionCorrector):
 
         Parameters
         ----------
-        sigma : scalar float 
+        sigma : scalar float
             all widths are set to the same value
             If sigma = None then uniform sigma is set
         """
@@ -804,22 +813,22 @@ class CBVCorrector(RegressionCorrector):
         # Add in a width to the Gaussian priors
         # alpha = flux_sigma^2 / sigma^2
         sigma = np.median(self.lc.flux_err.value) / np.sqrt(np.abs(alpha))
-        self._set_prior_width(sigma)                
+        self._set_prior_width(sigma)
         # Use RegressionCorrector.correct for the actual fitting
-        self.correct_regressioncorrector(self.design_matrix_collection, 
+        self.correct_regressioncorrector(self.design_matrix_collection,
             cadence_mask=self.optimization_params['cadence_mask'])
 
         # Do not compute and ignore if target score < 0
         if (self.optimization_params['target_over_score'] > 0):
             overMetric = self.over_fitting_metric(
                 n_samples=self.optimization_params['over_metric_nSamples'])
-        else: 
+        else:
             overMetric = 1.0
 
         # Do not compute and ignore if target score < 0
         if (self.optimization_params['target_under_score'] > 0):
             underMetric = self.under_fitting_metric()
-        else: 
+        else:
             underMetric = 1.0
 
         # Once we hit the target we want to ease-back on increasing the metric
@@ -831,14 +840,14 @@ class CBVCorrector(RegressionCorrector):
         if (self.optimization_params['target_over_score'] > 0 and
                 overMetric >= self.optimization_params['target_over_score']):
             overMetric = (self.optimization_params['target_over_score'] +
-                leakFactor * 
+                leakFactor *
                     (overMetric -
                         self.optimization_params['target_over_score']))
 
         if (self.optimization_params['target_under_score'] > 0 and
                 underMetric >= self.optimization_params['target_under_score']):
             underMetric = (self.optimization_params['target_under_score'] +
-                leakFactor * 
+                leakFactor *
                     (underMetric -
                         self.optimization_params['target_under_score']))
 
@@ -860,7 +869,7 @@ class CBVCorrector(RegressionCorrector):
         axs = self._diagnostic_plot()
 
         plt.title('Alpha = {0:2.3e}'.format(self.alpha))
-        
+
         return axs
 
     def goodness_metric_scan_plot(self, cbv_type=['SingleScale'],
@@ -907,7 +916,7 @@ class CBVCorrector(RegressionCorrector):
         overMetric = []
         underMetric = []
         for thisAlpha in alphaArray:
-            cbvCorrectorCopy.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices, 
+            cbvCorrectorCopy.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices,
                                         alpha=thisAlpha, ext_dm=ext_dm,
                                         cadence_mask=cadence_mask)
             overMetric.append(cbvCorrectorCopy.over_fitting_metric(n_samples=1))
@@ -920,7 +929,7 @@ class CBVCorrector(RegressionCorrector):
         ax.semilogx(alphaArray, overMetric, 'r.', label='OverFit')
 
         if (isinstance(self.alpha, float)):
-            ax.semilogx([self.alpha, self.alpha], [0, 1.0], 'k-', 
+            ax.semilogx([self.alpha, self.alpha], [0, 1.0], 'k-',
                 label='corrected_lc Alpha = {0:2.3e}'.format(self.alpha))
 
 
@@ -955,19 +964,19 @@ class CBVCorrector(RegressionCorrector):
                 self.lc.targetid, len(self.lc))
         if self.corrected_lc is not None:
             dictionary['corrected_lc'] = '<{} targetid={} length={}>'.format(
-                    type(self.corrected_lc), self.corrected_lc.targetid, 
+                    type(self.corrected_lc), self.corrected_lc.targetid,
                     len(self.corrected_lc))
-        
+
         dict_string = '\n'
         for key in dictionary.keys():
             dict_string += '\t{} = {}\n'.format(key, dictionary[key])
-        
+
         return dict_string
 
 #*******************************************************************************
 #*******************************************************************************
 #*******************************************************************************
-# Cotrending Basis Vectors Classes and Functions 
+# Cotrending Basis Vectors Classes and Functions
 #*******************************************************************************
 #*******************************************************************************
 #*******************************************************************************
@@ -1023,9 +1032,9 @@ class CotrendingBasisVectors(TimeSeries):
 
         # Add some columns if not existant
         if data is not None:
-            if not 'GAP' in data.colnames:
+            if 'GAP' not in data.colnames:
                 data['GAP'] = np.full(data[data.colnames[0]].size, False)
-            if not 'CADENCENO' in data.colnames:
+            if 'CADENCENO' not in data.colnames:
                 data['CADENCENO'] = np.arange(data[data.colnames[0]].size)
 
         # Initialize the astropy.timeseries.TimeSeries attributes
@@ -1276,7 +1285,7 @@ class CotrendingBasisVectors(TimeSeries):
                 if (len(keep_indices) / len(cbvs)) < poorly_aligned_threshold:
                     poorly_aligned_flag = True
                 cbvs = cbvs[keep_indices]
-            except:
+            except Exception:
                 # This method is slow but appears to be more robust
                 trim_indices = np.nonzero(np.logical_not(
                     np.in1d(cbvs.cadenceno, lc.cadenceno)))[0]
@@ -1327,7 +1336,7 @@ class CotrendingBasisVectors(TimeSeries):
 
         # If not extrapolating then check if extrapolation is necessary.
         # If so, throw a warning
-        if extrapolate==False:
+        if extrapolate is False:
             gapRemovedCBVtime = self.time.value[np.logical_not(self.gap_indicators.value)]
             if (np.min(lc.time.value) < np.min(gapRemovedCBVtime) or
                 np.max(lc.time.value) > np.max(gapRemovedCBVtime)   ):
@@ -1347,7 +1356,7 @@ class CotrendingBasisVectors(TimeSeries):
         for idx in self.cbv_indices:
             fInterp = PchipInterpolator(
                     self.time.value[np.logical_not(self.gap_indicators.value)],
-                    self['VECTOR_{}'.format(idx)][np.logical_not(self.gap_indicators.value)], 
+                    self['VECTOR_{}'.format(idx)][np.logical_not(self.gap_indicators.value)],
                     extrapolate=extrapolate)
             dataTbl['VECTOR_{}'.format(idx)] = fInterp(lc.time.value)
             # Replace NaNs with 0.0
@@ -1471,7 +1480,7 @@ class KeplerCotrendingBasisVectors(CotrendingBasisVectors):
             dataTbl.meta['MISSION'] = mission
             dataTbl.meta['CBV_TYPE'] = 'SingleScale'
 
-        except:
+        except Exception:
             dataTbl = None
             cbvTime = None
 
@@ -1606,7 +1615,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
         assert mission == 'TESS', 'This does not appear to be a TESS FITS HDU'
 
         # Check if a valid cbv_type and band was passed
-        if not cbv_type in self.validCBVTypes:
+        if cbv_type not in self.validCBVTypes:
             raise ValueError('Invalid cbv_type')
         if band is not None and band < 1:
             raise ValueError('Invalid band')
@@ -1653,7 +1662,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
             dataTbl.meta['CBV_TYPE'] = cbv_type
             dataTbl.meta['BAND'] = band
 
-        except:
+        except Exception:
             dataTbl = None
             cbvTime = None
 
@@ -1735,7 +1744,7 @@ def download_kepler_cbvs(*args, **kwargs):
 
 def load_kepler_cbvs(cbv_dir=None,mission=None, quarter=None, campaign=None,
         channel=None, module=None, output=None):
-    """Loads Kepler or K2 cotrending basis vectors, either from a local directory cbv_dir 
+    """Loads Kepler or K2 cotrending basis vectors, either from a local directory cbv_dir
     or searches the public data archive at MAST <https://archive.stsci.edu>.
 
     This function fetches the Cotrending Basis Vectors FITS HDU for the desired
@@ -1838,9 +1847,9 @@ def download_tess_cbvs(*args, **kwargs):
 
 def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
         ccd=None, cbv_type='SingleScale', band=None):
-    """Loads TESS cotrending basis vectors, either from a directory of 
-    CBV files already saved locally if cbv_dir is passed, or else 
-    will retrieve the relevant files programmatically from MAST. 
+    """Loads TESS cotrending basis vectors, either from a directory of
+    CBV files already saved locally if cbv_dir is passed, or else
+    will retrieve the relevant files programmatically from MAST.
 
     This function fetches the Cotrending Basis Vectors FITS HDU for the desired
     cotrending basis vectors.
@@ -1911,7 +1920,7 @@ def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
 
     try:
         SearchString = 's%04d-%s-%s-' % (sector, str(camera),str(ccd))
-    except:
+    except Exception:
         raise Exception('Error parsing sector string when getting TESS CBV FITS files')
 
     try:
@@ -1965,5 +1974,5 @@ def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
 
         return TessCotrendingBasisVectors.from_hdu(hdu=hdu, cbv_type=cbv_type, band=band)
 
-    except:
-        raise Exception('CBVS were not found')
+    except Exception as e:
+        raise Exception('CBVS were not found') from e

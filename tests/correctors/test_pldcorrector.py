@@ -1,12 +1,10 @@
-import pytest
-
 import matplotlib.pyplot as plt
-
+import pytest
 from lightkurve import (
-    search_targetpixelfile,
-    search_tesscut,
     KeplerLightCurve,
     TessLightCurve,
+    search_targetpixelfile,
+    search_tesscut,
 )
 from lightkurve.correctors import PLDCorrector
 
@@ -87,6 +85,7 @@ def test_pld_corrector():
     corrected_lc = pld.correct(pca_components=20)
     # try PLD on a TESS observation
     from lightkurve import TessTargetPixelFile
+
     from ..test_targetpixelfile import TESS_SIM
 
     tess_tpf = TessTargetPixelFile(TESS_SIM)

@@ -1,22 +1,21 @@
-import pytest
 import warnings
 
 import numpy as np
-from numpy.testing import assert_array_equal
 import pandas as pd
-from scipy import sparse
-
+import pytest
+from lightkurve import LightkurveWarning
 from lightkurve.correctors import (
-    SparseDesignMatrix,
-    SparseDesignMatrixCollection,
     DesignMatrix,
     DesignMatrixCollection,
+    SparseDesignMatrix,
+    SparseDesignMatrixCollection,
 )
-from lightkurve import LightkurveWarning
 from lightkurve.correctors.designmatrix import (
     create_sparse_spline_matrix,
     create_spline_matrix,
 )
+from numpy.testing import assert_array_equal
+from scipy import sparse
 
 
 def test_designmatrix_basics():

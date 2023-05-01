@@ -1,18 +1,17 @@
 import warnings
 
+import matplotlib.pyplot as plt
+import numpy as np
 import pytest
 from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.masked import Masked
-import matplotlib.pyplot as plt
-import numpy as np
-from numpy.testing import assert_array_equal
-
-from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
+from lightkurve.collections import LightCurveCollection, TargetPixelFileCollection
+from lightkurve.lightcurve import KeplerLightCurve, LightCurve, TessLightCurve
 from lightkurve.search import search_lightcurve
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from lightkurve.collections import LightCurveCollection, TargetPixelFileCollection
 from lightkurve.utils import LightkurveWarning
+from numpy.testing import assert_array_equal
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")

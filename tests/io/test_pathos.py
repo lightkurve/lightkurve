@@ -1,12 +1,10 @@
-import pytest
-
-from astropy.io import fits
 import numpy as np
-from numpy.testing import assert_array_equal
-
+import pytest
+from astropy.io import fits
 from lightkurve import search_lightcurve
-from lightkurve.io.pathos import read_pathos_lightcurve
 from lightkurve.io.detect import detect_filetype
+from lightkurve.io.pathos import read_pathos_lightcurve
+from numpy.testing import assert_array_equal
 
 
 @pytest.mark.remote_data

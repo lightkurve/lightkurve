@@ -3,7 +3,6 @@ import warnings
 
 import astropy.config as astropyconfig
 
-
 ROOTNAME = 'lightkurve'
 
 

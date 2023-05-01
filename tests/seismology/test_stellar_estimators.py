@@ -1,17 +1,15 @@
-from astropy import units as u
 import numpy as np
-from uncertainties import ufloat
-
+from astropy import units as u
 from lightkurve.seismology.stellar_estimators import (
-    NUMAX_SOL,
     DELTANU_SOL,
-    TEFF_SOL,
     G_SOL,
-    estimate_radius,
-    estimate_mass,
+    NUMAX_SOL,
+    TEFF_SOL,
     estimate_logg,
+    estimate_mass,
+    estimate_radius,
 )
-
+from uncertainties import ufloat
 
 cM = ufloat(1.30, 0.09)
 cR = ufloat(9.91, 0.24)

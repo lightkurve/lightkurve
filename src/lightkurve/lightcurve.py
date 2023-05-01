@@ -1,40 +1,36 @@
 """Defines LightCurve, KeplerLightCurve, and TessLightCurve."""
-import os
+import collections
 import datetime
 import logging
+import os
 import warnings
-import collections
 from collections.abc import Sequence
-
-import numpy as np
-from scipy.signal import savgol_filter
-from scipy.interpolate import interp1d
-import matplotlib
-from matplotlib import pyplot as plt
 from copy import deepcopy
 
-from astropy.table import Table, Column, MaskedColumn
-from astropy.io import fits
-from astropy.time import TimeBase, Time, TimeDelta
+import matplotlib
+import numpy as np
 from astropy import units as u
-from astropy.units import Quantity
-from astropy.timeseries import TimeSeries, aggregate_downsample
-from astropy.table import vstack
+from astropy.io import fits
 from astropy.stats import calculate_bin_edges
+from astropy.table import Table
+from astropy.time import Time, TimeBase, TimeDelta
+from astropy.timeseries import TimeSeries, aggregate_downsample
+from astropy.units import Quantity
 from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 from astropy.utils.exceptions import AstropyUserWarning
 from astropy.utils.masked import Masked
+from matplotlib import pyplot as plt
+from scipy.interpolate import interp1d
+from scipy.signal import savgol_filter
 
-from . import PACKAGEDIR, MPLSTYLE
+from . import MPLSTYLE, PACKAGEDIR
 from .utils import (
-    running_mean,
-    bkjd_to_astropy_time,
-    btjd_to_astropy_time,
-    validate_method,
+    LightkurveDeprecationWarning,
+    LightkurveWarning,
     _query_solar_system_objects,
+    running_mean,
+    validate_method,
 )
-from .utils import LightkurveWarning, LightkurveDeprecationWarning
-
 
 __all__ = ["LightCurve", "KeplerLightCurve", "TessLightCurve", "FoldedLightCurve"]
 
@@ -52,7 +48,7 @@ def _to_unitless_day(data):
 
 
 def _is_dict_like(data1):
-    return hasattr(data1, "keys") and callable(getattr(data1, "keys"))
+    return hasattr(data1, "keys") and callable(data1.keys)
 
 
 def _is_list_like(data1):
@@ -353,14 +349,14 @@ class LightCurve(TimeSeries):
                 flux = self.columns["flux"]
             else:
                 raise TypeError(
-                    f"'flux' has been given both in the `data` table and as a keyword argument"
+                    "'flux' has been given both in the `data` table and as a keyword argument"
                 )
         if "flux_err" in self.colnames:
             if flux_err is None:
                 flux_err = self.columns["flux_err"]
             else:
                 raise TypeError(
-                    f"'flux_err' has been given both in the `data` table and as a keyword argument"
+                    "'flux_err' has been given both in the `data` table and as a keyword argument"
                 )
 
         # Ensure `flux` and `flux_err` are populated with NaNs if missing
@@ -887,7 +883,7 @@ class LightCurve(TimeSeries):
         else:  # support astropy<5.0
             mask &= extra_mask
 
-        for iter in np.arange(0, niters):
+        for _iter in np.arange(0, niters):
             if break_tolerance is None:
                 break_tolerance = np.nan
             if polyorder >= window_length:
@@ -1198,7 +1194,7 @@ class LightCurve(TimeSeries):
 
         By default, the gaps will be filled with random white Gaussian noise
         distributed according to
-        :math:`\mathcal{N} (\mu=\overline{\mathrm{flux}}, \sigma=\mathrm{CDPP})`.
+        :math:`\\mathcal{N} (\\mu=\\overline{\\mathrm{flux}}, \\sigma=\\mathrm{CDPP})`.
         No other methods are supported at this time.
 
         Parameters
@@ -1260,7 +1256,7 @@ class LightCurve(TimeSeries):
         if method == "gaussian_noise":
             try:
                 std = lc.estimate_cdpp().to(lc.flux.unit).value
-            except:
+            except Exception:
                 std = np.nanstd(lc.flux.value)
             f[~in_original] = np.random.normal(
                 np.nanmean(lc.flux.value), std, (~in_original).sum()
@@ -1568,11 +1564,8 @@ class LightCurve(TimeSeries):
 
             # If `flux_err` is populated, assume the errors combine as the root-mean-square
             if np.any(np.isfinite(self.flux_err)):
-                rmse_func = (
-                    lambda x: np.sqrt(np.nansum(x ** 2)) / len(np.atleast_1d(x))
-                    if np.any(np.isfinite(x))
-                    else np.nan
-                )
+                def rmse_func(x):
+                    return np.sqrt(np.nansum(x ** 2)) / len(np.atleast_1d(x)) if np.any(np.isfinite(x)) else np.nan
                 ts_err = aggregate_downsample(
                     self,
                     time_bin_size=time_bin_size,
@@ -2308,7 +2301,7 @@ class LightCurve(TimeSeries):
             Dictionary of arguments to be passed to `to_pandas().to_excel(**kwargs)`.
         """
         try:
-            import openpyxl  # optional dependency
+            import openpyxl  # optional dependency # noqa
         except ModuleNotFoundError:
             raise ModuleNotFoundError(
                 "You need to install `openpyxl` to use this feature, e.g. use `pip install openpyxl`."
@@ -2639,18 +2632,20 @@ class LightCurve(TimeSeries):
 
         method = validate_method(method, supported_methods=["mean", "median", "sigma"])
         if (bin_points == 1) and (method in ["mean", "median"]):
-            bin_func = lambda y, e: (y[0], e[0])
+            def bin_func(y, e):
+                return y[0], e[0]
         elif (bin_points == 1) and (method in ["sigma"]):
-            bin_func = lambda y, e: ((y[0] - 1) / e[0], np.nan)
+            def bin_func(y, e):
+                return (y[0] - 1) / e[0], np.nan
         elif method == "mean":
-            bin_func = lambda y, e: (np.nanmean(y), np.nansum(e ** 2) ** 0.5 / len(e))
+            def bin_func(y, e):
+                return np.nanmean(y), np.nansum(e ** 2) ** 0.5 / len(e)
         elif method == "median":
-            bin_func = lambda y, e: (np.nanmedian(y), np.nansum(e ** 2) ** 0.5 / len(e))
+            def bin_func(y, e):
+                return np.nanmedian(y), np.nansum(e ** 2) ** 0.5 / len(e)
         elif method == "sigma":
-            bin_func = lambda y, e: (
-                (np.nanmean(y) - 1) / (np.nansum(e ** 2) ** 0.5 / len(e)),
-                np.nan,
-            )
+            def bin_func(y, e):
+                return (np.nanmean(y) - 1) / (np.nansum(e ** 2) ** 0.5 / len(e)), np.nan
 
         s = np.argsort(time.value)
         x, y, e = time.value[s], self.flux[s], self.flux_err[s]
@@ -2750,12 +2745,12 @@ class LightCurve(TimeSeries):
                 if bin_points == 1:
                     cbar.set_label(
                         "Flux in units of Standard Deviation "
-                        "$(f - \overline{f})/(\sigma_f)$"
+                        "$(f - \\overline{f})/(\\sigma_f)$"
                     )
                 else:
                     cbar.set_label(
                         "Average Flux in Bin in units of Standard Deviation "
-                        "$(f - \overline{f})/(\sigma_f)$"
+                        "$(f - \\overline{f})/(\\sigma_f)$"
                     )
 
             ax.set_xlabel("Phase")

@@ -1,20 +1,18 @@
 """Tests the `lightkurve.correctors.SFFCorrector` class."""
-import pytest
 import warnings
 
 import numpy as np
+import pytest
 from astropy.utils.data import get_pkg_data_filename
-from numpy.testing import assert_array_equal
-
 from lightkurve import (
-    LightCurve,
     KeplerLightCurve,
-    TessLightCurve,
+    LightCurve,
     LightkurveWarning,
+    TessLightCurve,
     search_lightcurve,
 )
 from lightkurve.correctors import SFFCorrector
-
+from numpy.testing import assert_array_equal
 
 K2_C08 = (
     "https://archive.stsci.edu/missions/k2/lightcurves/c8/"
@@ -225,7 +223,7 @@ def test_sff_tess_warning():
     """SFF is not designed for TESS, so we raise a warning."""
     lc = TessLightCurve(flux=[1, 2, 3], meta={"MISSION": "TESS"})
     with pytest.warns(LightkurveWarning, match="not suitable"):
-        corr = SFFCorrector(lc)
+        SFFCorrector(lc)
 
 
 @pytest.mark.remote_data

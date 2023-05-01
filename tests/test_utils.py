@@ -1,17 +1,22 @@
-import pytest
 import warnings
 
 import numpy as np
-from numpy.testing import assert_almost_equal, assert_array_equal
-
-from lightkurve.utils import KeplerQualityFlags, TessQualityFlags
-from lightkurve.utils import module_output_to_channel, channel_to_module_output
-from lightkurve.utils import LightkurveWarning
-from lightkurve.utils import running_mean, validate_method
-from lightkurve.utils import bkjd_to_astropy_time, btjd_to_astropy_time
-from lightkurve.utils import centroid_quadratic
-from lightkurve.utils import show_citation_instructions
+import pytest
 from lightkurve.lightcurve import LightCurve
+from lightkurve.utils import (
+    KeplerQualityFlags,
+    LightkurveWarning,
+    TessQualityFlags,
+    bkjd_to_astropy_time,
+    btjd_to_astropy_time,
+    centroid_quadratic,
+    channel_to_module_output,
+    module_output_to_channel,
+    running_mean,
+    show_citation_instructions,
+    validate_method,
+)
+from numpy.testing import assert_almost_equal, assert_array_equal
 
 
 def test_channel_to_module_output():
@@ -119,7 +124,7 @@ def test_lightkurve_warning():
         warnings.simplefilter("ignore", LightkurveWarning)
         time = np.array([1, 2, 3, np.nan])
         flux = np.array([1, 2, 3, 4])
-        lc = LightCurve(time=time, flux=flux)
+        LightCurve(time=time, flux=flux)
         assert len(warns) == 0
 
 

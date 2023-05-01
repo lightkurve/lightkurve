@@ -4,7 +4,6 @@ import numpy as np
 
 from .lightcurve import LightCurve
 
-
 __all__ = ["estimate_cdpp"]
 
 

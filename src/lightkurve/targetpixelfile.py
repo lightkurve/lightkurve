@@ -1,51 +1,49 @@
 """Defines TargetPixelFile, KeplerTargetPixelFile, and TessTargetPixelFile."""
 
 from __future__ import division
-import datetime
-import os
-import warnings
-import logging
 
 import collections
-
-from astropy.io import fits
-from astropy.io.fits import Undefined, BinTableHDU
-from astropy.nddata import Cutout2D
-from astropy.table import Table
-from astropy.wcs import WCS
-from astropy.utils.exceptions import AstropyWarning
-from astropy.coordinates import SkyCoord
-from astropy.stats.funcs import median_absolute_deviation as MAD
-from astropy.utils.decorators import deprecated
-from astropy.time import Time
-from astropy.units import Quantity
-import astropy.units as u
-
-import matplotlib
-from matplotlib import animation
-from matplotlib import patches
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-import numpy as np
-from scipy.ndimage import label
-from tqdm import tqdm
+import datetime
+import logging
+import os
+import warnings
 from copy import deepcopy
 
-from . import PACKAGEDIR, MPLSTYLE
-from .lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
+import astropy.units as u
+import matplotlib
+import matplotlib.animation
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+import numpy as np
+from astropy.coordinates import SkyCoord
+from astropy.io import fits
+from astropy.io.fits import BinTableHDU, Undefined
+from astropy.nddata import Cutout2D
+from astropy.stats.funcs import median_absolute_deviation as MAD
+from astropy.table import Table
+from astropy.time import Time
+from astropy.units import Quantity
+from astropy.utils.decorators import deprecated
+from astropy.utils.exceptions import AstropyWarning
+from astropy.wcs import WCS
+from matplotlib import patches
+from scipy.ndimage import label
+from tqdm import tqdm
+
+from . import MPLSTYLE, PACKAGEDIR
+from .io import detect_filetype
+from .lightcurve import KeplerLightCurve, LightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import (
     KeplerQualityFlags,
-    TessQualityFlags,
-    plot_image,
-    LightkurveWarning,
     LightkurveDeprecationWarning,
-    validate_method,
-    centroid_quadratic,
+    LightkurveWarning,
+    TessQualityFlags,
     _query_solar_system_objects,
+    centroid_quadratic,
+    plot_image,
+    validate_method,
 )
-from .io import detect_filetype
-
 
 __all__ = ["KeplerTargetPixelFile", "TessTargetPixelFile"]
 
@@ -659,7 +657,7 @@ class TargetPixelFile(object):
             elif isinstance(aperture_mask.flat[0], (np.integer, np.float_)):
                 aperture_mask = aperture_mask.astype(bool)
         self._last_aperture_mask = aperture_mask
-        
+
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3, reference_pixel="center"):
@@ -1026,7 +1024,7 @@ class TargetPixelFile(object):
         if location == "tess":
             pixel_scale = 27
 
-        if radius == None:
+        if radius is None:
             radius = (
                 2 ** 0.5 * (pixel_scale * (np.max(self.shape[1:]) + 5))
             ) * u.arcsecond.to(u.deg)
@@ -1489,9 +1487,9 @@ class TargetPixelFile(object):
             "RADIUS",
             "TMINDEX",
         ]
-        for label in labels:
-            if label in hdu.header:
-                hdu.header[label] = fits.card.Undefined()
+        for ell in labels:
+            if ell in hdu.header:
+                hdu.header[ell] = fits.card.Undefined()
 
         # HDUList
         hdus = [hdu]
@@ -1718,7 +1716,7 @@ class TargetPixelFile(object):
             images_cosmic_rays,
         ]
 
-        for idx, img in tqdm(enumerate(images_flux), total=len_images):
+        for idx, _img in tqdm(enumerate(images_flux), total=len_images):
             # Open images if provided and get HDUs
             hdu_list = [
                 _open_image(i[idx], extension) if i is not None else None
@@ -1888,7 +1886,8 @@ class TargetPixelFile(object):
                 _time_label_brief(self.time),
             )
         if corrector_func is None:
-            corrector_func = lambda x: x.remove_outliers()
+            def corrector_func(x):
+                return x.remove_outliers()
         if show_flux:
             cmap = plt.get_cmap()
             norm = plt.Normalize(
@@ -2239,8 +2238,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         model : TPFModel object
             Model with appropriate defaults for this Target Pixel File.
         """
-        from .prf import TPFModel, StarPrior, BackgroundPrior
-        from .prf import UniformPrior, GaussianPrior
+        from .prf import (
+            BackgroundPrior,
+            GaussianPrior,
+            StarPrior,
+            TPFModel,
+            UniformPrior,
+        )
 
         # Set up the model
         if "star_priors" not in kwargs:

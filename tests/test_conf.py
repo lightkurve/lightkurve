@@ -1,11 +1,10 @@
-from astropy.utils.data import get_pkg_data_filename
-
 import os
-from pathlib import Path
 import shutil
 import tempfile
+from pathlib import Path
 
 import lightkurve as lk
+from astropy.utils.data import get_pkg_data_filename
 
 
 def test_read_conf_from_file():

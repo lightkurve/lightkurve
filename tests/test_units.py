@@ -1,9 +1,9 @@
-import pytest
-
 import lightkurve as lk  # necessary to enable the units tested below
+import pytest
 from astropy import units as u
 
 from .io.test_tasoc import TEST_TIC_ID
+
 
 def test_custom_units():
     """Are ppt, ppm, and percent enabled AstroPy units?"""

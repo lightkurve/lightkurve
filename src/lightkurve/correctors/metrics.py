@@ -5,16 +5,14 @@ which enable users to assess whether the noise in a systematics-corrected light 
 under- or over-fitted.  These features were contributed by Jeff Smith (cf. https://github.com/lightkurve/lightkurve/pull/855)
 and are in turn inspired by similar metrics in use by the PDC module of the official Kepler/TESS pipeline.
 """
-import logging
 import copy
+import logging
 
 import numpy as np
-from scipy.interpolate import PchipInterpolator
 from memoization import cached
-from astropy import units as u
+from scipy.interpolate import PchipInterpolator
 
 from .. import LightCurve
-
 
 log = logging.getLogger(__name__)
 
@@ -60,7 +58,7 @@ def overfit_metric_lombscargle(
 
     # Perform the measurement multiple times and average to stabilize the metric
     metric_per_iter = []
-    for idx in np.arange(n_samples):
+    for _idx in np.arange(n_samples):
         pgOrig = orig_lc.to_periodogram()
         # Use the same periods in the corrected flux as just used in the
         # original flux
@@ -142,7 +140,7 @@ def underfit_metric_neighbors(
     The downloaded neighboring targets will normally be "aligned" to the
     corrected_lc, meaning the cadence numbers are used to align the targets
     to the corrected_lc. However, if interpolate=True then the targets will be
-    interpolated to the corrected_lc cadence times. extrapolate=True will 
+    interpolated to the corrected_lc cadence times. extrapolate=True will
     further extrapolate the targets to the corrected_lc cadence times.
 
     The returned under-fitting goodness metric is callibrated such that a
@@ -425,7 +423,7 @@ def _align_to_lc(lc, ref_lc):
             # This method is fast but might cause errors
             keep_indices = np.nonzero(np.in1d(aligned_lc.cadenceno, ref_lc.cadenceno))[0]
             aligned_lc = aligned_lc[keep_indices]
-        except:
+        except Exception:
             # This method is slow but appears to be more robust
             trim_indices = np.nonzero(np.logical_not(
                 np.in1d(aligned_lc.cadenceno, ref_lc.cadenceno)))[0]

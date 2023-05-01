@@ -2,12 +2,11 @@
 import warnings
 
 import numpy as np
-from numpy.testing import assert_almost_equal
 import pandas as pd
 import pytest
-
 from lightkurve import LightCurve, LightkurveWarning
-from lightkurve.correctors import RegressionCorrector, DesignMatrix
+from lightkurve.correctors import DesignMatrix, RegressionCorrector
+from numpy.testing import assert_almost_equal
 
 
 def test_regressioncorrector_priors():

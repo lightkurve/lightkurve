@@ -1,7 +1,6 @@
 """Reader for official TESS light curve FITS files produced by the Ames SPOC pipeline."""
 from ..lightcurve import TessLightCurve
 from ..utils import TessQualityFlags
-
 from .generic import read_generic_lightcurve
 
 

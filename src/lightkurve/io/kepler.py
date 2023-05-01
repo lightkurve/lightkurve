@@ -1,7 +1,6 @@
 """Reader for official Kepler light curve FITS files produced by the Ames pipeline."""
 from ..lightcurve import KeplerLightCurve
 from ..utils import KeplerQualityFlags
-
 from .generic import read_generic_lightcurve
 
 

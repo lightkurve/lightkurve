@@ -1,6 +1,7 @@
 """Generic classes and functions which aid the asteroseismology features."""
-import numpy as np
 import copy
+
+import numpy as np
 from astropy import units as u
 from astropy.units import Quantity
 

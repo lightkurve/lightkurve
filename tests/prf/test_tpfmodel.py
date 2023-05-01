@@ -1,16 +1,24 @@
 """Test the features of the lightkurve.prf.tpfmodels module."""
 import os
-import pytest
 
-from astropy.io import fits
 import numpy as np
+import pytest
+from astropy.io import fits
+from lightkurve.prf import (
+    BackgroundPrior,
+    FixedValuePrior,
+    FocusPrior,
+    GaussianPrior,
+    KeplerPRF,
+    MotionPrior,
+    PRFPhotometry,
+    SimpleKeplerPRF,
+    StarPrior,
+    TPFModel,
+    UniformPrior,
+)
 from numpy.testing import assert_allclose
 from scipy.stats import mode
-
-from lightkurve.prf import FixedValuePrior, GaussianPrior, UniformPrior
-from lightkurve.prf import StarPrior, BackgroundPrior, FocusPrior, MotionPrior
-from lightkurve.prf import TPFModel, PRFPhotometry
-from lightkurve.prf import SimpleKeplerPRF, KeplerPRF
 
 from .. import TESTDATA
 
@@ -129,10 +137,10 @@ def test_tpf_model_fitting():
     # Does fitting run without errors?
     result = model.fit(tpf[1].data)
     # Can we change model parameters?
-    assert result.motion.fitted == False
+    assert result.motion.fitted is False
     model.fit_motion = True
     result = model.fit(tpf[1].data)
-    assert result.motion.fitted == True
+    assert result.motion.fitted is True
     # Does fitting via the PRFPhotometry class run without errors?
     phot = PRFPhotometry(model)
     phot.run([tpf[1].data])

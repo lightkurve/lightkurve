@@ -1,17 +1,16 @@
 """Tests the features of the lightkurve.interact_bls module."""
-import pytest
-
-from astropy.timeseries import BoxLeastSquares
 import astropy.units as u
 import numpy as np
-
+import pytest
+from astropy.timeseries import BoxLeastSquares
 from lightkurve.lightcurve import KeplerLightCurve, TessLightCurve
+
 from .test_lightcurve import KEPLER10, TESS_SIM
 
 bad_optional_imports = False
 try:
-    import bokeh
-except:
+    pass
+except Exception:
     bad_optional_imports = True
 
 
@@ -44,19 +43,15 @@ def test_graceful_exit_outside_notebook():
 def test_helper_functions():
     """Can we use all the functions in interact_bls?"""
     from lightkurve.interact_bls import (
-        prepare_bls_datasource,
-        prepare_folded_datasource,
-        prepare_lightcurve_datasource,
-    )
-    from lightkurve.interact_bls import (
         make_bls_figure_elements,
         make_folded_figure_elements,
         make_lightcurve_figure_elements,
-    )
-    from lightkurve.interact_bls import (
+        prepare_bls_datasource,
         prepare_bls_help_source,
         prepare_f_help_source,
+        prepare_folded_datasource,
         prepare_lc_help_source,
+        prepare_lightcurve_datasource,
     )
 
     lc = KeplerLightCurve.read(KEPLER10)

@@ -6,34 +6,30 @@ with the `@pytest.mark.remote_data` decorator below will only run if the
 if no internet connection is available.
 """
 import os
-import pytest
-
-from numpy.testing import assert_almost_equal, assert_array_equal
 import tempfile
-from requests import HTTPError
 
-from astropy.coordinates import SkyCoord
 import astropy.units as u
-from astropy.table import Table
-
 import lightkurve as lk
-
-from lightkurve.utils import LightkurveWarning, LightkurveError
+import pytest
+from astropy.coordinates import SkyCoord
+from astropy.table import Table
+from lightkurve import (
+    KeplerTargetPixelFile,
+    TargetPixelFileCollection,
+    TessTargetPixelFile,
+)
 from lightkurve.search import (
+    SearchResult,
+    log,
     search_lightcurve,
     search_targetpixelfile,
     search_tesscut,
-    SearchResult,
-    SearchError,
-    log,
 )
-from lightkurve import (
-    KeplerTargetPixelFile,
-    TessTargetPixelFile,
-    TargetPixelFileCollection,
-)
+from lightkurve.utils import LightkurveError, LightkurveWarning
+from numpy.testing import assert_almost_equal, assert_array_equal
+from requests import HTTPError
 
-from .test_conf import use_custom_config_file, remove_custom_config
+from .test_conf import remove_custom_config, use_custom_config_file
 
 
 @pytest.mark.remote_data
@@ -198,7 +194,7 @@ def test_search_tesscut_download(caplog):
         # If we ask for the exact same cutout, do we get it from cache?
         caplog.clear()
         log.setLevel("DEBUG")
-        tpf_cached = search_string[0].download(cutout_size=(3, 5))
+        search_string[0].download(cutout_size=(3, 5))
         assert "Cached file found." in caplog.text
         # test #1063 - ensure when download_dir is specified, there is no error
         from tempfile import TemporaryDirectory

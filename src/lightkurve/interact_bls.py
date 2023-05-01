@@ -1,12 +1,12 @@
 """This module provides helper functions for the `LightCurve.interact_bls()` feature."""
 import logging
 import warnings
-import numpy as np
 
-from astropy.convolution import convolve, Box1DKernel
-from astropy.time import Time, TimeDelta
-from astropy.timeseries import BoxLeastSquares
 import astropy.units as u
+import numpy as np
+from astropy.convolution import Box1DKernel, convolve
+from astropy.time import Time
+from astropy.timeseries import BoxLeastSquares
 
 from .utils import LightkurveWarning
 
@@ -15,21 +15,18 @@ log = logging.getLogger(__name__)
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
-    import bokeh  # Import bokeh first so we get an ImportError we can catch
-    from bokeh.io import show, output_notebook
-    from bokeh.plotting import figure, ColumnDataSource
-    from bokeh.models import Slider, Span, Range1d
-    from bokeh.models import Text
-    from bokeh.layouts import layout, Spacer
+    from bokeh.events import PanEnd, Reset
+    from bokeh.io import output_notebook, show
+    from bokeh.layouts import Spacer, layout
+    from bokeh.models import Range1d, Slider, Span, Text
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button, Paragraph
-    from bokeh.events import PanEnd, Reset
+    from bokeh.plotting import ColumnDataSource, figure
 except ImportError:
     pass  # we will print an error message in `show_interact_widget` instead
 
 from .interact import prepare_lightcurve_datasource
 from .lightcurve import LightCurve
-
 
 __all__ = ["show_interact_widget"]
 

@@ -1158,15 +1158,15 @@ def _query_mast(
     exact_target_name = None
     target_lower = str(target).lower()
     # Was a Kepler target ID passed?
-    kplr_match = re.match("^(kplr|kic) ?(\d+)$", target_lower)
+    kplr_match = re.match("^(kplr|kic) ?(\\d+)$", target_lower)
     if kplr_match:
         exact_target_name = f"kplr{kplr_match.group(2).zfill(9)}"
     # Was a K2 target ID passed?
-    ktwo_match = re.match("^(ktwo|epic) ?(\d+)$", target_lower)
+    ktwo_match = re.match("^(ktwo|epic) ?(\\d+)$", target_lower)
     if ktwo_match:
         exact_target_name = f"ktwo{ktwo_match.group(2).zfill(9)}"
     # Was a TESS target ID passed?
-    tess_match = re.match("^(tess|tic) ?(\d+)$", target_lower)
+    tess_match = re.match("^(tess|tic) ?(\\d+)$", target_lower)
     if tess_match:
         exact_target_name = f"{tess_match.group(2).zfill(9)}"
 
@@ -1189,7 +1189,7 @@ def _query_mast(
             obs["distance"] = 0.0
             return obs
         else:
-            log.debug(f"No observations found. Now performing a cone search instead.")
+            log.debug("No observations found. Now performing a cone search instead.")
 
     # If the above did not return a result, then do a cone search using the MAST name resolver
     # `radius` defaults to 0.0001 and unit arcsecond
@@ -1358,7 +1358,7 @@ def _mask_kepler_products(products, quarter=None, month=None):
                     )
                 except IndexError:
                     pass
-            if not (date in permitted_dates):
+            if date not in permitted_dates:
                 mask[idx] = False
 
     return mask

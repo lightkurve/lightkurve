@@ -1,35 +1,34 @@
 """ cbvcorrector.py module unit tests
 """
 
-import pytest
-from numpy.testing import (
-    assert_almost_equal,
-    assert_array_equal,
-    assert_allclose,
-    assert_raises,
-)
-
 import warnings
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
+
 import astropy.units as u
+import matplotlib
+import numpy as np
 import pandas as pd
+import pytest
 from astropy.table import Table
 from astropy.time import Time
-
-from lightkurve import TessLightCurve, KeplerLightCurve
-from lightkurve import search_lightcurve
-from lightkurve import LightkurveWarning
-from lightkurve.correctors.designmatrix import DesignMatrix
+from lightkurve import (
+    KeplerLightCurve,
+    LightkurveWarning,
+    TessLightCurve,
+    search_lightcurve,
+)
 from lightkurve.correctors.cbvcorrector import (
-    load_kepler_cbvs,
-    load_tess_cbvs,
+    CBVCorrector,
     CotrendingBasisVectors,
     KeplerCotrendingBasisVectors,
     TessCotrendingBasisVectors,
+    load_kepler_cbvs,
+    load_tess_cbvs,
 )
-from lightkurve.correctors.cbvcorrector import CBVCorrector
+from lightkurve.correctors.designmatrix import DesignMatrix
+from numpy.testing import (
+    assert_allclose,
+)
+
 from .. import TESTDATA
 
 
@@ -539,7 +538,7 @@ def test_CBVCorrector_retrieval():
 
     #***
     # Test the need for extrapolation with Kepler data
-    lc = search_lightcurve("KIC 2437317", mission="Kepler", author="kepler", cadence='long', 
+    lc = search_lightcurve("KIC 2437317", mission="Kepler", author="kepler", cadence='long',
             quarter=6).download(flux_column="sap_flux")
     cbv_type = ['SingleScale']
     cbv_indices = [np.arange(1,9)]
@@ -551,5 +550,5 @@ def test_CBVCorrector_retrieval():
     # This will generate a light curve with the last value at about the median corrected flux
     cbvCorrector = CBVCorrector(lc, interpolate_cbvs=True, extrapolate_cbvs=True)
     cbvCorrector.correct_gaussian_prior(cbv_type=cbv_type, cbv_indices=cbv_indices, alpha=1e-4)
-    assert ((cbvCorrector.corrected_lc.flux[-1] - np.median(cbvCorrector.corrected_lc.flux)).value > 0.0 and  
+    assert ((cbvCorrector.corrected_lc.flux[-1] - np.median(cbvCorrector.corrected_lc.flux)).value > 0.0 and
             (cbvCorrector.corrected_lc.flux[-1] - np.median(cbvCorrector.corrected_lc.flux)).value < 20)

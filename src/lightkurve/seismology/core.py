@@ -3,27 +3,25 @@ import logging
 import warnings
 
 import numpy as np
+from astropy import units as u
+from astropy.units import cds
 from matplotlib import pyplot as plt
 from scipy.signal import find_peaks
 
-from astropy import units as u
-from astropy.units import cds
-
 from .. import MPLSTYLE
-from . import utils, stellar_estimators
 from ..periodogram import SNRPeriodogram
 from ..utils import LightkurveWarning, validate_method
+from . import stellar_estimators, utils
 from .utils import SeismologyQuantity
 
 # Import the optional Bokeh dependency required by ``interact_echelle```,
 # or print a friendly error otherwise.
 try:
-    import bokeh  # Import bokeh first so we get an ImportError we can catch
-    from bokeh.io import show, output_notebook
+    from bokeh.io import output_notebook, show
+    from bokeh.layouts import Spacer, layout
+    from bokeh.models import Button, LogColorMapper, RangeSlider, Slider
     from bokeh.plotting import figure
-    from bokeh.models import LogColorMapper, Slider, RangeSlider, Button
-    from bokeh.layouts import layout, Spacer
-except:
+except (ImportError, ModuleNotFoundError):
     # Nice error will be raised when ``interact_echelle``` is called.
     pass
 

@@ -1,15 +1,15 @@
 """Test the features of the lightkurve.prf.prfmodels module."""
 from __future__ import division, print_function
+
 from collections import OrderedDict
 
+import numpy as np
+import pytest
 from astropy.io import fits
 from astropy.utils.data import get_pkg_data_filename
-import numpy as np
-from numpy.testing import assert_allclose
-import pytest
-
 from lightkurve.prf import KeplerPRF, SimpleKeplerPRF
 from lightkurve.targetpixelfile import KeplerTargetPixelFile
+from numpy.testing import assert_allclose
 
 
 @pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu

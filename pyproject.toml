@@ -61,11 +61,11 @@ numpydoc = ">=1.1.0"
 sphinx-automodapi = ">=0.13"
 sphinxcontrib-rawfiles = ">=0.1.1"
 pydata-sphinx-theme = "==0.8.1"
-pylint = ">=2.6.0"
 ghp-import = ">=1.0.1"
 openpyxl = ">=3.0.7"
 tox = ">=3.24.5"
 mistune = "<2.0.0"  # Workaround for #1162 (not a true dependency)
+ruff = "*"
 
 [tool.poetry.group.dev.dependencies]
 ghp-import = "^2.1.0"
@@ -79,3 +79,25 @@ testpaths = [
     "tests",
     "src",
 ]
+
+[tool.ruff]
+line-length = 89
+update-check = false
+target-version = "py38"
+select = ["F", "I", "E", "W", "YTT", "B", "Q", "PLE", "PLW"]
+ignore = [
+    "B008",  # Allow function call in default constructor
+    "B017",  # Allow `pytest.raises(Exception)`
+    "B028",  # Don't require explicit stacklevel for warnings
+    "B904",  # Allow raising without from
+    "E402",  # Allow imports not at top of file
+    "E501",  # Allow long lines
+    "E741",  # Allow ambiguous variable names like "l"
+    "PLW2901",  # Allow overwriting loop variables
+    "Q000",  # Allow single quotes
+]
+exclude = []
+
+[tool.ruff.isort]
+force-wrap-aliases = true
+combine-as-imports = true

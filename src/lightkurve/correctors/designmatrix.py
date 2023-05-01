@@ -4,18 +4,17 @@ Specifically, this module adds the `DesignMatrix`, `DesignMatrixCollection`,
 `SparseDesignMatrix`, and `SparseDesignMatrixCollection` classes which
 are design to work with the `RegressionCorrector` class.
 """
-from copy import deepcopy
 import warnings
+from copy import deepcopy
 
-from astropy import units as u
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.sparse import lil_matrix, csr_matrix, hstack, vstack, issparse, find
+from astropy import units as u
+from scipy.sparse import csr_matrix, find, hstack, issparse, lil_matrix, vstack
 
 from .. import MPLSTYLE
 from ..utils import LightkurveWarning, plot_image
-
 
 __all__ = [
     "DesignMatrix",

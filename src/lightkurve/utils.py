@@ -1,27 +1,25 @@
 """This module provides various helper functions."""
 import logging
-import sys
 import os
+import sys
 import warnings
 from functools import wraps
 
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-import numpy as np
-from tqdm import tqdm
-
 import astropy
-from astropy.utils.data import download_file
-from astropy.units.quantity import Quantity
 import astropy.units as u
-from astropy.visualization import (
-    PercentileInterval,
-    ImageNormalize,
-    SqrtStretch,
-    LinearStretch,
-)
+import matplotlib.pyplot as plt
+import numpy as np
 from astropy.time import Time
-
+from astropy.units.quantity import Quantity
+from astropy.utils.data import download_file
+from astropy.visualization import (
+    ImageNormalize,
+    LinearStretch,
+    PercentileInterval,
+    SqrtStretch,
+)
+from matplotlib.colors import LogNorm
+from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
@@ -772,6 +770,7 @@ def show_citation_instructions():
         print(__citation__)
     else:
         from pathlib import Path  # local import to speed up `import lightkurve`
+
         import astroquery  # local import to speed up `import lightkurve`
 
         templatefile = Path(PACKAGEDIR, "data", "show_citation_instructions.html")
