@@ -600,8 +600,13 @@ class SNRPeriodogram(Periodogram):
     """
 
     def __init__(self, *args, **kwargs):
-        super(SNRPeriodogram, self).__init__(args[0], args[1], **kwargs)
-        self.background = args[2]
+        super(SNRPeriodogram, self).__init__(*args[:2], **kwargs)
+        
+        # Check if the SNRPeriodogram was initiated with its background
+        if len(args) == 3:
+            self.background = args[2]
+        else:
+            self.background = None
 
     def __repr__(self):
         return "SNRPeriodogram(ID: {})".format(self.label)
@@ -622,6 +627,11 @@ class SNRPeriodogram(Periodogram):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
+        if self.background == None:
+            raise ValueError("This SNRPeriodogram was initiated without the removed " +
+                            "background trend, so it can't be viewed.")
+            
+
         pg = self * self.background.power.value
         pg.power *= 1 * self.background.power.unit
 
