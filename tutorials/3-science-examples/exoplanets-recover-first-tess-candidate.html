@@ -487,7 +487,7 @@ div.rendered_html tbody tr:hover {
 <div class="output_area rendered_html docutils container">
 SearchResult containing 2 data products.
 
-<table id="table6302956416">
+<table id="table10990306736">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 01</td><td>2018</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>261136679</td><td>0.0</td></tr>
@@ -507,7 +507,7 @@ SearchResult containing 2 data products.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/Users/chedges/repos/lightkurve/src/lightkurve/search.py:414: LightkurveWarning: Warning: 2 files available to download. Only the first file has been downloaded. Please use `download_all()` or specify additional criteria (e.g. quarter, campaign, or sector) to limit your search.
+/Users/chedges/repos/lightkurve/src/lightkurve/search.py:423: LightkurveWarning: Warning: 2 files available to download. Only the first file has been downloaded. Please use `download_all()` or specify additional criteria (e.g. quarter, campaign, or sector) to limit your search.
   warnings.warn(
 </pre></div></div>
 </div>
@@ -646,7 +646,7 @@ TessTargetPixelFile(TICID: 261136679)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x177c57850&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x177c64370&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x177bd3580&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x2910851f0&gt;]
+[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x28f468ee0&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x28f498a00&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x28f404760&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x28f9314c0&gt;]
 </pre></div></div>
 </div>
 <p>You can access each extension and the data inside it in the same way you’d use <a class="reference external" href="https://docs.astropy.org/en/stable/io/fits/">astropy.io.fits</a>. If you want to access data held in the TPF, such as the time of the observations, you can do that easily by using</p>

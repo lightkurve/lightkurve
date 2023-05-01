@@ -176,9 +176,9 @@
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
 <span class="kn">from</span> <span class="nn">astropy.utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
 
-<span class="kn">from</span> <span class="nn">.detect</span> <span class="kn">import</span> <span class="n">detect_filetype</span>
 <span class="kn">from</span> <span class="nn">..lightcurve</span> <span class="kn">import</span> <span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="n">TessLightCurve</span>
 <span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">LightkurveDeprecationWarning</span><span class="p">,</span> <span class="n">LightkurveError</span>
+<span class="kn">from</span> <span class="nn">.detect</span> <span class="kn">import</span> <span class="n">detect_filetype</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -272,7 +272,7 @@
         <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;PATHOS&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">TessLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;pathos&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;CDIPS&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">TessLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;cdips&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">TessLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;cdips&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;TASOC&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">TessLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;tasoc&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;K2SFF&quot;</span><span class="p">:</span>
@@ -281,13 +281,15 @@
             <span class="k">return</span> <span class="n">KeplerLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;everest&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;KEPSEISMIC&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">KeplerLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;kepseismic&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;TGLC&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TessLightCurve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;tglc&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="c1"># ensure path_or_url is in the error</span>
         <span class="k">raise</span> <span class="n">LightkurveError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Error in reading Data product </span><span class="si">{</span><span class="n">path_or_url</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s2"> .</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;This file may be corrupt due to an interrupted download. &quot;</span>
             <span class="s2">&quot;Please remove it from your disk and try again.&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+        <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
 
     <span class="c1"># Official data products;</span>
     <span class="c1"># if the filetype is recognized, instantiate a class of that name</span>
@@ -296,7 +298,8 @@
             <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;lightkurve&quot;</span><span class="p">),</span> <span class="n">filetype</span><span class="p">)(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">LightkurveError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Data product f</span><span class="si">{</span><span class="n">path_or_url</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s2"> is not supported &quot;</span> <span class="s2">&quot;in this version of Lightkurve.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Data product f</span><span class="si">{</span><span class="n">path_or_url</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s2"> is not supported &quot;</span>
+                <span class="s2">&quot;in this version of Lightkurve.&quot;</span>
             <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># if these keywords don&#39;t exist, raise `ValueError`</span>

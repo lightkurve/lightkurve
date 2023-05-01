@@ -672,7 +672,7 @@ Kepler and TESS lightcurves. Let’s look at the CBVCorrector goodness metrics t
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.7118268280576449
+Over fitting Metric: 0.7124909134699382
 Under fitting Metric: 0.9703478826925148
 </pre></div></div>
 </div>
@@ -706,9 +706,9 @@ probably injected signals into our lightcurve and we should not trust this reall
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996566643790988
-Optimized Under-fitting metric: 0.8255781307442777
-Optimized Alpha: 9.651e+03
+Optimized Over-fitting metric: 0.9996594832459578
+Optimized Under-fitting metric: 0.8255781758065887
+Optimized Alpha: 9.836e+03
 </pre></div></div>
 </div>
 <p>Much better! We see the thermal settling systematic is still being removed, but the stellar variabity is better preserved. Note that the optimizer did not set the alpha parameter at exactly the red and blue curve intersection point. The default target goodness scores is 0.8 or above, which is fulfilled at alpha=1.45e-1. If we want to optimize the fit even more, by perhaps ensuring we are not over-fitting at all, then we can adjust the target over and under scores to emphasize which metric we are
@@ -731,9 +731,9 @@ more interested in. Below we more greatly emphasize improving the over-fitting m
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996594408230401
-Optimized Under-fitting metric: 0.8255781846196377
-Optimized Alpha: 9.870e+03
+Optimized Over-fitting metric: 0.999656537312764
+Optimized Under-fitting metric: 0.8255781518313899
+Optimized Alpha: 9.741e+03
 </pre></div></div>
 </div>
 <p>We are now perhaps biasing too far towards under-fitting, but depending on your research interests, this might be best.</p>
@@ -770,7 +770,7 @@ Optimized Alpha: 9.870e+03
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.2632956811464706
+Over fitting Metric: 0.2638797113369783
 Under fitting Metric: 0.9995877972880245
 </pre></div></div>
 </div>
@@ -808,9 +808,9 @@ you are only looking at the low frequency signals in the data then perhaps you d
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.7982190392178491
-Optimized Under-fitting metric: 0.46985435511948
-Optimized Alpha: 3.297e+00
+Optimized Over-fitting metric: 0.7971595577345271
+Optimized Under-fitting metric: 0.47022322840999176
+Optimized Alpha: 3.283e+00
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -880,7 +880,7 @@ ideal fit.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting Metric: 0.6267616705608123
+Over-fitting Metric: 0.6269827277571883
 Under-fitting Metric: 0.880152175383505
 </pre></div></div>
 </div>
@@ -929,8 +929,8 @@ the CBVCorrector object the CBVs will be downloaded, but the CBVs are for 2-minu
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting metric: 0.0797877956453702
-CDPP: 230.7580053423158 ppm
+Over-fitting metric: 0.07744671353863643
+CDPP: 230.75800325746218 ppm
 </pre></div></div>
 </div>
 <p>The least-squares fit did remove the background flux trend and at first sight the resultant might look good, but the over-fitting goodness metric is <code class="docutils literal notranslate"><span class="pre">0.08</span></code>. That’s not very good! It looks like we are dramatically over-fitting. We can see this in the bottom plot where the corrected curve has more high-frequency noise than the original. Let’s now add in the multi-scale basis vectors and see if we can do better. Note that we are joint fitting the CBVs and the external pixel-derived design matrix.</p>
@@ -953,8 +953,8 @@ CDPP: 230.7580053423158 ppm
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting metric: 0.31494931132464826
-CDPP: 55.83742647811467 ppm
+Over-fitting metric: 0.3216316169837652
+CDPP: 55.837426446581105 ppm
 </pre></div></div>
 </div>
 <p>That looks a lot better! Could we do a bit better by adding in a regularization term? Let’s do a goodness metric scan.</p>
@@ -988,9 +988,9 @@ we do see the under-fitting metric degrades slightly beginning at alpha=1e-1.</p
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.3524386637571877
-Optimized Alpha: 7.595e-04
-CDPP: 66.34199535684708 ppm
+Optimized Over-fitting metric: 0.33632311984114055
+Optimized Alpha: 1.564e-03
+CDPP: 77.78670099631304 ppm
 </pre></div></div>
 </div>
 <p>This is looking like a pretty good light curve. However, the CDPP increased a little as we optimized the over-fitting metric. Which correction to use may depend on your application. Since we are interested in the transiting planet, we will choose the corrected light curve with the lowest CDPP. Below we compare the light curve between just using the pixel-derived design matrix to also adding in the CBVs as a joint, regularized fit.</p>

@@ -172,29 +172,33 @@
   <h1>Source code for lightkurve.search</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Defines tools to retrieve Kepler data from the archive at MAST.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
-<span class="kn">import</span> <span class="nn">os</span>
+
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">requests</span> <span class="kn">import</span> <span class="n">HTTPError</span>
 
-<span class="kn">from</span> <span class="nn">memoization</span> <span class="kn">import</span> <span class="n">cached</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">join</span><span class="p">,</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Row</span>
+<span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">astropy.coordinates</span> <span class="kn">import</span> <span class="n">SkyCoord</span>
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">ascii</span>
-<span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
-<span class="kn">from</span> <span class="nn">astropy.utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Row</span><span class="p">,</span> <span class="n">Table</span><span class="p">,</span> <span class="n">join</span>
 <span class="kn">from</span> <span class="nn">astropy.time</span> <span class="kn">import</span> <span class="n">Time</span>
+<span class="kn">from</span> <span class="nn">astropy.utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">memoization</span> <span class="kn">import</span> <span class="n">cached</span>
+<span class="kn">from</span> <span class="nn">requests</span> <span class="kn">import</span> <span class="n">HTTPError</span>
 
-<span class="kn">from</span> <span class="nn">.targetpixelfile</span> <span class="kn">import</span> <span class="n">TargetPixelFile</span>
-<span class="kn">from</span> <span class="nn">.collections</span> <span class="kn">import</span> <span class="n">TargetPixelFileCollection</span><span class="p">,</span> <span class="n">LightCurveCollection</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">LightkurveError</span><span class="p">,</span> <span class="n">suppress_stdout</span><span class="p">,</span> <span class="n">LightkurveWarning</span><span class="p">,</span> <span class="n">LightkurveDeprecationWarning</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">PACKAGEDIR</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">.collections</span> <span class="kn">import</span> <span class="n">LightCurveCollection</span><span class="p">,</span> <span class="n">TargetPixelFileCollection</span>
 <span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">read</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">conf</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">config</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">PACKAGEDIR</span>
+<span class="kn">from</span> <span class="nn">.targetpixelfile</span> <span class="kn">import</span> <span class="n">TargetPixelFile</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LightkurveDeprecationWarning</span><span class="p">,</span>
+    <span class="n">LightkurveError</span><span class="p">,</span>
+    <span class="n">LightkurveWarning</span><span class="p">,</span>
+    <span class="n">suppress_stdout</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -221,6 +225,7 @@
     <span class="s2">&quot;EVEREST&quot;</span><span class="p">:</span> <span class="s2">&quot;https://archive.stsci.edu/hlsp/everest&quot;</span><span class="p">,</span>
     <span class="s2">&quot;TESScut&quot;</span><span class="p">:</span> <span class="s2">&quot;https://mast.stsci.edu/tesscut/&quot;</span><span class="p">,</span>
     <span class="s2">&quot;GSFC-ELEANOR-LITE&quot;</span><span class="p">:</span> <span class="s2">&quot;https://archive.stsci.edu/hlsp/gsfc-eleanor-lite&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TGLC&quot;</span><span class="p">:</span> <span class="s2">&quot;https://archive.stsci.edu/hlsp/tglc&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">REPR_COLUMNS_BASE</span> <span class="o">=</span> <span class="p">[</span>
@@ -360,9 +365,12 @@
                 <span class="k">if</span> <span class="n">p_ids</span> <span class="o">==</span> <span class="s2">&quot;N/A&quot;</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p_ids</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
                     <span class="k">continue</span>
                 <span class="c1"># e.g., handle cases with multiple proposals, e.g.,  G12345_G67890</span>
-                <span class="n">p_id_links</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+                <span class="n">p_id_links</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
 <span class="s2">&lt;a href=&#39;</span><span class="si">{</span><span class="n">to_tess_gi_url</span><span class="p">(</span><span class="n">p_id</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&gt;</span><span class="si">{</span><span class="n">p_id</span><span class="si">}</span><span class="s2">&lt;/a&gt;</span><span class="se">\</span>
-<span class="s2">&quot;&quot;&quot;</span> <span class="k">for</span> <span class="n">p_id</span> <span class="ow">in</span> <span class="n">p_ids</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)]</span>
+<span class="s2">&quot;&quot;&quot;</span>
+                    <span class="k">for</span> <span class="n">p_id</span> <span class="ow">in</span> <span class="n">p_ids</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+                <span class="p">]</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">p_ids</span><span class="si">}</span><span class="s2">&lt;&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="s1">&#39; , &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p_id_links</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
@@ -511,6 +519,7 @@
                 <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;File found in local cache.&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="kn">from</span> <span class="nn">astroquery.mast</span> <span class="kn">import</span> <span class="n">Observations</span>
+
                 <span class="n">download_url</span> <span class="o">=</span> <span class="n">table</span><span class="p">[:</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;dataURL&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Started downloading </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">download_url</span><span class="p">))</span>
                 <span class="n">download_response</span> <span class="o">=</span> <span class="n">Observations</span><span class="o">.</span><span class="n">download_products</span><span class="p">(</span>
@@ -520,7 +529,7 @@
                     <span class="k">raise</span> <span class="n">LightkurveError</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Download of </span><span class="si">{</span><span class="n">download_url</span><span class="si">}</span><span class="s2"> failed. &quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;MAST returns </span><span class="si">{</span><span class="n">download_response</span><span class="p">[</span><span class="s1">&#39;Status&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">download_response</span><span class="p">[</span><span class="s1">&#39;Message&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-                        <span class="p">)</span>
+                    <span class="p">)</span>
                 <span class="n">path</span> <span class="o">=</span> <span class="n">download_response</span><span class="p">[</span><span class="s2">&quot;Local Path&quot;</span><span class="p">]</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Finished downloading.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">read</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1195,7 +1204,7 @@
             <span class="c1"># K2 campaigns 9, 10, and 11 were split into two sections, which are</span>
             <span class="c1"># listed separately in the table with suffixes &quot;a&quot; and &quot;b&quot;</span>
             <span class="k">if</span> <span class="n">obs_project</span> <span class="o">==</span> <span class="s2">&quot;K2&quot;</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;sequence_number&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">]:</span>
-                <span class="k">for</span> <span class="n">half</span><span class="p">,</span><span class="n">letter</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">half</span><span class="p">,</span> <span class="n">letter</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;c</span><span class="si">{</span><span class="n">tmp_seqno</span><span class="si">}{</span><span class="n">half</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;productFilename&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]:</span>
                         <span class="n">obs_seqno</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">tmp_seqno</span><span class="p">)</span><span class="si">:</span><span class="s2">02d</span><span class="si">}{</span><span class="n">letter</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">result</span><span class="p">[</span><span class="s2">&quot;mission&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -1298,8 +1307,8 @@
 <span class="sd">        Table detailing the available observations on MAST.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Local astroquery import because the package is not used elsewhere</span>
+    <span class="kn">from</span> <span class="nn">astroquery.exceptions</span> <span class="kn">import</span> <span class="n">NoResultsWarning</span><span class="p">,</span> <span class="n">ResolverError</span>
     <span class="kn">from</span> <span class="nn">astroquery.mast</span> <span class="kn">import</span> <span class="n">Observations</span>
-    <span class="kn">from</span> <span class="nn">astroquery.exceptions</span> <span class="kn">import</span> <span class="n">ResolverError</span><span class="p">,</span> <span class="n">NoResultsWarning</span>
 
     <span class="c1"># If passed a SkyCoord, convert it to an &quot;ra, dec&quot; string for MAST</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">SkyCoord</span><span class="p">):</span>

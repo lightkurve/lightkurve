@@ -524,7 +524,8 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 </pre></div>
@@ -552,7 +553,7 @@ div.rendered_html tbody tr:hover {
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6280580496">
+<table id="table10823801200">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -751,7 +752,7 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>KeplerLightCurve length=4116 LABEL=&quot;KIC 6922244&quot; QUARTER=4 CAMPAIGN=None</i>
-<table id="table6295342336" class="table-striped table-bordered table-condensed">
+<table id="table10870714032" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>quality</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th><th>pix</th><th>pix</th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>float32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>int32</th></tr></thead>
@@ -839,9 +840,9 @@ Handbook</a>, Section 7, <em>Finding Optimal Apertures in Kepler Data</em>.</p>
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
-SearchResult containing 65 data products.
+SearchResult containing 68 data products.
 
-<table id="table6280579824">
+<table id="table11170693760">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr011904151</td><td>0.0</td></tr>
@@ -851,22 +852,22 @@ SearchResult containing 65 data products.
 <tr><td>4</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
 <tr><td>5</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>60</td><td>kplr011904151</td><td>0.0</td></tr>
 <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-<tr><td>58</td><td>TESS Sector 41</td><td>2021</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>600</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>59</td><td>TESS Sector 53</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>60</td><td>TESS Sector 53</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>61</td><td>TESS Sector 54</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>62</td><td>TESS Sector 54</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>63</td><td>TESS Sector 55</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>377780790</td><td>0.0</td></tr>
-<tr><td>64</td><td>TESS Sector 55</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>61</td><td>TESS Sector 53</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>600</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>62</td><td>TESS Sector 54</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>63</td><td>TESS Sector 54</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>64</td><td>TESS Sector 54</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>600</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>65</td><td>TESS Sector 55</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>66</td><td>TESS Sector 55</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>
+<tr><td>67</td><td>TESS Sector 55</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>600</td><td>377780790</td><td>0.0</td></tr>
 </table>
-Length = 65 rows</div>
+Length = 68 rows</div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kep</span> <span class="o">=</span> <span class="n">datalist</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<span class="n">tes</span> <span class="o">=</span> <span class="n">datalist</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kep</span> <span class="o">=</span> <span class="n">datalist</span><span class="p">[(</span><span class="n">datalist</span><span class="o">.</span><span class="n">author</span> <span class="o">==</span> <span class="s2">&quot;Kepler&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">datalist</span><span class="o">.</span><span class="n">exptime</span> <span class="o">==</span> <span class="mi">60</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">second</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="n">tes</span> <span class="o">=</span> <span class="n">datalist</span><span class="p">[(</span><span class="n">datalist</span><span class="o">.</span><span class="n">author</span> <span class="o">==</span> <span class="s2">&quot;SPOC&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">datalist</span><span class="o">.</span><span class="n">exptime</span> <span class="o">==</span> <span class="mi">120</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">second</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>

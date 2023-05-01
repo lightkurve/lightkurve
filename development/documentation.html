@@ -248,6 +248,27 @@ latest version of the documentation is available online at
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ poetry install
 </pre></div>
 </div>
+<p>To make a clean directory for the docs use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
+$ make clean
+</pre></div>
+</div>
+<p>To build the documentation in HTML format, execute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
+$ make html
+</pre></div>
+</div>
+<p>Note if you build the documentation after cleaning the directory this will compile the notebooks, which can take a significant amount of time (over 30 minutes). This will save the documentation website in the <code class="docutils literal notranslate"><span class="pre">../../lightkurve-docs</span></code> directory
+on your system.  If you re-run the <code class="xref py py-obj docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> command the notebook-based tutorials will not be recompiled by default
+because they take some time to build.  To recompile the just the notebooks, type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make notebooks
+</pre></div>
+</div>
+<p>Finally, if you have write permission to <em>lightkurve</em>’s GitHub repository,
+you can upload the documentation to the web server using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make upload
+</pre></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If you encounter the error <code class="docutils literal notranslate"><span class="pre">Pandoc</span> <span class="pre">wasn't</span> <span class="pre">found</span></code>, you will have to install <code class="docutils literal notranslate"><span class="pre">pandoc</span></code> separately as well following its <a class="reference external" href="https://pandoc.org/installing.html">installation instruction</a>  .
@@ -260,22 +281,12 @@ For example, on Mac OS you can install <code class="docutils literal notranslate
 </pre></div>
 </div>
 </div>
-<p>To build the documentation in HTML format, execute:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
-$ make clean
-$ make html
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To build the docs on a Mac you may have to install the Xcode Command Line Tools, which you can do using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ xcode-select --install
 </pre></div>
 </div>
-<p>This will save the documentation website in the <code class="docutils literal notranslate"><span class="pre">../../lightkurve-docs</span></code> directory
-on your system.  The notebook-based tutorials will not be recompiled by default
-because they take some time to build.  To recompile the notebooks, type:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">notebooks</span>
-</pre></div>
-</div>
-<p>Finally, if you have write permission to <em>lightkurve</em>’s GitHub repository,
-you can upload the documentation to the web server using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">upload</span>
-</pre></div>
 </div>
 </section>
 </section>

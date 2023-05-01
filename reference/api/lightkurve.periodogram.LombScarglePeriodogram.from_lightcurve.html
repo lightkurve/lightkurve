@@ -1213,6 +1213,11 @@
      lightkurve.io.tasoc.read_tasoc_lightcurve
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.tglc.read_tglc_lightcurve.html">
+     lightkurve.io.tglc.read_tglc_lightcurve
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toctree-l1 has-children">
@@ -1406,7 +1411,7 @@ normalization=’amplitude’, oversample_factor will be set to 5. If
 normalization=’psd’, it will be 1. These defaults can be
 overridden.</p>
 </dd>
-<dt><strong>freq_unit</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.CompositeUnit.html#astropy.units.CompositeUnit" title="(in Astropy v5.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.core.CompositeUnit</span></code></a></span></dt><dd><p>Default: None. The desired frequency units for the Lomb Scargle
+<dt><strong>freq_unit</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.CompositeUnit.html#astropy.units.CompositeUnit" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.core.CompositeUnit</span></code></a></span></dt><dd><p>Default: None. The desired frequency units for the Lomb Scargle
 periodogram. This implies that 1/freq_unit is the units for period.
 With default normalization (‘amplitude’), the freq_unit is set to
 1/day, which can be overridden. ‘psd’ normalization will set

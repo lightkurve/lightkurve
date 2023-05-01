@@ -197,9 +197,21 @@
 
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#developer-documentation">
-   Developer documentation
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Developing for Lightkurve
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#developer-documentation">
+     Developer documentation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#setting-up-a-development-environment">
+   Setting up a Development Environment
   </a>
  </li>
 </ul>
@@ -225,7 +237,7 @@
                 
   <section id="developing-for-lightkurve">
 <span id="development"></span><h1>Developing for Lightkurve<a class="headerlink" href="#developing-for-lightkurve" title="Permalink to this headline">#</a></h1>
-<p>Lightkurve is an open-source, community driven package. We strongly encourage users to contribute and develop new features for Lightkurve. These pages first discuss the vision of Lightkurve, and then how to contribute Pull Requests on github for new features. These pages also discuss how to compile our documentation (including this page!) and how we release a new version of Lightkurve.</p>
+<p>Lightkurve is an open-source, community driven package. We strongly encourage users to contribute and develop new features for Lightkurve. These pages first discuss the vision of Lightkurve, and then how to contribute Pull Requests on github for new features. These pages also discuss how to compile our documentation (including this page!) and how we release a new version of Lightkurve. Use the menu bar on the left to scroll through the docs or click below.</p>
 <section id="developer-documentation">
 <h2>Developer documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">#</a></h2>
 <div class="toctree-wrapper compound">
@@ -238,6 +250,77 @@
 </ul>
 </div>
 </section>
+</section>
+<section id="setting-up-a-development-environment">
+<h1>Setting up a Development Environment<a class="headerlink" href="#setting-up-a-development-environment" title="Permalink to this headline">#</a></h1>
+<p>To set up a development environment for Lightkurve you can follow the steps below.</p>
+<p>The first step is to create a copy of Lightkurve’s GitHub repository by logging into GitHub, browsing to
+<a class="reference external" href="https://github.com/lightkurve/lightkurve">https://github.com/lightkurve/lightkurve</a>,
+and clicking the <code class="docutils literal notranslate"><span class="pre">Fork</span></code> button in the top right corner.</p>
+<p>Head to a local directory of your choice and download your fork:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git
+</pre></div>
+</div>
+<p>Lightkurve uses the <a class="reference external" href="https://python-poetry.org/">poetry</a> package to create an isolated development
+environment which you can use to modify and test changes to the source code without interfering with
+your existing Python environment.</p>
+<p>You can set up the environment as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>lightkurve
+$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>poetry
+$<span class="w"> </span>poetry<span class="w"> </span>install
+</pre></div>
+</div>
+<p>A key advantage of the development environment is that any changes you make to the Lightkurve source
+code will be reflected right away, i.e., there is no need to re-install Lightkurve or the environment
+after every change.</p>
+<p>To run code in the development environment, you will need to prefix every Python command with
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">run</span></code>. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>YOUR-SCRIPT.py
+$<span class="w"> </span>poetry<span class="w"> </span>run<span class="w"> </span>jupyter<span class="w"> </span>notebook
+$<span class="w"> </span>poetry<span class="w"> </span>run<span class="w"> </span>pytest<span class="w">  </span><span class="c1"># runs all the unit tests</span>
+</pre></div>
+</div>
+<p>You can find more details on the <a class="reference external" href="https://python-poetry.org/">poetry website</a>,
+and you can find additional examples of tasks developers commonly execute in the development
+environment in Lightkurve’s <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/main/Makefile">Makefile</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The use of <code class="xref py py-obj docutils literal notranslate"><span class="pre">poetry</span></code> is not required to prepare and propose modifications to Lightkurve.
+If you wish to do so, you can install the development version in your current
+Python environment as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>lightkurve
+$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
+</pre></div>
+</div>
+<p>In this scenario, you will have to re-run <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code> every time you make changes
+to the source code.</p>
+<p>To avoid this extra step, you have the option of creating a symbolic
+link from your environment’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">site-packages</span></code> directory to the lightkurve source code tree
+as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>uninstall<span class="w"> </span>lightkurve
+$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--editable<span class="w"> </span>.<span class="w">  </span><span class="c1"># creates the symbolic link</span>
+</pre></div>
+</div>
+<p>This “editable install” method requires <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span></code> version <code class="xref py py-obj docutils literal notranslate"><span class="pre">21.3</span></code> or higher.
+While this method of installing Lightkurve is not usually recommended, it can be useful
+when you wish to modify and test multiple different packages in a single environment.</p>
+</div>
+<p>To be able to pull in any recent changes, we need to tell your copy of lightkurve
+where the upstream repository is located:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>remote<span class="w"> </span>add<span class="w"> </span>upstream<span class="w"> </span>https://github.com/lightkurve/lightkurve.git
+</pre></div>
+</div>
+<p>To verify that everything is setup correctly, execute:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>remote<span class="w"> </span>-v
+</pre></div>
+</div>
+<p>You should see something like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>origin<span class="w">      </span>https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git<span class="w"> </span><span class="o">(</span>fetch<span class="o">)</span>
+origin<span class="w">      </span>https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git<span class="w"> </span><span class="o">(</span>push<span class="o">)</span>
+upstream<span class="w">    </span>https://github.com/lightkurve/lightkurve.git<span class="w"> </span><span class="o">(</span>fetch<span class="o">)</span>
+upstream<span class="w">    </span>https://github.com/lightkurve/lightkurve.git<span class="w"> </span><span class="o">(</span>push<span class="o">)</span>
+</pre></div>
+</div>
 </section>
 
 

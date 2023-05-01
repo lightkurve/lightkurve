@@ -1,0 +1,6 @@
+﻿lightkurve.io.tglc.read\_tglc\_lightcurve
+=========================================
+
+.. currentmodule:: lightkurve.io.tglc
+
+.. autofunction:: read_tglc_lightcurve
