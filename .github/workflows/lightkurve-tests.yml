@@ -11,7 +11,13 @@
 
 name: Lightkurve-tests
 
-on: [push, pull_request]
+on:
+  # We always want to run tests on main
+  push:
+    branches:
+      - main
+  # And we'll also run tests on pull requests
+  pull_request:
 
 jobs:
 
