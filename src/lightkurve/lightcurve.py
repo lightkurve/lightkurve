@@ -615,7 +615,7 @@ class LightCurve(TimeSeries):
     )
     def hdu(self):
         with fits.open(self.filename) as hdulist:
-            hdulist = deepcopy(hdulist)
+            hdulist = hdulist.copy()
         return hdulist
 
     @property

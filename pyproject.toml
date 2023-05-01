@@ -79,3 +79,6 @@ testpaths = [
     "tests",
     "src",
 ]
+filterwarnings = [
+    "error::ResourceWarning",
+]

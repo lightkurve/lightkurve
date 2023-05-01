@@ -1655,7 +1655,7 @@ class TargetPixelFile(object):
                 hdu = img[extension]
             else:
                 with fits.open(img) as hdulist:
-                    hdu = deepcopy(hdulist[extension])
+                    hdu = hdulist[extension].copy()
             return hdu
 
         # Define a helper function to cutout images if not None
