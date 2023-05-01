@@ -23,6 +23,7 @@ from astropy.table import vstack
 from astropy.stats import calculate_bin_edges
 from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 from astropy.utils.exceptions import AstropyUserWarning
+from astropy.utils.masked import Masked
 
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (
@@ -1375,11 +1376,16 @@ class LightCurve(TimeSeries):
         # a local import here.
         from astropy.stats.sigma_clipping import sigma_clip
 
+        # sigma_clip won't work with masked ndarrays.
+        flux = self.flux.copy()
+        if isinstance(flux, Masked):
+            flux = flux.filled(np.nan)
+
         # First, we create the outlier mask using AstroPy's sigma_clip function
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
             outlier_mask = sigma_clip(
-                data=self.flux,
+                data=flux,
                 sigma=sigma,
                 sigma_lower=sigma_lower,
                 sigma_upper=sigma_upper,
