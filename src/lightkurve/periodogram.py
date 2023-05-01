@@ -383,7 +383,7 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
-    def flatten(self, method="logmedian", filter_width=0.01):
+    def flatten(self, method="logmedian", filter_width=0.1):
         """Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
         estimate of the noise background.
 
@@ -629,7 +629,7 @@ class SNRPeriodogram(Periodogram):
         self.bkg.plot(ax=ax, scale='log', label='Background',
                     lw = 2)
         ax.set_title(f'Method: {self.bkg.meta["FLAT_METHOD"]}, ' +  
-                     f'filter width {self.bkg.meta["FLAT_FILT_WIDTH"]}.')
+                     f'filter width {self.bkg.meta["FLAT_FILT_WIDTH"]}')
     
         return ax
 
