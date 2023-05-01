@@ -20,7 +20,7 @@ axes.spines.right : True
 axes.titlepad   : 10
 axes.titlesize  : 12
 axes.facecolor  : white
-axes.edgecolor  : 4c4c4c
+axes.edgecolor  : 000000
 axes.labelcolor : 000000
 axes.labelsize  : 12
 axes.grid       : False
