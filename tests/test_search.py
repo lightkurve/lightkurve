@@ -107,7 +107,7 @@ def test_search_lightcurve(caplog):
     #   https://simbad.cds.unistra.fr/simbad/sim-id?Ident=%405506010&Name=Kepler-10
     assert (
         len(search_lightcurve("2MASS J19024305+5014286", mission="Kepler", cadence="long").table)
-        == 15
+        == 21
     )
     # An invalid KIC/EPIC ID or target name should be dealt with gracefully
     search_lightcurve(-999)
