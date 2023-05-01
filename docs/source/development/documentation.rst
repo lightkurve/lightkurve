@@ -24,22 +24,26 @@ Building the *lightkurve* documentation requires `sphinx` and a few extra packag
 
     $ poetry install
 
-To build the documentation in HTML format, execute::
+To make a clean directory for the docs use::
 
     $ cd docs
     $ make clean
+
+To build the documentation in HTML format, execute::
+
+    $ cd docs
     $ make html
 
-This will save the documentation website in the ``../../lightkurve-docs`` directory
-on your system.  The notebook-based tutorials will not be recompiled by default
-because they take some time to build.  To recompile the notebooks, type::
+Note if you build the documentation after cleaning the directory this will compile the notebooks, which can take a significant amount of time (over 30 minutes). This will save the documentation website in the ``../../lightkurve-docs`` directory
+on your system.  If you re-run the `make html` command the notebook-based tutorials will not be recompiled by default
+because they take some time to build.  To recompile the just the notebooks, type::
 
-    make notebooks
+    $ make notebooks
 
 Finally, if you have write permission to *lightkurve*'s GitHub repository,
 you can upload the documentation to the web server using::
 
-    make upload
+    $ make upload
 
 .. note::
 
@@ -54,6 +58,10 @@ you can upload the documentation to the web server using::
 
 .. note::
     
-    To build the docs on a Mac you may have to install the Xcode Command Line Tools, which you can do using
+    To build the docs on a Mac you may have to install the Xcode Command Line Tools, which you can do using::
 
         $ xcode-select --install
+    
+
+
+
