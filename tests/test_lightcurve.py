@@ -1009,7 +1009,6 @@ def test_remove_nans():
     lc_clean = lc.remove_nans("flux_err")
     assert_array_equal(lc_clean.flux, [])
 
-
 def test_remove_outliers():
     # Does `remove_outliers()` remove outliers?
     lc = LightCurve(time=[1, 2, 3, 4], flux=[1, 1, 1000, 1])
@@ -1025,6 +1024,10 @@ def test_remove_outliers():
     lc_clean = lc.remove_outliers(sigma_lower=float("inf"), sigma_upper=1)
     assert_array_equal(lc_clean.time.value, [1, 3, 4, 5])
     assert_array_equal(lc_clean.flux, [1, 1, -1000, 1])
+    # Ensure that we can sigma clip masked arrays
+    lc = LightCurve(time=[1, 2, 3, 4], flux=Masked([1, 1, 1000, 1]))
+    lc_clean = lc.remove_outliers(sigma=1)
+    assert_array_equal(lc_clean.time.value, [1, 2, 4])
 
 
 @pytest.mark.remote_data
