@@ -601,7 +601,7 @@ class SNRPeriodogram(Periodogram):
 
     def __init__(self, *args, **kwargs):
         super(SNRPeriodogram, self).__init__(args[0], args[1], **kwargs)
-        self.bkg = args[2]
+        self.background = args[2]
 
     def __repr__(self):
         return "SNRPeriodogram(ID: {})".format(self.label)
@@ -622,14 +622,14 @@ class SNRPeriodogram(Periodogram):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        pg = self * self.bkg.power.value
-        pg.power *= 1 * self.bkg.power.unit
+        pg = self * self.background.power.value
+        pg.power *= 1 * self.background.power.unit
 
         ax = pg.plot(**kwargs)
-        self.bkg.plot(ax=ax, scale='log', label='Background',
+        self.background.plot(ax=ax, scale='log', label='Background',
                     lw = 2)
-        ax.set_title(f'Method: {self.bkg.meta["FLAT_METHOD"]}, ' +  
-                     f'filter width {self.bkg.meta["FLAT_FILT_WIDTH"]}')
+        ax.set_title(f'Method: {self.background.meta["FLAT_METHOD"]}, ' +  
+                     f'filter width {self.background.meta["FLAT_FILT_WIDTH"]}')
     
         return ax
 
