@@ -3,13 +3,12 @@ from __future__ import division, print_function
 
 import math
 
-from astropy.io import fits as pyfits
 import numpy as np
 import scipy
 import scipy.interpolate
+from astropy.io import fits as pyfits
 
 from ..utils import channel_to_module_output, plot_image
-
 
 __all__ = ["KeplerPRF", "SimpleKeplerPRF"]
 

@@ -5,7 +5,6 @@ A product description file wasn't obvious on the MAST website
 """
 from ..lightcurve import TessLightCurve
 from ..utils import TessQualityFlags
-
 from .generic import read_generic_lightcurve
 
 

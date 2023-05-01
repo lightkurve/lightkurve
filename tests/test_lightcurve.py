@@ -1,26 +1,29 @@
-from astropy.io import fits as pyfits
-from astropy.utils.data import get_pkg_data_filename
-from astropy.utils.masked import Masked
-from astropy import units as u
-from astropy.table import Table, Column, MaskedColumn
-from astropy.time import Time, TimeDelta
-from astropy.timeseries import aggregate_downsample
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-from numpy.testing import assert_almost_equal, assert_array_equal, assert_allclose, assert_equal
-import pytest
 import tempfile
 import warnings
 
-from lightkurve.io import read
-from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
-from lightkurve.lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
-from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning
-from lightkurve.search import search_lightcurve
+import matplotlib.pyplot as plt
+import numpy as np
+import pytest
+from astropy import units as u
+from astropy.io import fits as pyfits
+from astropy.table import Column, MaskedColumn, Table
+from astropy.time import Time, TimeDelta
+from astropy.timeseries import aggregate_downsample
+from astropy.utils.data import get_pkg_data_filename
+from astropy.utils.masked import Masked
 from lightkurve.collections import LightCurveCollection
+from lightkurve.io import read
+from lightkurve.lightcurve import KeplerLightCurve, LightCurve, TessLightCurve
+from lightkurve.lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
+from lightkurve.search import search_lightcurve
+from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
+from lightkurve.utils import LightkurveDeprecationWarning, LightkurveWarning
+from numpy.testing import (
+    assert_allclose,
+    assert_almost_equal,
+    assert_array_equal,
+    assert_equal,
+)
 
 from .test_targetpixelfile import TABBY_TPF
 
@@ -105,9 +108,9 @@ def test_math_operators_on_objects():
     assert_array_equal((lc2 / lc1).flux, lc2.flux / lc1.flux)
     # LightCurve objects can only be added or multiplied if they have equal length
     with pytest.raises(ValueError):
-        lc = lc1 + lc1[0:-5]
+        lc1 + lc1[0:-5]
     with pytest.raises(ValueError):
-        lc = lc1 * lc1[0:-5]
+        lc1 * lc1[0:-5]
 
 
 def test_rmath_operators():
@@ -718,7 +721,7 @@ def test_binned_quality():
 
 bad_resource_module_imports = False
 try:
-    import resource  # supported on Unix only
+    pass  # supported on Unix only
 except ImportError:
     bad_resource_module_imports = True
 
@@ -764,7 +767,7 @@ def test_bin_memory_usage(dict_of_bin_args):
     # Ensure it does not result in  Out of Memory Error
     with warnings.catch_warnings():  # lc.bin(binsize=n) is  is deprecated
         warnings.simplefilter("ignore", LightkurveDeprecationWarning)
-        lc_b = lc.bin(**dict_of_bin_args)
+        lc.bin(**dict_of_bin_args)
 
 #
 # END codes for lc.bin memory usage test
@@ -877,7 +880,7 @@ def test_to_fits():
     hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
 
     # Test "round-tripping": can we read-in what we write
-    lc_new = KeplerLightCurve.read(hdu)  # Regression test for #233
+    KeplerLightCurve.read(hdu)  # Regression test for #233
     assert hdu[0].header["EXTNAME"] == "PRIMARY"
     assert hdu[1].header["EXTNAME"] == "LIGHTCURVE"
     assert hdu[1].header["TTYPE1"] == "TIME"

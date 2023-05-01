@@ -5,7 +5,6 @@ Product description: https://archive.stsci.edu/hlsps/qlp/hlsp_qlp_tess_ffi_all_t
 """
 from ..lightcurve import TessLightCurve
 from ..utils import TessQualityFlags
-
 from .generic import read_generic_lightcurve
 
 

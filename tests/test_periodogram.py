@@ -1,18 +1,13 @@
-import sys
 
-import pytest
-import numpy as np
 import matplotlib.pyplot as plt
-from numpy.testing import assert_almost_equal, assert_array_equal
-
+import numpy as np
+import pytest
 from astropy import units as u
 from astropy.time import Time
-from astropy.stats.bls import BoxLeastSquares
 from astropy.utils.masked import Masked
-
 from lightkurve.lightcurve import LightCurve
 from lightkurve.periodogram import Periodogram
-from lightkurve.utils import LightkurveWarning
+from numpy.testing import assert_almost_equal, assert_array_equal
 
 
 def test_periodogram_basics():

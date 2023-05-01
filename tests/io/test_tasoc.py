@@ -1,13 +1,9 @@
 import pytest
-
 from astropy.io import fits
-import numpy as np
-from numpy.testing import assert_array_equal
-
 from lightkurve import search_lightcurve
-from lightkurve.io.tasoc import read_tasoc_lightcurve
 from lightkurve.io.detect import detect_filetype
-
+from lightkurve.io.tasoc import read_tasoc_lightcurve
+from numpy.testing import assert_array_equal
 
 # The URL needs to be updated upon a new TASOC data release.
 TEST_TIC_ID = 150441810

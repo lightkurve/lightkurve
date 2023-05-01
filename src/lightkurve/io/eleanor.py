@@ -1,13 +1,13 @@
 """Reader for GSFC-ELEANOR-LITE light curve files.
 Details can be found at https://archive.stsci.edu/hlsp/eleanor and https://archive.stsci.edu/hlsp/gsfc-eleanor-lite
 """
-from ..lightcurve import TessLightCurve
-from ..utils import TessQualityFlags
+import numpy as np
 from astropy import units as u
 
+from ..lightcurve import TessLightCurve
+from ..utils import TessQualityFlags
 from .generic import read_generic_lightcurve
 
-import numpy as np
 
 def read_eleanor_lightcurve(filename,
     flux_column="CORR_FLUX",

@@ -1,5 +1,4 @@
 import pytest
-
 from lightkurve import search_lightcurve
 
 

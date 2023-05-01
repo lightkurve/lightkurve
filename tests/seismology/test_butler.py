@@ -1,12 +1,10 @@
-import pytest
-from astropy import units as u
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.signal import unit_impulse as deltafn
-
+import pytest
+from astropy import units as u
+from lightkurve.periodogram import Periodogram, SNRPeriodogram
 from lightkurve.search import search_lightcurve
-from lightkurve.periodogram import Periodogram
-from lightkurve.periodogram import SNRPeriodogram
+from scipy.signal import unit_impulse as deltafn
 
 
 @pytest.mark.remote_data
@@ -194,7 +192,7 @@ def test_estimate_deltanu_basics():
     rsnr = snr[(snr.frequency.value > 1600) & (snr.frequency.value < 3200)]
     butler = rsnr.to_seismology()
     butler.estimate_numax()
-    numax = butler.estimate_deltanu()
+    butler.estimate_deltanu()
     assert np.isclose(true_deltanu, deltanu.value, atol=0.25 * true_deltanu)
 
     # Assert deltanu estimator works when input frequency is not in microhertz
@@ -250,7 +248,7 @@ def test_plot_deltanu_diagnostics():
 
     butler.estimate_numax()
     deltanu = butler.estimate_deltanu()
-    ax = butler.diagnose_deltanu()
+    butler.diagnose_deltanu()
     assert np.isclose(deltanu.value, true_deltanu, atol=0.25 * true_deltanu)
     assert deltanu.unit == u.microhertz
     plt.close("all")
@@ -273,7 +271,7 @@ def test_plot_deltanu_diagnostics():
     butler = rsnr.to_seismology()
     butler.estimate_numax()
     butler.estimate_deltanu()
-    ax = butler.diagnose_deltanu()
+    butler.diagnose_deltanu()
     plt.close("all")
 
     # Check it plots when frequency is in days
@@ -292,26 +290,26 @@ def test_stellar_estimator_calls():
 
     butler = snr.to_seismology()
     butler.estimate_numax()
-    deltanu = butler.estimate_deltanu()
+    butler.estimate_deltanu()
 
     # Calling teff from meta
-    mass = butler.estimate_mass()
-    rad = butler.estimate_radius()
-    log = butler.estimate_logg()
+    butler.estimate_mass()
+    butler.estimate_radius()
+    butler.estimate_logg()
 
     # Custom teff
-    mass = butler.estimate_mass(3100)
-    rad = butler.estimate_radius(3100)
-    log = butler.estimate_logg(3100)
+    butler.estimate_mass(3100)
+    butler.estimate_radius(3100)
+    butler.estimate_logg(3100)
 
     # Raise error if no teff available
     butler.periodogram.meta["TEFF"] = None
     with pytest.raises(ValueError):
-        mass = butler.estimate_mass()
+        butler.estimate_mass()
     with pytest.raises(ValueError):
-        rad = butler.estimate_radius()
+        butler.estimate_radius()
     with pytest.raises(ValueError):
-        log = butler.estimate_logg()
+        butler.estimate_logg()
 
 
 def test_plot_echelle():

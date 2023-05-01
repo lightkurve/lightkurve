@@ -1,7 +1,7 @@
 """Reader function for KEPSEISMIC community light curve products."""
 from ..lightcurve import KeplerLightCurve
-
 from .generic import read_generic_lightcurve
+
 
 def read_kepseismic_lightcurve(filename, **kwargs):
     """Read a KEPSEISMIC light curve file.

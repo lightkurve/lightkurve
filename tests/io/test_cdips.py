@@ -1,12 +1,10 @@
-import pytest
-
-from astropy.io import fits
 import numpy as np
-from numpy.testing import assert_array_equal
-
+import pytest
+from astropy.io import fits
 from lightkurve import search_lightcurve
 from lightkurve.io.cdips import read_cdips_lightcurve
 from lightkurve.io.detect import detect_filetype
+from numpy.testing import assert_array_equal
 
 TEST_TIC_ID = 104669918
 TEST_FIT_URL = "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HLSP/cdips/s0014/cam1_ccd1/hlsp_cdips_tess_ffi_gaiatwo0002030897830235411200-s0014-cam1-ccd1_tess_v01_llc.fits"

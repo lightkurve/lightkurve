@@ -1,17 +1,16 @@
 import os
-import warnings
 import tempfile
+import warnings
 
 import pytest
-
-from lightkurve.utils import LightkurveDeprecationWarning, LightkurveError
 from lightkurve import (
     PACKAGEDIR,
     KeplerTargetPixelFile,
-    TessTargetPixelFile,
     LightCurve,
+    TessTargetPixelFile,
 )
 from lightkurve.io import read
+from lightkurve.utils import LightkurveDeprecationWarning, LightkurveError
 
 from .. import TESTDATA
 

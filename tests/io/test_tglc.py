@@ -1,11 +1,10 @@
 import numpy as np
 import pytest
 from astropy.io import fits
-from numpy.testing import assert_array_equal
-
 from lightkurve import search_lightcurve
 from lightkurve.io.detect import detect_filetype
 from lightkurve.io.tglc import read_tglc_lightcurve
+from numpy.testing import assert_array_equal
 
 
 @pytest.mark.remote_data

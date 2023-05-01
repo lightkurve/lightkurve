@@ -7,28 +7,29 @@ import math
 import re
 import warnings
 
-import numpy as np
-from matplotlib import pyplot as plt
-
 import astropy
-from astropy.table import Table
+import numpy as np
 from astropy import units as u
-from astropy.units import cds
-from astropy.convolution import convolve, Box1DKernel
+from astropy.convolution import Box1DKernel, convolve
+from astropy.table import Table
 from astropy.time import Time
+from astropy.units import cds
+from matplotlib import pyplot as plt
 
 # LombScargle was moved from astropy.stats to astropy.timeseries in AstroPy v3.2
 try:
-    from astropy.timeseries import LombScargle
-    from astropy.timeseries import implementations  # for .main._is_regular
+    from astropy.timeseries import (
+        LombScargle,
+        implementations,  # for .main._is_regular
+    )
 except ImportError:
     from astropy.stats import LombScargle
     from astropy.stats.lombscargle import implementations
 
 
 from . import MPLSTYLE
-from .utils import LightkurveWarning, validate_method
 from .lightcurve import LightCurve
+from .utils import LightkurveWarning, validate_method
 
 log = logging.getLogger(__name__)
 
@@ -77,7 +78,7 @@ class Periodogram(object):
         label=None,
         targetid=None,
         default_view="frequency",
-        meta={},
+        meta=None,
     ):
         # Input validation
         if not isinstance(frequency, u.quantity.Quantity):
@@ -101,7 +102,7 @@ class Periodogram(object):
         self.label = label
         self.targetid = targetid
         self.default_view = self._validate_view(default_view)
-        self.meta = meta
+        self.meta = {} if meta is None else meta
 
     def _validate_view(self, view):
         """Verifies whether `view` is is one of {"frequency", "period"} and

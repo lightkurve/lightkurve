@@ -2,15 +2,11 @@
 """
 from __future__ import division, print_function
 
-from astropy.utils.data import get_pkg_data_filename
-from astropy.stats.bls import BoxLeastSquares
-
 import numpy as np
-import pytest
-from scipy import stats
-
+from astropy.utils.data import get_pkg_data_filename
+from lightkurve.correctors import PLDCorrector, SFFCorrector
 from lightkurve.targetpixelfile import KeplerTargetPixelFile
-from lightkurve.correctors import SFFCorrector, PLDCorrector
+from scipy import stats
 
 # See `data/synthetic/README.md` for details about these synthetic test files
 filename_synthetic_sine = get_pkg_data_filename(

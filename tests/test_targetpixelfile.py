@@ -3,26 +3,28 @@ import os
 import tempfile
 import warnings
 
+import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.testing import assert_array_equal
 import pytest
-
-from astropy.utils.data import get_pkg_data_filename
-from astropy.io.fits.verify import VerifyWarning
+from astropy import wcs
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
-from astropy import wcs
 from astropy.io.fits.card import UNDEFINED
-import astropy.units as u
+from astropy.io.fits.verify import VerifyWarning
+from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyWarning
-
-from lightkurve.targetpixelfile import KeplerTargetPixelFile, TargetPixelFileFactory
-from lightkurve.targetpixelfile import TessTargetPixelFile, TargetPixelFile
-from lightkurve.lightcurve import TessLightCurve
-from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning
 from lightkurve.io import read
+from lightkurve.lightcurve import TessLightCurve
 from lightkurve.search import search_tesscut
+from lightkurve.targetpixelfile import (
+    KeplerTargetPixelFile,
+    TargetPixelFile,
+    TargetPixelFileFactory,
+    TessTargetPixelFile,
+)
+from lightkurve.utils import LightkurveDeprecationWarning, LightkurveWarning
+from numpy.testing import assert_array_equal
 
 from .test_synthetic_data import filename_synthetic_flat
 
@@ -252,7 +254,7 @@ def test_wcs():
 def test_wcs_tabby(method):
     """Test the centroids from Tabby's star against simbad values"""
     tpf = KeplerTargetPixelFile(filename_tpf_tabby_lite)
-    tpf.wcs
+    assert isinstance(tpf.wcs, wcs.WCS)
     ra, dec = tpf.get_coordinates(0)
     col, row = tpf.estimate_centroids(method=method)
     col = col.value - tpf.column
@@ -468,7 +470,7 @@ def test_tpf_from_images():
     w.wcs.crval = [0, -90]
     w.wcs.ctype = ["RA---AIR", "DEC--AIR"]
     w.wcs.set_pv([(2, 1, 45.0)])
-    pixcrd = np.array([[0, 0], [24, 38], [45, 98]], np.float_)
+    np.array([[0, 0], [24, 38], [45, 98]], np.float_)
     header = w.to_header()
     header["CRVAL1P"] = 10
     header["CRVAL2P"] = 20
@@ -511,14 +513,14 @@ def test_tpf_from_images():
             # Ignore "LightkurveWarning: Could not detect filetype as TESSTargetPixelFile or KeplerTargetPixelFile, returning generic TargetPixelFile instead."
             warnings.simplefilter("ignore", LightkurveWarning)
             # Should be able to run with a list of file names
-            tpf_tmpfiles = TargetPixelFile.from_fits_images(
+            TargetPixelFile.from_fits_images(
                 tmpfile_names,
                 size=(3, 3),
                 position=SkyCoord(ra, dec, unit=(u.deg, u.deg)),
             )
 
             # Should be able to run with a list of HDUlists
-            tpf_hdus = TargetPixelFile.from_fits_images(
+            TargetPixelFile.from_fits_images(
                 hdus, size=(3, 3), position=SkyCoord(ra, dec, unit=(u.deg, u.deg))
             )
 
@@ -619,7 +621,7 @@ def test_tess_simulation():
     assert tpf.mission == "TESS"
     assert tpf.time.scale == "tdb"
     assert tpf.flux.shape == tpf.flux_err.shape
-    tpf.wcs
+    assert isinstance(tpf.wcs, wcs.WCS)
     col, row = tpf.estimate_centroids()
     # Regression test for https://github.com/lightkurve/lightkurve/pull/236
     assert (tpf.time.value == 0).sum() == 0
@@ -660,7 +662,7 @@ def test_tpf_tess():
     assert_array_equal(lc.time, tpf.time)
     assert tpf.time.scale == "tdb"
     assert tpf.flux.shape == tpf.flux_err.shape
-    tpf.wcs
+    assert isinstance(tpf.wcs, wcs.WCS)
     col, row = tpf.estimate_centroids()
 
 
@@ -779,7 +781,8 @@ def test_get_header():
     assert tpf.get_header(ext=2)["EXTNAME"] == "APERTURE"
     # ``tpf.header`` is deprecated
     with pytest.warns(LightkurveDeprecationWarning, match="deprecated"):
-        tpf.header
+        header = tpf.header
+        del header
 
 
 def test_plot_pixels():

@@ -2,16 +2,15 @@
 import logging
 import warnings
 
+import numpy as np
 from astropy.io import fits
 from astropy.table import Table
 from astropy.time import Time
 from astropy.units import UnitsWarning
-import numpy as np
 
-from ..utils import validate_method
 from ..lightcurve import LightCurve
 from ..units import ppm
-
+from ..utils import validate_method
 
 log = logging.getLogger(__name__)
 

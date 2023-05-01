@@ -4,14 +4,15 @@ with user-defined Gaussian priors in a fast, analytical way.
 import logging
 import warnings
 
-from astropy.stats import sigma_clip
-from astropy import units as u
-from astropy.utils.exceptions import AstropyUserWarning
-from astropy.utils.masked import Masked
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.sparse import issparse, csr_matrix
+from astropy import units as u
+from astropy.stats import sigma_clip
+from astropy.utils.exceptions import AstropyUserWarning
+from astropy.utils.masked import Masked
+from scipy.sparse import csr_matrix, issparse
 
+from ..lightcurve import MPLSTYLE, LightCurve
 from .corrector import Corrector
 from .designmatrix import (
     DesignMatrix,
@@ -19,8 +20,6 @@ from .designmatrix import (
     SparseDesignMatrix,
     SparseDesignMatrixCollection,
 )
-from ..lightcurve import LightCurve, MPLSTYLE
-
 
 __all__ = ["RegressionCorrector"]
 
@@ -34,49 +33,49 @@ class RegressionCorrector(Corrector):
     .. math::
 
         \\newcommand{\\y}{\\mathbf{y}}
-        \\newcommand{\\cov}{\\boldsymbol\Sigma_\y}
+        \\newcommand{\\cov}{\\boldsymbol\\Sigma_\\y}
         \\newcommand{\\w}{\\mathbf{w}}
-        \\newcommand{\\covw}{\\boldsymbol\Sigma_\w}
-        \\newcommand{\\muw}{\\boldsymbol\mu_\w}
-        \\newcommand{\\sigw}{\\boldsymbol\sigma_\w}
-        \\newcommand{\\varw}{\\boldsymbol\sigma^2_\w}
+        \\newcommand{\\covw}{\\boldsymbol\\Sigma_\\w}
+        \\newcommand{\\muw}{\\boldsymbol\\mu_\\w}
+        \\newcommand{\\sigw}{\\boldsymbol\\sigma_\\w}
+        \\newcommand{\\varw}{\\boldsymbol\\sigma^2_\\w}
 
-    Given a column vector of data :math:`\y`
+    Given a column vector of data :math:`\\y`
     and a design matrix of regressors :math:`X`,
-    we will find the vector of coefficients :math:`\w`
+    we will find the vector of coefficients :math:`\\w`
     such that:
 
     .. math::
 
-        \mathbf{y} = X\mathbf{w} + \mathrm{noise}
+        \\mathbf{y} = X\\mathbf{w} + \\mathrm{noise}
 
     We will assume that the model fits the data within Gaussian uncertainties:
 
     .. math::
 
-        p(\y | \w) = \mathcal{N}(X\w, \cov)
+        p(\\y | \\w) = \\mathcal{N}(X\\w, \\cov)
 
 
-    We make the regression robust by placing Gaussian priors on :math:`\w`:
+    We make the regression robust by placing Gaussian priors on :math:`\\w`:
 
     .. math::
 
-        p(\w) = \mathcal{N}(\muw, \sigw)
+        p(\\w) = \\mathcal{N}(\\muw, \\sigw)
 
 
     We can then find the maximum likelihood solution of the posterior
-    distribution :math:`p(\w | \y) \propto p(\y | \w) p(\w)` by solving
+    distribution :math:`p(\\w | \\y) \\propto p(\\y | \\w) p(\\w)` by solving
     the matrix equation:
 
     .. math::
 
-        \w = \covw (X^\\top \cov^{-1} \y + \\boldsymbol\sigma^{-2}_\w I \muw)
+        \\w = \\covw (X^\\top \\cov^{-1} \\y + \\boldsymbol\\sigma^{-2}_\\w I \\muw)
 
-    Where :math:`\covw` is the covariance matrix of the coefficients:
+    Where :math:`\\covw` is the covariance matrix of the coefficients:
 
     .. math::
 
-        \covw^{-1} = (X^\\top \cov^{-1} X + \\boldsymbol\sigma^{-2}_\w I)
+        \\covw^{-1} = (X^\\top \\cov^{-1} X + \\boldsymbol\\sigma^{-2}_\\w I)
 
 
     Parameters

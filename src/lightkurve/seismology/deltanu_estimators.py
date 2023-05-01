@@ -2,15 +2,14 @@
 from __future__ import division, print_function
 
 import numpy as np
-from scipy.signal import find_peaks
+from astropy import units as u
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from scipy.signal import find_peaks
 
-from astropy import units as u
-
-from .utils import SeismologyQuantity
-from . import utils
 from .. import MPLSTYLE
+from . import utils
+from .utils import SeismologyQuantity
 
 __all__ = ["estimate_deltanu_acf2d", "diagnose_deltanu_acf2d"]
 

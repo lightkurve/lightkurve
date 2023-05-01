@@ -15,9 +15,8 @@ __all__ = [
     "estimate_logg",
 ]
 
-from .core import *
-from .utils import *
-
-from .numax_estimators import *
-from .deltanu_estimators import *
-from .stellar_estimators import *
+from .core import Seismology
+from .deltanu_estimators import diagnose_deltanu_acf2d, estimate_deltanu_acf2d
+from .numax_estimators import diagnose_numax_acf2d, estimate_numax_acf2d
+from .stellar_estimators import estimate_logg, estimate_mass, estimate_radius
+from .utils import SeismologyQuantity

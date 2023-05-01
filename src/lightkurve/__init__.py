@@ -101,18 +101,56 @@ class Conf(_config.ConfigNamespace):
 conf = Conf()
 
 
-from .version import __version__
-from . import units  # enable ppt and ppm as units
-from .time import *
-from .lightcurve import *
-from .lightcurvefile import *
-from .correctors import *
-from .targetpixelfile import *
-from .utils import *
-from .convenience import *
-from .collections import *
-from .io import *
-from .search import *
-
 from . import config
+from .collections import (
+    LightCurveCollection as LightCurveCollection,
+    TargetPixelFileCollection as TargetPixelFileCollection,
+)
+from .convenience import estimate_cdpp as estimate_cdpp
+from .lightcurve import (
+    FoldedLightCurve as FoldedLightCurve,
+    KeplerLightCurve as KeplerLightCurve,
+    LightCurve as LightCurve,
+    TessLightCurve as TessLightCurve,
+)
+from .lightcurvefile import (
+    KeplerLightCurveFile as KeplerLightCurveFile,
+    LightCurveFile as LightCurveFile,
+    TessLightCurveFile as TessLightCurveFile,
+)
+from .search import (
+    SearchResult as SearchResult,
+    search_lightcurve as search_lightcurve,
+    search_lightcurvefile as search_lightcurvefile,
+    search_targetpixelfile as search_targetpixelfile,
+    search_tesscut as search_tesscut,
+)
+from .targetpixelfile import (
+    KeplerTargetPixelFile as KeplerTargetPixelFile,
+    TessTargetPixelFile as TessTargetPixelFile,
+)
+from .time import (
+    TimeBKJD as TimeBKJD,
+    TimeBTJD as TimeBTJD,
+)
+from .utils import (
+    KeplerQualityFlags as KeplerQualityFlags,
+    LightkurveError as LightkurveError,
+    LightkurveWarning as LightkurveWarning,
+    TessQualityFlags as TessQualityFlags,
+    bkjd_to_astropy_time as bkjd_to_astropy_time,
+    btjd_to_astropy_time as btjd_to_astropy_time,
+    show_citation_instructions as show_citation_instructions,
+)
+from .version import __version__ as __version__
+
+pass  # This is required to convince Ruff to allow the following imports to be last
+
+# Must be last to avoid circular imports
+from .correctors import *  # noqa
+from .io import (
+    open as open,
+    read as read,
+)
+
 config.warn_if_default_cache_dir_migration_needed()

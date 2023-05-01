@@ -40,16 +40,15 @@ print('The star flux in the first cadence is {}'.format(pp.results[0].stars[0].f
 from __future__ import division, print_function
 
 import logging
-from matplotlib import pyplot as plt
-import numpy as np
-from tqdm import tqdm
 import warnings
 
-from oktopus import Prior, GaussianPrior, UniformPrior, PoissonPosterior
+import numpy as np
+from matplotlib import pyplot as plt
+from oktopus import GaussianPrior, PoissonPosterior, Prior, UniformPrior
+from tqdm import tqdm
 
-from .prfmodel import KeplerPRF
 from ..utils import plot_image
-
+from .prfmodel import KeplerPRF
 
 __all__ = [
     "GaussianPrior",
@@ -391,7 +390,7 @@ class TPFModelParameters(object):
         array = np.asarray(array).ravel()
         next_idx = 0
         stars = []
-        for staridx in range(len(self.stars)):
+        for _staridx in range(len(self.stars)):
             star = StarParameters(
                 col=array[next_idx], row=array[next_idx + 1], flux=array[next_idx + 2]
             )
@@ -581,7 +580,7 @@ class TPFModel(object):
         # We assume the background gradient is proportional to one
         grad.append([np.ones(self.prfmodel.shape)])
         # We assume the gradient of other parameters is one
-        for i in range(len([params_array]) - 3 * len(params.stars) - 1):
+        for _i in range(len([params_array]) - 3 * len(params.stars) - 1):
             grad.append([np.ones(self.prfmodel.shape)])
         grad = sum(grad, [])
         return grad

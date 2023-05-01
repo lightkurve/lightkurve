@@ -1,21 +1,19 @@
 """Tests the features of the lightkurve.interact module."""
 import warnings
 
-from astropy.utils.data import get_pkg_data_filename
 import numpy as np
-from numpy.testing import assert_array_equal
 import pytest
-
-from lightkurve import LightkurveWarning, LightkurveError
+from astropy.utils.data import get_pkg_data_filename
+from lightkurve import LightkurveError, LightkurveWarning
+from lightkurve.interact import get_lightcurve_y_limits
 from lightkurve.search import search_targetpixelfile
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from .test_targetpixelfile import filename_tpf_tabby_lite
-from lightkurve.interact import get_lightcurve_y_limits
+from numpy.testing import assert_array_equal
 
+from .test_targetpixelfile import filename_tpf_tabby_lite
 
 bad_optional_imports = False
 try:
-    import bokeh
     from bokeh.plotting import ColumnDataSource
 except ImportError:
     bad_optional_imports = True
@@ -34,7 +32,7 @@ def test_bokeh_import_error(caplog):
     """If bokeh is not installed (optional dependency),
     is a friendly error message printed?"""
     try:
-        import bokeh
+        pass
     except ImportError:
         tpf = TessTargetPixelFile(example_tpf)
         tpf.interact()
@@ -44,7 +42,6 @@ def test_bokeh_import_error(caplog):
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_malformed_notebook_url():
     """Test if malformed notebook_urls raise proper exceptions."""
-    import bokeh
 
     tpf = TessTargetPixelFile(example_tpf)
     with pytest.raises(ValueError) as exc:
@@ -58,7 +55,6 @@ def test_malformed_notebook_url():
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_graceful_exit_outside_notebook():
     """Test if running interact outside of a notebook does fails gracefully."""
-    import bokeh
 
     tpf = TessTargetPixelFile(example_tpf)
     result = tpf.interact()
@@ -72,7 +68,6 @@ def test_custom_aperture_mask():
         # Ignore the "TELESCOP is not equal to TESS" warning
         warnings.simplefilter("ignore", LightkurveWarning)
         tpfs = [KeplerTargetPixelFile(filename_tpf_tabby_lite), TessTargetPixelFile(example_tpf)]
-    import bokeh
 
     for tpf in tpfs:
         mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
@@ -86,7 +81,6 @@ def test_custom_aperture_mask():
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_custom_exported_filename():
     """Can we provide a custom lightcurve to show?"""
-    import bokeh
 
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
@@ -121,14 +115,13 @@ def test_transform_and_ylim_funcs():
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_functions():
     """Do the helper functions in the interact module run without syntax error?"""
-    import bokeh
     from lightkurve.interact import (
-        prepare_tpf_datasource,
-        prepare_lightcurve_datasource,
         aperture_mask_from_selected_indices,
         get_lightcurve_y_limits,
         make_lightcurve_figure_elements,
         make_tpf_figure_elements,
+        prepare_lightcurve_datasource,
+        prepare_tpf_datasource,
         show_interact_widget,
     )
 
@@ -186,11 +179,10 @@ def test_interact_functions():
     ])
 def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
     """Do the helper functions in the interact module run without syntax error?"""
-    import bokeh
     from lightkurve.interact import (
-        prepare_tpf_datasource,
-        make_tpf_figure_elements,
         add_gaia_figure_elements,
+        make_tpf_figure_elements,
+        prepare_tpf_datasource,
     )
     tpf = tpf_class(tpf_file)
     mask = tpf._parse_aperture_mask(aperture_mask)
@@ -203,11 +195,10 @@ def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_sky_functions_case_no_target_coordinate():
-    import bokeh
     from lightkurve.interact import (
-        prepare_tpf_datasource,
-        make_tpf_figure_elements,
         add_gaia_figure_elements,
+        make_tpf_figure_elements,
+        prepare_tpf_datasource,
     )
     tpf_class, tpf_file = TessTargetPixelFile, example_tpf_no_target_position
 
@@ -223,8 +214,8 @@ def test_interact_sky_functions_case_no_target_coordinate():
 def test_interact_sky_functions_add_nearby_tics():
     """Test the backend of interact_sky() that combine Nearby TIC report with Gaia result."""
     from lightkurve.interact import (
-        _get_nearby_gaia_objects,
         _add_nearby_tics_if_tess,
+        _get_nearby_gaia_objects,
     )
     # This TIC's nearby report has a mix of stars with Gaia and without Gaia IDs.
     # https://exofop.ipac.caltech.edu/tess/nearbytarget.php?id=233087860
@@ -248,8 +239,8 @@ def test_interact_sky_functions_add_nearby_tics_weird_dtype():
     Case the dtype from Gaia result dataframe is weird.
     """
     from lightkurve.interact import (
-        _get_nearby_gaia_objects,
         _add_nearby_tics_if_tess,
+        _get_nearby_gaia_objects,
     )
     # For this TIC, the dataframe from Gaia search has weird DType:
     # df['Source'].dtype is an instance of pd.Int64Dtype, not the type class itself.
@@ -271,13 +262,12 @@ def test_interact_sky_functions_case_nearby_tics_failed(monkeypatch):
        interact_sky will still function (without the TIC information) rather
        than raising exceptions.
     """
-    import bokeh
-    from lightkurve.interact import (
-        prepare_tpf_datasource,
-        make_tpf_figure_elements,
-        add_gaia_figure_elements,
-    )
     import lightkurve.interact as lk_interact
+    from lightkurve.interact import (
+        add_gaia_figure_elements,
+        make_tpf_figure_elements,
+        prepare_tpf_datasource,
+    )
 
     def mock_raise(*args):
         raise IOError("simulated service unavailable")

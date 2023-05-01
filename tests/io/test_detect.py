@@ -1,8 +1,6 @@
 import os
 
 from astropy.io import fits
-
-from lightkurve import PACKAGEDIR
 from lightkurve.io import detect_filetype
 
 from .. import TESTDATA

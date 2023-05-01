@@ -14,46 +14,46 @@ visualization widget showing the pixel data and a lightcurve::
 Note that this will only work inside a Jupyter notebook at this time.
 """
 from __future__ import division, print_function
-import os
+
 import logging
+import os
 import warnings
 
+import astropy.units as u
 import numpy as np
-from astropy.coordinates import SkyCoord, Angle
+import pandas as pd
+from astropy.coordinates import Angle, SkyCoord
 from astropy.io import ascii
 from astropy.stats import sigma_clip
 from astropy.time import Time
-import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
-import pandas as pd
 from pandas import Series
 
-from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError
+from .utils import KeplerQualityFlags, LightkurveError, LightkurveWarning
 
 log = logging.getLogger(__name__)
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
-    import bokeh  # Import bokeh first so we get an ImportError we can catch
-    from bokeh.io import show, output_notebook, push_notebook
-    from bokeh.plotting import figure, ColumnDataSource
+    from bokeh.io import output_notebook, show
+    from bokeh.layouts import Spacer, layout
     from bokeh.models import (
-        LogColorMapper,
-        Slider,
-        RangeSlider,
-        Span,
+        Arrow,
+        BasicTicker,
         ColorBar,
+        LinearColorMapper,
+        LogColorMapper,
         LogTicker,
         Range1d,
-        LinearColorMapper,
-        BasicTicker,
-        Arrow,
+        RangeSlider,
+        Slider,
+        Span,
         VeeHead,
     )
-    from bokeh.layouts import layout, Spacer
+    from bokeh.models.formatters import PrintfTickFormatter
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button, Div
-    from bokeh.models.formatters import PrintfTickFormatter
+    from bokeh.plotting import ColumnDataSource, figure
 except ImportError:
     # We will print a nice error message in the `show_interact_widget` function
     pass
@@ -470,7 +470,7 @@ def _add_nearby_tics_if_tess(tpf, magnitude_limit, result):
     result = _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limit)
 
     source_colnames_extras = ['tic', 'TESSmag', 'separation']
-    tooltips_extras = [("TIC", "@tic"), ("TESS Mag", "@TESSmag"), ("Separation (\")", "@separation")]
+    tooltips_extras = [("TIC", "@tic"), ("TESS Mag", "@TESSmag"), ('Separation (")', "@separation")]
     return result, source_colnames_extras, tooltips_extras
 
 
@@ -1079,7 +1079,7 @@ def show_interact_widget(
         exported_filename = make_default_export_name(tpf)
     try:
         exported_filename = str(exported_filename)
-    except:
+    except Exception:
         log.error("Invalid input filename type for interact()")
         raise
     if ".fits" not in exported_filename.lower():

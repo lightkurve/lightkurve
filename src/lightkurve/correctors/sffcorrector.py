@@ -6,19 +6,17 @@ Self Flat-Fielding (SFF) method described in Vanderburg and Johnson (2014).
 import logging
 import warnings
 
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-
-from astropy.modeling import models, fitting
+import numpy as np
+import pandas as pd
+from astropy.modeling import fitting, models
 from astropy.units import Quantity
-
-from . import DesignMatrix, DesignMatrixCollection, SparseDesignMatrixCollection
-from .regressioncorrector import RegressionCorrector
-from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
 
 from .. import MPLSTYLE
 from ..utils import LightkurveWarning
+from . import DesignMatrix, DesignMatrixCollection, SparseDesignMatrixCollection
+from .designmatrix import create_sparse_spline_matrix, create_spline_matrix
+from .regressioncorrector import RegressionCorrector
 
 log = logging.getLogger(__name__)
 

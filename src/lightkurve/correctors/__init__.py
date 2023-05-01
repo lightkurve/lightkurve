@@ -12,9 +12,8 @@ class, which provides three key methods::
 Classes currently provided are `KeplerCBVCorrector`, `SFFCorrector`, and
 `PLDCorrector`.
 """
-from .designmatrix import *
-
-from .pldcorrector import *
-from .sffcorrector import *
-from .cbvcorrector import *
-from .regressioncorrector import *
+from .cbvcorrector import *  # noqa
+from .designmatrix import *  # noqa
+from .pldcorrector import *  # noqa
+from .regressioncorrector import *  # noqa
+from .sffcorrector import *  # noqa

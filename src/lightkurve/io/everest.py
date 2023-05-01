@@ -1,7 +1,6 @@
 """Reader for K2 EVEREST light curves."""
 from ..lightcurve import KeplerLightCurve
 from ..utils import KeplerQualityFlags
-
 from .generic import read_generic_lightcurve
 
 

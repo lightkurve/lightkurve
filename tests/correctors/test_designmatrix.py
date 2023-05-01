@@ -1,12 +1,11 @@
-import pytest
 import warnings
 
 import numpy as np
-from numpy.testing import assert_array_equal
 import pandas as pd
-
-from lightkurve.correctors import DesignMatrix, DesignMatrixCollection
+import pytest
 from lightkurve import LightkurveWarning
+from lightkurve.correctors import DesignMatrix, DesignMatrixCollection
+from numpy.testing import assert_array_equal
 
 
 def test_designmatrix_basics():

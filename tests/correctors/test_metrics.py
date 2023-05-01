@@ -1,14 +1,13 @@
 import numpy as np
 import pytest
-from numpy.testing import assert_allclose
-
 from lightkurve import LightCurve, search_lightcurve
 from lightkurve.correctors.metrics import (
+    _align_to_lc,
+    _compute_correlation,
     overfit_metric_lombscargle,
     underfit_metric_neighbors,
-    _compute_correlation,
-    _align_to_lc,
 )
+from numpy.testing import assert_allclose
 
 
 def test_overfit_metric_lombscargle():

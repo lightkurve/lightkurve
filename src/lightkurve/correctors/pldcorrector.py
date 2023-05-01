@@ -12,21 +12,20 @@ import logging
 import warnings
 from itertools import combinations_with_replacement as multichoose
 
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 
+from .. import MPLSTYLE
+from ..utils import LightkurveDeprecationWarning
 from .designmatrix import (
     DesignMatrix,
     DesignMatrixCollection,
     SparseDesignMatrixCollection,
+    create_sparse_spline_matrix,
+    create_spline_matrix,
 )
 from .regressioncorrector import RegressionCorrector
-from .designmatrix import create_spline_matrix, create_sparse_spline_matrix
-from .. import MPLSTYLE
-from ..utils import LightkurveDeprecationWarning
-
 
 log = logging.getLogger(__name__)
 
@@ -434,7 +433,7 @@ class PLDCorrector(RegressionCorrector):
         `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
-        if not getattr(self, "corrected_lc"):
+        if not self.corrected_lc:
             raise ValueError(
                 "You need to call the `correct()` method "
                 "before you can call `diagnose()`."

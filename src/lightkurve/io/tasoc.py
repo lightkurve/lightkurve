@@ -4,8 +4,6 @@
    pipeline used to generate the data is open source and available on GitHub - https://github.com/tasoc
 """
 from ..lightcurve import TessLightCurve
-from ..utils import TessQualityFlags
-
 from .generic import read_generic_lightcurve
 
 

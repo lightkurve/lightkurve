@@ -15,8 +15,11 @@ from . import (
     tess,
     tglc,
 )
-from .detect import *
-from .read import *
+from .detect import detect_filetype as detect_filetype
+from .read import (
+    open as open,
+    read as read,
+)
 
 __all__ = ["read", "open"]
 
