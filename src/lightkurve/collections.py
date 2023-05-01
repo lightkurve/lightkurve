@@ -8,6 +8,7 @@ import numpy as np
 from astropy.table import vstack
 from astropy.utils.decorators import deprecated
 
+import lightkurve
 from . import MPLSTYLE
 from .targetpixelfile import TargetPixelFile
 from .utils import LightkurveWarning, LightkurveDeprecationWarning
@@ -225,7 +226,7 @@ class LightCurveCollection(Collection):
         # Need `join_type='inner'` until AstroPy supports masked Quantities
         return vstack(lcs, join_type="inner", metadata_conflicts="silent")
 
-    def to_periodograms(**kwargs) -> Lightkurve.collections.PeriodogramCollection:
+    def to_periodograms(self, **kwargs):
         """Converts all light curves in the collection into periodograms.
         These periodograms are stored in a PeriodogramCollection.
 
@@ -241,7 +242,9 @@ class LightCurveCollection(Collection):
         """
         periodograms = []
         for idx, lc in enumerate(self):
-            lc_clean = lc.normalize().remove_nans()
+            lc_clean = lc.normalize().remove_nans().remove_outliers()
+
+            #TODO: pop keyword arguments
             periodograms.append(lc_clean.to_periodogram(*kwargs))
         
         return PeriodogramCollection(periodograms)
@@ -312,16 +315,18 @@ class PeriodogramCollection(Collection):
     def average(self):
         """ Average two time-separated periodograms (useful for TESS)
         """
-        #TODO: Build this function!
+        raise NotImplementError
     
     def normalize(self):
         """ Apply the `Periodogram.normalize()` function to all constituent periodogram objects
         """
+        raise NotImplementError
+
 
     def flatten(self):
         """ Apply the `Periodogram.flatten()` function to all constituent periodogram objects
         """
-        #TODO Build this function!
+        raise NotImplementError
 
     def plot(self, ax=None, offset=0.0, **kwargs) -> matplotlib.axes.Axes:
         """Plots all periodograms in the collection on a single plot.
@@ -354,8 +359,8 @@ class PeriodogramCollection(Collection):
                     kwargs.pop(kwarg)
 
             for idx, pg in enumerate(self):
-                kwargs["label"] = f"{idx}: {lc.meta.get('LABEL', '(missing label)')}"
-                pg.plot(ax=ax, c=f"C{idx}", offset=idx * offset, **kwargs)
+                kwargs["label"] = f"{idx}: {pg.meta.get('LABEL', '(missing label)')}"
+                (pg+idx*offset).plot(ax=ax, c=f"C{idx}", **kwargs)
 
         return ax
 
