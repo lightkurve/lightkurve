@@ -17,7 +17,8 @@ __all__ = ["LightCurveCollection", "TargetPixelFileCollection"]
 
 
 class Collection(object):
-    """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
+    """Base class for `LightCurveCollection`, `PeriodogramCollection`
+    and `TargetPixelFileCollection`.
 
     A collection can be indexed by standard Python list syntax.
     Additionally, it can be indexed by a subset of `numpy.ndarray` syntax:
@@ -85,7 +86,7 @@ class Collection(object):
         Parameters
         ----------
         obj : object
-            Typically a LightCurve or TargetPixelFile object
+            Typically a LightCurve, Periodogram or TargetPixelFile object
         """
         self.data.append(obj)
 
@@ -108,7 +109,7 @@ class Collection(object):
 
     @property
     def sector(self):
-        """(TESS-specific) the quarters of the lightcurves / target pixel files.
+        """(TESS-specific) the quarters of the lightcurves / periodograms / target pixel files.
 
         Returns `numpy.nan` for data products with lack a sector meta data keyword.
         The attribute is useful for filtering a collection by sector.
@@ -128,9 +129,10 @@ class Collection(object):
 
     @property
     def quarter(self):
-        """(Kepler-specific) the quarters of the lightcurves / target pixel files.
+        """(Kepler-specific) the quarters of the lightcurves / periodograms / target pixel files.
 
-        The Kepler quarters of the lightcurves / target pixel files; `numpy.nan` for those with none.
+        The Kepler quarters of the lightcurves / periodograms / target pixel files; `numpy.nan` for 
+        those with none.
         """
         return self._safeGetScalarAttr("quarter")
 
@@ -223,6 +225,28 @@ class LightCurveCollection(Collection):
         # Need `join_type='inner'` until AstroPy supports masked Quantities
         return vstack(lcs, join_type="inner", metadata_conflicts="silent")
 
+    def to_periodograms(**kwargs) -> Lightkurve.collections.PeriodogramCollection:
+        """Converts all light curves in the collection into periodograms.
+        These periodograms are stored in a PeriodogramCollection.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Dictionary of arguments to be passed to `LightCurve.to_periodogram`.
+
+        Returns
+        -------
+        pgc : `~lightkurve.collections.PeriodogramCollection`
+            A collection of periodograms.
+        """
+        periodograms = []
+        for idx, lc in enumerate(self):
+            lc_clean = lc.normalize().remove_nans()
+            periodograms.append(lc_clean.to_periodogram(*kwargs))
+        
+        return PeriodogramCollection(periodograms)
+
+
     def plot(self, ax=None, offset=0.0, **kwargs) -> matplotlib.axes.Axes:
         """Plots all light curves in the collection on a single plot.
 
@@ -271,6 +295,69 @@ class LightCurveCollection(Collection):
 
         return ax
 
+class PeriodogramCollection(Collection):
+    """Class to hold a collection of Periodogram objects.
+
+    #TODO: We need some way to stitch adjacent tess sectors!
+
+    Attributes
+    ----------
+    periodograms : array-like
+        List of Periodogram objects.
+    """
+
+    def __init__(self, periodograms):
+        super(PeriodogramCollection, self).__init__(periodograms)
+
+    def average(self):
+        """ Average two time-separated periodograms (useful for TESS)
+        """
+        #TODO: Build this function!
+    
+    def normalize(self):
+        """ Apply the `Periodogram.normalize()` function to all constituent periodogram objects
+        """
+
+    def flatten(self):
+        """ Apply the `Periodogram.flatten()` function to all constituent periodogram objects
+        """
+        #TODO Build this function!
+
+    def plot(self, ax=None, offset=0.0, **kwargs) -> matplotlib.axes.Axes:
+        """Plots all periodograms in the collection on a single plot.
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes.Axes`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be created.
+        offset : float
+            Offset to add to targets with different labels, to prevent periodograms
+            from being plotted on top of each other.  For example, if
+            the collection contains periodograms with unique labels "A", "B",
+            and "C", periodograms "A" will have `0*offset` added to their power/amplitude,
+            periodograms "B" will have `1*offset` offset added, and "C" will
+            have `2*offset` added.
+        **kwargs : dict
+            Dictionary of arguments to be passed to `Periodogram.plot`.
+
+        Returns
+        -------
+        ax : `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+        with plt.style.context(MPLSTYLE):
+            if ax is None:
+                _, ax = plt.subplots()
+            for kwarg in ["c", "color", "label"]:
+                if kwarg in kwargs:
+                    kwargs.pop(kwarg)
+
+            for idx, pg in enumerate(self):
+                kwargs["label"] = f"{idx}: {lc.meta.get('LABEL', '(missing label)')}"
+                pg.plot(ax=ax, c=f"C{idx}", offset=idx * offset, **kwargs)
+
+        return ax
 
 class TargetPixelFileCollection(Collection):
     """Class to hold a collection of `~lightkurve.targetpixelfile.TargetPixelFile` objects.
