@@ -29,17 +29,17 @@ log = logging.getLogger(__name__)
 
 
 class RegressionCorrector(Corrector):
-    """Remove noise using linear regression against a `.DesignMatrix`.
+    r"""Remove noise using linear regression against a `.DesignMatrix`.
 
     .. math::
 
-        \\newcommand{\\y}{\\mathbf{y}}
-        \\newcommand{\\cov}{\\boldsymbol\Sigma_\y}
-        \\newcommand{\\w}{\\mathbf{w}}
-        \\newcommand{\\covw}{\\boldsymbol\Sigma_\w}
-        \\newcommand{\\muw}{\\boldsymbol\mu_\w}
-        \\newcommand{\\sigw}{\\boldsymbol\sigma_\w}
-        \\newcommand{\\varw}{\\boldsymbol\sigma^2_\w}
+        \newcommand{\y}{\mathbf{y}}
+        \newcommand{\cov}{\boldsymbol\Sigma_\y}
+        \newcommand{\w}{\mathbf{w}}
+        \newcommand{\covw}{\boldsymbol\Sigma_\w}
+        \newcommand{\muw}{\boldsymbol\mu_\w}
+        \newcommand{\sigw}{\boldsymbol\sigma_\w}
+        \newcommand{\varw}{\boldsymbol\sigma^2_\w}
 
     Given a column vector of data :math:`\y`
     and a design matrix of regressors :math:`X`,
