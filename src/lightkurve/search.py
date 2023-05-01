@@ -54,6 +54,7 @@ AUTHOR_LINKS = {
     "TESScut": "https://mast.stsci.edu/tesscut/",
     "GSFC-ELEANOR-LITE": "https://archive.stsci.edu/hlsp/gsfc-eleanor-lite",
     "TGLC": "https://archive.stsci.edu/hlsp/tglc",
+    "KEPSEISMIC": "https://archive.stsci.edu/prepds/kepseismic/"
 }
 
 REPR_COLUMNS_BASE = [
@@ -1257,8 +1258,8 @@ def _filter_products(
     products : `astropy.table.Table` object
         Masked astropy table containing desired data products
     """
-    if provenance_name is None:  # apply all filters
-        provenance_lower = ("kepler", "k2", "spoc")
+    if provenance_name is None:  # apply all filters; tess-spoc is a HLSP but it is spoc-like
+        provenance_lower = ("kepler", "k2", "spoc", "tess-spoc")
     else:
         provenance_lower = [p.lower() for p in np.atleast_1d(provenance_name)]
 
@@ -1274,7 +1275,11 @@ def _filter_products(
     # HLSP products need to be filtered by extension
     if filetype.lower() == "lightcurve":
         mask &= np.array(
-            [uri.lower().endswith("lc.fits") for uri in products["productFilename"]]
+        [
+            uri.lower().endswith("lc.fits") if prov.lower() in ["kepler", "k2", "spoc", "tess-spoc"]
+            else uri.lower().endswith("fits") or uri.lower().endswith("fits.gz") 
+            for uri, prov in zip(products["productFilename"], products["provenance_name"])
+        ]
         )
     elif filetype.lower() == "target pixel":
         mask &= np.array(
