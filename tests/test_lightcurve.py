@@ -1025,7 +1025,7 @@ def test_remove_outliers():
     assert_array_equal(lc_clean.time.value, [1, 3, 4, 5])
     assert_array_equal(lc_clean.flux, [1, 1, -1000, 1])
     # Ensure that we can sigma clip masked arrays
-    lc = LightCurve(time=[1, 2, 3, 4], flux=Masked([1, 1, 1000, 1]))
+    lc = LightCurve(time=[1, 2, 3, 4, 5], flux=Masked([1, 1, 1000, 1, np.nan]))
     lc_clean = lc.remove_outliers(sigma=1)
     assert_array_equal(lc_clean.time.value, [1, 2, 4])
 
