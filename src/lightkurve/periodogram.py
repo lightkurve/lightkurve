@@ -813,53 +813,23 @@ class LombScarglePeriodogram(Periodogram):
         if oversample_factor is None:
             oversample_factor = 5.0
 
-        if "freq_unit" in kwargs:
-            warnings.warn(
-                "`freq_unit` keyword is deprecated, " "please use `xunit` instead.",
-                LightkurveWarning,
-            )
-            if xunit is None:
-                xunit = kwargs.pop("freq_unit")
-            else:
-                kwargs.pop("freq_unit")
-
-        if "min_period" in kwargs:
-            warnings.warn(
-                "`min_period` keyword is deprecated, "
-                "please use `minimum_period` instead.",
-                LightkurveWarning,
-            )
-            minimum_period = kwargs.pop("min_period", None)
-        if "max_period" in kwargs:
-            warnings.warn(
-                "`max_period` keyword is deprecated, "
-                "please use `maximum_period` instead.",
-                LightkurveWarning,
-            )
-            maximum_period = kwargs.pop("max_period", None)
-        if "min_frequency" in kwargs:
-            warnings.warn(
-                "`min_frequency` keyword is deprecated, "
-                "please use `minimum_frequency` instead.",
-                LightkurveWarning,
-            )
-            minimum_frequency = kwargs.pop("min_frequency", None)
-        if "max_frequency" in kwargs:
-            warnings.warn(
-                "`max_frequency` keyword is deprecated, "
-                "please use `maximum_frequency` instead.",
-                LightkurveWarning,
-            )
-            maximum_frequency = kwargs.pop("max_frequency", None)
-
         if xunit is None:
             xunit = "1/day" if normalization == "amplitude" else "microhertz"
+        xunit = _validate_unit(xunit)
+        # What unit will the frequency grid be in?
+        if xunit.physical_type == "frequency":
+            freq_unit = xunit
+        else:  # time unit
+            freq_unit = 1.0 / xunit
+
         if yunit is None:
             # This should default to yunit / xunit for PSD
-            yunit = lc.flux.unit if normalization == "amplitude" else "ppm^2/uHz"
+            if normalization == "amplitude":
+                yunit = lc.flux.unit
+            elif normalization == "psd":
+                yunit = "ppm^2 / microhertz"
 
         # Validate user input
-        xunit = _validate_unit(xunit)
         yunit = _validate_unit(yunit)
 
         # If period and frequency keywords have both been set, throw an error
@@ -873,11 +843,6 @@ class LombScarglePeriodogram(Periodogram):
                 "Please only use one."
             )
 
-        # What unit will the frequency grid be in?
-        if xunit.physical_type == "frequency":
-            freq_unit = xunit
-        else:  # time unit
-            freq_unit = 1.0 / xunit
         # Ensure the time stamps are in days
         if lc.time.format in ["bkjd", "btjd", "d", "days", "day", "jd", None]:
             time = lc.time.value.copy() * u.day
@@ -989,9 +954,24 @@ class LombScarglePeriodogram(Periodogram):
             power = LS.power(frequency, method=ls_method, normalization="psd")
 
         if normalization == "psd":  # Power spectral density
-            power = (power * 2.0 / (len(time) * oversample_factor * fs)).to(yunit)
+            nu = 0.5 * (minimum_frequency.value + maximum_frequency.value)
+            power_window = (
+                LombScargle(time, np.sin(2 * np.pi * nu * time.value)).power(
+                    frequency, normalization="psd"
+                )
+                / len(time)
+                * 4.0
+            )
+            Tobs = 1.0 / np.sum(
+                np.median(frequency[1:] - frequency[:-1]) * power_window
+            )
+            power = (power / len(time) * 4.0) * Tobs
+            power.to(yunit)
+            # power = (power * 2.0 / (len(time) * oversample_factor * fs)).to(yunit)
         elif normalization == "amplitude":
             power = (np.sqrt(power) * np.sqrt(4.0 / len(time))).to(yunit)
+        elif normalization == "power":
+            power = ((np.sqrt(power) * np.sqrt(4.0 / len(time))).to(yunit)) ** 2
 
         # Periodogram needs properties
         return LombScarglePeriodogram(
@@ -1056,6 +1036,7 @@ class LombScarglePeriodogram(Periodogram):
         if self.normalization == "psd":
             ax.set_xscale("log")
             ax.set_yscale("log")
+            ax.set_ylabel("Power spectral density")
         return ax
 
 
