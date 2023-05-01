@@ -813,6 +813,45 @@ class LombScarglePeriodogram(Periodogram):
         if oversample_factor is None:
             oversample_factor = 5.0
 
+        if "freq_unit" in kwargs:
+            warnings.warn(
+                "`freq_unit` keyword is deprecated, " "please use `xunit` instead.",
+                LightkurveWarning,
+            )
+            if xunit is None:
+                xunit = kwargs.pop("freq_unit")
+            else:
+                kwargs.pop("freq_unit")
+
+        if "min_period" in kwargs:
+            warnings.warn(
+                "`min_period` keyword is deprecated, "
+                "please use `minimum_period` instead.",
+                LightkurveWarning,
+            )
+            minimum_period = kwargs.pop("min_period", None)
+        if "max_period" in kwargs:
+            warnings.warn(
+                "`max_period` keyword is deprecated, "
+                "please use `maximum_period` instead.",
+                LightkurveWarning,
+            )
+            maximum_period = kwargs.pop("max_period", None)
+        if "min_frequency" in kwargs:
+            warnings.warn(
+                "`min_frequency` keyword is deprecated, "
+                "please use `minimum_frequency` instead.",
+                LightkurveWarning,
+            )
+            minimum_frequency = kwargs.pop("min_frequency", None)
+        if "max_frequency" in kwargs:
+            warnings.warn(
+                "`max_frequency` keyword is deprecated, "
+                "please use `maximum_frequency` instead.",
+                LightkurveWarning,
+            )
+            maximum_frequency = kwargs.pop("max_frequency", None)
+
         if xunit is None:
             xunit = "1/day" if normalization == "amplitude" else "microhertz"
         xunit = _validate_unit(xunit)
