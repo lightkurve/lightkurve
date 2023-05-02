@@ -1461,7 +1461,7 @@ class LightCurve(TimeSeries):
             A dictionary object that contains a number of entries equal to the number
             of columns in the lightcurve object, where each key is a lightkurve column 
             name and the correspoing value is the function that will be used to bin 
-            that column
+            that column.  
         bins : int, iterable or str, optional
             If an int, this gives the number of bins to divide the lightkurve into.
             In contrast to ``n_bins`` this adjusts the length of ``time_bin_size``
@@ -1564,7 +1564,7 @@ class LightCurve(TimeSeries):
                             ),
                             'flux_bin_std':np.nanstd,
                             'quality':np.bitwise_or.reduce,
-                            'cadence':np.median
+                            'cadenceno':np.median
                             }
 
         # Call aggregate_downsample modified from AstroPy's
