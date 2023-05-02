@@ -249,7 +249,7 @@ class DesignMatrix:
         dm.df = new_df
         return dm
 
-    def pca(self, nterms=6):
+    def pca(self, nterms=6, n_iter=10):
         """Returns a new `.DesignMatrix` with a smaller number of regressors.
 
         This method will use Principal Components Analysis (PCA) to reduce
@@ -259,6 +259,10 @@ class DesignMatrix:
         ----------
         nterms : int
             Number of columns in the new matrix.
+
+        n_iter : int
+            Number of iterations that will be run by the power iteration
+            algorithm to compute the principal components.
 
         Returns
         -------
@@ -274,7 +278,7 @@ class DesignMatrix:
         # produces more stable results.
         from fbpca import pca  # local import because not used elsewhere
 
-        new_values, _, _ = pca(self.values, nterms, n_iter=10)
+        new_values, _, _ = pca(self.values, nterms, n_iter)
         return DesignMatrix(new_values, name=self.name)
 
     def append_constant(self, prior_mu=0, prior_sigma=np.inf, inplace=False):
