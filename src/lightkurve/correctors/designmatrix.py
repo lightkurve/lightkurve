@@ -958,7 +958,7 @@ def create_spline_matrix(
         Number of knots (default: 20).
     knots: list [optional]
         The interior knots to use for the spline. If unspecified, then equally
-        spaced quantiles of the input data are used.
+        spaced quantiles of the input data are used such that there are `n_knots` knots.
     degree: int
         Polynomial degree.
     name: string
