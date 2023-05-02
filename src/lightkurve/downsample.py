@@ -56,7 +56,7 @@ def aggregate_downsample(
     time_bin_end=None,
     n_bins=None,
     aggregate_dict=None, 
-    aggregate_funct=None
+    aggregate_func=None
 
 ):
     """

@@ -18,7 +18,7 @@ from astropy.io import fits
 from astropy.time import TimeBase, Time, TimeDelta
 from astropy import units as u
 from astropy.units import Quantity
-from astropy.timeseries import TimeSeries, aggregate_downsample
+from astropy.timeseries import TimeSeries
 from astropy.table import vstack
 from astropy.stats import calculate_bin_edges
 from astropy.utils.decorators import deprecated, deprecated_renamed_argument
@@ -26,6 +26,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 from astropy.utils.masked import Masked
 
 from . import PACKAGEDIR, MPLSTYLE
+from .downsample import aggregate_downsample
 from .utils import (
     running_mean,
     bkjd_to_astropy_time,
@@ -1414,6 +1415,7 @@ class LightCurve(TimeSeries):
         time_bin_start=None,
         time_bin_end=None,
         n_bins=None,
+        aggregate_func=None,
         aggregate_dict=None,
         bins=None,
         binsize=None,
@@ -1554,6 +1556,16 @@ class LightCurve(TimeSeries):
                 time_bin_size = 0.5 * u.day
         elif not isinstance(time_bin_size, Quantity):
             time_bin_size *= u.day
+        
+        if aggregate_dict is None:
+            aggregate_dict={'flux':np.nanmean,
+                            'flux_err':(
+                                lambda x: np.sqrt(np.nansum(x ** 2)) / len(np.atleast_1d(x))
+                                if np.any(np.isfinite(x))
+                                else np.nan
+                            ),
+                            'flux_bin_std':np.nanstd
+                            }
 
         # Call AstroPy's aggregate_downsample
         with warnings.catch_warnings():
@@ -1561,7 +1573,7 @@ class LightCurve(TimeSeries):
             warnings.simplefilter("ignore", (RuntimeWarning, AstropyUserWarning))
             
             #To - Do: We'll need some defaults/ways to implement the dictionary
-            
+
             self.add_column(np.nan, name='flux_bin_std') 
     
             ts = aggregate_downsample(
@@ -1569,6 +1581,7 @@ class LightCurve(TimeSeries):
                 time_bin_size=time_bin_size,
                 n_bins=n_bins,
                 time_bin_start=time_bin_start,
+                aggregate_func=aggregate_func,
                 aggregate_dict=aggregate_dict,
                 **kwargs
             )
