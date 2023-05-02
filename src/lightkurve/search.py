@@ -54,7 +54,10 @@ AUTHOR_LINKS = {
     "TESScut": "https://mast.stsci.edu/tesscut/",
     "GSFC-ELEANOR-LITE": "https://archive.stsci.edu/hlsp/gsfc-eleanor-lite",
     "TGLC": "https://archive.stsci.edu/hlsp/tglc",
-    "KEPSEISMIC": "https://archive.stsci.edu/prepds/kepseismic/"
+    "KEPSEISMIC": "https://archive.stsci.edu/prepds/kepseismic/",
+    "IRIS": "https://archive.stsci.edu/hlsp/iris",
+    "K2SC": "https://archive.stsci.edu/prepds/k2sc/",
+    "K2VARCAT": "https://archive.stsci.edu/prepds/k2varcat/"
 }
 
 REPR_COLUMNS_BASE = [
@@ -1024,7 +1027,7 @@ def _search_products(
             obs_seqno = f"{tmp_seqno:02d}" if tmp_seqno else ""
             # Kepler sequence_number values were not populated at the time of
             # writing this code, so we parse them from the description field.
-            if obs_project == "Kepler" and result["sequence_number"].mask[idx]:
+            if obs_project == "Kepler" and not obs_seqno:
                 try:
                     tmp_seqno = re.findall(r".*Q(\d+)", result["description"][idx])[0]
                     obs_seqno = f"{int(tmp_seqno):02d}"
@@ -1046,7 +1049,7 @@ def _search_products(
             campaign=campaign,
             quarter=quarter,
             exptime=exptime,
-            project=mission,
+            project=obs_project,
             provenance_name=provenance_name,
             month=month,
             sector=sector,
@@ -1054,7 +1057,7 @@ def _search_products(
         )
         log.debug("MAST found {} matching data products.".format(len(masked_result)))
         masked_result["distance"].info.format = ".1f"  # display <0.1 arcsec
-        return SearchResult(masked_result)
+        return SearchResult(masked_result) #, result
 
     # Full Frame Images
     else:
@@ -1266,11 +1269,11 @@ def _filter_products(
     mask = np.ones(len(products), dtype=bool)
 
     # Kepler data needs a special filter for quarter and month
-    mask &= ~np.array(
-        [prov.lower() == "kepler" for prov in products["provenance_name"]]
-    )
-    if "kepler" in provenance_lower and campaign is None and sector is None:
-        mask |= _mask_kepler_products(products, quarter=quarter, month=month)
+    # mask |= ~np.array(
+    #     [prov.lower() == "kepler" for prov in products["provenance_name"]]
+    # )
+    if "Kepler" in project and campaign is None and sector is None:
+        mask &= _mask_kepler_products(products, quarter=quarter, month=month)
 
     # HLSP products need to be filtered by extension
     if filetype.lower() == "lightcurve":
@@ -1312,7 +1315,8 @@ def _filter_products(
 
 def _mask_kepler_products(products, quarter=None, month=None):
     """Returns a mask flagging the Kepler products that match the criteria."""
-    mask = np.array([proj.lower() == "kepler" for proj in products["provenance_name"]])
+
+    mask = np.array(["kepler" in proj.lower() for proj in products["mission"]])
     if mask.sum() == 0:
         return mask
 
@@ -1321,13 +1325,16 @@ def _mask_kepler_products(products, quarter=None, month=None):
     # for Kepler prime data at the time of writing this function.
     if quarter is not None:
         quarter_mask = np.zeros(len(products), dtype=bool)
-        for q in np.atleast_1d(quarter):
-            quarter_mask |= np.array(
-                [
-                    desc.lower().replace("-", "").endswith("q{}".format(q))
-                    for desc in products["description"]
-                ]
-            )
+
+        quarters = [seq if seq != '--'
+            else int(des.split(' Q')[-1]) if 'Q' in des
+            else None
+            for seq, des in zip(products['sequence_number'], products['description'])]
+
+        quarter_mask = np.array(
+            [True if q == quarter else False for q in quarters]
+        )
+
         mask &= quarter_mask
 
     # For Kepler short cadence data the month can be specified
