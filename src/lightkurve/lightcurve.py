@@ -1560,21 +1560,21 @@ class LightCurve(TimeSeries):
         if aggregate_dict is None:
             aggregate_dict={'flux':np.nanmean,
                             'flux_err':(
-                                lambda x: np.sqrt(np.nansum(x ** 2)) / len(np.atleast_1d(x))
-                                if np.any(np.isfinite(x))
-                                else np.nan
+                                lambda x: np.sqrt(np.nansum(x ** 2)) / np.sum(~np.isnan(x))
                             ),
-                            'flux_bin_std':np.nanstd
+                            'flux_bin_std':np.nanstd,
+                            'quality':np.bitwise_or.reduce,
+                            'cadence':np.median
                             }
 
-        # Call AstroPy's aggregate_downsample
+        # Call aggregate_downsample modified from AstroPy's
         with warnings.catch_warnings():
             # ignore uninteresting empty slice warnings
             warnings.simplefilter("ignore", (RuntimeWarning, AstropyUserWarning))
             
             #To - Do: We'll need some defaults/ways to implement the dictionary
 
-            self.add_column(np.nan, name='flux_bin_std') 
+            self.add_column(self.flux, name='flux_bin_std') 
     
             ts = aggregate_downsample(
                 self,
@@ -1585,6 +1585,8 @@ class LightCurve(TimeSeries):
                 aggregate_dict=aggregate_dict,
                 **kwargs
             )
+            
+            self.remove_column(name='flux_bin_std')
 
         # Prepare a LightCurve object by ensuring there is a time column
         # To Do - check to see if this changes anything in the typical case
