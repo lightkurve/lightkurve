@@ -502,7 +502,7 @@ def _estimate_arclength(centroid_col, centroid_row):
     """
     col = centroid_col - np.nanmin(centroid_col)
     row = centroid_row - np.nanmin(centroid_row)
-    if np.all((col.value == 0) & (row.value == 0)):
+    if np.all((col == 0) & (row == 0)):
         raise RuntimeError("Arclength cannot be computed because there is no "
                            "centroid motion. Make sure that the aperture of "
                            "the TPF at least two pixels.")
