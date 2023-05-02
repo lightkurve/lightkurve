@@ -304,7 +304,7 @@ class LightCurveCollection(Collection):
                     else:
                         break
                             
-        return super(LightCurveCollection, self).__init__(new_lcc_list)
+        return LightCurveCollection(new_lcc_list)
 
     def to_periodograms(self, **kwargs):
         """Converts all light curves in the collection into periodograms.
