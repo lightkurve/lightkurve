@@ -116,7 +116,7 @@ class PLDCorrector(RegressionCorrector):
         # we also need to remove nans from the flux_err and combine both masks.
         nan_mask_flux = np.isnan(lc.flux)
         nan_mask_err = np.isnan(lc.flux_err)
-        nan_mask = nan_mask_flux + nan_mask_err
+        nan_mask = np.ma.mask_or(nan_mask_flux,nan_mask_err)
         lc = lc[~nan_mask]
         self.tpf = tpf[~nan_mask]
         super().__init__(lc=lc)
