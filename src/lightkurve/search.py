@@ -284,19 +284,17 @@ class SearchResult(object):
     @property
     def hlsp_method(self):
         """Aperture/correction method, to help users distinguish HLSP data"""
-        method = np.empty(len(self.author), dtype='<U20')
-        if "TASOC" in self.author:
-            for idx in range(len(self.author)):
-                method[idx] = self.table["dataURI"][idx].split('-lc')[0][-3:].upper()
-            return method
-        elif "KEPSEISMIC" in self.author:
-            for idx in range(len(self.author)):
-                filt = self.table["dataURI"][idx].split('_kepler')[1][-3:]
-                versn = ' PSD' if 'psd' in self.table["dataURI"][idx] else ''
+        method = np.empty(len(self.author), dtype="<U20")
+        for idx in range(len(self.author)):
+            if self.author[idx] == "TASOC":
+                method[idx] = self.table["dataURI"][idx].split("-lc")[0][-3:].upper()
+            elif self.author[idx] == "KEPSEISMIC":
+                filt = self.table["dataURI"][idx].split("_kepler")[1][-3:]
+                versn = " PSD" if "psd" in self.table["dataURI"][idx] else ""
                 method[idx] = filt + versn
-            return method
-        else:
-            return None
+            else:
+                method[idx] = "N/A"
+        return method
 
     def _download_one(
         self, table, quality_bitmask, download_dir, cutout_size, **kwargs
