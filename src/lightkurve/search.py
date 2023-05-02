@@ -162,6 +162,8 @@ class SearchResult(object):
                 r"\d+.(\d{4})\d+", self.table["productFilename"][idx]
             )[0]
 
+        self.table["hlsp_method"] = self.hlsp_method
+
     def __repr__(self, html=False):
         def to_tess_gi_url(proposal_id):
             if re.match("^G0[12].+", proposal_id) is not None:
@@ -177,11 +179,13 @@ class SearchResult(object):
         columns = REPR_COLUMNS_BASE
         if self.display_extra_columns is not None:
             columns = REPR_COLUMNS_BASE + self.display_extra_columns
+
         # search_tesscut() has fewer columns, ensure we don't try to display columns that do not exist
         columns = [c for c in columns if c in self.table.colnames]
 
         self.table["#"] = [idx for idx in range(len(self.table))]
         out += "\n\n" + "\n".join(self.table[columns].pformat(max_width=300, html=html))
+
         # Make sure author names show up as clickable links
         if html:
             for author, url in AUTHOR_LINKS.items():
@@ -276,6 +280,23 @@ class SearchResult(object):
     def distance(self):
         """Distance from the search position for each data product found."""
         return self.table["distance"].quantity
+
+    @property
+    def hlsp_method(self):
+        """Aperture/correction method, to help users distinguish HLSP data"""
+        method = np.empty(len(self.author), dtype='<U20')
+        if "TASOC" in self.author:
+            for idx in range(len(self.author)):
+                method[idx] = self.table["dataURI"][idx].split('-lc')[0][-3:].upper()
+            return method
+        elif "KEPSEISMIC" in self.author:
+            for idx in range(len(self.author)):
+                filt = self.table["dataURI"][idx].split('_kepler')[1][-3:]
+                versn = ' PSD' if 'psd' in self.table["dataURI"][idx] else ''
+                method[idx] = filt + versn
+            return method
+        else:
+            return None
 
     def _download_one(
         self, table, quality_bitmask, download_dir, cutout_size, **kwargs
