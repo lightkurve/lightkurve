@@ -31,7 +31,7 @@ from scipy.ndimage import label
 from tqdm import tqdm
 from copy import deepcopy
 
-from . import PACKAGEDIR, MPLSTYLE
+from . import PACKAGEDIR, MPLSTYLE, MPLSTYLE_IMG
 from .lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import (
@@ -651,12 +651,12 @@ class TargetPixelFile(object):
             elif aperture_mask == "empty":
                 aperture_mask = np.zeros((self.shape[1], self.shape[2]), dtype=bool)
             elif (
-                np.issubdtype(aperture_mask.dtype, np.integer)
+                np.issubdtype(aperture_mask.dtype, int)
                 and ((aperture_mask & 2) == 2).any()
             ):
                 # Kepler and TESS pipeline style integer flags
                 aperture_mask = (aperture_mask & 2) == 2
-            elif isinstance(aperture_mask.flat[0], (np.integer, np.float)):
+            elif isinstance(aperture_mask.flat[0], (int, float)):
                 aperture_mask = aperture_mask.astype(bool)
         self._last_aperture_mask = aperture_mask
         return aperture_mask
@@ -1052,7 +1052,7 @@ class TargetPixelFile(object):
         column="FLUX",
         aperture_mask=None,
         show_colorbar=True,
-        mask_color="red",
+        mask_color="tomato",
         title=None,
         style="lightkurve",
         **kwargs,
@@ -1136,9 +1136,9 @@ class TargetPixelFile(object):
             "RAW_CNTS": "Raw Counts",
         }
 
-        with plt.style.context(style):
+        with plt.style.context([style, MPLSTYLE_IMG]):
             if title is None:
-                title = "Target ID: {}, Cadence: {}".format(
+                title = "Target ID: {}\nCadence: {}".format(
                     self.targetid, self.cadenceno[frame]
                 )
             # We subtract -0.5 because pixel coordinates refer to the middle of
