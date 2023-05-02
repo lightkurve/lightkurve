@@ -1328,7 +1328,7 @@ def _mask_kepler_products(products, quarter=None, month=None):
 
         quarters = [seq if seq != '--'
             else int(des.split(' Q')[-1]) if 'Q' in des
-            else None
+            else 'stitched'
             for seq, des in zip(products['sequence_number'], products['description'])]
 
         quarter_mask = np.array(
