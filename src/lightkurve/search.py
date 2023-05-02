@@ -1336,7 +1336,7 @@ def _mask_kepler_products(products, quarter=None, month=None):
         )
 
         mask &= quarter_mask
- 
+
     # For Kepler short cadence data the month can be specified
     if month is not None:
         month = np.atleast_1d(month)
