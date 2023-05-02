@@ -426,8 +426,8 @@ def _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limi
     # convert the string Ra/Dec to float
     # we assume the equinox is the same as those from Gaia DR2
     coords = SkyCoord(tab['RA'], tab['Dec'], unit=(u.hourangle, u.deg), frame='icrs')
-    _add_to(data, 'RA_ICRS', coords.ra.value)
-    _add_to(data, 'DE_ICRS', coords.dec.value)
+    _add_to(data, 'RAJ2000', coords.ra.value)
+    _add_to(data, 'DEJ2000', coords.dec.value)
     _add_to(data, 'pmRA', tab['PM RA (mas/yr)'])
     _add_to(data, 'e_pmRA', tab['PM RA Err (mas/yr)'])
     _add_to(data, 'pmDE', tab['PM Dec (mas/yr)'])
@@ -499,6 +499,7 @@ def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
     from astroquery.vizier import Vizier
 
     Vizier.ROW_LIMIT = -1
+    Vizier.columns = ['all']
     with warnings.catch_warnings():
         # suppress useless warning to workaround  https://github.com/astropy/astroquery/issues/2352
         warnings.filterwarnings(
@@ -506,7 +507,7 @@ def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
         )
         result = Vizier.query_region(
             c1,
-            catalog=["I/345/gaia2"],
+            catalog=["IV/38/tic"],
             radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
         )
     no_targets_found_message = ValueError(
@@ -519,7 +520,7 @@ def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
         raise no_targets_found_message
     elif len(result) == 0:
         raise too_few_found_message
-    result = result["I/345/gaia2"].to_pandas()
+    result = result["IV/38/tic"].to_pandas()
     result = result[result.Gmag < magnitude_limit]
     if len(result) == 0:
         raise no_targets_found_message
@@ -545,16 +546,16 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         )
 
     ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
-            np.nan_to_num(np.asarray(result.RA_ICRS)) * u.deg, np.nan_to_num(np.asarray(result.DE_ICRS)) * u.deg,
+            np.nan_to_num(np.asarray(result.RAJ2000)) * u.deg, np.nan_to_num(np.asarray(result.DEJ2000)) * u.deg,
             np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond / u.year,
             np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond / u.year,
             Time(2457206.375, format="jd", scale="tdb"),
             tpf.time[0])
-    result.RA_ICRS = ra_corrected.to(u.deg).value
-    result.DE_ICRS = dec_corrected.to(u.deg).value
+    result.RAJ2000 = ra_corrected.to(u.deg).value
+    result.DEJ2000 = dec_corrected.to(u.deg).value
 
     # Convert to pixel coordinates
-    radecs = np.vstack([result["RA_ICRS"], result["DE_ICRS"]]).T
+    radecs = np.vstack([result["RAJ2000"], result["DEJ2000"]]).T
     coords = tpf.wcs.all_world2pix(radecs, 0)
 
     # Gently size the points by their Gaia magnitude
@@ -562,8 +563,8 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     one_over_parallax = 1.0 / (result["Plx"] / 1000.0)
     source = ColumnDataSource(
         data=dict(
-            ra=result["RA_ICRS"],
-            dec=result["DE_ICRS"],
+            ra=result["RAJ2000"],
+            dec=result["DEJ2000"],
             pmra=result["pmRA"],
             pmde=result["pmDE"],
             source=_to_display(result["Source"]),
