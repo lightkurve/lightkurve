@@ -393,7 +393,7 @@ class PeriodogramCollection(Collection):
     def __init__(self, periodograms):
         super(PeriodogramCollection, self).__init__(periodograms)
 
-    def rebase(self, frequency = None, **kwargs):
+    def rebase(self, lc_collection, frequency = None, **kwargs):
         """The periodograms are re-done from their light curves to match the
         lowest frequency resolution of the collected periodograms. Alternatively
         a custom grid of frequencies can be passed for all periodograms to be
@@ -402,10 +402,11 @@ class PeriodogramCollection(Collection):
 
         Parameters
         ----------
+        lc_collection : `~lightkurve.collections.LightCurveCollection`
+            The collection of light curves used to create the `PeriodogramCollection`
         frequency :  array-like
             The grid of frequencies to use. If given a unit, it is converted to
-            units of freq_unit. If not, it is assumed to be in units of
-            freq_unit. This over rides any set frequency limits.
+            units of freq_unit.
         **kwargs : dict
             Dictionary of arguments to be passed to `LightCurve.to_periodogram`.
 
@@ -414,22 +415,21 @@ class PeriodogramCollection(Collection):
         pgc : `~lightkurve.collections.PeriodogramCollection`
             A collection of periodograms.
         """
-        # If no frequency is passed, maximum frequency is set by the lowest maximum frequency
+        # If no frequency is passed, we use an equal grid of frequencies
+        # of the length of the shortest periodogram to the lowest nyquist frequency
         if frequency is None:
-            frequency = self[np.argmin([len(pg.frequency) for pg in self])].frequency
-            maximum_frequency = np.min([pg.frequency.value[-1] for pg in self])
-            frequency = frequency[frequency < maximum_frequency]
-
-        # If a frequency is passed, maximum frequency is overridden
-        if frequency is not None:
-            maximum_frequency = frequency[-1]
+            len_frequency = np.min([len(pg.frequency) for pg in self])
+            max_frequency = np.min([pg.frequency.value[-1] for pg in self])
+            min_frequency = np.min([pg.frequency.value[0] for pg in self])
+            frequency = np.linspace(min_frequency, max_frequency, len_frequency)
 
         new_periodogram_list= []
-        for pg in self:
-            pg.meta['LIGHTCURVE'].to_periodogram(frequency = frequency, *kwargs)
+        for lc in lc_collection:
+            pg = lc.to_periodogram(frequency = frequency, *kwargs)
             new_periodogram_list.append(pg)
 
         #TODO: Add checks for the input and for the collection all being on the same baseline.
+        #TODO: Add checks that the input LCC is the same as the one that geneated the PGC originally.
 
         return PeriodogramCollection(new_periodogram_list)
 
