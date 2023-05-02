@@ -777,16 +777,19 @@ class LombScarglePeriodogram(Periodogram):
             normalization='amplitude', oversample_factor will be set to 5. If
             normalization='psd', it will be 1. These defaults can be
             overridden.
-        freq_unit : `astropy.units.core.CompositeUnit`
+        xunit : `astropy.units.core.CompositeUnit`
             Default: None. The desired frequency units for the Lomb Scargle
             periodogram. This implies that 1/freq_unit is the units for period.
             With default normalization ('amplitude'), the freq_unit is set to
             1/day, which can be overridden. 'psd' normalization will set
             freq_unit to microhertz.
-        normalization : 'psd' or 'amplitude'
+        yunit : `astropy.units.core.CompositeUnit`
+            Default: None. The desired power units for the Lomb Scargle
+            periodogram.
+        normalization : 'psd' or 'amplitude' or 'power'
             Default: `'amplitude'`. The desired normalization of the spectrum.
-            Can be either power spectral density (`'psd'`) or amplitude
-            (`'amplitude'`).
+            Can be either power spectral density (`'psd'`), amplitude
+            (`'amplitude'`), or power (`'power'`).
         ls_method : str
             Default: `'fast'`. Passed to the `method` keyword of
             `astropy.stats.LombScargle()`.
@@ -799,7 +802,6 @@ class LombScarglePeriodogram(Periodogram):
             Returns a Periodogram object extracted from the lightcurve.
         """
         # Input validation
-        normalization = validate_method(normalization, ["psd", "amplitude"])
         if np.isnan(lc.flux).any() or (
             hasattr(lc.flux, "unmasked") and np.isnan(lc.flux.unmasked).any()
         ):
@@ -992,28 +994,12 @@ class LombScarglePeriodogram(Periodogram):
             LS = LombScargle(time, lc.flux, nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization="psd")
 
-        if normalization == "psd":  # Power spectral density
-            nu = 0.5 * (minimum_frequency.value + maximum_frequency.value)
-            power_window = (
-                LombScargle(time, np.sin(2 * np.pi * nu * time.value)).power(
-                    frequency, normalization="psd"
-                )
-                / len(time)
-                * 4.0
-            )
-            Tobs = 1.0 / np.sum(
-                np.median(frequency[1:] - frequency[:-1]) * power_window
-            )
-            power = (power / len(time) * 4.0) * Tobs
-            power.to(yunit)
-            # power = (power * 2.0 / (len(time) * oversample_factor * fs)).to(yunit)
-        elif normalization == "amplitude":
-            power = (np.sqrt(power) * np.sqrt(4.0 / len(time))).to(yunit)
-        elif normalization == "power":
-            power = ((np.sqrt(power) * np.sqrt(4.0 / len(time))).to(yunit)) ** 2
+        # Update the meta with the light curve!
+        meta = lc.meta
+        meta['LIGHTCURVE'] = lc
 
         # Periodogram needs properties
-        return LombScarglePeriodogram(
+        pg = LombScarglePeriodogram(
             frequency=frequency,
             power=power,
             nyquist=nyquist,
@@ -1024,7 +1010,69 @@ class LombScarglePeriodogram(Periodogram):
             ls_method=ls_method,
             xunit=xunit,
             yunit=yunit,
-            meta=lc.meta,
+            meta=meta,
+            normalization='unnormalized',
+        )
+        
+        return pg.normalize(normalization)
+    
+    def normalize(self, normalization=['psd', 'amplitude', 'power']):
+        """Normalizes the periodogram 
+
+        Args:
+            normalization (list, optional): _description_. Defaults to ['psd', 'amplitude', 'power'].
+
+        Raises:
+            LightkurveWarning: _description_
+
+        Returns:
+            LombScarglePeriodogram: The normalized periodogram
+        """
+        # Ensure the periodogram is not already normalized
+        if self.normalization is not 'unnormalized':
+            warnings.warn(
+                "You are attempting to normalize a periodogram that has already been {} normalized. This will result in improperly scaled values!".format(
+                    self.normalization
+                ),
+                LightkurveWarning,
+            )
+        
+        # Make sure normalization is valid
+        normalization = validate_method(normalization, ["psd", "amplitude", "power"])
+
+        # Normalize the power!
+        time = self.meta['LIGHTCURVE']['time']
+        power = self.power
+        if normalization == "psd":  # Power spectral density
+            nu = 0.5 * (self.frequency.min().value + self.frequency.max().value)
+            power_window = (
+                LombScargle(time, np.sin(2 * np.pi * nu * time.value)).power(
+                    self.frequency.to('1/day'), normalization="psd"
+                )
+                / len(time)
+                * 4.0
+            )
+            Tobs = 1.0 / np.sum(
+                np.median(self.frequency.value[1:] - self.frequency.value[:-1]) * power_window
+            )
+            power = (power / len(time) * 4.0) * Tobs
+            power.to(self.yunit)
+        elif normalization == "amplitude":
+            power = (np.sqrt(power) * np.sqrt(4.0 / len(time))).to(self.yunit)
+        elif normalization == "power":
+            power = ((np.sqrt(power) * np.sqrt(4.0 / len(time))).to(self.yunit)) ** 2
+        
+        # Return original LS with updated power
+        return LombScarglePeriodogram(
+            frequency=self.frequency,
+            power=power,
+            nyquist=self.nyquist,
+            ls_obj=self._LS_object,
+            nterms=self.nterms,
+            ls_method=self.ls_method,
+            xunit=self.xunit,
+            yunit=self.yunit,
+            meta=self.meta,
             normalization=normalization,
         )
 
