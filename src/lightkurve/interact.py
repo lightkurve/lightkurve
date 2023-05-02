@@ -499,19 +499,18 @@ def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
     if tpf.mission == "TESS":
         pix_scale = 21.0
     # We are querying with a diameter as the radius, overfilling by 2x.
-    from astroquery.vizier import Vizier
 
-    Vizier.ROW_LIMIT = -1
     with warnings.catch_warnings():
         # suppress useless warning to workaround  https://github.com/astropy/astroquery/issues/2352
         warnings.filterwarnings(
             "ignore", category=u.UnitsWarning, message="Unit 'e' not supported by the VOUnit standard"
         )
-        result = Vizier.query_region(
+        from astroquery.mast import Catalogs
+        result = Catalogs.query_region(
             c1,
-            catalog=["I/345/gaia2"],
-            radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
+            catalog = "TIC", radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
         )
+
     no_targets_found_message = ValueError(
         "Either no sources were found in the query region " "or Vizier is unavailable"
     )
@@ -522,13 +521,13 @@ def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
         raise no_targets_found_message
     elif len(result) == 0:
         raise too_few_found_message
-    result = result["I/345/gaia2"].to_pandas()
-    result = result[result.Gmag < magnitude_limit]
+    result = result.to_pandas()   
+    result = result[result.GAIAmag < magnitude_limit]
     if len(result) == 0:
         raise no_targets_found_message
     # drop all the filtered rows, it makes subsequent TESS-specific processing easier (to add rows/columns)
     result.reset_index(drop=True, inplace=True)
-    result['magForSize'] = result['Gmag']  # to be used as the basis for sizing the dots in plots
+    result['magForSize'] = result['GAIAmag']  # to be used as the basis for sizing the dots in plots
     return result
 
 
@@ -548,30 +547,30 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         )
 
     ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
-            np.nan_to_num(np.asarray(result.RA_ICRS)) * u.deg, np.nan_to_num(np.asarray(result.DE_ICRS)) * u.deg,
+            np.nan_to_num(np.asarray(result.ra)) * u.deg, np.nan_to_num(np.asarray(result.dec)) * u.deg,
             np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond / u.year,
-            np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond / u.year,
+            np.nan_to_num(np.asarray(result.pmDEC)) * u.milliarcsecond / u.year,
             Time(2457206.375, format="jd", scale="tdb"),
             tpf.time[0])
-    result.RA_ICRS = ra_corrected.to(u.deg).value
-    result.DE_ICRS = dec_corrected.to(u.deg).value
+    result.ra = ra_corrected.to(u.deg).value
+    result.dec = dec_corrected.to(u.deg).value
 
     # Convert to pixel coordinates
-    radecs = np.vstack([result["RA_ICRS"], result["DE_ICRS"]]).T
+    radecs = np.vstack([result["ra"], result["dec"]]).T
     coords = tpf.wcs.all_world2pix(radecs, 0)
 
     # Gently size the points by their Gaia magnitude
     sizes = 64.0 / 2 ** (result["magForSize"] / 5.0)
-    one_over_parallax = 1.0 / (result["Plx"] / 1000.0)
+    one_over_parallax = 1.0 / (result["plx"] / 1000.0)
     source = ColumnDataSource(
         data=dict(
-            ra=result["RA_ICRS"],
-            dec=result["DE_ICRS"],
+            ra=result["ra"],
+            dec=result["dec"],
             pmra=result["pmRA"],
-            pmde=result["pmDE"],
-            source=_to_display(result["Source"]),
-            Gmag=result["Gmag"],
-            plx=result["Plx"],
+            pmde=result["pmDEC"],
+            source=_to_display(result["GAIA"].astype(int)),
+            Gmag=result["GAIAmag"],
+            plx=result["plx"],
             one_over_plx=one_over_parallax,
             x=coords[:, 0] + tpf.column,
             y=coords[:, 1] + tpf.row,
