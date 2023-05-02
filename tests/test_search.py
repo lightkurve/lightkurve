@@ -291,7 +291,7 @@ def test_collections():
                 "EPIC 205998445", mission="K2", radius=900, limit=6
             ).table
         )
-        == 4
+        == 5
     )
     # if download() is used when multiple files are available, should only download 1
     with pytest.warns(LightkurveWarning, match="4 files available to download"):
