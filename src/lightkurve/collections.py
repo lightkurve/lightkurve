@@ -226,6 +226,86 @@ class LightCurveCollection(Collection):
         # Need `join_type='inner'` until AstroPy supports masked Quantities
         return vstack(lcs, join_type="inner", metadata_conflicts="silent")
 
+    def stitch_similar(self, corrector_func=lambda x: x.normalize()):
+        """Stitch together similar `LightCurve` objects into a new `LightCurveCollection`.
+        Lightcurves which share the following properites are stitched together:
+        - Have the same author
+        - Have the same exposure time
+        - Are observed consecutively
+
+        Any function passed to `corrector_func` will be applied to each light curve
+        before stitching. For example, passing "lambda x: x.normalize().flatten()"
+        will normalize and flatten each light curve before stitching.
+
+        Parameters
+        ----------
+        corrector_func : function
+            Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.
+            This function is applied to each light curve in the collection
+            prior to stitching. The default is to normalize each light curve.
+
+        Returns
+        -------
+        lc : `~lightkurve.lightcurve.LightCurve`
+            Stitched light curve.
+        """        
+        new_lcc_list = []
+        
+        # Generate list of exptimes
+        exptimes = np.array([np.round(np.median(np.diff(lc.time.value)) \
+                            * 24 *60 * 60).astype(int) for lc in self])
+            
+        # Generate list of sectors
+        # TODO: Change language so it's Kepler-friendly
+        sectors = np.array([lc.sector for lc in self])
+        
+        # Generate list of authors
+        authors = np.array([lc.author for lc in self])
+            
+        new_lcc_list = []
+        for exptime in np.unique(exptimes):
+            sx = exptimes == exptime
+            for author in np.unique(authors[sx]):
+                sa = authors[sx] == author
+
+                # Combine adjacent sectors within these groups
+                sectorlist = sectors[sx][sa]
+                target = [sectorlist[0]]
+
+                for i in np.arange(1, 1+len(sectorlist)):
+                    diff = np.diff(sectorlist[i-1 : i+1])
+                    if not any(diff):
+                        output_stitch = self[sx][sa][np.isin(sectorlist,target)].stitch(corrector_func=corrector_func)
+                        output_stitch.meta['SECTORS'] = sectorlist
+                        output_stitch.meta['AUTHOR'] = author
+                        output_stitch.meta['EXPTIME'] = exptime
+                        new_lcc_list.append(output_stitch)
+                        break      
+                        
+                    if diff == 1:
+                        target.append(sectorlist[i])
+                        if i == len(sectorlist)-1:
+                            output_stitch = self[sx][sa][np.isin(sectorlist,target)].stitch(corrector_func=corrector_func)
+                            output_stitch.meta['SECTORS'] = sectorlist
+                            output_stitch.meta['AUTHOR'] = author
+                            output_stitch.meta['EXPTIME'] = exptime
+                            new_lcc_list.append(output_stitch)
+                            break
+                        continue
+                        
+                    elif diff > 1:
+                        output_stitch = self[sx][sa][np.isin(sectorlist,target)].stitch(corrector_func=corrector_func)
+                        output_stitch.meta['SECTORS'] = sectorlist
+                        output_stitch.meta['AUTHOR'] = author
+                        output_stitch.meta['EXPTIME'] = exptime
+                        new_lcc_list.append(output_stitch)
+                        target = [sectorlist[i]]
+                        continue
+                    else:
+                        break
+                            
+        return super(LightCurveCollection, self).__init__(new_lcc_list)
+
     def to_periodograms(self, **kwargs):
         """Converts all light curves in the collection into periodograms.
         These periodograms are stored in a PeriodogramCollection.
@@ -321,7 +401,6 @@ class PeriodogramCollection(Collection):
         """ Apply the `Periodogram.normalize()` function to all constituent periodogram objects
         """
         raise NotImplementError
-
 
     def flatten(self):
         """ Apply the `Periodogram.flatten()` function to all constituent periodogram objects
