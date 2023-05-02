@@ -22,18 +22,18 @@ def reduceat(array, indices, function):
     It will check if the input function has a reduceat and call that if it does.
     """
     if len(indices) == 0:
-        return np.array([])
+        return np.empty(0, dtype=array.dtype)
     elif hasattr(function, "reduceat"):
-        return np.array(function.reduceat(array, indices))
+        return function.reduceat(array, indices)
     else:
-        result = []
+        result = np.empty(len(indices), dtype=array.dtype)
         for i in range(len(indices) - 1):
             if indices[i + 1] <= indices[i] + 1:
-                result.append(function(array[indices[i]]))
+                result[i] = function(array[indices[i]])
             else:
-                result.append(function(array[indices[i] : indices[i + 1]]))
-        result.append(function(array[indices[-1] :]))
-        return np.array(result)
+                result[i] = function(array[indices[i] : indices[i + 1]])
+        result[-1] = function(array[indices[-1] :])
+        return result
 
 
 def _to_relative_longdouble(time: Time, rel_base: Time) -> np.longdouble:
