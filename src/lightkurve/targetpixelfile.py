@@ -1172,8 +1172,7 @@ class TargetPixelFile(object):
             )
             ax.grid(False)
             
-            #if not hasattr(ax, "wcs"):
-            #Make sure the ticks show integer values for col/row
+            # Make sure the ticks show integer values for col/row
             ax.yaxis.get_major_locator().set_params(integer=True) 
             ax.xaxis.get_major_locator().set_params(integer=True) 
 
@@ -1184,7 +1183,7 @@ class TargetPixelFile(object):
                 for j in range(self.shape[2]):
                     if aperture_mask[i, j]:
                         if hasattr(ax, "wcs"):
-                            #When using WCS coordinates, do not add col/row to mask coords
+                            # When using WCS coordinates, do not add col/row to mask coords
                     	    xy = (j - 0.5, i - 0.5)
                         else:
                     	    xy = (j + self.column - 0.5, i + self.row - 0.5)
