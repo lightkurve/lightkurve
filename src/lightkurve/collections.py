@@ -257,6 +257,7 @@ class LightCurveCollection(Collection):
             
         # Generate list of sectors
         # TODO: Change language so it's Kepler-friendly
+        # TODO: Fix ordering of the sectorlist, which isn't increasing in number
         sectors = np.array([lc.sector for lc in self])
         
         # Generate list of authors
@@ -392,9 +393,54 @@ class PeriodogramCollection(Collection):
     def __init__(self, periodograms):
         super(PeriodogramCollection, self).__init__(periodograms)
 
-    def average(self):
-        """ Average two time-separated periodograms (useful for TESS)
+    def rebase(self, frequency = None, **kwargs):
+        """The periodograms are re-done from their light curves to match the
+        lowest frequency resolution of the collected periodograms. Alternatively
+        a custom grid of frequencies can be passed for all periodograms to be
+        added to. The Nyquist frequency can also be set. If it is not set, the
+        lowest Nyquist frequency in the `PeriodogramCollection` will be used.
+
+        Parameters
+        ----------
+        frequency :  array-like
+            The grid of frequencies to use. If given a unit, it is converted to
+            units of freq_unit. If not, it is assumed to be in units of
+            freq_unit. This over rides any set frequency limits.
+        **kwargs : dict
+            Dictionary of arguments to be passed to `LightCurve.to_periodogram`.
+
+        Returns
+        -------
+        pgc : `~lightkurve.collections.PeriodogramCollection`
+            A collection of periodograms.
         """
+        # If no frequency is passed, maximum frequency is set by the lowest maximum frequency
+        if frequency is None:
+            frequency = self[np.argmin([len(pg.frequency) for pg in self])].frequency
+            maximum_frequency = np.min([pg.frequency.value[-1] for pg in self])
+            frequency = frequency[frequency < maximum_frequency]
+
+        # If a frequency is passed, maximum frequency is overridden
+        if frequency is not None:
+            maximum_frequency = frequency[-1]
+
+        new_periodogram_list= []
+        for pg in self:
+            pg.meta['LIGHTCURVE'].to_periodogram(frequency = frequency, *kwargs)
+            new_periodogram_list.append(pg)
+
+        #TODO: Add checks for the input and for the collection all being on the same baseline.
+
+        return PeriodogramCollection(new_periodogram_list)
+
+    def average(self):
+        """ Average two time-separated periodograms (useful for TESS).
+       
+
+        # TODO: Write this out properly and include the link to the relevant paper.
+        """
+        # TODO: Raise warnings for incompatible frequency spacings.
+
         raise NotImplementError
     
     def normalize(self):
