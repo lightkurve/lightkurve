@@ -55,7 +55,7 @@ def aggregate_downsample(
     time_bin_start=None,
     time_bin_end=None,
     n_bins=None,
-    aggregate_func=None
+    aggregate_dict=None
 ):
     """
     Downsample a time series by binning values into bins with a fixed size or

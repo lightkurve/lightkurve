@@ -1414,7 +1414,7 @@ class LightCurve(TimeSeries):
         time_bin_start=None,
         time_bin_end=None,
         n_bins=None,
-        aggregate_func=None,
+        aggregate_dict=None,
         bins=None,
         binsize=None,
     ):
@@ -1455,9 +1455,11 @@ class LightCurve(TimeSeries):
             The number of bins to use. Defaults to the number needed to fit all
             the original points. Note that this will create this number of bins
             of length ``time_bin_size`` independent of the lightkurve length.
-        aggregate_func : callable, optional
-            The function to use for combining points in the same bin. Defaults
-            to np.nanmean.
+        aggregate_dict : callable, optional
+            A dictionary object that contains a number of entries equal to the number
+            of columns in the lightcurve object, where each key is a lightkurve column 
+            name and the correspoing value is the function that will be used to bin 
+            that column
         bins : int, iterable or str, optional
             If an int, this gives the number of bins to divide the lightkurve into.
             In contrast to ``n_bins`` this adjusts the length of ``time_bin_size``
@@ -1557,42 +1559,22 @@ class LightCurve(TimeSeries):
         with warnings.catch_warnings():
             # ignore uninteresting empty slice warnings
             warnings.simplefilter("ignore", (RuntimeWarning, AstropyUserWarning))
+            
+            #To - Do: We'll need some defaults/ways to implement the dictionary
+            
+            self.add_column(np.nan, name='flux_bin_std') 
+    
             ts = aggregate_downsample(
                 self,
                 time_bin_size=time_bin_size,
                 n_bins=n_bins,
                 time_bin_start=time_bin_start,
-                aggregate_func=aggregate_func,
+                aggregate_dict=aggregate_dict,
                 **kwargs
             )
 
-            # If `flux_err` is populated, assume the errors combine as the root-mean-square
-            if np.any(np.isfinite(self.flux_err)):
-                rmse_func = (
-                    lambda x: np.sqrt(np.nansum(x ** 2)) / len(np.atleast_1d(x))
-                    if np.any(np.isfinite(x))
-                    else np.nan
-                )
-                ts_err = aggregate_downsample(
-                    self,
-                    time_bin_size=time_bin_size,
-                    n_bins=n_bins,
-                    time_bin_start=time_bin_start,
-                    aggregate_func=rmse_func,
-                )
-                ts["flux_err"] = ts_err["flux_err"]
-            # If `flux_err` is unavailable, populate `flux_err` as nanstd(flux)
-            else:
-                ts_err = aggregate_downsample(
-                    self,
-                    time_bin_size=time_bin_size,
-                    n_bins=n_bins,
-                    time_bin_start=time_bin_start,
-                    aggregate_func=np.nanstd,
-                )
-                ts["flux_err"] = ts_err["flux"]
-
         # Prepare a LightCurve object by ensuring there is a time column
+        # To Do - check to see if this changes anything in the typical case
         ts._required_columns = []
         ts.add_column(ts.time_bin_start + ts.time_bin_size / 2.0, name="time")
 
