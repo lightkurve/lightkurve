@@ -278,7 +278,7 @@ class DesignMatrix:
         # produces more stable results.
         from fbpca import pca  # local import because not used elsewhere
 
-        new_values, _, _ = pca(self.values, nterms, n_iter)
+        new_values, _, _ = pca(self.values, nterms, n_iter=n_iter)
         return DesignMatrix(new_values, name=self.name)
 
     def append_constant(self, prior_mu=0, prior_sigma=np.inf, inplace=False):
