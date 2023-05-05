@@ -247,12 +247,14 @@ class TessQualityFlags(QualityFlags):
     InsufficientTargets = 32768
 
     #: DEFAULT bitmask identifies all cadences which are definitely useless.
+    # See https://outerspace.stsci.edu/display/TESS/2.0+-+Data+Product+Overview
     DEFAULT_BITMASK = (
-        AttitudeTweak | SafeMode | CoarsePoint | EarthPoint | Desat | ManualExclude
+        AttitudeTweak | SafeMode | CoarsePoint | EarthPoint | Argabrightening | 
+        Desat | ManualExclude | ImpulsiveOutlier | Straylight2 | BadCalibrationExclude
     )
     #: HARD bitmask is conservative and may identify cadences which are useful.
     HARD_BITMASK = (
-        DEFAULT_BITMASK | ApertureCosmic | CollateralCosmic | Straylight | Straylight2
+        DEFAULT_BITMASK | ApertureCosmic | CollateralCosmic | Straylight
     )
     #: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.
     HARDEST_BITMASK = 65535
