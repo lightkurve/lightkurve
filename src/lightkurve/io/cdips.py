@@ -28,7 +28,7 @@ def read_cdips_lightcurve(filename,
     There are several kinds of flux and  magnitudes provided. For consistancy
     we have chosen to display as default 'IFL1', the flux in aperture 1. 
     This is given in ADU. 
-    The flux_err is also provided as 'IFE1' in ADU.
+    The flux_err is also provided as 'IFE1' in ADU
 
     More information: https://archive.stsci.edu/hlsp/cdips
 
