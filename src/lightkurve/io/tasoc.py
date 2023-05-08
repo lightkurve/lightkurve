@@ -21,7 +21,7 @@ def read_tasoc_lightcurve(filename, flux_column="FLUX_CORR", quality_bitmask=Non
     flux_column : str
         Column that will be used to populate the flux values.
         By default, "FLUX_CORR" is used. It contains the T'DA extracted lightcurve,
-        with corrections applied to the raw light curves.
+        with corrections applied to the raw light curves
     """
     lc = read_generic_lightcurve(
         filename, flux_column=flux_column.lower(), time_format="btjd"
