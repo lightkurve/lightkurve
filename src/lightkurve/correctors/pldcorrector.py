@@ -6,7 +6,7 @@ target's own Target Pixel File.
 against a design matrix composed of the following elements:
 * A background light curve to capture the dominant scattered light systematics.
 * Background-corrected pixel time series to capture any residual systematics.
-* Splines to capture the target's intrinsic variability.
+* Splines to capture the target's intrinsic variability
 """
 import logging
 import warnings
