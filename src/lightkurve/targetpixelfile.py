@@ -1155,8 +1155,8 @@ class TargetPixelFile(object):
             #If an axes is passed that used WCS projection, don't use img_extent
             #This addresses lk issue #1095, where the tpf was incorrectly plotted
             try: 
-            	if hasattr(ax, "wcs"):
-            		img_extent = None
+                if hasattr(ax, "wcs"):
+                    img_extent = None
             except NameError:
             	pass
 
