@@ -614,7 +614,9 @@ class LightCurve(TimeSeries):
         warning_type=LightkurveDeprecationWarning,
     )
     def hdu(self):
-        return fits.open(self.filename)
+        with fits.open(self.filename) as hdulist:
+            hdulist = hdulist.copy()
+        return hdulist
 
     @property
     @deprecated("2.0", warning_type=LightkurveDeprecationWarning)

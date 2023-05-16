@@ -1,6 +1,7 @@
 """Read a generic FITS table containing a light curve."""
 import logging
 import warnings
+from copy import deepcopy
 
 from astropy.io import fits
 from astropy.table import Table
@@ -34,7 +35,8 @@ def read_generic_lightcurve(
     if isinstance(filename, fits.HDUList):
         hdulist = filename  # Allow HDUList to be passed
     else:
-        hdulist = fits.open(filename)
+        with fits.open(filename) as hdulist:
+            hdulist = deepcopy(hdulist)
 
     # Raise an exception if the requested extension is invalid
     if isinstance(ext, str):

@@ -102,7 +102,8 @@ class TargetPixelFile(object):
         if isinstance(path, fits.HDUList):
             self.hdu = path
         else:
-            self.hdu = fits.open(self.path, **kwargs)
+            with fits.open(self.path, **kwargs) as hdulist:
+                self.hdu = deepcopy(hdulist)
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
 
@@ -1653,7 +1654,8 @@ class TargetPixelFile(object):
             elif isinstance(img, fits.HDUList):
                 hdu = img[extension]
             else:
-                hdu = fits.open(img)[extension]
+                with fits.open(img) as hdulist:
+                    hdu = hdulist[extension].copy()
             return hdu
 
         # Define a helper function to cutout images if not None
