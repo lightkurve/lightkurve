@@ -1376,7 +1376,7 @@ class LightCurve(TimeSeries):
         # a local import here.
         from astropy.stats.sigma_clipping import sigma_clip
 
-        # sigma_clip won't work with masked ndarrays.
+        # astropy.stats.sigma_clip won't work with masked ndarrays so we convert to regular arrays
         flux = self.flux.copy()
         if isinstance(flux, Masked):
             flux = flux.filled(np.nan)
