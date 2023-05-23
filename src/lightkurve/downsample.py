@@ -1,5 +1,5 @@
-'''astropy-timeseries-downsample function imported as a starting point
-to improve the lightkurve binning function'''
+"""astropy-timeseries-downsample function imported as a starting point
+to improve the lightkurve binning function"""
 
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
@@ -55,9 +55,8 @@ def aggregate_downsample(
     time_bin_start=None,
     time_bin_end=None,
     n_bins=None,
-    aggregate_dict=None, 
+    aggregate_dict=None,
     aggregate_func=None
-
 ):
     """
     Downsample a time series by binning values into bins with a fixed size or
@@ -257,24 +256,23 @@ def aggregate_downsample(
                 "Skipping column {0} since it has a mix-in type", AstropyUserWarning
             )
             continue
-        
-        
-        aggregate_column_function=aggregate_func
-        if(aggregate_dict != None):
-            if( colname in aggregate_dict):
-                aggregate_column_function=aggregate_dict[colname]
+
+        aggregate_column_function = aggregate_func
+        if aggregate_dict != None:
+            if colname in aggregate_dict:
+                aggregate_column_function = aggregate_dict[colname]
 
         if isinstance(values, u.Quantity):
             data = u.Quantity(np.repeat(np.nan, n_bins), unit=values.unit)
             data[unique_indices] = u.Quantity(
-                reduceat(values.value, groups, aggregate_column_function), 
-                values.unit, copy=False
+                reduceat(values.value, groups, aggregate_column_function),
+                values.unit,
+                copy=False,
             )
         else:
             data = np.ma.zeros(n_bins, dtype=values.dtype)
             data.mask = 1
-            data[unique_indices] = reduceat(values, groups, 
-                                            aggregate_column_function)
+            data[unique_indices] = reduceat(values, groups, aggregate_column_function)
             data.mask[unique_indices] = 0
 
         binned[colname] = data
