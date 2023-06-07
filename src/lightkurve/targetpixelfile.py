@@ -1152,13 +1152,14 @@ class TargetPixelFile(object):
                 self.row + self.shape[1] - 0.5,
             )
             
-            #If an axes is passed that used WCS projection, don't use img_extent
-            #This addresses lk issue #1095, where the tpf was incorrectly plotted
-            try: 
+            # If an axes is passed that used WCS projection, don't use img_extent
+            # This addresses lk issue #1095, where the tpf coordinates were incorrectly plotted
+            
+            # By default ax=None
+            if ax != None:
                 if hasattr(ax, "wcs"):
                     img_extent = None
-            except NameError:
-            	pass
+
 
             	
             ax = plot_image(
@@ -1172,9 +1173,6 @@ class TargetPixelFile(object):
             )
             ax.grid(False)
             
-            # Make sure the ticks show integer values for col/row
-            ax.yaxis.get_major_locator().set_params(integer=True) 
-            ax.xaxis.get_major_locator().set_params(integer=True) 
 
         # Overlay the aperture mask if given
         if aperture_mask is not None:
