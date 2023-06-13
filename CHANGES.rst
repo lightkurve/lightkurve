@@ -1,6 +1,7 @@
 2.4.1dev (unreleased)
 =====================
 
+- Updated the TPF plotting function to work correctly with WCS plotting [#1298]
 - Added the ability to open light curves from the TGLC High Level Science Product
 
 2.4.0 (2023-02-14)
