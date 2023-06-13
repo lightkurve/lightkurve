@@ -9,7 +9,12 @@ from astropy.timeseries import aggregate_downsample
 import matplotlib.pyplot as plt
 import numpy as np
 
-from numpy.testing import assert_almost_equal, assert_array_equal, assert_allclose, assert_equal
+from numpy.testing import (
+    assert_almost_equal,
+    assert_array_equal,
+    assert_allclose,
+    assert_equal,
+)
 import pytest
 import tempfile
 import warnings
@@ -24,7 +29,7 @@ from lightkurve.collections import LightCurveCollection
 
 from .test_targetpixelfile import TABBY_TPF
 
-_HAS_VAR_BINS = 'time_bin_end' in aggregate_downsample.__kwdefaults__
+_HAS_VAR_BINS = "time_bin_end" in aggregate_downsample.__kwdefaults__
 
 
 # 8th Quarter of Tabby's star
@@ -139,7 +144,7 @@ def test_math_operators_on_units():
 def test_math_regression_925():
     """Regression test for #925: left hand side multiplication with a np.float failed."""
     lc = LightCurve(time=[1, 2, 3], flux=[1, 1, 1], flux_err=[1, 1, 1])
-    for three in [3, 3.0, np.float64(3), u.Quantity(3.)]:
+    for three in [3, 3.0, np.float64(3), u.Quantity(3.0)]:
         # left hand side multiplication with a numpy float failed in the past, cf. #925
         assert all((three * lc).flux == 3)
         assert all((lc * three).flux == 3)
@@ -264,11 +269,9 @@ def test_lightcurve_fold():
         lc.fold(10, 2456600)
 
 
-@pytest.mark.parametrize(
-    "normalize_phase", [False, True]
-)
+@pytest.mark.parametrize("normalize_phase", [False, True])
 def test_lightcurve_fold_odd_even_masks(normalize_phase):
-    """Test for FoldedLightCurve odd/even mask. See #1104. """
+    """Test for FoldedLightCurve odd/even mask. See #1104."""
 
     # a sine curve with 4-day period, with minimum at day 3, 7, ...
     epoch_time, period = 3, 4
@@ -283,7 +286,12 @@ def test_lightcurve_fold_odd_even_masks(normalize_phase):
 
     # epoch_phase should only shift how the folded lightcurve,
     # but not the actual odd/even mask calculation
-    fold = lc.fold(period=period, epoch_time=epoch_time, epoch_phase=0.5, normalize_phase=normalize_phase)
+    fold = lc.fold(
+        period=period,
+        epoch_time=epoch_time,
+        epoch_phase=0.5,
+        normalize_phase=normalize_phase,
+    )
     odd = fold.odd_mask
     even = fold.even_mask
     assert len(odd) == len(fold.time)
@@ -298,6 +306,7 @@ def test_lightcurve_fold_odd_even_masks(normalize_phase):
             if t < 1 or (5 <= t and t < 9):
                 return True
             return False
+
         return np.array([_mask(t) for t in fold.time_original.value])
 
     def create_expected_cycle(times):
@@ -310,6 +319,7 @@ def test_lightcurve_fold_odd_even_masks(normalize_phase):
                 return 2
             else:
                 return 3
+
         return np.array([_cycle(t) for t in fold.time_original.value])
 
     even_expected = create_expected_even(fold)
@@ -554,7 +564,7 @@ def test_bin():
         warnings.simplefilter("ignore", LightkurveDeprecationWarning)
 
         lc = LightCurve(
-            time=np.arange(10), flux=2 * np.ones(10), flux_err=2 ** 0.5 * np.ones(10)
+            time=np.arange(10), flux=2 * np.ones(10), flux_err=2**0.5 * np.ones(10)
         )
         binned_lc = lc.bin(binsize=2)
         assert_allclose(binned_lc.flux, 2 * np.ones(5))
@@ -563,10 +573,10 @@ def test_bin():
         if _HAS_VAR_BINS:  # With Astropy 5.0 check the exact numbers again
             assert_allclose(binned_lc.flux_err, np.ones(5))
         else:
-            assert_allclose(binned_lc.flux_err, np.sqrt([2./3, 1, 1, 1, 2]))
+            assert_allclose(binned_lc.flux_err, np.sqrt([2.0 / 3, 1, 1, 1, 2]))
         assert len(binned_lc.time) == 5
         with pytest.raises(TypeError):
-            lc.bin(method='doesnotexist')
+            lc.bin(method="doesnotexist")
         # If `flux_err` is missing, the errors on the bins should be the stddev
         lc = LightCurve(time=np.arange(10), flux=2 * np.ones(10))
         binned_lc = lc.bin(binsize=2)
@@ -589,12 +599,12 @@ def test_bin():
 
 
 def test_bin_meta():
-    """Ensure .bin() result carries original meta. See #1040 """
+    """Ensure .bin() result carries original meta. See #1040"""
     lc = LightCurve(
-        time=np.arange(10), flux=2 * np.ones(10), flux_err=2 ** 0.5 * np.ones(10)
+        time=np.arange(10), flux=2 * np.ones(10), flux_err=2**0.5 * np.ones(10)
     )
-    lc.meta['CREATOR'] = 'lk unit test'
-    lc.meta['SECTOR'] = 99
+    lc.meta["CREATOR"] = "lk unit test"
+    lc.meta["SECTOR"] = 99
     binned_lc = lc.bin(time_bin_size=5)
     assert binned_lc.meta == lc.meta
 
@@ -633,7 +643,9 @@ def test_bins_kwarg():
     # The `bins=`` kwarg cannot support a list or array with aggregate_downsample < #11266
     time_bin_edges = [0, 10, 20, 30, 40, 50, 60, 70, 80]
     if not _HAS_VAR_BINS:  # Need Astropy 5.0 for those
-        with pytest.raises(ValueError, match="Sequence or method for ``bins`` requires Astropy"):
+        with pytest.raises(
+            ValueError, match="Sequence or method for ``bins`` requires Astropy"
+        ):
             binned_lc = lc.bin(bins=time_bin_edges)
     else:
         # You get N-1 bins when you enter N fenceposts
@@ -651,7 +663,9 @@ def test_bins_kwarg():
 
     # The `bins=`` kwarg also supports the methods from astropy.stats.histogram
     if not _HAS_VAR_BINS:  # Need Astropy 5.0 for those
-        with pytest.raises(ValueError, match="Sequence or method for ``bins`` requires Astropy"):
+        with pytest.raises(
+            ValueError, match="Sequence or method for ``bins`` requires Astropy"
+        ):
             for special_bins in ["blocks", "knuth", "scott", "freedman"]:
                 binned_lc = lc.bin(bins=special_bins)
 
@@ -660,9 +674,13 @@ def test_bins_kwarg():
 
     # In dense bins, flux error should go down as root-N for N number of bins
     binned_lc = lc.bin(binsize=100)  # Exactly 100 samples per bin
-    assert np.isclose(lc.flux_err.mean() / np.sqrt(100), binned_lc.flux_err.mean(), rtol=0.3)
+    assert np.isclose(
+        lc.flux_err.mean() / np.sqrt(100), binned_lc.flux_err.mean(), rtol=0.3
+    )
     binned_lc = lc.bin(bins=38)  # Roughly 100 samples per bin
-    assert np.isclose(lc.flux_err.mean() / np.sqrt(100), binned_lc.flux_err.mean(), rtol=0.3)
+    assert np.isclose(
+        lc.flux_err.mean() / np.sqrt(100), binned_lc.flux_err.mean(), rtol=0.3
+    )
 
     # The bins parameter must be integer not a float
     with pytest.raises(TypeError, match="``bins`` must have integer type."):
@@ -685,17 +703,17 @@ def test_bin_quality():
         time=[1, 2, 3, 4],
         flux=[1, 1, 1, 1],
         quality=[0, 1, 2, 3],
-        centroid_col=[0., 1, 0, 1],
-        centroid_row=[0., 2, 0, 2],
+        centroid_col=[0.0, 1, 0, 1],
+        centroid_row=[0.0, 2, 0, 2],
     )
     binned_lc = lc.bin(binsize=2)
 
     if _HAS_VAR_BINS:
         assert_allclose(binned_lc.centroid_col, [0.5, 0.5])  # Expect mean
-        assert_allclose(binned_lc.centroid_row, [1, 1])      # Expect mean
+        assert_allclose(binned_lc.centroid_row, [1, 1])  # Expect mean
     else:  # Again account for 3-1 allocation to first and last bin
-        assert_allclose(binned_lc.centroid_col, [1./3, 1])   # Expect mean
-        assert_allclose(binned_lc.centroid_row, [2./3, 2])   # Expect mean
+        assert_allclose(binned_lc.centroid_col, [1.0 / 3, 1])  # Expect mean
+        assert_allclose(binned_lc.centroid_row, [2.0 / 3, 2])  # Expect mean
 
 
 # TEMPORARILY SKIPPED, cf. https://github.com/lightkurve/lightkurve/issues/663
@@ -706,12 +724,13 @@ def test_binned_quality():
         time=[1, 2, 3, 4],
         flux=[1, 1, 1, 1],
         quality=[0, 1, 2, 3],
-        centroid_col=[0., 1, 0, 1],
-        centroid_row=[0., 2, 0, 2],
+        centroid_col=[0.0, 1, 0, 1],
+        centroid_row=[0.0, 2, 0, 2],
     )
     binned_lc = lc.bin(binsize=2)
 
-    assert_allclose(binned_lc.quality, [1, 3])               # Expect bitwise or
+    assert_allclose(binned_lc.quality, [1, 3])  # Expect bitwise or
+
 
 # BEGIN codes for lc.bin memory usage test
 #
@@ -734,9 +753,11 @@ def duplicate_and_stitch(lc, num_copies):
     return LightCurveCollection(lcc).stitch()
 
 
-
 @pytest.mark.memtest
-@pytest.mark.skipif(bad_resource_module_imports, reason="Requires resource module, only available for Unix")
+@pytest.mark.skipif(
+    bad_resource_module_imports,
+    reason="Requires resource module, only available for Unix",
+)
 @pytest.mark.remote_data
 @pytest.mark.parametrize(
     "dict_of_bin_args",
@@ -744,7 +765,7 @@ def duplicate_and_stitch(lc, num_copies):
         dict(bins=10000),
         dict(binsize=10),
         dict(time_bin_size=20 * u.min),
-    ]
+    ],
 )
 def test_bin_memory_usage(dict_of_bin_args):
     """Ensure lc.bin() does not use excessive memory (#1092)"""
@@ -765,6 +786,7 @@ def test_bin_memory_usage(dict_of_bin_args):
     with warnings.catch_warnings():  # lc.bin(binsize=n) is  is deprecated
         warnings.simplefilter("ignore", LightkurveDeprecationWarning)
         lc_b = lc.bin(**dict_of_bin_args)
+
 
 #
 # END codes for lc.bin memory usage test
@@ -883,6 +905,14 @@ def test_to_fits():
     assert hdu[1].header["TTYPE1"] == "TIME"
     assert hdu[1].header["TTYPE2"] == "FLUX"
 
+    # lc2 = lc.copy()
+    # lc2["chrstina"] = lc2.flux.copy()
+    # hdu = lc2.to_fits()
+    # assert "CHRSTINA" not in hdu[1].columns.names
+
+    # hdu = lc2.to_fits(extra_data={"chrstina": lc2["chrstina"]})
+    # assert "CHRSTINA" in hdu[1].columns.names
+
     # Test aperture mask support in to_fits
     for tpf in [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(filename_tess)]:
         random_mask = np.random.randint(0, 2, size=tpf.flux[0].shape, dtype=bool)
@@ -907,12 +937,11 @@ def test_to_fits():
         lc = tpf.to_lightcurve(aperture_mask=None)
         lc = tpf.to_lightcurve(aperture_mask=thresh_mask)
         lc_out = lc - bkg_lc.flux * (thresh_mask.sum() / bkg_mask.sum())
-        lc_out.to_fits(
+        hdu = lc_out.to_fits(
             aperture_mask=thresh_mask,
-            path=tempfile.NamedTemporaryFile().name,
-            overwrite=True,
-            extra_data={"BKG": bkg_lc.flux},
+            bkg=bkg_lc.flux,
         )
+        assert "BKG" in hdu[1].columns.names
 
 
 def test_astropy_time_bkjd():
@@ -1098,7 +1127,7 @@ def test_flatten_returns_normalized():
 
 
 def test_iterative_flatten():
-    """Test the iterative sigma clipping in flatten """
+    """Test the iterative sigma clipping in flatten"""
     # Test a light curve with a single, buried outlier.
     x = np.arange(2000)
     y = np.sin(x / 200) / 100 + 1
@@ -1135,7 +1164,7 @@ def test_fill_gaps():
     lc = LightCurve(
         time=[1, 2, 3, 4, 6, 7, 8],
         flux=Masked([1, 1, np.nan, 1, 1, 1, 1], mask=lc_mask),
-        flux_err=Masked([0, 0, np.nan, 0, 0, 0, 0], mask=lc_mask)
+        flux_err=Masked([0, 0, np.nan, 0, 0, 0, 0], mask=lc_mask),
     )
     nlc = lc.fill_gaps()
     assert len(lc.time) < len(nlc.time)
@@ -1304,7 +1333,7 @@ def test_bin_issue705():
         lc.bin(binsize=15)
 
 
-#@pytest.mark.remote_data
+# @pytest.mark.remote_data
 @pytest.mark.skip  # At time of writing, the SkyBot API yields too many intermittent HTTP Errors
 def test_SSOs():
     # TESS test
@@ -1385,37 +1414,37 @@ def test_combine_kepler_tess():
 # - adapated from: https://github.com/astropy/astropy/blob/v5.0.4/astropy/timeseries/tests/test_sampled.py
 # - the goal is not to repeat the tests, but to ensure LightCurve supports the same type variants.
 
-INPUT_TIME = Time(['2016-03-22T12:30:31',
-                   '2015-01-21T12:30:32',
-                   '2016-03-22T12:30:40'])
+INPUT_TIME = Time(["2016-03-22T12:30:31", "2015-01-21T12:30:32", "2016-03-22T12:30:40"])
 INPUT_RAW_TIME = [25800000.0, 25800000.1, 25800000.2]  # raw time in JD
-PLAIN_TABLE = Table([[1, 2, 11], [3, 4, 1], [1, 1, 1]], names=['flux', 'flux_err', 'c'])
+PLAIN_TABLE = Table([[1, 2, 11], [3, 4, 1], [1, 1, 1]], names=["flux", "flux_err", "c"])
 
 
 def test_initialization_with_data():
-    lc = LightCurve(time=INPUT_TIME, data=[[10, 2, 3], [4, 5, 6]], names=['flux', 'flux_err'])
+    lc = LightCurve(
+        time=INPUT_TIME, data=[[10, 2, 3], [4, 5, 6]], names=["flux", "flux_err"]
+    )
     assert_equal(lc.time.isot, INPUT_TIME.isot)
-    assert_equal(lc['flux'], [10, 2, 3])
-    assert_equal(lc['flux_err'], [4, 5, 6])
+    assert_equal(lc["flux"], [10, 2, 3])
+    assert_equal(lc["flux_err"], [4, 5, 6])
 
 
 def test_initialization_with_table():
     lc = LightCurve(time=INPUT_TIME, data=PLAIN_TABLE)
-    assert lc.colnames == ['time', 'flux', 'flux_err', 'c']
+    assert lc.colnames == ["time", "flux", "flux_err", "c"]
 
 
 def test_initialization_with_time_in_data():
     data = PLAIN_TABLE.copy()
-    data['time'] = INPUT_TIME
+    data["time"] = INPUT_TIME
 
     lc1 = LightCurve(data=data)
 
-    assert set(lc1.colnames) == set(['time', 'flux', 'flux_err', 'c'])
+    assert set(lc1.colnames) == set(["time", "flux", "flux_err", "c"])
     assert all(lc1.time == INPUT_TIME)
 
     # flux / flux_err is not required in input, but will be automatically generated
-    lc2 = LightCurve(data=[[10, 2, 3], INPUT_TIME], names=['a', 'time'])
-    assert set(lc2.colnames) == set(['time', 'a', 'flux', 'flux_err'])
+    lc2 = LightCurve(data=[[10, 2, 3], INPUT_TIME], names=["a", "time"])
+    assert set(lc2.colnames) == set(["time", "a", "flux", "flux_err"])
     assert all(lc2.time == INPUT_TIME)
 
     # `LightCurve.__init__()` also needs to support `data` in a list of (Time, Column/Column Mix-ins) without `names`
@@ -1426,11 +1455,15 @@ def test_initialization_with_time_in_data():
 
 def test_initialization_with_raw_time_in_data():
     """Variant of `test_initialization_with_time_in_data() that is Lightcurve-specific.
-       Time can be raw values in default format
+    Time can be raw values in default format
     """
-    lc = LightCurve(data=[[10, 2, 3], [4, 5, 6], INPUT_RAW_TIME], names=['flux', 'flux_err', 'time'])
-    assert set(lc.colnames) == set(['time', 'flux', 'flux_err'])
-    assert_array_equal(lc.time, Time(INPUT_RAW_TIME, format=lc.time.format, scale=lc.time.scale))
+    lc = LightCurve(
+        data=[[10, 2, 3], [4, 5, 6], INPUT_RAW_TIME], names=["flux", "flux_err", "time"]
+    )
+    assert set(lc.colnames) == set(["time", "flux", "flux_err"])
+    assert_array_equal(
+        lc.time, Time(INPUT_RAW_TIME, format=lc.time.format, scale=lc.time.scale)
+    )
 
 
 # case multiple time columns: handled by the base TimeSeries
@@ -1439,21 +1472,25 @@ def test_initialization_with_raw_time_in_data():
 def test_initialization_with_ndarray():
     # test init with ndarray does not exist in astropy `test_sampled.py`, and is added
     # for completeness sake
-    data = np.array([(1.0, 0.2, 0),
-                     (3.0, 0.4, 4),
-                     (5.0, 0.6, 2)],
-                    dtype=[('flux', 'f8'), ('flux_err', 'f8'), ('c', 'i4')])
+    data = np.array(
+        [(1.0, 0.2, 0), (3.0, 0.4, 4), (5.0, 0.6, 2)],
+        dtype=[("flux", "f8"), ("flux_err", "f8"), ("c", "i4")],
+    )
     lc = LightCurve(time=INPUT_TIME, data=data)
-    assert lc.colnames == ['time', 'flux', 'flux_err', 'c']
+    assert lc.colnames == ["time", "flux", "flux_err", "c"]
 
 
 def test_initialization_with_time_in_ndarray():
-    data = np.array([(1.0, 0.2, 0, INPUT_RAW_TIME[0]),
-                     (3.0, 0.4, 4, INPUT_RAW_TIME[1]),
-                     (5.0, 0.6, 2, INPUT_RAW_TIME[2])],
-                    dtype=[('flux', 'f8'), ('flux_err', 'f8'), ('c', 'i4'), ('time', 'f8')])
+    data = np.array(
+        [
+            (1.0, 0.2, 0, INPUT_RAW_TIME[0]),
+            (3.0, 0.4, 4, INPUT_RAW_TIME[1]),
+            (5.0, 0.6, 2, INPUT_RAW_TIME[2]),
+        ],
+        dtype=[("flux", "f8"), ("flux_err", "f8"), ("c", "i4"), ("time", "f8")],
+    )
     lc = LightCurve(data=data)
-    assert lc.colnames == ['time', 'flux', 'flux_err', 'c']
+    assert lc.colnames == ["time", "flux", "flux_err", "c"]
 
 
 def test_mixed_instantiation():
@@ -1618,7 +1655,7 @@ def test_attr_access_meta():
 @pytest.mark.parametrize(
     "lc",
     [
-        LightCurve(time=[1, 2, 3], flux=[4, 5, 6], meta={'SECTOR': 5}),
+        LightCurve(time=[1, 2, 3], flux=[4, 5, 6], meta={"SECTOR": 5}),
         LightCurve(time=[1, 2, 3], flux=[4, 5, 6]),
     ],
 )
@@ -1626,11 +1663,11 @@ def test_meta_assignment(lc):
     """Test edge cases in trying to assign meta (#1046)"""
 
     # ensure lc.meta assignment does not emit any warnings.
-    meta_new = {'TSTART': 123456789.0}
+    meta_new = {"TSTART": 123456789.0}
     with pytest.warns(None) as record:
         lc.meta = meta_new
 
-    if (len(record) > 0):
+    if len(record) > 0:
         pytest.fail(f"{len(record)} unexpected warning: {record[0]}")
 
     # for the case existing meta is not empty
@@ -1811,7 +1848,7 @@ def test_support_non_numeric_columns():
 
 
 def test_select_columns_as_lightcurve():
-    """Select a subset of columns as a lightcurve object. #1194 """
+    """Select a subset of columns as a lightcurve object. #1194"""
     lc = LightCurve(time=np.arange(0, 12))
     lc["flux"] = np.ones_like(lc.time, dtype="f8") - 0.01
     lc["flux_err"] = np.ones_like(lc.time, dtype="f8") * 0.0001
@@ -1819,24 +1856,24 @@ def test_select_columns_as_lightcurve():
     lc["col2"] = np.zeros_like(lc.time, dtype="i4")
 
     # subset of columns including "time" works
-    lc_subset = lc['time', 'flux', 'col2']
+    lc_subset = lc["time", "flux", "col2"]
     # columns flux / flux_err are always there as part of a LightCurve object
-    assert set(lc_subset.colnames) == set(['time', 'flux', 'flux_err', 'col2'])
+    assert set(lc_subset.colnames) == set(["time", "flux", "flux_err", "col2"])
     # the flux_err in the subset, as it is not specified requested,
     # is one with `nan`, rather than rather than the original lc.flux_err.
     assert np.isnan(lc_subset.flux_err).all()
     # the subset should still be an instance of LightCurve (rather than just QTable)
-    assert(isinstance(lc_subset, type(lc)))
+    assert isinstance(lc_subset, type(lc))
 
-    lc_b = lc.bin(time_bin_size=3*u.day)
-    lc_b_subset = lc_b['time', 'flux', 'flux_err', 'col1']
-    assert set(lc_b_subset.colnames) == set(['time', 'flux', 'flux_err', 'col1'])
-    assert(isinstance(lc_b_subset, type(lc_b)))
+    lc_b = lc.bin(time_bin_size=3 * u.day)
+    lc_b_subset = lc_b["time", "flux", "flux_err", "col1"]
+    assert set(lc_b_subset.colnames) == set(["time", "flux", "flux_err", "col1"])
+    assert isinstance(lc_b_subset, type(lc_b))
 
     lc_f = lc.fold(period=3)
-    lc_f_subset = lc_f['time', 'flux', 'flux_err']
-    assert set(lc_f_subset.colnames) == set(['time', 'flux', 'flux_err'])
-    assert(isinstance(lc_f_subset, type(lc_f)))
+    lc_f_subset = lc_f["time", "flux", "flux_err"]
+    assert set(lc_f_subset.colnames) == set(["time", "flux", "flux_err"])
+    assert isinstance(lc_f_subset, type(lc_f))
 
 
 def test_timedelta():
@@ -1872,13 +1909,13 @@ def test_plot_with_offset():
 def test_string_column_with_unit():
     """Regression test for #980."""
     # string-typed columns with a unit set were making `_convert_col_for_table` crash
-    col = Column(data=["a", "b", "c"], unit='unitless')
-    LightCurve(data={'time': [1, 2, 3], 'x': col})
+    col = Column(data=["a", "b", "c"], unit="unitless")
+    LightCurve(data={"time": [1, 2, 3], "x": col})
 
 
 def test_head_tail_truncate():
     """Simple test for the `head()`, `tail()`, and `truncate()` methods."""
-    lc = LightCurve({'time': [1, 2, 3, 4, 5], 'flux':[1, 2, 3, 4, 5]})
+    lc = LightCurve({"time": [1, 2, 3, 4, 5], "flux": [1, 2, 3, 4, 5]})
     assert lc.head(1).flux == 1
     assert lc.head(n=1).flux == 1
     assert lc.tail(1).flux == 5
@@ -1898,18 +1935,22 @@ def test_head_tail_truncate():
         lc.cycle = [11, 12, 15, 14, 13]
     assert all(lc.truncate(12, 14, column="cycle").flux == [2, 4, 5])
 
+
 def test_select_flux():
     """Simple test for the `LightCurve.select_flux()` method."""
     u_e_s = u.electron / u.second
-    lc = LightCurve(data={'time': [1,2,3],
-                          'flux': [2, 3, 4] * u_e_s,
-                          'flux_err': [0, 1, 2] * u_e_s,
-                          'newflux': [4, 5, 6] * u_e_s,
-                          'newflux_err': [7, 8, 9] * u_e_s,
-                          'newflux_n1': [0.9, 1, 1.1] * u.dimensionless_unscaled,  # normalized, unitless
-                          'newflux_n2': [0.9, 1, 1.1],  # normalized, no unit
-                          },
-                          )
+    lc = LightCurve(
+        data={
+            "time": [1, 2, 3],
+            "flux": [2, 3, 4] * u_e_s,
+            "flux_err": [0, 1, 2] * u_e_s,
+            "newflux": [4, 5, 6] * u_e_s,
+            "newflux_err": [7, 8, 9] * u_e_s,
+            "newflux_n1": [0.9, 1, 1.1]
+            * u.dimensionless_unscaled,  # normalized, unitless
+            "newflux_n2": [0.9, 1, 1.1],  # normalized, no unit
+        },
+    )
     # Can we set flux to newflux?
     assert all(lc.select_flux("newflux").flux == lc.newflux)
     assert lc.select_flux("newflux").meta["FLUX_ORIGIN"] == "newflux"
@@ -1918,7 +1959,9 @@ def test_select_flux():
     # Does `select_flux()` set the error column by default?
     assert all(lc.select_flux("newflux").flux_err == lc.newflux_err)
     # Can a different error column be specified?
-    assert all(lc.select_flux("newflux", flux_err_column="newflux").flux_err == lc.newflux)
+    assert all(
+        lc.select_flux("newflux", flux_err_column="newflux").flux_err == lc.newflux
+    )
     # ensure flux_err in the new lc is nan if the origin does not have it
     assert all(np.isnan(lc.select_flux("newflux_n1")["flux_err"]))
     # Do invalid column names raise a ValueError?
@@ -1929,16 +1972,26 @@ def test_select_flux():
     # Test for setting normalized correctly (#1091)
     lc_n = lc.normalize(unit="percent")
     assert lc_n.meta["NORMALIZED"]  # expected behavior of normalize, not the real test
-    assert lc_n.select_flux("newflux").meta.get("NORMALIZED", False) is False  # actual test 1
-    assert lc.meta.get("NORMALIZED", False) is False  # expected behavior, not the real test
-    assert lc.select_flux("newflux_n1").meta.get("NORMALIZED", False)  # actual test 2a, the new column is normalized
-    assert lc.select_flux("newflux_n2").meta.get("NORMALIZED", False)  # actual test 2b, the new column is normalized
+    assert (
+        lc_n.select_flux("newflux").meta.get("NORMALIZED", False) is False
+    )  # actual test 1
+    assert (
+        lc.meta.get("NORMALIZED", False) is False
+    )  # expected behavior, not the real test
+    assert lc.select_flux("newflux_n1").meta.get(
+        "NORMALIZED", False
+    )  # actual test 2a, the new column is normalized
+    assert lc.select_flux("newflux_n2").meta.get(
+        "NORMALIZED", False
+    )  # actual test 2b, the new column is normalized
 
 
 def test_transit_mask_with_quantities():
     """Regression test for #1141."""
     lc = LightCurve(time=range(10), flux=range(10))
-    mask_quantity = lc.create_transit_mask(period=2.9*u.day, transit_time=1*u.day, duration=1*u.day)
+    mask_quantity = lc.create_transit_mask(
+        period=2.9 * u.day, transit_time=1 * u.day, duration=1 * u.day
+    )
     mask_no_quantity = lc.create_transit_mask(period=2.9, transit_time=1, duration=1)
     assert all(mask_quantity == mask_no_quantity)
 
@@ -1954,6 +2007,6 @@ def test_nbins():
 def test_river_plot_with_masked_flux():
     """Regression test for #1175."""
     flux = Masked(np.random.normal(loc=1, scale=0.1, size=100))
-    flux_err = Masked(0.1*np.ones(100))
+    flux_err = Masked(0.1 * np.ones(100))
     lc = LightCurve(time=np.linspace(1, 100, 100), flux=flux, flux_err=flux_err)
-    lc.plot_river(period=10.)
+    lc.plot_river(period=10.0)
