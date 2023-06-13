@@ -1143,6 +1143,7 @@ class TargetPixelFile(object):
                 title = "Target ID: {}, Cadence: {}".format(
                     self.targetid, self.cadenceno[frame]
                 )
+            
             # We subtract -0.5 because pixel coordinates refer to the middle of
             # a pixel, e.g. (col, row) = (10.0, 20.0) is a pixel center.
             img_extent = (
@@ -1151,6 +1152,17 @@ class TargetPixelFile(object):
                 self.row - 0.5,
                 self.row + self.shape[1] - 0.5,
             )
+            
+            # If an axes is passed that used WCS projection, don't use img_extent
+            # This addresses lk issue #1095, where the tpf coordinates were incorrectly plotted
+            
+            # By default ax=None
+            if ax != None:
+                if hasattr(ax, "wcs"):
+                    img_extent = None
+
+
+            	
             ax = plot_image(
                 data_to_plot,
                 ax=ax,
@@ -1161,6 +1173,7 @@ class TargetPixelFile(object):
                 **kwargs,
             )
             ax.grid(False)
+            
 
         # Overlay the aperture mask if given
         if aperture_mask is not None:
@@ -1168,8 +1181,13 @@ class TargetPixelFile(object):
             for i in range(self.shape[1]):
                 for j in range(self.shape[2]):
                     if aperture_mask[i, j]:
+                        if hasattr(ax, "wcs"):
+                            # When using WCS coordinates, do not add col/row to mask coords
+                    	    xy = (j - 0.5, i - 0.5)
+                        else:
+                    	    xy = (j + self.column - 0.5, i + self.row - 0.5)
                         rect = patches.Rectangle(
-                            xy=(j + self.column - 0.5, i + self.row - 0.5),
+                            xy=xy,
                             width=1,
                             height=1,
                             color=mask_color,
