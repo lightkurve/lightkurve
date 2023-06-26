@@ -40,8 +40,8 @@ def test_read_cdips():
         assert type(lc).__name__ == "TessLightCurve"
         assert lc.meta["FLUX_ORIGIN"] == ext.lower()
         # Are `time` and `flux` consistent with the FITS file?
-        # Removed 2457000 days from the TMID_BJD values 
-        assert_array_equal(f[1].data['TMID_BJD'][lc.meta['QUALITY_MASK']]-2457000,
+    
+        assert_array_equal(f[1].data['TMID_BJD'][lc.meta['QUALITY_MASK']],
                            lc.time.value)
         assert_array_equal(f[1].data[ext][lc.meta['QUALITY_MASK']],
                            lc.flux.value)

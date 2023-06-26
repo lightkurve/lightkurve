@@ -62,16 +62,14 @@ def read_cdips_lightcurve(filename,
     # Set the appropriate error column for this aperture
     quality_column = f"irq{ap}"
 
+    # The time is in jd not btjd as such the time_format was changes to jd.
     lc = read_generic_lightcurve(filename,
                                  time_column="tmid_bjd",
                                  flux_column=flux_column.lower(),
                                  flux_err_column=flux_err_column,
                                  quality_column=quality_column,
-                                 time_format='btjd')
+                                 time_format='jd')
 
-    #The time displayed is in BJD not BTJD. We can fix this by subtracting
-    # 2457000
-    lc["time"] = lc["time"]-2457000
 
 
     # Filter out poor-quality data
@@ -98,7 +96,8 @@ def read_cdips_lightcurve(filename,
 
     
     lc.meta["AUTHOR"] = "CDIPS"
-    lc.meta['QUALITY_BITMASK'] = 36
+    #Adjusting the bitmaks to the TESS default value of 175
+    lc.meta['QUALITY_BITMASK'] = 175
     lc.meta['QUALITY_MASK'] = quality_mask
 
     return TessLightCurve(data=lc)
