@@ -52,10 +52,10 @@ def read_cdips_lightcurve(filename,
     if include_inst_errs:
         # If fluxes are requested, return flux errors
         if flux_column[:-1].lower()=="ifl":
-            flux_err_column = f"ife{ap}"
+            flux_err_column = f"ife{ap}" 
         # Otherwise magnitudes are being requested, return magnitude errors
         else:
-            flux_err_column = f"ire{ap}"
+            flux_err_column = f"ire{ap}" 
     else:
         flux_err_column = ""
 
