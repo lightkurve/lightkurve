@@ -28,7 +28,9 @@ from astropy.utils.exceptions import AstropyUserWarning
 import pandas as pd
 from pandas import Series
 
-from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError
+
+from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError, finalize_notebook_url
+
 
 log = logging.getLogger(__name__)
 
@@ -978,7 +980,7 @@ def make_default_export_name(tpf, suffix="custom-lc"):
 
 def show_interact_widget(
     tpf,
-    notebook_url="localhost:8888",
+    notebook_url=None,
     lc=None,
     max_cadences=200000,
     aperture_mask="default",
@@ -1013,6 +1015,9 @@ def show_interact_widget(
         will need to supply this value for the application to display
         properly. If no protocol is supplied in the URL, e.g. if it is
         of the form "localhost:8888", then "http" will be used.
+        For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+        to the public hostname of your JupyterHub and notebook_url will
+        be defined appropriately automatically.
     max_cadences: int
         Raise a RuntimeError if the number of cadences shown is larger than
         this value. This limit helps keep browsers from becoming unresponsive.
@@ -1064,6 +1069,8 @@ def show_interact_widget(
             "you can install bokeh using e.g. `conda install bokeh`."
         )
         return None
+
+    notebook_url = finalize_notebook_url(notebook_url)
 
     aperture_mask = tpf._parse_aperture_mask(aperture_mask)
     if ~aperture_mask.any():
@@ -1297,7 +1304,8 @@ def show_interact_widget(
     return show(create_interact_ui, notebook_url=notebook_url)
 
 
-def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty",  magnitude_limit=18):
+
+def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitude_limit=18):
     """skyview
 
     Parameters
@@ -1313,6 +1321,9 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty
         will need to supply this value for the application to display
         properly. If no protocol is supplied in the URL, e.g. if it is
         of the form "localhost:8888", then "http" will be used.
+        For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+        to the public hostname of your JupyterHub and notebook_url will
+        be defined appropriately automatically.
     aperture_mask : array-like, 'pipeline', 'threshold', 'default', 'background', or 'empty'
         Highlight pixels selected by aperture_mask.
         Default is 'empty': no pixel is highlighted.
@@ -1332,6 +1343,8 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty
             "you can install bokeh using e.g. `conda install bokeh`."
         )
         return None
+
+    notebook_url = finalize_notebook_url(notebook_url)
 
     # Try to identify the "fiducial frame", for which the TPF WCS is exact
     zp = (tpf.pos_corr1 == 0) & (tpf.pos_corr2 == 0)

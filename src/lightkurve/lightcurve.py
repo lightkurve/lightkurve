@@ -32,6 +32,7 @@ from .utils import (
     btjd_to_astropy_time,
     validate_method,
     _query_solar_system_objects,
+    finalize_notebook_url
 )
 from .utils import LightkurveWarning, LightkurveDeprecationWarning
 
@@ -2118,7 +2119,7 @@ class LightCurve(TimeSeries):
 
     def interact_bls(
         self,
-        notebook_url="localhost:8888",
+        notebook_url=None,
         minimum_period=None,
         maximum_period=None,
         resolution=2000,
@@ -2146,6 +2147,9 @@ class LightCurve(TimeSeries):
             will need to supply this value for the application to display
             properly. If no protocol is supplied in the URL, e.g. if it is
             of the form "localhost:8888", then "http" will be used.
+            For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+            to the public hostname of your JupyterHub and notebook_url will
+            be defined appropriately automatically.
         minimum_period : float or None
             Minimum period to assess the BLS to. If None, default value of 0.3 days
             will be used.
@@ -2172,6 +2176,8 @@ class LightCurve(TimeSeries):
         .. [1] https://docs.astropy.org/en/stable/timeseries/bls.html
         """
         from .interact_bls import show_interact_widget
+
+        notebook_url = finalize_notebook_url(notebook_url)
 
         return show_interact_widget(
             self,

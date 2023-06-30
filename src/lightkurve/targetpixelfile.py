@@ -43,6 +43,7 @@ from .utils import (
     validate_method,
     centroid_quadratic,
     _query_solar_system_objects,
+    finalize_notebook_url
 )
 from .io import detect_filetype
 
@@ -660,7 +661,7 @@ class TargetPixelFile(object):
             elif isinstance(aperture_mask.flat[0], (np.integer, np.float_)):
                 aperture_mask = aperture_mask.astype(bool)
         self._last_aperture_mask = aperture_mask
-        
+
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3, reference_pixel="center"):
@@ -1143,7 +1144,7 @@ class TargetPixelFile(object):
                 title = "Target ID: {}, Cadence: {}".format(
                     self.targetid, self.cadenceno[frame]
                 )
-            
+
             # We subtract -0.5 because pixel coordinates refer to the middle of
             # a pixel, e.g. (col, row) = (10.0, 20.0) is a pixel center.
             img_extent = (
@@ -1152,17 +1153,17 @@ class TargetPixelFile(object):
                 self.row - 0.5,
                 self.row + self.shape[1] - 0.5,
             )
-            
+
             # If an axes is passed that used WCS projection, don't use img_extent
             # This addresses lk issue #1095, where the tpf coordinates were incorrectly plotted
-            
+
             # By default ax=None
             if ax != None:
                 if hasattr(ax, "wcs"):
                     img_extent = None
 
 
-            	
+
             ax = plot_image(
                 data_to_plot,
                 ax=ax,
@@ -1173,7 +1174,7 @@ class TargetPixelFile(object):
                 **kwargs,
             )
             ax.grid(False)
-            
+
 
         # Overlay the aperture mask if given
         if aperture_mask is not None:
@@ -1183,9 +1184,9 @@ class TargetPixelFile(object):
                     if aperture_mask[i, j]:
                         if hasattr(ax, "wcs"):
                             # When using WCS coordinates, do not add col/row to mask coords
-                    	    xy = (j - 0.5, i - 0.5)
+                            xy = (j - 0.5, i - 0.5)
                         else:
-                    	    xy = (j + self.column - 0.5, i + self.row - 0.5)
+                            xy = (j + self.column - 0.5, i + self.row - 0.5)
                         rect = patches.Rectangle(
                             xy=xy,
                             width=1,
@@ -1278,7 +1279,7 @@ class TargetPixelFile(object):
 
     def interact(
         self,
-        notebook_url="localhost:8888",
+        notebook_url=None,
         max_cadences=200000,
         aperture_mask="default",
         exported_filename=None,
@@ -1309,6 +1310,9 @@ class TargetPixelFile(object):
             will need to supply this value for the application to display
             properly. If no protocol is supplied in the URL, e.g. if it is
             of the form "localhost:8888", then "http" will be used.
+            For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+            to the public hostname of your JupyterHub and notebook_url will
+            be defined appropriately automatically.
         max_cadences : int
             Print an error message if the number of cadences shown is larger than
             this value. This limit helps keep browsers from becoming unresponsive.
@@ -1358,6 +1362,8 @@ class TargetPixelFile(object):
         """
         from .interact import show_interact_widget
 
+        notebook_url = finalize_notebook_url(notebook_url)
+
         return show_interact_widget(
             self,
             notebook_url=notebook_url,
@@ -1369,7 +1375,8 @@ class TargetPixelFile(object):
             **kwargs,
         )
 
-    def interact_sky(self, notebook_url="localhost:8888", aperture_mask="empty", magnitude_limit=18):
+
+    def interact_sky(self, notebook_url=None, aperture_mask="empty", magnitude_limit=18):
         """Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.
 
         Parameters
@@ -1383,6 +1390,9 @@ class TargetPixelFile(object):
             will need to supply this value for the application to display
             properly. If no protocol is supplied in the URL, e.g. if it is
             of the form "localhost:8888", then "http" will be used.
+            For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+            to the public hostname of your JupyterHub and notebook_url will
+            be defined appropriately automatically.
         aperture_mask : array-like, 'pipeline', 'threshold', 'default', 'background', or 'empty'
             Highlight pixels selected by aperture_mask.
             Default is 'empty': no pixel is highlighted.
@@ -1390,6 +1400,8 @@ class TargetPixelFile(object):
             A value to limit the results in based on Gaia Gmag. Default, 18.
         """
         from .interact import show_skyview_widget
+
+        notebook_url = finalize_notebook_url(notebook_url)
 
         return show_skyview_widget(
             self, notebook_url=notebook_url, aperture_mask=aperture_mask, magnitude_limit=magnitude_limit
