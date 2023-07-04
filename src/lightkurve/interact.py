@@ -123,9 +123,6 @@ def _get_corrected_coordinate(tpf_or_lc, pm_ra, pm_dec):
     dec = h.get("DEC_OBJ")
     equinox = h.get("EQUINOX")
 
-    pm_ra = h.get('PMRA')
-    pm_dec = h.get('PMDEC')
-
     if ra is None or dec is None or pm_ra is None or pm_dec is None or equinox is None:
         # case cannot apply proper motion due to missing parameters
         return ra, dec, False
@@ -501,20 +498,17 @@ def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
 
         if tpf.mission == "Kepler" or tpf.mission == "K2":
             pix_scale = 4.0  # arcseconds / pixel for Kepler, default
-            result = Catalogs.query_region(
-                c1,
-                catalog = "GaiaDR3", 
-                radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
-            )
 
         if tpf.mission == "TESS":
             pix_scale = 21.0
-            result = Catalogs.query_region(
-                c1,
-                catalog = "TIC", 
-                radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
-            )
         
+        result = Catalogs.query_region(
+                c1,
+                catalog = "GaiaDR3", 
+                radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
+        )
+
+
     no_targets_found_message = ValueError(
         "Either no sources were found in the query region " "or Vizier is unavailable"
     )
@@ -525,24 +519,14 @@ def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
         raise no_targets_found_message
     elif len(result) == 0:
         raise too_few_found_message
-        
-    if tpf.mission == "Kepler" or tpf.mission == "K2":        
-        result = result.to_pandas()   
-        result = result[result.phot_g_mean_mag < magnitude_limit]    
-        if len(result) == 0:
-            raise no_targets_found_message
-    # drop all the filtered rows, it makes subsequent TESS-specific processing easier (to add rows/columns)
-        result.reset_index(drop=True, inplace=True)
-        result['magForSize'] = result['phot_g_mean_mag']  # to be used as the basis for sizing the dots in plots
-        
-    if tpf.mission == "TESS":
-        result = result.to_pandas()  
-        result = result[result.GAIAmag < magnitude_limit]   
-        if len(result) == 0:
-            raise no_targets_found_message
-        result.reset_index(drop=True, inplace=True)
-        result['magForSize'] = result['GAIAmag']  # to be used as the basis for size
-                
+               
+    result = result.to_pandas()   
+    result = result[result.phot_g_mean_mag < magnitude_limit]    
+    if len(result) == 0:
+        raise no_targets_found_message
+    result.reset_index(drop=True, inplace=True)
+    result['magForSize'] = result['phot_g_mean_mag']  # to be used as the basis for sizing the dots in plots
+
     return result
 
 
@@ -562,21 +546,12 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
             LightkurveWarning,
         )
 
-    if tpf.mission == "TESS":
-        ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
+    ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
         np.nan_to_num(np.asarray(result.ra)) * u.deg, np.nan_to_num(np.asarray(result.dec)) * u.deg,
-            np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond / u.year,
-            np.nan_to_num(np.asarray(result.pmDEC)) * u.milliarcsecond / u.year,
-            Time(2457206.375, format="jd", scale="tdb"),
-            tpf.time[0])
-    
-    if tpf.mission == "Kepler" or tpf.mission == "K2":
-        ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
-        np.nan_to_num(np.asarray(result.ra)) * u.deg, np.nan_to_num(np.asarray(result.dec)) * u.deg,
-            np.nan_to_num(np.asarray(result.pmra)) * u.milliarcsecond / u.year,
-            np.nan_to_num(np.asarray(result.pmdec)) * u.milliarcsecond / u.year,
-            Time(2457206.375, format="jd", scale="tdb"),
-            tpf.time[0])
+        np.nan_to_num(np.asarray(result.pmra)) * u.milliarcsecond / u.year,
+        np.nan_to_num(np.asarray(result.pmdec)) * u.milliarcsecond / u.year,
+        Time(2457206.375, format="jd", scale="tdb"),
+        tpf.time[0])
     
     result.ra = ra_corrected.to(u.deg).value
     result.dec = dec_corrected.to(u.deg).value
@@ -587,41 +562,22 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 
     # Gently size the points by their Gaia magnitude
     sizes = 64.0 / 2 ** (result["magForSize"] / 5.0)
-    if tpf.mission == "TESS":
-        one_over_parallax = 1.0 / (result["plx"] / 1000.0)
-        source = ColumnDataSource(
-            data=dict(
-                ra=result["ra"],
-                dec=result["dec"],
-                pmra=result["pmRA"],
-                pmde=result["pmDEC"],
-                source=_to_display(result["GAIA"].astype(int)),
-                Gmag=result["GAIAmag"],
-                plx=result["plx"],
-                one_over_plx=one_over_parallax,
-                x=coords[:, 0] + tpf.column,
-                y=coords[:, 1] + tpf.row,
-                size=sizes,
-            )
+    one_over_parallax = 1.0 / (result["parallax"] / 1000.0)
+    source = ColumnDataSource(
+        data=dict(
+            ra=result["ra"],
+            dec=result["dec"],
+            pmra=result["pmra"],
+            pmde=result["pmdec"],
+            source=_to_display(result["source_id"].astype(int)),
+            Gmag=result["phot_g_mean_mag"],
+            plx=result["parallax"],
+            one_over_plx=one_over_parallax,
+            x=coords[:, 0] + tpf.column,
+            y=coords[:, 1] + tpf.row,
+            size=sizes,
         )
-
-    if tpf.mission == "Kepler" or tpf.mission == "K2":
-        one_over_parallax = 1.0 / (result["parallax"] / 1000.0)
-        source = ColumnDataSource(
-            data=dict(
-                ra=result["ra"],
-                dec=result["dec"],
-                pmra=result["pmra"],
-                pmde=result["pmdec"],
-                source=_to_display(result["source_id"].astype(int)),
-                Gmag=result["phot_g_mean_mag"],
-                plx=result["parallax"],
-                one_over_plx=one_over_parallax,
-                x=coords[:, 0] + tpf.column,
-                y=coords[:, 1] + tpf.row,
-                size=sizes,
-            )
-        )
+    )
 
 
     for c in source_colnames_extras:
@@ -668,10 +624,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 
     # mark the target's position too
 
-    if tpf.mission == "TESS":
-        pm_ra, pm_dec = np.nan_to_num(np.asarray(result["pmRA"])), np.nan_to_num(np.asarray(result["pmDEC"]))
-    if tpf.mission == "Kepler" or tpf.mission == "K2":
-        pm_ra, pm_dec = np.nan_to_num(np.asarray(result["pmra"])), np.nan_to_num(np.asarray(result["pmdec"]))
+    pm_ra, pm_dec = np.nan_to_num(np.asarray(result["pmra"])), np.nan_to_num(np.asarray(result["pmdec"]))
 
     target_ra, target_dec, pm_corrected = _get_corrected_coordinate(tpf, pm_ra[0], pm_dec[0])
     target_x, target_y = None, None
