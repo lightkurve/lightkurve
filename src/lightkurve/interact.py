@@ -99,6 +99,7 @@ def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
     #    noticeable significant difference. E.g., applying it to Proxima Cen, a target with large parallax
     #    and huge proper motion, does not change the result in any noticeable way.
     #
+
     c = SkyCoord(ra, dec, pm_ra_cosdec=pm_ra, pm_dec=pm_dec,
                 frame='icrs', obstime=equinox)
 
@@ -112,7 +113,7 @@ def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
     return new_c.ra, new_c.dec, True
 
 
-def _get_corrected_coordinate(tpf_or_lc):
+def _get_corrected_coordinate(tpf_or_lc, pm_ra, pm_dec):
     """Extract coordinate from Kepler/TESS FITS, with proper motion corrected
        to the start of observation if proper motion is available."""
     h = tpf_or_lc.meta
@@ -120,20 +121,16 @@ def _get_corrected_coordinate(tpf_or_lc):
 
     ra = h.get("RA_OBJ")
     dec = h.get("DEC_OBJ")
-
-    pm_ra = h.get("PMRA")
-    pm_dec = h.get("PMDEC")
     equinox = h.get("EQUINOX")
+
+    pm_ra = h.get('PMRA')
+    pm_dec = h.get('PMDEC')
 
     if ra is None or dec is None or pm_ra is None or pm_dec is None or equinox is None:
         # case cannot apply proper motion due to missing parameters
         return ra, dec, False
 
-    # Note: it'd be better / extensible if the unit is a property of the tpf or lc
-    if tpf_or_lc.meta.get("TICID") is not None:
-        pm_unit = u.milliarcsecond / u.year
-    else:  # assumes to be Kepler / K2
-        pm_unit = u.arcsecond / u.year
+    pm_unit = u.milliarcsecond / u.year
 
     ra_corrected, dec_corrected, pm_corrected = _correct_with_proper_motion(
             ra * u.deg, dec *u.deg,
@@ -447,6 +444,7 @@ def _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limi
 
 def _add_nearby_tics_if_tess(tpf, magnitude_limit, result):
     tic_id = tpf.meta.get('TICID', None)
+
     # handle 3 cases:
     # - TESS tpf has a valid id, type integer
     # - Some TESSCut has empty string while and some others has None
@@ -500,8 +498,7 @@ def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
         warnings.filterwarnings(
             "ignore", category=u.UnitsWarning, message="Unit 'e' not supported by the VOUnit standard"
         )
-        
-        from astroquery.mast import Catalogs
+
         if tpf.mission == "Kepler" or tpf.mission == "K2":
             pix_scale = 4.0  # arcseconds / pixel for Kepler, default
             result = Catalogs.query_region(
@@ -556,6 +553,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 
     source_colnames_extras = []
     tooltips_extras = []
+
     try:
         result, source_colnames_extras, tooltips_extras = _add_nearby_tics_if_tess(tpf, magnitude_limit, result)
     except Exception as err:
@@ -669,8 +667,15 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     )
 
     # mark the target's position too
-    target_ra, target_dec, pm_corrected = _get_corrected_coordinate(tpf)
+
+    if tpf.mission == "TESS":
+        pm_ra, pm_dec = np.nan_to_num(np.asarray(result["pmRA"])), np.nan_to_num(np.asarray(result["pmDEC"]))
+    if tpf.mission == "Kepler" or tpf.mission == "K2":
+        pm_ra, pm_dec = np.nan_to_num(np.asarray(result["pmra"])), np.nan_to_num(np.asarray(result["pmdec"]))
+
+    target_ra, target_dec, pm_corrected = _get_corrected_coordinate(tpf, pm_ra[0], pm_dec[0])
     target_x, target_y = None, None
+
     if target_ra is not None and target_dec is not None:
         pix_x, pix_y = tpf.wcs.all_world2pix([(target_ra, target_dec)], 0)[0]
         target_x, target_y = tpf.column + pix_x, tpf.row + pix_y
