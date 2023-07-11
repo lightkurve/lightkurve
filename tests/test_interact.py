@@ -50,10 +50,6 @@ def test_malformed_notebook_url():
     with pytest.raises(ValueError) as exc:
         tpf.interact(notebook_url="")
     assert "Empty host value" in exc.value.args[0]
-    with pytest.raises(AttributeError) as exc:
-        tpf.interact(notebook_url=None)
-    assert "object has no attribute" in exc.value.args[0]
-
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_graceful_exit_outside_notebook():

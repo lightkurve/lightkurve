@@ -32,8 +32,6 @@ from pandas import Series
 from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError, finalize_notebook_url
 
 
-log = logging.getLogger(__name__)
-
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
@@ -140,8 +138,8 @@ def _get_corrected_coordinate(tpf_or_lc):
     ra_corrected, dec_corrected, pm_corrected = _correct_with_proper_motion(
             ra * u.deg, dec *u.deg,
             pm_ra * pm_unit, pm_dec * pm_unit,
-            # e.g., equinox 2000 is treated as J2000 is set to be noon of 2000-01-01 TT
-            Time(equinox, format="decimalyear", scale="tt") + 0.5,
+            # we assume the data is in J2000 epoch
+            Time('2000', format='byear'),
             new_time)
     return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value, pm_corrected
 
@@ -462,7 +460,6 @@ def _add_nearby_tics_if_tess(tpf, magnitude_limit, result):
 
     # nearby TICs from ExoFOP
     tab = _search_nearby_of_tess_target(tic_id)
-
     gaia_ids = result['Source'].array
 
     # merge the TICs with matching Gaia entries
@@ -538,7 +535,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     """Make the Gaia Figure Elements"""
 
     result = _get_nearby_gaia_objects(tpf, magnitude_limit)
-
+    
     source_colnames_extras = []
     tooltips_extras = []
     try:
@@ -557,7 +554,6 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
             tpf.time[0])
     result.RA_ICRS = ra_corrected.to(u.deg).value
     result.DE_ICRS = dec_corrected.to(u.deg).value
-
     # Convert to pixel coordinates
     radecs = np.vstack([result["RA_ICRS"], result["DE_ICRS"]]).T
     coords = tpf.wcs.all_world2pix(radecs, 0)
@@ -1356,7 +1352,6 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitud
         fiducial_frame = 0
 
     aperture_mask = tpf._parse_aperture_mask(aperture_mask)
-
     def create_interact_ui(doc):
         tpf_source = prepare_tpf_datasource(tpf, aperture_mask)
 
