@@ -2964,6 +2964,33 @@ class LightCurve(TimeSeries):
             mask &= _to_unitless(getattr(self, column)) <= after
         return self[mask]
 
+    def remove_data(self, start: float = None, end: float = None, column: str = "time"):
+        """remove eata from the light curve between two values.
+
+        Parameters
+        ----------
+        start : float
+            Clip all rows between start and end
+        end: float
+            Clip all rows between start and end
+        column : str, optional
+            The name of the column on which the clipping is based. Defaults to 'time'.
+
+        Returns
+        -------
+        clipped_lc : LightCurve
+            The clipped light curve.
+        """
+        def _to_unitless(data):
+            return np.asarray(getattr(data, "value", data))
+
+        mask = np.ones(len(self), dtype=bool)
+
+        if end and start:
+            mask &= (_to_unitless(getattr(self, column)) >= end) | (_to_unitless(getattr(self, column)) <= start)
+        return self[mask]
+
+
 
 class FoldedLightCurve(LightCurve):
     """Subclass of `LightCurve` in which the ``time`` parameter represents phase values.
