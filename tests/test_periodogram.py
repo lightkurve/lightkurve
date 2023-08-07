@@ -44,9 +44,9 @@ def test_periodogram_normalization():
         flux_unit="electron/second",
     )
     # Test amplitude normalization and correct units
-    pg = lc.to_periodogram(normalization="amplitude")
+    pg = lc.to_periodogram().normalize("amplitude")
     assert pg.power.unit == u.electron / u.second
-    pg = lc.normalize(unit="ppm").to_periodogram(normalization="amplitude")
+    pg = lc.normalize(unit="ppm").to_periodogram().normalize("amplitude")
     assert pg.power.unit == u.cds.ppm
 
     # Test PSD normalization and correct units
