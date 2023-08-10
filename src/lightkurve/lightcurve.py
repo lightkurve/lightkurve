@@ -23,6 +23,7 @@ from astropy.table import vstack
 from astropy.stats import calculate_bin_edges
 from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 from astropy.utils.exceptions import AstropyUserWarning
+from astropy.utils.masked import Masked
 
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (
@@ -613,7 +614,9 @@ class LightCurve(TimeSeries):
         warning_type=LightkurveDeprecationWarning,
     )
     def hdu(self):
-        return fits.open(self.filename)
+        with fits.open(self.filename) as hdulist:
+            hdulist = hdulist.copy()
+        return hdulist
 
     @property
     @deprecated("2.0", warning_type=LightkurveDeprecationWarning)
@@ -1193,7 +1196,7 @@ class LightCurve(TimeSeries):
         return self[~np.isnan(self[column])]  # This will return a sliced copy
 
     def fill_gaps(self, method: str = "gaussian_noise"):
-        """Fill in gaps in time.
+        r"""Fill in gaps in time.
 
         By default, the gaps will be filled with random white Gaussian noise
         distributed according to
@@ -1378,8 +1381,18 @@ class LightCurve(TimeSeries):
         # First, we create the outlier mask using AstroPy's sigma_clip function
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
+            flux = self.flux
+            if isinstance(flux, Masked):
+                # Workaround for https://github.com/astropy/astropy/issues/14360
+                # in passing MaskedQuantity to sigma_clip, by converting it to Quantity.
+                # We explicitly fill masked values with `np.nan` here to ensure they are masked during sigma clipping.
+                # To handle unlikely edge case, convert int to float to ensure filing `np.nan` work.
+                # The conversion is acceptable because only the mask of the sigma_clip() result is used.
+                if np.issubdtype(flux.dtype, np.int_):
+                    flux = flux.astype(float)
+                flux = flux.filled(np.nan)
             outlier_mask = sigma_clip(
-                data=self.flux,
+                data=flux,
                 sigma=sigma,
                 sigma_lower=sigma_lower,
                 sigma_upper=sigma_upper,
@@ -1485,7 +1498,7 @@ class LightCurve(TimeSeries):
             )
         elif bins is not None:
             if (bins not in ('blocks', 'knuth', 'scott', 'freedman') and
-                    np.array(bins).dtype != np.int):
+                    np.array(bins).dtype != np.int_):
                 raise TypeError("``bins`` must have integer type.")
             elif (isinstance(bins, str) or np.size(bins) != 1) and not _HAS_VAR_BINS:
                 raise ValueError("Sequence or method for ``bins`` requires Astropy 5.0.")
@@ -2739,12 +2752,12 @@ class LightCurve(TimeSeries):
                 if bin_points == 1:
                     cbar.set_label(
                         "Flux in units of Standard Deviation "
-                        "$(f - \overline{f})/(\sigma_f)$"
+                        r"$(f - \overline{f})/(\sigma_f)$"
                     )
                 else:
                     cbar.set_label(
                         "Average Flux in Bin in units of Standard Deviation "
-                        "$(f - \overline{f})/(\sigma_f)$"
+                        r"$(f - \overline{f})/(\sigma_f)$"
                     )
 
             ax.set_xlabel("Phase")
@@ -3359,7 +3372,7 @@ def _boolean_mask_to_bitmask(aperture_mask):
     # Masks can either be boolean input or Kepler pipeline style
     clean_mask = np.nan_to_num(aperture_mask)
 
-    contains_bit2 = (clean_mask.astype(np.int) & 2).any()
+    contains_bit2 = (clean_mask.astype(np.int_) & 2).any()
     all_zeros_or_ones = (clean_mask.dtype in ["float", "int"]) & (
         (set(np.unique(clean_mask)) - {0, 1}) == set()
     )
@@ -3373,8 +3386,8 @@ def _boolean_mask_to_bitmask(aperture_mask):
         out_mask = aperture_mask.astype(np.uint8)
     else:
         log.warn(
-            "The input aperture mask must be boolean or follow the \
-                Kepler-pipeline standard; returning None."
+            "The input aperture mask must be boolean or follow the "
+            "Kepler-pipeline standard; returning None."
         )
         out_mask = None
     return out_mask

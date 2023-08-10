@@ -803,7 +803,7 @@ def test_missing_pipeline_mask():
     TPFs produced by TESSCut contain an empty pipeline mask.  When the pipeline
     mask is missing or empty, we want `to_lightcurve()` to fall back on the
     'threshold' mask by default, to avoid creating a light curve based on zero pixels."""
-    tpf = search_tesscut("Proxima Cen", sector=12).download(cutout_size=1)
+    tpf = search_tesscut("Proxima Cen", sector=12).download(cutout_size=3)
     lc = tpf.to_lightcurve()
     assert np.isfinite(lc.flux).any()
     assert lc.meta.get("APERTURE_MASK", None) == "threshold"

@@ -144,7 +144,9 @@ def test_interact_functions():
     # ensure proper 2D - 1D conversion
     assert tpf_source.data["xx"].ndim == 1
     assert tpf_source.data["yy"].ndim == 1
-    assert tpf_source.selected.indices.ndim == 1
+    # for bokeh v3, .indices needs to plain list .
+    # cf. https://github.com/bokeh/bokeh/issues/12624
+    assert isinstance(tpf_source.selected.indices, list)
 
     # the lower-level function aperture_mask_from_selected_indices() is used in
     # callback _create_lightcurve_from_pixels(), which cannot be easily tested.

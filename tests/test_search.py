@@ -103,8 +103,10 @@ def test_search_split_campaigns():
 @pytest.mark.remote_data
 def test_search_lightcurve(caplog):
     # We should also be able to resolve it by its name instead of KIC ID
+    # The name Kepler-10 somehow no longer works on MAST. So we use 2MASS instead:
+    #   https://simbad.cds.unistra.fr/simbad/sim-id?Ident=%405506010&Name=Kepler-10
     assert (
-        len(search_lightcurve("Kepler-10", mission="Kepler", cadence="long").table)
+        len(search_lightcurve("2MASS J19024305+5014286", mission="Kepler", cadence="long").table)
         == 15
     )
     # An invalid KIC/EPIC ID or target name should be dealt with gracefully
@@ -215,13 +217,13 @@ def test_search_tesscut_download(caplog):
 @pytest.mark.remote_data
 def test_search_with_skycoord():
     """Can we pass both names, SkyCoord objects, and coordinate strings?"""
-    sr_name = search_targetpixelfile("Kepler-10", mission="Kepler", cadence="long")
+    sr_name = search_targetpixelfile("KIC 11904151", mission="Kepler", cadence="long")
     assert (
         len(sr_name) == 15
     )  # Kepler-10 as observed during 15 quarters in long cadence
     # Can we search using a SkyCoord objects?
     sr_skycoord = search_targetpixelfile(
-        SkyCoord.from_name("Kepler_10"), mission="Kepler", cadence="long"
+        SkyCoord.from_name("KIC 11904151"), mission="Kepler", cadence="long"
     )
     assert_array_equal(
         sr_name.table["productFilename"], sr_skycoord.table["productFilename"]
@@ -249,7 +251,7 @@ def test_search_with_skycoord():
 
 @pytest.mark.remote_data
 def test_searchresult():
-    sr = search_lightcurve("Kepler-10", mission="Kepler")
+    sr = search_lightcurve("KIC 11904151", mission="Kepler")
     assert len(sr) == len(sr.table)  # Tests SearchResult.__len__
     assert len(sr[2:7]) == 5  # Tests SearchResult.__get__
     assert len(sr[2]) == 1
@@ -260,9 +262,9 @@ def test_searchresult():
 @pytest.mark.remote_data
 def test_month():
     # In short cadence, if we specify both quarter and month
-    sr = search_targetpixelfile("Kepler-10", quarter=11, month=1, cadence="short")
+    sr = search_targetpixelfile("KIC 11904151", quarter=11, month=1, cadence="short")
     assert len(sr) == 1
-    sr = search_targetpixelfile("Kepler-10", quarter=11, month=[1, 3], cadence="short")
+    sr = search_targetpixelfile("KIC 11904151", quarter=11, month=[1, 3], cadence="short")
     assert len(sr) == 2
 
 
@@ -370,7 +372,7 @@ def test_corrupt_download_handling_case_empty():
         os.makedirs(expected_dir)
         open(expected_fn, "w").close()  # create "corrupt" i.e. empty file
         with pytest.raises(LightkurveError) as err:
-            search_targetpixelfile("Kepler-10", quarter=4, cadence="long").download(
+            search_targetpixelfile("KIC 11904151", quarter=4, cadence="long").download(
                 download_dir=tmpdirname
             )
         assert "may be corrupt" in err.value.args[0]

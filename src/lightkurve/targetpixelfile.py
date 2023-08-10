@@ -102,7 +102,8 @@ class TargetPixelFile(object):
         if isinstance(path, fits.HDUList):
             self.hdu = path
         else:
-            self.hdu = fits.open(self.path, **kwargs)
+            with fits.open(self.path, **kwargs) as hdulist:
+                self.hdu = deepcopy(hdulist)
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
 
@@ -651,14 +652,15 @@ class TargetPixelFile(object):
             elif aperture_mask == "empty":
                 aperture_mask = np.zeros((self.shape[1], self.shape[2]), dtype=bool)
             elif (
-                np.issubdtype(aperture_mask.dtype, np.integer)
+                np.issubdtype(aperture_mask.dtype, np.int_)
                 and ((aperture_mask & 2) == 2).any()
             ):
                 # Kepler and TESS pipeline style integer flags
                 aperture_mask = (aperture_mask & 2) == 2
-            elif isinstance(aperture_mask.flat[0], (np.integer, np.float)):
+            elif isinstance(aperture_mask.flat[0], (np.integer, np.float_)):
                 aperture_mask = aperture_mask.astype(bool)
         self._last_aperture_mask = aperture_mask
+        
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3, reference_pixel="center"):
@@ -1141,6 +1143,7 @@ class TargetPixelFile(object):
                 title = "Target ID: {}, Cadence: {}".format(
                     self.targetid, self.cadenceno[frame]
                 )
+            
             # We subtract -0.5 because pixel coordinates refer to the middle of
             # a pixel, e.g. (col, row) = (10.0, 20.0) is a pixel center.
             img_extent = (
@@ -1149,6 +1152,17 @@ class TargetPixelFile(object):
                 self.row - 0.5,
                 self.row + self.shape[1] - 0.5,
             )
+            
+            # If an axes is passed that used WCS projection, don't use img_extent
+            # This addresses lk issue #1095, where the tpf coordinates were incorrectly plotted
+            
+            # By default ax=None
+            if ax != None:
+                if hasattr(ax, "wcs"):
+                    img_extent = None
+
+
+            	
             ax = plot_image(
                 data_to_plot,
                 ax=ax,
@@ -1159,6 +1173,7 @@ class TargetPixelFile(object):
                 **kwargs,
             )
             ax.grid(False)
+            
 
         # Overlay the aperture mask if given
         if aperture_mask is not None:
@@ -1166,8 +1181,13 @@ class TargetPixelFile(object):
             for i in range(self.shape[1]):
                 for j in range(self.shape[2]):
                     if aperture_mask[i, j]:
+                        if hasattr(ax, "wcs"):
+                            # When using WCS coordinates, do not add col/row to mask coords
+                    	    xy = (j - 0.5, i - 0.5)
+                        else:
+                    	    xy = (j + self.column - 0.5, i + self.row - 0.5)
                         rect = patches.Rectangle(
-                            xy=(j + self.column - 0.5, i + self.row - 0.5),
+                            xy=xy,
                             width=1,
                             height=1,
                             color=mask_color,
@@ -1652,7 +1672,8 @@ class TargetPixelFile(object):
             elif isinstance(img, fits.HDUList):
                 hdu = img[extension]
             else:
-                hdu = fits.open(img)[extension]
+                with fits.open(img) as hdulist:
+                    hdu = hdulist[extension].copy()
             return hdu
 
         # Define a helper function to cutout images if not None

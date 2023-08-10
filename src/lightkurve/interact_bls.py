@@ -293,8 +293,8 @@ def make_lightcurve_figure_elements(
     # Make figure
     fig = figure(
         title="Light Curve",
-        plot_height=300,
-        plot_width=900,
+        height=300,
+        width=900,
         tools="pan,box_zoom,wheel_zoom,reset",
         toolbar_location="below",
         border_fill_color="#FFFFFF",
@@ -395,8 +395,8 @@ def make_folded_figure_elements(
     # Build Figure
     fig = figure(
         title="Folded Light Curve",
-        plot_height=340,
-        plot_width=450,
+        height=340,
+        width=450,
         tools="pan,box_zoom,wheel_zoom,reset",
         toolbar_location="below",
         border_fill_color="#FFFFFF",
@@ -488,8 +488,8 @@ def make_bls_figure_elements(result, bls_source, help_source):
     # Build Figure
     fig = figure(
         title="BLS Periodogram",
-        plot_height=340,
-        plot_width=450,
+        height=340,
+        width=450,
         tools="pan,box_zoom,wheel_zoom,tap,reset",
         toolbar_location="below",
         border_fill_color="#FFFFFF",

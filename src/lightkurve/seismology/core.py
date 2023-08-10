@@ -423,8 +423,8 @@ class Seismology(object):
         maximum_frequency=None,
         smooth_filter_width=0.1,
         scale="linear",
-        plot_width=490,
-        plot_height=340,
+        width=490,
+        height=340,
         title="Echelle",
     ):
         """Helper function to make the elements of the echelle diagram for bokeh plotting."""
@@ -446,8 +446,8 @@ class Seismology(object):
         )
 
         fig = figure(
-            plot_width=plot_width,
-            plot_height=plot_height,
+            width=width,
+            height=height,
             x_range=(0, 1),
             y_range=(y_f[0].value, y_f[-1].value),
             title=title,

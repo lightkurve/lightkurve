@@ -234,7 +234,10 @@ def prepare_tpf_datasource(tpf, aperture_mask):
     xa = xa.flatten()
     ya = ya.flatten()
     tpf_source = ColumnDataSource(data=dict(xx=xa.astype(float), yy=ya.astype(float)))
-    tpf_source.selected.indices = aperture_mask_to_selected_indices(aperture_mask)
+    # convert the ndarray from aperture_mask_to_selected_indices() to plain list
+    # because bokeh v3.0.2 does not accept ndarray (and causes js error)
+    # see https://github.com/bokeh/bokeh/issues/12624
+    tpf_source.selected.indices = list(aperture_mask_to_selected_indices(aperture_mask))
     return tpf_source
 
 
@@ -287,8 +290,8 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
 
     fig = figure(
         title=title,
-        plot_height=340,
-        plot_width=600,
+        height=340,
+        width=600,
         tools="pan,wheel_zoom,box_zoom,tap,reset",
         toolbar_location="below",
         border_fill_color="whitesmoke",
@@ -768,8 +771,8 @@ def make_tpf_figure_elements(
     tpf_source_selectable=True,
     pedestal=None,
     fiducial_frame=None,
-    plot_width=370,
-    plot_height=340,
+    width=370,
+    height=340,
     scale="log",
     vmin=None,
     vmax=None,
@@ -823,8 +826,8 @@ def make_tpf_figure_elements(
     # We subtract 0.5 from the range below because pixel coordinates refer to
     # the middle of a pixel, e.g. (col, row) = (10.0, 20.0) is a pixel center.
     fig = figure(
-        plot_width=plot_width,
-        plot_height=plot_height,
+        width=width,
+        height=height,
         x_range=(tpf.column - 0.5, tpf.column + tpf.shape[2] - 0.5),
         y_range=(tpf.row - 0.5, tpf.row + tpf.shape[1] - 0.5),
         title=title,
@@ -1245,7 +1248,7 @@ def show_interact_widget(
                     exported_filename,
                     overwrite=True,
                     flux_column_name="SAP_FLUX",
-                    aperture_mask=lc_new.meta["APERTURE_MASK"].astype(np.int),
+                    aperture_mask=lc_new.meta["APERTURE_MASK"].astype(np.int_),
                     SOURCE="lightkurve interact",
                     NOTE="custom mask",
                     MASKNPIX=np.nansum(lc_new.meta["APERTURE_MASK"]),
@@ -1352,8 +1355,8 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty
             tpf_source,
             tpf_source_selectable=False,
             fiducial_frame=fiducial_frame,
-            plot_width=640,
-            plot_height=600,
+            width=640,
+            height=600,
             tools="tap,box_zoom,wheel_zoom,reset"
         )
         fig_tpf, r, message_selected_target = add_gaia_figure_elements(

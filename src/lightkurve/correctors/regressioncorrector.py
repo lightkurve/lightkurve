@@ -6,6 +6,8 @@ import warnings
 
 from astropy.stats import sigma_clip
 from astropy import units as u
+from astropy.utils.exceptions import AstropyUserWarning
+from astropy.utils.masked import Masked
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.sparse import issparse, csr_matrix
@@ -27,17 +29,17 @@ log = logging.getLogger(__name__)
 
 
 class RegressionCorrector(Corrector):
-    """Remove noise using linear regression against a `.DesignMatrix`.
+    r"""Remove noise using linear regression against a `.DesignMatrix`.
 
     .. math::
 
-        \\newcommand{\\y}{\\mathbf{y}}
-        \\newcommand{\\cov}{\\boldsymbol\Sigma_\y}
-        \\newcommand{\\w}{\\mathbf{w}}
-        \\newcommand{\\covw}{\\boldsymbol\Sigma_\w}
-        \\newcommand{\\muw}{\\boldsymbol\mu_\w}
-        \\newcommand{\\sigw}{\\boldsymbol\sigma_\w}
-        \\newcommand{\\varw}{\\boldsymbol\sigma^2_\w}
+        \newcommand{\y}{\mathbf{y}}
+        \newcommand{\cov}{\boldsymbol\Sigma_\y}
+        \newcommand{\w}{\mathbf{w}}
+        \newcommand{\covw}{\boldsymbol\Sigma_\w}
+        \newcommand{\muw}{\boldsymbol\mu_\w}
+        \newcommand{\sigw}{\boldsymbol\sigma_\w}
+        \newcommand{\varw}{\boldsymbol\sigma^2_\w}
 
     Given a column vector of data :math:`\y`
     and a design matrix of regressors :math:`X`,
@@ -254,10 +256,18 @@ class RegressionCorrector(Corrector):
             )
             model = u.Quantity(model, unit=self.lc.flux.unit)
             residuals = self.lc.flux - model
-            # In Astropy>=5.0, residuals will be a MaskedQuantity
-            if hasattr(residuals, 'mask'):
-                residuals = residuals.unmasked
-            self.outlier_mask |= sigma_clip(residuals, sigma=sigma).mask
+            if isinstance(residuals, Masked):
+                # Workaround for https://github.com/astropy/astropy/issues/14360
+                # in passing MaskedQuantity to sigma_clip, by converting it to Quantity.
+                # We explicitly fill masked values with `np.nan` here to ensure they are masked during sigma clipping.
+                # To handle unlikely edge case, convert int to float to ensure filing `np.nan` work.
+                # The conversion is acceptable because only the mask of the sigma_clip() result is used.
+                if np.issubdtype(residuals.dtype, np.int_):
+                    residuals = residuals.astype(float)
+                residuals = residuals.filled(np.nan)
+            with warnings.catch_warnings():  # Ignore warnings due to NaNs
+                warnings.simplefilter("ignore", AstropyUserWarning)
+                self.outlier_mask |= sigma_clip(residuals, sigma=sigma).mask
             log.debug(
                 "correct(): iteration {}: clipped {} cadences"
                 "".format(count, self.outlier_mask.sum())
