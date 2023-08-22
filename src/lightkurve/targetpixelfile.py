@@ -655,12 +655,6 @@ class TargetPixelFile(object):
             # Kepler and TESS pipeline style integer flags
             if np.issubdtype(aperture_mask.dtype, np.dtype('>i4')):
                 aperture_mask = (aperture_mask & 2) == 2
-<<<<<<< HEAD
-            elif isinstance(aperture_mask.flat[0], (np.integer, np.float_)):
-                aperture_mask = aperture_mask.astype(bool)
-        self._last_aperture_mask = aperture_mask
-
-=======
             elif np.issubdtype(aperture_mask.dtype, int):
                 if ((aperture_mask & 2) == 2).any():
                     # Kepler and TESS pipeline style integer flags
@@ -670,7 +664,6 @@ class TargetPixelFile(object):
             elif np.issubdtype(aperture_mask.dtype, float):
                 aperture_mask = aperture_mask.astype(bool)                
         self._last_aperture_mask = aperture_mask 
->>>>>>> edcdd65173345bc354030c496548bfddf9a87266
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3, reference_pixel="center"):
