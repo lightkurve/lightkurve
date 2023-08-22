@@ -580,9 +580,12 @@ class TargetPixelFile(object):
             return self.to_corrector("pld", **kwargs).correct()
 
     def _resolve_default_aperture_mask(self, aperture_mask):
-        if isinstance(aperture_mask, str) and (aperture_mask == "default"):
-            # returns 'pipeline', unless it is missing. Falls back to 'threshold'
-            return "pipeline" if np.any(self.pipeline_mask) else "threshold"
+        if isinstance(aperture_mask, str):
+            if (aperture_mask == "default"):
+                # returns 'pipeline', unless it is missing. Falls back to 'threshold'
+                return "pipeline" if np.any(self.pipeline_mask) else "threshold"
+            else:
+                return aperture_mask
         else:
             return aperture_mask
 
@@ -617,51 +620,57 @@ class TargetPixelFile(object):
         aperture_mask = self._resolve_default_aperture_mask(aperture_mask)
 
         # If 'pipeline' mask is requested but missing, fall back to 'threshold'
-        if (
-            isinstance(aperture_mask, str)
-            and (aperture_mask == "pipeline")
-            and ~np.any(self.pipeline_mask)
-        ):
-            raise ValueError(
-                "_parse_aperture_mask: 'pipeline' is requested, but it is missing or empty."
-            )
+        # To Do: Should pipeline mask always be True?
+        if isinstance(aperture_mask, str):
+            if (aperture_mask == "pipeline") and ~np.any(self.pipeline_mask):
+                raise ValueError(
+                    "_parse_aperture_mask: 'pipeline' is requested, but it is missing or empty."
+                )
 
         # Input validation
-        if hasattr(aperture_mask, "shape") and (
-            aperture_mask.shape != self.flux[0].shape
-        ):
-            raise ValueError(
-                "`aperture_mask` has shape {}, "
-                "but the flux data has shape {}"
-                "".format(aperture_mask.shape, self.flux[0].shape)
-            )
+        if hasattr(aperture_mask, "shape"):
+            if (aperture_mask.shape != self.shape[1:]):
+                raise ValueError(
+                    "`aperture_mask` has shape {}, "
+                    "but the flux data has shape {}"
+                    "".format(aperture_mask.shape, self.shape[1:])
+                )
 
-        with warnings.catch_warnings():
-            # `aperture_mask` supports both arrays and string values; these yield
-            # uninteresting FutureWarnings when compared, so let's ignore that.
-            warnings.simplefilter(action="ignore", category=FutureWarning)
-            if aperture_mask is None or aperture_mask == "all":
+        if aperture_mask is None:
+            aperture_mask = np.ones((self.shape[1], self.shape[2]), dtype=bool)
+        elif isinstance(aperture_mask, str):
+            if aperture_mask.lower() == "all":
                 aperture_mask = np.ones((self.shape[1], self.shape[2]), dtype=bool)
-            elif aperture_mask == "pipeline":
+            elif aperture_mask.lower() == "pipeline":
                 aperture_mask = self.pipeline_mask
-            elif aperture_mask == "threshold":
+            elif aperture_mask.lower() == "threshold":
                 aperture_mask = self.create_threshold_mask()
-            elif aperture_mask == "background":
+            elif aperture_mask.lower() == "background":
                 aperture_mask = ~self.create_threshold_mask(
                     threshold=0, reference_pixel=None
                 )
-            elif aperture_mask == "empty":
+            elif aperture_mask.lower() == "empty":
                 aperture_mask = np.zeros((self.shape[1], self.shape[2]), dtype=bool)
-            elif (
-                np.issubdtype(aperture_mask.dtype, np.int_)
-                and ((aperture_mask & 2) == 2).any()
-            ):
-                # Kepler and TESS pipeline style integer flags
+        elif isinstance(aperture_mask, np.ndarray):
+            # Kepler and TESS pipeline style integer flags
+            if np.issubdtype(aperture_mask.dtype, np.dtype('>i4')):
                 aperture_mask = (aperture_mask & 2) == 2
+<<<<<<< HEAD
             elif isinstance(aperture_mask.flat[0], (np.integer, np.float_)):
                 aperture_mask = aperture_mask.astype(bool)
         self._last_aperture_mask = aperture_mask
 
+=======
+            elif np.issubdtype(aperture_mask.dtype, int):
+                if ((aperture_mask & 2) == 2).any():
+                    # Kepler and TESS pipeline style integer flags
+                    aperture_mask = (aperture_mask & 2) == 2
+                else:
+                    aperture_mask = aperture_mask.astype(bool)                
+            elif np.issubdtype(aperture_mask.dtype, float):
+                aperture_mask = aperture_mask.astype(bool)                
+        self._last_aperture_mask = aperture_mask 
+>>>>>>> edcdd65173345bc354030c496548bfddf9a87266
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3, reference_pixel="center"):

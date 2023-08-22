@@ -1379,6 +1379,11 @@ class LightCurve(TimeSeries):
         # a local import here.
         from astropy.stats.sigma_clipping import sigma_clip
 
+        # astropy.stats.sigma_clip won't work with masked ndarrays so we convert to regular arrays
+        flux = self.flux.copy()
+        if isinstance(flux, Masked):
+            flux = flux.filled(np.nan)
+
         # First, we create the outlier mask using AstroPy's sigma_clip function
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")

@@ -2,6 +2,7 @@
 =====================
 
 - Updated interact features to work with JupyterHub (e.g. TiKE) [#1349]
+- Fixed the aperture parsing functions inside TPFs to be compliant with `numpy` v1.25 [#1360]
 - Made `LombScarglePeriodogram` compatible with Astropy v5.3 [#1342]
 - Updated the TPF plotting function to work correctly with WCS plotting [#1298]
 - Added the ability to open light curves from the TGLC High Level Science Product
