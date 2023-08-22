@@ -39,10 +39,42 @@ Documentation
 Read the documentation at `https://docs.lightkurve.org <https://docs.lightkurve.org>`_.
 
 
-Quickstart
-----------
+Quickstart and Installation
+---------------------------
 
-Please visit our quickstart guide at `https://docs.lightkurve.org/quickstart.html <https://docs.lightkurve.org/quickstart.html>`_.
+Please visit our quickstart guide at `https://docs.lightkurve.org/quickstart.html <https://docs.lightkurve.org/quickstart.html>`_. 
+
+The easiest way to install *Lightkurve* and all of its dependencies is to use the ``pip`` command,
+which is a standard part of all Python distributions.
+To install *Lightkurve*, run the following command in a terminal window::
+
+    $ python -m pip install lightkurve --upgrade
+
+The ``--upgrade`` flag is optional, but recommended if you already
+have *Lightkurve* installed and want to upgrade to the latest version.
+
+Depending on the specific Python environment, you may need to replace ``python``
+with the correct Python interpreter, e.g., ``python3``.
+
+If you want to experiment with the latest development version of
+*Lightkurve*, you can install it straight from the main branch on GitHub:
+
+.. code-block:: bash
+
+    $ git clone https://github.com/lightkurve/lightkurve.git
+    $ cd lightkurve
+    $ python -m pip install .
+
+If you want to have a so-called editable install which enables the installed
+version to immediately reflect changes made in the source tree, you can use:
+
+.. code-block:: bash
+
+    $ python -m pip install poetry
+    $ poetry install
+
+Please see our guide on `https://docs.lightkurve.org/development/index.html <https://docs.lightkurve.org/development/index.html>`_
+for additional instructions.
 
 
 Contributing
