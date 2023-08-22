@@ -953,18 +953,23 @@ def create_spline_matrix(
     x, n_knots=20, knots=None, degree=3, name="spline", include_intercept=True
 ):
     """Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.
+
     Parameters
     ----------
     x : np.ndarray
         vector to spline
     n_knots: int
         Number of knots (default: 20).
+    knots: list [optional]
+        The interior knots to use for the spline. If unspecified, then equally
+        spaced quantiles of the input data are used such that there are `n_knots` knots.
     degree: int
         Polynomial degree.
     name: string
         Name to pass to `.DesignMatrix` (default: 'spline').
     include_intercept: bool
         Whether to include row of ones to find intercept. Default False.
+
     Returns
     -------
     dm: `.DesignMatrix`
