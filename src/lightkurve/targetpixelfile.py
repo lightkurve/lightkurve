@@ -635,10 +635,6 @@ class TargetPixelFile(object):
                     "".format(aperture_mask.shape, self.shape[1:])
                 )
 
-        # with warnings.catch_warnings():
-        #     # `aperture_mask` supports both arrays and string values; these yield
-        #     # uninteresting FutureWarnings when compared, so let's ignore that.
-        #     warnings.simplefilter(action="ignore", category=FutureWarning)
         if aperture_mask is None:
             aperture_mask = np.ones((self.shape[1], self.shape[2]), dtype=bool)
         elif isinstance(aperture_mask, str):
