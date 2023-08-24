@@ -99,6 +99,7 @@ def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
     #    noticeable significant difference. E.g., applying it to Proxima Cen, a target with large parallax
     #    and huge proper motion, does not change the result in any noticeable way.
     #
+
     c = SkyCoord(ra, dec, pm_ra_cosdec=pm_ra, pm_dec=pm_dec,
                 frame='icrs', obstime=equinox)
 
@@ -112,7 +113,7 @@ def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
     return new_c.ra, new_c.dec, True
 
 
-def _get_corrected_coordinate(tpf_or_lc):
+def _get_corrected_coordinate(tpf_or_lc, pm_ra, pm_dec):
     """Extract coordinate from Kepler/TESS FITS, with proper motion corrected
        to the start of observation if proper motion is available."""
     h = tpf_or_lc.meta
@@ -120,20 +121,13 @@ def _get_corrected_coordinate(tpf_or_lc):
 
     ra = h.get("RA_OBJ")
     dec = h.get("DEC_OBJ")
-
-    pm_ra = h.get("PMRA")
-    pm_dec = h.get("PMDEC")
     equinox = h.get("EQUINOX")
 
     if ra is None or dec is None or pm_ra is None or pm_dec is None or equinox is None:
         # case cannot apply proper motion due to missing parameters
         return ra, dec, False
 
-    # Note: it'd be better / extensible if the unit is a property of the tpf or lc
-    if tpf_or_lc.meta.get("TICID") is not None:
-        pm_unit = u.milliarcsecond / u.year
-    else:  # assumes to be Kepler / K2
-        pm_unit = u.arcsecond / u.year
+    pm_unit = u.milliarcsecond / u.year
 
     ra_corrected, dec_corrected, pm_corrected = _correct_with_proper_motion(
             ra * u.deg, dec *u.deg,
@@ -447,6 +441,7 @@ def _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limi
 
 def _add_nearby_tics_if_tess(tpf, magnitude_limit, result):
     tic_id = tpf.meta.get('TICID', None)
+
     # handle 3 cases:
     # - TESS tpf has a valid id, type integer
     # - Some TESSCut has empty string while and some others has None
@@ -494,24 +489,26 @@ def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
                f"ra: {tpf.ra}, dec: {tpf.dec}")
         raise LightkurveError(msg) from err
 
-    # Use pixel scale for query size
-    pix_scale = 4.0  # arcseconds / pixel for Kepler, default
-    if tpf.mission == "TESS":
-        pix_scale = 21.0
-    # We are querying with a diameter as the radius, overfilling by 2x.
-    from astroquery.vizier import Vizier
-
-    Vizier.ROW_LIMIT = -1
+    from astroquery.mast import Catalogs
     with warnings.catch_warnings():
         # suppress useless warning to workaround  https://github.com/astropy/astroquery/issues/2352
         warnings.filterwarnings(
             "ignore", category=u.UnitsWarning, message="Unit 'e' not supported by the VOUnit standard"
         )
-        result = Vizier.query_region(
-            c1,
-            catalog=["I/345/gaia2"],
-            radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
+
+        if tpf.mission == "Kepler" or tpf.mission == "K2":
+            pix_scale = 4.0  # arcseconds / pixel for Kepler, default
+
+        if tpf.mission == "TESS":
+            pix_scale = 21.0
+        
+        result = Catalogs.query_region(
+                c1,
+                catalog = "GaiaDR3", 
+                radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
         )
+
+
     no_targets_found_message = ValueError(
         "Either no sources were found in the query region " "or Vizier is unavailable"
     )
@@ -522,13 +519,14 @@ def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
         raise no_targets_found_message
     elif len(result) == 0:
         raise too_few_found_message
-    result = result["I/345/gaia2"].to_pandas()
-    result = result[result.Gmag < magnitude_limit]
+               
+    result = result.to_pandas()   
+    result = result[result.phot_g_mean_mag < magnitude_limit]    
     if len(result) == 0:
         raise no_targets_found_message
-    # drop all the filtered rows, it makes subsequent TESS-specific processing easier (to add rows/columns)
     result.reset_index(drop=True, inplace=True)
-    result['magForSize'] = result['Gmag']  # to be used as the basis for sizing the dots in plots
+    result['magForSize'] = result['phot_g_mean_mag']  # to be used as the basis for sizing the dots in plots
+
     return result
 
 
@@ -539,6 +537,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 
     source_colnames_extras = []
     tooltips_extras = []
+
     try:
         result, source_colnames_extras, tooltips_extras = _add_nearby_tics_if_tess(tpf, magnitude_limit, result)
     except Exception as err:
@@ -548,36 +547,39 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         )
 
     ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
-            np.nan_to_num(np.asarray(result.RA_ICRS)) * u.deg, np.nan_to_num(np.asarray(result.DE_ICRS)) * u.deg,
-            np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond / u.year,
-            np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond / u.year,
-            Time(2457206.375, format="jd", scale="tdb"),
-            tpf.time[0])
-    result.RA_ICRS = ra_corrected.to(u.deg).value
-    result.DE_ICRS = dec_corrected.to(u.deg).value
+        np.nan_to_num(np.asarray(result.ra)) * u.deg, np.nan_to_num(np.asarray(result.dec)) * u.deg,
+        np.nan_to_num(np.asarray(result.pmra)) * u.milliarcsecond / u.year,
+        np.nan_to_num(np.asarray(result.pmdec)) * u.milliarcsecond / u.year,
+        Time(2457206.375, format="jd", scale="tdb"),
+        tpf.time[0])
+    
+    result.ra = ra_corrected.to(u.deg).value
+    result.dec = dec_corrected.to(u.deg).value
+    radecs = np.vstack([result["ra"], result["dec"]]).T
 
     # Convert to pixel coordinates
-    radecs = np.vstack([result["RA_ICRS"], result["DE_ICRS"]]).T
     coords = tpf.wcs.all_world2pix(radecs, 0)
 
     # Gently size the points by their Gaia magnitude
     sizes = 64.0 / 2 ** (result["magForSize"] / 5.0)
-    one_over_parallax = 1.0 / (result["Plx"] / 1000.0)
+    one_over_parallax = 1.0 / (result["parallax"] / 1000.0)
     source = ColumnDataSource(
         data=dict(
-            ra=result["RA_ICRS"],
-            dec=result["DE_ICRS"],
-            pmra=result["pmRA"],
-            pmde=result["pmDE"],
-            source=_to_display(result["Source"]),
-            Gmag=result["Gmag"],
-            plx=result["Plx"],
+            ra=result["ra"],
+            dec=result["dec"],
+            pmra=result["pmra"],
+            pmde=result["pmdec"],
+            source=_to_display(result["source_id"].astype(int)),
+            Gmag=result["phot_g_mean_mag"],
+            plx=result["parallax"],
             one_over_plx=one_over_parallax,
             x=coords[:, 0] + tpf.column,
             y=coords[:, 1] + tpf.row,
             size=sizes,
         )
     )
+
+
     for c in source_colnames_extras:
         source.data[c] = result[c]
 
@@ -621,8 +623,12 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     )
 
     # mark the target's position too
-    target_ra, target_dec, pm_corrected = _get_corrected_coordinate(tpf)
+
+    pm_ra, pm_dec = np.nan_to_num(np.asarray(result["pmra"])), np.nan_to_num(np.asarray(result["pmdec"]))
+
+    target_ra, target_dec, pm_corrected = _get_corrected_coordinate(tpf, pm_ra[0], pm_dec[0])
     target_x, target_y = None, None
+
     if target_ra is not None and target_dec is not None:
         pix_x, pix_y = tpf.wcs.all_world2pix([(target_ra, target_dec)], 0)[0]
         target_x, target_y = tpf.column + pix_x, tpf.row + pix_y
@@ -720,7 +726,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
                 msg += f"""
 <tr><td>Gaia source</td><td>{source.data['source'].iat[idx]}
 (<a target="_blank"
-    href="http://vizier.u-strasbg.fr/viz-bin/VizieR-S?Gaia DR2 {source.data['source'].iat[idx]}">Vizier</a>)</td></tr>
+    href="http://vizier.u-strasbg.fr/viz-bin/VizieR-S?Gaia DR3 {source.data['source'].iat[idx]}">Vizier</a>)</td></tr>
 <tr><td>G</td><td>{source.data['Gmag'].iat[idx]:.3f}</td></tr>
 <tr><td>Parallax (mas)</td>
     <td>{source.data['plx'].iat[idx]:,.3f} (~ {source.data['one_over_plx'].iat[idx]:,.0f} pc)</td>
@@ -733,7 +739,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 <tr><td>row</td><td>{source.data['y'][idx]:.1f}</td></tr>
 <tr><td colspan="2">Search
 <a target="_blank"
-   href="http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Gaia DR2 {source.data['source'].iat[idx]}">
+   href="http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Gaia DR3 {source.data['source'].iat[idx]}">
 SIMBAD by Gaia ID</a></td></tr>
 <tr><td colspan="2">
 <a target="_blank"
