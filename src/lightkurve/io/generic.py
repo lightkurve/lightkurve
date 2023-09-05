@@ -67,7 +67,13 @@ def read_generic_lightcurve(
         elif unitstr == "ppm" and repr(tab[colname].unit).startswith("Unrecognized"):
             # Workaround for issue #956
             tab[colname].unit = ppm
-
+        elif unitstr == "ADU":
+            tab[colname].unit = "adu"
+        elif unitstr.lower() == "unitless":
+            tab[colname].unit = ""
+        elif unitstr.lower() == "degcelcius":
+            # CDIPS has non-astropy units
+            tab[colname].unit = "deg_C"
         # Rename columns to lowercase
         tab.rename_column(colname, colname.lower())
 
