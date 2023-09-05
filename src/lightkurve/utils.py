@@ -855,10 +855,8 @@ def finalize_notebook_url(notebook_url):
     Lightkurve should "just work" as if the local default URL localhost:8888
     was sufficient.
 
-    To make a working function result more concrete:
-
-    >>> remote_jupyter_proxy_url(25346)
-      --> 'https://test.timeseries.science.stsci.edu/user/homer@stsci.edu/proxy/24356'
+    For example remote_jupyter_proxy_url(25346) would return the URL
+    "https://test.timeseries.science.stsci.edu/user/homer@stsci.edu/proxy/24356"
 
     which is essentially HUB + USER_SESSION + BOKEH_PORT_IN_SESSION
 
