@@ -84,8 +84,10 @@ def detect_filetype(hdulist: HDUList) -> str:
 
     # Is it a K2VARCAT file?
     # There are no self-identifying keywords in the header, so go by filename.
-    if "hlsp_k2varcat" in (hdulist.filename() or ""):
-        return "K2VARCAT"
+    fname = hdulist.filename() if callable(hdulist.filename) else hdulist.filename
+    if fname is not None:
+        if "hlsp_k2varcat" in fname:
+            return "K2VARCAT"
 
     # Is it a K2SC file?
     if "k2sc" in hdulist[0].header.get("creator", "").lower():
