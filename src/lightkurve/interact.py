@@ -28,9 +28,9 @@ from astropy.utils.exceptions import AstropyUserWarning
 import pandas as pd
 from pandas import Series
 
-from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError
 
-log = logging.getLogger(__name__)
+from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError, finalize_notebook_url
+
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
@@ -138,8 +138,8 @@ def _get_corrected_coordinate(tpf_or_lc):
     ra_corrected, dec_corrected, pm_corrected = _correct_with_proper_motion(
             ra * u.deg, dec *u.deg,
             pm_ra * pm_unit, pm_dec * pm_unit,
-            # e.g., equinox 2000 is treated as J2000 is set to be noon of 2000-01-01 TT
-            Time(equinox, format="decimalyear", scale="tt") + 0.5,
+            # we assume the data is in J2000 epoch
+            Time('2000', format='byear'),
             new_time)
     return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value, pm_corrected
 
@@ -460,7 +460,6 @@ def _add_nearby_tics_if_tess(tpf, magnitude_limit, result):
 
     # nearby TICs from ExoFOP
     tab = _search_nearby_of_tess_target(tic_id)
-
     gaia_ids = result['Source'].array
 
     # merge the TICs with matching Gaia entries
@@ -536,7 +535,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     """Make the Gaia Figure Elements"""
 
     result = _get_nearby_gaia_objects(tpf, magnitude_limit)
-
+    
     source_colnames_extras = []
     tooltips_extras = []
     try:
@@ -555,7 +554,6 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
             tpf.time[0])
     result.RA_ICRS = ra_corrected.to(u.deg).value
     result.DE_ICRS = dec_corrected.to(u.deg).value
-
     # Convert to pixel coordinates
     radecs = np.vstack([result["RA_ICRS"], result["DE_ICRS"]]).T
     coords = tpf.wcs.all_world2pix(radecs, 0)
@@ -978,7 +976,7 @@ def make_default_export_name(tpf, suffix="custom-lc"):
 
 def show_interact_widget(
     tpf,
-    notebook_url="localhost:8888",
+    notebook_url=None,
     lc=None,
     max_cadences=200000,
     aperture_mask="default",
@@ -1013,6 +1011,9 @@ def show_interact_widget(
         will need to supply this value for the application to display
         properly. If no protocol is supplied in the URL, e.g. if it is
         of the form "localhost:8888", then "http" will be used.
+        For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+        to the public hostname of your JupyterHub and notebook_url will
+        be defined appropriately automatically.
     max_cadences: int
         Raise a RuntimeError if the number of cadences shown is larger than
         this value. This limit helps keep browsers from becoming unresponsive.
@@ -1064,6 +1065,8 @@ def show_interact_widget(
             "you can install bokeh using e.g. `conda install bokeh`."
         )
         return None
+
+    notebook_url = finalize_notebook_url(notebook_url)
 
     aperture_mask = tpf._parse_aperture_mask(aperture_mask)
     if ~aperture_mask.any():
@@ -1297,7 +1300,8 @@ def show_interact_widget(
     return show(create_interact_ui, notebook_url=notebook_url)
 
 
-def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty",  magnitude_limit=18):
+
+def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitude_limit=18):
     """skyview
 
     Parameters
@@ -1313,6 +1317,9 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty
         will need to supply this value for the application to display
         properly. If no protocol is supplied in the URL, e.g. if it is
         of the form "localhost:8888", then "http" will be used.
+        For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+        to the public hostname of your JupyterHub and notebook_url will
+        be defined appropriately automatically.
     aperture_mask : array-like, 'pipeline', 'threshold', 'default', 'background', or 'empty'
         Highlight pixels selected by aperture_mask.
         Default is 'empty': no pixel is highlighted.
@@ -1333,6 +1340,8 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty
         )
         return None
 
+    notebook_url = finalize_notebook_url(notebook_url)
+
     # Try to identify the "fiducial frame", for which the TPF WCS is exact
     zp = (tpf.pos_corr1 == 0) & (tpf.pos_corr2 == 0)
     (zp_loc,) = np.where(zp)
@@ -1343,7 +1352,6 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty
         fiducial_frame = 0
 
     aperture_mask = tpf._parse_aperture_mask(aperture_mask)
-
     def create_interact_ui(doc):
         tpf_source = prepare_tpf_datasource(tpf, aperture_mask)
 
