@@ -954,12 +954,14 @@ def _search_products(
                 "".format(target)
             )
 
+    
+
     # Specifying quarter, campaign, or quarter should constrain the mission
-    if quarter:
+    if quarter is not None:
         mission = "Kepler"
-    if campaign:
+    if campaign is not None:
         mission = "K2"
-    if sector:
+    if sector is not None:
         mission = "TESS"
     # Ensure mission is a list
     mission = np.atleast_1d(mission).tolist()
