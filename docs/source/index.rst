@@ -35,3 +35,4 @@ Documentation
     tutorials/index
     reference/index
     about/index
+    development/index

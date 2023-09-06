@@ -1,7 +1,14 @@
 .. _about:
 
-About
-=====
+About Lightkurve
+================
+
+These pages will help you with how to install and cite Lightkurve, and you can see our changelog. We also show some other software tools that rely on or work well with Lightkurve. 
+
+If you encounter a problem with Lightkurve, we encourage you to
+`open an issue on the GitHub repository <https://github.com/lightkurve/lightkurve/issues>`_.
+
+If you would like to propose a change or bug fix to Lightkurve, you can learn more in our :ref:`development documentation <development>`.
 
 Package info
 ------------
@@ -13,16 +20,3 @@ Package info
     citing.rst
     changelog.rst
     other_software.rst
-
-
-Developer documentation
------------------------
-
-.. toctree::
-    :maxdepth: 1
-
-    vision.rst
-    contributing.rst
-    testing.rst
-    documentation.rst
-    release-procedure.rst
