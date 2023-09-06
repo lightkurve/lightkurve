@@ -1126,12 +1126,14 @@
                 <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
             <span class="p">)</span>
 
+    
+
     <span class="c1"># Specifying quarter, campaign, or quarter should constrain the mission</span>
-    <span class="k">if</span> <span class="n">quarter</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">quarter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mission</span> <span class="o">=</span> <span class="s2">&quot;Kepler&quot;</span>
-    <span class="k">if</span> <span class="n">campaign</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">campaign</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mission</span> <span class="o">=</span> <span class="s2">&quot;K2&quot;</span>
-    <span class="k">if</span> <span class="n">sector</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">sector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mission</span> <span class="o">=</span> <span class="s2">&quot;TESS&quot;</span>
     <span class="c1"># Ensure mission is a list</span>
     <span class="n">mission</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">mission</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
@@ -1330,15 +1332,15 @@
     <span class="n">exact_target_name</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">target_lower</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="c1"># Was a Kepler target ID passed?</span>
-    <span class="n">kplr_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^(kplr|kic) ?(\d+)$&quot;</span><span class="p">,</span> <span class="n">target_lower</span><span class="p">)</span>
+    <span class="n">kplr_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^(kplr|kic) ?(\d+)$&quot;</span><span class="p">,</span> <span class="n">target_lower</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">kplr_match</span><span class="p">:</span>
         <span class="n">exact_target_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;kplr</span><span class="si">{</span><span class="n">kplr_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="c1"># Was a K2 target ID passed?</span>
-    <span class="n">ktwo_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^(ktwo|epic) ?(\d+)$&quot;</span><span class="p">,</span> <span class="n">target_lower</span><span class="p">)</span>
+    <span class="n">ktwo_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^(ktwo|epic) ?(\d+)$&quot;</span><span class="p">,</span> <span class="n">target_lower</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">ktwo_match</span><span class="p">:</span>
         <span class="n">exact_target_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ktwo</span><span class="si">{</span><span class="n">ktwo_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="c1"># Was a TESS target ID passed?</span>
-    <span class="n">tess_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^(tess|tic) ?(\d+)$&quot;</span><span class="p">,</span> <span class="n">target_lower</span><span class="p">)</span>
+    <span class="n">tess_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^(tess|tic) ?(\d+)$&quot;</span><span class="p">,</span> <span class="n">target_lower</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">tess_match</span><span class="p">:</span>
         <span class="n">exact_target_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tess_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 

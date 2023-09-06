@@ -21,6 +21,7 @@
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -236,269 +237,12 @@
               
               <div>
                 
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
-    border: none;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars and line breaks on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-    white-space: pre;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    /*background: #f5f5f5;*/
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-    margin: 0;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
-  font-weight: bold;
-}
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-</style>
-<div style="float:right; margin-bottom:1em;">
+  <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/3-science-examples/asteroseismology-estimating-mass-and-radius.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/3-science-examples/asteroseismology-estimating-mass-and-radius.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
-<br style="clear:both;"><section id="How-to-estimate-a-star’s-mass-and-radius-using-asteroseismology">
-<h1>How to estimate a star’s mass and radius using asteroseismology<a class="headerlink" href="#How-to-estimate-a-star’s-mass-and-radius-using-asteroseismology" title="Permalink to this headline">#</a></h1>
+<br style="clear:both;"><section id="How-to-estimate-a-star's-mass-and-radius-using-asteroseismology">
+<h1>How to estimate a star’s mass and radius using asteroseismology<a class="headerlink" href="#How-to-estimate-a-star's-mass-and-radius-using-asteroseismology" title="Permalink to this headline">#</a></h1>
 <section id="Learning-Goals">
 <h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
 <p>In this tutorial you will learn:</p>
@@ -533,7 +277,7 @@ studying how these waves disturb the surface of the star. Properties which can b
 <section id="1.-Plotting-the-Frequency-Spectrum-of-a-Sun-Like-Star">
 <h2>1. Plotting the Frequency Spectrum of a Sun-Like Star<a class="headerlink" href="#1.-Plotting-the-Frequency-Spectrum-of-a-Sun-Like-Star" title="Permalink to this headline">#</a></h2>
 <p>The frequency spectrum (also known as periodogram) of a solar-like oscillator like the Sun shows a rich spectrum of modes of oscillation, equally spaced in frequency, colloquially referred to as a “comb.”</p>
-<p>We will investigate this spectrum using the Sun-like star KIC 10963065 as an example. This star is also colloquially known as “Rudy” (cf. <a class="reference external" href="https://arxiv.org/pdf/1612.00436.pdf">Lund et al. 2016</a>). In order to get a good resolution in the frequency domain, we start by downloading and combining four quarters of Short Cadence <em>Kepler</em> data as follows:</p>
+<p>We will investigate this spectrum using the Sun-like star KIC 10963065 as an example. This star is also colloquially known as “Rudy” (cf. <a class="reference external" href="https://arxiv.org/pdf/1612.00436.pdf">Lund et al. 2016</a>). In order to get a good resolution in the frequency domain, we start by downloading and combining four quarters of Short Cadence <em>Kepler</em> data as follows:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -608,7 +352,7 @@ studying how these waves disturb the surface of the star. Properties which can b
 <section id="2.-Estimating-the-Frequency-of-Maximum-Amplitude-\nu_{\rm-max}">
 <h2>2. Estimating the Frequency of Maximum Amplitude <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span><a class="headerlink" href="#2.-Estimating-the-Frequency-of-Maximum-Amplitude-\nu_{\rm-max}" title="Permalink to this headline">#</a></h2>
 <p>The frequency of maximum amplitude can be estimated in a number of ways. An obvious estimate would be to take the frequency that corresponds to the maximum amplitude in the power spectrum. This would not be a robust estimate however, because the maximum peak is very sensitive to noise and sampling effects.</p>
-<p>Instead, one of the most commonly used methods to estimate <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span> is the 2D autocorrelation function (ACF) method. Literature publications using this method include, for example, <a class="reference external" href="https://arxiv.org/abs/0910.2764">Huber et al. (2009)</a> and <a class="reference external" href="https://arxiv.org/abs/1905.08333">Viani et al. (2019)</a>. A version of this method is provided by the Lightkurve package.</p>
+<p>Instead, one of the most commonly used methods to estimate <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span> is the 2D autocorrelation function (ACF) method. Literature publications using this method include, for example, <a class="reference external" href="https://arxiv.org/abs/0910.2764">Huber et al. (2009)</a> and <a class="reference external" href="https://arxiv.org/abs/1905.08333">Viani et al. (2019)</a>. A version of this method is provided by the Lightkurve package.</p>
 <p>Before diving into Lightkurve’s tools, we will need to prepare our <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.html?highlight=periodogram#lightkurve.periodogram.Periodogram">Periodogram</a> object. We do this by first removing background noise using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.flatten.html?highlight=flatten#lightkurve.periodogram.Periodogram.flatten">flatten()</a> method:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -698,8 +442,8 @@ numax: $2145.00$ $\mathrm{\mu Hz}$ (method: ACF2D)</div></div>
 <section id="3.-Estimating-the-Frequency-Spacing-\Delta\nu">
 <h2>3. Estimating the Frequency Spacing <span class="math notranslate nohighlight">\(\Delta\nu\)</span><a class="headerlink" href="#3.-Estimating-the-Frequency-Spacing-\Delta\nu" title="Permalink to this headline">#</a></h2>
 <p>In order to estimate <span class="math notranslate nohighlight">\(\Delta\nu\)</span> efficiently, we can use the fact that we only need to investigate the ACF in the region surrounding <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span>. In this region, peaks in the ACF will show up corresponding to the repeating comb structure overlapping with itself.</p>
-<p>Having an estimate of <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span> also makes measuring <span class="math notranslate nohighlight">\(\Delta\nu\)</span> possible in a second way. Using well-established empirical relations which have been published in the literature, we can infer the Full Width Half Maximum (FWHM) of the mode envelope based on the value of <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span>. This helps us further narrow down the region in which to calculate the ACF. Lightkurve uses the relationships published by <a class="reference external" href="https://arxiv.org/abs/1004.0449">Mosser et al. 2010</a> and <a class="reference external" href="https://arxiv.org/abs/1612.00436">Lund
-et al. 2017</a>, which are:</p>
+<p>Having an estimate of <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span> also makes measuring <span class="math notranslate nohighlight">\(\Delta\nu\)</span> possible in a second way. Using well-established empirical relations which have been published in the literature, we can infer the Full Width Half Maximum (FWHM) of the mode envelope based on the value of <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span>. This helps us further narrow down the region in which to calculate the ACF. Lightkurve uses the relationships published by <a class="reference external" href="https://arxiv.org/abs/1004.0449">Mosser et al. 2010</a> and <a class="reference external" href="https://arxiv.org/abs/1612.00436">Lund
+et al. 2017</a>, which are:</p>
 <div class="math notranslate nohighlight">
 \[\textrm{FWHM} \approx 0.25 \times \nu_{\rm max}\, \text{for main sequence stars, and}\]</div>
 <div class="math notranslate nohighlight">
@@ -707,7 +451,7 @@ et al. 2017</a>, which are:</p>
 <p>We can also use <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span> to make a rough estimate of <span class="math notranslate nohighlight">\(\Delta\nu\)</span> to guide our search for the true <span class="math notranslate nohighlight">\(\Delta\nu\)</span>. This is roughly</p>
 <div class="math notranslate nohighlight">
 \[\Delta\nu \approx 0.294 \times \nu_{\rm max}^{0772}\, ,\]</div>
-<p>which we assume to be the same for all solar-like oscillators (<a class="reference external" href="https://arxiv.org/abs/0909.5193">Stello et al. 2009</a>).</p>
+<p>which we assume to be the same for all solar-like oscillators (<a class="reference external" href="https://arxiv.org/abs/0909.5193">Stello et al. 2009</a>).</p>
 <p>To understand how this works in practice, let’s first <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.estimate_deltanu.html?highlight=estimate_deltanu">estimate_deltanu()</a>, and then <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.seismology.Seismology.diagnose_deltanu.html?highlight=diagnose_deltanu">diagnose_deltanu()</a>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
@@ -734,12 +478,67 @@ deltanu: $103.11$ $\mathrm{\mu Hz}$ (method: ACF2D)</div></div>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">AttributeError</span>                            Traceback (most recent call last)
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/lightkurve-hY241qo1-py3.9/lib/python3.9/site-packages/IPython/core/formatters.py:340</span>, in <span class="ansi-cyan-fg">BaseFormatter.__call__</span><span class="ansi-blue-fg">(self, obj)</span>
+<span class="ansi-green-intense-fg ansi-bold">    338</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">pass</span>
+<span class="ansi-green-intense-fg ansi-bold">    339</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">--&gt; 340</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">printer</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">obj</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    341</span> <span style="color: rgb(95,135,135)"># Finally look for special method names</span>
+<span class="ansi-green-intense-fg ansi-bold">    342</span> method <span style="color: rgb(98,98,98)">=</span> get_real_method(obj, <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>print_method)
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/lightkurve-hY241qo1-py3.9/lib/python3.9/site-packages/IPython/core/pylabtools.py:152</span>, in <span class="ansi-cyan-fg">print_figure</span><span class="ansi-blue-fg">(fig, fmt, bbox_inches, base64, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    149</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">matplotlib</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">backend_bases</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> FigureCanvasBase
+<span class="ansi-green-intense-fg ansi-bold">    150</span>     FigureCanvasBase(fig)
+<span class="ansi-green-fg">--&gt; 152</span> <span class="ansi-yellow-bg">fig</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">canvas</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">print_figure</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">bytes_io</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kw</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    153</span> data <span style="color: rgb(98,98,98)">=</span> bytes_io<span style="color: rgb(98,98,98)">.</span>getvalue()
+<span class="ansi-green-intense-fg ansi-bold">    154</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> fmt <span style="color: rgb(98,98,98)">==</span> <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">svg</span><span style="color: rgb(175,0,0)">&#39;</span>:
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/lightkurve-hY241qo1-py3.9/lib/python3.9/site-packages/matplotlib/backend_bases.py:2353</span>, in <span class="ansi-cyan-fg">FigureCanvasBase.print_figure</span><span class="ansi-blue-fg">(self, filename, dpi, facecolor, edgecolor, orientation, format, bbox_inches, pad_inches, bbox_extra_artists, backend, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">   2350</span>         bbox_inches <span style="color: rgb(98,98,98)">=</span> bbox_inches<span style="color: rgb(98,98,98)">.</span>padded(pad_inches)
+<span class="ansi-green-intense-fg ansi-bold">   2352</span>     <span style="color: rgb(95,135,135)"># call adjust_bbox to save only the given area</span>
+<span class="ansi-green-fg">-&gt; 2353</span>     restore_bbox <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">_tight_bbox</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">adjust_bbox</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">   2354</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">figure</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">bbox_inches</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">figure</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">canvas</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">fixed_dpi</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   2356</span>     _bbox_inches_restore <span style="color: rgb(98,98,98)">=</span> (bbox_inches, restore_bbox)
+<span class="ansi-green-intense-fg ansi-bold">   2357</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/lightkurve-hY241qo1-py3.9/lib/python3.9/site-packages/matplotlib/_tight_bbox.py:28</span>, in <span class="ansi-cyan-fg">adjust_bbox</span><span class="ansi-blue-fg">(fig, bbox_inches, fixed_dpi)</span>
+<span class="ansi-green-intense-fg ansi-bold">     26</span> locator <span style="color: rgb(98,98,98)">=</span> ax<span style="color: rgb(98,98,98)">.</span>get_axes_locator()
+<span class="ansi-green-intense-fg ansi-bold">     27</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> locator <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg">---&gt; 28</span>     ax<span style="color: rgb(98,98,98)">.</span>apply_aspect(<span class="ansi-yellow-bg">locator</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">ax</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">None</span><span class="ansi-yellow-bg">)</span>)
+<span class="ansi-green-intense-fg ansi-bold">     29</span> locator_list<span style="color: rgb(98,98,98)">.</span>append(locator)
+<span class="ansi-green-intense-fg ansi-bold">     30</span> current_pos <span style="color: rgb(98,98,98)">=</span> ax<span style="color: rgb(98,98,98)">.</span>get_position(original<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">False</span>)<span style="color: rgb(98,98,98)">.</span>frozen()
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/lightkurve-hY241qo1-py3.9/lib/python3.9/site-packages/mpl_toolkits/axes_grid1/inset_locator.py:73</span>, in <span class="ansi-cyan-fg">AnchoredLocatorBase.__call__</span><span class="ansi-blue-fg">(self, ax, renderer)</span>
+<span class="ansi-green-intense-fg ansi-bold">     71</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">__call__</span>(<span style="color: rgb(0,135,0)">self</span>, ax, renderer):
+<span class="ansi-green-intense-fg ansi-bold">     72</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>axes <span style="color: rgb(98,98,98)">=</span> ax
+<span class="ansi-green-fg">---&gt; 73</span>     bbox <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">get_window_extent</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">renderer</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     74</span>     px, py <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>get_offset(bbox<span style="color: rgb(98,98,98)">.</span>width, bbox<span style="color: rgb(98,98,98)">.</span>height, <span style="color: rgb(98,98,98)">0</span>, <span style="color: rgb(98,98,98)">0</span>, renderer)
+<span class="ansi-green-intense-fg ansi-bold">     75</span>     bbox_canvas <span style="color: rgb(98,98,98)">=</span> Bbox<span style="color: rgb(98,98,98)">.</span>from_bounds(px, py, bbox<span style="color: rgb(98,98,98)">.</span>width, bbox<span style="color: rgb(98,98,98)">.</span>height)
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/lightkurve-hY241qo1-py3.9/lib/python3.9/site-packages/matplotlib/offsetbox.py:399</span>, in <span class="ansi-cyan-fg">OffsetBox.get_window_extent</span><span class="ansi-blue-fg">(self, renderer)</span>
+<span class="ansi-green-intense-fg ansi-bold">    396</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">get_window_extent</span>(<span style="color: rgb(0,135,0)">self</span>, renderer<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">None</span>):
+<span class="ansi-green-intense-fg ansi-bold">    397</span>     <span style="color: rgb(95,135,135)"># docstring inherited</span>
+<span class="ansi-green-intense-fg ansi-bold">    398</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> renderer <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg">--&gt; 399</span>         renderer <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">figure</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_get_renderer</span>()
+<span class="ansi-green-intense-fg ansi-bold">    400</span>     bbox <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>get_bbox(renderer)
+<span class="ansi-green-intense-fg ansi-bold">    401</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">try</span>:  <span style="color: rgb(95,135,135)"># Some subclasses redefine get_offset to take no args.</span>
+
+<span class="ansi-red-fg">AttributeError</span>: &#39;NoneType&#39; object has no attribute &#39;_get_renderer&#39;
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_3-science-examples_asteroseismology-estimating-mass-and-radius_32_0.png" src="../../_images/tutorials_3-science-examples_asteroseismology-estimating-mass-and-radius_32_0.png" />
-</div>
+<div class="highlight"><pre>
+&lt;Figure size 848.5x800 with 3 Axes&gt;
+</pre></div></div>
 </div>
 <p>In the top panel we see the region in the frequency spectrum for which the ACF is evaluated, which is one FWHM on either side of <span class="math notranslate nohighlight">\(\nu_{\rm max}\)</span>. This region encompasses the strongest modes of oscillation.</p>
 <p>In the bottom panel we can see the ACF, that is, the result of calculating the correlation of the data with itself as it is shifted over itself. Where modes of oscillation overlap with one another, there will be a spike in the ACF. Because the modes are regularly spaced, these spikes will also be regularly spaced, and will reflect the spacing between modes of oscillation.</p>
@@ -754,7 +553,7 @@ deltanu: $103.11$ $\mathrm{\mu Hz}$ (method: ACF2D)</div></div>
 \[\frac{R}{R_\odot} \simeq \left(\frac{\nu_\rm{max}}{\nu_\rm{max,\odot}}\right) \left(\frac{\Delta\nu}{\Delta\nu_{\odot}}\right)^{-2}\left(\frac{T_{\rm eff}}{T_{\rm eff,\odot}}\right)^{1/2}\, \text{and}\]</div>
 <div class="math notranslate nohighlight">
 \[\frac{g}{g_\odot} \simeq \left(\frac{\nu_\rm{max}}{\nu_\rm{max,\odot}}\right) \left(\frac{T_{\rm eff}}{T_{\rm eff,\odot}}\right)^{1/2}\,\]</div>
-<p>where the <span class="math notranslate nohighlight">\(\odot\)</span> symbol represents the Sun. In Lightkurve, the solar values used are <span class="math notranslate nohighlight">\(\nu_{\rm max, \odot} = 3090\, \mu\rm{Hz}\)</span>, <span class="math notranslate nohighlight">\(\Delta\nu_\odot = 135.1\, \mu{\rm Hz}\)</span> (<a class="reference external" href="https://arxiv.org/abs/1010.4566">Huber et al. 2010</a>) and <span class="math notranslate nohighlight">\(T_{\rm eff, \odot} = 5777.2\, \rm{K}\)</span> (<a class="reference external" href="https://arxiv.org/abs/1605.09788">Prša et al. 2016</a>).</p>
+<p>where the <span class="math notranslate nohighlight">\(\odot\)</span> symbol represents the Sun. In Lightkurve, the solar values used are <span class="math notranslate nohighlight">\(\nu_{\rm max, \odot} = 3090\, \mu\rm{Hz}\)</span>, <span class="math notranslate nohighlight">\(\Delta\nu_\odot = 135.1\, \mu{\rm Hz}\)</span> (<a class="reference external" href="https://arxiv.org/abs/1010.4566">Huber et al. 2010</a>) and <span class="math notranslate nohighlight">\(T_{\rm eff, \odot} = 5777.2\, \rm{K}\)</span> (<a class="reference external" href="https://arxiv.org/abs/1605.09788">Prša et al. 2016</a>).</p>
 <p>These scaling relations are built into Lightkurve. We can call them as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:

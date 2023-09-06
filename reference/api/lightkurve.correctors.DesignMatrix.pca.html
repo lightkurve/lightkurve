@@ -1312,7 +1312,7 @@
 <h1>lightkurve.correctors.DesignMatrix.pca<a class="headerlink" href="#lightkurve-correctors-designmatrix-pca" title="Permalink to this headline">#</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.correctors.DesignMatrix.pca">
-<span class="sig-prename descclassname"><span class="pre">DesignMatrix.</span></span><span class="sig-name descname"><span class="pre">pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nterms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/designmatrix.html#DesignMatrix.pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.DesignMatrix.pca" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">DesignMatrix.</span></span><span class="sig-name descname"><span class="pre">pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nterms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/designmatrix.html#DesignMatrix.pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.DesignMatrix.pca" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns a new <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> with a smaller number of regressors.</p>
 <p>This method will use Principal Components Analysis (PCA) to reduce
 the number of columns in the matrix.</p>
@@ -1320,6 +1320,9 @@ the number of columns in the matrix.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>nterms</strong><span class="classifier">int</span></dt><dd><p>Number of columns in the new matrix.</p>
+</dd>
+<dt><strong>n_iter</strong><span class="classifier">int</span></dt><dd><p>Number of iterations that will be run by the power iteration
+algorithm to compute the principal components.</p>
 </dd>
 </dl>
 </dd>

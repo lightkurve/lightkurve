@@ -1312,7 +1312,7 @@
 <h1>lightkurve.KeplerTargetPixelFile.interact_sky<a class="headerlink" href="#lightkurve-keplertargetpixelfile-interact-sky" title="Permalink to this headline">#</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.KeplerTargetPixelFile.interact_sky">
-<span class="sig-prename descclassname"><span class="pre">KeplerTargetPixelFile.</span></span><span class="sig-name descname"><span class="pre">interact_sky</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notebook_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'localhost:8888'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aperture_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'empty'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitude_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">18</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.interact_sky" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">KeplerTargetPixelFile.</span></span><span class="sig-name descname"><span class="pre">interact_sky</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notebook_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aperture_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'empty'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitude_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">18</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.interact_sky" title="Permalink to this definition">#</a></dt>
 <dd><p>Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1324,7 +1324,10 @@ different URLs. This parameter defaults to the standard notebook
 host and port. If you are running on a different location, you
 will need to supply this value for the application to display
 properly. If no protocol is supplied in the URL, e.g. if it is
-of the form “localhost:8888”, then “http” will be used.</p>
+of the form “localhost:8888”, then “http” will be used.
+For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+to the public hostname of your JupyterHub and notebook_url will
+be defined appropriately automatically.</p>
 </dd>
 <dt><strong>aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, ‘threshold’, ‘default’, ‘background’, or ‘empty’</span></dt><dd><p>Highlight pixels selected by aperture_mask.
 Default is ‘empty’: no pixel is highlighted.</p>

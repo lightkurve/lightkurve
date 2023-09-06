@@ -201,17 +201,17 @@
 
 
 <div class="viewcode-block" id="RegressionCorrector"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector">[docs]</a><span class="k">class</span> <span class="nc">RegressionCorrector</span><span class="p">(</span><span class="n">Corrector</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove noise using linear regression against a `.DesignMatrix`.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove noise using linear regression against a `.DesignMatrix`.</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        \\newcommand{\\y}{\\mathbf{y}}</span>
-<span class="sd">        \\newcommand{\\cov}{\\boldsymbol\Sigma_\y}</span>
-<span class="sd">        \\newcommand{\\w}{\\mathbf{w}}</span>
-<span class="sd">        \\newcommand{\\covw}{\\boldsymbol\Sigma_\w}</span>
-<span class="sd">        \\newcommand{\\muw}{\\boldsymbol\mu_\w}</span>
-<span class="sd">        \\newcommand{\\sigw}{\\boldsymbol\sigma_\w}</span>
-<span class="sd">        \\newcommand{\\varw}{\\boldsymbol\sigma^2_\w}</span>
+<span class="sd">        \newcommand{\y}{\mathbf{y}}</span>
+<span class="sd">        \newcommand{\cov}{\boldsymbol\Sigma_\y}</span>
+<span class="sd">        \newcommand{\w}{\mathbf{w}}</span>
+<span class="sd">        \newcommand{\covw}{\boldsymbol\Sigma_\w}</span>
+<span class="sd">        \newcommand{\muw}{\boldsymbol\mu_\w}</span>
+<span class="sd">        \newcommand{\sigw}{\boldsymbol\sigma_\w}</span>
+<span class="sd">        \newcommand{\varw}{\boldsymbol\sigma^2_\w}</span>
 
 <span class="sd">    Given a column vector of data :math:`\y`</span>
 <span class="sd">    and a design matrix of regressors :math:`X`,</span>

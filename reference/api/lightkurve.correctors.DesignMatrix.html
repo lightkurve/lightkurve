@@ -1322,8 +1322,8 @@ for use by Lightkurve’s <a class="reference internal" href="lightkurve.correct
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>df</strong><span class="classifier">dict, array, or <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.0.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> object</span></dt><dd><p>Columns to include in the design matrix.  If this object is not a
-<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.0.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> then it will be passed to the DataFrame constructor.</p>
+<dt><strong>df</strong><span class="classifier">dict, array, or <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.1.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> object</span></dt><dd><p>Columns to include in the design matrix.  If this object is not a
+<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.1.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> then it will be passed to the DataFrame constructor.</p>
 </dd>
 <dt><strong>columns</strong><span class="classifier">iterable of str (optional)</span></dt><dd><p>Column names, if not already provided via <code class="docutils literal notranslate"><span class="pre">df</span></code>.</p>
 </dd>
@@ -1370,7 +1370,7 @@ column in a linear regression problem.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrix.copy.html#lightkurve.correctors.DesignMatrix.copy" title="lightkurve.correctors.DesignMatrix.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
 <td><p>Returns a deepcopy of DesignMatrix</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrix.pca.html#lightkurve.correctors.DesignMatrix.pca" title="lightkurve.correctors.DesignMatrix.pca"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code></a>([nterms])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrix.pca.html#lightkurve.correctors.DesignMatrix.pca" title="lightkurve.correctors.DesignMatrix.pca"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code></a>([nterms, n_iter])</p></td>
 <td><p>Returns a new <a class="reference internal" href="#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> with a smaller number of regressors.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrix.plot.html#lightkurve.correctors.DesignMatrix.plot" title="lightkurve.correctors.DesignMatrix.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([ax])</p></td>
@@ -1404,7 +1404,7 @@ column in a linear regression problem.</p>
 <td><p>Design matrix &quot;X&quot; to be used in RegressionCorrector objects</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrix.rank.html#lightkurve.correctors.DesignMatrix.rank" title="lightkurve.correctors.DesignMatrix.rank"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rank</span></code></a></p></td>
-<td><p>Matrix rank computed using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v1.24)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank</span></code></a>.</p></td>
+<td><p>Matrix rank computed using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v1.25)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrix.shape.html#lightkurve.correctors.DesignMatrix.shape" title="lightkurve.correctors.DesignMatrix.shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code></a></p></td>
 <td><p>Tuple specifying the shape of the matrix as (n_rows, n_columns).</p></td>

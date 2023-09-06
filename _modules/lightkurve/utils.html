@@ -176,6 +176,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">LogNorm</span>
@@ -206,6 +207,8 @@
     <span class="s2">&quot;bkjd_to_astropy_time&quot;</span><span class="p">,</span>
     <span class="s2">&quot;btjd_to_astropy_time&quot;</span><span class="p">,</span>
     <span class="s2">&quot;show_citation_instructions&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;finalize_notebook_url&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;remote_jupyter_proxy_url&quot;</span>
 <span class="p">]</span>
 
 
@@ -979,6 +982,67 @@
 <span class="k">def</span> <span class="nf">is_notebook</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns `True` if we are running in a notebook.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_get_notebook_environment</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;jupyter&quot;</span><span class="p">,</span> <span class="s2">&quot;colab&quot;</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">remote_jupyter_proxy_url</span><span class="p">(</span><span class="n">port</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Callable to configure Bokeh&#39;s show method when a proxy must be</span>
+<span class="sd">    configured.    If port is None we&#39;re asking about the URL</span>
+<span class="sd">    for the origin header.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;LK_JUPYTERHUB_EXTERNAL_URL&#39;</span><span class="p">]</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">base_url</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span>
+
+    <span class="c1"># If port is None we&#39;re asking for the URL origin</span>
+    <span class="c1"># so return the public hostname.</span>
+    <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">host</span>
+
+    <span class="n">service_url_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;JUPYTERHUB_SERVICE_PREFIX&#39;</span><span class="p">]</span>
+    <span class="n">proxy_url_path</span> <span class="o">=</span> <span class="s1">&#39;proxy/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">port</span>
+
+    <span class="n">user_url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">service_url_path</span><span class="p">)</span>
+    <span class="n">full_url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="n">user_url</span><span class="p">,</span> <span class="n">proxy_url_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">full_url</span>
+
+
+<span class="k">def</span> <span class="nf">finalize_notebook_url</span><span class="p">(</span><span class="n">notebook_url</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Based on `notebook_url` and the environment, compute a final value for</span>
+<span class="sd">    notebook_url to be passed on to bokeh enabling transparent operation on JupyterHub.</span>
+
+<span class="sd">    See Bokeh instructions here:</span>
+<span class="sd">    https://docs.bokeh.org/en/latest/docs/user_guide/output/jupyter.html</span>
+
+<span class="sd">    This handles two aspects of Bokeh made tricky by JupyterHub, firstly</span>
+<span class="sd">    accessing the random Bokeh server port while behind a proxy, and second not</span>
+<span class="sd">    triggering CORS restrictions while accessing a second server.</span>
+
+<span class="sd">    A key aspect of the computed URL is the externally visible DNS name of the</span>
+<span class="sd">    JupyterHub, so for the case of TIKE we might have:</span>
+
+<span class="sd">    export LK_JUPYTERHUB_EXTERNAL_URL=&quot;https://timeseries.science.stsci.edu&quot;</span>
+
+<span class="sd">    If LK_JUPYTERHUB_EXTERNAL_URL is implicitly defined by the hub environment,</span>
+<span class="sd">    JupyterHub users can nominally ignore the notebook_url parameter and</span>
+<span class="sd">    Lightkurve should &quot;just work&quot; as if the local default URL localhost:8888</span>
+<span class="sd">    was sufficient.</span>
+
+<span class="sd">    For example remote_jupyter_proxy_url(25346) would return the URL</span>
+<span class="sd">    &quot;https://test.timeseries.science.stsci.edu/user/homer@stsci.edu/proxy/24356&quot;</span>
+
+<span class="sd">    which is essentially HUB + USER_SESSION + BOKEH_PORT_IN_SESSION</span>
+
+<span class="sd">    The function result should be identical to past behavior unless the definition</span>
+<span class="sd">    of LK_JUPYTERHUB_EXTERNAL_URL indicates JupyterHub is in use.  In this case the</span>
+<span class="sd">    use of remote_jupyter_proxy_url is activated.   This effectively makes it the</span>
+<span class="sd">    JupyterHub default instead of localhost:8888.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">notebook_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">notebook_url</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LK_JUPYTERHUB_EXTERNAL_URL&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">remote_jupyter_proxy_url</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;localhost:8888&quot;</span>
 </pre></div>
 
               </div>

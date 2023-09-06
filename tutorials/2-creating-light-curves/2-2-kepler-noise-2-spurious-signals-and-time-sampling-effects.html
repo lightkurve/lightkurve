@@ -21,6 +21,7 @@
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -270,264 +271,7 @@
               
               <div>
                 
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
-    border: none;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars and line breaks on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-    white-space: pre;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    /*background: #f5f5f5;*/
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-    margin: 0;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
-  font-weight: bold;
-}
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-</style>
-<div style="float:right; margin-bottom:1em;">
+  <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/2-creating-light-curves/2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
@@ -589,11 +333,20 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/chedges/Library/Caches/pypoetry/virtualenvs/lightkurve-hY241qo1-py3.9/lib/python3.9/site-packages/astropy/io/fits/fitsrec.py:715: UserWarning: Field 12 has a repeat count of 0 in its format code, indicating an empty field.
+  warnings.warn(
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_9_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_9_0.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_9_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_9_1.png" />
 </div>
 </div>
 <p>Notice the jagged pattern which repeats around five times every day. This is the signal introduced by focus changes. KIC 2436365 is a non-variable star, which means that this pattern is the only variable signal present, and there is no confusion as to what we’re looking at. In variable stars, this pattern could cause an effect similar to signal dilution, where actual stellar variability or transit events are attenuated by the presence of another signal.</p>
@@ -622,7 +375,7 @@ div.rendered_html tbody tr:hover {
 <img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_12_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_12_0.png" />
 </div>
 </div>
-<p>The signal of the variable FGS star is present around 0.35 cycles per day, and has a harmonic where you’d expect it at 0.7 c/d. Because of the way this signal is introduced into the data, it remains low amplitude, and is unlikely to have an effect on the majority of <em>Kepler</em> analysis. In fact, when studying a star with its own strong signal, and/or all 17 quarters of data, the variable FGS signal is unlikely to show up at all.</p>
+<p>The signal of the variable FGS star is present around 0.35 cycles per day, and has a harmonic where you’d expect it at 0.7 c/d. Because of the way this signal is introduced into the data, it remains low amplitude, and is unlikely to have an effect on the majority of <em>Kepler</em> analysis. In fact, when studying a star with its own strong signal, and/or all 17 quarters of data, the variable FGS signal is unlikely to show up at all.</p>
 <p>For an accuracy check, let’s look at the same region in Quarters 3 and 4, which has a comparable sampling rate in the periodogram, to show that there is no signal present:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -671,7 +424,7 @@ div.rendered_html tbody tr:hover {
 <h2>4. PDC Long Period Attenuation<a class="headerlink" href="#4.-PDC-Long-Period-Attenuation" title="Permalink to this headline">#</a></h2>
 <p>The <em>Kepler</em> PDC pipeline is designed to prepare data for planet searches, which is focused on short-period transit signals; long-period signals are often instrumental systematics, such as flux variations caused by pixel-level temperature changes. To remove these systematics, the pipeline corrects variability with a period of roughly 10 days or more — or a frequency of less than 0.1 c/d (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics
 Handbook</a>, Section 5.15). Of course, this also results in the loss of any long-period stellar variability. As such, it is suggested that you perform your own photometry, such as outlined in the custom aperture photometry tutorial, if you’re searching for long periods.</p>
-<p>The star we’ll use as an example was studied by <a class="reference external" href="https://arxiv.org/pdf/2001.10878.pdf">Yu et al. 2020</a>; this paper also includes a brief discussion of the attenuation of long-period signals in PDCSAP data.</p>
+<p>The star we’ll use as an example was studied by <a class="reference external" href="https://arxiv.org/pdf/2001.10878.pdf">Yu et al. 2020</a>; this paper also includes a brief discussion of the attenuation of long-period signals in PDCSAP data.</p>
 <p>Let’s look at the PDC data first:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -735,11 +488,20 @@ Handbook</a>, Section 5.15). Of course, this also results in the loss of any lon
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/chedges/Library/Caches/pypoetry/virtualenvs/lightkurve-hY241qo1-py3.9/lib/python3.9/site-packages/astropy/io/fits/fitsrec.py:715: UserWarning: Field 12 has a repeat count of 0 in its format code, indicating an empty field.
+  warnings.warn(
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_24_0.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_24_0.png" />
+<img alt="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_24_1.png" src="../../_images/tutorials_2-creating-light-curves_2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects_24_1.png" />
 </div>
 </div>
 </section>

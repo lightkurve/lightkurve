@@ -21,6 +21,7 @@
     href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -304,269 +305,12 @@
               
               <div>
                 
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
-    border: none;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars and line breaks on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-    white-space: pre;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    /*background: #f5f5f5;*/
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-    margin: 0;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
-  font-weight: bold;
-}
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-</style>
-<div style="float:right; margin-bottom:1em;">
+  <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/whats-new-v2.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Fwhats-new-v2.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
-<br style="clear:both;"><section id="What’s-new-in-Lightkurve-2?">
-<h1>What’s new in Lightkurve 2?<a class="headerlink" href="#What’s-new-in-Lightkurve-2?" title="Permalink to this headline">#</a></h1>
+<br style="clear:both;"><section id="What's-new-in-Lightkurve-2?">
+<h1>What’s new in Lightkurve 2?<a class="headerlink" href="#What's-new-in-Lightkurve-2?" title="Permalink to this headline">#</a></h1>
 <p>This page shows you what is new in Lightkurve v2. If you’d like to see our changelog, which tracks minor version changes and patches, you can <a class="reference external" href="https://docs.lightkurve.org/about/changelog.html">click here</a>.</p>
 <section id="Lightkurve-2-offers-improved-support-for-TESS">
 <h2>Lightkurve 2 offers improved support for TESS<a class="headerlink" href="#Lightkurve-2-offers-improved-support-for-TESS" title="Permalink to this headline">#</a></h2>
@@ -610,7 +354,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=3</i>
-<table id="table4385954688" class="table-striped table-bordered table-condensed">
+<table id="table4349919296" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
 <thead><tr><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float64</th></tr></thead>
@@ -638,7 +382,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=3</i>
-<table id="table4385954688" class="table-striped table-bordered table-condensed">
+<table id="table4349919296" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
@@ -665,7 +409,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=2</i>
-<table id="table4385800096" class="table-striped table-bordered table-condensed">
+<table id="table4350159360" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
@@ -783,7 +527,7 @@ array([&#39;2020-05-30 12:00:00.000&#39;, &#39;2020-05-30 14:24:00.000&#39;,
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=3</i>
-<table id="table4385822896" class="table-striped table-bordered table-condensed">
+<table id="table6128591344" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
@@ -814,9 +558,9 @@ array([&#39;2020-05-30 12:00:00.000&#39;, &#39;2020-05-30 14:24:00.000&#39;,
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
-SearchResult containing 13 data products.
+SearchResult containing 15 data products.
 
-<table id="table10840475488">
+<table id="table6131315520">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 19</td><td>2019</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>303256075</td><td>0.0</td></tr>
@@ -831,7 +575,9 @@ SearchResult containing 13 data products.
 <tr><td>9</td><td>TESS Sector 47</td><td>2021</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>600</td><td>303256075</td><td>0.0</td></tr>
 <tr><td>10</td><td>TESS Sector 52</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>600</td><td>303256075</td><td>0.0</td></tr>
 <tr><td>11</td><td>TESS Sector 53</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>600</td><td>303256075</td><td>0.0</td></tr>
-<tr><td>12</td><td>TESS Sector 60</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>303256075</td><td>0.0</td></tr>
+<tr><td>12</td><td>TESS Sector 59</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>200</td><td>303256075</td><td>0.0</td></tr>
+<tr><td>13</td><td>TESS Sector 60</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>303256075</td><td>0.0</td></tr>
+<tr><td>14</td><td>TESS Sector 60</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>200</td><td>303256075</td><td>0.0</td></tr>
 </table></div>
 </div>
 </section>
@@ -853,13 +599,13 @@ SearchResult containing 13 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6237795424">
+<table id="table6131300864">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 27</td><td>2020</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>20</td><td>441420236</td><td>0.0</td></tr>
 </table></div>
 </div>
-<p>You can also filter search results after the fact via attribute access, e.g. via <code class="docutils literal notranslate"><span class="pre">search.exptime</span></code>:</p>
+<p>You can also filter search results after the fact via attribute access, e.g. via <code class="docutils literal notranslate"><span class="pre">search.exptime</span></code>:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
@@ -900,9 +646,9 @@ SearchResult containing 1 data products.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996623015165003
-Optimized Under-fitting metric: 0.8255822766223211
-Optimized Alpha: 9.829e+03
+Optimized Over-fitting metric: 0.9996633183155386
+Optimized Under-fitting metric: 0.8255822817894045
+Optimized Alpha: 9.877e+03
 </pre></div></div>
 </div>
 <p>The corrector now produces detailed diagnostic plots showing the light curve before (grey) and after (black) the noise (blue) was removed:</p>
@@ -977,7 +723,7 @@ Optimized Alpha: 9.829e+03
 <ol class="arabic simple">
 <li><p><strong>lc.time is now always an Astropy Time object.</strong> Unfortunately, many NumPy and SciPy functions do not deal seamlessly with <code class="docutils literal notranslate"><span class="pre">Time</span></code> objects yet. Existing code may have to be modified to pass <code class="docutils literal notranslate"><span class="pre">lc.time.value</span></code> to NumPy/SciPy functions where <code class="docutils literal notranslate"><span class="pre">lc.time</span></code> was passed before.</p></li>
 <li><p><strong>Other numerical columns are now Astropy Quantity objects.</strong> While Quantity objects are largely compatible with NumPy/SciPy, situations do arise where users may wish to perform operations on <code class="docutils literal notranslate"><span class="pre">lc.flux.value</span></code> instead of <code class="docutils literal notranslate"><span class="pre">lc.flux</span></code>.</p></li>
-<li><p><strong>All metadata is now stored in the lc.meta dictionary</strong>. This includes any header values of the FITS file from which a light curve was loaded. For convenience, we continue to support attribute access, e.g. <code class="docutils literal notranslate"><span class="pre">lc.sector</span></code> is available as a shortcut for <code class="docutils literal notranslate"><span class="pre">lc.meta['SECTOR']</span></code>.</p></li>
+<li><p><strong>All metadata is now stored in the lc.meta dictionary</strong>. This includes any header values of the FITS file from which a light curve was loaded. For convenience, we continue to support attribute access, e.g. <code class="docutils literal notranslate"><span class="pre">lc.sector</span></code> is available as a shortcut for <code class="docutils literal notranslate"><span class="pre">lc.meta['SECTOR']</span></code>.</p></li>
 <li><p><strong>LightCurveFile classes have been deprecated.</strong> Instead, light curve files can now be loaded using <code class="docutils literal notranslate"><span class="pre">LightCurve.read(filename,</span> <span class="pre">format=&quot;tess&quot;)</span></code>.</p></li>
 <li><p><strong>lc.time can no longer contain NaN values</strong>. This is because AstroPy Time objects do not currently support NaN values. As a result, light curve reading functions will tend to ignore rows with NaN time values. All other columns in a light curve continue to support NaNs values however.</p></li>
 <li><p><strong>lc.bin() now takes time_bin_size and time_bin_start arguments.</strong> This is for consistency with <code class="docutils literal notranslate"><span class="pre">astropy.timeseries.aggregate_downsample</span></code>. This significantly alters the behavior of binning, because bins are now defined in time instead of by number of data points.</p></li>

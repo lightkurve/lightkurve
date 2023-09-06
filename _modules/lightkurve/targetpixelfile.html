@@ -215,6 +215,7 @@
     <span class="n">validate_method</span><span class="p">,</span>
     <span class="n">centroid_quadratic</span><span class="p">,</span>
     <span class="n">_query_solar_system_objects</span><span class="p">,</span>
+    <span class="n">finalize_notebook_url</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">detect_filetype</span>
 
@@ -274,7 +275,8 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">path</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdulist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">hdulist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span> <span class="o">=</span> <span class="n">quality_bitmask</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="n">targetid</span>
 
@@ -665,7 +667,7 @@
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">attr</span> <span class="o">!=</span> <span class="s2">&quot;header&quot;</span> <span class="ow">and</span> <span class="n">attr</span> <span class="o">!=</span> <span class="s2">&quot;astropy_time&quot;</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;hdu&quot;</span><span class="p">:</span>
                     <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;res&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">}</span>
@@ -750,9 +752,12 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_corrector</span><span class="p">(</span><span class="s2">&quot;pld&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_resolve_default_aperture_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
-            <span class="c1"># returns &#39;pipeline&#39;, unless it is missing. Falls back to &#39;threshold&#39;</span>
-            <span class="k">return</span> <span class="s2">&quot;pipeline&quot;</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;threshold&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
+                <span class="c1"># returns &#39;pipeline&#39;, unless it is missing. Falls back to &#39;threshold&#39;</span>
+                <span class="k">return</span> <span class="s2">&quot;pipeline&quot;</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;threshold&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">aperture_mask</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">aperture_mask</span>
 
@@ -787,51 +792,50 @@
         <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_default_aperture_mask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
 
         <span class="c1"># If &#39;pipeline&#39; mask is requested but missing, fall back to &#39;threshold&#39;</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;_parse_aperture_mask: &#39;pipeline&#39; is requested, but it is missing or empty.&quot;</span>
-            <span class="p">)</span>
+        <span class="c1"># To Do: Should pipeline mask always be True?</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;_parse_aperture_mask: &#39;pipeline&#39; is requested, but it is missing or empty.&quot;</span>
+                <span class="p">)</span>
 
         <span class="c1"># Input validation</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-            <span class="n">aperture_mask</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;`aperture_mask` has shape </span><span class="si">{}</span><span class="s2">, &quot;</span>
-                <span class="s2">&quot;but the flux data has shape </span><span class="si">{}</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;`aperture_mask` has shape </span><span class="si">{}</span><span class="s2">, &quot;</span>
+                    <span class="s2">&quot;but the flux data has shape </span><span class="si">{}</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+                <span class="p">)</span>
 
-        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-            <span class="c1"># `aperture_mask` supports both arrays and string values; these yield</span>
-            <span class="c1"># uninteresting FutureWarnings when compared, so let&#39;s ignore that.</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">aperture_mask</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">aperture_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">:</span>
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_mask</span>
-            <span class="k">elif</span> <span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;threshold&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;threshold&quot;</span><span class="p">:</span>
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">()</span>
-            <span class="k">elif</span> <span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;background&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;background&quot;</span><span class="p">:</span>
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">(</span>
                     <span class="n">threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">reference_pixel</span><span class="o">=</span><span class="kc">None</span>
                 <span class="p">)</span>
-            <span class="k">elif</span> <span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;empty&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;empty&quot;</span><span class="p">:</span>
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="p">(</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="p">((</span><span class="n">aperture_mask</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
-            <span class="p">):</span>
-                <span class="c1"># Kepler and TESS pipeline style integer flags</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="c1"># Kepler and TESS pipeline style integer flags</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;&gt;i4&#39;</span><span class="p">)):</span>
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">aperture_mask</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">)):</span>
-                <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_last_aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span>
-        
+            <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">aperture_mask</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                    <span class="c1"># Kepler and TESS pipeline style integer flags</span>
+                    <span class="n">aperture_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">aperture_mask</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>                
+            <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>                
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span> 
         <span class="k">return</span> <span class="n">aperture_mask</span>
 
     <span class="k">def</span> <span class="nf">create_threshold_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">reference_pixel</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">):</span>
@@ -1314,6 +1318,7 @@
                 <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Target ID: </span><span class="si">{}</span><span class="s2">, Cadence: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span>
                 <span class="p">)</span>
+
             <span class="c1"># We subtract -0.5 because pixel coordinates refer to the middle of</span>
             <span class="c1"># a pixel, e.g. (col, row) = (10.0, 20.0) is a pixel center.</span>
             <span class="n">img_extent</span> <span class="o">=</span> <span class="p">(</span>
@@ -1322,6 +1327,17 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span>
             <span class="p">)</span>
+
+            <span class="c1"># If an axes is passed that used WCS projection, don&#39;t use img_extent</span>
+            <span class="c1"># This addresses lk issue #1095, where the tpf coordinates were incorrectly plotted</span>
+
+            <span class="c1"># By default ax=None</span>
+            <span class="k">if</span> <span class="n">ax</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;wcs&quot;</span><span class="p">):</span>
+                    <span class="n">img_extent</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+
             <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_image</span><span class="p">(</span>
                 <span class="n">data_to_plot</span><span class="p">,</span>
                 <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
@@ -1333,14 +1349,20 @@
             <span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
+
         <span class="c1"># Overlay the aperture mask if given</span>
         <span class="k">if</span> <span class="n">aperture_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_aperture_mask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="n">aperture_mask</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;wcs&quot;</span><span class="p">):</span>
+                            <span class="c1"># When using WCS coordinates, do not add col/row to mask coords</span>
+                            <span class="n">xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
                         <span class="n">rect</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">(</span>
-                            <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">),</span>
+                            <span class="n">xy</span><span class="o">=</span><span class="n">xy</span><span class="p">,</span>
                             <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                             <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                             <span class="n">color</span><span class="o">=</span><span class="n">mask_color</span><span class="p">,</span>
@@ -1431,7 +1453,7 @@
 
     <span class="k">def</span> <span class="nf">interact</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">notebook_url</span><span class="o">=</span><span class="s2">&quot;localhost:8888&quot;</span><span class="p">,</span>
+        <span class="n">notebook_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">max_cadences</span><span class="o">=</span><span class="mi">200000</span><span class="p">,</span>
         <span class="n">aperture_mask</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
         <span class="n">exported_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1462,6 +1484,9 @@
 <span class="sd">            will need to supply this value for the application to display</span>
 <span class="sd">            properly. If no protocol is supplied in the URL, e.g. if it is</span>
 <span class="sd">            of the form &quot;localhost:8888&quot;, then &quot;http&quot; will be used.</span>
+<span class="sd">            For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL</span>
+<span class="sd">            to the public hostname of your JupyterHub and notebook_url will</span>
+<span class="sd">            be defined appropriately automatically.</span>
 <span class="sd">        max_cadences : int</span>
 <span class="sd">            Print an error message if the number of cadences shown is larger than</span>
 <span class="sd">            this value. This limit helps keep browsers from becoming unresponsive.</span>
@@ -1511,6 +1536,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">.interact</span> <span class="kn">import</span> <span class="n">show_interact_widget</span>
 
+        <span class="n">notebook_url</span> <span class="o">=</span> <span class="n">finalize_notebook_url</span><span class="p">(</span><span class="n">notebook_url</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">show_interact_widget</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">notebook_url</span><span class="o">=</span><span class="n">notebook_url</span><span class="p">,</span>
@@ -1522,7 +1549,8 @@
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">interact_sky</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="s2">&quot;localhost:8888&quot;</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s2">&quot;empty&quot;</span><span class="p">,</span> <span class="n">magnitude_limit</span><span class="o">=</span><span class="mi">18</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">interact_sky</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s2">&quot;empty&quot;</span><span class="p">,</span> <span class="n">magnitude_limit</span><span class="o">=</span><span class="mi">18</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</span>
 
 <span class="sd">        Parameters</span>
@@ -1536,6 +1564,9 @@
 <span class="sd">            will need to supply this value for the application to display</span>
 <span class="sd">            properly. If no protocol is supplied in the URL, e.g. if it is</span>
 <span class="sd">            of the form &quot;localhost:8888&quot;, then &quot;http&quot; will be used.</span>
+<span class="sd">            For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL</span>
+<span class="sd">            to the public hostname of your JupyterHub and notebook_url will</span>
+<span class="sd">            be defined appropriately automatically.</span>
 <span class="sd">        aperture_mask : array-like, &#39;pipeline&#39;, &#39;threshold&#39;, &#39;default&#39;, &#39;background&#39;, or &#39;empty&#39;</span>
 <span class="sd">            Highlight pixels selected by aperture_mask.</span>
 <span class="sd">            Default is &#39;empty&#39;: no pixel is highlighted.</span>
@@ -1543,6 +1574,8 @@
 <span class="sd">            A value to limit the results in based on Gaia Gmag. Default, 18.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">.interact</span> <span class="kn">import</span> <span class="n">show_skyview_widget</span>
+
+        <span class="n">notebook_url</span> <span class="o">=</span> <span class="n">finalize_notebook_url</span><span class="p">(</span><span class="n">notebook_url</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">show_skyview_widget</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="n">notebook_url</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="n">magnitude_limit</span><span class="o">=</span><span class="n">magnitude_limit</span>
@@ -1825,7 +1858,8 @@
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">):</span>
                 <span class="n">hdu</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">extension</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">img</span><span class="p">)[</span><span class="n">extension</span><span class="p">]</span>
+                <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdulist</span><span class="p">:</span>
+                    <span class="n">hdu</span> <span class="o">=</span> <span class="n">hdulist</span><span class="p">[</span><span class="n">extension</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">hdu</span>
 
         <span class="c1"># Define a helper function to cutout images if not None</span>

@@ -21,6 +21,7 @@
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -175,7 +176,7 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#1.-About-NASA’s-Photometric-Space-Telescopes">
+  <a class="reference internal nav-link" href="#1.-About-NASA's-Photometric-Space-Telescopes">
    1. About NASA’s Photometric Space Telescopes
   </a>
   <ul class="nav section-nav flex-column">
@@ -266,264 +267,7 @@
               
               <div>
                 
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
-    border: none;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars and line breaks on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-    white-space: pre;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    /*background: #f5f5f5;*/
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-    margin: 0;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
-  font-weight: bold;
-}
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-</style>
-<div style="float:right; margin-bottom:1em;">
+  <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/1-getting-started/using-light-curve-file-products.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/1-getting-started/using-light-curve-file-products.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
@@ -543,7 +287,7 @@ div.rendered_html tbody tr:hover {
 <h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
 <p>The <a class="reference external" href="https://archive.stsci.edu/kepler">Kepler</a>, <a class="reference external" href="https://archive.stsci.edu/k2">K2</a>, and <a class="reference external" href="https://archive.stsci.edu/tess">TESS</a> telescopes observe stars for long periods of time, from just under a month to four years. By doing so they observe how the brightness of stars change over time. A series of these brightness observations is referred to as a <a class="reference external" href="https://www.nasa.gov/kepler/education/lightcurves/">light curve</a> of a star.</p>
 <p>Light curves of stars observed by the <em>Kepler</em>, <em>K2</em>, or <em>TESS</em> missions are created from the raw images collected by these telescopes using software built for this purpose by the mission teams. In this tutorial, we will learn how to use the Lightkurve package to download these preprocessed light curves from <em>Kepler</em>’s data archive, plot them, and understand their properties and units.</p>
-<p>Much of the explanation below is inspired by <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Kinemuchi et al. (2012)</a>, an excellent paper introducing and explaining the terminology surrounding the <em>Kepler</em> mission and its data. You can find detailed information on the mission and its data products in the official <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a> and the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf">Kepler Data Processing
+<p>Much of the explanation below is inspired by <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Kinemuchi et al. (2012)</a>, an excellent paper introducing and explaining the terminology surrounding the <em>Kepler</em> mission and its data. You can find detailed information on the mission and its data products in the official <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a> and the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf">Kepler Data Processing
 Handbook</a>.</p>
 <p>We will use the <em>Kepler</em> mission as the main example, but these tools are extensible to <em>TESS</em> and <em>K2</em> as well. For example, while in this tutorial we will learn to work with Lightkurve’s <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> objects, there are also <code class="docutils literal notranslate"><span class="pre">TessLightCurve</span></code> objects that work in the same way.</p>
 </section>
@@ -560,8 +304,8 @@ Handbook</a>.</p>
 </div>
 </div>
 </section>
-<section id="1.-About-NASA’s-Photometric-Space-Telescopes">
-<h2>1. About NASA’s Photometric Space Telescopes<a class="headerlink" href="#1.-About-NASA’s-Photometric-Space-Telescopes" title="Permalink to this headline">#</a></h2>
+<section id="1.-About-NASA's-Photometric-Space-Telescopes">
+<h2>1. About NASA’s Photometric Space Telescopes<a class="headerlink" href="#1.-About-NASA's-Photometric-Space-Telescopes" title="Permalink to this headline">#</a></h2>
 <p>In order to understand the data produced by NASA’s <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> missions, it is useful to understand a little about how these data were obtained.</p>
 <section id="1.1.-Kepler">
 <h3>1.1. <a class="reference external" href="https://www.nasa.gov/mission_pages/kepler/overview/index.html">Kepler</a><a class="headerlink" href="#1.1.-Kepler" title="Permalink to this headline">#</a></h3>
@@ -571,7 +315,7 @@ star may be observed in multiple quarters, it may fall on a different CCD channe
 at different times, you obtain a light curve.</p>
 <p><em>Kepler</em> recorded the brightness measurements at two different cadences: a Short Cadence (SC, 58.85 seconds) and a Long Cadence (LC, 29.4 minutes). For more details, read: <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, Section 2.1. <em>Mission Overview</em> and 2.6. <em>Pixels of Interest</em>, and the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf">Kepler Archive
 Manual</a> Chapter 2: <em>Kepler</em> Data Products.</p>
-<p><img alt="8917e4e3acbf46789e168c214cd9a440" src="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/active-missions/tess/_images/Keplerfieldofviewstarchart.gif?t=tn2400" /></p>
+<p><img alt="f8c0091fad174f94b4400934223ac611" src="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/active-missions/tess/_images/Keplerfieldofviewstarchart.gif?t=tn2400" /></p>
 <p><em>Figure:</em> The field of view of the <em>Kepler</em> mission. The rectangles represent the CCD modules described above.</p>
 </section>
 <section id="1.2.-K2">
@@ -609,7 +353,7 @@ different cadence modes, including 20 seconds, 120 seconds, 10 minutes, and 30 m
 <div class="output_area rendered_html docutils container">
 SearchResult containing 18 data products.
 
-<table id="table10887425376">
+<table id="table5627871776">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -648,7 +392,7 @@ objects — this is only relevant when you pass a <code class="docutils literal 
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table4414255360">
+<table id="table5627859920">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -687,7 +431,7 @@ SearchResult containing 1 data products.
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>KeplerLightCurve length=4116 LABEL=&quot;KIC 6922244&quot; QUARTER=4 AUTHOR=Kepler FLUX_ORIGIN=pdcsap_flux</i>
-<table id="table10888584112" class="table-striped table-bordered table-condensed">
+<table id="table5629329360" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>quality</th><th>timecorr</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>sap_flux</th><th>sap_flux_err</th><th>sap_bkg</th><th>sap_bkg_err</th><th>pdcsap_flux</th><th>pdcsap_flux_err</th><th>sap_quality</th><th>psf_centr1</th><th>psf_centr1_err</th><th>psf_centr2</th><th>psf_centr2_err</th><th>mom_centr1</th><th>mom_centr1_err</th><th>mom_centr2</th><th>mom_centr2_err</th><th>pos_corr1</th><th>pos_corr2</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th><th></th><th>d</th><th>pix</th><th>pix</th><th></th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th></tr></thead>
 <thead><tr><th>Time</th><th>float32</th><th>float32</th><th>int32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>int32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
@@ -852,7 +596,7 @@ between us and the star.</p>
  &#39;DEADC&#39;: 0.92063492,
  &#39;TIMEPIXR&#39;: 0.5,
  &#39;TIERRELA&#39;: 5.78e-07,
- &#39;TIERABSO&#39;: &lt;astropy.io.fits.card.Undefined at 0x2893284f0&gt;,
+ &#39;TIERABSO&#39;: &lt;astropy.io.fits.card.Undefined at 0x14f8510d0&gt;,
  &#39;INT_TIME&#39;: 6.01980290327,
  &#39;READTIME&#39;: 0.518948526144,
  &#39;FRAMETIM&#39;: 6.538751429414,
@@ -1176,7 +920,7 @@ Time format: bkjd
 <div class="output_area rendered_html docutils container">
 SearchResult containing 36 data products.
 
-<table id="table10901313424">
+<table id="table5634447872">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>377780790</td><td>0.0</td></tr>

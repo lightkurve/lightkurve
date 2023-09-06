@@ -674,10 +674,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">col</span> <span class="o">=</span> <span class="n">centroid_col</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">)</span>
     <span class="n">row</span> <span class="o">=</span> <span class="n">centroid_row</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">centroid_row</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">((</span><span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Arclength cannot be computed because there is no &quot;</span>
+                           <span class="s2">&quot;centroid motion. Make sure that the aperture of &quot;</span>
+                           <span class="s2">&quot;the TPF at least two pixels.&quot;</span><span class="p">)</span>
     <span class="c1"># Force c to be correlated not anticorrelated</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="o">-</span> <span class="n">col</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">col</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">row</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+    <span class="n">arclength</span> <span class="o">=</span> <span class="p">(</span><span class="n">col</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">row</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+    <span class="k">return</span> <span class="n">arclength</span> 
 </pre></div>
 
               </div>

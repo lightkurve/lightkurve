@@ -421,7 +421,7 @@
         <span class="n">dm</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">new_df</span>
         <span class="k">return</span> <span class="n">dm</span></div>
 
-<div class="viewcode-block" id="DesignMatrix.pca"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.pca.html#lightkurve.correctors.DesignMatrix.pca">[docs]</a>    <span class="k">def</span> <span class="nf">pca</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nterms</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+<div class="viewcode-block" id="DesignMatrix.pca"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.pca.html#lightkurve.correctors.DesignMatrix.pca">[docs]</a>    <span class="k">def</span> <span class="nf">pca</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nterms</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new `.DesignMatrix` with a smaller number of regressors.</span>
 
 <span class="sd">        This method will use Principal Components Analysis (PCA) to reduce</span>
@@ -431,6 +431,10 @@
 <span class="sd">        ----------</span>
 <span class="sd">        nterms : int</span>
 <span class="sd">            Number of columns in the new matrix.</span>
+
+<span class="sd">        n_iter : int</span>
+<span class="sd">            Number of iterations that will be run by the power iteration</span>
+<span class="sd">            algorithm to compute the principal components.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -446,7 +450,7 @@
         <span class="c1"># produces more stable results.</span>
         <span class="kn">from</span> <span class="nn">fbpca</span> <span class="kn">import</span> <span class="n">pca</span>  <span class="c1"># local import because not used elsewhere</span>
 
-        <span class="n">new_values</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pca</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">nterms</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">new_values</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pca</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">nterms</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="n">n_iter</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">DesignMatrix</span><span class="p">(</span><span class="n">new_values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DesignMatrix.append_constant"><a class="viewcode-back" href="../../../reference/api/lightkurve.correctors.DesignMatrix.append_constant.html#lightkurve.correctors.DesignMatrix.append_constant">[docs]</a>    <span class="k">def</span> <span class="nf">append_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prior_mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">prior_sigma</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1121,18 +1125,23 @@
     <span class="n">x</span><span class="p">,</span> <span class="n">n_knots</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">knots</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;spline&quot;</span><span class="p">,</span> <span class="n">include_intercept</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : np.ndarray</span>
 <span class="sd">        vector to spline</span>
 <span class="sd">    n_knots: int</span>
 <span class="sd">        Number of knots (default: 20).</span>
+<span class="sd">    knots: list [optional]</span>
+<span class="sd">        The interior knots to use for the spline. If unspecified, then equally</span>
+<span class="sd">        spaced quantiles of the input data are used such that there are `n_knots` knots.</span>
 <span class="sd">    degree: int</span>
 <span class="sd">        Polynomial degree.</span>
 <span class="sd">    name: string</span>
 <span class="sd">        Name to pass to `.DesignMatrix` (default: &#39;spline&#39;).</span>
 <span class="sd">    include_intercept: bool</span>
 <span class="sd">        Whether to include row of ones to find intercept. Default False.</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dm: `.DesignMatrix`</span>

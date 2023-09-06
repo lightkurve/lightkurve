@@ -21,6 +21,7 @@
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -263,264 +264,7 @@
               
               <div>
                 
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
-    border: none;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars and line breaks on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-    white-space: pre;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    /*background: #f5f5f5;*/
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-    margin: 0;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
-  font-weight: bold;
-}
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-</style>
-<div style="float:right; margin-bottom:1em;">
+  <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/2-creating-light-curves/2-3-k2-pldcorrector.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-3-k2-pldcorrector.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
@@ -538,7 +282,7 @@ div.rendered_html tbody tr:hover {
 <section id="Introduction">
 <h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
 <p>The <a class="reference external" href="https://archive.stsci.edu/k2">K2</a> and <a class="reference external" href="https://archive.stsci.edu/tess">TESS</a> missions both provide high-precision photometry for thousands of exoplanet candidates. However, observations by both telescopes can be muddled by instrumental systematic trends, making exoplanet detection or stellar characterization difficult.</p>
-<p>Pixel Level Decorrelation (PLD) is a method that has primarily been used to remove systematic trends introduced by small spacecraft motions during observations, and has been shown to be successful at improving the precision of data taken by the <em>Spitzer</em> space telescope (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2015ApJ...805..132D/abstract">Deming et al. 2015</a>) and the <em>K2</em> mission (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2016AJ....152..100L/abstract">Luger et al. 2016</a>;
+<p>Pixel Level Decorrelation (PLD) is a method that has primarily been used to remove systematic trends introduced by small spacecraft motions during observations, and has been shown to be successful at improving the precision of data taken by the <em>Spitzer</em> space telescope (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2015ApJ...805..132D/abstract">Deming et al. 2015</a>) and the <em>K2</em> mission (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2016AJ....152..100L/abstract">Luger et al. 2016</a>;
 <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2018AJ....156...99L/abstract">2018</a>). PLD works by identifying a set of trends in the pixels surrounding the target star, and performing linear regression to create a combination of these trends that effectively models the systematic noise introduced by spacecraft motion. This noise model is then subtracted from the uncorrected light curve.</p>
 <p>This method has been shown to be very effective at removing the periodic systematic trends in <em>K2</em>, and can also help remove the scattered light background signal in <em>TESS</em> observations. This tutorial will demonstrate how to use the <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.html?highlight=pldcorrector">PLDCorrector</a> for each mission, and will give advice on how to best implement PLD. The
 <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.html?highlight=pldcorrector">PLDCorrector</a> is a special case of the <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector">RegressionCorrector</a>. For more information on how to use
@@ -668,7 +412,7 @@ PLDCorrector (ID: EPIC 212779596)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Uncorrected CDPP = 2928 ppm
-Corrected CDPP = 105 ppm
+Corrected CDPP = 106 ppm
 </pre></div></div>
 </div>
 <p>By this metric, the photometric precision improved by more than a factor of 25 after applying PLD.</p>
@@ -695,8 +439,8 @@ Corrected CDPP = 105 ppm
 </div>
 <p>The diagnostic plot is composed of the following panels: - <strong>Top panel</strong>: The uncorrected light curve (<code class="docutils literal notranslate"><span class="pre">original</span></code>) is shown in black, with the Combined Differential Photometric Precision (CDPP), a measurement of the light curve’s scatter, noted in the legend. - <strong>Middle panel</strong>: The PLD-corrected light curve (<code class="docutils literal notranslate"><span class="pre">corrected</span></code>) is plotted in gray with the noise model created by the combination of pixel values (<code class="docutils literal notranslate"><span class="pre">pixel_series</span></code>) in blue, the estimated background trend (<code class="docutils literal notranslate"><span class="pre">background</span></code>) in red, and
 the polynomial spline fit to the stellar variability (<code class="docutils literal notranslate"><span class="pre">spline</span></code>) in yellow. For <em>K2</em>, the background signal is minimal compared to the systematic trends due to motion, but it is much more significant for <em>TESS</em> observations. Notice that the corrected light curve closely matches the spline, which is tracing the preserved stellar variability. - <strong>Bottom panel</strong>: A direct comparison between the uncorrected light curve (<code class="docutils literal notranslate"><span class="pre">original</span></code>) and the PLD-corrected light curve (<code class="docutils literal notranslate"><span class="pre">corrected</span></code>), again noting
-the CDPP of each light curve in the legend. This panel also indicates which cadences were flagged as outliers (<code class="docutils literal notranslate"><span class="pre">outlier_mask</span></code>), which lie greater than five standard deviations above or below the light curve, as well as which cadences are excluded from the spline fit (<code class="docutils literal notranslate"><span class="pre">~cadence_mask</span></code>). As we will see below, <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code> is a Boolean array with the same length as the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code>’s time array, where <code class="docutils literal notranslate"><span class="pre">True</span></code> is included in the spline fit and <code class="docutils literal notranslate"><span class="pre">False</span></code> is excluded. The tilde
-(<code class="docutils literal notranslate"><span class="pre">~</span></code>) indicates that the inverse of the mask is marked in this plot, that is, the excluded cadences will be crossed out in blue.</p>
+the CDPP of each light curve in the legend. This panel also indicates which cadences were flagged as outliers (<code class="docutils literal notranslate"><span class="pre">outlier_mask</span></code>), which lie greater than five standard deviations above or below the light curve, as well as which cadences are excluded from the spline fit (<code class="docutils literal notranslate"><span class="pre">~cadence_mask</span></code>). As we will see below, <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code> is a Boolean array with the same length as the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code>’s time array, where <code class="docutils literal notranslate"><span class="pre">True</span></code> is included in the spline fit and <code class="docutils literal notranslate"><span class="pre">False</span></code> is excluded. The tilde (<code class="docutils literal notranslate"><span class="pre">~</span></code>)
+indicates that the inverse of the mask is marked in this plot, that is, the excluded cadences will be crossed out in blue.</p>
 <p>The plot above makes it convenient to review the components of the noise removal algorithm. The performance of the algorithm is strongly affected by the choice of pixels which go into the model components. To diagnose this part of the algorithm, we can use the <code class="docutils literal notranslate"><span class="pre">diagnose_masks</span></code> method:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
@@ -801,7 +545,7 @@ the CDPP of each light curve in the legend. This panel also indicates which cade
 <h2>4. Applying PLD to a <em>TESS</em> Light Curve<a class="headerlink" href="#4.-Applying-PLD-to-a-TESS-Light-Curve" title="Permalink to this headline">#</a></h2>
 <p><em>TESS</em> has multiple observing modes. For example, there are two-minute cadence observations, which were retrieved for specific targeted objects, and there are 30-minute cadence Full Frame Images (FFIs), which capture the entire <em>TESS</em> field of view.</p>
 <p>In this example, we will examine a target using the FFI observation. The <em>TESS</em> FFIs are dominated by the scattered light background signal on the <em>TESS</em> detector, which creates high-amplitude, periodic variation. This background can make planet detection difficult, but it can be removed using PLD.</p>
-<p>To access FFI data, we will use the <a class="reference external" href="https://mast.stsci.edu/tesscut/">TESScut</a> tool on the Mikulski Archive for Space Telescopes (MAST), developed by <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract">Brasseur et al. 2019</a>. Lightkurve has a built-in search method for creating cutouts called <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_tesscut.html?highlight=search_tesscut">search_tesscut</a>, which uses the same syntax as the
+<p>To access FFI data, we will use the <a class="reference external" href="https://mast.stsci.edu/tesscut/">TESScut</a> tool on the Mikulski Archive for Space Telescopes (MAST), developed by <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract">Brasseur et al. 2019</a>. Lightkurve has a built-in search method for creating cutouts called <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_tesscut.html?highlight=search_tesscut">search_tesscut</a>, which uses the same syntax as the
 <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile</a> method above. We will search for the Wolf-Rayet star WR 40, which was observed by <em>TESS</em> in Sector 10.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
@@ -819,7 +563,7 @@ the CDPP of each light curve in the legend. This panel also indicates which cade
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table11240270864">
+<table id="table10894017248">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 10</td><td>2019</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>WR40</td><td>0.0</td></tr>

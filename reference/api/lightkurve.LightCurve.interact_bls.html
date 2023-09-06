@@ -1312,7 +1312,7 @@
 <h1>lightkurve.LightCurve.interact_bls<a class="headerlink" href="#lightkurve-lightcurve-interact-bls" title="Permalink to this headline">#</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.LightCurve.interact_bls">
-<span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">interact_bls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notebook_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'localhost:8888'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.interact_bls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.interact_bls" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">interact_bls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notebook_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.interact_bls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.interact_bls" title="Permalink to this definition">#</a></dt>
 <dd><p>Display an interactive Jupyter Notebook widget to find planets.</p>
 <p>The Box Least Squares (BLS) periodogram is a statistical tool used
 for detecting transiting exoplanets and eclipsing binaries in
@@ -1332,7 +1332,10 @@ different URLs. This parameter defaults to the standard notebook
 host and port. If you are running on a different location, you
 will need to supply this value for the application to display
 properly. If no protocol is supplied in the URL, e.g. if it is
-of the form “localhost:8888”, then “http” will be used.</p>
+of the form “localhost:8888”, then “http” will be used.
+For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+to the public hostname of your JupyterHub and notebook_url will
+be defined appropriately automatically.</p>
 </dd>
 <dt><strong>minimum_period</strong><span class="classifier">float or None</span></dt><dd><p>Minimum period to assess the BLS to. If None, default value of 0.3 days
 will be used.</p>
