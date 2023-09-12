@@ -1,53 +1,64 @@
 ''' 
 THIS IS A WORK IN PROGRESS
 
-This PR is an update to prfmodel.py. 
-In addition to adding functionality for TESS, this PR makes a number of functional and structural changes. 
 
+This PR is an update to prfmodel.py.
+In addition to adding functionality for TESS, this PR makes a number of functional and structural changes.
 
-Changes from original 
+Changes from original
+
 - Adds functionality for TESS
 - TESS PRF files are modified to '0-out' pixels that do not contribute to the PRF
 - Kepler and TESS files are stored in the lightkurve file structure (ie not downloaded from the internet)
-- The Interpolated PRF is cropped so that the flux contribution cannot extend past the PRF file size. 
+- The Interpolated PRF is cropped so that the flux contribution cannot extend past the PRF file size.
 - The structure of the call is changed (specifics of which I'm still deciding on)
 
 
 Use cases and functionality I am considering:
-I want to build a PRF model to simulate a real TPF
-	- call PRF(tpf). This gets channel/cam/ccd, col/row from tpf header
-	- use Rebekah's search_grid function (in development) to get a table of all stars
-		brighter than a given magnitude cutoff
-		- the returned table includes ra/dec with pm correction, pixel x and y, and TESS magnitude
-	- loop through stars and create a prf for each star, with flux determined by the TESS mag
-	- return a PRF that sums all of the PRFs
+
+"I want to make an aperture for a TESSCut TPF"
+	- tpf.prf.estimate_aperture()
 	
-I want to just see what the PRF looks like at a given location
-	- call PRF(channel/cam/cdd, row, col OR ra, dec)
-	- return a PRF the size of the engineering files (11x11 pixels I believe)
+"I want to build a PRF model to simulate a real TPF"
+	- Each TargetPixelFile has a prf attribute which is a callable PRF instance tpf.prf. 
+	  Users can e.g. do tpf.prf.estimate_aperture() or tpf.prf.estimate_aperture(completeness=0.9) or tpf.prf.model(position)
+	- obtain a table of star positions (either in coords, pixel coords, magnitudes or flux)
+	- return a np.ndarray of values that can be multiplied by flux summed to create an image.
 	
-I want to create a PRF of only a selection of stars
-    - call PRF(table, channel/camera/ccd)
-    	- Note table would be in the same format as Rebekah's return table
-	- loop through stars and create a prf for each star
-	- How would I know how big to make this? 
-		- If not specified, I guess just use the largest/smallest columns and rows?
+	
+"I want to just see what the PRF looks like at a given location"
+	- lk.prf.TessPRF(camera=1, ccd=1).plot(loc)
+	- lk.prf.TessPRF(camera=1, ccd=1).model(loc)
+	- should return a PRF the size of the engineering files (11x11 pixels I believe) by default
+	
+	
+New Workflow:
 
+- Instantiate PRF with only the channel (Kepler) or camera/ccd (TESS)
+- Call a 'model' function with the column, row, flux, center_col, center_row, flux, scale_col, scale_row, rotation_angle
 
-
-# New Workflow:
-# Instantiate PRF with only the channel (Kepler) or camera/ccd (TESS)
-# Call a 'model' function with the column, row, flux, center_col, center_row, flux, scale_col, scale_row, rotation_angle
+'''
+from abc import ABC, abstractmethod
 
 
 # Just sketching out a few models right now
-def class PRF(ABC):
-
-	def estimate_aperture(tpf):
+class PRF(ABC):
+	def __init__(self, fname, pixel_size):
+		# load PSF file
+		# Initialize object
+	def estimate_aperture(tpf: lk.TargetPixelFile): -> npt.ArrayLike
 		# Given a tpf, build a prf model and estimate the best aperture
-	def create_simple_aperture(pix_c, pix_r, ra, dec, flux, completeness)
+		# Add in completeness and contamination values (flfrcsap/crowdsap)
+	def estimate_pipeline_aperture(tpf: lk.TargetPixelFile): -> npt.ArrayLike
+		# Given a tpf, build a prf model that is close to what the pipeline does
+		# Probably a wrapper for the above function with a defined completeness/contamination
+	def create_simple_aperture(self, coord:Union[tuple, SkyCoord], completeness: float = 0.9, oversample: int = 5): -> npt.ArrayLike
 		# Based on completeness requirement, create an aperture
-		# This wouldn't worry about contamination I think
+		# This wouldn't worry about contamination
+		# Can take either RA/Dec or pixel coordinates
+	def create_highres_model(self, oversample: int = 5):
+		# make a PSF model on a higher resolution grid in order to estimate the completeness or contamination. 
+		# You might have 5x the pixel size as a sane default
 	def model(self,
 		corner_col,
 		corner_row,
@@ -59,7 +70,7 @@ def class PRF(ABC):
         rotation_angle=0.0,
     ):
 		
-'''
+
 
 		
 #############################################################        
@@ -71,16 +82,22 @@ class KeplerPRF(PRF):
     """A KeplerPRF class"""
     # I want the option to either give it a tpf and it reads channel/shape OR provide that info
     def __init__(self, channel, shape):
+    	super().__init__(fname=fname, pixel_size=pixel_size)
     	self.channel = channel
     	self.shape = shape
     	
     def __repr__(self):
         return "I'm a Kepler PRF"
         
-    def __call__(self, center_col, center_row, **kwargs):
+    def __call__(self, center_col, center_row, ADD MORE HERE):
         return self.evaluate(
             center_col, center_row, **kwargs
         )
+    @staticmethod
+	def from_tpf(self, tpf):
+    	'''Creates a PRF object using a TPF'''
+    	# Add some error checks that it's a Kepler TPF here
+    	return PRF(tpf.channel, tpf.shape)
 
     	
 #############################################################        
@@ -90,10 +107,13 @@ class KeplerPRF(PRF):
 #############################################################
 class TessPRF(PRF):
     """A TessPRF class""" 
-    def __init__(self, camera, ccd, shape):
+    def __init__(self, camera, ccd, shape, sector):
+    	# Sector needed as different engineering files are needed for sectors < 4
+        super().__init__(fname=fname, pixel_size=pixel_size)
     	self.camera = camera
     	self.ccd = ccd
     	self.shape = shape
+    	self.sector = sector
     	
     def __repr__(self):
         return "I'm a TESS PRF"
@@ -102,7 +122,11 @@ class TessPRF(PRF):
         return self.evaluate(
             center_col, center_row, **kwargs
         )
-
+    @staticmethod
+	def from_tpf(self, tpf):
+    	'''Creates a PRF object using a TPF'''
+    	# Add some error checks that it's a Kepler TPF here
+    	return PRF(tpf.camera, tpf.ccd, tpf.shape)
     	
 
 

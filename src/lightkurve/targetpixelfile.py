@@ -2369,6 +2369,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
             "targetid": self.targetid,
         }
         return KeplerLightCurve(time=self.time, flux=lc.flux, **keys)
+    
+    def prf(self):
+    	'''Returns a PRF object'''
+    	if self.mission.lower == 'kepler':
+    		return PRF.from_tpf(self)
 
 
 class FactoryError(Exception):
@@ -2911,3 +2916,8 @@ class TessTargetPixelFile(TargetPixelFile):
             flux_err=flux_bkg_err,
             **keys,
         )
+        
+    """def prf(self):
+    	'''Returns a PRF object'''
+    	if self.mission.lower == 'tess':
+    		return PRF.from_tpf(self)"""
