@@ -2370,10 +2370,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         }
         return KeplerLightCurve(time=self.time, flux=lc.flux, **keys)
     
+    @property
     def prf(self):
     	'''Returns a PRF object'''
-    	if self.mission.lower == 'kepler':
-    		return PRF.from_tpf(self)
+    	return KeplerPRF.from_tpf(self)
 
 
 class FactoryError(Exception):
