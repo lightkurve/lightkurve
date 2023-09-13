@@ -33,7 +33,7 @@ from copy import deepcopy
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
-from .prf import KeplerPRF
+from .prf import KeplerPRF, TessPRF
 from .utils import (
     KeplerQualityFlags,
     TessQualityFlags,
@@ -2917,6 +2917,10 @@ class TessTargetPixelFile(TargetPixelFile):
             **keys,
         )
         
+    @property
+    def prf(self):
+    	'''Returns a PRF object'''
+    	return TessPRF.from_tpf(self)    
     """def prf(self):
     	'''Returns a PRF object'''
     	if self.mission.lower == 'tess':
