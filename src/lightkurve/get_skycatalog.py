@@ -19,47 +19,38 @@ This file will likely be merged into the search.py code and structure
 It is placed here as an initial working document 
 """
 
-import sys, os
-
-import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-
 from astropy.coordinates import SkyCoord
-from astropy.coordinates import ICRS, Galactic, FK4, FK5  # Low-level frames
-from astropy.coordinates import Angle, Latitude, Longitude  # Angles
-
 import astropy.units as u
 from astropy.time import Time
-
-from astroquery.mast import Observations
 from astroquery.mast import Catalogs
+from astropy.coordinates import SkyCoord
 
-import lightkurve as lk
-from lightkurve import *
 
-def get_skycatalog(tpf_or_lc, 
-                search_radius_deg=None, 
-                lim_mag=None, 
-                catalog=None):
-    
+def get_skycatalog(coord: SkyCoord, 
+                radius: float, 
+                magnitude_limit: float=18., 
+                catalog:str='KIC'
+                epoch:float=2000, 
+                columns: list = None):
+    """
+    Function that returns an astropy table of sources that meet the input criteria. Queries ---
+
+    Parameters:
+    -----------
+        coord : astropy.coordinates.SkyCoord
+            Coordinates around which to do a radius query
+        radius : float
+            Radius in arcseconds to query
+        magnitude_limit : float
+            A value to limit the results in based on Gaia Gmag. Default, 18.
+        catalog: str
+            The catalog to query, either 'KIC', 'EPIC', or 'TIC', 'GaiaDR3'
+    """
     #Need to add a check to make sure file type is correct 
-
     #Need to make this a box search
-    #If a TPF supplied make the box search slightly larger than the size of the TPF
+        # Could do, or could cut it down I don't think it's a faster query
      
-    
-    
-    #Get the time that the data was collected
-    new_time = tpf_or_lc.time[0]
-    #Get the R.A., Dec., and the equinox 
-    ra = tpf_or_lc.ra
-    dec = tpf_or_lc.dec
-    #Format it so that it works with the catalog query
-    cords = str(ra)+" "+str(dec)
-    #Get the equinox from the header
-    equinox = tpf_or_lc.meta["EQUINOX"]
-    
     
     #This code is specific for a TESS object a TPF, TESSCut or a LC - TPF.starcat_all(rad,lim_mag) and it return the answer
     #We could modify it in the future so that you could just put in the object R.A and Dec.
@@ -70,26 +61,11 @@ def get_skycatalog(tpf_or_lc,
     #We should set a default value if a radius is specified
     #If it is a TPF and the radius is not specified then get this info based on the size plus x amount of pixels
     
-    if search_radius_deg==None:
-        srd=0.1
-    else:
-        srd = search_radius_deg
-        
-    if lim_mag == None:
-        lm = 18
-    else: 
-        lm = lim_mag
-
     #Want the catalog to have either the TIC or KIC inputs as default
     #Need to use tpf.mission to determine which mission it is from
     #Then set default
     #Problem is that there is no KIC option in catalog query - we could try something else?
-    
-    if catalog == None:
-        ct = "TIC"
-    else:
-        ct = catalog
-        
+       
     #Allowed catalog values - want to add a check here
    
     cv = ["HSC","Galex","Gaia","TIC","CTL","Panstarrs", "DiskDetective", "Plato"]
@@ -132,8 +108,11 @@ def get_skycatalog(tpf_or_lc,
     #Will need to convert this into astropy to make lk compatable
     df = mag_lim.to_pandas()
     
+    # Just return RADec corrected as ra and dec
     df.insert(3, 'ra_corrected', new_ra, True)
     df.insert(4, 'dec_corrected', new_dec, True)
+
+    # Table should have ra, dec, t/k/k2mag, 
         
     return df
 

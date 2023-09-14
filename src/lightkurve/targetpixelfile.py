@@ -44,6 +44,7 @@ from .utils import (
     centroid_quadratic,
     _query_solar_system_objects,
     finalize_notebook_url
+    get_skycatalog
 )
 from .io import detect_filetype
 
@@ -1408,6 +1409,28 @@ class TargetPixelFile(object):
         return show_skyview_widget(
             self, notebook_url=notebook_url, aperture_mask=aperture_mask, magnitude_limit=magnitude_limit
         )
+    
+    @property
+    def skycatalog(self):
+        """Returns an astropy.table of the sources in the TPF"""
+        pix_radius = np.hypot(*(np.ceil(np.asarray(self.shape[1:])/2) + 1))
+        epoch = self.time.jd.mean()
+        # RH: convert this to a year using astropy.time.Time
+        if self.mission.lower() in ['kepler']:
+            deg_radius = pix_radius * 4
+            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec), radius=deg_radius, catalog='KIC', epoch=epoch)
+        elif self.mission.lower() in ['k2', 'ktwo']:
+            deg_radius = pix_radius * 4
+            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec), radius=deg_radius, catalog='EPIC', epoch=epoch)
+        elif self.mission.lower() in ['tess']:
+            deg_radius = pix_radius * 21
+            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec), radius=deg_radius, catalog='TIC', epoch=epoch)
+        else:
+            raise ValueError("Cannot parse `mission` attribute')
+            return
+
+        # now add columns which are the pixel positions, based on self.wcs
+        return skycatalog  
 
     def to_corrector(self, method="pld", **kwargs):
         """Returns a `~correctors.corrector.Corrector` instance to remove systematics.
