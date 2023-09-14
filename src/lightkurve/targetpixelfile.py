@@ -43,6 +43,7 @@ from .utils import (
     validate_method,
     centroid_quadratic,
     _query_solar_system_objects,
+    finalize_notebook_url
 )
 from .io import detect_filetype
 
@@ -102,7 +103,8 @@ class TargetPixelFile(object):
         if isinstance(path, fits.HDUList):
             self.hdu = path
         else:
-            self.hdu = fits.open(self.path, **kwargs)
+            with fits.open(self.path, **kwargs) as hdulist:
+                self.hdu = deepcopy(hdulist)
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
 
@@ -578,9 +580,12 @@ class TargetPixelFile(object):
             return self.to_corrector("pld", **kwargs).correct()
 
     def _resolve_default_aperture_mask(self, aperture_mask):
-        if isinstance(aperture_mask, str) and (aperture_mask == "default"):
-            # returns 'pipeline', unless it is missing. Falls back to 'threshold'
-            return "pipeline" if np.any(self.pipeline_mask) else "threshold"
+        if isinstance(aperture_mask, str):
+            if (aperture_mask == "default"):
+                # returns 'pipeline', unless it is missing. Falls back to 'threshold'
+                return "pipeline" if np.any(self.pipeline_mask) else "threshold"
+            else:
+                return aperture_mask
         else:
             return aperture_mask
 
@@ -615,51 +620,50 @@ class TargetPixelFile(object):
         aperture_mask = self._resolve_default_aperture_mask(aperture_mask)
 
         # If 'pipeline' mask is requested but missing, fall back to 'threshold'
-        if (
-            isinstance(aperture_mask, str)
-            and (aperture_mask == "pipeline")
-            and ~np.any(self.pipeline_mask)
-        ):
-            raise ValueError(
-                "_parse_aperture_mask: 'pipeline' is requested, but it is missing or empty."
-            )
+        # To Do: Should pipeline mask always be True?
+        if isinstance(aperture_mask, str):
+            if (aperture_mask == "pipeline") and ~np.any(self.pipeline_mask):
+                raise ValueError(
+                    "_parse_aperture_mask: 'pipeline' is requested, but it is missing or empty."
+                )
 
         # Input validation
-        if hasattr(aperture_mask, "shape") and (
-            aperture_mask.shape != self.flux[0].shape
-        ):
-            raise ValueError(
-                "`aperture_mask` has shape {}, "
-                "but the flux data has shape {}"
-                "".format(aperture_mask.shape, self.flux[0].shape)
-            )
+        if hasattr(aperture_mask, "shape"):
+            if (aperture_mask.shape != self.shape[1:]):
+                raise ValueError(
+                    "`aperture_mask` has shape {}, "
+                    "but the flux data has shape {}"
+                    "".format(aperture_mask.shape, self.shape[1:])
+                )
 
-        with warnings.catch_warnings():
-            # `aperture_mask` supports both arrays and string values; these yield
-            # uninteresting FutureWarnings when compared, so let's ignore that.
-            warnings.simplefilter(action="ignore", category=FutureWarning)
-            if aperture_mask is None or aperture_mask == "all":
+        if aperture_mask is None:
+            aperture_mask = np.ones((self.shape[1], self.shape[2]), dtype=bool)
+        elif isinstance(aperture_mask, str):
+            if aperture_mask.lower() == "all":
                 aperture_mask = np.ones((self.shape[1], self.shape[2]), dtype=bool)
-            elif aperture_mask == "pipeline":
+            elif aperture_mask.lower() == "pipeline":
                 aperture_mask = self.pipeline_mask
-            elif aperture_mask == "threshold":
+            elif aperture_mask.lower() == "threshold":
                 aperture_mask = self.create_threshold_mask()
-            elif aperture_mask == "background":
+            elif aperture_mask.lower() == "background":
                 aperture_mask = ~self.create_threshold_mask(
                     threshold=0, reference_pixel=None
                 )
-            elif aperture_mask == "empty":
+            elif aperture_mask.lower() == "empty":
                 aperture_mask = np.zeros((self.shape[1], self.shape[2]), dtype=bool)
-            elif (
-                np.issubdtype(aperture_mask.dtype, np.int_)
-                and ((aperture_mask & 2) == 2).any()
-            ):
-                # Kepler and TESS pipeline style integer flags
+        elif isinstance(aperture_mask, np.ndarray):
+            # Kepler and TESS pipeline style integer flags
+            if np.issubdtype(aperture_mask.dtype, np.dtype('>i4')):
                 aperture_mask = (aperture_mask & 2) == 2
-            elif isinstance(aperture_mask.flat[0], (np.integer, np.float_)):
-                aperture_mask = aperture_mask.astype(bool)
-        self._last_aperture_mask = aperture_mask
-        
+            elif np.issubdtype(aperture_mask.dtype, int):
+                if ((aperture_mask & 2) == 2).any():
+                    # Kepler and TESS pipeline style integer flags
+                    aperture_mask = (aperture_mask & 2) == 2
+                else:
+                    aperture_mask = aperture_mask.astype(bool)                
+            elif np.issubdtype(aperture_mask.dtype, float):
+                aperture_mask = aperture_mask.astype(bool)                
+        self._last_aperture_mask = aperture_mask 
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3, reference_pixel="center"):
@@ -1142,6 +1146,7 @@ class TargetPixelFile(object):
                 title = "Target ID: {}, Cadence: {}".format(
                     self.targetid, self.cadenceno[frame]
                 )
+
             # We subtract -0.5 because pixel coordinates refer to the middle of
             # a pixel, e.g. (col, row) = (10.0, 20.0) is a pixel center.
             img_extent = (
@@ -1150,6 +1155,17 @@ class TargetPixelFile(object):
                 self.row - 0.5,
                 self.row + self.shape[1] - 0.5,
             )
+
+            # If an axes is passed that used WCS projection, don't use img_extent
+            # This addresses lk issue #1095, where the tpf coordinates were incorrectly plotted
+
+            # By default ax=None
+            if ax != None:
+                if hasattr(ax, "wcs"):
+                    img_extent = None
+
+
+
             ax = plot_image(
                 data_to_plot,
                 ax=ax,
@@ -1161,14 +1177,20 @@ class TargetPixelFile(object):
             )
             ax.grid(False)
 
+
         # Overlay the aperture mask if given
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
             for i in range(self.shape[1]):
                 for j in range(self.shape[2]):
                     if aperture_mask[i, j]:
+                        if hasattr(ax, "wcs"):
+                            # When using WCS coordinates, do not add col/row to mask coords
+                            xy = (j - 0.5, i - 0.5)
+                        else:
+                            xy = (j + self.column - 0.5, i + self.row - 0.5)
                         rect = patches.Rectangle(
-                            xy=(j + self.column - 0.5, i + self.row - 0.5),
+                            xy=xy,
                             width=1,
                             height=1,
                             color=mask_color,
@@ -1259,7 +1281,7 @@ class TargetPixelFile(object):
 
     def interact(
         self,
-        notebook_url="localhost:8888",
+        notebook_url=None,
         max_cadences=200000,
         aperture_mask="default",
         exported_filename=None,
@@ -1290,6 +1312,9 @@ class TargetPixelFile(object):
             will need to supply this value for the application to display
             properly. If no protocol is supplied in the URL, e.g. if it is
             of the form "localhost:8888", then "http" will be used.
+            For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+            to the public hostname of your JupyterHub and notebook_url will
+            be defined appropriately automatically.
         max_cadences : int
             Print an error message if the number of cadences shown is larger than
             this value. This limit helps keep browsers from becoming unresponsive.
@@ -1339,6 +1364,8 @@ class TargetPixelFile(object):
         """
         from .interact import show_interact_widget
 
+        notebook_url = finalize_notebook_url(notebook_url)
+
         return show_interact_widget(
             self,
             notebook_url=notebook_url,
@@ -1350,7 +1377,8 @@ class TargetPixelFile(object):
             **kwargs,
         )
 
-    def interact_sky(self, notebook_url="localhost:8888", aperture_mask="empty", magnitude_limit=18):
+
+    def interact_sky(self, notebook_url=None, aperture_mask="empty", magnitude_limit=18):
         """Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.
 
         Parameters
@@ -1364,6 +1392,9 @@ class TargetPixelFile(object):
             will need to supply this value for the application to display
             properly. If no protocol is supplied in the URL, e.g. if it is
             of the form "localhost:8888", then "http" will be used.
+            For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+            to the public hostname of your JupyterHub and notebook_url will
+            be defined appropriately automatically.
         aperture_mask : array-like, 'pipeline', 'threshold', 'default', 'background', or 'empty'
             Highlight pixels selected by aperture_mask.
             Default is 'empty': no pixel is highlighted.
@@ -1371,6 +1402,8 @@ class TargetPixelFile(object):
             A value to limit the results in based on Gaia Gmag. Default, 18.
         """
         from .interact import show_skyview_widget
+
+        notebook_url = finalize_notebook_url(notebook_url)
 
         return show_skyview_widget(
             self, notebook_url=notebook_url, aperture_mask=aperture_mask, magnitude_limit=magnitude_limit
@@ -1653,7 +1686,8 @@ class TargetPixelFile(object):
             elif isinstance(img, fits.HDUList):
                 hdu = img[extension]
             else:
-                hdu = fits.open(img)[extension]
+                with fits.open(img) as hdulist:
+                    hdu = hdulist[extension].copy()
             return hdu
 
         # Define a helper function to cutout images if not None

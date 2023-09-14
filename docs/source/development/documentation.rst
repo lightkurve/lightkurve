@@ -24,6 +24,27 @@ Building the *lightkurve* documentation requires `sphinx` and a few extra packag
 
     $ poetry install
 
+To make a clean directory for the docs use::
+
+    $ cd docs
+    $ make clean
+
+To build the documentation in HTML format, execute::
+
+    $ cd docs
+    $ make html
+
+Note if you build the documentation after cleaning the directory this will compile the notebooks, which can take a significant amount of time (over 30 minutes). This will save the documentation website in the ``../../lightkurve-docs`` directory
+on your system.  If you re-run the `make html` command the notebook-based tutorials will not be recompiled by default
+because they take some time to build.  To recompile the just the notebooks, type::
+
+    $ make notebooks
+
+Finally, if you have write permission to *lightkurve*'s GitHub repository,
+you can upload the documentation to the web server using::
+
+    $ make upload
+
 .. note::
 
     If you encounter the error ``Pandoc wasn't found``, you will have to install ``pandoc`` separately as well following its `installation instruction <https://pandoc.org/installing.html>`_  .
@@ -35,19 +56,12 @@ Building the *lightkurve* documentation requires `sphinx` and a few extra packag
 
         $ conda install --channel=conda-forge pandoc
 
-To build the documentation in HTML format, execute::
+.. note::
+    
+    To build the docs on a Mac you may have to install the Xcode Command Line Tools, which you can do using::
 
-    $ cd docs
-    $ make clean
-    $ make html
+        $ xcode-select --install
+    
 
-This will save the documentation website in the ``../../lightkurve-docs`` directory
-on your system.  The notebook-based tutorials will not be recompiled by default
-because they take some time to build.  To recompile the notebooks, type::
 
-    make notebooks
 
-Finally, if you have write permission to *lightkurve*'s GitHub repository,
-you can upload the documentation to the web server using::
-
-    make upload

@@ -954,12 +954,14 @@ def _search_products(
                 "".format(target)
             )
 
+    
+
     # Specifying quarter, campaign, or quarter should constrain the mission
-    if quarter:
+    if quarter is not None:
         mission = "Kepler"
-    if campaign:
+    if campaign is not None:
         mission = "K2"
-    if sector:
+    if sector is not None:
         mission = "TESS"
     # Ensure mission is a list
     mission = np.atleast_1d(mission).tolist()
@@ -1158,15 +1160,15 @@ def _query_mast(
     exact_target_name = None
     target_lower = str(target).lower()
     # Was a Kepler target ID passed?
-    kplr_match = re.match("^(kplr|kic) ?(\d+)$", target_lower)
+    kplr_match = re.match(r"^(kplr|kic) ?(\d+)$", target_lower)
     if kplr_match:
         exact_target_name = f"kplr{kplr_match.group(2).zfill(9)}"
     # Was a K2 target ID passed?
-    ktwo_match = re.match("^(ktwo|epic) ?(\d+)$", target_lower)
+    ktwo_match = re.match(r"^(ktwo|epic) ?(\d+)$", target_lower)
     if ktwo_match:
         exact_target_name = f"ktwo{ktwo_match.group(2).zfill(9)}"
     # Was a TESS target ID passed?
-    tess_match = re.match("^(tess|tic) ?(\d+)$", target_lower)
+    tess_match = re.match(r"^(tess|tic) ?(\d+)$", target_lower)
     if tess_match:
         exact_target_name = f"{tess_match.group(2).zfill(9)}"
 

@@ -4,7 +4,7 @@ from astropy.io import fits
 import numpy as np
 from numpy.testing import assert_array_equal
 
-from lightkurve import search_lightcurve
+from lightkurve import search_lightcurve, LightCurveCollection
 from lightkurve.io.cdips import read_cdips_lightcurve
 from lightkurve.io.detect import detect_filetype
 
@@ -59,3 +59,7 @@ def test_search_cdips():
     lc = search.download()
     assert type(lc).__name__ == "TessLightCurve"
     assert hasattr(lc, "sector")
+    assert str(lc['bge'].unit) == 'adu'
+    slc = LightCurveCollection([lc, lc]).stitch()
+    assert len(slc) == 2*len(lc)
+
