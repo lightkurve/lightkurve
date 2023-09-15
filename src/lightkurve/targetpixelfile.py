@@ -2372,7 +2372,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
     
     @property
     def prf(self):
-    	'''Returns a PRF object'''
+    	'''Returns a PRF
+    	   Do I want this to return the object instead?
+    	'''
     	return KeplerPRF.from_tpf(self)
 
 

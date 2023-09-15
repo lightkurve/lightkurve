@@ -42,7 +42,11 @@ from abc import ABC, abstractmethod
 from typing import Union
 from astropy.coordinates import SkyCoord
 import numpy.typing as npt
+import numpy as np
+import scipy
 from ..utils import channel_to_module_output, plot_image
+from astropy.io import fits as pyfits
+import math
 
 #from ..targetpixelfile import TargetPixelFile
 
@@ -92,16 +96,79 @@ class PRF(ABC):
 		# You might have 5x the pixel size as a sane default
 		raise NotImplementedError
 		
-	def model(self):#,
-		'''corner_col,
-		corner_row,
-		center_col, # if not provided, use corner_col + self.shape[0] / 2
-		center_row, # if not provided, use corner_row + self.shape[1] / 2
+	def evaluate(self,
+		center_col = None, # If not specified, make output 10x10 with prf in center?
+		center_row = None, # if not provided, use corner_row + self.shape[1] / 2
 		flux=1.0,
 		scale_col=1.0,
 		scale_row=1.0,
-		rotation_angle=0.0,):'''
-		raise NotImplementedError
+		rotation_angle=0.0,):
+		
+		"""
+		Interpolates the PRF model onto detector coordinates.
+
+		Parameters
+		----------
+		center_col, center_row : float
+			Column and row coordinates of the center
+		flux : float
+			Total integrated flux of the PRF
+		scale_col, scale_row : float
+			Pixel scale stretch parameter, i.e. the numbers by which the PRF
+			model needs to be multiplied in the column and row directions to
+			account for focus changes
+		rotation_angle : float
+			Rotation angle in radians
+
+		Returns
+		-------
+		prf_model : 2D array
+			Two dimensional array representing the PRF values parametrized
+			by flux, centroids, widths, and rotation as applicble.
+		"""
+		if center_col == None:
+			center_col=self.column + self.shape[1] / 2
+		if center_row == None:
+			center_row=self.row+ self.shape[0] / 2
+		
+		if ((scale_col == 1.0) and (scale_row == 1.0) and (rotation_angle == 0.0)):
+			delta_col = self.col_coord - center_col
+			delta_row = self.row_coord - center_row
+			self.prf_model = flux * self.interpolate(delta_row, delta_col)
+		
+		else:
+			cosa = math.cos(rotation_angle)
+			sina = math.sin(rotation_angle)
+
+			delta_col = self.col_coord - center_col
+			delta_row = self.row_coord - center_row
+			delta_col, delta_row = np.meshgrid(delta_col, delta_row)
+
+			rot_row = delta_row * cosa - delta_col * sina
+			rot_col = delta_row * sina + delta_col * cosa
+
+			self.prf_model = flux * self.interpolate(
+				rot_row.flatten() * scale_row, rot_col.flatten() * scale_col, grid=False
+			).reshape(self.shape)
+
+		
+		# CUTOUT THE SIZE OF THE PRF MODEL
+		# Rect bivariate spline extrapolates when the grid goes beyond the original coordinates
+		#	  resulting in trailing col/rows of low values. We don't need to deal with that. 
+		#print(f"testcol: {delta_col}")
+		#print(f"testro: {delta_row}")
+		#testcol = np.abs(delta_col) >= 6.5
+		#testrow = np.abs(delta_row) >= 6.5
+		
+		
+		#cutout_prf = self.prf_model.copy()
+		#cutout_prf[testcol] = 0
+		#cutout_prf[testrow] = 0
+		#self.prf = cutout_prf
+
+		return self.prf_model
+			
+		
 		
 	@abstractmethod
 	def _prepare_prf(self):
@@ -125,18 +192,36 @@ class KeplerPRF(PRF):
 	The model is a 550x550 (or 750x750) grid that covers 11x11 (or 15x15) pixels
 	"""
 	# I want the option to either give it a tpf and it reads channel/shape OR provide that info
-	def __init__(self, column, row, channel):
+	def __init__(self, column, row, channel, shape):
 		super().__init__(column=column, row=row)
 		self.channel = channel
-		#self.shape = shape
+		self.shape = shape
+		(
+			self.col_coord,
+			self.row_coord,
+			self.interpolate,
+			self.supersampled_prf,
+		) = self._prepare_prf()
 		
 	def __repr__(self):
 		return "I'm a Kepler PRF"
 		
-	def __call__(self, center_col, center_row): # Add more here
+	def __call__(self, column, row, channel, shape, **kwargs): # Add more here
 		return self.evaluate(
 			center_col, center_row, **kwargs
 		)
+	
+	def evaluate(self, **kwargs):
+		'''
+		Optional keywords:
+		center_col (default is the center of the image)
+		center_row (default is the center of the image)
+		flux (default 1.0),
+		scale_col (default 1.0, ie no scaling),
+		scale_row (default 1.0, ie no scaling),
+		rotation_angle (default 0.0, ie no rotation)
+		'''
+		return super().evaluate(**kwargs) # Make kwargs explicit?
 		
 	def _read_prf_calibration_file(self, path, ext):
 		prf_cal_file = pyfits.open(path)
@@ -154,16 +239,16 @@ class KeplerPRF(PRF):
 		min_prf_weight = 1e-6
 		module, output = channel_to_module_output(self.channel)
 		# determine suitable PRF calibration file
-		prefix = str(module).zfill(2)
-		prfs_url_path = "http://archive.stsci.edu/missions/kepler/fpc/prf/"
+		module = str(module).zfill(2)
+		prfs_url_path = "http://archive.stsci.edu/missions/kepler/fpc/prf/kplr"
 		prffile = (
 			prfs_url_path
-			+ prefix
 			+ str(module)
 			+ "."
 			+ str(output)
 			+ "_2011265_prf.fits"
 		)
+		print(prffile)
 
 		# read PRF images
 		prfn = [0] * n_hdu
@@ -210,13 +295,16 @@ class KeplerPRF(PRF):
 		# not to be confused with our convention, in which the
 		# x-axis correspond to the column-axis
 		interpolate = scipy.interpolate.RectBivariateSpline(PRFrow, PRFcol, supersamp_prf)
-		self.supersampled_prf = supersamp_prf
-		return col_coord, row_coord, interpolate, prf
+		
+		return col_coord, row_coord, interpolate, supersamp_prf
 	
 	def from_tpf(self):
 		'''Creates a PRF object using a TPF'''
 		# Add some error checks that it's a Kepler TPF here
-		return KeplerPRF(self.column, self.row, self.channel)
+		print(self.shape)
+		test_prf =  KeplerPRF(self.column, self.row, self.channel, self.shape[1:3])
+		print(test_prf)
+		return test_prf.evaluate()
 		
 	def plot(self, *params, **kwargs): # Fill in params explicitly
 		#pflux = self.evaluate(*params) # Check if there is already a PRF model, and if not evaluate
@@ -251,7 +339,7 @@ class TessPRF(PRF):
 		return "I'm a TESS PRF"
 		
 	def __call__(self, center_col, center_row, **kwargs):
-		return self.evaluate(
+		return self.model(
 			center_col, center_row, **kwargs
 		)
 	
@@ -359,7 +447,7 @@ class TessPRF(PRF):
 		# x-axis correspond to the column-axis
 
 		interpolate = scipy.interpolate.RectBivariateSpline(PRFrow, PRFcol, prf)
-		self.supersampled_prf = supersamp_prf		
+			
 		 
 		return col_coord, row_coord, interpolate, prf
 

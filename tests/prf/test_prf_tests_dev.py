@@ -10,9 +10,21 @@ def test_tpf_has_prfattribute():
 	tpf = lk.KeplerTargetPixelFile(filename_tpf_tabby_lite)
 	assert hasattr(tpf, 'prf')
 	assert isinstance(tpf.prf, lk.prf.prfmodel.PRF)
+	
+	prf = tpf.prf
+	assert prf.shape == tpf.shape[1:3]
+	
+	assert np.isclose(np.sum(prf), 1., rtol=.01)
+	
+
 
 # Check if a TESS TPF has a prf attribute and that it returns an object of class PRF	
 def test_tpf_has_prfattribute():
 	tpf = lk.TessTargetPixelFile(filename_tess)
 	assert hasattr(tpf, 'prf')
 	assert isinstance(tpf.prf, lk.prf.prfmodel.PRF)
+	
+
+	
+# Check if the output PRF has the right shape
+# Check if the sum of the PRF is close to 1 (1000) when given flux=1 (1000)
