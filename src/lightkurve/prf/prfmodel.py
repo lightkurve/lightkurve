@@ -47,6 +47,7 @@ import scipy
 from ..utils import channel_to_module_output, plot_image
 from astropy.io import fits as pyfits
 import math
+from .targetpixelfile import TargetPixelFile
 
 #from ..targetpixelfile import TargetPixelFile
 
@@ -55,13 +56,19 @@ import math
 class PRF(ABC):
 
 	@abstractmethod
-	def __init__(self, column, row, shape):
+	def __init__(self, column:int, row:int, shape:tuple):
 		"""
 		A generic base class object for PRFs You're not supposed to use this.
 		See KeplerPRF and TessPRF for the instantiable classes. 
 		
-		column = pixel coordinate of the lower left column value
-		column = pixel coordinate of the lower left row value
+		Parameters
+		----------
+		column : int
+		 	pixel coordinate of the lower left column value
+		row : int
+		 	 pixel coordinate of the lower left row value
+		shape : tuple
+			shape of any resultant PRFs
 		"""
 		
 		# load PSF file
@@ -73,15 +80,15 @@ class PRF(ABC):
 	def __repr__(self):
 		return "I'm an abstract PRF"
 		
-	def __call__(self):
-		raise NotImplementedError
+	# def __call__(self):
+	# 	raise NotImplementedError
 		
-	def estimate_aperture(self, tpf): #tpf: TargetPixelFile) -> npt.ArrayLike:
+	def estimate_aperture(self, tpf: TargetPixelFile) -> npt.ArrayLike:
 		# Given a tpf, build a prf model and estimate the best aperture
 		# Add in completeness and contamination values (flfrcsap/crowdsap)
 		raise NotImplementedError
 		
-	def estimate_pipeline_aperture(self, tpf):#tpf: TargetPixelFile) -> npt.ArrayLike:
+	def estimate_pipeline_aperture(self, tpf: TargetPixelFile) -> npt.ArrayLike:
 		# Given a tpf, build a prf model that is close to what the pipeline does
 		# Probably a wrapper for the above function with a defined completeness/contamination
 		raise NotImplementedError
@@ -101,9 +108,8 @@ class PRF(ABC):
 		center_col = None, # If not specified, make output 10x10 with prf in center?
 		center_row = None, # if not provided, use corner_row + self.shape[1] / 2
 		flux=1.0,
-		scale_col=1.0,
-		scale_row=1.0,
-		rotation_angle=0.0,):
+		scale=1.0,
+		rotation_angle=0.0):
 		
 		"""
 		Interpolates the PRF model onto detector coordinates.
@@ -114,7 +120,7 @@ class PRF(ABC):
 			Column and row coordinates of the center
 		flux : float
 			Total integrated flux of the PRF
-		scale_col, scale_row : float
+		scale : float
 			Pixel scale stretch parameter, i.e. the numbers by which the PRF
 			model needs to be multiplied in the column and row directions to
 			account for focus changes
@@ -127,32 +133,29 @@ class PRF(ABC):
 			Two dimensional array representing the PRF values parametrized
 			by flux, centroids, widths, and rotation as applicble.
 		"""
-		if center_col == None:
-			center_col=self.column + self.shape[1] / 2
-		if center_row == None:
-			center_row=self.row+ self.shape[0] / 2
-		
-		if ((scale_col == 1.0) and (scale_row == 1.0) and (rotation_angle == 0.0)):
-			delta_col = self.col_coord - center_col
-			delta_row = self.row_coord - center_row
-			self.prf_model = flux * self.interpolate(delta_row, delta_col)
-		
+		if center_col is None:
+			center_col = self.column + self.shape[1] / 2
+		if center_row is None:
+			center_row = self.row + self.shape[0] / 2
+
+		delta_col = self.column - center_col
+		delta_row = self.row - center_row		
+		if (scale == 1.0) and (rotation_angle == 0.0):
+			self.prf_model = flux * self.interpolate(delta_row, delta_col)		
 		else:
-			cosa = math.cos(rotation_angle)
-			sina = math.sin(rotation_angle)
-
-			delta_col = self.col_coord - center_col
-			delta_row = self.row_coord - center_row
-			delta_col, delta_row = np.meshgrid(delta_col, delta_row)
-
-			rot_row = delta_row * cosa - delta_col * sina
-			rot_col = delta_row * sina + delta_col * cosa
-
+			rot_col, rot_row = np.meshgrid(delta_col, delta_row)
+			if rotation_angle != 0:
+				cosa = math.cos(rotation_angle)
+				sina = math.sin(rotation_angle)
+				rot_row = delta_row * cosa - rot_col * sina
+				rot_col = delta_row * sina + rot_col * cosa
 			self._prf_model = flux * self.interpolate(
-				rot_row.flatten() * scale_row, rot_col.flatten() * scale_col, grid=False
+				rot_row.flatten() * scale, rot_col.flatten() * scale, grid=False
 			).reshape(self.shape)
 
 		
+		# NS maybe you could just augment the files so there is a border of 0s around
+		# We definitely need a test that the rotation is right
 		# CUTOUT THE SIZE OF THE PRF MODEL
 		# Rect bivariate spline extrapolates when the grid goes beyond the original coordinates
 		#	  resulting in trailing col/rows of low values. We don't need to deal with that. 
@@ -169,12 +172,12 @@ class PRF(ABC):
 
 		return self._prf_model
 		
-	@property
-	def prf_model(self):
-		if hasattr(self, '_prf_model'):
-			return self._prf_model
-		else:
-			raise ValueError('call evaluate')
+	# @property
+	# def prf_model(self):
+	# 	if hasattr(self, '_prf_model'):
+	# 		return self._prf_model
+	# 	else:
+	# 		raise ValueError('call evaluate')
 			
 		
 		
@@ -225,8 +228,7 @@ class KeplerPRF(PRF):
 		center_col (default is the center of the image)
 		center_row (default is the center of the image)
 		flux (default 1.0),
-		scale_col (default 1.0, ie no scaling),
-		scale_row (default 1.0, ie no scaling),
+		scale (default 1.0, ie no scaling),
 		rotation_angle (default 0.0, ie no rotation)
 		'''
 		return super().evaluate(**kwargs) # Make kwargs explicit?
@@ -372,9 +374,9 @@ class TessPRF(PRF):
 
 		# TESS has a separate file for each point in a grid of pixel locations.
 		# Find the closest 4 to your pixel location and go from there.
-		rows= np.array([1,1,1,1,1,513,513,513,513,513,1025,1025,1025,1025,
+		rows = np.array([1,1,1,1,1,513,513,513,513,513,1025,1025,1025,1025,
 			1025,1536,1536,1536,1536,1536,2048,2048,2048,2048,2048])
-		cols= np.array([45,557,1069,1580,2092,45,557,1069,1580,2092,45,557,
+		cols = np.array([45,557,1069,1580,2092,45,557,1069,1580,2092,45,557,
 			1069,1580,2092,45,557,1069,1580,2092,45,557,1069,1580,2092])
 
 		# I think this simplifies things a little bit
