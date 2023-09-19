@@ -21,14 +21,14 @@ Use cases and functionality I am considering:
 	
 "I want to build a PRF model to simulate a real TPF"
 	- Each TargetPixelFile has a prf attribute which is a callable PRF instance tpf.prf. 
-	  Users can e.g. do tpf.prf.estimate_aperture() or tpf.prf.estimate_aperture(completeness=0.9) or tpf.prf.model(position)
+	  Users can e.g. do tpf.prf.estimate_aperture() or tpf.prf.estimate_aperture(completeness=0.9) or tpf.prf.evaluate(position)
 	- obtain a table of star positions (either in coords, pixel coords, magnitudes or flux)
 	- return a np.ndarray of values that can be multiplied by flux summed to create an image.
 	
 	
 "I want to just see what the PRF looks like at a given location"
 	- lk.prf.TessPRF(camera=1, ccd=1).plot(loc)
-	- lk.prf.TessPRF(camera=1, ccd=1).model(loc)
+	- lk.prf.TessPRF(camera=1, ccd=1).evaluate(loc)
 	- should return a PRF the size of the engineering files (11x11 pixels I believe) by default
 	
 	
@@ -55,7 +55,7 @@ import math
 class PRF(ABC):
 
 	@abstractmethod
-	def __init__(self, column, row):
+	def __init__(self, column, row, shape):
 		"""
 		A generic base class object for PRFs You're not supposed to use this.
 		See KeplerPRF and TessPRF for the instantiable classes. 
@@ -68,6 +68,7 @@ class PRF(ABC):
 		# Initialize object
 		self.column = column
 		self.row = row
+		self.shape = shape
 		
 	def __repr__(self):
 		return "I'm an abstract PRF"
@@ -147,7 +148,7 @@ class PRF(ABC):
 			rot_row = delta_row * cosa - delta_col * sina
 			rot_col = delta_row * sina + delta_col * cosa
 
-			self.prf_model = flux * self.interpolate(
+			self._prf_model = flux * self.interpolate(
 				rot_row.flatten() * scale_row, rot_col.flatten() * scale_col, grid=False
 			).reshape(self.shape)
 
@@ -166,7 +167,14 @@ class PRF(ABC):
 		#cutout_prf[testrow] = 0
 		#self.prf = cutout_prf
 
-		return self.prf_model
+		return self._prf_model
+		
+	@property
+	def prf_model(self):
+		if hasattr(self, '_prf_model'):
+			return self._prf_model
+		else:
+			raise ValueError('call evaluate')
 			
 		
 		
@@ -193,9 +201,9 @@ class KeplerPRF(PRF):
 	"""
 	# I want the option to either give it a tpf and it reads channel/shape OR provide that info
 	def __init__(self, column, row, channel, shape):
-		super().__init__(column=column, row=row)
+		super().__init__(column=column, row=row, shape=shape)
 		self.channel = channel
-		self.shape = shape
+		
 		(
 			self.col_coord,
 			self.row_coord,
@@ -240,7 +248,8 @@ class KeplerPRF(PRF):
 		module, output = channel_to_module_output(self.channel)
 		# determine suitable PRF calibration file
 		module = str(module).zfill(2)
-		prfs_url_path = "http://archive.stsci.edu/missions/kepler/fpc/prf/kplr"
+		#prfs_url_path = "http://archive.stsci.edu/missions/kepler/fpc/prf/kplr"
+		prfs_url_path = "data/kepler/kplr"
 		prffile = (
 			prfs_url_path
 			+ str(module)
@@ -298,13 +307,13 @@ class KeplerPRF(PRF):
 		
 		return col_coord, row_coord, interpolate, supersamp_prf
 	
-	def from_tpf(self):
+	def from_tpf(self, **kwargs):
 		'''Creates a PRF object using a TPF'''
 		# Add some error checks that it's a Kepler TPF here
 		print(self.shape)
 		test_prf =  KeplerPRF(self.column, self.row, self.channel, self.shape[1:3])
-		print(test_prf)
-		return test_prf.evaluate()
+
+		return test_prf#.evaluate()
 		
 	def plot(self, *params, **kwargs): # Fill in params explicitly
 		#pflux = self.evaluate(*params) # Check if there is already a PRF model, and if not evaluate
@@ -343,20 +352,18 @@ class TessPRF(PRF):
 			center_col, center_row, **kwargs
 		)
 	
-	def _read_prf_calibration_file(self, path):
+	def _read_prf_calibration_file(self, hdu):
 		# The TESS fits file is different than Kepler. We always want the first extension. 
 		# The second is the errors.
 		# TODO: These files do not crop out noisy data, unlike Kepler that zeros out the fringe. 
 		#	   Remake these and save them out locally. 
-		prf_cal_file = fits.open(path)
 		
-		data = prf_cal_file[0].data
-		crval1p = prf_cal_file[0].header["CRVAL1P"]
-		crval2p = prf_cal_file[0].header["CRVAL2P"]
-		cdelt1p = prf_cal_file[0].header["CDELT1P"]
-		cdelt2p = prf_cal_file[0].header["CDELT2P"]
-		prf_cal_file.close()
-
+		data = hdu.data
+		crval1p = hdu.header["CRVAL1P"]
+		crval2p = hdu.header["CRVAL2P"]
+		cdelt1p = hdu.header["CDELT1P"]
+		cdelt2p = hdu.header["CDELT2P"]
+		
 		return data, crval1p, crval2p, cdelt1p, cdelt2p	
 		
 	def _prepare_prf(self):
@@ -365,10 +372,11 @@ class TessPRF(PRF):
 
 		# TESS has a separate file for each point in a grid of pixel locations.
 		# Find the closest 4 to your pixel location and go from there.
-		cols= np.array([45,557,1069,1580,2092,45,557,1069,1580,2092,45,557,
-			1069,1580,2092,45,557,1069,1580,2092,45,557,1069,1580,2092])
 		rows= np.array([1,1,1,1,1,513,513,513,513,513,1025,1025,1025,1025,
 			1025,1536,1536,1536,1536,1536,2048,2048,2048,2048,2048])
+		cols= np.array([45,557,1069,1580,2092,45,557,1069,1580,2092,45,557,
+			1069,1580,2092,45,557,1069,1580,2092,45,557,1069,1580,2092])
+
 		# I think this simplifies things a little bit
 		pythagorus = np.sqrt((rows-self.row)**2. + (cols-self.column)**2.)
 		# Provide the index for the row/column combination that make up a box around the target location
@@ -376,31 +384,12 @@ class TessPRF(PRF):
 		
 		
 		# Not all ccd/cams have the same date, so need to do a bit of finagling
-		# NOTE IF I REMAKE THESE FILES, I WILL DROP THIS DATA TO SIMPLIFY
-		if self.sector < 4:
-			prfSector = 1
-			prfs_url_path = "https://archive.stsci.edu/missions/tess/models/prf_fitsfiles/start_s0001/"
-			if (self.camera == 1):
-				prffiles = [f"{prfs_url_path}cam{self.camera}_ccd{self.ccd}/tess2018243163600-prf-{self.camera}-{self.ccd}-row{rows[c]:04}-col{cols[c]:04}.fits" for c in four_corners]
-			elif ((self.camera == 2) & (self.ccd <= 3)):
-				prffiles = [f"{prfs_url_path}cam{self.camera}_ccd{self.ccd}/tess2018243163600-prf-{self.camera}-{self.ccd}-row{rows[c]:04}-col{cols[c]:04}.fits" for c in four_corners]
-			else:
-				prffiles = [f"{prfs_url_path}cam{self.camera}_ccd{self.ccd}/tess2018243163601-prf-{self.camera}-{self.ccd}-row{rows[c]:04}-col{cols[c]:04}.fits" for c in four_corners]
-		else:
-			prfSector = 4
-			prfs_url_path = "https://archive.stsci.edu/missions/tess/models/prf_fitsfiles/start_s0004/"
-			if (self.camera == 1) & (self.ccd == 1):
-				prffiles = [f"{prfs_url_path}cam{self.camera}_ccd{self.ccd}/tess2019107181900-prf-{self.camera}-{self.ccd}-row{rows[c]:04}-col{cols[c]:04}.fits" for c in four_corners]
-			elif ((self.camera == 1) & (self.ccd > 1)) \
-				| (self.camera == 2) \
-				| ((self.camera == 3) & (self.ccd == 1)):
-				prffiles = [f"{prfs_url_path}cam{self.camera}_ccd{self.ccd}/tess2019107181901-prf-{self.camera}-{self.ccd}-row{rows[c]:04}-col{cols[c]:04}.fits" for c in four_corners]
-			else:
-				prffiles = [f"{prfs_url_path}cam{self.camera}_ccd{self.ccd}/tess2019107181902-prf-{self.camera}-{self.ccd}-row{rows[c]:04}-col{cols[c]:04}.fits" for c in four_corners]
-		
-		# Read PRF images
-		# This format is to stay consistent with how Kepler's files are read in
-		n_hdu = len(four_corners) 
+		# NOTE: now treating all sectors the same (always use the > sector 4 fils)
+		# This file has the prf images saved in extensions 1-25 (not 0-24)
+		prffiles = f"data/tess/tess_prf_cam{self.camera}_ccd{self.ccd}.fits"
+		prf_cal_file = fits.open(prffiles)
+
+		n_hdu = 4
 		prfn = [0] * n_hdu
 		crval1p = np.zeros(n_hdu, dtype="float32")
 		crval2p = np.zeros(n_hdu, dtype="float32")
@@ -414,7 +403,9 @@ class TessPRF(PRF):
 				crval2p[i],
 				cdelt1p[i],
 				cdelt2p[i],
-			) = self._read_prf_calibration_file(prffiles[i])
+			) = self._read_prf_calibration_file(prf_cal_file[four_corners+1])
+		prf_cal_file.close()
+		
 		
 		prfn = np.array(prfn)
 		PRFcol = np.arange(0.5, np.shape(prfn[0])[1] + 0.5)
@@ -472,59 +463,3 @@ class TessPRF(PRF):
 
 		
 		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-################################################################################
-#								   KEPLER  
-################################################################################
-	def _read_prf_calibration_file(self, path, ext):
-		prf_cal_file = pyfits.open(path)
-		data = prf_cal_file[ext].data
-		#data[data == 0.] = np.nan
-		# looks like these data below are the same for all prf calibration files
-		crval1p = prf_cal_file[ext].header["CRVAL1P"]
-		crval2p = prf_cal_file[ext].header["CRVAL2P"]
-		cdelt1p = prf_cal_file[ext].header["CDELT1P"]
-		cdelt2p = prf_cal_file[ext].header["CDELT2P"]
-		prf_cal_file.close()
-
-		return data, crval1p, crval2p, cdelt1p, cdelt2p
-		
-		
-		
-################################################################################
-#								   TESS  
-################################################################################		
-	def _read_prf_calibration_file(self, path):
-		# The TESS fits file is different than Kepler. We always want the first extension. 
-		# The second is the errors.
-		# NOTE: This format will change when I save the cropped images locally
-		prf_cal_file = fits.open(path)
-		data = prf_cal_file[0].data
-		# looks like these data below are the same for all prf calibration files
-		crval1p = prf_cal_file[0].header["CRVAL1P"]
-		crval2p = prf_cal_file[0].header["CRVAL2P"]
-		cdelt1p = prf_cal_file[0].header["CDELT1P"]
-		cdelt2p = prf_cal_file[0].header["CDELT2P"]
-		prf_cal_file.close()
-
-		return data, crval1p, crval2p, cdelt1p, cdelt2p
