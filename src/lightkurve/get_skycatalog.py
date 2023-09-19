@@ -33,8 +33,9 @@ def get_skycatalog(coord: SkyCoord,
                    radius: float, 
                    magnitude_limit: float=18., 
                    catalog: str,
-                   equinox: float, 
-                   columns: list = None):
+                   equinox: float,
+                   epoch: float,
+                   vizeR_cols: list = None):
     """
     Function that returns an astropy table of sources that meet the input criteria. Queries ---
 
@@ -73,14 +74,13 @@ def get_skycatalog(coord: SkyCoord,
 
     
     
-    catalogTIC = Catalogs.query_object(str(cords), radius=srd, catalog=ct)
-    mag_cut = np.where(catalogTIC["Tmag"]<float(lm))
-    mag_lim = catalogTIC[mag_cut]
-    
-    ra_list = mag_lim["ra"]
-    dec_list = mag_lim["dec"]
-    pm_ra = mag_lim["pmRA"]
-    pm_dec = mag_lim["pmDEC"]
+    catalog_result = vizeR_cols.query_object(coord, catalog, Angle(radius, "arcsec"))[0]
+
+    #This will need to be updates for each heading as cab be different for each one
+    ra_list = catalog_result["RAJ2000"]
+    dec_list = catalog_result["DEJ2000"]
+    pm_ra = catalog_result["pmRA"]
+    pm_dec = catalog_result["pmDEC"]
 
     pm_unit = u.milliarcsecond / u.year
     
@@ -100,10 +100,10 @@ def get_skycatalog(coord: SkyCoord,
                      pm_ra_cosdec=pm_ra[a] * pm_unit, 
                      pm_dec=pm_dec[a] * pm_unit,
                      frame='icrs',
-                     obstime=Time(equinox, format="decimalyear", scale="tt") + 0.5)
+                     obstime=equinox)
     
             
-        new_c = c.apply_space_motion(new_obstime=new_time)
+        new_c = c.apply_space_motion(new_obstime=epoch)
         
         new_ra.append(new_c.ra.to(u.deg).value)
         new_dec.append(new_c.dec.to(u.deg).value)
