@@ -20,19 +20,21 @@ It is placed here as an initial working document
 """
 
 import numpy as np
-from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astropy.time import Time
 from astroquery.mast import Catalogs
 from astropy.coordinates import SkyCoord
+from astroquery.vizier import Vizier
 
+#We are going to use Vizer instead of the mast query
+from astroquery.vizier import Vizier
 
 def get_skycatalog(coord: SkyCoord, 
-                radius: float, 
-                magnitude_limit: float=18., 
-                catalog:str='KIC'
-                epoch:float=2000, 
-                columns: list = None):
+                   radius: float, 
+                   magnitude_limit: float=18., 
+                   catalog: str,
+                   equinox: float, 
+                   columns: list = None):
     """
     Function that returns an astropy table of sources that meet the input criteria. Queries ---
 
@@ -46,6 +48,7 @@ def get_skycatalog(coord: SkyCoord,
             A value to limit the results in based on Gaia Gmag. Default, 18.
         catalog: str
             The catalog to query, either 'KIC', 'EPIC', or 'TIC', 'GaiaDR3'
+
     """
     #Need to add a check to make sure file type is correct 
     #Need to make this a box search
@@ -67,8 +70,8 @@ def get_skycatalog(coord: SkyCoord,
     #Problem is that there is no KIC option in catalog query - we could try something else?
        
     #Allowed catalog values - want to add a check here
-   
-    cv = ["HSC","Galex","Gaia","TIC","CTL","Panstarrs", "DiskDetective", "Plato"]
+
+    
     
     catalogTIC = Catalogs.query_object(str(cords), radius=srd, catalog=ct)
     mag_cut = np.where(catalogTIC["Tmag"]<float(lm))

@@ -1414,19 +1414,36 @@ class TargetPixelFile(object):
     def skycatalog(self):
         """Returns an astropy.table of the sources in the TPF"""
         pix_radius = np.hypot(*(np.ceil(np.asarray(self.shape[1:])/2) + 1))
-        epoch = self.time.jd.mean()
-        # RH: convert this to a year using astropy.time.Time
+        epoch = self.time.jd.mean() - 2457000
+        equinox=Time(self.EQUINOX, format="decimalyear", scale="tt") + 0.5
+      
         if self.mission.lower() in ['kepler']:
-            deg_radius = pix_radius * 4
-            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec), radius=deg_radius, catalog='KIC', epoch=epoch)
+            catalog = 'V/133'
+            arcsec_radius = pix_radius * 4
+            vizeR_cols = Vizier(columns=['KIC','RAJ2000', 'DEJ2000','pmRA','pmDE', 'kepmag'],
+              column_filters={"kepmag":"<18"},
+              keywords=["Kepler", "K2"])
+            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec, unit="deg"), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
         elif self.mission.lower() in ['k2', 'ktwo']:
-            deg_radius = pix_radius * 4
-            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec), radius=deg_radius, catalog='EPIC', epoch=epoch)
+            catalog = 'IV/34'
+            arcsec_radius = pix_radius * 4
+            vizeR_cols = Vizier(columns=['ID','RAJ2000', 'DEJ2000','pmRA','pmDEC', "Kpmag"],
+                column_filters={"Kpmag":"<18"})
+            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec, unit="deg"), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
         elif self.mission.lower() in ['tess']:
-            deg_radius = pix_radius * 21
-            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec), radius=deg_radius, catalog='TIC', epoch=epoch)
+            arcsec_radius = pix_radius * 21
+            vizeR_cols = Vizier(columns=['TIC', 'RAJ2000', 'DEJ2000','pmRA','pmDE', 'Tmag'],
+           column_filters={"Tmag":"<18"}, 
+           keywords=["TESS"])
+            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec, unit="deg"), radius=arcsec_radius, catalog='IV/39/tic82', equinox=equinox, epoch=epoch)
         else:
-            raise ValueError("Cannot parse `mission` attribute')
+            #raise ValueError("Cannot parse `mission` attribute")
+            #Changed this to look at the Gaia DR3 catalog
+            arcsec_radius = pix_radius * 21
+            vizeR_cols = Vizier(columns=['DR3Name','RAJ2000','DEJ2000','pmRA','pmDE','Gmag'],
+                column_filters={"Gmag":"<18"}, 
+                keywords=["Gaia"])
+            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec, unit="deg"), radius=arcsec_radius, catalog='I/355', equinox=equinox, epoch=epoch)
             return
 
         # now add columns which are the pixel positions, based on self.wcs
