@@ -1410,46 +1410,47 @@ class TargetPixelFile(object):
             self, notebook_url=notebook_url, aperture_mask=aperture_mask, magnitude_limit=magnitude_limit
         )
     
-    @property
-    def skycatalog(self):
-        """Returns an astropy.table of the sources in the TPF"""
-        pix_radius = np.hypot(*(np.ceil(np.asarray(self.shape[1:])/2) + 1))
-        epoch = self.time.jd.mean() - 2457000
-        equinox=Time(self.EQUINOX, format="decimalyear", scale="tt") + 0.5
+    # @property
+    # def skycatalog(self):
+    #     """Returns an astropy.table of the sources in the TPF"""
+    #     pix_radius = np.hypot(*(np.ceil(np.asarray(self.shape[1:])/2) + 1))
+    #     epoch = self.time.jd.mean() - 2457000
+    #     equinox=Time(self.EQUINOX, format="decimalyear", scale="tt") + 0.5
       
-        if self.mission.lower() in ['kepler']:
-            catalog = 'V/133'
-            arcsec_radius = pix_radius * 4
-            vizeR_cols = Vizier(columns=['KIC','RAJ2000', 'DEJ2000','pmRA','pmDE', 'kepmag'],
-              column_filters={"kepmag":"<18"},
-              keywords=["Kepler", "K2"])
-            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec, unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
-        elif self.mission.lower() in ['k2', 'ktwo']:
-            catalog = 'IV/34'
-            arcsec_radius = pix_radius * 4
-            vizeR_cols = Vizier(columns=['ID','RAJ2000', 'DEJ2000','pmRA','pmDEC', "Kpmag"],
-                column_filters={"Kpmag":"<18"})
-            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec,  unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
-        elif self.mission.lower() in ['tess']:
-            catalog = 'IV/39/tic82'
-            arcsec_radius = pix_radius * 21
-            vizeR_cols = Vizier(columns=['TIC', 'RAJ2000', 'DEJ2000','pmRA','pmDE', 'Tmag'],
-           column_filters={"Tmag":"<18"}, 
-           keywords=["TESS"])
-            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec,  unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
-        else:
-            #raise ValueError("Cannot parse `mission` attribute")
-            #Changed this to look at the Gaia DR3 catalog
-            catalog = 'I/355'
-            arcsec_radius = pix_radius * 21
-            vizeR_cols = Vizier(columns=['DR3Name','RAJ2000','DEJ2000','pmRA','pmDE','Gmag'],
-                column_filters={"Gmag":"<18"}, 
-                keywords=["Gaia"])
-            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec,  unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
-            return
+    #     if self.mission.lower() in ['kepler']:
+    #         catalog = 'V/133'
+    #         arcsec_radius = pix_radius * 4
+    #         vizeR_cols = Vizier(columns=['KIC','RAJ2000', 'DEJ2000','pmRA','pmDE', 'kepmag'],
+    #           column_filters={"kepmag":"<18"},
+    #           keywords=["Kepler", "K2"])
+    #         # apply_propermotion
+    #         skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec, unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
+    #     elif self.mission.lower() in ['k2', 'ktwo']:
+    #         catalog = 'IV/34'
+    #         arcsec_radius = pix_radius * 4
+    #         vizeR_cols = Vizier(columns=['ID','RAJ2000', 'DEJ2000','pmRA','pmDEC', "Kpmag"],
+    #             column_filters={"Kpmag":"<18"})
+    #         skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec,  unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
+    #     elif self.mission.lower() in ['tess']:
+    #         catalog = 'IV/39/tic82'
+    #         arcsec_radius = pix_radius * 21
+    #         vizeR_cols = Vizier(columns=['TIC', 'RAJ2000', 'DEJ2000','pmRA','pmDE', 'Tmag'],
+    #        column_filters={"Tmag":"<18"}, 
+    #        keywords=["TESS"])
+    #         skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec,  unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
+    #     else:
+    #         #raise ValueError("Cannot parse `mission` attribute")
+    #         #Changed this to look at the Gaia DR3 catalog
+    #         catalog = 'I/355'
+    #         arcsec_radius = pix_radius * 21
+    #         vizeR_cols = Vizier(columns=['DR3Name','RAJ2000','DEJ2000','pmRA','pmDE','Gmag'],
+    #             column_filters={"Gmag":"<18"}, 
+    #             keywords=["Gaia"])
+    #         skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec,  unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
+    #         return
 
-        # now add columns which are the pixel positions, based on self.wcs
-        return skycatalog  
+    #     # now add columns which are the pixel positions, based on self.wcs
+    #     return skycatalog  
 
     def to_corrector(self, method="pld", **kwargs):
         """Returns a `~correctors.corrector.Corrector` instance to remove systematics.
@@ -2269,6 +2270,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return KeplerLightCurve(
             time=self.time, flux=flux, flux_err=flux_err, **keys, meta=meta
         )
+    
+    def get_skycatalog(self, catalog_name=None):
+        if catalog_name is None:
+            # Check the mission if it's Kepler or K2
+        catalog = update_propermotion(query_skycatalog(KEPLER PARAMS))
+        #apply self.wcs to add column and row positions
+        return catalog
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -2927,6 +2935,9 @@ class TessTargetPixelFile(TargetPixelFile):
         return TessLightCurve(
             time=self.time, flux=flux, flux_err=flux_err, **keys, meta=meta
         )
+
+    def get_skycatalog(self, catalog_name='TIC'):
+        return update_propermotion(query_skycatalog(TESS PARAMS))
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)

@@ -119,3 +119,46 @@ def get_skycatalog(coord: SkyCoord,
         
     return df
 
+
+
+_catalog_dict = {'kepler':'V/133', 'k2':'IV/34', 'tess', 'gaia'}
+
+def query_skycatalog(catalog_name, magnitude_limit=18, epoch=2000, equinox=Reasonable Date, arcsec_radius=20):
+        """Returns an astropy.table of the sources in the TPF"""
+        epoch = self.time.jd.mean()
+        equinox=Time(self.EQUINOX, format="decimalyear", scale="tt") + 0.5
+
+        if catalog_name.lower() in ['kepler']:
+            catalog_name = _catalog_dict['kepler']
+            catalog = Vizier(columns=['KIC','RAJ2000', 'DEJ2000','pmRA','pmDE', 'kepmag'],
+              column_filters={"kepmag":f"<{magnitude_limit}"}, catalog=catalog_name)
+            catalog.rename({'kepmag':'mag', 'KIC':'ID', 'pmDE':'pmDEC'})
+            # apply_propermotion
+            skycatalog =  apply_propermotion(catalog, equinox=equinox, epoch=epoch)
+        elif catalog_name.lower() in ['k2', 'ktwo']:
+            catalog_name = _catalog_dict['kepler']
+            catalog = Vizier(columns=['ID','RAJ2000', 'DEJ2000','pmRA','pmDEC', "Kpmag"],
+              column_filters={"Kpmag":"f"<{magnitude_limit}""}, catalog=catalog_name)
+            catalog.rename({'Kpmag':'mag'})
+            # apply_propermotion
+            skycatalog =  apply_propermotion(catalog, equinox=equinox, epoch=epoch)
+        elif catalog_name.lower() in ['tess']:
+            catalog = 'IV/39/tic82'
+            vizeR_cols = Vizier(columns=['TIC', 'RAJ2000', 'DEJ2000','pmRA','pmDE', 'Tmag'],
+           column_filters={"Tmag":"<18"}, 
+           keywords=["TESS"])
+            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec,  unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
+        elif catalog_name.lower() in ['gaia', 'dr3']:
+            #raise ValueError("Cannot parse `mission` attribute")
+            #Changed this to look at the Gaia DR3 catalog
+            catalog = 'I/355'
+            vizeR_cols = Vizier(columns=['DR3Name','RAJ2000','DEJ2000','pmRA','pmDE','Gmag'],
+                column_filters={"Gmag":"<18"}, 
+                keywords=["Gaia"])
+            skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec,  unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
+        else:
+             try:
+                # Assuming they've put in a real catalog on vizier, you won't be able to rename anything, you won't be able to assume columns, so give them everything
+            except:
+                raise ValueError("") # tell them you don't understand the catalog
+        return skycatalog  
