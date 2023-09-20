@@ -83,26 +83,54 @@ class PRF(ABC):
 	# def __call__(self):
 	# 	raise NotImplementedError
 		
-	def estimate_aperture(self, tpf: TargetPixelFile) -> npt.ArrayLike:
+		
+	'''def estimate_pipeline_aperture(self, tpf: TargetPixelFile) -> npt.ArrayLike:
+		# Given a tpf, build a prf model that is close to what the pipeline does
+		# Probably a wrapper for the above function with a defined completeness/contamination
+		raise NotImplementedError'''
+		
+	def get_simple_aperture(self, prf_model: npt.ArrayLike, min_completeness: float = 0.9) -> npt.ArrayLike: #oversample?
+		# Based on completeness requirement, create an aperture
+		# This doesn't worry about contamination at all
+		# This takes as an input the prf model at the desired pixel scale. 
+
+    	prf_model = prf_model / np.sum(prf_model) # Is this an acceptable way to normalize?
+    
+    	reverse_sort = np.argsort(prf_model.flatten())[::-1]
+    	cusu = np.cumsum(prf_model.flatten()[reverse_sort])
+    	idx = srt[cusu <= min_completeness]
+    
+    	mask = np.zeros(np.shape(prf_model), dtype=bool).flatten()
+    	mask[idx] = True
+    	mask = mask.reshape(np.shape(prf_model))
+    	return mask
+	
+		
+	def estimate_contamination(self, tpf: TargetPixelFile) -> npt.ArrayLike: #cols, rows, fluxes, aperture
 		# Given a tpf, build a prf model and estimate the best aperture
 		# Add in completeness and contamination values (flfrcsap/crowdsap)
 		raise NotImplementedError
 		
-	def estimate_pipeline_aperture(self, tpf: TargetPixelFile) -> npt.ArrayLike:
-		# Given a tpf, build a prf model that is close to what the pipeline does
-		# Probably a wrapper for the above function with a defined completeness/contamination
-		raise NotImplementedError
+	def estimate_compleness(self, prf: npt.ArrayLike, aperture: npt.ArrayLike) -> float: 
+		'''
+		Returns the fraction of total flux from the target contained in a given aperture
 		
-	def create_simple_aperture(self, coord:Union[tuple, SkyCoord], completeness: float = 0.9, oversample: int = 5) -> npt.ArrayLike:
-		# Based on completeness requirement, create an aperture
-		# This wouldn't worry about contamination
-		# Can take either RA/Dec or pixel coordinates
-		raise NotImplementedError
+		Parameters
+		----------
+		prf: 2D array containing the PRF model for the target of interest
+		aperture: 2D Boolean array of the same size as prf
 		
-	def create_highres_model(self, oversample: int = 5):
+		Returns
+		-------
+		completeness: fraction of total flux contained within the aperture
+		'''
+		return np.sum(prf[aperture]) / np.sum(prf)
+		
+		
+	'''def create_highres_model(self, oversample: int = 5):
 		# make a PSF model on a higher resolution grid in order to estimate the completeness or contamination. 
 		# You might have 5x the pixel size as a sane default
-		raise NotImplementedError
+		raise NotImplementedError'''
 		
 	def evaluate(self,
 		center_col = None, # If not specified, make output 10x10 with prf in center?
