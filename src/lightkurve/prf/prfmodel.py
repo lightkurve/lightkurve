@@ -41,13 +41,15 @@ New Workflow:
 from abc import ABC, abstractmethod
 from typing import Union
 from astropy.coordinates import SkyCoord
+from astropy.utils.data import get_pkg_data_filename
 import numpy.typing as npt
 import numpy as np
 import scipy
 from ..utils import channel_to_module_output, plot_image
 from astropy.io import fits as pyfits
 import math
-from .targetpixelfile import TargetPixelFile
+import matplotlib.pyplot as plt
+#from ..targetpixelfile import TargetPixelFile
 
 #from ..targetpixelfile import TargetPixelFile
 
@@ -94,19 +96,20 @@ class PRF(ABC):
 		# This doesn't worry about contamination at all
 		# This takes as an input the prf model at the desired pixel scale. 
 
-    	prf_model = prf_model / np.sum(prf_model) # Is this an acceptable way to normalize?
-    
-    	reverse_sort = np.argsort(prf_model.flatten())[::-1]
-    	cusu = np.cumsum(prf_model.flatten()[reverse_sort])
-    	idx = srt[cusu <= min_completeness]
-    
-    	mask = np.zeros(np.shape(prf_model), dtype=bool).flatten()
-    	mask[idx] = True
-    	mask = mask.reshape(np.shape(prf_model))
-    	return mask
+		prf_model = prf_model / np.sum(prf_model) # Is this an acceptable way to normalize?
+	
+		reverse_sort = np.argsort(prf_model.flatten())[::-1]
+		cusu = np.cumsum(prf_model.flatten()[reverse_sort])
+		idx = srt[cusu <= min_completeness]
+	
+		mask = np.zeros(np.shape(prf_model), dtype=bool).flatten()
+		mask[idx] = True
+		mask = mask.reshape(np.shape(prf_model))
+		return mask
 	
 		
-	def estimate_contamination(self, tpf: TargetPixelFile) -> npt.ArrayLike: #cols, rows, fluxes, aperture
+	def estimate_contamination(self, tpf) -> npt.ArrayLike:
+	#def estimate_contamination(self, tpf: TargetPixelFile) -> npt.ArrayLike: #cols, rows, fluxes, aperture
 		# Given a tpf, build a prf model and estimate the best aperture
 		# Add in completeness and contamination values (flfrcsap/crowdsap)
 		raise NotImplementedError
@@ -259,7 +262,20 @@ class KeplerPRF(PRF):
 		scale (default 1.0, ie no scaling),
 		rotation_angle (default 0.0, ie no rotation)
 		'''
-		return super().evaluate(**kwargs) # Make kwargs explicit?
+		
+		# the super().evaluate returns 1 PRF. 
+		# In this call, we can make it so that it loops through to make a cube if more than one col/row is given. 
+		if isinstance(center_col, list):
+			prf = np.zeros(len(center_col), self.shape[0], self.shape[1]) # test col/row in right order
+			#[prf[ii,:,:] = super().evaluate(center_col[ii], center_row[ii], flux[ii], 
+			#	scale=scale, rotation_angle=rotation_angle) for ii in len(center_col)]
+			
+			# Gotta handle this better. What if fluxes aren't given? etc.
+			for ii in range(len(center_col)):
+				prf[ii,:,:] = super().evaluate(center_col[ii], center_row[ii], flux[ii])
+			return prf
+		else:
+			return super().evaluate(**kwargs) # Make kwargs explicit?
 		
 	def _read_prf_calibration_file(self, path, ext):
 		prf_cal_file = pyfits.open(path)
@@ -279,7 +295,8 @@ class KeplerPRF(PRF):
 		# determine suitable PRF calibration file
 		module = str(module).zfill(2)
 		#prfs_url_path = "http://archive.stsci.edu/missions/kepler/fpc/prf/kplr"
-		prfs_url_path = "data/kepler/kplr"
+		prfs_url_path = "../prf/data/kepler/kplr"
+		
 		prffile = (
 			prfs_url_path
 			+ str(module)
@@ -287,8 +304,9 @@ class KeplerPRF(PRF):
 			+ str(output)
 			+ "_2011265_prf.fits"
 		)
-		print(prffile)
-
+		
+		prffile = get_pkg_data_filename(prffile)
+		
 		# read PRF images
 		prfn = [0] * n_hdu
 		crval1p = np.zeros(n_hdu, dtype="float32")
@@ -317,6 +335,14 @@ class KeplerPRF(PRF):
 		supersamp_prf = np.zeros(np.shape(prfn[0]), dtype="float32")
 		ref_column = self.column + 0.5 * coldim
 		ref_row = self.row + 0.5 * rowdim
+		
+		#temporary test
+		'''import matplotlib.pyplot as plt
+		fig, ax = plt.subplots(n_hdu)
+		for i in range(n_hdu):
+			ax[i].imshow(np.log(prfn[i]), origin='lower')
+		plt.show()'''
+			
 
 		for i in range(n_hdu):
 			prf_weight = math.sqrt(
@@ -345,19 +371,20 @@ class KeplerPRF(PRF):
 
 		return test_prf#.evaluate()
 		
-	def plot(self, *params, **kwargs): # Fill in params explicitly
-		#pflux = self.evaluate(*params) # Check if there is already a PRF model, and if not evaluate
+	def plot(self, *params): 
 		plot_image(
-			pflux,
-			title=f"Kepler PRF Model, Channel: {self.channel}, CCD: {self.ccd}",
+			self.supersampled_prf,
+			title=f"Supersampled Kepler PRF Model, Channel: {self.channel}",
 			extent=(
 				self.column,
 				self.column + self.shape[1],
 				self.row,
 				self.row + self.shape[0],
 			),
-			**kwargs
+			clabel='relative flux',
+			*params
 		)	
+		plt.show()
 
 		
 #############################################################		
@@ -367,12 +394,19 @@ class KeplerPRF(PRF):
 #############################################################
 class TessPRF(PRF):
 	"""A TessPRF class""" 
-	def __init__(self, column, row, camera, ccd, sector):
+	def __init__(self, column, row, shape, camera, ccd):
 		# Sector needed as different engineering files are needed for sectors < 4
-		super().__init__(column=column, row=row)
+		super().__init__(column=column, row=row, shape=shape)
 		self.camera = camera
 		self.ccd = ccd
-		self.sector = sector
+		
+		(
+			self.col_coord,
+			self.row_coord,
+			self.interpolate,
+			self.supersampled_prf,
+		) = self._prepare_prf()
+		
 		
 	def __repr__(self):
 		return "I'm a TESS PRF"
@@ -416,8 +450,9 @@ class TessPRF(PRF):
 		# Not all ccd/cams have the same date, so need to do a bit of finagling
 		# NOTE: now treating all sectors the same (always use the > sector 4 fils)
 		# This file has the prf images saved in extensions 1-25 (not 0-24)
-		prffiles = f"data/tess/tess_prf_cam{self.camera}_ccd{self.ccd}.fits"
-		prf_cal_file = fits.open(prffiles)
+		prffile = f"../prf/data/tess/tess_prf_cam{self.camera}_ccd{self.ccd}.fits"
+		prffile = get_pkg_data_filename(prffile)
+		prf_cal_file = pyfits.open(prffile)
 
 		n_hdu = 4
 		prfn = [0] * n_hdu
@@ -433,7 +468,7 @@ class TessPRF(PRF):
 				crval2p[i],
 				cdelt1p[i],
 				cdelt2p[i],
-			) = self._read_prf_calibration_file(prf_cal_file[four_corners+1])
+			) = self._read_prf_calibration_file(prf_cal_file[four_corners[i]+1])
 		prf_cal_file.close()
 		
 		
@@ -467,28 +502,29 @@ class TessPRF(PRF):
 		# not to be confused with our convention, in which the
 		# x-axis correspond to the column-axis
 
-		interpolate = scipy.interpolate.RectBivariateSpline(PRFrow, PRFcol, prf)
+		interpolate = scipy.interpolate.RectBivariateSpline(PRFrow, PRFcol, supersamp_prf)
 			
 		 
-		return col_coord, row_coord, interpolate, prf
+		return col_coord, row_coord, interpolate, supersamp_prf
 
 	def from_tpf(self):
 		'''Creates a PRF object using a TPF'''
 		# Add some error checks that it's a Tess TPF here
 		return TessPRF(self.column, self.row, self.camera, self.ccd, self.sector)
 		
-	def plot(self, *params, **kwargs): # Fill in params explicitly
+	def plot(self, *params): # Fill in params explicitly
 		#pflux = self.evaluate(*params) # Check if there is already a PRF model, and if not evaluate
 		plot_image(
-			pflux,
-			title=f"TESS PRF Model, Sector: {self.sector}, Camera: {self.camera}, CCD: {self.ccd}",
+			self.supersampled_prf,
+			title=f"TESS PRF Model, Camera: {self.camera}, CCD: {self.ccd}",
 			extent=(
 				self.column,
 				self.column + self.shape[1],
 				self.row,
 				self.row + self.shape[0],
 			),
-			**kwargs
+			clabel='relative flux',
+			*params
 		)
 
 		
