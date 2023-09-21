@@ -13,6 +13,8 @@ from lightkurve.utils import centroid_quadratic
 from lightkurve.utils import show_citation_instructions
 from lightkurve.lightcurve import LightCurve
 
+from lightkurve.get_skycatalog import get_skycatalog
+
 
 def test_channel_to_module_output():
     assert channel_to_module_output(1) == (2, 1)
@@ -187,3 +189,21 @@ def test_centroid_quadratic_robustness():
 
 def test_show_citation_instructions():
     show_citation_instructions()
+
+@pytest.mark.remote_data
+def test_query_skycatalog():
+    # Test a sky coord where you know how many sources should be returned, use a small radius 
+    # Check that the type returned is correct
+    # Check you can't pass the wrong input
+    # Test each catalog
+    # Test that the proper motion works
+    # Test different epochs
+    
+
+@pytest.mark.remote_data
+def test_query_skycatalog_tpf():
+    # Test that you get an answer for each TPF type
+    # Check that the proper motions are applied
+    # Check that it has pixel positions
+    
+

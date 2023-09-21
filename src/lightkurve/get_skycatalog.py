@@ -170,19 +170,7 @@ def query_skycatalog(
         # apply_propermotion
         catalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
     else:
-        try:
-            # This assumes  that the name of the catalog they entered is correct,
-            # We cant filter this and just have to return everything.
-            filters = Vizier()
-            catalog = filters.query_object(
-                coord, catalog=catalog_name, radius=Angle(arcsec_radius, "arcsec")
-            )
-
-            # Here we want to check the catalog for an RAJ2000, a DEJ200 and the proper motions
-            # If these do not exist then we will have to stop.
-
-        except:
-            raise ValueError(
-                "This is not a valid catalog name please refer to https://vizier.cds.unistra.fr/ for a list of catalogs that can be used"
-            )
+        raise ValueError(
+            "This is not a valid catalog name please refer to Lightkurve docs for a list of catalogs that can be used"
+        )
     return catalog
