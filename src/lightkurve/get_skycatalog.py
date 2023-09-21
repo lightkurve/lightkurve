@@ -27,6 +27,7 @@ from astropy.coordinates import SkyCoord
 from astroquery.vizier import Vizier
 from astropy.table import Table
 
+
 # This creates a dictionary of the relevant catalogs in VizieR
 _catalog_dict = {
     "kepler": "V/133",
@@ -37,108 +38,74 @@ _catalog_dict = {
 
 
 # This function should take the information from the skycatalog search and apply the proper motion
-def apply_propermotion(catalog, equinox: str, epoch: float):
+def apply_propermotion(catalog: Table, epoch: Time, equinox: Time = Time('2000')) -> Table:
     """
     Function that returns an astropy table of sources with the proper motion applied
 
     Parameters:
     -----------
-    coord :
-        astropy.table which contains the coordinates of all targets and proper motion values
-    equinox : float
-        This is the date of the current ra and dec - J2000
-    epoch : float
-        Time of the observation - this needs to be a astropy.time format
+    catalog :
+        astropy.table.Table which contains the coordinates of targets and proper motion values
+    epoch : astropy.time.Time
+        Time of the observation - this needs to be an astropy.time.Time object
+    equinox : astropy.time.Time
+        This is the date of the catalog, assumed to be J2000
 
     Output:
     ------
-    Returna and astopy table with ID, corrected RA, corrected Dec, and mag
-
+    catalog : astropy.table.Table
+        Returns an astropy table with ID, corrected RA, corrected Dec
     """
 
     # Get the input data from the catalog
-    ra_list = catalog["RAJ2000"]
-    dec_list = catalog["DEJ2000"]
-    pm_ra = catalog["pmRA"]
-    pm_dec = catalog["pmDEC"]
-
-    # Below is then code pulled in/adapted from #1332 by Veselin
-    # _get_nearby_gaia_objects
-    # _get_corrected_coordinates
-    if (
-        ra_list is None
-        or dec_list is None
-        or pm_ra is None
-        or pm_dec is None
-        or (np.all(pm_ra == 0) and np.all(pm_dec == 0))
-        or equinox is None
-    ):
-        return ra_list, dec_list, False
-
-    correction = SkyCoord(
-        ra_list,
-        dec_list,
-        pm_ra_cosdec=pm_ra,
-        pm_dec=pm_dec,
+    c = SkyCoord(
+        catalog["RAJ2000"],
+        catalog["DEJ2000"],
+        pm_ra_cosdec=catalog["pmRA"],
+        pm_dec=catalog["pmDEC"],
         frame="icrs",
         obstime=equinox,
     )
 
-    pm_values = correction.apply_space_motion(new_obstime=epoch)
-
-    corrected_ra = pm_values.ra.to(u.deg).value
-    corrected_dec = pm_values.ra.to(u.deg).value
-
-    # Now need to create a new astropy table with these values
-    pm_table = Table()
-    pm_table["ID"] = catalog["ID"]
-    pm_table["RA_corrected"] = corrected_ra
-    pm_table["DEC_corrected"] = corrected_dec
-    pm_table["Mag"] = catalog["Mag"]
-
-    return pm_table
+    c1 = c.apply_space_motion(new_obstime=epoch)
 
 
-# This function should just query the vizieR catalogs:
+    catalog["RA"] = c1.ra.to(u.deg).value
+    catalog["Dec"] = c1.dec.to(u.deg).value
+#    catalog.drop("RAJ2000")
+#    catalog.drop("DEJ2000")
+    return catalog
+
 def query_skycatalog(
-    coord: None,
-    tpf_or_lc: None,
+    coord: SkyCoord,
     catalog_name: str,
-    arcsec_radius: float = 20.0,
+    radius: float = 20.0,
     magnitude_limit: float = 18.0,
-):
-    """Function that returns an astropy table of sources in the region of interest ---
+    epoch: Time = Time('2000'), 
+    equinox: Time = Time('2000'), 
+) -> Table:
+    """Function that returns an astropy table of sources in the region of interest
 
     Parameters:
     -----------
     coord : astropy.coordinates.SkyCoord
         Coordinates around which to do a radius query
-
     radius : float
         Radius in arcseconds to query
     magnitude_limit : float
         A value to limit the results in based on the Tmag/Kepler mag/K2 mag or Gaia G mag. Default, 18.
     catalog: str
         The catalog to query, either 'kepler', 'k2', or 'tess', 'gaia'
+    epoch: astropy.time.Time
+    equinox: astropy.time.Time
+    
     Output:
     -------
-    Returns an astropy.table of the sources in the TPF"""
+    Returns an astropy.table of the sources within radius query
+    """
 
-    if coord == None:
-        # Get the co-ordinates from the ra and dec of the tpf_or_lc
-        coord = SkyCoord(tpf_or_lc.ra, tpf_or_lc.dec, unit=(u.deg, u.deg), frame="icrs")
-    else:
-        coord == coord
-
-    # Coordinate frame equinox time - TIC, KIC, EPIC, and Gaia all use J2000
-    # Since we are using these co-ordinates i dont think we need to take it from the header
-    equinox = "J2000"
-    # If we do need to get it from the header then use this
-    # equinox = Time(self.EQUINOX, format='jyear', out_subfmt='jyear_str')
-
-    # The epoch should be the time(s) of observation.
-    # We can get this information from the header and then convert it into a year.
-    epoch = Time(np.mean(tpf_or_lc.time.value), scale="tdb", format="btjd")
+    if not isinstance(coord, SkyCoord):
+        raise ValueError("Must pass an `astropy.coordinates.SkyCoord` object.")
 
     if catalog_name.lower() in ["kepler"]:
         catalog_name = _catalog_dict["kepler"]
@@ -147,15 +114,12 @@ def query_skycatalog(
             column_filters={"kepmag": f"<{magnitude_limit}"},
         )
         catalog = filters.query_region(
-            coord, catalog=catalog_name, radius=Angle(arcsec_radius, "arcsec")
-        )
-        catalog = catalog[catalog_name]
-        catalog.rename_column("KIC", "ID")
-        catalog.rename_column("pmDE", "pmDEC")
-        catalog.rename_column("kepmag", "Mag")
+            coord, catalog=catalog_name, radius=Angle(radius, "arcsec")
+        )[catalog_name]
+        catalog.rename_columns(("KIC", 'pmDE', "kepmag"), ("ID", "pmDEC", "Mag"))
 
         # apply_propermotion
-        skycatalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
+        catalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
 
     elif catalog_name.lower() in ["k2", "ktwo"]:
         catalog_name = _catalog_dict["k2"]
@@ -164,13 +128,12 @@ def query_skycatalog(
             column_filters={"Kpmag": f"<{magnitude_limit}"},
         )
         catalog = filters.query_object(
-            coord, catalog=catalog_name, radius=Angle(arcsec_radius, "arcsec")
-        )
-        catalog = catalog[catalog_name]
+            coord, catalog=catalog_name, radius=Angle(radius, "arcsec")
+        )[catalog_name]
         catalog.rename_column("Kpmag", "Mag")
 
         # apply_propermotion
-        skycatalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
+        catalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
 
     elif catalog_name.lower() in ["tess"]:
         catalog_name = _catalog_dict["tess"]
@@ -181,32 +144,31 @@ def query_skycatalog(
         )
 
         catalog = filters.query_region(
-            coord, catalog=str(catalog_name), radius=Angle(arcsec_radius, "arcsec")
-        )
-        catalog = catalog[catalog_name]
+            coord, catalog=str(catalog_name), radius=Angle(radius, "arcsec")
+        )[catalog_name]
+
         catalog.rename_column("TIC", "ID")
         catalog.rename_column("pmDE", "pmDEC")
         catalog.rename_column("Tmag", "Mag")
 
         # apply_propermotion
-        skycatalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
+        catalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
 
     elif catalog_name.lower() in ["gaia", "dr3"]:
-        catalog_name = _catalog_dict["k2"]
+        catalog_name = _catalog_dict["gaia"]
         filters = Vizier(
             columns=["DR3Name", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Gmag"],
             column_filters={"Gmag": f"<{magnitude_limit}"},
         )
         catalog = filters.query_region(
-            coord, catalog=catalog_name, radius=Angle(arcsec_radius, "arcsec")
-        )
-        catalog = catalog[catalog_name]
+            coord, catalog=catalog_name, radius=Angle(radius, "arcsec")
+        )[catalog_name]
         catalog.rename_column("DR3Name", "ID")
         catalog.rename_column("pmDE", "pmDEC")
         catalog.rename_column("Gmag", "Mag")
 
         # apply_propermotion
-        skycatalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
+        catalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
     else:
         try:
             # This assumes  that the name of the catalog they entered is correct,
@@ -223,4 +185,4 @@ def query_skycatalog(
             raise ValueError(
                 "This is not a valid catalog name please refer to https://vizier.cds.unistra.fr/ for a list of catalogs that can be used"
             )
-    return skycatalog
+    return catalog

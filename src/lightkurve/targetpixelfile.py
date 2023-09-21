@@ -2271,11 +2271,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
             time=self.time, flux=flux, flux_err=flux_err, **keys, meta=meta
         )
     
-    def get_skycatalog(self, catalog_name=None):
-        if catalog_name is None:
-            # Check the mission if it's Kepler or K2
-        catalog = update_propermotion(query_skycatalog(KEPLER PARAMS))
-        #apply self.wcs to add column and row positions
+    @property
+    def skycatalog(self):
+        catalog = query_skycatalog(KEPLER PARAMS, catalog='kepler')
+        # apply self.wcs to add column and row positions
+        # update table with column and row
+        # cut down to targets within 1 pixel of edge of TPF
         return catalog
 
     def get_bkg_lightcurve(self, aperture_mask=None):
