@@ -91,53 +91,80 @@ class PRF(ABC):
 		# Probably a wrapper for the above function with a defined completeness/contamination
 		raise NotImplementedError'''
 		
-	def get_simple_aperture(self, prf_model: npt.ArrayLike, min_completeness: float = 0.9) -> npt.ArrayLike: #oversample?
+	def get_simple_aperture(self, prf: npt.ArrayLike, min_completeness: float = 0.9) -> npt.ArrayLike: #oversample?
 		'''
 		Based on completeness requirement, create an aperture.
 		This simple does NOT account for contamination.
 		
-		Parameters
-		----------
-		prf_model: prf model with pixel scale resolution (If we add an 'oversample' feature, this would probably be the supersampled prf?)
-		min_completeness: Minimum fraction of flux contained within the aperture
+		Parameters:
+		-----------
+		prf : npt.ArrayLike 
+			Normalized 2D PRF image at pixel scale resolution (If we add an 'oversample' feature, this would probably be the supersampled prf?)
+		min_completeness : float
+			Minimum fraction of flux contained within the aperture
 		
-		Returns
-		-------
-		mask: 2D boolean array containing the pixels in the resulting aperture
+		Returns:
+		--------
+		aperture : npt.ArrayLike 
+			2D boolean array same size as `prf`, True where source is inside aperture
 		'''
 
-		prf_model = prf_model / np.sum(prf_model) # Is this an acceptable way to normalize?
-	
-		reverse_sort = np.argsort(prf_model.flatten())[::-1]
-		cusu = np.cumsum(prf_model.flatten()[reverse_sort])
-		idx = srt[cusu <= min_completeness]
-	
-		mask = np.zeros(np.shape(prf_model), dtype=bool).flatten()
-		mask[idx] = True
-		mask = mask.reshape(np.shape(prf_model))
-		return mask
+		if np.sum(prf) > 1:
+			raise ValueError("`prf_model` must sum to 1 or less.")
+
+		reverse_sort = np.argsort(prf.flatten())[::-1]
+		cusu = np.cumsum(prf.flatten()[reverse_sort])
+		# indices that are "inside" aperture
+		idx = reverse_sort[cusu <= min_completeness]
+
+		aperture = np.zeros(np.prod(prf.shape), dtype=bool)
+		aperture[idx] = True
+		# reshape to shape of prf
+		aperture = aperture.reshape(np.shape(prf))
+		return aperture
 	
 		
-	def estimate_contamination(self, tpf) -> npt.ArrayLike:
+	def estimate_contamination(self, prfs:npt.ArrayLike, fluxes:npt.ArrayLike, index:int=0) -> float:
+		"""
+		
+		Parameters:
+		-----------
+		prfs : npt.ArrayLike
+			3D cube of the PRFs of all sources with shape (nsources x nrows x ncolumns)
+		fluxes : npt.ArrayLike
+			Array of fluxes for each source with shape (nsources)
+		index : int
+			The index of the source to be considered as the target
+
+		Returns:
+		--------
+		contamination : float
+			Value between 0 and 1 expressing contamination of the aperture
+		"""
+
+		
 	#def estimate_contamination(self, tpf: TargetPixelFile) -> npt.ArrayLike: #cols, rows, fluxes, aperture
 		# Given a tpf, build a prf model and estimate the best aperture
 		# Add in completeness and contamination values (flfrcsap/crowdsap)
 		raise NotImplementedError
 		
-	def estimate_compleness(self, prf: npt.ArrayLike, aperture: npt.ArrayLike) -> float: 
+	def estimate_completeness(self, prf: npt.ArrayLike, aperture: npt.ArrayLike) -> float: 
 		'''
 		Returns the fraction of total flux from the target contained in a given aperture
 		
 		Parameters
 		----------
-		prf: 2D array containing the PRF model for the target of interest
-		aperture: 2D Boolean array of the same size as prf
-		
+		prf : npt.ArrayLike 
+			Normalized 2D PRF image at pixel scale resolution
+		aperture: npt.ArrayLike 
+			2D boolean array same size as `prf`, True where source is inside aperture
 		Returns
 		-------
-		completeness: fraction of total flux contained within the aperture
+		completeness : float
+			fraction of total flux contained within the aperture
 		'''
-		return np.sum(prf[aperture]) / np.sum(prf)
+		raise NotImplementedError
+#		return np.sum(prf[aperture]) / np.sum(prf)
 		
 		
 	'''def create_highres_model(self, oversample: int = 5):
@@ -146,8 +173,8 @@ class PRF(ABC):
 		raise NotImplementedError'''
 		
 	def evaluate(self,
-		center_col = None, # If not specified, make output 10x10 with prf in center?
-		center_row = None, # if not provided, use corner_row + self.shape[1] / 2
+		center_col = None, 
+		center_row = None, 
 		flux: float = 1.0,
 		scale: float = 1.0,
 		rotation_angle: float = 0.0):
@@ -174,7 +201,6 @@ class PRF(ABC):
 			Two dimensional array representing the PRF values parametrized
 			by flux, centroids, widths, and rotation as applicble.
 		"""
-		print(center_col, center_row)
 		if center_col is None:
 			center_col = self.column + self.shape[1] / 2
 		if center_row is None:
@@ -184,8 +210,6 @@ class PRF(ABC):
 		delta_row = self.row_coord - center_row		
 		if (scale == 1.0) and (rotation_angle == 0.0):
 			prf_model = flux * self.interpolate(delta_row, delta_col)		
-			print('no scaling')
-			print(delta_col, delta_row)
 		else:
 			rot_col, rot_row = np.meshgrid(delta_col, delta_row)
 			if rotation_angle != 0:
@@ -196,7 +220,6 @@ class PRF(ABC):
 			prf_model = flux * self.interpolate(
 				rot_row.flatten() * scale, rot_col.flatten() * scale, grid=False
 			).reshape(self.shape)
-			print('yes scaling')
 
 		
 		# NS maybe you could just augment the files so there is a border of 0s around
@@ -223,6 +246,7 @@ class PRF(ABC):
 		
 	@abstractmethod
 	def _prepare_prf(self):
+		"""Method to open PRF files for given mission"""
 		pass
 
 	@abstractmethod
@@ -239,7 +263,7 @@ class KeplerPRF(PRF):
 	"""A KeplerPRF class.
 	
 	There are 5 PRF measurements (the 4 corners and the center) for each channel.
-	The measured PRF is over-sampled by a factor of 50 to allow for sub-pixel interpolation.
+	The measured PRF is over-sampled by a factor of 50 to enable for sub-pixel interpolation.
 	The model is a 550x550 (or 750x750) grid that covers 11x11 (or 15x15) pixels
 	"""
 	# I want the option to either give it a tpf and it reads channel/shape OR provide that info
@@ -257,7 +281,7 @@ class KeplerPRF(PRF):
 	def __repr__(self):
 		return "I'm a Kepler PRF"
 		
-	def __call__(self, column, row, channel, shape, **kwargs): # Add more here
+	def __call__(self, center_col, center_row, **kwargs): # Add more here
 		return self.prf_model(
 			center_col, center_row, **kwargs
 		)
@@ -277,11 +301,10 @@ class KeplerPRF(PRF):
 	 		raise ValueError('call evaluate')'''
 	# Renamed 'evaluate'
 	def prf_model(self, 
-			center_col:  Union[int, list[int], None] = None, 
-			center_row:  Union[int, list[int], None] = None,
-			flux: Union[float, list[float], None] = 1.0,
+			center_col:  Union[float, list[float], npt.ArrayLike, None] = None, 
+			center_row:  Union[float, list[float], npt.ArrayLike, None] = None,
 			scale: float = 1.0,
-			rotation_angle: float = 0.0 ):
+			rotation_angle: float = 0.0 )-> npt.ArrayLike:
 		'''
 		Optional keywords:
 		center_col (default is the center of the image)
@@ -294,18 +317,14 @@ class KeplerPRF(PRF):
 
 		# the super().evaluate returns 1 PRF. 
 		# In this call, we can make it so that it loops through to make a cube if more than one col/row is given. 
-		if isinstance(center_col, list):
+		# You could also pass an array like here, you can give isinstance a tuple of allowed classes
+		if isinstance(center_col, (list, np.ndarray)):
 			if len(center_col) != len(center_row):
-				raise ValueError( "Column/row locations must have the same shape.")
-		
+				raise ValueError( "Column/row locations must have the same shape.")		
 			prf = np.zeros(len(center_col), self.shape[0], self.shape[1]) # check if col/row in right order here
-					
 			for ii in range(len(center_col)):
 				# Flux for each target is not necessarily required
-				if len(flux) == len(center_col):
-					prf[ii,:,:] = super().evaluate(center_col[ii], center_row[ii], flux[ii], scale, rotation_angle)
-				else:
-					prf[ii,:,:] = super().evaluate(center_col[ii], center_row[ii], flux, scale, rotation_angle)
+				prf[ii,:,:] = super().evaluate(center_col=center_col[ii], center_row=center_row[ii], flux=1, scale=scale, rotation_angle=rotation_angle)
 			return prf
 		else:
 			return super().evaluate(center_col, center_row, flux, scale, rotation_angle)
@@ -397,15 +416,14 @@ class KeplerPRF(PRF):
 		
 		return col_coord, row_coord, interpolate, supersamp_prf
 	
-	def from_tpf(self, **kwargs):
+	def from_tpf(self):
 		'''Creates a PRF object using a TPF'''
 		# Add some error checks that it's a Kepler TPF here
-		print(self.shape)
 		test_prf =  KeplerPRF(self.column, self.row, self.channel, self.shape[1:3])
-
-		return test_prf#.evaluate()
+		return test_prf
 		
 	def plot(self, *params): 
+		"""docstring plz"""
 		plot_image(
 			self.supersampled_prf,
 			title=f"Supersampled Kepler PRF Model, Channel: {self.channel}",

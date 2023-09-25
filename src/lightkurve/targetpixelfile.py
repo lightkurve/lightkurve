@@ -2122,7 +2122,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def __repr__(self):
         return "KeplerTargetPixelFile Object (ID: {})".format(self.targetid)
 
-    def get_prf_model(self):
+    @property
+    def prf(self):
         """Returns an object of KeplerPRF initialized using the
         necessary metadata in the tpf object.
 
@@ -2134,6 +2135,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return KeplerPRF(
             channel=self.channel, shape=self.shape[1:], column=self.column, row=self.row
         )
+
+    def get_simple_aperture(self, ra=None, dec=None, completeness=0.9):
+        # self.ra, self.dec, pmra, pmdec in header -> row and column at time
+        # warning if ra and dec is None if somehow tesscut maybe?
+        # prf_model = self.prf.prf_model(row=row, column=column)
+        # aperture = self.prf.get_simple_aperture(prf_model, completeness=completeness)
+
 
     @property
     def obsmode(self):
