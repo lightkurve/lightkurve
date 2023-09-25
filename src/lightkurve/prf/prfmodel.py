@@ -92,9 +92,19 @@ class PRF(ABC):
 		raise NotImplementedError'''
 		
 	def get_simple_aperture(self, prf_model: npt.ArrayLike, min_completeness: float = 0.9) -> npt.ArrayLike: #oversample?
-		# Based on completeness requirement, create an aperture
-		# This doesn't worry about contamination at all
-		# This takes as an input the prf model at the desired pixel scale. 
+		'''
+		Based on completeness requirement, create an aperture.
+		This simple does NOT account for contamination.
+		
+		Parameters
+		----------
+		prf_model: prf model with pixel scale resolution (If we add an 'oversample' feature, this would probably be the supersampled prf?)
+		min_completeness: Minimum fraction of flux contained within the aperture
+		
+		Returns
+		-------
+		mask: 2D boolean array containing the pixels in the resulting aperture
+		'''
 
 		prf_model = prf_model / np.sum(prf_model) # Is this an acceptable way to normalize?
 	
@@ -138,9 +148,9 @@ class PRF(ABC):
 	def evaluate(self,
 		center_col = None, # If not specified, make output 10x10 with prf in center?
 		center_row = None, # if not provided, use corner_row + self.shape[1] / 2
-		flux=1.0,
-		scale=1.0,
-		rotation_angle=0.0):
+		flux: float = 1.0,
+		scale: float = 1.0,
+		rotation_angle: float = 0.0):
 		
 		"""
 		Interpolates the PRF model onto detector coordinates.
@@ -164,15 +174,18 @@ class PRF(ABC):
 			Two dimensional array representing the PRF values parametrized
 			by flux, centroids, widths, and rotation as applicble.
 		"""
+		print(center_col, center_row)
 		if center_col is None:
 			center_col = self.column + self.shape[1] / 2
 		if center_row is None:
 			center_row = self.row + self.shape[0] / 2
 
-		delta_col = self.column - center_col
-		delta_row = self.row - center_row		
+		delta_col = self.col_coord - center_col
+		delta_row = self.row_coord - center_row		
 		if (scale == 1.0) and (rotation_angle == 0.0):
-			self.prf_model = flux * self.interpolate(delta_row, delta_col)		
+			prf_model = flux * self.interpolate(delta_row, delta_col)		
+			print('no scaling')
+			print(delta_col, delta_row)
 		else:
 			rot_col, rot_row = np.meshgrid(delta_col, delta_row)
 			if rotation_angle != 0:
@@ -180,9 +193,10 @@ class PRF(ABC):
 				sina = math.sin(rotation_angle)
 				rot_row = delta_row * cosa - rot_col * sina
 				rot_col = delta_row * sina + rot_col * cosa
-			self._prf_model = flux * self.interpolate(
+			prf_model = flux * self.interpolate(
 				rot_row.flatten() * scale, rot_col.flatten() * scale, grid=False
 			).reshape(self.shape)
+			print('yes scaling')
 
 		
 		# NS maybe you could just augment the files so there is a border of 0s around
@@ -200,15 +214,10 @@ class PRF(ABC):
 		#cutout_prf[testcol] = 0
 		#cutout_prf[testrow] = 0
 		#self.prf = cutout_prf
-
-		return self._prf_model
 		
-	# @property
-	# def prf_model(self):
-	# 	if hasattr(self, '_prf_model'):
-	# 		return self._prf_model
-	# 	else:
-	# 		raise ValueError('call evaluate')
+		return prf_model
+		
+
 			
 		
 		
@@ -234,7 +243,7 @@ class KeplerPRF(PRF):
 	The model is a 550x550 (or 750x750) grid that covers 11x11 (or 15x15) pixels
 	"""
 	# I want the option to either give it a tpf and it reads channel/shape OR provide that info
-	def __init__(self, column, row, channel, shape):
+	def __init__(self, column: int, row: int, channel:int, shape:tuple):
 		super().__init__(column=column, row=row, shape=shape)
 		self.channel = channel
 		
@@ -249,11 +258,30 @@ class KeplerPRF(PRF):
 		return "I'm a Kepler PRF"
 		
 	def __call__(self, column, row, channel, shape, **kwargs): # Add more here
-		return self.evaluate(
+		return self.prf_model(
 			center_col, center_row, **kwargs
 		)
-	
-	def evaluate(self, **kwargs):
+		
+	'''	# maybe evaluate can compute for a single target, and prf_model makes the stack of dimension (ntargets, shape)
+	# @property
+	def prf_model(self, center_col:  Union[int, list[int], None], center_row:  Union[int, list[int], None]):
+		if len(center_col) != len(center_row):
+			raise ValueError( "Column/row locations must have the same shape.")
+		
+		prf_model = np.zeros(len(center_col, self.shape[0], self.shape[1]))
+		for ii in len(center_col):
+			prf_model[ii, :, : ] = self.evaluate()	
+	 	if hasattr(self, '_prf_model'):
+	 		return self._prf_model
+	 	else:
+	 		raise ValueError('call evaluate')'''
+	# Renamed 'evaluate'
+	def prf_model(self, 
+			center_col:  Union[int, list[int], None] = None, 
+			center_row:  Union[int, list[int], None] = None,
+			flux: Union[float, list[float], None] = 1.0,
+			scale: float = 1.0,
+			rotation_angle: float = 0.0 ):
 		'''
 		Optional keywords:
 		center_col (default is the center of the image)
@@ -263,19 +291,25 @@ class KeplerPRF(PRF):
 		rotation_angle (default 0.0, ie no rotation)
 		'''
 		
+
 		# the super().evaluate returns 1 PRF. 
 		# In this call, we can make it so that it loops through to make a cube if more than one col/row is given. 
 		if isinstance(center_col, list):
-			prf = np.zeros(len(center_col), self.shape[0], self.shape[1]) # test col/row in right order
-			#[prf[ii,:,:] = super().evaluate(center_col[ii], center_row[ii], flux[ii], 
-			#	scale=scale, rotation_angle=rotation_angle) for ii in len(center_col)]
-			
-			# Gotta handle this better. What if fluxes aren't given? etc.
+			if len(center_col) != len(center_row):
+				raise ValueError( "Column/row locations must have the same shape.")
+		
+			prf = np.zeros(len(center_col), self.shape[0], self.shape[1]) # check if col/row in right order here
+					
 			for ii in range(len(center_col)):
-				prf[ii,:,:] = super().evaluate(center_col[ii], center_row[ii], flux[ii])
+				# Flux for each target is not necessarily required
+				if len(flux) == len(center_col):
+					prf[ii,:,:] = super().evaluate(center_col[ii], center_row[ii], flux[ii], scale, rotation_angle)
+				else:
+					prf[ii,:,:] = super().evaluate(center_col[ii], center_row[ii], flux, scale, rotation_angle)
 			return prf
 		else:
-			return super().evaluate(**kwargs) # Make kwargs explicit?
+			return super().evaluate(center_col, center_row, flux, scale, rotation_angle)
+			
 		
 	def _read_prf_calibration_file(self, path, ext):
 		prf_cal_file = pyfits.open(path)
@@ -336,7 +370,7 @@ class KeplerPRF(PRF):
 		ref_column = self.column + 0.5 * coldim
 		ref_row = self.row + 0.5 * rowdim
 		
-		#temporary test
+		#temporary check to visualize the individual prfs
 		'''import matplotlib.pyplot as plt
 		fig, ax = plt.subplots(n_hdu)
 		for i in range(n_hdu):
