@@ -2272,11 +2272,25 @@ class KeplerTargetPixelFile(TargetPixelFile):
         )
     
     @property
-    def skycatalog(self):
-        catalog = query_skycatalog(KEPLER PARAMS, catalog='kepler')
+    def get_skycatalog(self):
+        catalog = query_skycatalog(SkyCoord(self.ra, self.dec, unit="deg"), epoch=Time(np.mean(self.time.value), scale='tdb', format='bkjd'), catalog='kepler')
+
         # apply self.wcs to add column and row positions
+        w = self.wcs
+
         # update table with column and row
+        
+        x, y = w.world_to_pixel(SkyCoord(catalog['RAJ2000'], catalog['DEJ2000'], unit="deg"))
+        catalog['x'] = self.column+x
+        catalog['y'] = self.row+y
+
+        x_shape = self.tpf.shape[1]
+        y_shape = self.tpf.shape[2]
+
+        
         # cut down to targets within 1 pixel of edge of TPF
+        
+        
         return catalog
 
     def get_bkg_lightcurve(self, aperture_mask=None):

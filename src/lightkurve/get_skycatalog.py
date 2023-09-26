@@ -38,7 +38,7 @@ _catalog_dict = {
 
 
 # This function should take the information from the skycatalog search and apply the proper motion
-def apply_propermotion(catalog: Table, epoch: Time, equinox: Time = Time('2000')) -> Table:
+def apply_propermotion(catalog: Table, equinox: Time, epoch: Time):
     """
     Function that returns an astropy table of sources with the proper motion applied
 
@@ -46,15 +46,16 @@ def apply_propermotion(catalog: Table, epoch: Time, equinox: Time = Time('2000')
     -----------
     catalog :
         astropy.table.Table which contains the coordinates of targets and proper motion values
+    equinox: astropy.time.Time
+        The R.A and Dec. vaulues taken from the catalogs is in J2000.
+        The J2000. 0 epoch is precisely Julian date 2451545.0 TT.
     epoch : astropy.time.Time
-        Time of the observation - this needs to be an astropy.time.Time object
-    equinox : astropy.time.Time
-        This is the date of the catalog, assumed to be J2000
+        Time of the observation - This is taken from the catalog R.A and Dec. values and re-formatted as an astropy.time.Time object
 
     Output:
     ------
     catalog : astropy.table.Table
-        Returns an astropy table with ID, corrected RA, corrected Dec
+        Returns an astropy table with ID, corrected RA, corrected Dec, and Mag(?Some ppl might find this benifical for contamination reasons?)
     """
 
     # Get the input data from the catalog
@@ -69,43 +70,50 @@ def apply_propermotion(catalog: Table, epoch: Time, equinox: Time = Time('2000')
 
     c1 = c.apply_space_motion(new_obstime=epoch)
 
+    catalog["RAJ2000"] = c1.ra.to(u.deg).value
+    catalog["DEJ2000"] = c1.dec.to(u.deg).value
 
-    catalog["RA"] = c1.ra.to(u.deg).value
-    catalog["Dec"] = c1.dec.to(u.deg).value
-#    catalog.drop("RAJ2000")
-#    catalog.drop("DEJ2000")
     return catalog
+
 
 def query_skycatalog(
     coord: SkyCoord,
+    epoch: Time,
     catalog_name: str,
     radius: float = 20.0,
     magnitude_limit: float = 18.0,
-    epoch: Time = Time('2000'), 
-    equinox: Time = Time('2000'), 
-) -> Table:
+    equinox: Time = Time(2451545.0, format="jd", scale="tt"),
+):
     """Function that returns an astropy table of sources in the region of interest
 
     Parameters:
     -----------
     coord : astropy.coordinates.SkyCoord
         Coordinates around which to do a radius query
+    epoch: astropy.time.Time
+        The time of observation in JD and TT. Note that tess data is in btjd & tdb - so a user would have to specify in the Time object
+        For example you could put in `Time(np.mean(lc.time.value), scale='tdb', format='btjd')`
+    catalog: str
+        The catalog to query, either 'kepler', 'k2', or 'tess', 'gaia'
     radius : float
         Radius in arcseconds to query
     magnitude_limit : float
         A value to limit the results in based on the Tmag/Kepler mag/K2 mag or Gaia G mag. Default, 18.
-    catalog: str
-        The catalog to query, either 'kepler', 'k2', or 'tess', 'gaia'
-    epoch: astropy.time.Time
     equinox: astropy.time.Time
-    
+        The R.A and Dec. vaulues taken from the catalogs is in J2000.
+        The J2000. 0 epoch is precisely Julian date 2451545.0 TT.
+
     Output:
     -------
     Returns an astropy.table of the sources within radius query
     """
 
     if not isinstance(coord, SkyCoord):
-        raise ValueError("Must pass an `astropy.coordinates.SkyCoord` object.")
+        raise ValueError("Must pass an `astropy.coordinates.SkyCoord object.")
+    if not isinstance(epoch, Time):
+        raise ValueError("Must pass an `astropy.time.Time object.")
+    if not isinstance(equinox, Time):
+        raise ValueError("Must pass an `astropy.time.Time object.")
 
     if catalog_name.lower() in ["kepler"]:
         catalog_name = _catalog_dict["kepler"]
@@ -116,7 +124,7 @@ def query_skycatalog(
         catalog = filters.query_region(
             coord, catalog=catalog_name, radius=Angle(radius, "arcsec")
         )[catalog_name]
-        catalog.rename_columns(("KIC", 'pmDE', "kepmag"), ("ID", "pmDEC", "Mag"))
+        catalog.rename_columns(("KIC", "pmDE", "kepmag"), ("ID", "pmDEC", "Mag"))
 
         # apply_propermotion
         catalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
@@ -146,10 +154,7 @@ def query_skycatalog(
         catalog = filters.query_region(
             coord, catalog=str(catalog_name), radius=Angle(radius, "arcsec")
         )[catalog_name]
-
-        catalog.rename_column("TIC", "ID")
-        catalog.rename_column("pmDE", "pmDEC")
-        catalog.rename_column("Tmag", "Mag")
+        catalog.rename_columns(("TIC", "pmDE", "Tmag"), ("ID", "pmDEC", "Mag"))
 
         # apply_propermotion
         catalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
@@ -163,9 +168,7 @@ def query_skycatalog(
         catalog = filters.query_region(
             coord, catalog=catalog_name, radius=Angle(radius, "arcsec")
         )[catalog_name]
-        catalog.rename_column("DR3Name", "ID")
-        catalog.rename_column("pmDE", "pmDEC")
-        catalog.rename_column("Gmag", "Mag")
+        catalog.rename_columns(("DR3Name", "pmDE", "Gmag"), ("ID" "pmDEC", "Mag"))
 
         # apply_propermotion
         catalog = apply_propermotion(catalog, equinox=equinox, epoch=epoch)
