@@ -143,7 +143,7 @@ class PRF(ABC):
 	def estimate_contamination(self, aperture: npt.ArrayLike, prf_model:npt.ArrayLike, fluxes:npt.ArrayLike, idx:int=0) -> float:
 		"""
 		
-		Parameters:
+		Parameters: 
 		-----------
 		aperture: npt.ArrayLike 
 			2D boolean array same size as `prf`, True where source is inside aperture
@@ -384,6 +384,7 @@ class KeplerPRF(PRF):
 			return np.expand_dims(prf_model, axis=0)
 		
 	def _read_prf_calibration_file(self, path, ext):
+		''' Reads the Kepler calibration files'''
 		prf_cal_file = pyfits.open(path)
 		data = prf_cal_file[ext].data
 		crval1p = prf_cal_file[ext].header["CRVAL1P"]
@@ -395,6 +396,10 @@ class KeplerPRF(PRF):
 		return data, crval1p, crval2p, cdelt1p, cdelt2p
 		
 	def _prepare_prf(self):
+		'''
+		Sets up the PRF model interpolation by reading in the relevant Kepler files,
+		and combining them by weighting them by distance to the location on the CCD of interest
+		'''
 		n_hdu = 5 # measurements at the 4 corners + center
 		min_prf_weight = 1e-6
 		module, output = channel_to_module_output(self.channel)
