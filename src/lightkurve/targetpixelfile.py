@@ -2141,6 +2141,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # warning if ra and dec is None if somehow tesscut maybe?
         # prf_model = self.prf.prf_model(row=row, column=column)
         # aperture = self.prf.get_simple_aperture(prf_model, completeness=completeness)
+        NotImplementedError
 
 
     @property

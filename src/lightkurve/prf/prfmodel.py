@@ -49,12 +49,11 @@ from ..utils import channel_to_module_output, plot_image
 from astropy.io import fits as pyfits
 import math
 import matplotlib.pyplot as plt
-#from ..targetpixelfile import TargetPixelFile
+from matplotlib import patches
+#from ..targetpixelfile import _parse_aperture_mask
 
-#from ..targetpixelfile import TargetPixelFile
 
 
-# Just sketching out a few models right now
 class PRF(ABC):
 
 	@abstractmethod
@@ -91,62 +90,88 @@ class PRF(ABC):
 		# Probably a wrapper for the above function with a defined completeness/contamination
 		raise NotImplementedError'''
 		
-	def get_simple_aperture(self, prf: npt.ArrayLike, min_completeness: float = 0.9) -> npt.ArrayLike: #oversample?
+	def get_simple_aperture(self, prf_model: npt.ArrayLike, idx: int = 0, min_completeness: float = 0.9, plot: bool=False) -> npt.ArrayLike: 
 		'''
 		Based on completeness requirement, create an aperture.
-		This simple does NOT account for contamination.
+		This simple aperture does NOT account for contamination by other sources.
 		
 		Parameters:
 		-----------
-		prf : npt.ArrayLike 
-			Normalized 2D PRF image at pixel scale resolution (If we add an 'oversample' feature, this would probably be the supersampled prf?)
+		prf_model : npt.ArrayLike
+			3D cube of the PRFs of all sources with shape (nsources x nrows x ncolumns)
+			Only the target source is used for this function. 
+		idx : int
+			The index of the source to be considered as the target (default 0)
 		min_completeness : float
 			Minimum fraction of flux contained within the aperture
+		plot : bool
+			plots the simple aperture over the model PRF
 		
 		Returns:
 		--------
 		aperture : npt.ArrayLike 
-			2D boolean array same size as `prf`, True where source is inside aperture
+			2D boolean array of the same (nrows x ncolumns) as `prf_model`.
+			True where source is inside aperture
 		'''
+		prf = prf_model[idx, :, :]
 
 		if np.sum(prf) > 1:
 			raise ValueError("`prf_model` must sum to 1 or less.")
+		
+		# If completeness = 1, return any pixel that contains any amount of flux
+		if min_completeness == 1.0:
+			aperture = np.zeros(prf.shape, dtype=bool)
+			aperture[prf != 0.0] = True
+		else:
+			reverse_sort = np.argsort(prf.flatten())[::-1]
+			cusu = np.cumsum(prf.flatten()[reverse_sort])
+			# indices that are "inside" aperture
+			idx = reverse_sort[cusu < min_completeness]
 
-		reverse_sort = np.argsort(prf.flatten())[::-1]
-		cusu = np.cumsum(prf.flatten()[reverse_sort])
-		# indices that are "inside" aperture
-		idx = reverse_sort[cusu <= min_completeness]
+			aperture = np.zeros(prf.shape, dtype=bool).flatten()
 
-		aperture = np.zeros(np.prod(prf.shape), dtype=bool)
-		aperture[idx] = True
-		# reshape to shape of prf
-		aperture = aperture.reshape(np.shape(prf))
+			aperture[idx] = True
+			# reshape to shape of prf
+			aperture = aperture.reshape(np.shape(prf))
+		
+		if plot:
+			self._plot_aperture(prf, aperture)
+			
 		return aperture
 	
 		
-	def estimate_contamination(self, prfs:npt.ArrayLike, fluxes:npt.ArrayLike, index:int=0) -> float:
+	def estimate_contamination(self, aperture: npt.ArrayLike, prf_model:npt.ArrayLike, fluxes:npt.ArrayLike, idx:int=0) -> float:
 		"""
 		
 		Parameters:
 		-----------
-		prfs : npt.ArrayLike
+		aperture: npt.ArrayLike 
+			2D boolean array same size as `prf`, True where source is inside aperture
+		prf_model : npt.ArrayLike
 			3D cube of the PRFs of all sources with shape (nsources x nrows x ncolumns)
 		fluxes : npt.ArrayLike
 			Array of fluxes for each source with shape (nsources)
-		index : int
-			The index of the source to be considered as the target
+		idx : int
+			The index of the source to be considered as the target (default 0)
 
 		Returns:
 		--------
 		contamination : float
-			Value between 0 and 1 expressing contamination of the aperture
+			Fraction of total flux in the aperture that comes from the target source.
+			Will be a value between 0 and 1 (1 being all flux comes from the target source)
 		"""
-
 		
-	#def estimate_contamination(self, tpf: TargetPixelFile) -> npt.ArrayLike: #cols, rows, fluxes, aperture
-		# Given a tpf, build a prf model and estimate the best aperture
-		# Add in completeness and contamination values (flfrcsap/crowdsap)
-		raise NotImplementedError
+		if prf_model.shape[0] == 1:
+			print('There are no other sources in your TPF.')
+		
+		prfs = np.array( [prf_model[ii, :, :] * fluxes[ii] for ii in range(len(fluxes))])
+		
+		target_flux = np.sum(prfs[idx, aperture])
+		all_flux = np.sum(prfs[:, aperture] )
+		
+
+		return target_flux/all_flux
+		
 		
 	def estimate_completeness(self, prf: npt.ArrayLike, aperture: npt.ArrayLike) -> float: 
 		'''
@@ -238,7 +263,35 @@ class PRF(ABC):
 		#cutout_prf[testrow] = 0
 		#self.prf = cutout_prf
 		
+		prf_model[prf_model < 1e-16] = 0.0 #Discuss this cutoff
 		return prf_model
+	
+	def _plot_aperture(self, prf: npt.ArrayLike, aperture: npt.ArrayLike, idx: int = 0, hatch_color: str = 'red'):
+		fig, ax = plt.subplots(1)
+		ax.set_title("Model PRF Aperture")
+		ax.imshow(prf, 
+			origin='lower',
+			extent=(
+				self.column,
+				self.column + self.shape[1],
+				self.row,
+				self.row + self.shape[0],
+			)
+		)
+		for i in range(self.shape[0]):
+			for j in range(self.shape[1]):
+				if aperture[i, j]:
+					xy = (j + self.column, i + self.row)
+					rect = patches.Rectangle(
+				    	xy=xy, 
+				    	width=1, 
+				    	height=1, 
+				    	color=hatch_color, 
+				    	fill=False,
+				    	hatch="//")
+					ax.add_patch(rect)
+		plt.show()
+		
 		
 
 			
@@ -286,49 +339,49 @@ class KeplerPRF(PRF):
 			center_col, center_row, **kwargs
 		)
 		
-	'''	# maybe evaluate can compute for a single target, and prf_model makes the stack of dimension (ntargets, shape)
-	# @property
-	def prf_model(self, center_col:  Union[int, list[int], None], center_row:  Union[int, list[int], None]):
-		if len(center_col) != len(center_row):
-			raise ValueError( "Column/row locations must have the same shape.")
-		
-		prf_model = np.zeros(len(center_col, self.shape[0], self.shape[1]))
-		for ii in len(center_col):
-			prf_model[ii, :, : ] = self.evaluate()	
-	 	if hasattr(self, '_prf_model'):
-	 		return self._prf_model
-	 	else:
-	 		raise ValueError('call evaluate')'''
-	# Renamed 'evaluate'
+
 	def prf_model(self, 
 			center_col:  Union[float, list[float], npt.ArrayLike, None] = None, 
 			center_row:  Union[float, list[float], npt.ArrayLike, None] = None,
 			scale: float = 1.0,
 			rotation_angle: float = 0.0 )-> npt.ArrayLike:
 		'''
-		Optional keywords:
-		center_col (default is the center of the image)
-		center_row (default is the center of the image)
-		flux (default 1.0),
-		scale (default 1.0, ie no scaling),
-		rotation_angle (default 0.0, ie no rotation)
+		Creates a cube of PRF models 
+		
+		Optional Parameters
+		-------------------
+		center_col : float or list of floats
+			column location of the target on the CCD. If not provided, finds the center of the field of view
+		center_row : float or list of floats
+			row location of the target on the CCD. If not provided, finds the center of the field of view
+		scale : float
+			Pixel scale stretch parameter, i.e. the numbers by which the PRF
+            model needs to be multiplied in the column and row directions to
+            account for focus changes. Default is 1 (no scaling)
+		rotation_angle : float
+			Rotation angle in radians. default 0.0, ie no rotation
+			
+		Returns
+		-------
+		PRF model : npt.ArrayLike
+			3D cube of PRF models of shape (ntargets, nrows, ncolumns) at instrument pixel resolution
+		
 		'''
 		
+		# PRF.evaluate returns 1 PRF. 
+		# Here, evaluate is called for each target provided (e.g., for each source within a tpf) 
 
-		# the super().evaluate returns 1 PRF. 
-		# In this call, we can make it so that it loops through to make a cube if more than one col/row is given. 
-		# You could also pass an array like here, you can give isinstance a tuple of allowed classes
 		if isinstance(center_col, (list, np.ndarray)):
 			if len(center_col) != len(center_row):
 				raise ValueError( "Column/row locations must have the same shape.")		
-			prf = np.zeros(len(center_col), self.shape[0], self.shape[1]) # check if col/row in right order here
+			prf_model = np.zeros((len(center_col), self.shape[0], self.shape[1])) # check if col/row in right order here
 			for ii in range(len(center_col)):
 				# Flux for each target is not necessarily required
-				prf[ii,:,:] = super().evaluate(center_col=center_col[ii], center_row=center_row[ii], flux=1, scale=scale, rotation_angle=rotation_angle)
-			return prf
+				prf_model[ii,:,:] = super().evaluate(center_col=center_col[ii], center_row=center_row[ii],  scale=scale, rotation_angle=rotation_angle)
+			return prf_model
 		else:
-			return super().evaluate(center_col, center_row, flux, scale, rotation_angle)
-			
+			prf_model = super().evaluate(center_col, center_row, scale=scale, rotation_angle=rotation_angle)
+			return np.expand_dims(prf_model, axis=0)
 		
 	def _read_prf_calibration_file(self, path, ext):
 		prf_cal_file = pyfits.open(path)
@@ -347,7 +400,6 @@ class KeplerPRF(PRF):
 		module, output = channel_to_module_output(self.channel)
 		# determine suitable PRF calibration file
 		module = str(module).zfill(2)
-		#prfs_url_path = "http://archive.stsci.edu/missions/kepler/fpc/prf/kplr"
 		prfs_url_path = "../prf/data/kepler/kplr"
 		
 		prffile = (
@@ -389,12 +441,6 @@ class KeplerPRF(PRF):
 		ref_column = self.column + 0.5 * coldim
 		ref_row = self.row + 0.5 * rowdim
 		
-		#temporary check to visualize the individual prfs
-		'''import matplotlib.pyplot as plt
-		fig, ax = plt.subplots(n_hdu)
-		for i in range(n_hdu):
-			ax[i].imshow(np.log(prfn[i]), origin='lower')
-		plt.show()'''
 			
 
 		for i in range(n_hdu):
@@ -417,14 +463,25 @@ class KeplerPRF(PRF):
 		return col_coord, row_coord, interpolate, supersamp_prf
 	
 	def from_tpf(self):
-		'''Creates a PRF object using a TPF'''
+		'''Creates a PRF object to reflect the properties of a given TPF'''
 		# Add some error checks that it's a Kepler TPF here
-		test_prf =  KeplerPRF(self.column, self.row, self.channel, self.shape[1:3])
-		return test_prf
+		prf_object =  KeplerPRF(self.column, self.row, self.channel, self.shape[1:3])
+		return prf_object
 		
 	def plot(self, *params): 
-		"""docstring plz"""
-		plot_image(
+		""" Plots the supersampled PRF model, evaluated for the given location on the CCD
+
+		Parameters
+		----------
+		Can use optional formatting parameters used by lk.utils.plot_image
+
+		Returns
+		-------
+		ax : `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+		"""
+		
+		ax = plot_image(
 			self.supersampled_prf,
 			title=f"Supersampled Kepler PRF Model, Channel: {self.channel}",
 			extent=(
@@ -434,9 +491,11 @@ class KeplerPRF(PRF):
 				self.row + self.shape[0],
 			),
 			clabel='relative flux',
-			*params
+			
 		)	
-		plt.show()
+		return ax
+
+	
 
 		
 #############################################################		
