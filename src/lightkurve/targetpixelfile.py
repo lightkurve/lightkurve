@@ -2281,14 +2281,19 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # update table with column and row
         
         x, y = w.world_to_pixel(SkyCoord(catalog['RAJ2000'], catalog['DEJ2000'], unit="deg"))
-        catalog['x'] = self.column+x
-        catalog['y'] = self.row+y
+        catalog['x'] = self.column + x
+        catalog['y'] = self.row + y
 
-        x_shape = self.tpf.shape[1]
-        y_shape = self.tpf.shape[2]
+        # cut down to targets within 1 pixel of edge of TPF (otherwide - 1 here)
+        x_lim = self.column + self.tpf.shape[1]
+        y_lim = self.row + self.tpf.shape[2]
+
+        #Want to filter
+        if catalog['x']-xlim > 0 and catalog['y']-ylim > 0:
+            
+        
 
         
-        # cut down to targets within 1 pixel of edge of TPF
         
         
         return catalog
