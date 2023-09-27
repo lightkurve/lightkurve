@@ -115,7 +115,7 @@ class PRF(ABC):
 		'''
 		prf = prf_model[idx, :, :]
 
-		if np.sum(prf) > 1:
+		if np.sum(prf) > 1.01: # The PRF occasionally sums to slightly more
 			raise ValueError("`prf_model` must sum to 1 or less.")
 		
 		# If completeness = 1, return any pixel that contains any amount of flux
@@ -144,6 +144,8 @@ class PRF(ABC):
 	# tprf = tp.prf_model...
 	# aperture = tp.get_simple_aperture...
 	# tp.estimate_conamination(tprf, aperture...
+	
+	# Should this be a hidden function?
 	def estimate_contamination(self, prf_model:npt.ArrayLike, aperture: npt.ArrayLike, fluxes:npt.ArrayLike, idx:int=0) -> float:
 		"""
 		
@@ -176,7 +178,7 @@ class PRF(ABC):
 
 		return target_flux/all_flux
 		
-		
+	# Should this be a hidden function?		
 	def estimate_completeness(self, prf_model: npt.ArrayLike, aperture: npt.ArrayLike, idx: int = 0) -> float: 
 		'''
 		Returns the fraction of total flux from the target contained in a given aperture
