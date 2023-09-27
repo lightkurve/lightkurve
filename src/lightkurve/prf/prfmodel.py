@@ -555,25 +555,21 @@ class TessPRF(PRF):
 		'''
 		min_prf_weight = 1e-6 
 
-		# TESS has a separate file for each point in a grid of pixel locations.
-		# Find the closest 4 to your pixel location and go from there.
-		rows = np.array([1,1,1,1,1,513,513,513,513,513,1025,1025,1025,1025,
-			1025,1536,1536,1536,1536,1536,2048,2048,2048,2048,2048])
-		cols = np.array([45,557,1069,1580,2092,45,557,1069,1580,2092,45,557,
-			1069,1580,2092,45,557,1069,1580,2092,45,557,1069,1580,2092])
 
-		# I think this simplifies things a little bit
-		pythagorus = np.sqrt((rows-self.row)**2. + (cols-self.column)**2.)
-		# Provide the index for the row/column combination that make up a box around the target location
-		four_corners = np.argpartition(pythagorus,4)[:4] 
-		
-		
-		# Not all ccd/cams have the same date, so need to do a bit of finagling
 		# NOTE: now treating all sectors the same (always use the > sector 4 fils)
 		# This file has the prf images saved in extensions 1-25 (not 0-24)
 		prffile = f"../prf/data/tess/tess_prf_cam{self.camera}_ccd{self.ccd}.fits"
 		prffile = get_pkg_data_filename(prffile)
 		prf_cal_file = pyfits.open(prffile)
+		
+		# TESS has a separate file for each point in a grid of pixel locations.
+		# Find the closest 4 to your pixel location and go from there.
+		rows = np.array([prf_cal_file[i].header['CRVAL2P'] for i in range(1, 26)])
+		cols = np.array([prf_cal_file[i].header['CRVAL1P'] for i in range(1, 26)])
+		
+		distance = np.sqrt((rows-self.row)**2. + (cols-self.column)**2.)
+		# Provide the index for the row/column combination that make up a box around the target location
+		nearest_four = np.argpartition(distance,4)[:4] 
 
 		n_hdu = 4
 		prfn = [0] * n_hdu
@@ -589,7 +585,7 @@ class TessPRF(PRF):
 				crval2p[i],
 				cdelt1p[i],
 				cdelt2p[i],
-			) = self._read_prf_calibration_file(prf_cal_file[four_corners[i]+1])
+			) = self._read_prf_calibration_file(prf_cal_file[nearest_four[i]+1])
 		prf_cal_file.close()
 		
 		
