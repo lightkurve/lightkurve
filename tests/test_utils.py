@@ -13,8 +13,7 @@ from lightkurve.utils import centroid_quadratic
 from lightkurve.utils import show_citation_instructions
 from lightkurve.lightcurve import LightCurve
 
-from lightkurve.get_skycatalog import get_skycatalog
-
+from lightkurve.utils import query_skycatalog
 
 def test_channel_to_module_output():
     assert channel_to_module_output(1) == (2, 1)
@@ -192,18 +191,83 @@ def test_show_citation_instructions():
 
 @pytest.mark.remote_data
 def test_query_skycatalog():
-    # Test a sky coord where you know how many sources should be returned, use a small radius 
-    # Check that the type returned is correct
-    # Check you can't pass the wrong input
-    # Test each catalog
-    # Test that the proper motion works
+    # Tests the region around TIC 228760807 which should return a catalog containing 4 objects. 
+    catalog = lk.query_skycatalog(SkyCoord(194.10141041659, -27.3905828803397, unit="deg"),
+                                  Time(1569.4424277786259, scale='tdb', format='btjd'),
+                                  'TESS',80,18)
+    assert len(catalog['ID']) == 4
+    
+    # Checks that an astropy Table is returned
+    assert isinstance(catalog, Table)
+
+     # Test that the proper motion works
+    correct_ra = 194.10768406619445
+    correct_dec = -27.41051178249595
+
+    assert catalog['RAJ2000'][0]==correct_ra
+    assert catalog['DEJ2000'][0]==correct_dec
+
     # Test different epochs
+    catalog_new = lk.query_skycatalog(SkyCoord(194.10141041659, -27.3905828803397, unit="deg")
+                                      Time(2461041.500, scale='tt', format='jd'),
+                                      'TESS',80,18)
+
+    correct_ra_new = 194.10764826027054
+    correct_dec_new = -27.41050446197694
+
+    assert catalog_new['RAJ2000'][0]==correct_ra_new
+    assert catalog_new['DEJ2000'][0]==correct_dec_new
+    
+    # Checks to test the catalog type i.e., simbad is not included in our catalog list.
+    lk.query_skycatalog(coord, epoch,'simbad',80,18)
+    with pytest.raises(ValueError, match="Can not parse catalog name 'simbad'")
+    
+    # Test each catalog
+    #Gaia
+    catalog_gaia = lk.query_skycatalog(SkyCoord(194.10141041659, -27.3905828803397, unit="deg"),
+                    Time(1569.4424277786259, scale='tdb', format='btjd'),
+                    'Gaia',80,18)
+
+    assert len(catalog_gaia['ID']) == 2
+
+    #Kepler
+    catalog_kepler = lk.query_skycatalog(SkyCoord(285.679391, 50.2413, unit="deg"),
+                                         Time(120.5391465105713, scale="tdb", format="bkjd"),
+                                         'kepler',20,18)
+
+    
+    assert len(catalog_kepler['ID']) == 5
+
+    #K2
+    catalog_k2 = lk.query_skycatalog(SkyCoord(172.560465, 7.588391, unit="deg"),
+                                         Time(1975.1781333280233, scale="tdb", format="bkjd"),
+                                         'k2',20,18)
+
+    assert len(catalog_k2['ID']) == 1
+    
     
 
 @pytest.mark.remote_data
 def test_query_skycatalog_tpf():
+
     # Test that you get an answer for each TPF type
+    TESS_tpf = lk.search_targetpixelfile("TIC 228760807")[0].download()
+    catalog_tess = TESS_tpf.skycatalog
+    assert isinstance(catalog_tess, Table)
+
+    Kepler_tpf = lk.search_targetpixelfile("Kepler-10")[0].download()
+    catalog_kepler = Kepler_tpf.skycatalog
+    assert isinstance(catalog_kepler, Table)
+
+    K2_tpf = lk.search_targetpixelfile("K2-18")[0].download()
+    catalog_k2 = K2_tpf.skycatalog
+    assert isinstance(catalog_k2, Table)
+    
+    
     # Check that the proper motions are applied
+
+
+
     # Check that it has pixel positions
     
 
