@@ -2050,36 +2050,7 @@ class TargetPixelFile(object):
                 fig.set_size_inches((y * 1.5, x * 1.5))
 
         return ax
-
-        @property
-    def skycatalog(self):
-
-        """Function that returns an astropy table of sources with the proper motion correction applied
-
-        Returns:
-        ------
-        catalog : astropy.table.Table
-        Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
-        """
-        catalog = query_skycatalog(SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog=self.mission.lower())
-        
-        column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RAJ2000'], catalog['DEJ2000'], unit="deg"))
-        catalog['column'] = self.column + column
-        catalog['row'] = self.row + row
-
-        # Cut down to targets within 1 pixel of edge of TPF (otherwide - 1 here)
-        x_min = self.column
-        y_min = self.row
-        x_max = self.column + self.tpf.shape[1]
-        y_max = self.row + self.tpf.shape[2]
-
-        #Want to filter based on the size of the TPF
-        catalog[(catalog['column'] >=x_min) & (catalog['column'] <=x_max)]
-        catalog[(catalog['row'] >=y_min) & (catalog['row'] <=y_max)]
     
-        return catalog
-
-
 class KeplerTargetPixelFile(TargetPixelFile):
     """Class to read and interact with the pixel data products
     ("Target Pixel Files") created by NASA's Kepler pipeline.
@@ -2272,24 +2243,22 @@ class KeplerTargetPixelFile(TargetPixelFile):
         catalog : astropy.table.Table
         Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
         """
-        catalog = query_skycatalog(SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog=self.mission.lower())
-        
+        catalog = query_skycatalog(coord=SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog_name=self.mission.lower())
+
         column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RAJ2000'], catalog['DEJ2000'], unit="deg"))
+
         catalog['column'] = self.column + column
         catalog['row'] = self.row + row
 
-        # Cut down to targets within 1 pixel of edge of TPF (otherwide - 1 here)
-        x_min = self.column
-        y_min = self.row
-        x_max = self.column + self.tpf.shape[1]
-        y_max = self.row + self.tpf.shape[2]
+        # Cut down to targets within 1 pixel of edge of TPF (otherwise - 1 here)
+        col_min = self.column
+        row_min = self.row
+        col_max = self.column + self.shape[1]
+        row_max = self.row + self.shape[2]
 
         #Want to filter - there is probably a cleaner way to do this
-        catalog[catalog['column'] >=x_min]
-        catalog[catalog['column'] <=x_max]
-        catalog[catalog['row'] >=y_min]
-        catalog[catalog['row'] <=y_max]
-    
+        catalog[(catalog['column'] >=col_min) & (catalog['column'] <=col_max) & (catalog['row'] >=row_min) & (catalog['row'] <=row_max)]
+        
         return catalog
             
 
@@ -2950,9 +2919,33 @@ class TessTargetPixelFile(TargetPixelFile):
         return TessLightCurve(
             time=self.time, flux=flux, flux_err=flux_err, **keys, meta=meta
         )
+    
+    @property
+    def skycatalog(self):
 
-    def get_skycatalog(self, catalog_name='TIC'):
-        return update_propermotion(query_skycatalog(TESS PARAMS))
+        """Function that returns an astropy table of sources with the proper motion correction applied
+
+        Returns:
+        ------
+        catalog : astropy.table.Table
+        Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
+        """
+        catalog = query_skycatalog(coord=SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog_name=self.mission.lower())
+        
+        column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RAJ2000'], catalog['DEJ2000'], unit="deg"))
+        catalog['column'] = self.column + column
+        catalog['row'] = self.row + row
+
+        # Cut down to targets within 1 pixel of edge of TPF (otherwise - 1 here)
+        col_min = self.column
+        row_min = self.row
+        col_max = self.column + self.shape[1]
+        row_max = self.row + self.shape[2]
+
+        #Want to filter - there is probably a cleaner way to do this
+        catalog[(catalog['column'] >=col_min) & (catalog['column'] <=col_max) & (catalog['row'] >=row_min) & (catalog['row'] <=row_max)]
+
+        return catalog 
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)

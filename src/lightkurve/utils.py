@@ -1006,7 +1006,7 @@ def query_skycatalog(
         raise ValueError(f"Can not parse catalog name '{catalog_name}'")
 
     # Get the Vizier catalog name
-    catalog = _Catalog_Dictionary[catalog_name.lower()]["catalog"]
+    catalog_file = _Catalog_Dictionary[catalog_name.lower()]["catalog"]
 
     # Get the appropriate column names and filters to be applied
     filters = Vizier(
@@ -1021,8 +1021,8 @@ def query_skycatalog(
     # The catalog can cut off at 50 - we dont want this to happen
     filters.ROW_LIMIT = -1
     # Now query the catalog
-    catalog = filters.query_region(coord, catalog=catalog, radius=Angle(radius))[
-        catalog
+    catalog = filters.query_region(coord, catalog=catalog_file, radius=Angle(radius))[
+        catalog_file
     ]
 
     # If epic is being requested only one column needs to be renamed
