@@ -25,7 +25,7 @@ from astropy.time import Time
 from astropy.coordinates import SkyCoord, Angle
 from astroquery.vizier import Vizier
 from astropy.table import Table
-import typing as T
+from typing import Union
 
 log = logging.getLogger(__name__)
 
@@ -876,37 +876,37 @@ def finalize_notebook_url(notebook_url):
     else:
         return "localhost:8888"
 
-def _apply_propermotion(catalog: Table, equinox: Time, epoch: Time):
+def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
     """
     Hidden function that returns an astropy table of sources with the proper motion correction applied
 
     Parameters:
     -----------
-    catalog :
+    table :
         astropy.table.Table which contains the coordinates of targets and proper motion values
     equinox: astropy.time.Time
         The R.A and Dec. values taken from the catalogs is in J2000.
         The J2000. 0 epoch is precisely the Julian year 2000 in terrestrial time (tt).
     epoch : astropy.time.Time
-        Time of the observation - This is taken from the catalog R.A and Dec. values and re-formatted as an astropy.time.Time object
+        Time of the observation - This is taken from the table R.A and Dec. values and re-formatted as an astropy.time.Time object
 
     Returns:
     ------
-    catalog : astropy.table.Table
+    table : astropy.table.Table
         Returns an astropy table with ID, corrected RA, corrected Dec, and Mag(?Some ppl might find this benifical for contamination reasons?)
     """
 
     # We need to remove any nan values from our proper  motion list
     # Doing this will allow objects which do not have proper motion to still be displayed
-    catalog["pmRA"] = np.nan_to_num(catalog["pmRA"], 0.0)
-    catalog["pmDEC"] = np.nan_to_num(catalog["pmDEC"], 0.0)
+    table["pmRA"] = np.nan_to_num(table["pmRA"], 0.0)
+    table["pmDEC"] = np.nan_to_num(table["pmDEC"], 0.0)
 
-    # Get the input data from the catalog
+    # Get the input data from the table
     c = SkyCoord(
-        ra=catalog["RAJ2000"],
-        dec=catalog["DEJ2000"],
-        pm_ra_cosdec=catalog["pmRA"],
-        pm_dec=catalog["pmDEC"],
+        ra=table["RAJ2000"],
+        dec=table["DEJ2000"],
+        pm_ra_cosdec=table["pmRA"],
+        pm_dec=table["pmDEC"],
         frame="icrs",
         obstime=equinox,
     )
@@ -915,17 +915,16 @@ def _apply_propermotion(catalog: Table, equinox: Time, epoch: Time):
     c1 = c.apply_space_motion(new_obstime=epoch)
 
     # Adjust the output table
-    catalog["RAJ2000"] = c1.ra.to(u.deg).value
-    catalog["DEJ2000"] = c1.dec.to(u.deg).value
-
-    return catalog
+    table["RA_CORRECTED"] = c1.ra.to(u.deg).value
+    table["DEC_CORRECTED"] = c1.dec.to(u.deg).value
+    return table
 
 
 def query_skycatalog(
     coord: SkyCoord,
     epoch: Time,
-    catalog_name: str,
-    radius: T.Union[float, u.Quantity] = u.Quantity(20, "arcsecond"),
+    catalog: str,
+    radius: Union[float, u.Quantity] = u.Quantity(20, "arcsecond"),
     magnitude_limit: float = 18.0,
     equinox: Time = Time(2000, format="jyear", scale="tt"),
 ):
@@ -956,28 +955,28 @@ def query_skycatalog(
     #This is a lits of VizieR catalogs and their input parameters to be used in the
     #query_skycatalog function
     _Catalog_Dictionary = {
-        "kepler": {
+        "KIC": {
             "catalog": "V/133/kic",
             "columns": ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"],
             "column_filters": "kepmag",
             "rename_in": ("KIC", "pmDE", "kepmag"),
             "rename_out": ("ID", "pmDEC", "Mag"),
         },
-        "k2": {
+        "EPIC": {
             "catalog": "IV/34/epic",
             "columns": ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Kpmag"],
             "column_filters": "Kpmag",
-            "rename_in": "Kpmag",
-            "rename_out": "Mag",
+            "rename_in": ("Kpmag"),
+            "rename_out": ("Mag"),
         },
-        "tess": {
+        "TIC": {
             "catalog": "IV/39/tic82",
             "columns": ["TIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Tmag"],
             "column_filters": "Tmag",
             "rename_in": ("TIC", "pmDE", "Tmag"),
             "rename_out": ("ID", "pmDEC", "Mag"),
         },
-        "gaia": {
+        "GaiaDR3": {
             "catalog": "I/355/gaiadr3",
             "columns": ["DR3Name", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Gmag"],
             "column_filters": "Gmag",
@@ -1002,17 +1001,17 @@ def query_skycatalog(
         raise
 
     # Check to make sure that the catalog provided by the user is valid for this function
-    if catalog_name.lower() not in list(_Catalog_Dictionary.keys()):
-        raise ValueError(f"Can not parse catalog name '{catalog_name}'")
+    if catalog.lower() not in _Catalog_Dictionary.keys():
+        raise ValueError(f"Can not parse catalog name '{catalog}'")
 
     # Get the Vizier catalog name
-    catalog_file = _Catalog_Dictionary[catalog_name.lower()]["catalog"]
+    catalog_name = _Catalog_Dictionary[catalog.lower()]["catalog"]
 
     # Get the appropriate column names and filters to be applied
     filters = Vizier(
-        columns=_Catalog_Dictionary[catalog_name.lower()]["columns"],
+        columns=_Catalog_Dictionary[catalog.lower()]["columns"],
         column_filters={
-            _Catalog_Dictionary[catalog_name.lower()][
+            _Catalog_Dictionary[catalog.lower()][
                 "column_filters"
             ]: f"<{magnitude_limit}"
         },
@@ -1021,23 +1020,18 @@ def query_skycatalog(
     # The catalog can cut off at 50 - we dont want this to happen
     filters.ROW_LIMIT = -1
     # Now query the catalog
-    catalog = filters.query_region(coord, catalog=catalog_file, radius=Angle(radius))[
-        catalog_file
+    result = filters.query_region(coord, catalog=catalog_name, radius=Angle(radius))[
+        catalog_name
     ]
 
     # If epic is being requested only one column needs to be renamed
-    if catalog_name == "k2":
-        catalog.rename_column(
-            _Catalog_Dictionary[catalog_name.lower()]["rename_in"],
-            _Catalog_Dictionary[catalog_name.lower()]["rename_out"],
-        )
-    else:
-        catalog.rename_columns(
-            _Catalog_Dictionary[catalog_name.lower()]["rename_in"],
-            _Catalog_Dictionary[catalog_name.lower()]["rename_out"],
-        )
+    result.rename_columns(
+        _Catalog_Dictionary[catalog.lower()]["rename_in"],
+        _Catalog_Dictionary[catalog.lower()]["rename_out"],
+    )
 
     # apply_propermotion
-    catalog = _apply_propermotion(catalog, equinox=equinox, epoch=epoch)
-
-    return catalog
+    result = _apply_propermotion(result, equinox=equinox, epoch=epoch)
+    # drop J2000
+    # rename RA_CORRECTED to RA
+    return result

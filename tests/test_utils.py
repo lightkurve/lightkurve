@@ -192,9 +192,8 @@ def test_show_citation_instructions():
 @pytest.mark.remote_data
 def test_query_skycatalog():
     # Tests the region around TIC 228760807 which should return a catalog containing 4 objects. 
-    catalog = lk.query_skycatalog(SkyCoord(194.10141041659, -27.3905828803397, unit="deg"),
-                                  Time(1569.4424277786259, scale='tdb', format='btjd'),
-                                  'TESS',80,18)
+    c = SkyCoord(194.10141041659, -27.3905828803397, unit="deg")
+    catalog = query_skycatalog(c, Time(1569.4424277786259, scale='tdb', format='btjd'), 'TESS', 80, 18)
     assert len(catalog['ID']) == 4
     
     # Checks that an astropy Table is returned
@@ -204,34 +203,38 @@ def test_query_skycatalog():
     correct_ra = 194.10768406619445
     correct_dec = -27.41051178249595
 
-    assert catalog['RAJ2000'][0]==correct_ra
-    assert catalog['DEJ2000'][0]==correct_dec
+    # assert catalog['RAJ2000'][0] == correct_ra
+    # assert catalog['DEJ2000'][0] == correct_dec
+ 
+    assert np.isclose(catalog['RAJ2000'][0], correct_ra, atol=1e-6)
+    assert np.isclose(catalog['DEJ2000'][0], correct_dec, atol=1e-6)
 
     # Test different epochs
-    catalog_new = lk.query_skycatalog(SkyCoord(194.10141041659, -27.3905828803397, unit="deg")
+    catalog_new = query_skycatalog(c
                                       Time(2461041.500, scale='tt', format='jd'),
                                       'TESS',80,18)
 
     correct_ra_new = 194.10764826027054
     correct_dec_new = -27.41050446197694
 
-    assert catalog_new['RAJ2000'][0]==correct_ra_new
-    assert catalog_new['DEJ2000'][0]==correct_dec_new
-    
-    # Checks to test the catalog type i.e., simbad is not included in our catalog list.
-    lk.query_skycatalog(coord, epoch,'simbad',80,18)
-    with pytest.raises(ValueError, match="Can not parse catalog name 'simbad'")
-    
-    # Test each catalog
-    #Gaia
-    catalog_gaia = lk.query_skycatalog(SkyCoord(194.10141041659, -27.3905828803397, unit="deg"),
+    assert np.isclose(catalog['RAJ2000'][0], correct_ra_new, atol=1e-6)
+    assert np.isclose(catalog['DEJ2000'][0], correct_dec_new, atol=1e-6)
+
+    # test the catalog type i.e., simbad is not included in our catalog list.
+    # Look at other tests to see if this is correct syntax
+    with pytest.raises(ValueError, match="Can not parse catalog name 'simbad'"):
+        query_skycatalog(coord, epoch, 'simbad', 80, 18)
+        
+    # Test each other catalog
+    # Gaia
+    catalog_gaia = query_skycatalog(c,
                     Time(1569.4424277786259, scale='tdb', format='btjd'),
                     'Gaia',80,18)
 
     assert len(catalog_gaia['ID']) == 2
 
     #Kepler
-    catalog_kepler = lk.query_skycatalog(SkyCoord(285.679391, 50.2413, unit="deg"),
+    catalog_kepler = query_skycatalog(SkyCoord(285.679391, 50.2413, unit="deg"),
                                          Time(120.5391465105713, scale="tdb", format="bkjd"),
                                          'kepler',20,18)
 
@@ -239,7 +242,7 @@ def test_query_skycatalog():
     assert len(catalog_kepler['ID']) == 5
 
     #K2
-    catalog_k2 = lk.query_skycatalog(SkyCoord(172.560465, 7.588391, unit="deg"),
+    catalog_k2 = query_skycatalog(SkyCoord(172.560465, 7.588391, unit="deg"),
                                          Time(1975.1781333280233, scale="tdb", format="bkjd"),
                                          'k2',20,18)
 
@@ -254,20 +257,21 @@ def test_query_skycatalog_tpf():
     TESS_tpf = lk.search_targetpixelfile("TIC 228760807")[0].download()
     catalog_tess = TESS_tpf.skycatalog
     assert isinstance(catalog_tess, Table)
+    # assert that the target is inside the TPF
 
     Kepler_tpf = lk.search_targetpixelfile("Kepler-10")[0].download()
     catalog_kepler = Kepler_tpf.skycatalog
     assert isinstance(catalog_kepler, Table)
+    # assert that the target is inside the TPF
 
     K2_tpf = lk.search_targetpixelfile("K2-18")[0].download()
     catalog_k2 = K2_tpf.skycatalog
     assert isinstance(catalog_k2, Table)
+    # assert that the target is inside the TPF (you can do this with the tpf.ra, tpf.dec, use astropy skycoord to assert they are within 0.1" or something)
     
-    
-    # Check that the proper motions are applied
-
-
-
     # Check that it has pixel positions
+    # Check that the pixel positions are within reason
+    # Check that there are magnitudes
+
     
 

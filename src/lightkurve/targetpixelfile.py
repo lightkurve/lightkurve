@@ -2243,7 +2243,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         catalog : astropy.table.Table
         Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
         """
-        catalog = query_skycatalog(coord=SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog_name=self.mission.lower())
+        # Please test what happens if you use this and repeatedly call skycatalog
+        # I believe the search is cached, so the second time should be much faster
+        catalog = query_skycatalog(coord=SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog=self.mission.lower())
 
         column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RAJ2000'], catalog['DEJ2000'], unit="deg"))
 
@@ -2251,14 +2253,18 @@ class KeplerTargetPixelFile(TargetPixelFile):
         catalog['row'] = self.row + row
 
         # Cut down to targets within 1 pixel of edge of TPF (otherwise - 1 here)
-        col_min = self.column
-        row_min = self.row
-        col_max = self.column + self.shape[1]
-        row_max = self.row + self.shape[2]
+        col_min = self.column - 1
+        row_min = self.row - 1
+        # Double check the "shape" is the right way round
+        # You can check elsewhere in lightkurve
+        col_max = self.column + self.shape[1] + 1
+        row_max = self.row + self.shape[2] + 1
 
-        #Want to filter - there is probably a cleaner way to do this
-        catalog[(catalog['column'] >=col_min) & (catalog['column'] <=col_max) & (catalog['row'] >=row_min) & (catalog['row'] <=row_max)]
-        
+        # Filter
+        catalog[(catalog['column'] >= col_min) &
+         (catalog['column'] <= col_max) &
+         (catalog['row'] >= row_min) &
+         (catalog['row'] <= row_max)]
         return catalog
             
 
@@ -2945,6 +2951,10 @@ class TessTargetPixelFile(TargetPixelFile):
         #Want to filter - there is probably a cleaner way to do this
         catalog[(catalog['column'] >=col_min) & (catalog['column'] <=col_max) & (catalog['row'] >=row_min) & (catalog['row'] <=row_max)]
 
+        # Get target magnitude from ID for Kepler/TESS/K2
+        # for TESScut you could pick the brightest target or the one closest to the center,
+        # and then add a column which is mostly False and True at the target is used as a benchmark
+        #catalog['relative_flux'] = (apparent magnitude equation to get relative flux)
         return catalog 
 
     def get_bkg_lightcurve(self, aperture_mask=None):
