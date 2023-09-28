@@ -22,7 +22,10 @@ from astropy.visualization import (
     LinearStretch,
 )
 from astropy.time import Time
-
+from astropy.coordinates import SkyCoord, Angle
+from astroquery.vizier import Vizier
+from astropy.table import Table
+import typing as T
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +39,8 @@ __all__ = [
     "btjd_to_astropy_time",
     "show_citation_instructions",
     "finalize_notebook_url",
-    "remote_jupyter_proxy_url"
+    "remote_jupyter_proxy_url",
+    "query_skycatalog"
 ]
 
 
@@ -871,3 +875,169 @@ def finalize_notebook_url(notebook_url):
         return remote_jupyter_proxy_url
     else:
         return "localhost:8888"
+
+def _apply_propermotion(catalog: Table, equinox: Time, epoch: Time):
+    """
+    Hidden function that returns an astropy table of sources with the proper motion correction applied
+
+    Parameters:
+    -----------
+    catalog :
+        astropy.table.Table which contains the coordinates of targets and proper motion values
+    equinox: astropy.time.Time
+        The R.A and Dec. values taken from the catalogs is in J2000.
+        The J2000. 0 epoch is precisely the Julian year 2000 in terrestrial time (tt).
+    epoch : astropy.time.Time
+        Time of the observation - This is taken from the catalog R.A and Dec. values and re-formatted as an astropy.time.Time object
+
+    Returns:
+    ------
+    catalog : astropy.table.Table
+        Returns an astropy table with ID, corrected RA, corrected Dec, and Mag(?Some ppl might find this benifical for contamination reasons?)
+    """
+
+    # We need to remove any nan values from our proper  motion list
+    # Doing this will allow objects which do not have proper motion to still be displayed
+    catalog["pmRA"] = np.nan_to_num(catalog["pmRA"], 0.0)
+    catalog["pmDEC"] = np.nan_to_num(catalog["pmDEC"], 0.0)
+
+    # Get the input data from the catalog
+    c = SkyCoord(
+        ra=catalog["RAJ2000"],
+        dec=catalog["DEJ2000"],
+        pm_ra_cosdec=catalog["pmRA"],
+        pm_dec=catalog["pmDEC"],
+        frame="icrs",
+        obstime=equinox,
+    )
+
+    # Calculate the new values
+    c1 = c.apply_space_motion(new_obstime=epoch)
+
+    # Adjust the output table
+    catalog["RAJ2000"] = c1.ra.to(u.deg).value
+    catalog["DEJ2000"] = c1.dec.to(u.deg).value
+
+    return catalog
+
+
+def query_skycatalog(
+    coord: SkyCoord,
+    epoch: Time,
+    catalog_name: str,
+    radius: T.Union[float, u.Quantity] = u.Quantity(20, "arcsecond"),
+    magnitude_limit: float = 18.0,
+    equinox: Time = Time(2000, format="jyear", scale="tt"),
+):
+    """Function that returns an astropy table of sources in the region of interest
+
+    Parameters:
+    -----------
+    coord : astropy.coordinates.SkyCoord
+        Coordinates around which to do a radius query
+    epoch: astropy.time.Time
+        The time of observation in JD and TT. Note that tess data is in btjd & tdb - so a user would have to specify in the Time object
+        For example you could put in `Time(np.mean(lc.time.value), scale='tdb', format='btjd')`
+    catalog: str
+        The catalog to query, either 'kepler', 'k2', or 'tess', 'gaia'
+    radius : float
+        Radius in arcseconds to query
+    magnitude_limit : float
+        A value to limit the results in based on the Tmag/Kepler mag/K2 mag or Gaia G mag. Default, 18.
+    equinox: astropy.time.Time
+        The R.A and Dec. values taken from the catalogs is in J2000.
+        The J2000. 0 epoch is precisely the Julian year 2000 in terrestrial time (tt).
+
+    Returns:
+    -------
+    Returns an astropy.table of the sources within radius query corrected for propermotion
+    """
+
+    #This is a lits of VizieR catalogs and their input parameters to be used in the
+    #query_skycatalog function
+    _Catalog_Dictionary = {
+        "kepler": {
+            "catalog": "V/133/kic",
+            "columns": ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"],
+            "column_filters": "kepmag",
+            "rename_in": ("KIC", "pmDE", "kepmag"),
+            "rename_out": ("ID", "pmDEC", "Mag"),
+        },
+        "k2": {
+            "catalog": "IV/34/epic",
+            "columns": ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Kpmag"],
+            "column_filters": "Kpmag",
+            "rename_in": "Kpmag",
+            "rename_out": "Mag",
+        },
+        "tess": {
+            "catalog": "IV/39/tic82",
+            "columns": ["TIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Tmag"],
+            "column_filters": "Tmag",
+            "rename_in": ("TIC", "pmDE", "Tmag"),
+            "rename_out": ("ID", "pmDEC", "Mag"),
+        },
+        "gaia": {
+            "catalog": "I/355/gaiadr3",
+            "columns": ["DR3Name", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Gmag"],
+            "column_filters": "Gmag",
+            "rename_in": ("DR3Name", "pmDE", "Gmag"),
+            "rename_out": ("ID", "pmDEC", "Mag"),
+        },
+    }
+
+    # Check to make sure that user input is in the correct format
+    if not isinstance(coord, SkyCoord):
+        raise TypeError("Must pass an `astropy.coordinates.SkyCoord` object.")
+    if not isinstance(epoch, Time):
+        raise TypeError("Must pass an `astropy.time.Time object`.")
+    if not isinstance(equinox, Time):
+        raise TypeError("Must pass an `astropy.time.Time object`.")
+
+    # Here we check to make sure that the radius entered is in arcseconds
+    # This also means we do not need to specify arcseconds in our catalog query
+    try:
+        radius = u.Quantity(radius, "arcsecond")
+    except u.UnitConversionError:
+        raise
+
+    # Check to make sure that the catalog provided by the user is valid for this function
+    if catalog_name.lower() not in list(_Catalog_Dictionary.keys()):
+        raise ValueError(f"Can not parse catalog name '{catalog_name}'")
+
+    # Get the Vizier catalog name
+    catalog = _Catalog_Dictionary[catalog_name.lower()]["catalog"]
+
+    # Get the appropriate column names and filters to be applied
+    filters = Vizier(
+        columns=_Catalog_Dictionary[catalog_name.lower()]["columns"],
+        column_filters={
+            _Catalog_Dictionary[catalog_name.lower()][
+                "column_filters"
+            ]: f"<{magnitude_limit}"
+        },
+    )
+
+    # The catalog can cut off at 50 - we dont want this to happen
+    filters.ROW_LIMIT = -1
+    # Now query the catalog
+    catalog = filters.query_region(coord, catalog=catalog, radius=Angle(radius))[
+        catalog
+    ]
+
+    # If epic is being requested only one column needs to be renamed
+    if catalog_name == "k2":
+        catalog.rename_column(
+            _Catalog_Dictionary[catalog_name.lower()]["rename_in"],
+            _Catalog_Dictionary[catalog_name.lower()]["rename_out"],
+        )
+    else:
+        catalog.rename_columns(
+            _Catalog_Dictionary[catalog_name.lower()]["rename_in"],
+            _Catalog_Dictionary[catalog_name.lower()]["rename_out"],
+        )
+
+    # apply_propermotion
+    catalog = _apply_propermotion(catalog, equinox=equinox, epoch=epoch)
+
+    return catalog

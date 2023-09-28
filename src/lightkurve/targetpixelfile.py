@@ -14,12 +14,16 @@ from astropy.nddata import Cutout2D
 from astropy.table import Table
 from astropy.wcs import WCS
 from astropy.utils.exceptions import AstropyWarning
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import SkyCoord, Angle
 from astropy.stats.funcs import median_absolute_deviation as MAD
 from astropy.utils.decorators import deprecated
 from astropy.time import Time
 from astropy.units import Quantity
 import astropy.units as u
+from astropy.table import Table
+from astroquery.vizier import Vizier
+
+import typing as T
 
 import matplotlib
 from matplotlib import animation
@@ -43,8 +47,9 @@ from .utils import (
     validate_method,
     centroid_quadratic,
     _query_solar_system_objects,
-    finalize_notebook_url
-    get_skycatalog
+    finalize_notebook_url,
+    query_skycatalog,
+    _apply_propermotion
 )
 from .io import detect_filetype
 
@@ -1408,49 +1413,7 @@ class TargetPixelFile(object):
 
         return show_skyview_widget(
             self, notebook_url=notebook_url, aperture_mask=aperture_mask, magnitude_limit=magnitude_limit
-        )
-    
-    # @property
-    # def skycatalog(self):
-    #     """Returns an astropy.table of the sources in the TPF"""
-    #     pix_radius = np.hypot(*(np.ceil(np.asarray(self.shape[1:])/2) + 1))
-    #     epoch = self.time.jd.mean() - 2457000
-    #     equinox=Time(self.EQUINOX, format="decimalyear", scale="tt") + 0.5
-      
-    #     if self.mission.lower() in ['kepler']:
-    #         catalog = 'V/133'
-    #         arcsec_radius = pix_radius * 4
-    #         vizeR_cols = Vizier(columns=['KIC','RAJ2000', 'DEJ2000','pmRA','pmDE', 'kepmag'],
-    #           column_filters={"kepmag":"<18"},
-    #           keywords=["Kepler", "K2"])
-    #         # apply_propermotion
-    #         skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec, unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
-    #     elif self.mission.lower() in ['k2', 'ktwo']:
-    #         catalog = 'IV/34'
-    #         arcsec_radius = pix_radius * 4
-    #         vizeR_cols = Vizier(columns=['ID','RAJ2000', 'DEJ2000','pmRA','pmDEC', "Kpmag"],
-    #             column_filters={"Kpmag":"<18"})
-    #         skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec,  unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
-    #     elif self.mission.lower() in ['tess']:
-    #         catalog = 'IV/39/tic82'
-    #         arcsec_radius = pix_radius * 21
-    #         vizeR_cols = Vizier(columns=['TIC', 'RAJ2000', 'DEJ2000','pmRA','pmDE', 'Tmag'],
-    #        column_filters={"Tmag":"<18"}, 
-    #        keywords=["TESS"])
-    #         skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec,  unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
-    #     else:
-    #         #raise ValueError("Cannot parse `mission` attribute")
-    #         #Changed this to look at the Gaia DR3 catalog
-    #         catalog = 'I/355'
-    #         arcsec_radius = pix_radius * 21
-    #         vizeR_cols = Vizier(columns=['DR3Name','RAJ2000','DEJ2000','pmRA','pmDE','Gmag'],
-    #             column_filters={"Gmag":"<18"}, 
-    #             keywords=["Gaia"])
-    #         skycatalog =  get_skycatalog(SkyCoord(self.ra, self.dec,  unit=(u.deg, u.deg),frame='icrs'), radius=arcsec_radius, catalog=catalog, equinox=equinox, epoch=epoch)
-    #         return
-
-    #     # now add columns which are the pixel positions, based on self.wcs
-    #     return skycatalog  
+        ) 
 
     def to_corrector(self, method="pld", **kwargs):
         """Returns a `~correctors.corrector.Corrector` instance to remove systematics.
@@ -2088,6 +2051,34 @@ class TargetPixelFile(object):
 
         return ax
 
+        @property
+    def skycatalog(self):
+
+        """Function that returns an astropy table of sources with the proper motion correction applied
+
+        Returns:
+        ------
+        catalog : astropy.table.Table
+        Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
+        """
+        catalog = query_skycatalog(SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog=self.mission.lower())
+        
+        column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RAJ2000'], catalog['DEJ2000'], unit="deg"))
+        catalog['column'] = self.column + column
+        catalog['row'] = self.row + row
+
+        # Cut down to targets within 1 pixel of edge of TPF (otherwide - 1 here)
+        x_min = self.column
+        y_min = self.row
+        x_max = self.column + self.tpf.shape[1]
+        y_max = self.row + self.tpf.shape[2]
+
+        #Want to filter based on the size of the TPF
+        catalog[(catalog['column'] >=x_min) & (catalog['column'] <=x_max)]
+        catalog[(catalog['row'] >=y_min) & (catalog['row'] <=y_max)]
+    
+        return catalog
+
 
 class KeplerTargetPixelFile(TargetPixelFile):
     """Class to read and interact with the pixel data products
@@ -2272,31 +2263,35 @@ class KeplerTargetPixelFile(TargetPixelFile):
         )
     
     @property
-    def get_skycatalog(self):
-        catalog = query_skycatalog(SkyCoord(self.ra, self.dec, unit="deg"), epoch=Time(np.mean(self.time.value), scale='tdb', format='bkjd'), catalog='kepler')
+    def skycatalog(self):
 
-        # apply self.wcs to add column and row positions
-        w = self.wcs
+        """Function that returns an astropy table of sources with the proper motion correction applied
 
-        # update table with column and row
+        Returns:
+        ------
+        catalog : astropy.table.Table
+        Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
+        """
+        catalog = query_skycatalog(SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog=self.mission.lower())
         
-        x, y = w.world_to_pixel(SkyCoord(catalog['RAJ2000'], catalog['DEJ2000'], unit="deg"))
-        catalog['x'] = self.column + x
-        catalog['y'] = self.row + y
+        column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RAJ2000'], catalog['DEJ2000'], unit="deg"))
+        catalog['column'] = self.column + column
+        catalog['row'] = self.row + row
 
-        # cut down to targets within 1 pixel of edge of TPF (otherwide - 1 here)
-        x_lim = self.column + self.tpf.shape[1]
-        y_lim = self.row + self.tpf.shape[2]
+        # Cut down to targets within 1 pixel of edge of TPF (otherwide - 1 here)
+        x_min = self.column
+        y_min = self.row
+        x_max = self.column + self.tpf.shape[1]
+        y_max = self.row + self.tpf.shape[2]
 
-        #Want to filter
-        if catalog['x']-xlim > 0 and catalog['y']-ylim > 0:
-            
-        
-
-        
-        
-        
+        #Want to filter - there is probably a cleaner way to do this
+        catalog[catalog['column'] >=x_min]
+        catalog[catalog['column'] <=x_max]
+        catalog[catalog['row'] >=y_min]
+        catalog[catalog['row'] <=y_max]
+    
         return catalog
+            
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
