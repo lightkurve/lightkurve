@@ -915,8 +915,11 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
     c1 = c.apply_space_motion(new_obstime=epoch)
 
     # Adjust the output table
+    table.rename_columns(("RAJ2000","DEJ2000"),("RA_CORRECTED","DEC_CORRECTED"))
+    # Add new data corrected RA and Dec
     table["RA_CORRECTED"] = c1.ra.to(u.deg).value
     table["DEC_CORRECTED"] = c1.dec.to(u.deg).value
+
     return table
 
 
@@ -955,28 +958,28 @@ def query_skycatalog(
     #This is a lits of VizieR catalogs and their input parameters to be used in the
     #query_skycatalog function
     _Catalog_Dictionary = {
-        "KIC": {
+        "kic": {
             "catalog": "V/133/kic",
             "columns": ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"],
             "column_filters": "kepmag",
             "rename_in": ("KIC", "pmDE", "kepmag"),
             "rename_out": ("ID", "pmDEC", "Mag"),
         },
-        "EPIC": {
+        "epic": {
             "catalog": "IV/34/epic",
             "columns": ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Kpmag"],
             "column_filters": "Kpmag",
-            "rename_in": ("Kpmag"),
-            "rename_out": ("Mag"),
+            "rename_in": ["Kpmag"],
+            "rename_out": ["Mag"],
         },
-        "TIC": {
+        "tic": {
             "catalog": "IV/39/tic82",
             "columns": ["TIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Tmag"],
             "column_filters": "Tmag",
             "rename_in": ("TIC", "pmDE", "Tmag"),
             "rename_out": ("ID", "pmDEC", "Mag"),
         },
-        "GaiaDR3": {
+        "gaiadr3": {
             "catalog": "I/355/gaiadr3",
             "columns": ["DR3Name", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Gmag"],
             "column_filters": "Gmag",
@@ -1032,6 +1035,5 @@ def query_skycatalog(
 
     # apply_propermotion
     result = _apply_propermotion(result, equinox=equinox, epoch=epoch)
-    # drop J2000
-    # rename RA_CORRECTED to RA
+
     return result

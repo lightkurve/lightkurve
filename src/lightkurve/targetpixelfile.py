@@ -2245,9 +2245,18 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         # Please test what happens if you use this and repeatedly call skycatalog
         # I believe the search is cached, so the second time should be much faster
-        catalog = query_skycatalog(coord=SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog=self.mission.lower())
 
-        column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RAJ2000'], catalog['DEJ2000'], unit="deg"))
+
+        if self.mission.lower() == "kepler":
+            catalog_name = "kic"
+        elif self.mission.lower() == "k2":
+            catalog_name = "epic"
+        elif self.mission.lower() == "tess":
+            catalog_name = "tic"
+            
+        catalog = query_skycatalog(coord=SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog=catalog_name)
+
+        column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RA_CORRECTED'], catalog['DEC_CORRECTED'], unit="deg"))
 
         catalog['column'] = self.column + column
         catalog['row'] = self.row + row
@@ -2265,6 +2274,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
          (catalog['column'] <= col_max) &
          (catalog['row'] >= row_min) &
          (catalog['row'] <= row_max)]
+        
         return catalog
             
 
@@ -2925,7 +2935,7 @@ class TessTargetPixelFile(TargetPixelFile):
         return TessLightCurve(
             time=self.time, flux=flux, flux_err=flux_err, **keys, meta=meta
         )
-    
+
     @property
     def skycatalog(self):
 
@@ -2936,27 +2946,40 @@ class TessTargetPixelFile(TargetPixelFile):
         catalog : astropy.table.Table
         Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
         """
-        catalog = query_skycatalog(coord=SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog_name=self.mission.lower())
-        
-        column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RAJ2000'], catalog['DEJ2000'], unit="deg"))
+        # Please test what happens if you use this and repeatedly call skycatalog
+        # I believe the search is cached, so the second time should be much faster
+
+
+        if self.mission.lower() == "kepler":
+            catalog_name = "kic"
+        elif self.mission.lower() == "k2":
+            catalog_name = "epic"
+        elif self.mission.lower() == "tess":
+            catalog_name = "tic"
+            
+        catalog = query_skycatalog(coord=SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog=catalog_name)
+
+        column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RA_CORRECTED'], catalog['DEC_CORRECTED'], unit="deg"))
+
         catalog['column'] = self.column + column
         catalog['row'] = self.row + row
 
         # Cut down to targets within 1 pixel of edge of TPF (otherwise - 1 here)
-        col_min = self.column
-        row_min = self.row
-        col_max = self.column + self.shape[1]
-        row_max = self.row + self.shape[2]
+        col_min = self.column - 1
+        row_min = self.row - 1
+        # Double check the "shape" is the right way round
+        # You can check elsewhere in lightkurve
+        col_max = self.column + self.shape[1] + 1
+        row_max = self.row + self.shape[2] + 1
 
-        #Want to filter - there is probably a cleaner way to do this
-        catalog[(catalog['column'] >=col_min) & (catalog['column'] <=col_max) & (catalog['row'] >=row_min) & (catalog['row'] <=row_max)]
-
-        # Get target magnitude from ID for Kepler/TESS/K2
-        # for TESScut you could pick the brightest target or the one closest to the center,
-        # and then add a column which is mostly False and True at the target is used as a benchmark
-        #catalog['relative_flux'] = (apparent magnitude equation to get relative flux)
-        return catalog 
-
+        # Filter
+        catalog[(catalog['column'] >= col_min) &
+         (catalog['column'] <= col_max) &
+         (catalog['row'] >= row_min) &
+         (catalog['row'] <= row_max)]
+        
+        return catalog
+    
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         # Ignore warnings related to zero or negative errors
