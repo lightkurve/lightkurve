@@ -2258,8 +2258,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RA_CORRECTED'], catalog['DEC_CORRECTED'], unit="deg"))
 
-        catalog['column'] = self.column + column
-        catalog['row'] = self.row + row
+        catalog['Column'] = (self.column + column) * u.pix
+        catalog['Row'] = (self.row + row) * u.pix 
 
         # Cut down to targets within 1 pixel of edge of TPF (otherwise - 1 here)
         col_min = self.column - 1
@@ -2270,11 +2270,24 @@ class KeplerTargetPixelFile(TargetPixelFile):
         row_max = self.row + self.shape[2] + 1
 
         # Filter
-        catalog[(catalog['column'] >= col_min) &
-         (catalog['column'] <= col_max) &
-         (catalog['row'] >= row_min) &
-         (catalog['row'] <= row_max)]
+        catalog[(catalog['Column'] >= col_min) &
+         (catalog['Column'] <= col_max) &
+         (catalog['Row'] >= row_min) &
+         (catalog['Row'] <= row_max)]
+
+
+        #Given that these have been filtered based on the pixel region we must
+        #Re-find the brightest object in the output
+        bright_index = np.argmin(catalog['Mag'])
+
+        #Re-create the boolean array listing which star is the reference
+        catalog['Reference Star'] = np.isin(catalog['Mag'],catalog['Mag'][bright_index])
         
+
+        #Re-calculate the relative flux based on the reference star
+        catalog['Relative_Flux'] = np.exp((catalog['Mag']-catalog['Mag'][bright_index]) / -2.5) 
+
+                
         return catalog
             
 
@@ -2961,8 +2974,8 @@ class TessTargetPixelFile(TargetPixelFile):
 
         column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RA_CORRECTED'], catalog['DEC_CORRECTED'], unit="deg"))
 
-        catalog['column'] = self.column + column
-        catalog['row'] = self.row + row
+        catalog['Column'] = (self.column + column) * u.pix
+        catalog['Row'] = (self.row + row) * u.pix
 
         # Cut down to targets within 1 pixel of edge of TPF (otherwise - 1 here)
         col_min = self.column - 1
@@ -2973,10 +2986,21 @@ class TessTargetPixelFile(TargetPixelFile):
         row_max = self.row + self.shape[2] + 1
 
         # Filter
-        catalog[(catalog['column'] >= col_min) &
-         (catalog['column'] <= col_max) &
-         (catalog['row'] >= row_min) &
-         (catalog['row'] <= row_max)]
+        catalog[(catalog['Column'] >= col_min) &
+         (catalog['Column'] <= col_max) &
+         (catalog['Row'] >= row_min) &
+         (catalog['Row'] <= row_max)]
+        
+        #Given that these have been filtered based on the pixel region we must
+        #Re-find the brightest object in the output
+        bright_index = np.argmin(catalog['Mag'])
+
+        #Re-create the boolean array listing which star is the reference
+        catalog['Reference Star'] = np.isin(catalog['Mag'],catalog['Mag'][bright_index])
+        
+
+        #Re-calculate the relative flux based on the reference star
+        catalog['Relative_Flux'] = np.exp((catalog['Mag']-catalog['Mag'][bright_index]) / -2.5) 
         
         return catalog
     

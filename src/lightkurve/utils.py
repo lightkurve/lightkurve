@@ -1033,6 +1033,16 @@ def query_skycatalog(
         _Catalog_Dictionary[catalog.lower()]["rename_out"],
     )
 
+    #Find the brightest object in the catalog output
+    bright_index = np.argmin(result['Mag'])
+
+    #Create a boolean array listing which star is the reference
+    result['Reference Star'] = np.isin(result['Mag'],result['Mag'][bright_index])
+        
+
+    #Calculate the relative flux
+    result['Relative_Flux'] = np.exp((result['Mag']-result['Mag'][bright_index]) / -2.5) 
+
     # apply_propermotion
     result = _apply_propermotion(result, equinox=equinox, epoch=epoch)
 
