@@ -45,7 +45,7 @@ from .utils import (
     validate_method,
     centroid_quadratic,
     _query_solar_system_objects,
-    finalize_notebook_url
+    finalize_notebook_url,
 )
 from .io import detect_filetype
 
@@ -570,7 +570,9 @@ class TargetPixelFile(object):
         lc : LightCurve object
             Object containing the resulting lightcurve.
         """
-        method = validate_method(method, supported_methods=["aperture", "prf", "sap", "sff", "cbv", "pld"])
+        method = validate_method(
+            method, supported_methods=["aperture", "prf", "sap", "sff", "cbv", "pld"]
+        )
         if method in ["aperture", "sap"]:
             return self.extract_aperture_photometry(**kwargs)
         elif method == "prf":
@@ -583,7 +585,7 @@ class TargetPixelFile(object):
 
     def _resolve_default_aperture_mask(self, aperture_mask):
         if isinstance(aperture_mask, str):
-            if (aperture_mask == "default"):
+            if aperture_mask == "default":
                 # returns 'pipeline', unless it is missing. Falls back to 'threshold'
                 return "pipeline" if np.any(self.pipeline_mask) else "threshold"
             else:
@@ -631,7 +633,7 @@ class TargetPixelFile(object):
 
         # Input validation
         if hasattr(aperture_mask, "shape"):
-            if (aperture_mask.shape != self.shape[1:]):
+            if aperture_mask.shape != self.shape[1:]:
                 raise ValueError(
                     "`aperture_mask` has shape {}, "
                     "but the flux data has shape {}"
@@ -655,17 +657,17 @@ class TargetPixelFile(object):
                 aperture_mask = np.zeros((self.shape[1], self.shape[2]), dtype=bool)
         elif isinstance(aperture_mask, np.ndarray):
             # Kepler and TESS pipeline style integer flags
-            if np.issubdtype(aperture_mask.dtype, np.dtype('>i4')):
+            if np.issubdtype(aperture_mask.dtype, np.dtype(">i4")):
                 aperture_mask = (aperture_mask & 2) == 2
             elif np.issubdtype(aperture_mask.dtype, int):
                 if ((aperture_mask & 2) == 2).any():
                     # Kepler and TESS pipeline style integer flags
                     aperture_mask = (aperture_mask & 2) == 2
                 else:
-                    aperture_mask = aperture_mask.astype(bool)                
+                    aperture_mask = aperture_mask.astype(bool)
             elif np.issubdtype(aperture_mask.dtype, float):
-                aperture_mask = aperture_mask.astype(bool)                
-        self._last_aperture_mask = aperture_mask 
+                aperture_mask = aperture_mask.astype(bool)
+        self._last_aperture_mask = aperture_mask
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3, reference_pixel="center"):
@@ -929,7 +931,7 @@ class TargetPixelFile(object):
         sigma=3,
         cache=True,
         return_mask=False,
-        show_progress=True
+        show_progress=True,
     ):
         """Returns a list of asteroids or comets which affected the target pixel files.
 
@@ -1034,7 +1036,7 @@ class TargetPixelFile(object):
 
         if radius == None:
             radius = (
-                2 ** 0.5 * (pixel_scale * (np.max(self.shape[1:]) + 5))
+                2**0.5 * (pixel_scale * (np.max(self.shape[1:]) + 5))
             ) * u.arcsecond.to(u.deg)
 
         res = _query_solar_system_objects(
@@ -1166,8 +1168,6 @@ class TargetPixelFile(object):
                 if hasattr(ax, "wcs"):
                     img_extent = None
 
-
-
             ax = plot_image(
                 data_to_plot,
                 ax=ax,
@@ -1178,7 +1178,6 @@ class TargetPixelFile(object):
                 **kwargs,
             )
             ax.grid(False)
-
 
         # Overlay the aperture mask if given
         if aperture_mask is not None:
@@ -1271,9 +1270,16 @@ class TargetPixelFile(object):
             # To make installing Lightkurve easier, ipython is an optional dependency,
             # because we can assume it is installed when notebook-specific features are called
             from IPython.display import HTML
-            return HTML(self._to_matplotlib_animation(step=step, interval=interval, **plot_args).to_jshtml())
+
+            return HTML(
+                self._to_matplotlib_animation(
+                    step=step, interval=interval, **plot_args
+                ).to_jshtml()
+            )
         except ModuleNotFoundError:
-            log.error("ipython needs to be installed for animate() to work (e.g., `pip install ipython`)")
+            log.error(
+                "ipython needs to be installed for animate() to work (e.g., `pip install ipython`)"
+            )
 
     def to_fits(self, output_fn=None, overwrite=False):
         """Writes the TPF to a FITS file on disk."""
@@ -1379,8 +1385,9 @@ class TargetPixelFile(object):
             **kwargs,
         )
 
-
-    def interact_sky(self, notebook_url=None, aperture_mask="empty", magnitude_limit=18):
+    def interact_sky(
+        self, notebook_url=None, aperture_mask="empty", magnitude_limit=18
+    ):
         """Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.
 
         Parameters
@@ -1408,7 +1415,10 @@ class TargetPixelFile(object):
         notebook_url = finalize_notebook_url(notebook_url)
 
         return show_skyview_widget(
-            self, notebook_url=notebook_url, aperture_mask=aperture_mask, magnitude_limit=magnitude_limit
+            self,
+            notebook_url=notebook_url,
+            aperture_mask=aperture_mask,
+            magnitude_limit=magnitude_limit,
         )
 
     def to_corrector(self, method="pld", **kwargs):
@@ -2145,7 +2155,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # aperture = self.prf.get_simple_aperture(prf_model, completeness=completeness)
         NotImplementedError
 
-
     @property
     def obsmode(self):
         """'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
@@ -2380,66 +2389,76 @@ class KeplerTargetPixelFile(TargetPixelFile):
             "targetid": self.targetid,
         }
         return KeplerLightCurve(time=self.time, flux=lc.flux, **keys)
-    
+
     # QUESTION: The above 4 functions were experimental in the existing lk version
     #           Do we want to remove them or keep them? They do a more sophisticated fit,
     #           which perhaps does not follow the 'building blocks' philosophy
-    
+
     @property
     def prf(self):
-    	'''
-    	Returns an initialized KeplerPRF object.
-    	The PRF is initialized with the same row/column dimensions and channel as the TPF
-    	'''
-    	
-    	#Note the two functions below use this. I don't know how we should store this info,
-    	#      or if we should rerun it.
-    	return KeplerPRF.from_tpf(self)
-    
-    #@property
-    def simple_aperture(self,
-    	center_col:  Union[float, list[float], npt.ArrayLike, None] = None, 
-		center_row:  Union[float, list[float], npt.ArrayLike, None] = None,
-		scale: float = 1.0,
-		rotation_angle: float = 0.0,
-		plot: bool = False,
-		min_completeness: float = 0.9 )-> npt.ArrayLike:
-		
-    	'''
-    	Gets a simple aperture for the target star. 
-    	'''
-    	
-    	# By default, get the target position from the header
-    	# NOTE for a tesscut, this is just the input coordinates, so the search criteria must be centered on the target
-    	# SECOND NOTE: I think using skycatalog and the ra/dec would be better as that will have PM corrections
-    	if center_col is None:
-    		center_col = self.get_header(ext=1)['1CRV4P'] + self.get_header(ext=1)['1CRPX5']
-    	if center_row is None:
-    		center_row = self.get_header(ext=1)['2CRV4P'] + self.get_header(ext=1)['2CRPX5']
-    	KepPRF = self.prf
-    	prf_model = KepPRF.prf_model(center_col = center_col, center_row = center_row, 
-    		scale=scale, rotation_angle=rotation_angle)
+        """
+        Returns an initialized KeplerPRF object.
+        The PRF is initialized with the same row/column dimensions and channel as the TPF
+        """
 
-    	aperture = KepPRF.get_simple_aperture(prf_model, min_completeness=min_completeness, plot=plot)
+        # Note the two functions below use this. I don't know how we should store this info,
+        #      or if we should rerun it.
+        return KeplerPRF.from_tpf(self)
 
-    	return aperture
-    
+    # @property
+    def simple_aperture(
+        self,
+        center_col: Union[float, list[float], npt.ArrayLike, None] = None,
+        center_row: Union[float, list[float], npt.ArrayLike, None] = None,
+        scale: float = 1.0,
+        rotation_angle: float = 0.0,
+        plot: bool = False,
+        min_completeness: float = 0.9,
+    ) -> npt.ArrayLike:
+        """
+        Gets a simple aperture for the target star.
+        """
+
+        # By default, get the target position from the header
+        # NOTE for a tesscut, this is just the input coordinates, so the search criteria must be centered on the target
+        # SECOND NOTE: I think using skycatalog and the ra/dec would be better as that will have PM corrections
+        if center_col is None:
+            center_col = (
+                self.get_header(ext=1)["1CRV4P"] + self.get_header(ext=1)["1CRPX5"]
+            )
+        if center_row is None:
+            center_row = (
+                self.get_header(ext=1)["2CRV4P"] + self.get_header(ext=1)["2CRPX5"]
+            )
+        KepPRF = self.prf
+        prf_model = KepPRF.prf_model(
+            center_col=center_col,
+            center_row=center_row,
+            scale=scale,
+            rotation_angle=rotation_angle,
+        )
+
+        aperture = KepPRF.get_simple_aperture(
+            prf_model, min_completeness=min_completeness, plot=plot
+        )
+
+        return aperture
+
     # Can this function have the same name as prf.estimate_contamination?
     def estimate_contamination(self, aperture: npt.ArrayLike):
-    	# Should I use tpf.pipeline_mask my default?
-    		# If so, for tesscut, this is all falses. Change to all true?
-    
-    	# I am assuming the first value in skycatalog will always be the target 
-    	# Also assumes the flux estimate will be incorporated into this package. 
-    	# catalog = self.skycatalog() # get a list of all stars in the FOV
-    	
-    	# KepPRF = self.prf
-    	# prf_model = KepPRF.prf_model(center_row = catalog['row'], center_col = catalog['column'], 
-    	#		scale=scale, rotation_angle=rotation_angle, )
-    	# return self.estimate_contamination(prf_model, aperture = aperture, catalog['flux'])
-    
-    	NotImplementedError
-    	
+        # Should I use tpf.pipeline_mask my default?
+        # If so, for tesscut, this is all falses. Change to all true?
+
+        # I am assuming the first value in skycatalog will always be the target
+        # Also assumes the flux estimate will be incorporated into this package.
+        # catalog = self.skycatalog() # get a list of all stars in the FOV
+
+        # KepPRF = self.prf
+        # prf_model = KepPRF.prf_model(center_row = catalog['row'], center_col = catalog['column'],
+        # 		scale=scale, rotation_angle=rotation_angle, )
+        # return self.estimate_contamination(prf_model, aperture = aperture, catalog['flux'])
+
+        NotImplementedError
 
 
 class FactoryError(Exception):
@@ -2982,20 +3001,20 @@ class TessTargetPixelFile(TargetPixelFile):
             flux_err=flux_bkg_err,
             **keys,
         )
-        
+
     @property
     def prf(self):
-    	'''
-    	Returns an initialized TessPRF object.
-    	The PRF is initialized with the same row/column dimensions and channel as the TPF
-    	'''
-    	
-    	#Note the two functions below use this. I don't know how we should store this info,
-    	#      or if we should rerun it.
-    	return TessPRF.from_tpf(self)
-    
-    #@property
-    '''
+        """
+        Returns an initialized TessPRF object.
+        The PRF is initialized with the same row/column dimensions and channel as the TPF
+        """
+
+        # Note the two functions below use this. I don't know how we should store this info,
+        #      or if we should rerun it.
+        return TessPRF.from_tpf(self)
+
+    # @property
+    """
     I think this is valid for both Tess and Kepler if I make general names.
     I can move this to the generic tpf class
     But check if K2 has the same header keywords 1/2CRV4P and 1/2CRPX5
@@ -3007,9 +3026,9 @@ class TessTargetPixelFile(TargetPixelFile):
 		plot: bool = False,
 		min_completeness: float = 0.9 )-> npt.ArrayLike:
 		
-    '''
-    	#Gets a simple aperture for the target star. 
-    '''
+    """
+    # Gets a simple aperture for the target star.
+    """
     	
     	# By default, get the target position from the header
     	# NOTE for a tesscut, this is just the input coordinates, so the search criteria must be centered on the target
@@ -3024,10 +3043,10 @@ class TessTargetPixelFile(TargetPixelFile):
 
     	aperture = KepPRF.get_simple_aperture(prf_model, min_completeness=min_completeness, plot=plot)
 
-    	return aperture'''
-    
+    	return aperture"""
+
     # Can this function have the same name as prf.estimate_contamination?
-    '''Same as the above function, this could probably be in the generic class. 
+    """Same as the above function, this could probably be in the generic class. 
     def estimate_contamination(self, aperture: npt.ArrayLike):
     	# Should I use tpf.pipeline_mask my default?
     		# If so, for tesscut, this is all falses. Change to all true?
@@ -3041,4 +3060,4 @@ class TessTargetPixelFile(TargetPixelFile):
     	#		scale=scale, rotation_angle=rotation_angle, )
     	# return self.estimate_contamination(prf_model, aperture = aperture, catalog['flux'])
     
-    	NotImplementedError'''
+    	NotImplementedError"""
