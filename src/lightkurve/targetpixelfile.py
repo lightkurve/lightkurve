@@ -2985,9 +2985,60 @@ class TessTargetPixelFile(TargetPixelFile):
         
     @property
     def prf(self):
-    	'''Returns a PRF object'''
-    	return TessPRF.from_tpf(self)    
-    """def prf(self):
-    	'''Returns a PRF object'''
-    	if self.mission.lower == 'tess':
-    		return PRF.from_tpf(self)"""
+    	'''
+    	Returns an initialized TessPRF object.
+    	The PRF is initialized with the same row/column dimensions and channel as the TPF
+    	'''
+    	
+    	#Note the two functions below use this. I don't know how we should store this info,
+    	#      or if we should rerun it.
+    	return TessPRF.from_tpf(self)
+    
+    #@property
+    '''
+    I think this is valid for both Tess and Kepler if I make general names.
+    I can move this to the generic tpf class
+    But check if K2 has the same header keywords 1/2CRV4P and 1/2CRPX5
+    def simple_aperture(self,
+    	center_col:  Union[float, list[float], npt.ArrayLike, None] = None, 
+		center_row:  Union[float, list[float], npt.ArrayLike, None] = None,
+		scale: float = 1.0,
+		rotation_angle: float = 0.0,
+		plot: bool = False,
+		min_completeness: float = 0.9 )-> npt.ArrayLike:
+		
+    '''
+    	#Gets a simple aperture for the target star. 
+    '''
+    	
+    	# By default, get the target position from the header
+    	# NOTE for a tesscut, this is just the input coordinates, so the search criteria must be centered on the target
+    	# SECOND NOTE: I think using skycatalog and the ra/dec would be better as that will have PM corrections
+    	if center_col is None:
+    		center_col = self.get_header(ext=1)['1CRV4P'] + self.get_header(ext=1)['1CRPX5']
+    	if center_row is None:
+    		center_row = self.get_header(ext=1)['2CRV4P'] + self.get_header(ext=1)['2CRPX5']
+    	KepPRF = self.prf
+    	prf_model = KepPRF.prf_model(center_col = center_col, center_row = center_row, 
+    		scale=scale, rotation_angle=rotation_angle)
+
+    	aperture = KepPRF.get_simple_aperture(prf_model, min_completeness=min_completeness, plot=plot)
+
+    	return aperture'''
+    
+    # Can this function have the same name as prf.estimate_contamination?
+    '''Same as the above function, this could probably be in the generic class. 
+    def estimate_contamination(self, aperture: npt.ArrayLike):
+    	# Should I use tpf.pipeline_mask my default?
+    		# If so, for tesscut, this is all falses. Change to all true?
+    
+    	# I am assuming the first value in skycatalog will always be the target 
+    	# Also assumes the flux estimate will be incorporated into this package. 
+    	# catalog = self.skycatalog() # get a list of all stars in the FOV
+    	
+    	# KepPRF = self.prf
+    	# prf_model = KepPRF.prf_model(center_row = catalog['row'], center_col = catalog['column'], 
+    	#		scale=scale, rotation_angle=rotation_angle, )
+    	# return self.estimate_contamination(prf_model, aperture = aperture, catalog['flux'])
+    
+    	NotImplementedError'''

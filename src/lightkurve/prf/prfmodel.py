@@ -37,6 +37,8 @@ New Workflow:
 - Instantiate PRF with only the channel (Kepler) or camera/ccd (TESS)
 - Call a 'model' function with the column, row, flux, center_col, center_row, flux, scale_col, scale_row, rotation_angle
 
+Question: Do we want to preserve the gradient function?
+
 '''
 from abc import ABC, abstractmethod
 from typing import Union
@@ -57,7 +59,7 @@ from matplotlib import patches
 class PRF(ABC):
 
 	@abstractmethod
-	def __init__(self, column:int, row:int, shape:tuple):
+	def __init__(self, column:int, row:int, shape:tuple = (11,11)):
 		"""
 		A generic base class object for PRFs You're not supposed to use this.
 		See KeplerPRF and TessPRF for the instantiable classes. 
@@ -120,7 +122,7 @@ class PRF(ABC):
 		
 		# If completeness = 1, return any pixel that contains any amount of flux
 		if min_completeness == 1.0:
-			aperture = np.zeros(prf.shape, dtype=bool)
+			aperture = prf.astype(bool) 
 			aperture[prf != 0.0] = True
 
 		else:
@@ -169,16 +171,15 @@ class PRF(ABC):
 		
 		if prf_model.shape[0] == 1:
 			print('There are no other sources in your TPF. Contamination will be 1 (no contamination)')
+			return 1.
 		
 		prfs = np.array( [prf_model[ii, :, :] * fluxes[ii] for ii in range(len(fluxes))])
 		
 		target_flux = np.sum(prfs[idx, aperture])
 		all_flux = np.sum(prfs[:, aperture] )
-		
-
 		return target_flux/all_flux
 		
-	# Should this be a hidden function?		
+		
 	def estimate_completeness(self, prf_model: npt.ArrayLike, aperture: npt.ArrayLike, idx: int = 0) -> float: 
 		'''
 		Returns the fraction of total flux from the target contained in a given aperture
@@ -235,28 +236,141 @@ class PRF(ABC):
 		if center_row is None:
 			center_row = self.row + self.shape[0] / 2
 
+		print(self.col_coord)
 		delta_col = self.col_coord - center_col
-		delta_row = self.row_coord - center_row		
+		delta_row = self.row_coord - center_row
+		print(delta_col)
+		
+		
 		if (scale == 1.0) and (rotation_angle == 0.0):
 			prf = flux * self.interpolate(delta_row, delta_col)		
+
 		else:
-			rot_col, rot_row = np.meshgrid(delta_col, delta_row)
+			# Does this need to be a meshgrid if scale is required to be symmetrical?
+			#rot_col, rot_row = np.meshgrid(delta_col, delta_row)
+			rot_col = delta_col
+			rot_row = delta_row.copy()
 			if rotation_angle != 0:
 				cosa = math.cos(rotation_angle)
 				sina = math.sin(rotation_angle)
 				rot_row = delta_row * cosa - rot_col * sina
 				rot_col = delta_row * sina + rot_col * cosa
+			
+			# Why does this make the sum of the PRF << 1?
+			# Changing this to divide by scale does more what I would expect
+			# print(np.array(rot_row.flatten()) / scale)
+			'''print(np.array(rot_col.flatten()) * 2)
 			prf = flux * self.interpolate(
-				rot_row.flatten() * scale, rot_col.flatten() * scale, grid=False
-			).reshape(self.shape)
+				np.array(rot_row.flatten()) * scale , np.array(rot_col.flatten()) * scale , grid=False
+			).reshape(self.shape)'''
+			prf = flux * self.interpolate(delta_row * scale, delta_col* scale)
 
 		
 		# NS maybe you could just augment the files so there is a border of 0s around
-		# We definitely need a test that the rotation is right
-		# Nicole comment - these values tend to be crazy small, so this may be cleaner?
-		
+		# The prf values around the edges tend to be crazy small, so this may be more practical
 		prf[prf < 1e-16] = 0.0 #Discuss this cutoff
 		return prf
+		
+	def gradient(self,
+		center_col = None, 
+		center_row = None, 
+		flux: float = 1.0,
+		scale: float = 1.0,
+		rotation_angle: float = 0.0) -> list:
+		
+		"""
+		This function returns the gradient of the PRF model with
+		respect to center_col, center_row, flux, scale,
+		and rotation_angle.
+
+		Parameters
+		----------
+		center_col, center_row : float
+			Column and row coordinates of the center
+		flux : float
+			Total integrated flux of the PRF
+		scale : float
+			Pixel scale stretch parameter, i.e. the numbers by which the PRF
+			model needs to be multiplied in the column and row directions to
+			account for focus changes
+		rotation_angle : float
+			Rotation angle in radians
+
+		Returns
+		-------
+		grad_prf : list
+			Returns a list of arrays where the elements are the partial derivatives
+			of the PRF model with respect to center_col, center_row, flux, scale_col,
+			scale_row, and rotation_angle, respectively.
+		"""
+		if center_col is None:
+			center_col = self.column + self.shape[1] / 2
+		if center_row is None:
+			center_row = self.row + self.shape[0] / 2
+
+		
+		delta_col = self.col_coord - center_col
+		delta_row = self.row_coord - center_row
+		
+		
+		
+		if (scale == 1.0) and (rotation_angle == 0.0):
+			deriv_flux = self.interpolate(delta_row, delta_col)
+			deriv_center_col = -flux * self.interpolate(delta_row, delta_col, dy=1)
+			deriv_center_row = -flux * self.interpolate(delta_row, delta_col, dx=1)
+
+			return [deriv_center_col, deriv_center_row, deriv_flux]	
+
+		else:
+			# Does this need to be a meshgrid if scale is required to be symmetrical?
+			delta_col, delta_row = np.meshgrid(delta_col, delta_row)
+			rot_row = delta_row * cosa - delta_col * sina
+			rot_col = delta_row * sina + delta_col * cosa
+			
+			# for a proof of the maths that follow, see the pdf attached
+			# on pull request #198 in lightkurve GitHub repo.
+			deriv_flux = self.interpolate(
+				rot_row.flatten() * scale_row, rot_col.flatten() * scale_col, grid=False
+			).reshape(self.shape)
+
+			interp_dy = self.interpolate(
+				rot_row.flatten() * scale_row,
+				rot_col.flatten() * scale_col,
+				grid=False,
+				dy=1,
+			).reshape(self.shape)
+
+			interp_dx = self.interpolate(
+				rot_row.flatten() * scale_row,
+				rot_col.flatten() * scale_col,
+				grid=False,
+				dx=1,
+			).reshape(self.shape)
+
+			scale_row_times_interp_dx = scale_row * interp_dx
+			scale_col_times_interp_dy = scale_col * interp_dy
+
+			deriv_center_col = -flux * (
+				cosa * scale_col_times_interp_dy - sina * scale_row_times_interp_dx
+			)
+			deriv_center_row = -flux * (
+				sina * scale_col_times_interp_dy + cosa * scale_row_times_interp_dx
+			)
+			deriv_scale_row = flux * interp_dx * rot_row
+			deriv_scale_col = flux * interp_dy * rot_col
+			deriv_rotation_angle = flux * (
+				interp_dy * scale_col * (delta_row * cosa - delta_col * sina)
+				- interp_dx * scale_row * (delta_row * sina + delta_col * cosa)
+			)
+
+			return [
+				deriv_center_col,
+		   	 	deriv_center_row,
+				deriv_flux,
+				deriv_scale_col,
+				deriv_scale_row,
+				deriv_rotation_angle,
+			]
 		
 	def prf_model(self, 
 		center_col:  Union[float, list[float], npt.ArrayLike, None] = None, 
@@ -459,9 +573,10 @@ class KeplerPRF(PRF):
 		# not to be confused with our convention, in which the
 		# x-axis correspond to the column-axis
 		interpolate = scipy.interpolate.RectBivariateSpline(PRFrow, PRFcol, supersamp_prf)
-		
+
 		return col_coord, row_coord, interpolate, supersamp_prf
 	
+	@classmethod
 	def from_tpf(self):
 		'''Creates a PRF object to reflect the properties of a given TPF'''
 		# Add some error checks that it's a Kepler TPF here
@@ -587,7 +702,6 @@ class TessPRF(PRF):
 				cdelt2p[i],
 			) = self._read_prf_calibration_file(prf_cal_file[nearest_four[i]+1])
 		prf_cal_file.close()
-		
 		
 		prfn = np.array(prfn)
 		PRFcol = np.arange(0.5, np.shape(prfn[0])[1] + 0.5)
