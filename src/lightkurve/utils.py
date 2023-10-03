@@ -1027,21 +1027,25 @@ def query_skycatalog(
         catalog_name
     ]
 
-    # If epic is being requested only one column needs to be renamed
+    # Rename the columns so that the output is uniform
     result.rename_columns(
         _Catalog_Dictionary[catalog.lower()]["rename_in"],
         _Catalog_Dictionary[catalog.lower()]["rename_out"],
     )
 
+    #Based on the input coordinates pick the object with the mininmum separation as the reference star.
+    c1 = SkyCoord(result['RAJ2000'],result['DEJ2000'], unit="deg")
+    sep = coord.separation(c1)
+    
     # Find the brightest object in the catalog output
-    bright_index = np.argmin(result["Mag"])
+    ref_index = np.argmin(sep)
 
     # Create a boolean array listing which star is the reference
-    result["Reference Star"] = np.isin(result["Mag"], result["Mag"][bright_index])
+    result["Reference Star"] = np.isin(result["Mag"], result["Mag"][ref_index])
 
     # Calculate the relative flux
     result["Relative_Flux"] = np.exp(
-        (result["Mag"] - result["Mag"][bright_index]) / -2.5
+        (result["Mag"] - result["Mag"][ref_index]) / -2.5
     )
 
     # apply_propermotion
