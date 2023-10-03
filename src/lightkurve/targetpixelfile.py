@@ -499,7 +499,7 @@ class TargetPixelFile(object):
         """
         attrs = {}
         for attr in dir(self):
-            if not attr.startswith("_") and attr != "header" and attr != "astropy_time":
+            if not attr.startswith("_") and attr != "header" and attr != "astropy_time" and attr !="skycatalog":
                 res = getattr(self, attr)
                 if callable(res):
                     continue
