@@ -292,9 +292,9 @@ def test_query_skycatalog_tpf():
     correct_row = 1806.0942842433474
     correct_col = 825.0328770805637
 
-    assert np.isclose(catalog_tess["Row"][0], correct_row, atol=1e-6)
-    assert np.isclose(catalog_tess["Column"][0], correct_col, atol=1e-6)
+    assert np.isclose(catalog_tess["Row"][index], correct_row, atol=1e-6)
+    assert np.isclose(catalog_tess["Column"][index], correct_col, atol=1e-6)
 
     # Check that there are magnitudes
     correct_mag = 9.459
-    assert np.isclose(catalog_tess["Mag"][0], correct_mag, atol=1e-3)
+    assert np.isclose(catalog_tess["Mag"][index], correct_mag, atol=1e-3)
