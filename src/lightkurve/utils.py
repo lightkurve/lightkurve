@@ -927,7 +927,7 @@ def query_skycatalog(
     coord: SkyCoord,
     epoch: Time,
     catalog: str,
-    radius: Union[float, u.Quantity] = u.Quantity(20, "arcsecond"),
+    radius: Union[float, u.Quantity] = u.Quantity(250, "arcsecond"),
     magnitude_limit: float = 18.0,
     equinox: Time = Time(2000, format="jyear", scale="tt"),
 ):

@@ -2263,16 +2263,16 @@ class KeplerTargetPixelFile(TargetPixelFile):
         catalog["Column"] = (self.column + column) * u.pix
         catalog["Row"] = (self.row + row) * u.pix
 
-        # Cut down to targets within 1 pixel of edge of TPF (otherwise - 1 here)
+        # Cut down to targets within 1 pixel of edge of TPF 
         col_min = self.column - 1
         row_min = self.row - 1
-        # Double check the "shape" is the right way round
-        # You can check elsewhere in lightkurve
-        col_max = self.column + self.shape[1] + 1
-        row_max = self.row + self.shape[2] + 1
+    
+        col_max = self.column + self.shape[2] +1
+        row_max = self.row + self.shape[1] + 1
+
 
         # Filter
-        catalog[
+        catalog_filtered = catalog[
             (catalog["Column"] >= col_min)
             & (catalog["Column"] <= col_max)
             & (catalog["Row"] >= row_min)
@@ -2281,17 +2281,17 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         # Given that these have been filtered based on the pixel region we must
         # Re-find the brightest object in the output
-        bright_index = np.argmin(catalog["Mag"])
+        bright_index = np.argmin(catalog_filtered["Mag"])
 
         # Re-create the boolean array listing which star is the reference
-        catalog["Reference Star"] = np.isin(catalog["Mag"], catalog["Mag"][bright_index])
+        catalog_filtered["Reference Star"] = np.isin(catalog_filtered["Mag"], catalog_filtered["Mag"][bright_index])
 
         # Re-calculate the relative flux based on the reference star
-        catalog["Relative_Flux"] = np.exp(
-            (catalog["Mag"] - catalog["Mag"][bright_index]) / -2.5
+        catalog_filtered["Relative_Flux"] = np.exp(
+            (catalog_filtered["Mag"] - catalog_filtered["Mag"][bright_index]) / -2.5
         )
 
-        return catalog
+        return catalog_filtered 
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -2986,13 +2986,12 @@ class TessTargetPixelFile(TargetPixelFile):
         # Cut down to targets within 1 pixel of edge of TPF (otherwise - 1 here)
         col_min = self.column - 1
         row_min = self.row - 1
-        # Double check the "shape" is the right way round
-        # You can check elsewhere in lightkurve
-        col_max = self.column + self.shape[1] + 1
-        row_max = self.row + self.shape[2] + 1
         
+        col_max = self.column + self.shape[2] + 1 
+        row_max = self.row + self.shape[1] + 1
+
         # Filter
-        catalog[
+        catalog_filtered = catalog[
             (catalog["Column"] >= col_min)
             & (catalog["Column"] <= col_max)
             & (catalog["Row"] >= row_min)
@@ -3001,17 +3000,17 @@ class TessTargetPixelFile(TargetPixelFile):
         
         # Given that these have been filtered based on the pixel region we must
         # Re-find the brightest object in the output
-        bright_index = np.argmin(catalog["Mag"])
+        bright_index = np.argmin(catalog_filtered["Mag"])
 
         # Re-create the boolean array listing which star is the reference
-        catalog["Reference Star"] = np.isin(catalog["Mag"], catalog["Mag"][bright_index])
+        catalog_filtered["Reference Star"] = np.isin(catalog_filtered["Mag"], catalog_filtered["Mag"][bright_index])
         
         # Re-calculate the relative flux based on the reference star
-        catalog["Relative_Flux"] = np.exp(
-            (catalog["Mag"] - catalog["Mag"][bright_index]) / -2.5
+        catalog_filtered["Relative_Flux"] = np.exp(
+            (catalog_filtered["Mag"] - catalog_filtered["Mag"][bright_index]) / -2.5
         )
 
-        return catalog
+        return catalog_filtered
     
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
