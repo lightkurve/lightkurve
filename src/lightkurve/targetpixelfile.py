@@ -2245,14 +2245,18 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         if self.mission.lower() == "kepler":
             catalog_name = "kic"
+            radius = 4 * self.shape[1] * u.arcsec
         elif self.mission.lower() == "k2":
             catalog_name = "epic"
+            radius = 4 * self.shape[1] * u.arcsec
         elif self.mission.lower() == "tess":
             catalog_name = "tic"
-
+            radius = 21 * self.shape[1] * u.arcsec
+            
         catalog = query_skycatalog(
             coord=SkyCoord(self.ra, self.dec, unit="deg"),
             epoch=self.time[0],
+            radius=radius,
             catalog=catalog_name,
         )
 
@@ -2962,17 +2966,21 @@ class TessTargetPixelFile(TargetPixelFile):
         """
         # Please test what happens if you use this and repeatedly call skycatalog
         # I believe the search is cached, so the second time should be much faster
-        
+
         if self.mission.lower() == "kepler":
             catalog_name = "kic"
+            radius = 4 * self.shape[1] * u.arcsec
         elif self.mission.lower() == "k2":
             catalog_name = "epic"
+            radius = 4 * self.shape[1] * u.arcsec
         elif self.mission.lower() == "tess":
             catalog_name = "tic"
-
+            radius = 21 * self.shape[1] * u.arcsec
+            
         catalog = query_skycatalog(
             coord=SkyCoord(self.ra, self.dec, unit="deg"),
             epoch=self.time[0],
+            radius=radius,
             catalog=catalog_name,
         )
 
