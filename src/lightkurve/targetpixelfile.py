@@ -2242,8 +2242,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         catalog : astropy.table.Table
         Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
         """
-        # Please test what happens if you use this and repeatedly call skycatalog
-        # I believe the search is cached, so the second time should be much faster
 
         if self.mission.lower() == "kepler":
             catalog_name = "kic"
