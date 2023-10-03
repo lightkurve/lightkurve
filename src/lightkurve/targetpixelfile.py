@@ -2235,7 +2235,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
     
     @property
     def skycatalog(self):
-
         """Function that returns an astropy table of sources with the proper motion correction applied
 
         Returns:
@@ -2246,20 +2245,25 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Please test what happens if you use this and repeatedly call skycatalog
         # I believe the search is cached, so the second time should be much faster
 
-
         if self.mission.lower() == "kepler":
             catalog_name = "kic"
         elif self.mission.lower() == "k2":
             catalog_name = "epic"
         elif self.mission.lower() == "tess":
             catalog_name = "tic"
-            
-        catalog = query_skycatalog(coord=SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog=catalog_name)
 
-        column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RA_CORRECTED'], catalog['DEC_CORRECTED'], unit="deg"))
+        catalog = query_skycatalog(
+            coord=SkyCoord(self.ra, self.dec, unit="deg"),
+            epoch=self.time[0],
+            catalog=catalog_name,
+        )
 
-        catalog['Column'] = (self.column + column) * u.pix
-        catalog['Row'] = (self.row + row) * u.pix 
+        column, row = self.wcs.world_to_pixel(
+            SkyCoord(catalog["RA_CORRECTED"], catalog["DEC_CORRECTED"], unit="deg")
+        )
+
+        catalog["Column"] = (self.column + column) * u.pix
+        catalog["Row"] = (self.row + row) * u.pix
 
         # Cut down to targets within 1 pixel of edge of TPF (otherwise - 1 here)
         col_min = self.column - 1
@@ -2270,26 +2274,26 @@ class KeplerTargetPixelFile(TargetPixelFile):
         row_max = self.row + self.shape[2] + 1
 
         # Filter
-        catalog[(catalog['Column'] >= col_min) &
-         (catalog['Column'] <= col_max) &
-         (catalog['Row'] >= row_min) &
-         (catalog['Row'] <= row_max)]
+        catalog[
+            (catalog["Column"] >= col_min)
+            & (catalog["Column"] <= col_max)
+            & (catalog["Row"] >= row_min)
+            & (catalog["Row"] <= row_max)
+        ]
 
+        # Given that these have been filtered based on the pixel region we must
+        # Re-find the brightest object in the output
+        bright_index = np.argmin(catalog["Mag"])
 
-        #Given that these have been filtered based on the pixel region we must
-        #Re-find the brightest object in the output
-        bright_index = np.argmin(catalog['Mag'])
+        # Re-create the boolean array listing which star is the reference
+        catalog["Reference Star"] = np.isin(catalog["Mag"], catalog["Mag"][bright_index])
 
-        #Re-create the boolean array listing which star is the reference
-        catalog['Reference Star'] = np.isin(catalog['Mag'],catalog['Mag'][bright_index])
-        
+        # Re-calculate the relative flux based on the reference star
+        catalog["Relative_Flux"] = np.exp(
+            (catalog["Mag"] - catalog["Mag"][bright_index]) / -2.5
+        )
 
-        #Re-calculate the relative flux based on the reference star
-        catalog['Relative_Flux'] = np.exp((catalog['Mag']-catalog['Mag'][bright_index]) / -2.5) 
-
-                
         return catalog
-            
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -2951,9 +2955,8 @@ class TessTargetPixelFile(TargetPixelFile):
 
     @property
     def skycatalog(self):
-
         """Function that returns an astropy table of sources with the proper motion correction applied
-
+        
         Returns:
         ------
         catalog : astropy.table.Table
@@ -2961,22 +2964,27 @@ class TessTargetPixelFile(TargetPixelFile):
         """
         # Please test what happens if you use this and repeatedly call skycatalog
         # I believe the search is cached, so the second time should be much faster
-
-
+        
         if self.mission.lower() == "kepler":
             catalog_name = "kic"
         elif self.mission.lower() == "k2":
             catalog_name = "epic"
         elif self.mission.lower() == "tess":
             catalog_name = "tic"
-            
-        catalog = query_skycatalog(coord=SkyCoord(self.ra, self.dec, unit="deg"), epoch=self.time[0], catalog=catalog_name)
 
-        column, row = self.wcs.world_to_pixel(SkyCoord(catalog['RA_CORRECTED'], catalog['DEC_CORRECTED'], unit="deg"))
+        catalog = query_skycatalog(
+            coord=SkyCoord(self.ra, self.dec, unit="deg"),
+            epoch=self.time[0],
+            catalog=catalog_name,
+        )
 
-        catalog['Column'] = (self.column + column) * u.pix
-        catalog['Row'] = (self.row + row) * u.pix
+        column, row = self.wcs.world_to_pixel(
+            SkyCoord(catalog["RA_CORRECTED"], catalog["DEC_CORRECTED"], unit="deg")
+        )
 
+        catalog["Column"] = (self.column + column) * u.pix
+        catalog["Row"] = (self.row + row) * u.pix
+        
         # Cut down to targets within 1 pixel of edge of TPF (otherwise - 1 here)
         col_min = self.column - 1
         row_min = self.row - 1
@@ -2984,24 +2992,27 @@ class TessTargetPixelFile(TargetPixelFile):
         # You can check elsewhere in lightkurve
         col_max = self.column + self.shape[1] + 1
         row_max = self.row + self.shape[2] + 1
-
+        
         # Filter
-        catalog[(catalog['Column'] >= col_min) &
-         (catalog['Column'] <= col_max) &
-         (catalog['Row'] >= row_min) &
-         (catalog['Row'] <= row_max)]
+        catalog[
+            (catalog["Column"] >= col_min)
+            & (catalog["Column"] <= col_max)
+            & (catalog["Row"] >= row_min)
+            & (catalog["Row"] <= row_max)
+        ]
         
-        #Given that these have been filtered based on the pixel region we must
-        #Re-find the brightest object in the output
-        bright_index = np.argmin(catalog['Mag'])
+        # Given that these have been filtered based on the pixel region we must
+        # Re-find the brightest object in the output
+        bright_index = np.argmin(catalog["Mag"])
 
-        #Re-create the boolean array listing which star is the reference
-        catalog['Reference Star'] = np.isin(catalog['Mag'],catalog['Mag'][bright_index])
+        # Re-create the boolean array listing which star is the reference
+        catalog["Reference Star"] = np.isin(catalog["Mag"], catalog["Mag"][bright_index])
         
+        # Re-calculate the relative flux based on the reference star
+        catalog["Relative_Flux"] = np.exp(
+            (catalog["Mag"] - catalog["Mag"][bright_index]) / -2.5
+        )
 
-        #Re-calculate the relative flux based on the reference star
-        catalog['Relative_Flux'] = np.exp((catalog['Mag']-catalog['Mag'][bright_index]) / -2.5) 
-        
         return catalog
     
     def get_bkg_lightcurve(self, aperture_mask=None):

@@ -915,7 +915,7 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
     c1 = c.apply_space_motion(new_obstime=epoch)
 
     # Adjust the output table
-    table.rename_columns(("RAJ2000","DEJ2000"),("RA_CORRECTED","DEC_CORRECTED"))
+    table.rename_columns(("RAJ2000", "DEJ2000"), ("RA_CORRECTED", "DEC_CORRECTED"))
     # Add new data corrected RA and Dec
     table["RA_CORRECTED"] = c1.ra.to(u.deg).value
     table["DEC_CORRECTED"] = c1.dec.to(u.deg).value
@@ -955,8 +955,8 @@ def query_skycatalog(
     Returns an astropy.table of the sources within radius query corrected for propermotion
     """
 
-    #This is a lits of VizieR catalogs and their input parameters to be used in the
-    #query_skycatalog function
+    # This is a lits of VizieR catalogs and their input parameters to be used in the
+    # query_skycatalog function
     _Catalog_Dictionary = {
         "kic": {
             "catalog": "V/133/kic",
@@ -1033,15 +1033,16 @@ def query_skycatalog(
         _Catalog_Dictionary[catalog.lower()]["rename_out"],
     )
 
-    #Find the brightest object in the catalog output
-    bright_index = np.argmin(result['Mag'])
+    # Find the brightest object in the catalog output
+    bright_index = np.argmin(result["Mag"])
 
-    #Create a boolean array listing which star is the reference
-    result['Reference Star'] = np.isin(result['Mag'],result['Mag'][bright_index])
-        
+    # Create a boolean array listing which star is the reference
+    result["Reference Star"] = np.isin(result["Mag"], result["Mag"][bright_index])
 
-    #Calculate the relative flux
-    result['Relative_Flux'] = np.exp((result['Mag']-result['Mag'][bright_index]) / -2.5) 
+    # Calculate the relative flux
+    result["Relative_Flux"] = np.exp(
+        (result["Mag"] - result["Mag"][bright_index]) / -2.5
+    )
 
     # apply_propermotion
     result = _apply_propermotion(result, equinox=equinox, epoch=epoch)

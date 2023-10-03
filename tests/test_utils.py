@@ -196,67 +196,77 @@ def test_show_citation_instructions():
 
 @pytest.mark.remote_data
 def test_query_skycatalog():
-    # Tests the region around TIC 228760807 which should return a catalog containing 4 objects. 
+    # Tests the region around TIC 228760807 which should return a catalog containing 4 objects.
     c = SkyCoord(194.10141041659, -27.3905828803397, unit="deg")
-    epoch  = Time(1569.4424277786259, scale='tdb', format='btjd')
-    
-    catalog = query_skycatalog(c, epoch, 'tic', 80, 18)
-    assert len(catalog['ID']) == 4
-    
+    epoch = Time(1569.4424277786259, scale="tdb", format="btjd")
+
+    catalog = query_skycatalog(c, epoch, "tic", 80, 18)
+    assert len(catalog["ID"]) == 4
+
     # Checks that an astropy Table is returned
     assert isinstance(catalog, Table)
 
-     # Test that the proper motion works
+    # Test that the proper motion works
     correct_ra = 194.10768406619445
     correct_dec = -27.41051178249595
- 
-    assert np.isclose(catalog['RA_CORRECTED'][0], correct_ra, atol=1e-6)
-    assert np.isclose(catalog['DEC_CORRECTED'][0], correct_dec, atol=1e-6)
+
+    assert np.isclose(catalog["RA_CORRECTED"][0], correct_ra, atol=1e-6)
+    assert np.isclose(catalog["DEC_CORRECTED"][0], correct_dec, atol=1e-6)
 
     # Test different epochs
-    catalog_new = query_skycatalog(c, Time(2461041.500, scale='tt', format='jd'),'tic',80,18)
+    catalog_new = query_skycatalog(
+        c, Time(2461041.500, scale="tt", format="jd"), "tic", 80, 18
+    )
 
     correct_ra_new = 194.10764826027054
     correct_dec_new = -27.41050446197694
 
-    assert np.isclose(catalog['RA_CORRECTED'][0], correct_ra_new, atol=1e-6)
-    assert np.isclose(catalog['DEC_CORRECTED'][0], correct_dec_new, atol=1e-6)
+    assert np.isclose(catalog["RA_CORRECTED"][0], correct_ra_new, atol=1e-6)
+    assert np.isclose(catalog["DEC_CORRECTED"][0], correct_dec_new, atol=1e-6)
 
     # test the catalog type i.e., simbad is not included in our catalog list.
     # Look at other tests to see if this is correct syntax
     with pytest.raises(ValueError, match="Can not parse catalog name 'simbad'"):
-        query_skycatalog(c, epoch, 'simbad', 80, 18)
-        
+        query_skycatalog(c, epoch, "simbad", 80, 18)
+
     # Test each other catalog
     # Gaia
-    catalog_gaia = query_skycatalog(c, Time(1569.4424277786259, scale='tdb', format='btjd'),'gaiadr3',80,18)
+    catalog_gaia = query_skycatalog(
+        c, Time(1569.4424277786259, scale="tdb", format="btjd"), "gaiadr3", 80, 18
+    )
 
-    assert len(catalog_gaia['ID']) == 2
+    assert len(catalog_gaia["ID"]) == 2
 
-    #Kepler
-    catalog_kepler = query_skycatalog(SkyCoord(285.679391, 50.2413, unit="deg"),
-                                         Time(120.5391465105713, scale="tdb", format="bkjd"),
-                                         'kic',20,18)
+    # Kepler
+    catalog_kepler = query_skycatalog(
+        SkyCoord(285.679391, 50.2413, unit="deg"),
+        Time(120.5391465105713, scale="tdb", format="bkjd"),
+        "kic",
+        20,
+        18,
+    )
 
-    assert len(catalog_kepler['ID']) == 5
+    assert len(catalog_kepler["ID"]) == 5
 
-    #K2
-    catalog_k2 = query_skycatalog(SkyCoord(172.560465, 7.588391, unit="deg"),
-                                         Time(1975.1781333280233, scale="tdb", format="bkjd"),
-                                         'epic',20,18)
+    # K2
+    catalog_k2 = query_skycatalog(
+        SkyCoord(172.560465, 7.588391, unit="deg"),
+        Time(1975.1781333280233, scale="tdb", format="bkjd"),
+        "epic",
+        20,
+        18,
+    )
 
-    assert len(catalog_k2['ID']) == 1
-    
-    
+    assert len(catalog_k2["ID"]) == 1
+
 
 @pytest.mark.remote_data
 def test_query_skycatalog_tpf():
-
     # Test that you get an answer for each TPF type
     TESS_tpf = search_targetpixelfile("TIC 228760807")[0].download()
     catalog_tess = TESS_tpf.skycatalog
     assert isinstance(catalog_tess, Table)
-    
+
     Kepler_tpf = search_targetpixelfile("Kepler-10")[0].download()
     catalog_kepler = Kepler_tpf.skycatalog
     assert isinstance(catalog_kepler, Table)
@@ -269,26 +279,22 @@ def test_query_skycatalog_tpf():
     target_ra = TESS_tpf.ra
     target_dec = TESS_tpf.dec
 
-    index = np.where(catalog_tess['ID']==228760807)
-    cat_ra = catalog_tess['RA_CORRECTED'][index]
-    cat_dec = catalog_tess['DEC_CORRECTED'][index]
+    index = np.where(catalog_tess["ID"] == 228760807)
+    cat_ra = catalog_tess["RA_CORRECTED"][index]
+    cat_dec = catalog_tess["DEC_CORRECTED"][index]
 
     c1 = SkyCoord(target_ra, target_dec, unit="deg")
     c2 = SkyCoord(cat_ra, cat_dec, unit="deg")
     sep = c1.separation(c2)
-    assert sep.arcsecond < 10 
-    
+    assert sep.arcsecond < 10
+
     # Check that it has pixel positions and that they are within reason
     correct_row = 1806.0942842433474
     correct_col = 825.0328770805637
- 
-    assert np.isclose(catalog_tess['Row'][0], correct_row, atol=1e-6)
-    assert np.isclose(catalog_tess['Column'][0], correct_col, atol=1e-6)
-    
+
+    assert np.isclose(catalog_tess["Row"][0], correct_row, atol=1e-6)
+    assert np.isclose(catalog_tess["Column"][0], correct_col, atol=1e-6)
+
     # Check that there are magnitudes
     correct_mag = 9.459
-    assert np.isclose(catalog_tess['Mag'][0], correct_mag, atol=1e-3)
-    
-
-    
-
+    assert np.isclose(catalog_tess["Mag"][0], correct_mag, atol=1e-3)
