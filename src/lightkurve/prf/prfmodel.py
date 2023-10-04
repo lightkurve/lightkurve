@@ -55,6 +55,29 @@ from matplotlib import patches
 #from ..targetpixelfile import TargetPixelFile
 # from ..targetpixelfile import _parse_aperture_mask
 
+def from_tpf(tpf):
+	"""
+	Returns a KeplerPRF or TessPRF object when passed TPF
+	
+	Parameters:
+	-----------
+	tpf : TargetPixelFile
+		lightkurve TargetPixelFile of a TESS, Kepler, or K2 cutout
+		
+	Returns:
+	--------
+	prf_object : PRF
+		Initialized PRF object in the shape and location of the TPF
+	"""
+
+	if tpf.mission.lower() == 'tess':
+		prf_object = TessPRF(tpf.column, tpf.row, tpf.shape[1:3], tpf.camera, tpf.ccd)
+	elif (tpf.mission.lower() == 'kepler') | (tpf.mission.lower() == 'k2'):
+		prf_object = KeplerPRF(tpf.column, tpf.row, tpf.shape[1:3], tpf.channel)
+	else:
+		raise TypeError("TPF must be from Kepler/K2 or TESS")	
+	return prf_object
+
 
 class PRF(ABC):
 	@abstractmethod
@@ -63,8 +86,8 @@ class PRF(ABC):
 		A generic base class object for PRFs. You're not supposed to use this directly.
 		See KeplerPRF and TessPRF for the instantiable classes.
 
-		Parameters
-		----------
+		Parameters:
+		-----------
 		column : int
 				pixel coordinate of the lower left column value
 		row : int
@@ -219,12 +242,10 @@ class PRF(ABC):
 		"""
 		return np.sum(prf_model[target_idx, aperture]) / np.sum(prf_model[target_idx, :, :])
 
-	# Question, should I remove flux here? 
 	def evaluate(
 		self,
 		center_col=None,
 		center_row=None,
-		flux: float = 1.0,
 		scale: float = 1.0,
 		rotation_angle: float = 0.0,
 	):
@@ -235,8 +256,6 @@ class PRF(ABC):
 		----------
 		center_col, center_row : float
 				Column and row coordinates of the center
-		flux : float
-				Total integrated flux of the PRF
 		scale : float
 				Pixel scale stretch parameter, i.e. the numbers by which the PRF
 				model needs to be multiplied in the column and row directions to
@@ -263,7 +282,7 @@ class PRF(ABC):
 		
 
 		if (scale == 1.0) and (rotation_angle == 0.0):
-			prf = flux * self.interpolate(delta_row, delta_col)
+			prf = self.interpolate(delta_row, delta_col)
 
 		else:
 			
@@ -276,7 +295,7 @@ class PRF(ABC):
 
 			# Changing this to divide by scale does more what I would expect
 
-			prf = flux * self.interpolate(
+			prf = self.interpolate(
 				rot_row.flatten() * scale , rot_col.flatten() * scale, grid=False
 			).reshape(self.shape)
 			prf = prf/(1/scale)**2
@@ -418,7 +437,7 @@ class PRF(ABC):
 
 		"""
 
-		# PRF.evaluate returns 1 PRF.
+		# PRF.evaluate returns a PRF for one onject.
 		# Here, evaluate is called for each target provided (e.g., for each source within a tpf)
 
 		if isinstance(center_col, (list, np.ndarray)):
@@ -486,8 +505,6 @@ class PRF(ABC):
 		"""Method to read PRF fits files for each mission and extract needed information"""
 		pass
 		
-	'''def from_tpf(self):
-		pass'''
 
 
 #############################################################
@@ -496,7 +513,8 @@ class PRF(ABC):
 #############################################################
 #############################################################
 class KeplerPRF(PRF):
-	"""A KeplerPRF class.
+	"""
+	A KeplerPRF class.
 
 	There are 5 PRF measurements (the 4 corners and the center) for each channel.
 	The measured PRF is over-sampled by a factor of 50 to enable for sub-pixel interpolation.
@@ -608,15 +626,6 @@ class KeplerPRF(PRF):
 
 		return col_coord, row_coord, interpolate, supersamp_prf
 
-	'''def from_tpf(self):
-		"""Creates a PRF object using a Kepler/K2 TPF"""
-		if not isinstance(self, TargetPixelFile):
-			raise ValueError("Input is not a valid TargetPixelFile")
-		if not (self.mission.lower() == 'kepler') | (self.mission.lower() == 'k2'):
-			raise ValueError("Must provide a Kepler/K2 TPF.")
-			
-		prf_object = KeplerPRF(self.column, self.row, self.channel, self.shape[1:3])
-		return prf_object'''
 
 	def plot(self, *params):
 		"""Generates a plot showing the supersampled PRF model, evaluated for the given location on the CCD
@@ -765,15 +774,6 @@ class TessPRF(PRF):
 		return col_coord, row_coord, interpolate, supersamp_prf
 	
 
-	'''def from_tpf(self):
-		"""Returns a TessPRF object when passed a TESS TPF"""
-		if not isinstance(self, TargetPixelFile):
-			raise ValueError("Input is not a valid TargetPixelFile")
-		if not self.mission.lower() == 'tess':
-			raise ValueError("Must provide a TESS TPF.")
-			
-		prf_object = TessPRF(self.column, self.row, self.shape[1:3], self.camera, self.ccd)
-		return prf_object'''
 
 	def plot(self, *params):  # Fill in params explicitly
 		"""Plots the supersampled PRF model, evaluated for the given location on the CCD
