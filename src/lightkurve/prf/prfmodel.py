@@ -193,7 +193,8 @@ class PRF(ABC):
 				prf model multiplied by total expected flux
 		
 		"""
-		# Add check to see if prf_model and fluxes are the same length
+		if len(fluxes) != prf_model.shape[0]:
+			raise ValueError(f"number of input fluxes do not match number of elements in prf_model.")
 		return 	np.array([prf_model[ii, :, :] * fluxes[ii] for ii in range(len(fluxes))])
 
 	def estimate_completeness(
@@ -218,6 +219,7 @@ class PRF(ABC):
 		"""
 		return np.sum(prf_model[target_idx, aperture]) / np.sum(prf_model[target_idx, :, :])
 
+	# Question, should I remove flux here? 
 	def evaluate(
 		self,
 		center_col=None,
@@ -238,7 +240,9 @@ class PRF(ABC):
 		scale : float
 				Pixel scale stretch parameter, i.e. the numbers by which the PRF
 				model needs to be multiplied in the column and row directions to
-				account for focus changes
+				account for focus changes. 
+				Values < 1 stretch the image, Values > 1 make the PRF more compact.
+				E.g. a scale value of 0.5 will double the PRF footprint. 
 		rotation_angle : float
 				Rotation angle in radians
 
@@ -273,14 +277,12 @@ class PRF(ABC):
 			# Changing this to divide by scale does more what I would expect
 
 			prf = flux * self.interpolate(
-				rot_row.flatten() / scale , rot_col.flatten() / scale , grid=False
+				rot_row.flatten() * scale , rot_col.flatten() * scale, grid=False
 			).reshape(self.shape)
-			# prf = prf/(scale**2) ?
+			prf = prf/(1/scale)**2
 			
-
-		# NS maybe you could just augment the files so there is a border of 0s around
-		# The prf values around the edges tend to be crazy small, so this may be more practical
-		prf[prf < 1e-16] = 0.0  # Discuss this cutoff
+		# Ignore relative flux below a given threshold as the resulting flux change is not detectable
+		prf[prf < 1e-16] = 0.0 
 		return prf
 
 	def gradient(
@@ -305,7 +307,9 @@ class PRF(ABC):
 		scale : float
 				Pixel scale stretch parameter, i.e. the numbers by which the PRF
 				model needs to be multiplied in the column and row directions to
-				account for focus changes
+				account for focus changes. 
+				Values < 1 stretch the image, Values > 1 make the PRF more compact.
+				E.g. a scale value of 0.5 will double the PRF footprint. 
 		rotation_angle : float
 				Rotation angle in radians
 
@@ -390,7 +394,9 @@ class PRF(ABC):
 		rotation_angle: float = 0.0,
 	) -> npt.ArrayLike:
 		"""
-		Creates a cube of PRF models
+		Creates a stack of PRF models. 
+		if center_col/center_row are lists (e.g., a list of pixel locations for each star 
+		located in a TPF), a prf will be generated for each. 
 
 		Optional Parameters
 		-------------------
@@ -421,7 +427,8 @@ class PRF(ABC):
 				raise ValueError("Column/row locations must have the same shape.")
 			prf_model = np.zeros((len(center_col), self.shape[0], self.shape[1]))
 			for ii in range(len(center_col)):
-				# Flux for each target is not necessarily required
+				# Flux for each target is not taken into account here. 
+				# Can multiply prf_model by flux to get relative prf values.
 				prf_model[ii, :, :] = self.evaluate(
 					center_col=center_col[ii],
 					center_row=center_row[ii],
@@ -476,6 +483,7 @@ class PRF(ABC):
 
 	@abstractmethod
 	def _read_prf_calibration_file(self):
+		"""Method to read PRF fits files for each mission and extract needed information"""
 		pass
 		
 	'''def from_tpf(self):
@@ -493,9 +501,10 @@ class KeplerPRF(PRF):
 	There are 5 PRF measurements (the 4 corners and the center) for each channel.
 	The measured PRF is over-sampled by a factor of 50 to enable for sub-pixel interpolation.
 	The model is a 550x550 (or 750x750) grid that covers 11x11 (or 15x15) pixels
+	
+	https://archive.stsci.edu/missions/kepler/commissioning_prfs/
 	"""
 
-	# I want the option to either give it a tpf and it reads channel/shape OR provide that info
 	def __init__(self, column: int, row: int, shape: tuple, channel: int):
 		super().__init__(column=column, row=row, shape=shape)
 		self.channel = channel
@@ -610,7 +619,7 @@ class KeplerPRF(PRF):
 		return prf_object'''
 
 	def plot(self, *params):
-		"""Plots the supersampled PRF model, evaluated for the given location on the CCD
+		"""Generates a plot showing the supersampled PRF model, evaluated for the given location on the CCD
 
 		Parameters:
 		-----------
