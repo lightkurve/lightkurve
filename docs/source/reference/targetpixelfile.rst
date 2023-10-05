@@ -59,3 +59,6 @@ Constructor
    KeplerTargetPixelFile.get_header
    KeplerTargetPixelFile.get_keyword
    KeplerTargetPixelFile.animate
+   KeplerTargetPixelFile.skycatalog
+   TessTargetPixelFile.skycatalog
+   
