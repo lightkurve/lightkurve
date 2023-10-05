@@ -1037,16 +1037,19 @@ def query_skycatalog(
     c1 = SkyCoord(result['RAJ2000'],result['DEJ2000'], unit="deg")
     sep = coord.separation(c1)
     
-    # Find the brightest object in the catalog output
+    # Find the object with the minimum separation
     ref_index = np.argmin(sep)
 
-    # Create a boolean array listing which star is the reference
-    result["Reference Star"] = np.isin(result["Mag"], result["Mag"][ref_index])
+    # Provide the separation
+    result["Separation"] = sep
 
     # Calculate the relative flux
     result["Relative_Flux"] = np.exp(
         (result["Mag"] - result["Mag"][ref_index]) / -2.5
     )
+
+    #Now sort the table based on separation
+    result.sort(['Separation'])
 
     # apply_propermotion
     result = _apply_propermotion(result, equinox=equinox, epoch=epoch)
