@@ -2421,7 +2421,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     # Move this to the generic tpf class?
 
-    def simple_aperture(
+    def get_simple_aperture(
         self,
         center_col: Union[float, SkyCoord, None] = None,
         center_row: Union[float, SkyCoord, None] = None,
@@ -2456,6 +2456,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
                         2D boolean array of the same (nrows x ncolumns)
 
         """
+        
+        if (min_completeness < 0) | (min_completeness > 1):
+        	raise ValueError("Completeness must be between 0 and 1")
 
         # By default, get the target position from the header.
         if (center_col is None) | (center_row is None):
@@ -2486,7 +2489,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     def estimate_completeness(
         self,
-        aperture: [npt.ArrayLike, None] = None,
+        aperture: npt.ArrayLike,
         center_col: Union[float, SkyCoord, None] = None,
         center_row: Union[float, SkyCoord, None] = None,
         scale: float = 1.0,
@@ -2520,8 +2523,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         """
 
-        if aperture is None:
-            aperture = self.pipeline_mask
+
 
         # By default, get the target position from the header. For a tesscut, this is just the input coordinates.
         if (center_col is None) | (center_row is None):
@@ -3165,8 +3167,8 @@ class TessTargetPixelFile(TargetPixelFile):
 		return self.prf.prf_model(center_col = catalog['columns'], center_row = catalog['row'], scale=scale, rotation_angle=rotation_angle)
 		'''
 
-    # Move this to the generic tpf class?
-    def simple_aperture(
+    # Move this to base class.
+    def get_simple_aperture(
         self,
         center_col: Union[float, SkyCoord, None] = None,
         center_row: Union[float, SkyCoord, None] = None,
@@ -3201,6 +3203,9 @@ class TessTargetPixelFile(TargetPixelFile):
                         2D boolean array of the same (nrows x ncolumns)
 
         """
+        
+        if (min_completeness < 0) | (min_completeness > 1):
+        	raise ValueError("Completeness must be between 0 and 1")
 
         # By default, get the target position from the header. For a tesscut, this is just the input coordinates.
         if (center_col is None) | (center_row is None):
@@ -3216,6 +3221,7 @@ class TessTargetPixelFile(TargetPixelFile):
             center_col = float(center_col) + self.column
             center_row = float(center_row) + self.row
 
+		# TODO: fix this.
         TessPRF = self.prf
         prf_model = TessPRF.prf_model(
             center_col=center_col,
@@ -3232,7 +3238,7 @@ class TessTargetPixelFile(TargetPixelFile):
 
     def estimate_completeness(
         self,
-        aperture: [npt.ArrayLike, None] = None,
+        aperture: npt.ArrayLike,
         center_col: Union[float, SkyCoord, None] = None,
         center_row: Union[float, SkyCoord, None] = None,
         scale: float = 1.0,
@@ -3266,11 +3272,7 @@ class TessTargetPixelFile(TargetPixelFile):
 
         """
 
-        if aperture is None:
-            aperture = self.pipeline_mask
-            # TESScut has an array of all 'False' values for the mask
-            if np.sum(aperture) == 0:
-                raise ValueError("Need to specify a valid aperture")
+
 
         # By default, get the target position from the header. For a tesscut, this is just the input coordinates.
         if (center_col is None) | (center_row is None):
