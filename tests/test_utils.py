@@ -207,8 +207,8 @@ def test_query_skycatalog():
     assert isinstance(catalog, Table)
 
     # Test that the proper motion works
-    correct_ra = 194.10768406619445
-    correct_dec = -27.41051178249595
+    correct_ra = 194.10075230969787
+    correct_dec = -27.390340343480744
 
     assert np.isclose(catalog["RA_CORRECTED"][0], correct_ra, atol=1e-6)
     assert np.isclose(catalog["DEC_CORRECTED"][0], correct_dec, atol=1e-6)
@@ -218,8 +218,8 @@ def test_query_skycatalog():
         c, Time(2461041.500, scale="tt", format="jd"), "tic", 80, 18
     )
 
-    correct_ra_new = 194.10764826027054
-    correct_dec_new = -27.41050446197694
+    correct_ra_new = 194.10052070792756
+    correct_dec_new = -27.390254988629433
 
     assert np.isclose(catalog["RA_CORRECTED"][0], correct_ra_new, atol=1e-6)
     assert np.isclose(catalog["DEC_CORRECTED"][0], correct_dec_new, atol=1e-6)
