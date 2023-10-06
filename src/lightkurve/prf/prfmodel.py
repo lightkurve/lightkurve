@@ -1,6 +1,4 @@
 """ 
-6-Oct-2023
-
 This is an update to the PRF module. Changes include:
 
 - Adding functionality for TESS
@@ -21,15 +19,16 @@ Use cases :
 	- tpf.simple_aperture(...)
 	
 "I want to build a PRF model to simulate a real TPF"
-	- If given a list of center_col and center_row values, prf_model returns a 3D cube of PRF models. 
+	- If given a list of the location of each object within the cutout region, 
+		prf_model returns a 3D cube contining PRF models for each object. 
 	- get_flux_weighted_prf() multiplies the prf_model cube by the list of fluxes
 	- This can then be summed to get the prf model of the field. 
 	
-	
-	
+
 "I want to just see what the PRF looks like at a given location"
 	- lk.prf.TessPRF(column = 100, row = 200, camera = 1, ccd = 1).plot()
-	- lk.prf.TessPRF(column = 100, row = 200, camera = 1, ccd = 1).prf_model(center_col=105, center_row=202)
+	- lk.prf.TessPRF(column = 100, row = 200, camera = 1, ccd = 1).prf_model(center_col=105,
+		center_row=202)
 	
 
 
@@ -47,8 +46,6 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib import patches
 
-# from ..targetpixelfile import TargetPixelFile
-# from ..targetpixelfile import _parse_aperture_mask
 
 
 def from_tpf(tpf):
@@ -85,11 +82,11 @@ class PRF(ABC):
         Parameters:
         -----------
         column : int
-                        pixel coordinate of the lower left column value
+            pixel coordinate of the lower left column value
         row : int
-                         pixel coordinate of the lower left row value
+            pixel coordinate of the lower left row value
         shape : tuple
-                        shape of the resultant PRFs in pixels
+            shape of the resultant PRFs in pixels
         """
 
         # load PSF file
@@ -115,14 +112,14 @@ class PRF(ABC):
         Parameters:
         -----------
         prf_model : npt.ArrayLike
-                        3D cube of the PRFs of all sources with shape (nsources x nrows x ncolumns)
-                        Only the target source is used for this function.
+            3D cube of the PRFs of all sources with shape (nsources x nrows x ncolumns)
+            Only the target source is used for this function.
         target_idx : int
-                        The index of the source to be considered as the target (default 0)
+            The index of the source to be considered as the target (default 0)
         min_completeness : float
-                        Minimum fraction of flux contained within the aperture
+            Minimum fraction of flux contained within the aperture
         plot : bool
-                        plots the simple aperture over the model PRF
+            plots the simple aperture over the model PRF
 
         Returns:
         --------
@@ -335,7 +332,7 @@ class PRF(ABC):
                         of the PRF model with respect to center_col, center_row, flux, scale_col,
                     scale_row, and rotation_angle, respectively.
         """
-
+		# Implemented to match intuition that larger scale value results in a broader PRF
         scale = 1 / scale
 
         if center_col is None:
@@ -354,7 +351,6 @@ class PRF(ABC):
             return [deriv_center_col, deriv_center_row, deriv_flux]
 
         else:
-            # Does this need to be a meshgrid if scale is required to be symmetrical?
             delta_col, delta_row = np.meshgrid(delta_col, delta_row)
             rot_row = delta_row * cosa - delta_col * sina
             rot_col = delta_row * sina + delta_col * cosa
@@ -445,7 +441,7 @@ class PRF(ABC):
             prf_model = np.zeros((len(center_col), self.shape[0], self.shape[1]))
             for ii in range(len(center_col)):
                 # Flux for each target is not taken into account here.
-                # Can multiply prf_model by flux to get relative prf values.
+                # To account for flux, see get_flux_weighted_prf().
                 prf_model[ii, :, :] = self.evaluate(
                     center_col=center_col[ii],
                     center_row=center_row[ii],

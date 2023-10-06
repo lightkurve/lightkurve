@@ -13,7 +13,7 @@ filename_tpf_tabby_lite = get_pkg_data_filename(
 # Check if tpf.prf returns an object of class PRF (specifically KeplerPRF)
 # Check that the shape of the PRF object matches the TPF
 # Check that the sum of the vanilla PRF values is very close to 1 (this wouldn't be true if we added stretch parameters)
-def test_tpf_has_prfattribute():
+def test_kepler():
     tpf = lk.KeplerTargetPixelFile(filename_tpf_tabby_lite)
 
     # Check that the TargetPixelFile class has the appropriate prf functions
@@ -22,6 +22,10 @@ def test_tpf_has_prfattribute():
     assert isinstance(tpf.prf, lk.prf.prfmodel.KeplerPRF)
     assert tpf.prf.shape == tpf.shape[1:3]
     assert np.isclose(np.sum(tpf.prf.prf_model()), 1.0, rtol=0.01)
+    # Check that prf.from_tpf() works
+   
+    
+
 
     ################# APERTURE CHECKS ##################
     # Check that tpf.simple_aperture returns an aperture of the same shape
@@ -36,14 +40,20 @@ def test_tpf_has_prfattribute():
     # assert tpf.estimate_contamination(aperture) == 1.
 
     # Create a Kepler PRF directly (ie not tied to a TFP)
+    
+    kep_prf = lk.prf.KeplerPRF(column=100, row=200, channel=6, shape=(15,15))
+    kep_model = kep_prf.prf_model(center_col=[102,106], center_row=[202,204])
+    assert kep_model.shape == (2,15,15)
+
+
 
     # Check if a TESS TPF has a prf attribute and that it returns an object of class PRF
-    # def test_tpf_has_prfattribute():
-    # 	tpf = lk.TessTargetPixelFile(filename_tess)
+def test_tess():
+    tpf = lk.TessTargetPixelFile(filename_tess)
     # Check that the TargetPixelFile class has the appropriate prf functions
     assert hasattr(tpf, "prf")
     assert isinstance(tpf.prf, lk.prf.prfmodel.PRF)
-    assert isinstance(tpf.prf, lk.prf.prfmodel.KeplerPRF)
+    assert isinstance(tpf.prf, lk.prf.prfmodel.TessPRF)
     assert tpf.prf.shape == tpf.shape[1:3]
     assert np.isclose(np.sum(tpf.prf.prf_model()), 1.0, rtol=0.01)
 
@@ -55,3 +65,5 @@ def test_tpf_has_prfattribute():
     assert aperture.shape == tpf.shape[1:3]
     assert np.sum(aperture) >= 1
     assert np.sum(aperture) > np.sum(tpf.simple_aperture(min_completeness=0.1))
+    
+    test_prf = lk.prf.TessPRF(column=100, row=200, camera=4, ccd=2, shape=(15,15))
