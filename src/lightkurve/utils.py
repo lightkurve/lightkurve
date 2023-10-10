@@ -911,8 +911,14 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
         obstime=equinox,
     )
 
-    # Calculate the new values
-    c1 = c.apply_space_motion(new_obstime=epoch)
+    #Suppress warning caused by zero values for pm
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore", message="ERFA function"
+        )
+    
+        # Calculate the new values
+        c1 = c.apply_space_motion(new_obstime=epoch)
 
     # Adjust the output table
     table.rename_columns(("RAJ2000", "DEJ2000"), ("RA_CORRECTED", "DEC_CORRECTED"))
