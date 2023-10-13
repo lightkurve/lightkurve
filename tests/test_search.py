@@ -107,7 +107,7 @@ def test_search_lightcurve(caplog):
     #   https://simbad.cds.unistra.fr/simbad/sim-id?Ident=%405506010&Name=Kepler-10
     assert (
         len(search_lightcurve("2MASS J19024305+5014286", mission="Kepler", cadence="long").table)
-        == 15
+        == 21
     )
     # An invalid KIC/EPIC ID or target name should be dealt with gracefully
     search_lightcurve(-999)
@@ -291,7 +291,7 @@ def test_collections():
                 "EPIC 205998445", mission="K2", radius=900, limit=6
             ).table
         )
-        == 4
+        == 5
     )
     # if download() is used when multiple files are available, should only download 1
     with pytest.warns(LightkurveWarning, match="4 files available to download"):
