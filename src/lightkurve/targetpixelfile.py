@@ -2060,18 +2060,16 @@ class TargetPixelFile(object):
         catalog : astropy.table.Table
         Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
         """
-
-        
         
         if self.mission.lower() == "kepler":
             catalog_name = "kic"
-            radius = 4 * np.max([self.shape[1],self.shape[2]])/2 * u.arcsec
+            radius = 4 * (np.max([self.shape[1],self.shape[2]])+10)/2 * u.arcsec
         elif self.mission.lower() == "k2":
             catalog_name = "epic"
-            radius = 4 * np.max([self.shape[1],self.shape[2]])/2 * u.arcsec
+            radius = 4 * (np.max([self.shape[1],self.shape[2]])+10)/2 * u.arcsec
         elif self.mission.lower() == "tess":
             catalog_name = "tic"
-            radius = 21 * np.max([self.shape[1],self.shape[2]])/2 * u.arcsec
+            radius = 21 * (np.max([self.shape[1],self.shape[2]])+10)/2  * u.arcsec
         else:
             raise ValueError("Must pass a valid Target Pixel File object.")
             
@@ -2083,7 +2081,7 @@ class TargetPixelFile(object):
         )
 
         column, row = self.wcs.world_to_pixel(
-            SkyCoord(catalog["RA_CORRECTED"], catalog["DEC_CORRECTED"], unit="deg")
+            SkyCoord(catalog["RA"], catalog["DEC"], unit="deg")
         )
 
         catalog["Column"] = (self.column + column) * u.pix
@@ -2092,13 +2090,12 @@ class TargetPixelFile(object):
         # Cut down to targets within 1 pixel of edge of TPF 
         col_min = self.column - 1
         row_min = self.row - 1
-    
-        col_max = self.column + self.shape[2] +1
-        row_max = self.row + self.shape[1] + 1
 
+        col_max = self.column + self.shape[2] 
+        row_max = self.row + self.shape[1] 
 
         # Filter
-        catalog[
+        catalog = catalog[
             (catalog["Column"] >= col_min)
             & (catalog["Column"] <= col_max)
             & (catalog["Row"] >= row_min)

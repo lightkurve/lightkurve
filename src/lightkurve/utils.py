@@ -22,7 +22,7 @@ from astropy.visualization import (
     LinearStretch,
 )
 from astropy.time import Time
-from astropy.coordinates import SkyCoord, Angle
+from astropy.coordinates import SkyCoord, Angle, Distance
 from astroquery.vizier import Vizier
 from astropy.table import Table
 from typing import Union
@@ -898,9 +898,12 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
 
     # We need to remove any nan values from our proper  motion list
     # Doing this will allow objects which do not have proper motion to still be displayed
-    table["pmRA"] = np.nan_to_num(table["pmRA"], 0.0)
-    table["pmDEC"] = np.nan_to_num(table["pmDEC"], 0.0)
+    #table["pmRA"] = np.nan_to_num(table["pmRA"], 0.0)
+    #table["pmDEC"] = np.nan_to_num(table["pmDEC"], 0.0)
+    table["pmRA"] = np.ma.filled(table["pmRA"].astype(float), 0.0)
+    table["pmDEC"] = np.ma.filled(table["pmDEC"].astype(float), 0.0)
 
+    
     # Get the input data from the table
     c = SkyCoord(
         ra=table["RAJ2000"],
@@ -920,11 +923,9 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
         # Calculate the new values
         c1 = c.apply_space_motion(new_obstime=epoch)
 
-    # Adjust the output table
-    table.rename_columns(("RAJ2000", "DEJ2000"), ("RA_CORRECTED", "DEC_CORRECTED"))
     # Add new data corrected RA and Dec
-    table["RA_CORRECTED"] = c1.ra.to(u.deg).value
-    table["DEC_CORRECTED"] = c1.dec.to(u.deg).value
+    table["RA"] = c1.ra.to(u.deg).value * u.deg
+    table["DEC"] = c1.dec.to(u.deg).value *u.deg
 
     return table
 
@@ -966,31 +967,31 @@ def query_skycatalog(
     _Catalog_Dictionary = {
         "kic": {
             "catalog": "V/133/kic",
-            "columns": ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"],
+            "columns": ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE","kepmag"],
             "column_filters": "kepmag",
             "rename_in": ("KIC", "pmDE", "kepmag"),
-            "rename_out": ("ID", "pmDEC", "Mag"),
+            "rename_out": ("ID", "pmDEC", "Kepler_Mag"),
         },
         "epic": {
             "catalog": "IV/34/epic",
             "columns": ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Kpmag"],
             "column_filters": "Kpmag",
             "rename_in": ["Kpmag"],
-            "rename_out": ["Mag"],
+            "rename_out": ["K2_Mag"],
         },
         "tic": {
             "catalog": "IV/39/tic82",
             "columns": ["TIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Tmag"],
             "column_filters": "Tmag",
             "rename_in": ("TIC", "pmDE", "Tmag"),
-            "rename_out": ("ID", "pmDEC", "Mag"),
+            "rename_out": ("ID", "pmDEC", "TESS_Mag"),
         },
         "gaiadr3": {
             "catalog": "I/355/gaiadr3",
             "columns": ["DR3Name", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Gmag"],
             "column_filters": "Gmag",
             "rename_in": ("DR3Name", "pmDE", "Gmag"),
-            "rename_out": ("ID", "pmDEC", "Mag"),
+            "rename_out": ("ID", "pmDEC", "Gaia_G_Mag"),
         },
     }
 
@@ -1051,7 +1052,7 @@ def query_skycatalog(
 
     # Calculate the relative flux
     result["Relative_Flux"] = np.exp(
-        (result["Mag"] - result["Mag"][ref_index]) / -2.5
+        ([value for key, value in result.items() if '_Mag' in key][0] - [value for key, value in result.items() if '_Mag' in key][0][ref_index]) / -2.5
     )
 
     #Now sort the table based on separation
