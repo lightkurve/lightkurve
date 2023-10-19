@@ -898,12 +898,9 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
 
     # We need to remove any nan values from our proper  motion list
     # Doing this will allow objects which do not have proper motion to still be displayed
-    #table["pmRA"] = np.nan_to_num(table["pmRA"], 0.0)
-    #table["pmDEC"] = np.nan_to_num(table["pmDEC"], 0.0)
     table["pmRA"] = np.ma.filled(table["pmRA"].astype(float), 0.0)
     table["pmDEC"] = np.ma.filled(table["pmDEC"].astype(float), 0.0)
 
-    
     # Get the input data from the table
     c = SkyCoord(
         ra=table["RAJ2000"],
@@ -914,18 +911,16 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
         obstime=equinox,
     )
 
-    #Suppress warning caused by zero values for pm
+    # Suppress warning caused by zero values for pm
     with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore", message="ERFA function"
-        )
-    
+        warnings.filterwarnings("ignore", message="ERFA function")
+
         # Calculate the new values
         c1 = c.apply_space_motion(new_obstime=epoch)
 
     # Add new data corrected RA and Dec
     table["RA"] = c1.ra.to(u.deg).value * u.deg
-    table["DEC"] = c1.dec.to(u.deg).value *u.deg
+    table["DEC"] = c1.dec.to(u.deg).value * u.deg
 
     return table
 
@@ -967,7 +962,7 @@ def query_skycatalog(
     _Catalog_Dictionary = {
         "kic": {
             "catalog": "V/133/kic",
-            "columns": ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE","kepmag"],
+            "columns": ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"],
             "column_filters": "kepmag",
             "rename_in": ("KIC", "pmDE", "kepmag"),
             "rename_out": ("ID", "pmDEC", "Kepler_Mag"),
@@ -1040,10 +1035,10 @@ def query_skycatalog(
         _Catalog_Dictionary[catalog.lower()]["rename_out"],
     )
 
-    #Based on the input coordinates pick the object with the mininmum separation as the reference star.
-    c1 = SkyCoord(result['RAJ2000'],result['DEJ2000'], unit="deg")
+    # Based on the input coordinates pick the object with the mininmum separation as the reference star.
+    c1 = SkyCoord(result["RAJ2000"], result["DEJ2000"], unit="deg")
     sep = coord.separation(c1)
-    
+
     # Find the object with the minimum separation
     ref_index = np.argmin(sep)
 
@@ -1052,11 +1047,15 @@ def query_skycatalog(
 
     # Calculate the relative flux
     result["Relative_Flux"] = np.exp(
-        ([value for key, value in result.items() if '_Mag' in key][0] - [value for key, value in result.items() if '_Mag' in key][0][ref_index]) / -2.5
+        (
+            [value for key, value in result.items() if "_Mag" in key][0]
+            - [value for key, value in result.items() if "_Mag" in key][0][ref_index]
+        )
+        / -2.5
     )
 
-    #Now sort the table based on separation
-    result.sort(['Separation'])
+    # Now sort the table based on separation
+    result.sort(["Separation"])
 
     # apply_propermotion
     result = _apply_propermotion(result, equinox=equinox, epoch=epoch)

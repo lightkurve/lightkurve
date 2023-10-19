@@ -210,8 +210,8 @@ def test_query_skycatalog():
     correct_ra = 194.10075230969787
     correct_dec = -27.390340343480744
 
-    assert np.isclose(catalog["RA_CORRECTED"][0], correct_ra, atol=1e-6)
-    assert np.isclose(catalog["DEC_CORRECTED"][0], correct_dec, atol=1e-6)
+    assert np.isclose(catalog["RA"][0], correct_ra, atol=1e-6)
+    assert np.isclose(catalog["DEC"][0], correct_dec, atol=1e-6)
 
     # Test different epochs
     catalog_new = query_skycatalog(
@@ -221,8 +221,8 @@ def test_query_skycatalog():
     correct_ra_new = 194.10052070792756
     correct_dec_new = -27.390254988629433
 
-    assert np.isclose(catalog["RA_CORRECTED"][0], correct_ra_new, atol=1e-6)
-    assert np.isclose(catalog["DEC_CORRECTED"][0], correct_dec_new, atol=1e-6)
+    assert np.isclose(catalog["RA"][0], correct_ra_new, atol=1e-6)
+    assert np.isclose(catalog["DEC"][0], correct_dec_new, atol=1e-6)
 
     # test the catalog type i.e., simbad is not included in our catalog list.
     # Look at other tests to see if this is correct syntax
@@ -280,8 +280,8 @@ def test_query_skycatalog_tpf():
     target_dec = TESS_tpf.dec
 
     index = np.where(catalog_tess["ID"] == 228760807)
-    cat_ra = catalog_tess["RA_CORRECTED"][index]
-    cat_dec = catalog_tess["DEC_CORRECTED"][index]
+    cat_ra = catalog_tess["RA"][index]
+    cat_dec = catalog_tess["DEC"][index]
 
     c1 = SkyCoord(target_ra, target_dec, unit="deg")
     c2 = SkyCoord(cat_ra, cat_dec, unit="deg")
@@ -297,4 +297,4 @@ def test_query_skycatalog_tpf():
 
     # Check that there are magnitudes
     correct_mag = 9.459
-    assert np.isclose(catalog_tess["Mag"][index], correct_mag, atol=1e-3)
+    assert np.isclose(catalog_tess["TESS_Mag"][index], correct_mag, atol=1e-3)
