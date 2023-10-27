@@ -2496,7 +2496,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         rotation_angle: float = 0.0,
     ) -> float:
         """
-        Estimates the fraction of flux from the target falls within a given aperture.
+        Estimates the fraction of flux from the target falls within a given aperture based on the PRF model.
         This does not account for blending.
 
         Parameters:
@@ -3151,6 +3151,7 @@ class TessTargetPixelFile(TargetPixelFile):
         Returns an initialized TessPRF object.
         The PRF is initialized with the same row/column dimensions and camera/ccd as the TPF
         """
+	
 
         return TessPRF(self.column, self.row, self.camera, self.ccd, self.shape[1:3])
 
@@ -3245,7 +3246,7 @@ class TessTargetPixelFile(TargetPixelFile):
         rotation_angle: float = 0.0,
     ) -> float:
         """
-        Estimates the fraction of flux from the target falls within a given aperture.
+        Estimates the fraction of flux from the target falls within a given aperture from the PRF model.
         This does not account for blending.
 
         Parameters:

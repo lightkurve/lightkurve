@@ -45,7 +45,8 @@ from astropy.io import fits as pyfits
 import math
 import matplotlib.pyplot as plt
 from matplotlib import patches
-
+import warnings
+from ..utils import LightkurveWarning
 
 
 def from_tpf(tpf):
@@ -300,7 +301,10 @@ class PRF(ABC):
 			).reshape(self.shape)
 			
 			prf = prf / (1 / scale) ** 2
-
+			
+			# Normalize the values when 'scale' is set to decrease the PRF spread
+			if (1 / scale) < 1:
+				prf = prf/np.sum(prf)
 			
 
 		# Ignore relative flux below a given threshold as the resulting flux change is not detectable
@@ -410,7 +414,7 @@ class PRF(ABC):
 				deriv_rotation_angle,
 			]
 
-	def prf_model(
+	def _prf_model(
 		self,
 		center_col: Union[float, list[float], npt.ArrayLike, None] = None,
 		center_row: Union[float, list[float], npt.ArrayLike, None] = None,
@@ -551,6 +555,14 @@ class KeplerPRF(PRF):
 		return self.prf_model(
 			center_col, center_row, scale=scale, rotation_angle=rotation_angle
 		)
+		
+	def prf_model(self,
+		center_col: Union[float, list[float], npt.ArrayLike, None] = None,
+		center_row: Union[float, list[float], npt.ArrayLike, None] = None,
+		scale: float = 1.0,
+		rotation_angle: float = 0.0,
+		) -> npt.ArrayLike:
+		return self._prf_model(center_col, center_row, scale=scale, rotation_angle=rotation_angle)
 
 	def _read_prf_calibration_file(self, path, ext):
 		"""Reads the Kepler calibration files"""
@@ -693,6 +705,41 @@ class TessPRF(PRF):
 		return self.prf_model(
 			center_col, center_row, scale=scale, rotation_angle=rotation_angle
 		)
+		
+	def prf_model(self,
+		center_col: Union[float, list[float], npt.ArrayLike, None] = None,
+		center_row: Union[float, list[float], npt.ArrayLike, None] = None,
+		scale: float = 1.0,
+		rotation_angle: float = 0.0,
+		) -> npt.ArrayLike:
+		PRF_mod = self._prf_model(center_col, center_row, scale=scale, rotation_angle=rotation_angle)
+		
+		# Mask out flux if it falls on the collateral pixels
+
+		if self.column < 45:
+			tar_flux_before = np.sum(PRF_mod[0,:,:])
+			mask_cols = 45 - self.column
+			PRF_mod[:,:,:mask_cols] = 0
+			tar_flux_after = np.sum(PRF_mod[0,:,:])
+			
+			warnings.warn(
+                f"TPF contains collateral pixels. {(1-(tar_flux_after/tar_flux_before))*100}% of flux is missing",
+                LightkurveWarning,
+            )
+	
+			
+		if self.column + self.shape[1] >= 2093:
+			tar_flux_before = np.sum(PRF_mod[0,:,:])
+			mask_cols = 2093 - self.column
+			PRF_mod[:,:,mask_cols:] = 0
+			tar_flux_after = np.sum(PRF_mod[0,:,:])
+			
+			warnings.warn(
+                f"TPF contains collateral pixels. {(1-(tar_flux_after/tar_flux_before))*100}% of flux is missing",
+                LightkurveWarning,
+            )
+		
+		return PRF_mod #self._prf_model(center_col, center_row, scale=scale, rotation_angle=rotation_angle)
 
 	def _read_prf_calibration_file(self, hdu):
 		data = hdu.data
