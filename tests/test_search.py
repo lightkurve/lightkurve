@@ -385,11 +385,10 @@ def test_mast_http_error_handling(monkeypatch):
     from astroquery.mast import Observations
 
     result = search_lightcurve("TIC 273985862", mission="TESS")
-    remote_url = result.table[0]["dataURL"]
+    remote_url = result.table[0]["dataURI"]
 
     def mock_http_error_response(*args, **kwargs):
         """Mock the `download_product()` response to simulate MAST returns HTTP error"""
-        print("DBG mock_http_error_response called")
         return Table(data={
             "Local Path": ["./mastDownload/acme_lc.fits"],
             "Status": ["ERROR"],

@@ -348,7 +348,7 @@ class SearchResult(object):
             else:
                 from astroquery.mast import Observations
 
-                download_url = table[:1]["dataURL"][0]
+                download_url = table[:1]["dataURI"][0]
                 log.debug("Started downloading {}.".format(download_url))
                 download_response = Observations.download_products(
                     table[:1], mrp_only=False, download_dir=download_dir
@@ -953,8 +953,6 @@ def _search_products(
                 "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
                 "".format(target)
             )
-
-    
 
     # Specifying quarter, campaign, or quarter should constrain the mission
     if quarter is not None:
