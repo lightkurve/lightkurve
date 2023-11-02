@@ -8,7 +8,7 @@ from astropy.time import Time, TimeDelta
 from astropy.timeseries import BoxLeastSquares
 import astropy.units as u
 
-from .utils import LightkurveWarning
+from .utils import LightkurveWarning, finalize_notebook_url
 
 log = logging.getLogger(__name__)
 
@@ -293,8 +293,8 @@ def make_lightcurve_figure_elements(
     # Make figure
     fig = figure(
         title="Light Curve",
-        plot_height=300,
-        plot_width=900,
+        height=300,
+        width=900,
         tools="pan,box_zoom,wheel_zoom,reset",
         toolbar_location="below",
         border_fill_color="#FFFFFF",
@@ -395,8 +395,8 @@ def make_folded_figure_elements(
     # Build Figure
     fig = figure(
         title="Folded Light Curve",
-        plot_height=340,
-        plot_width=450,
+        height=340,
+        width=450,
         tools="pan,box_zoom,wheel_zoom,reset",
         toolbar_location="below",
         border_fill_color="#FFFFFF",
@@ -488,8 +488,8 @@ def make_bls_figure_elements(result, bls_source, help_source):
     # Build Figure
     fig = figure(
         title="BLS Periodogram",
-        plot_height=340,
-        plot_width=450,
+        height=340,
+        width=450,
         tools="pan,box_zoom,wheel_zoom,tap,reset",
         toolbar_location="below",
         border_fill_color="#FFFFFF",
@@ -598,7 +598,7 @@ def _preprocess_lc_for_bls(lc):
 
 def show_interact_widget(
     lc,
-    notebook_url="localhost:8888",
+    notebook_url=None,
     minimum_period=None,
     maximum_period=None,
     resolution=2000,
@@ -616,6 +616,9 @@ def show_interact_widget(
         will need to supply this value for the application to display
         properly. If no protocol is supplied in the URL, e.g. if it is
         of the form "localhost:8888", then "http" will be used.
+        For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+        to the public hostname of your JupyterHub and notebook_url will
+        be defined appropriately automatically.
     minimum_period : float or None
         Minimum period to assess the BLS to. If None, default value of 0.3 days
         will be used.
@@ -1001,4 +1004,5 @@ def show_interact_widget(
     lc = _preprocess_lc_for_bls(lc)
 
     output_notebook(verbose=False, hide_banner=True)
+    notebook_url = finalize_notebook_url(notebook_url)
     return show(_create_interact_ui, notebook_url=notebook_url)

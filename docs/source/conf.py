@@ -87,7 +87,7 @@ todo_include_todos = True
 nbsphinx_execute = "auto"
 
 # Some notebook cells take longer than 60 seconds to execute
-nbsphinx_timeout = 300
+nbsphinx_timeout = 500
 
 # PUT PROLOG HERE
 nbsphinx_prolog = r"""

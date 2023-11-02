@@ -106,7 +106,7 @@ def read_eleanor_lightcurve(filename,
     # convert to int to ensure we stick with the convention
     for colname in ["ffiindex", "cadenceno"]:
         if colname in lc.colnames:
-            if not np.issubdtype(lc[colname].dtype, np.integer):
+            if not np.issubdtype(lc[colname].dtype, np.int_):
                 lc[colname] = np.asarray(lc[colname].value, dtype=int)
 
     if (

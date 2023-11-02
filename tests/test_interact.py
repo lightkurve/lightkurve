@@ -50,10 +50,6 @@ def test_malformed_notebook_url():
     with pytest.raises(ValueError) as exc:
         tpf.interact(notebook_url="")
     assert "Empty host value" in exc.value.args[0]
-    with pytest.raises(AttributeError) as exc:
-        tpf.interact(notebook_url=None)
-    assert "object has no attribute" in exc.value.args[0]
-
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_graceful_exit_outside_notebook():
@@ -144,7 +140,9 @@ def test_interact_functions():
     # ensure proper 2D - 1D conversion
     assert tpf_source.data["xx"].ndim == 1
     assert tpf_source.data["yy"].ndim == 1
-    assert tpf_source.selected.indices.ndim == 1
+    # for bokeh v3, .indices needs to plain list .
+    # cf. https://github.com/bokeh/bokeh/issues/12624
+    assert isinstance(tpf_source.selected.indices, list)
 
     # the lower-level function aperture_mask_from_selected_indices() is used in
     # callback _create_lightcurve_from_pixels(), which cannot be easily tested.

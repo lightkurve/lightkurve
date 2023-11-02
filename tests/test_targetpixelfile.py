@@ -803,7 +803,7 @@ def test_missing_pipeline_mask():
     TPFs produced by TESSCut contain an empty pipeline mask.  When the pipeline
     mask is missing or empty, we want `to_lightcurve()` to fall back on the
     'threshold' mask by default, to avoid creating a light curve based on zero pixels."""
-    tpf = search_tesscut("Proxima Cen", sector=12).download(cutout_size=1)
+    tpf = search_tesscut("Proxima Cen", sector=12).download(cutout_size=3)
     lc = tpf.to_lightcurve()
     assert np.isfinite(lc.flux).any()
     assert lc.meta.get("APERTURE_MASK", None) == "threshold"
@@ -876,3 +876,37 @@ def test_fluxmode():
 def test_animate():
     tpf = read(filename_tpf_one_center)
     tpf.animate()
+
+def test_parse_aperture_masks():
+    """Regression test for numpy 1.25.0"""
+    for tpf in [read(filename_tpf_tabby_lite), read(filename_tpf_one_center)]:
+        # Pipeline
+        # Check string apertures work as expected
+        for aperture in ["background", "threshold", "all", "empty", None]:
+            mask = tpf._parse_aperture_mask(aperture)
+            assert isinstance(mask, np.ndarray)
+            assert np.issubdtype(mask.dtype, bool)
+
+        # Check boolean apertures work as expected
+        for aperture in [np.zeros(tpf.shape[1:], bool), np.ones(tpf.shape[1:], bool), tpf.flux.value[0] > 0]:
+            mask = tpf._parse_aperture_mask(aperture)
+            assert isinstance(mask, np.ndarray)
+            assert np.issubdtype(mask.dtype, bool)
+
+        # Check integer masks work as expected:
+        for aperture in [np.ones(tpf.shape[1:]), np.zeros(tpf.shape[1:]), tpf.hdu[2].data, tpf.hdu[2].data.astype(int)]:
+            mask = tpf._parse_aperture_mask(aperture)
+            assert isinstance(mask, np.ndarray)
+            assert np.issubdtype(mask.dtype, bool)    
+
+    # Check pipeline shows that no pixels are selected
+    tpf = read(filename_tpf_one_center)
+    with pytest.raises(ValueError) as exc:
+        tpf._parse_aperture_mask("pipeline")
+    assert "'pipeline' is requested, but it is missing or empty" in exc.value.args[0]
+
+    # Check pipeline shows that pixels are selected
+    tpf = read(filename_tpf_tabby_lite)
+    tpf._parse_aperture_mask("pipeline")
+    assert isinstance(mask, np.ndarray)
+    assert np.issubdtype(mask.dtype, bool)    

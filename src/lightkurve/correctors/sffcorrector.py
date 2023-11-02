@@ -502,7 +502,12 @@ def _estimate_arclength(centroid_col, centroid_row):
     """
     col = centroid_col - np.nanmin(centroid_col)
     row = centroid_row - np.nanmin(centroid_row)
+    if np.all((col == 0) & (row == 0)):
+        raise RuntimeError("Arclength cannot be computed because there is no "
+                           "centroid motion. Make sure that the aperture of "
+                           "the TPF at least two pixels.")
     # Force c to be correlated not anticorrelated
     if np.polyfit(col.data, row.data, 1)[0] < 0:
         col = np.nanmax(col) - col
-    return (col ** 2 + row ** 2) ** 0.5
+    arclength = (col ** 2 + row ** 2) ** 0.5
+    return arclength 

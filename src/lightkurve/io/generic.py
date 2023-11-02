@@ -1,6 +1,7 @@
 """Read a generic FITS table containing a light curve."""
 import logging
 import warnings
+from copy import deepcopy
 
 from astropy.io import fits
 from astropy.table import Table
@@ -34,7 +35,8 @@ def read_generic_lightcurve(
     if isinstance(filename, fits.HDUList):
         hdulist = filename  # Allow HDUList to be passed
     else:
-        hdulist = fits.open(filename)
+        with fits.open(filename) as hdulist:
+            hdulist = deepcopy(hdulist)
 
     # Raise an exception if the requested extension is invalid
     if isinstance(ext, str):
@@ -65,7 +67,13 @@ def read_generic_lightcurve(
         elif unitstr == "ppm" and repr(tab[colname].unit).startswith("Unrecognized"):
             # Workaround for issue #956
             tab[colname].unit = ppm
-
+        elif unitstr == "ADU":
+            tab[colname].unit = "adu"
+        elif unitstr.lower() == "unitless":
+            tab[colname].unit = ""
+        elif unitstr.lower() == "degcelcius":
+            # CDIPS has non-astropy units
+            tab[colname].unit = "deg_C"
         # Rename columns to lowercase
         tab.rename_column(colname, colname.lower())
 

@@ -9,7 +9,7 @@ from ..utils import TessQualityFlags
 from .generic import read_generic_lightcurve
 
 
-def read_tasoc_lightcurve(filename, flux_column="FLUX_RAW", quality_bitmask=None):
+def read_tasoc_lightcurve(filename, flux_column="FLUX_CORR", quality_bitmask=None):
     """Returns a TESS TASOC `~lightkurve.lightcurve.LightCurve`.
 
     More information: https://archive.stsci.edu/hlsp/tasoc
@@ -20,9 +20,8 @@ def read_tasoc_lightcurve(filename, flux_column="FLUX_RAW", quality_bitmask=None
         Local path or remote url of TASOC light curve FITS file.
     flux_column : str
         Column that will be used to populate the flux values.
-        By default, "FLUX_RAW" is used. It contains the T'DA extracted lightcurve,
-        with no corrections applied to the raw light curves. Corrected lightcurves
-        may become available in the future.
+        By default, "FLUX_CORR" is used. It contains the T'DA extracted lightcurve,
+        with corrections applied to the raw light curves
     """
     lc = read_generic_lightcurve(
         filename, flux_column=flux_column.lower(), time_format="btjd"
