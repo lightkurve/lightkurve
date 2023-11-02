@@ -54,6 +54,7 @@ AUTHOR_LINKS = {
     "TESScut": "https://mast.stsci.edu/tesscut/",
     "GSFC-ELEANOR-LITE": "https://archive.stsci.edu/hlsp/gsfc-eleanor-lite",
     "TGLC": "https://archive.stsci.edu/hlsp/tglc",
+    "KBONUS-BKG":"https://archive.stsci.edu/hlsp/kbonus-bkg",
 }
 
 REPR_COLUMNS_BASE = [
@@ -133,11 +134,11 @@ class SearchResult(object):
         This ordering is not a judgement on the quality of one product vs another,
         because we love all pipelines!
         """
-        sort_priority = {"Kepler": 1, "K2": 1, "SPOC": 1, "TESS-SPOC": 2, "QLP": 3}
+        sort_priority = {"Kepler": 1, "K2": 1, "SPOC": 1, "KBONUS-BKG":2, "TESS-SPOC": 2, "QLP": 3}
         self.table["sort_order"] = [
             sort_priority.get(author, 9) for author in self.table["author"]
         ]
-        self.table.sort(["distance", "year", "mission", "sort_order", "exptime"])
+        self.table.sort(["distance", "project", "sort_order", "year", "exptime"])
 
     def _add_columns(self):
         """Adds a user-friendly index (``#``) column and adds column unit
@@ -348,7 +349,7 @@ class SearchResult(object):
             else:
                 from astroquery.mast import Observations
 
-                download_url = table[:1]["dataURL"][0]
+                download_url = table[:1]["dataURI"][0]
                 log.debug("Started downloading {}.".format(download_url))
                 download_response = Observations.download_products(
                     table[:1], mrp_only=False, download_dir=download_dir
@@ -953,8 +954,6 @@ def _search_products(
                 "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
                 "".format(target)
             )
-
-    
 
     # Specifying quarter, campaign, or quarter should constrain the mission
     if quarter is not None:
