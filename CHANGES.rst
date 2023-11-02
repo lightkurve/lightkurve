@@ -1,6 +1,7 @@
 2.4.1dev (unreleased)
 =====================
 
+- Updated plot style to default to higher resolution [#1311]
 - Fixed download issue due to MAST API change [#1380]
 - Updated interact features to work with JupyterHub (e.g. TiKE) [#1349]
 - Exposed niters parameter in the PCA function of design matrix
