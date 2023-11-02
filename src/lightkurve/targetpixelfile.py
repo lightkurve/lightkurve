@@ -31,7 +31,7 @@ from scipy.ndimage import label
 from tqdm import tqdm
 from copy import deepcopy
 
-from . import PACKAGEDIR, MPLSTYLE
+from . import PACKAGEDIR, MPLSTYLE, MPLSTYLE_IMG
 from .lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import (
@@ -43,7 +43,7 @@ from .utils import (
     validate_method,
     centroid_quadratic,
     _query_solar_system_objects,
-    finalize_notebook_url
+    finalize_notebook_url,
 )
 from .io import detect_filetype
 
@@ -568,7 +568,9 @@ class TargetPixelFile(object):
         lc : LightCurve object
             Object containing the resulting lightcurve.
         """
-        method = validate_method(method, supported_methods=["aperture", "prf", "sap", "sff", "cbv", "pld"])
+        method = validate_method(
+            method, supported_methods=["aperture", "prf", "sap", "sff", "cbv", "pld"]
+        )
         if method in ["aperture", "sap"]:
             return self.extract_aperture_photometry(**kwargs)
         elif method == "prf":
@@ -581,7 +583,7 @@ class TargetPixelFile(object):
 
     def _resolve_default_aperture_mask(self, aperture_mask):
         if isinstance(aperture_mask, str):
-            if (aperture_mask == "default"):
+            if aperture_mask == "default":
                 # returns 'pipeline', unless it is missing. Falls back to 'threshold'
                 return "pipeline" if np.any(self.pipeline_mask) else "threshold"
             else:
@@ -629,7 +631,7 @@ class TargetPixelFile(object):
 
         # Input validation
         if hasattr(aperture_mask, "shape"):
-            if (aperture_mask.shape != self.shape[1:]):
+            if aperture_mask.shape != self.shape[1:]:
                 raise ValueError(
                     "`aperture_mask` has shape {}, "
                     "but the flux data has shape {}"
@@ -653,17 +655,17 @@ class TargetPixelFile(object):
                 aperture_mask = np.zeros((self.shape[1], self.shape[2]), dtype=bool)
         elif isinstance(aperture_mask, np.ndarray):
             # Kepler and TESS pipeline style integer flags
-            if np.issubdtype(aperture_mask.dtype, np.dtype('>i4')):
+            if np.issubdtype(aperture_mask.dtype, np.dtype(">i4")):
                 aperture_mask = (aperture_mask & 2) == 2
             elif np.issubdtype(aperture_mask.dtype, int):
                 if ((aperture_mask & 2) == 2).any():
                     # Kepler and TESS pipeline style integer flags
                     aperture_mask = (aperture_mask & 2) == 2
                 else:
-                    aperture_mask = aperture_mask.astype(bool)                
+                    aperture_mask = aperture_mask.astype(bool)
             elif np.issubdtype(aperture_mask.dtype, float):
-                aperture_mask = aperture_mask.astype(bool)                
-        self._last_aperture_mask = aperture_mask 
+                aperture_mask = aperture_mask.astype(bool)
+        self._last_aperture_mask = aperture_mask
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3, reference_pixel="center"):
@@ -927,7 +929,7 @@ class TargetPixelFile(object):
         sigma=3,
         cache=True,
         return_mask=False,
-        show_progress=True
+        show_progress=True,
     ):
         """Returns a list of asteroids or comets which affected the target pixel files.
 
@@ -1032,7 +1034,7 @@ class TargetPixelFile(object):
 
         if radius == None:
             radius = (
-                2 ** 0.5 * (pixel_scale * (np.max(self.shape[1:]) + 5))
+                2**0.5 * (pixel_scale * (np.max(self.shape[1:]) + 5))
             ) * u.arcsecond.to(u.deg)
 
         res = _query_solar_system_objects(
@@ -1057,7 +1059,7 @@ class TargetPixelFile(object):
         column="FLUX",
         aperture_mask=None,
         show_colorbar=True,
-        mask_color="red",
+        mask_color="tomato",
         title=None,
         style="lightkurve",
         **kwargs,
@@ -1141,9 +1143,9 @@ class TargetPixelFile(object):
             "RAW_CNTS": "Raw Counts",
         }
 
-        with plt.style.context(style):
+        with plt.style.context([style, MPLSTYLE_IMG]):
             if title is None:
-                title = "Target ID: {}, Cadence: {}".format(
+                title = "Target ID: {}\nCadence: {}".format(
                     self.targetid, self.cadenceno[frame]
                 )
 
@@ -1164,8 +1166,6 @@ class TargetPixelFile(object):
                 if hasattr(ax, "wcs"):
                     img_extent = None
 
-
-
             ax = plot_image(
                 data_to_plot,
                 ax=ax,
@@ -1176,7 +1176,6 @@ class TargetPixelFile(object):
                 **kwargs,
             )
             ax.grid(False)
-
 
         # Overlay the aperture mask if given
         if aperture_mask is not None:
@@ -1269,9 +1268,16 @@ class TargetPixelFile(object):
             # To make installing Lightkurve easier, ipython is an optional dependency,
             # because we can assume it is installed when notebook-specific features are called
             from IPython.display import HTML
-            return HTML(self._to_matplotlib_animation(step=step, interval=interval, **plot_args).to_jshtml())
+
+            return HTML(
+                self._to_matplotlib_animation(
+                    step=step, interval=interval, **plot_args
+                ).to_jshtml()
+            )
         except ModuleNotFoundError:
-            log.error("ipython needs to be installed for animate() to work (e.g., `pip install ipython`)")
+            log.error(
+                "ipython needs to be installed for animate() to work (e.g., `pip install ipython`)"
+            )
 
     def to_fits(self, output_fn=None, overwrite=False):
         """Writes the TPF to a FITS file on disk."""
@@ -1377,8 +1383,9 @@ class TargetPixelFile(object):
             **kwargs,
         )
 
-
-    def interact_sky(self, notebook_url=None, aperture_mask="empty", magnitude_limit=18):
+    def interact_sky(
+        self, notebook_url=None, aperture_mask="empty", magnitude_limit=18
+    ):
         """Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.
 
         Parameters
@@ -1406,7 +1413,10 @@ class TargetPixelFile(object):
         notebook_url = finalize_notebook_url(notebook_url)
 
         return show_skyview_widget(
-            self, notebook_url=notebook_url, aperture_mask=aperture_mask, magnitude_limit=magnitude_limit
+            self,
+            notebook_url=notebook_url,
+            aperture_mask=aperture_mask,
+            magnitude_limit=magnitude_limit,
         )
 
     def to_corrector(self, method="pld", **kwargs):

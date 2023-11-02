@@ -1,50 +1,102 @@
 # Matplotlib style used by lightkurve
 
+lines.color:     C0                # has no affect on plot(); see axes.prop_cycle
+lines.linewidth  : 0.8
+lines.markersize : 1.5
+
+
 figure.facecolor : white
-figure.dpi       : 100
-figure.figsize   : 8.485, 4
+figure.edgecolor:   white     # figure edge color
+figure.dpi       : 150
+figure.figsize   : 6.4, 4.
+figure.titlesize:   x-large     # size of the figure title (``Figure.suptitle()``)
+figure.autolayout: True  # When True, automatically adjust subplot
+                           # parameters to make the plot fit the figure
+                           # using `tight_layout`
+
 
 image.cmap : viridis
+image.origin:          lower        # {lower, upper}
 
-text.color : 4c4c4c
+
+text.color : 000000
 
 scatter.marker : .
 
-lines.linewidth  : 0.5
-lines.markersize : 2
-
-axes.formatter.use_mathtext : True
-axes.spines.top   : True
-axes.spines.right : True
-
+axes.spines.top   : False
+axes.spines.right : False
 axes.titlepad   : 10
-axes.titlesize  : 18
+axes.titlesize  : x-large
 axes.facecolor  : white
-axes.edgecolor  : 4c4c4c
-axes.labelcolor : 4c4c4c
-axes.labelsize  : 15
+axes.edgecolor  : 000000
+axes.labelcolor : 000000
+axes.labelsize  : large
 axes.grid       : False
-axes.prop_cycle : cycler('color', ['333333', '0072B2', '009E73', 'D55E00', 'CC79A7', 'F0E442', '56B4E9'])
+axes.linewidth  : 1.25
+axes.prop_cycle : cycler('color', ['000000', '0072B2', '009E73', 'D55E00', 'CC79A7', 'F0E442', '56B4E9'])
+axes.titleweight:   normal  # font weight of title
+axes.formatter.use_mathtext: True  # When True, use mathtext for scientific
+                                     # notation.
+axes.formatter.min_exponent: 1  # minimum exponent to format in scientific notation
+axes.formatter.useoffset: True  # If True, the tick label formatter
+                                 # will default to labeling ticks relative
+                                 # to an offset when the data range is
+                                 # small compared to the minimum absolute
+                                 # value of the data.
+axes.formatter.offset_threshold: 4  # When useoffset is True, the offset
+                                     # will be used when it can remove
+                                     # at least this number of significant
+                                     # digits from tick labels.
 
-legend.fontsize      : 11
+axes.unicode_minus: True  # use Unicode for the minus symbol rather than hyphen.  See
+                           # https://en.wikipedia.org/wiki/Plus_and_minus_signs#Character_codes
+axes.xmargin:   .05  # x margin.  See `axes.Axes.margins`
+axes.ymargin:   .05  # y margin.  See `axes.Axes.margins`
+axes.zmargin:   .05  # z margin.  See `axes.Axes.margins`
+axes.autolimit_mode: data  # If "data", use axes.xmargin and axes.ymargin as is.
+                            # If "round_numbers", after application of margins, axis
+                            # limits are further expanded to the nearest "round" number.
+polaraxes.grid: True  # display grid on polar axes
+axes3d.grid:    True  # display grid on 3D axes
+
+axes3d.xaxis.panecolor:    (0.95, 0.95, 0.95, 0.5)  # background pane on 3D axes
+axes3d.yaxis.panecolor:    (0.90, 0.90, 0.90, 0.5)  # background pane on 3D axes
+axes3d.zaxis.panecolor:    (0.925, 0.925, 0.925, 0.5)  # background pane on 3D axes
+
+axes.labelpad:      7.0
+
+
+errorbar.capsize: 3
+
+legend.fontsize      : medium
 legend.frameon       : True
 legend.numpoints     : 3
 legend.scatterpoints : 3
-legend.facecolor     : white
-legend.edgecolor     : 4c4c4c
+legend.facecolor     : inherit
+legend.edgecolor     : 000000
+legend.framealpha:    0.9
+legend.handlelength:  2.5  # the length of the legend lines
+
+
+savefig.dpi:       150      # figure dots per inch or 'figure'
+savefig.bbox:      tight    # {tight, standard}
+
+grid.linestyle: --
 
 xtick.top           : False
-xtick.color         : 4c4c4c
+xtick.color         : 666666
+xtick.labelcolor    : 000000
 xtick.direction     : in
 xtick.major.size    : 8
 xtick.minor.size    : 4
 xtick.minor.visible : True
-xtick.labelsize     : 12
+xtick.labelsize     : medium
 
 ytick.minor.visible : True
 ytick.right         : False
-ytick.color         : 4c4c4c
+ytick.color         : 666666
+ytick.labelcolor    : 000000
 ytick.direction     : in
 ytick.major.size    : 8
 ytick.minor.size    : 4
-ytick.labelsize     : 12
+ytick.labelsize     : medium
