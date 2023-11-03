@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lightkurve"
-version = "2.4.2"
+version = "2.5.0dev"
 description = "A friendly package for Kepler & TESS time series analysis in Python."
 license = "MIT"
 authors = ["Geert Barentsen <hello@geert.io>"]
