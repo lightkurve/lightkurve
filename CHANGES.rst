@@ -1,8 +1,12 @@
-2.4.1dev (unreleased)
+2.4.2dev (unreleased)
 =====================
 
 - Updated plot style to default to higher resolution [#1311]
 - Fixed download issue due to MAST API change [#1380]
+
+2.4.1 (2023-09-06)
+=====================
+
 - Updated interact features to work with JupyterHub (e.g. TiKE) [#1349]
 - Exposed niters parameter in the PCA function of design matrix
 - Fixed the aperture parsing functions inside TPFs to be compliant with `numpy` v1.25 [#1360]
@@ -12,7 +16,6 @@
 
 2.4.0 (2023-02-14)
 ==================
-
 
 - Added the ability to configure the default cache directory used by
   ``SearchResult.download()`` / ``SearchResult.download_all()``. [#1214]
