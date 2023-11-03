@@ -7,7 +7,6 @@ import os
 import re
 import warnings
 from datetime import datetime, timedelta
-from copy import deepcopy
 
 import numpy as np
 from astropy import units as u
@@ -21,7 +20,7 @@ from requests import HTTPError
 
 from . import PACKAGEDIR, conf, config
 from .collections import LightCurveCollection, TargetPixelFileCollection
-from .io import read
+from .io import read, AUTHOR_LINKS
 from .targetpixelfile import TargetPixelFile
 from .utils import (
     LightkurveDeprecationWarning,
@@ -39,27 +38,6 @@ __all__ = [
     "search_tesscut",
     "SearchResult",
 ]
-
-
-# Which external links should we display in the SearchResult repr?
-AUTHOR_LINKS = {
-    "Kepler": "https://archive.stsci.edu/kepler/data_products.html",
-    "K2": "https://archive.stsci.edu/k2/data_products.html",
-    "SPOC": "https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html",
-    "TESS-SPOC": "https://archive.stsci.edu/hlsp/tess-spoc",
-    "QLP": "https://archive.stsci.edu/hlsp/qlp",
-    "TASOC": "https://archive.stsci.edu/hlsp/tasoc",
-    "PATHOS": "https://archive.stsci.edu/hlsp/pathos",
-    "CDIPS": "https://archive.stsci.edu/hlsp/cdips",
-    "K2SFF": "https://archive.stsci.edu/hlsp/k2sff",
-    "EVEREST": "https://archive.stsci.edu/hlsp/everest",
-    "TESScut": "https://mast.stsci.edu/tesscut/",
-    "GSFC-ELEANOR-LITE": "https://archive.stsci.edu/hlsp/gsfc-eleanor-lite",
-    "TGLC": "https://archive.stsci.edu/hlsp/tglc",
-    "KBONUS-BKG": "https://archive.stsci.edu/hlsp/kbonus-bkg",
-    "KEPSEISMIC": "https://archive.stsci.edu/prepds/kepseismic/",
-    "IRIS": "https://archive.stsci.edu/hlsp/iris",
-}
 
 REPR_COLUMNS_BASE = [
     "#",
@@ -145,8 +123,8 @@ class SearchResult(object):
             "Kepler": 1,
             "K2": 1,
             "SPOC": 1,
-            "KBONUS-BKG": 2,
             "TESS-SPOC": 2,
+            "KBONUS-BKG": 3,
             "QLP": 3,
         }
         self.table["sort_order"] = [
@@ -160,6 +138,7 @@ class SearchResult(object):
         """Adds a user-friendly index (``#``) column and adds column unit
         and display format information.
         """
+        self.table = Table(self.table, masked=True, copy=False)
         if "#" not in self.table.columns:
             self.table["#"] = None
         self.table["exptime"].unit = "s"
@@ -192,6 +171,14 @@ class SearchResult(object):
         ]
         self.table["start_time"][kepler_mask] = start_time
         self.table["end_time"][kepler_mask] = end_time
+
+        # We mask KBONUS times because they are invalid for the quarter data
+        kbonus_mask = self.table["author"] == "KBONUS-BKG"
+        kbonus_mask[kbonus_mask] = np.asarray(
+            [len(seq) > 0 for seq in self.table["sequence"][kbonus_mask]]
+        )
+        self.table["start_time"].mask = kbonus_mask
+        self.table["end_time"].mask = kbonus_mask
 
         # Some products are HLSPs and some are mission products, this column helps people distinguish them
         self.table["product_type"] = "Mission Product"
@@ -289,22 +276,17 @@ class SearchResult(object):
     @property
     def mission(self):
         """Kepler quarter or TESS sector names for each data product found."""
-        return self.table["mission"].data
-
-    @property
-    def year(self):
-        """Year the observation was made."""
-        return self.table["year"].data
+        return self.table["mission"].data.data
 
     @property
     def author(self):
         """Pipeline name for each data product found."""
-        return self.table["author"].data
+        return self.table["author"].data.data
 
     @property
     def target_name(self):
         """Target name for each data product found."""
-        return self.table["target_name"].data
+        return self.table["target_name"].data.data
 
     @property
     def exptime(self):
@@ -319,22 +301,22 @@ class SearchResult(object):
     @property
     def product_type(self):
         """Whether the data product is a mission product or High Level Science Product."""
-        return self.table["product_type"].data
+        return self.table["product_type"].data.data
 
     @property
     def sequence(self):
         """What quarter, campaign, or sector the data is from."""
-        return self.table["sequence"].data
+        return self.table["sequence"].data.data
 
     @property
     def start_time(self):
         """Start time of the observation."""
-        return Time(self.table["start_time"].data)
+        return Time(self.table["start_time"].data.data)
 
     @property
     def end_time(self):
         """End time of the observation."""
-        return Time(self.table["end_time"].data)
+        return Time(self.table["end_time"].data.data)
 
     @property
     def year(self):
@@ -1092,7 +1074,6 @@ def _search_products(
             table_names=["", "_products"],
         )
         result.sort(["distance", "obs_id"])
-
         # Add the user-friendly 'author' column (synonym for 'provenance_name')
         result["author"] = result["provenance_name"]
         result["start_time"] = Column(
@@ -1110,6 +1091,7 @@ def _search_products(
         kbonus_mask = result["provenance_name"] == "KBONUS-BKG"
         kbonus_tabs = []
         if kbonus_mask.any():
+            result["exptime"][kbonus_mask] = 1800
             for kbonus_target in np.unique(result["target_name"][kbonus_mask].data):
                 kbonus_tab = vstack(
                     [result[kbonus_mask & (result["target_name"] == kbonus_target)]]
@@ -1150,6 +1132,7 @@ def _search_products(
             else:
                 sequence.append("")
         result["sequence"] = np.asarray(sequence)
+
         masked_result = _filter_products(
             result,
             filetype=filetype,
@@ -1393,14 +1376,27 @@ def _filter_products(
     #     provenance_lower = [p.lower() for p in np.atleast_1d(provenance_name)]
 
     mask = np.ones(len(products), dtype=bool)
+    # Remove authors we don't have readers for:
+    bad_authors = np.asarray(
+        [author not in AUTHOR_LINKS.keys() for author in products["author"]]
+    )
+    if bad_authors.any():
+        log.warn(
+            f"Authors {np.unique(products['author'][bad_authors].data)} have been removed as `lightkurve` does not have a specific reader for these HLSPs."
+        )
+        mask &= ~bad_authors
 
     # Kepler data needs a special filter for quarter and month
-    mask &= ~np.array(
-        [prov.lower() == "kepler" for prov in products["provenance_name"]]
-    )
-    #    if "kepler" in provenance_lower and campaign is None and sector is None:
     if (quarter is not None) | (month is not None):
         mask &= _mask_kepler_products(products, quarter=quarter, month=month)
+
+    # We remove one of the TASOC light curve flavors
+    mask &= np.asarray(
+        [
+            "1800_tess_v05_ens-lc.fits" not in filename
+            for filename in products["productFilename"]
+        ]
+    )
     # HLSP products need to be filtered by extension
     if filetype.lower() == "lightcurve":
         # We add a special case for KEPSEISMIC which doesn't obey naming convention
