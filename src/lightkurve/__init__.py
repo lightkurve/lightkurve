@@ -6,7 +6,6 @@ import os
 
 PACKAGEDIR = os.path.abspath(os.path.dirname(__file__))
 MPLSTYLE = "{}/data/lightkurve.mplstyle".format(PACKAGEDIR)
-MPLSTYLE_IMG = "{}/data/lightkurve-images.mplstyle".format(PACKAGEDIR)
 """Lightkurve's stylesheet for matplotlib.
 
 It is useful for users who create their own figures and want their figures following
