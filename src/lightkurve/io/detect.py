@@ -78,6 +78,11 @@ def detect_filetype(hdulist: HDUList) -> str:
     if hdulist[0].header.get("HLSPID") == "KBONUS-BKG":
         return "KBONUS-BKG"
 
+    # Is it an IRIS light curve?
+    # cf. https://archive.stsci.edu/hlsp/kbonus-bkg
+    if hdulist[0].header.get("HLSPID") == "IRIS":
+        return "IRIS"
+
     # Is it a TASOC TESS light curve?
     # cf. https://tasoc.dk and https://archive.stsci.edu/hlsp/tasoc
     if hdulist[0].header.get("ORIGIN") == "TASOC/Aarhus":

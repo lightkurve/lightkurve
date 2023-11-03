@@ -39,17 +39,17 @@ from .test_conf import use_custom_config_file, remove_custom_config
 @pytest.mark.remote_data
 def test_search_targetpixelfile():
     # EPIC 210634047 was observed twice in long cadence
-    assert len(search_targetpixelfile("EPIC 210634047", mission="K2").table) == 2
+    assert len(search_targetpixelfile("EPIC 210634047", author="K2").table) == 2
     # ...including Campaign 4
     assert (
-        len(search_targetpixelfile("EPIC 210634047", mission="K2", campaign=4).table)
+        len(search_targetpixelfile("EPIC 210634047", author="K2", campaign=4).table)
         == 1
     )
     # KIC 11904151 (Kepler-10) was observed in LC in 15 Quarters
     assert (
         len(
             search_targetpixelfile(
-                "KIC 11904151", mission="Kepler", cadence="long"
+                "KIC 11904151", author="Kepler", cadence="long"
             ).table
         )
         == 15
@@ -58,7 +58,7 @@ def test_search_targetpixelfile():
     assert (
         len(
             search_targetpixelfile(
-                "KIC 11904151", mission="Kepler", cadence="long", quarter=11
+                "KIC 11904151", author="Kepler", cadence="long", quarter=11
             ).unique_targets
         )
         == 1
@@ -66,21 +66,37 @@ def test_search_targetpixelfile():
     assert (
         len(
             search_targetpixelfile(
-                "KIC 11904151", mission="Kepler", cadence="long", quarter=12
+                "KIC 11904151", author="Kepler", cadence="long", quarter=12
             ).table
         )
         == 0
     )
-    search_targetpixelfile("KIC 11904151", quarter=11, cadence="long").download()
+    search_targetpixelfile(
+        "KIC 11904151", quarter=11, cadence="long", author="Kepler"
+    ).download()
     # with mission='TESS', it should return TESS observations
     tic = "TIC 273985862"  # Has been observed in multiple sectors including 1
-    assert len(search_targetpixelfile(tic, mission="TESS").table) > 1
+    assert len(search_targetpixelfile(tic, author="TESS").table) > 1
+    # There is a single neighbor to pi men at this radius, if we set the radius argument it should be found.
     assert (
-        len(search_targetpixelfile(tic, author="SPOC", sector=1, radius=100).table)
+        len(
+            search_targetpixelfile(
+                tic, author="TESS", sector=1, radius=100 * u.arcsec
+            ).table
+        )
         == 2
     )
-    search_targetpixelfile(tic, author="SPOC", sector=1).download()
-    assert len(search_targetpixelfile("pi Mensae", sector=1, author="SPOC").table) == 1
+    # Searching with SPOC author shoudl also work
+    assert (
+        len(
+            search_targetpixelfile(
+                tic, author="SPOC", sector=1, radius=100 * u.arcsec
+            ).table
+        )
+        == 2
+    )
+    search_targetpixelfile(tic, author="TESS", sector=1).download()
+    assert len(search_targetpixelfile("pi Mensae", sector=1, author="TESS").table) == 1
     # Issue #445: indexing with -1 should return the last index of the search result
     assert len(search_targetpixelfile("pi Men")[-1]) == 1
 
@@ -96,7 +112,9 @@ def test_search_split_campaigns():
     campaigns = [9, 10, 11]
     ids = ["EPIC 228162462", "EPIC 228726301", "EPIC 202975993"]
     for c, idx in zip(campaigns, ids):
-        search = search_targetpixelfile(idx, campaign=c, cadence="long").table
+        search = search_targetpixelfile(
+            idx, campaign=c, cadence="long", author="K2"
+        ).table
         assert len(search) == 2
 
 
@@ -106,7 +124,14 @@ def test_search_lightcurve(caplog):
     # The name Kepler-10 somehow no longer works on MAST. So we use 2MASS instead:
     #   https://simbad.cds.unistra.fr/simbad/sim-id?Ident=%405506010&Name=Kepler-10
     assert (
-        len(search_lightcurve("2MASS J19024305+5014286", mission="Kepler", author="Kepler", cadence="long").table)
+        len(
+            search_lightcurve(
+                "2MASS J19024305+5014286",
+                mission="Kepler",
+                author="Kepler",
+                cadence="long",
+            ).table
+        )
         == 15
     )
     # An invalid KIC/EPIC ID or target name should be dealt with gracefully
@@ -115,11 +140,28 @@ def test_search_lightcurve(caplog):
     search_lightcurve("DOES_NOT_EXIST (UNIT TEST)")
     assert "disambiguate" in caplog.text
     # If we ask for all cadence types, there should be four Kepler files given
-    assert len(search_lightcurve("KIC 4914423", quarter=6, cadence="any", author="Kepler").table) == 4
+    assert (
+        len(
+            search_lightcurve(
+                "KIC 4914423", quarter=6, cadence="any", author="Kepler"
+            ).table
+        )
+        == 4
+    )
     # ...and only one should have long cadence
-    assert len(search_lightcurve("KIC 4914423", quarter=6, cadence="long", author="Kepler").table) == 1
+    assert (
+        len(
+            search_lightcurve(
+                "KIC 4914423", quarter=6, cadence="long", author="Kepler"
+            ).table
+        )
+        == 1
+    )
     # Should be able to resolve an ra/dec
-    assert len(search_lightcurve("297.5835, 40.98339", quarter=6, author="Kepler").table) == 1
+    assert (
+        len(search_lightcurve("297.5835, 40.98339", quarter=6, author="Kepler").table)
+        == 1
+    )
     # Should be able to resolve a SkyCoord
     c = SkyCoord("297.5835 40.98339", unit=(u.deg, u.deg))
     search = search_lightcurve(c, quarter=6, author="Kepler")
@@ -138,7 +180,7 @@ def test_search_lightcurve(caplog):
     assert (
         len(
             search_lightcurve(
-                tic, mission="TESS", author="spoc", sector=1, radius=100
+                tic, mission="TESS", author="spoc", sector=1, radius=100 * u.arcsec
             ).table
         )
         == 2
@@ -202,9 +244,12 @@ def test_search_tesscut_download(caplog):
         assert "Cached file found." in caplog.text
         # test #1063 - ensure when download_dir is specified, there is no error
         from tempfile import TemporaryDirectory
+
         with TemporaryDirectory(dir=".", prefix="temp_lk_cache_4test_") as download_dir:
             # ensure relative path works, the bug in #1063
-            tpf_w_download_dir = search_string[0].download(cutout_size=(3, 5), download_dir=download_dir)
+            tpf_w_download_dir = search_string[0].download(
+                cutout_size=(3, 5), download_dir=download_dir
+            )
             assert tpf_w_download_dir.flux[0].shape == (3, 5)
             tpf_w_download_dir = None  # remove the tpf reference so that the underlying file can be deleted on Windows
     except HTTPError as exc:
@@ -264,7 +309,9 @@ def test_month():
     # In short cadence, if we specify both quarter and month
     sr = search_targetpixelfile("KIC 11904151", quarter=11, month=1, cadence="short")
     assert len(sr) == 1
-    sr = search_targetpixelfile("KIC 11904151", quarter=11, month=[1, 3], cadence="short")
+    sr = search_targetpixelfile(
+        "KIC 11904151", quarter=11, month=[1, 3], cadence="short"
+    )
     assert len(sr) == 2
 
 
@@ -389,12 +436,14 @@ def test_mast_http_error_handling(monkeypatch):
 
     def mock_http_error_response(*args, **kwargs):
         """Mock the `download_product()` response to simulate MAST returns HTTP error"""
-        return Table(data={
-            "Local Path": ["./mastDownload/acme_lc.fits"],
-            "Status": ["ERROR"],
-            "Message": ["HTTP Error 500: Internal Server Error"],
-            "URL": [remote_url],
-            })
+        return Table(
+            data={
+                "Local Path": ["./mastDownload/acme_lc.fits"],
+                "Status": ["ERROR"],
+                "Message": ["HTTP Error 500: Internal Server Error"],
+                "URL": [remote_url],
+            }
+        )
 
     monkeypatch.setattr(Observations, "download_products", mock_http_error_response)
 
@@ -442,7 +491,9 @@ def test_overlapping_targets_718():
         assert search.target_name[0] == f"kplr{target[4:].zfill(9)}"
 
     # When using `radius=1` we should also retrieve the overlapping targets
-    search = search_lightcurve("KIC 5112705", quarter=11, author="Kepler", radius=1 * u.arcsec)
+    search = search_lightcurve(
+        "KIC 5112705", quarter=11, author="Kepler", radius=1 * u.arcsec
+    )
     assert len(search) > 1
 
     # Searching by `target_name` should not preven a KIC identifier to work
@@ -569,7 +620,7 @@ def test_split_k2_campaigns():
 def test_customize_search_result_display():
     search = search_lightcurve("TIC390021728")
     # default display does not have proposal id
-    assert 'proposal_id' not in search.__repr__()
+    assert "proposal_id" not in search.__repr__()
 
     # custom config: has proposal_id in display
     try:
@@ -581,30 +632,36 @@ def test_customize_search_result_display():
         # the TIC used is in multiple sectors, with some rows having proposal_id and some rows
         # have none. So it's also a sanity test the for the actual proposal_id display logic.
         search = search_lightcurve("TIC298734307")
-        assert 'proposal_id' in search.__repr__()
+        assert "proposal_id" in search.__repr__()
     finally:
         remove_custom_config()  # restore default to avoid side effects
 
     # test changing config at runtime
     try:
-        lk.conf.search_result_display_extra_columns = ['sequence_number']
+        lk.conf.search_result_display_extra_columns = ["sequence_number"]
 
-        search = search_lightcurve("TIC169175503")  # again use a different TIC to avoid caching complication
-        assert 'sequence_number' in search.__repr__()
+        search = search_lightcurve(
+            "TIC169175503"
+        )  # again use a different TIC to avoid caching complication
+        assert "sequence_number" in search.__repr__()
     finally:
-        lk.conf.search_result_display_extra_columns = []  # restore default to avoid side effects
+        lk.conf.search_result_display_extra_columns = (
+            []
+        )  # restore default to avoid side effects
 
     # Test per-object customization
     search.display_extra_columns = []
-    assert 'proposal_id' not in search.__repr__()
-    search.display_extra_columns = ['sequence_number', 'proposal_id']  # also support multiple columns
-    assert 'proposal_id' in search.__repr__()
-    assert 'sequence_number' in search.__repr__()
+    assert "proposal_id" not in search.__repr__()
+    search.display_extra_columns = [
+        "sequence_number",
+        "proposal_id",
+    ]  # also support multiple columns
+    assert "proposal_id" in search.__repr__()
+    assert "sequence_number" in search.__repr__()
 
 
 @pytest.mark.remote_data
 def test_customize_search_result_display_case_nonexistent_column():
-
     # Ensure that if an extra column specified are not in search result
     # the extra column will not be shown (and it does not generate error)
     #
@@ -612,5 +669,5 @@ def test_customize_search_result_display_case_nonexistent_column():
     # search_lightcurve() / search_targetpixelfile(), but not in those of search_tesscut()
 
     search = search_lightcurve("TIC390021728")
-    search.display_extra_columns = ['foo_col']
-    assert 'foo_col' not in search.__repr__()
+    search.display_extra_columns = ["foo_col"]
+    assert "foo_col" not in search.__repr__()

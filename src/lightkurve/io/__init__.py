@@ -15,6 +15,7 @@ from . import (
     tess,
     tglc,
     kbonus,
+    iris,
 )
 from .detect import *
 from .read import *
@@ -37,6 +38,7 @@ try:
     registry.register_reader(
         "kepseismic", LightCurve, kepseismic.read_kepseismic_lightcurve
     )
+    registry.register_reader("iris", LightCurve, iris.read_iris_lightcurve)
     registry.register_reader("tglc", LightCurve, tglc.read_tglc_lightcurve)
     registry.register_reader("kbonus", LightCurve, kbonus.read_kbonus_lightcurve)
 except registry.IORegistryError:

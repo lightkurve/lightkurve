@@ -7,12 +7,13 @@ import os
 import re
 import warnings
 from datetime import datetime, timedelta
+from copy import deepcopy
 
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii
-from astropy.table import Row, Table, join, Column
+from astropy.table import Row, Table, join, Column, vstack
 from astropy.time import Time
 from astropy.utils import deprecated
 from memoization import cached
@@ -56,6 +57,8 @@ AUTHOR_LINKS = {
     "GSFC-ELEANOR-LITE": "https://archive.stsci.edu/hlsp/gsfc-eleanor-lite",
     "TGLC": "https://archive.stsci.edu/hlsp/tglc",
     "KBONUS-BKG": "https://archive.stsci.edu/hlsp/kbonus-bkg",
+    "KEPSEISMIC": "https://archive.stsci.edu/prepds/kepseismic/",
+    "IRIS": "https://archive.stsci.edu/hlsp/iris",
 }
 
 REPR_COLUMNS_BASE = [
@@ -149,7 +152,9 @@ class SearchResult(object):
         self.table["sort_order"] = [
             sort_priority.get(author, 9) for author in self.table["author"]
         ]
-        self.table.sort(["distance", "project", "sort_order", "start_time", "exptime"])
+        self.table.sort(
+            ["distance", "project", "sort_order", "sequence", "start_time", "exptime"]
+        )
 
     def _add_columns(self):
         """Adds a user-friendly index (``#``) column and adds column unit
@@ -176,7 +181,7 @@ class SearchResult(object):
             self.table["productFilename"][kepler_mask].data
         )
         start_time = [
-            Time(datetime.strptime(filename.split("-")[-1].split("_")[0], "%Y%j%H%M%S"))
+            Time(datetime.strptime(filename.split("-")[1].split("_")[0], "%Y%j%H%M%S"))
             for filename in filenames
         ]
         end_time = [
@@ -423,6 +428,13 @@ class SearchResult(object):
                     )
                 path = download_response["Local Path"]
                 log.debug("Finished downloading.")
+            if table["author"][0] == "KBONUS-BKG":
+                quarter = (
+                    int(table["sequence"][0].split(" ")[-1])
+                    if (len(table["sequence"][0]) != 0)
+                    else None
+                )
+                kwargs["quarter"] = quarter
             return read(path, quality_bitmask=quality_bitmask, **kwargs)
 
     @suppress_stdout
@@ -1093,7 +1105,24 @@ def _search_products(
         )
         # Add the user-friendly 'mission' column
         result["mission"] = result["project"]
-        result["sequence"] = None
+
+        # We need to duplicate any kbonus entries because of their file format.
+        kbonus_mask = result["provenance_name"] == "KBONUS-BKG"
+        kbonus_tabs = []
+        if kbonus_mask.any():
+            for kbonus_target in np.unique(result["target_name"][kbonus_mask].data):
+                kbonus_tab = vstack(
+                    [result[kbonus_mask & (result["target_name"] == kbonus_target)]]
+                    * 18
+                )
+                kbonus_tab["description"] = [
+                    f"{desc} - Q{idx}"
+                    for idx, desc in enumerate(kbonus_tab["description"])
+                ]
+                kbonus_tabs.append(kbonus_tab)
+            result = vstack([result, vstack(kbonus_tabs)])
+
+        sequence = []
         obs_prefix = {"Kepler": "Quarter", "K2": "Campaign", "TESS": "Sector"}
         for idx in range(len(result)):
             obs_project = result["project"][idx]
@@ -1101,7 +1130,8 @@ def _search_products(
             obs_seqno = f"{tmp_seqno:02d}" if tmp_seqno else ""
             # Kepler sequence_number values were not populated at the time of
             # writing this code, so we parse them from the description field.
-            if obs_project == "Kepler" and result["sequence_number"].mask[idx]:
+            seq = Table.MaskedColumn(result["sequence_number"])
+            if obs_project == "Kepler" and seq.mask[idx]:
                 try:
                     tmp_seqno = re.findall(r".*Q(\d+)", result["description"][idx])[0]
                     obs_seqno = f"{int(tmp_seqno):02d}"
@@ -1114,10 +1144,12 @@ def _search_products(
                     if f"c{tmp_seqno}{half}" in result["productFilename"][idx]:
                         obs_seqno = f"{int(tmp_seqno):02d}{letter}"
             if len(obs_seqno) != 0:
-                result["sequence"][idx] = "{} {}".format(
-                    obs_prefix.get(obs_project, ""), obs_seqno
+                sequence.append(
+                    "{} {}".format(obs_prefix.get(obs_project, ""), obs_seqno)
                 )
-
+            else:
+                sequence.append("")
+        result["sequence"] = np.asarray(sequence)
         masked_result = _filter_products(
             result,
             filetype=filetype,
@@ -1132,6 +1164,7 @@ def _search_products(
         )
         log.debug("MAST found {} matching data products.".format(len(masked_result)))
         masked_result["distance"].info.format = ".1f"  # display <0.1 arcsec
+
         return SearchResult(masked_result)
 
     # Full Frame Images
@@ -1266,6 +1299,7 @@ def _query_mast(
             )
     else:
         mission_match = False
+    # Passed an ID number, no radius, and an official mission author
     if exact_target_name and (radius is None) and mission_match:
         log.debug(
             "Started querying MAST for observations with the exact "
@@ -1304,15 +1338,6 @@ def _query_mast(
             warnings.filterwarnings("ignore", category=NoResultsWarning)
             warnings.filterwarnings("ignore", message="t_exptime is continuous")
             obs = Observations.query_criteria(objectname=target, **query_criteria)
-            if exact_target_name:
-                mask = ~np.asarray(
-                    [
-                        target_name.startswith(exact_target_name[:4])
-                        & ~(target_name == exact_target_name)
-                        for target_name in obs["target_name"]
-                    ]
-                ).astype(bool)
-                obs = obs[mask]
         obs.sort("distance")
         # We use `exptime` as an alias for `t_exptime`
         obs["exptime"] = obs["t_exptime"]
@@ -1362,10 +1387,10 @@ def _filter_products(
     products : `astropy.table.Table` object
         Masked astropy table containing desired data products
     """
-    if provenance_name is None:  # apply all filters
-        provenance_lower = ("kepler", "k2", "spoc")
-    else:
-        provenance_lower = [p.lower() for p in np.atleast_1d(provenance_name)]
+    # if provenance_name is None:  # apply all filters
+    #     provenance_lower = ("kepler", "k2", "spoc")
+    # else:
+    #     provenance_lower = [p.lower() for p in np.atleast_1d(provenance_name)]
 
     mask = np.ones(len(products), dtype=bool)
 
@@ -1373,13 +1398,17 @@ def _filter_products(
     mask &= ~np.array(
         [prov.lower() == "kepler" for prov in products["provenance_name"]]
     )
-    if "kepler" in provenance_lower and campaign is None and sector is None:
-        mask |= _mask_kepler_products(products, quarter=quarter, month=month)
-
+    #    if "kepler" in provenance_lower and campaign is None and sector is None:
+    if (quarter is not None) | (month is not None):
+        mask &= _mask_kepler_products(products, quarter=quarter, month=month)
     # HLSP products need to be filtered by extension
     if filetype.lower() == "lightcurve":
+        # We add a special case for KEPSEISMIC which doesn't obey naming convention
         mask &= np.array(
-            [uri.lower().endswith("lc.fits") for uri in products["productFilename"]]
+            [
+                uri.lower().endswith(("lc.fits", "-20d_kepler_v1_cor-filt-inp.fits"))
+                for uri in products["productFilename"]
+            ]
         )
     elif filetype.lower() == "target pixel":
         mask &= np.array(
@@ -1390,7 +1419,6 @@ def _filter_products(
         )
     elif filetype.lower() == "ffi":
         mask &= np.array(["TESScut" in desc for desc in products["description"]])
-
     # Allow only fits files
     mask &= np.array(
         [
@@ -1412,22 +1440,28 @@ def _filter_products(
 
 def _mask_kepler_products(products, quarter=None, month=None):
     """Returns a mask flagging the Kepler products that match the criteria."""
-    mask = np.array([proj.lower() == "kepler" for proj in products["provenance_name"]])
+    mask = np.asarray(products["project"].data) == "Kepler"
     if mask.sum() == 0:
         return mask
 
     # Identify quarter by the description.
     # This is necessary because the `sequence_number` field was not populated
     # for Kepler prime data at the time of writing this function.
+    quarter_mask = np.zeros(len(mask), bool)
     if quarter is not None:
-        quarter_mask = np.zeros(len(products), dtype=bool)
         for q in np.atleast_1d(quarter):
             quarter_mask |= np.array(
                 [
-                    desc.lower().replace("-", "").endswith("q{}".format(q))
-                    for desc in products["description"]
+                    (
+                        (int(seq.split(" ")[-1]) == q)
+                        & (seq.lower().startswith("quarter"))
+                    )
+                    if len(seq) > 0
+                    else True
+                    for seq in products["sequence"]
                 ]
             )
+            # If there is no quarter in the sequence, we assume that it is HLSP that covers multiple quarters
         mask &= quarter_mask
 
     # For Kepler short cadence data the month can be specified

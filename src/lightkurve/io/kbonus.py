@@ -16,11 +16,6 @@ def _warn_bonus_file(filename):
             log.warning(
                 "Kepler magnitude is bright (less than 12), indicating the target is saturated. KBONUS-BKG data is invalid for saturated targets."
             )
-        quarter_map = {
-            ext.header["quarter"]: idx
-            for idx, ext in enumerate(hdulist)
-            if "QUARTER" in ext.header
-        }
         psffrac = np.asarray(
             [
                 ext.header["PSFFRAC"]
@@ -47,54 +42,28 @@ def _read_kbonus_lightcurve(filename, ext, **kwargs):
 
     lc.meta["AUTHOR"] = "KBONUS-BKG"
     lc.meta["TARGETID"] = lc.meta.get("GAIAID")
-    with fits.open(lc.filename, lazy_load_hdus=True) as hdu:
-        lc.meta["FLFRCSAP"] = hdu[2].header["FLFRCSAP"]
-        lc.meta["CROWDSAP"] = hdu[2].header["CROWDSAP"]
+    if ext != 1:
+        with fits.open(lc.filename, lazy_load_hdus=True) as hdulist:
+            lc.meta["FLFRCSAP"] = hdulist[ext].header["FLFRCSAP"]
+            lc.meta["CROWDSAP"] = hdulist[ext].header["CROWDSAP"]
     return KeplerLightCurve(data=lc, **kwargs)
 
 
-def read_kbonus_lightcurve(filename, **kwargs):
+def read_kbonus_lightcurve(filename, quarter=None, **kwargs):
     """Read a KBONUS-BKG light curve file.
 
     More information: https://archive.stsci.edu/hlsp/kbonus-bkg
 
     By default this will return the corrected, stitched light curve.
-    Use the `quarters` argument to extract specific separated quarters.
+    Use the `quarter` argument to extract specific separated quarter.
 
     Parameters
     ----------
     filename : str
         Path or URL of a KBONUS-BKG light curve FITS file.
-    quarters : None, int, list of int, or 'all'
-        Which quarters to load. If None, will load the stitched light curve
-        from the first extension. If a list of ints, int, or 'any', will load
-        each of those quarters into a LightCurveCollection.
-
-    Returns
-    -------
-    lc : `KeplerLightCurve`
-    """
-
-    _warn_bonus_file(filename)
-    return _read_kbonus_lightcurve(filename, ext=1, **kwargs)
-
-
-def read_kbonus_lightcurve_quarters(filename, quarters="any", **kwargs):
-    """Read a KBONUS-BKG light curve file.
-
-    More information: https://archive.stsci.edu/hlsp/kbonus-bkg
-
-    By default this will return the corrected, stitched light curve.
-    Use the `quarters` argument to extract specific separated quarters.
-
-    Parameters
-    ----------
-    filename : str
-        Path or URL of a KBONUS-BKG light curve FITS file.
-    quarters : None, int, list of int, or 'all'
-        Which quarters to load. If None, will load the stitched light curve
-        from the first extension. If a list of ints, int, or 'any', will load
-        each of those quarters into a LightCurveCollection.
+    quarter : None or int
+        Which quarter to load. If None, will load the stitched light curve
+        from the first extension. If an int, will load that quarter only.
 
     Returns
     -------
@@ -102,22 +71,35 @@ def read_kbonus_lightcurve_quarters(filename, quarters="any", **kwargs):
 
     """
     _warn_bonus_file(filename)
+    if quarter is None:
+        return _read_kbonus_lightcurve(filename, ext=1, **kwargs)
     with fits.open(filename, lazy_load_hdus=True) as hdulist:
         quarter_map = {
             ext.header["quarter"]: idx
             for idx, ext in enumerate(hdulist)
             if "QUARTER" in ext.header
         }
-    if isinstance(quarters, str):
-        if quarters.lower() in ["all", "any"]:
-            quarters = np.arange(18)
-    if isinstance(quarters, (int, float, list, np.ndarray)):
-        quarters = np.atleast_1d(quarters).astype(int)
-        lcs = [
-            _read_kbonus_lightcurve(filename, ext=quarter_map[quarter], **kwargs)
-            for quarter in quarters
-            if quarter in quarter_map
-        ]
-        return LightCurveCollection(lcs)
+        gaiaid = hdulist[0].header["OBJECT"]
+
+    if isinstance(quarter, str):
+        if quarter.lower() in ["all", "any"]:
+            quarter = None
+    if isinstance(quarter, int):
+        try:
+            lc = _read_kbonus_lightcurve(filename, ext=quarter_map[quarter], **kwargs)
+        except KeyError:
+            try:
+                lc = _read_kbonus_lightcurve(filename, ext=2, **kwargs)[:0]
+            except KeyError:
+                lc = _read_kbonus_lightcurve(filename, ext=1, **kwargs)[:0]
+            lc.meta = {
+                "QUARTER": quarter,
+                "AUTHOR": "KBONUS-BKG",
+                "GAIAID": gaiaid,
+                "LABEL": gaiaid,
+            }
+
+        lc.meta["TARGETID"] = lc.meta.get("GAIAID")
+        return lc
     else:
-        raise ValueError("Can not parse `quarters`.")
+        raise ValueError("Can not parse `quarter`.")
