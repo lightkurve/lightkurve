@@ -1,3 +1,0 @@
-# Turns on spines just for images
-axes.spines.top   : True
-axes.spines.right : True

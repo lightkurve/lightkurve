@@ -1,7 +1,6 @@
 2.4.2dev (unreleased)
 =====================
 
-- Updated plot style to default to higher resolution [#1311]
 - Fixed download issue due to MAST API change [#1380]
 
 2.4.1 (2023-09-06)
