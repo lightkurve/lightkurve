@@ -1,4 +1,4 @@
-2.4.2dev (unreleased)
+2.4.2 (2023-11-03)
 =====================
 
 - Fixed download issue due to MAST API change [#1380]
