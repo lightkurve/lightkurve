@@ -226,6 +226,7 @@
     <span class="s2">&quot;TESScut&quot;</span><span class="p">:</span> <span class="s2">&quot;https://mast.stsci.edu/tesscut/&quot;</span><span class="p">,</span>
     <span class="s2">&quot;GSFC-ELEANOR-LITE&quot;</span><span class="p">:</span> <span class="s2">&quot;https://archive.stsci.edu/hlsp/gsfc-eleanor-lite&quot;</span><span class="p">,</span>
     <span class="s2">&quot;TGLC&quot;</span><span class="p">:</span> <span class="s2">&quot;https://archive.stsci.edu/hlsp/tglc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;KBONUS-BKG&quot;</span><span class="p">:</span><span class="s2">&quot;https://archive.stsci.edu/hlsp/kbonus-bkg&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">REPR_COLUMNS_BASE</span> <span class="o">=</span> <span class="p">[</span>
@@ -305,11 +306,11 @@
 <span class="sd">        This ordering is not a judgement on the quality of one product vs another,</span>
 <span class="sd">        because we love all pipelines!</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sort_priority</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Kepler&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;K2&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;SPOC&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;TESS-SPOC&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;QLP&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+        <span class="n">sort_priority</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Kepler&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;K2&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;SPOC&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;KBONUS-BKG&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;TESS-SPOC&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;QLP&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;sort_order&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">sort_priority</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">author</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span> <span class="k">for</span> <span class="n">author</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">]</span>
         <span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s2">&quot;distance&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="s2">&quot;mission&quot;</span><span class="p">,</span> <span class="s2">&quot;sort_order&quot;</span><span class="p">,</span> <span class="s2">&quot;exptime&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s2">&quot;distance&quot;</span><span class="p">,</span> <span class="s2">&quot;project&quot;</span><span class="p">,</span> <span class="s2">&quot;sort_order&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="s2">&quot;exptime&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_add_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a user-friendly index (``#``) column and adds column unit</span>
@@ -520,7 +521,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="kn">from</span> <span class="nn">astroquery.mast</span> <span class="kn">import</span> <span class="n">Observations</span>
 
-                <span class="n">download_url</span> <span class="o">=</span> <span class="n">table</span><span class="p">[:</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;dataURL&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">download_url</span> <span class="o">=</span> <span class="n">table</span><span class="p">[:</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;dataURI&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Started downloading </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">download_url</span><span class="p">))</span>
                 <span class="n">download_response</span> <span class="o">=</span> <span class="n">Observations</span><span class="o">.</span><span class="n">download_products</span><span class="p">(</span>
                     <span class="n">table</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">mrp_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download_dir</span><span class="o">=</span><span class="n">download_dir</span>
@@ -1125,8 +1126,6 @@
                 <span class="s2">&quot;Please add the prefix &#39;EPIC&#39; or &#39;TIC&#39; to disambiguate.&quot;</span>
                 <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
             <span class="p">)</span>
-
-    
 
     <span class="c1"># Specifying quarter, campaign, or quarter should constrain the mission</span>
     <span class="k">if</span> <span class="n">quarter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

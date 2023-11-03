@@ -1350,8 +1350,8 @@
                 
   <section id="lightcurve">
 <span id="api-lightcurve"></span><h1>LightCurve<a class="headerlink" href="#lightcurve" title="Permalink to this headline">#</a></h1>
-<p>The <a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> class is an extension of AstroPy’s <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a>
-object, which itself extends AstroPy’s <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a>.
+<p>The <a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> class is an extension of AstroPy’s <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a>
+object, which itself extends AstroPy’s <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a>.
 Compared to a generic Table, LightCurve objects enforce the presence of three
 special data columns: <a class="reference internal" href="api/lightkurve.LightCurve.time.html#lightkurve.LightCurve.time" title="lightkurve.LightCurve.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>, <a class="reference internal" href="api/lightkurve.LightCurve.flux.html#lightkurve.LightCurve.flux" title="lightkurve.LightCurve.flux"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code></a>, and <a class="reference internal" href="api/lightkurve.LightCurve.flux_err.html#lightkurve.LightCurve.flux_err" title="lightkurve.LightCurve.flux_err"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_err</span></code></a>.
 This enables a LightCurve object to offer a range of methods which are specific to working
@@ -1368,14 +1368,14 @@ Additional columns can be added by passing a table-like object to the <code clas
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a>([data, time, flux, flux_err])</p></td>
-<td><p>Subclass of AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> guaranteed to have <em>time</em>, <em>flux</em>, and <em>flux_err</em> columns.</p></td>
+<td><p>Subclass of AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> guaranteed to have <em>time</em>, <em>flux</em>, and <em>flux_err</em> columns.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">#</a></h2>
-<p>Another difference with AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> is that all columns can
+<p>Another difference with AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> is that all columns can
 be accessed conveniently as attributes.  For example, <code class="docutils literal notranslate"><span class="pre">LightCurve.time</span></code> is
 offered as a shorthand for <code class="docutils literal notranslate"><span class="pre">LightCurve[&quot;time&quot;]</span></code>.</p>
 <table class="autosummary longtable table autosummary">
@@ -1385,13 +1385,13 @@ offered as a shorthand for <code class="docutils literal notranslate"><span clas
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.time.html#lightkurve.LightCurve.time" title="lightkurve.LightCurve.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.time</span></code></a></p></td>
-<td><p>Time values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
+<td><p>Time values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.flux.html#lightkurve.LightCurve.flux" title="lightkurve.LightCurve.flux"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.flux</span></code></a></p></td>
-<td><p>Brightness values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
+<td><p>Brightness values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.flux_err.html#lightkurve.LightCurve.flux_err" title="lightkurve.LightCurve.flux_err"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.flux_err</span></code></a></p></td>
-<td><p>Brightness uncertainties stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
+<td><p>Brightness uncertainties stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1422,13 +1422,13 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.plot.html#lightkurve.LightCurve.plot" title="lightkurve.LightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.plot</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
+<td><p>Plot the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.8.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.scatter.html#lightkurve.LightCurve.scatter" title="lightkurve.LightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.scatter</span></code></a>([colorbar_label, ...])</p></td>
-<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
+<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.8.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.errorbar.html#lightkurve.LightCurve.errorbar" title="lightkurve.LightCurve.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.errorbar</span></code></a>([linestyle])</p></td>
-<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
+<td><p>Plots the light curve using Matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.8.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.plot_river.html#lightkurve.LightCurve.plot_river" title="lightkurve.LightCurve.plot_river"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.plot_river</span></code></a>(period[, epoch_time, ...])</p></td>
 <td><p>Plot the light curve as a river plot.</p></td>
@@ -1511,7 +1511,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">LightCurve.sec
 <td><p>Converts the light curve to a FITS file in the Kepler/TESS file format.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_pandas.html#lightkurve.LightCurve.to_pandas" title="lightkurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_pandas</span></code></a>(**kwargs)</p></td>
-<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.1.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
+<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.LightCurve.to_periodogram.html#lightkurve.LightCurve.to_periodogram" title="lightkurve.LightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.to_periodogram</span></code></a>([method])</p></td>
 <td><p>Converts the light curve to a <a class="reference internal" href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</p></td>

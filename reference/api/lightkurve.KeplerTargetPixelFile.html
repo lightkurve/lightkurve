@@ -1323,9 +1323,9 @@ in the online documentation for examples on using this class.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a></span></dt><dd><p>Path to a Kepler Target Pixel file. Alternatively, you can pass a
+<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code></a></span></dt><dd><p>Path to a Kepler Target Pixel file. Alternatively, you can pass a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code> object, which is the AstroPy object returned by
-the <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a> function.</p>
+the <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a> function.</p>
 </dd>
 <dt><strong>quality_bitmask</strong><span class="classifier">“none”, “default”, “hard”, “hardest”, or int</span></dt><dd><p>Bitmask that should be used to ignore bad-quality cadences.
 If a string is passed, it has the following meaning:</p>
@@ -1348,7 +1348,7 @@ have the effect of removing cadences where
 <code class="docutils literal notranslate"><span class="pre">(tpf.hdu[1].data['QUALITY']</span> <span class="pre">&amp;</span> <span class="pre">quality_bitmask)</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.
 See the <a class="reference internal" href="lightkurve.KeplerQualityFlags.html#lightkurve.KeplerQualityFlags" title="lightkurve.KeplerQualityFlags"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code></a> class for details on the bitmasks.</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Optional keyword arguments passed on to <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a>.</p>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Optional keyword arguments passed on to <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/files.html#astropy.io.fits.open" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -1541,7 +1541,7 @@ See the <a class="reference internal" href="lightkurve.KeplerQualityFlags.html#l
 <td><p>Returns the time for all good-quality cadences.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.wcs.html#lightkurve.KeplerTargetPixelFile.wcs" title="lightkurve.KeplerTargetPixelFile.wcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wcs</span></code></a></p></td>
-<td><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System solution for the target pixel file.</p></td>
+<td><p>Returns an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.wcs.WCS.html#astropy.wcs.WCS" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code></a> object with the World Coordinate System solution for the target pixel file.</p></td>
 </tr>
 </tbody>
 </table>

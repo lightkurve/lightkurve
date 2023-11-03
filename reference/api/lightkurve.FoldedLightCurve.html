@@ -1335,10 +1335,10 @@ and implements different plotting defaults.</p>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_column</span></code>(*args, **kwargs)</p></td>
-<td><p>See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table.add_column" title="(in Astropy v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_column()</span></code></a>.</p></td>
+<td><p>See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table.add_column" title="(in Astropy v6.1)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_column()</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_columns</span></code>(*args, **kwargs)</p></td>
-<td><p>See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table.add_columns" title="(in Astropy v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_columns()</span></code></a>.</p></td>
+<td><p>See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table.add_columns" title="(in Astropy v6.1)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_columns()</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_index</span></code>(colnames[, engine, unique])</p></td>
 <td><p>Insert a new index among one or more columns.</p></td>
@@ -1371,7 +1371,7 @@ and implements different plotting defaults.</p>
 <td><p>Returns a boolean array that is <code class="docutils literal notranslate"><span class="pre">True</span></code> during transits and <code class="docutils literal notranslate"><span class="pre">False</span></code> elsewhere.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.FoldedLightCurve.errorbar.html#lightkurve.FoldedLightCurve.errorbar" title="lightkurve.FoldedLightCurve.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
+<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html#matplotlib.pyplot.errorbar" title="(in Matplotlib v3.8.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_cdpp</span></code>([transit_duration, ...])</p></td>
 <td><p>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</p></td>
@@ -1392,13 +1392,13 @@ and implements different plotting defaults.</p>
 <td><p>Returns a <a class="reference internal" href="#lightkurve.FoldedLightCurve" title="lightkurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> object folded on a period and epoch.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_pandas</span></code>(df[, time_scale])</p></td>
-<td><p>Convert a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> to a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
+<td><p>Convert a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> to a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_stingray</span></code>(lc)</p></td>
 <td><p>Create a new <a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from a <code class="xref py py-obj docutils literal notranslate"><span class="pre">stingray.Lightcurve</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_timeseries</span></code>(ts)</p></td>
-<td><p>Creates a new <a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p></td>
+<td><p>Creates a new <a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">group_by</span></code>(keys)</p></td>
 <td><p>Group this table by the specified <code class="docutils literal notranslate"><span class="pre">keys</span></code></p></td>
@@ -1446,7 +1446,7 @@ and implements different plotting defaults.</p>
 <td><p>Return a list of lines for the formatted string representation of</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.FoldedLightCurve.plot.html#lightkurve.FoldedLightCurve.plot" title="lightkurve.FoldedLightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
+<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.8.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html#lightkurve.FoldedLightCurve.plot_river" title="lightkurve.FoldedLightCurve.plot_river"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_river</span></code></a>(**kwargs)</p></td>
 <td><p>Plot the folded light curve in a river style.</p></td>
@@ -1461,7 +1461,7 @@ and implements different plotting defaults.</p>
 <td><p>Returns a list of asteroids or comets which affected the light curve.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code>(filename[, time_column, time_format, ...])</p></td>
-<td><p>Read and parse a file and returns a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
+<td><p>Read and parse a file and returns a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.timeseries.TimeSeries</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_column</span></code>(name)</p></td>
 <td><p>Remove a column from the table.</p></td>
@@ -1500,7 +1500,7 @@ and implements different plotting defaults.</p>
 <td><p>Round numeric columns in-place to the specified number of decimals.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.FoldedLightCurve.scatter.html#lightkurve.FoldedLightCurve.scatter" title="lightkurve.FoldedLightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(**kwargs)</p></td>
-<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
+<td><p>Plot the folded light curve using matplotlib's <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.8.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_neighbors</span></code>([limit, radius])</p></td>
 <td><p>Search the data archive at MAST for the most nearby light curves.</p></td>
@@ -1536,7 +1536,7 @@ and implements different plotting defaults.</p>
 <td><p>Converts the light curve to a FITS file in the Kepler/TESS file format.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code>(**kwargs)</p></td>
-<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.1.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
+<td><p>Converts the light curve to a Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodogram</span></code>([method])</p></td>
 <td><p>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</p></td>
@@ -1611,10 +1611,10 @@ and implements different plotting defaults.</p>
 <td><p>Boolean mask which flags the even-numbered cycles (2, 4, 6, etc).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code></p></td>
-<td><p>Brightness values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
+<td><p>Brightness values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_err</span></code></p></td>
-<td><p>Brightness uncertainties stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
+<td><p>Brightness uncertainties stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_quantity</span></code></p></td>
 <td><p><div class="deprecated">
@@ -1683,7 +1683,7 @@ and implements different plotting defaults.</p>
 <td><p>Maintain tuple that controls table column visibility for print output.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></p></td>
-<td><p>Time values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
+<td><p>Time values stored as an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">time_format</span></code></p></td>
 <td><p><div class="deprecated">

@@ -1422,7 +1422,7 @@ For example, a search result can be filtered by exposure time using
 <td><p>Declination coordinate for each data product found.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.SearchResult.table.html#lightkurve.SearchResult.table" title="lightkurve.SearchResult.table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult.table</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v6.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> containing the full search results returned by the MAST API.</p></td>
+<td><p><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> containing the full search results returned by the MAST API.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1447,7 +1447,7 @@ For example, a search result can be filtered by exposure time using
 <p><a class="reference internal" href="api/lightkurve.SearchResult.download_all.html#lightkurve.SearchResult.download_all" title="lightkurve.SearchResult.download_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult.download_all</span></code></a> returns a <a class="reference internal" href="api/lightkurve.LightCurveCollection.html#lightkurve.LightCurveCollection" title="lightkurve.LightCurveCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveCollection</span></code></a> or a
 <a class="reference internal" href="api/lightkurve.TargetPixelFileCollection.html#lightkurve.TargetPixelFileCollection" title="lightkurve.TargetPixelFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code></a> object. They contain the data products, along with some convenience functions.</p>
 <p>A collection can also be further filtered using standard Python list syntax,
-and a subset of <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> syntax.
+and a subset of <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> syntax.
 For example, a collection can be filtered by TESS sectors using
 <code class="docutils literal notranslate"><span class="pre">lcc[(lcc.sector</span> <span class="pre">&gt;=</span> <span class="pre">13)</span> <span class="pre">&amp;</span> <span class="pre">(lcc.sector</span> <span class="pre">&lt;=</span> <span class="pre">19)]</span></code>.</p>
 <table class="autosummary longtable table autosummary">

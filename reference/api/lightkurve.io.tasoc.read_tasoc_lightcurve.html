@@ -1312,7 +1312,7 @@
 <h1>lightkurve.io.tasoc.read_tasoc_lightcurve<a class="headerlink" href="#lightkurve-io-tasoc-read-tasoc-lightcurve" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="lightkurve.io.tasoc.read_tasoc_lightcurve">
-<span class="sig-prename descclassname"><span class="pre">lightkurve.io.tasoc.</span></span><span class="sig-name descname"><span class="pre">read_tasoc_lightcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'FLUX_RAW'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality_bitmask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/io/tasoc.html#read_tasoc_lightcurve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.io.tasoc.read_tasoc_lightcurve" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lightkurve.io.tasoc.</span></span><span class="sig-name descname"><span class="pre">read_tasoc_lightcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'FLUX_CORR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality_bitmask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/io/tasoc.html#read_tasoc_lightcurve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.io.tasoc.read_tasoc_lightcurve" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns a TESS TASOC <a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a>.</p>
 <p>More information: <a class="reference external" href="https://archive.stsci.edu/hlsp/tasoc">https://archive.stsci.edu/hlsp/tasoc</a></p>
 <dl class="field-list simple">
@@ -1321,9 +1321,8 @@
 <dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Local path or remote url of TASOC light curve FITS file.</p>
 </dd>
 <dt><strong>flux_column</strong><span class="classifier">str</span></dt><dd><p>Column that will be used to populate the flux values.
-By default, “FLUX_RAW” is used. It contains the T’DA extracted lightcurve,
-with no corrections applied to the raw light curves. Corrected lightcurves
-may become available in the future.</p>
+By default, “FLUX_CORR” is used. It contains the T’DA extracted lightcurve,
+with corrections applied to the raw light curves</p>
 </dd>
 </dl>
 </dd>
