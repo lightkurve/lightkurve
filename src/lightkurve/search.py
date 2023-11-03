@@ -6,12 +6,13 @@ import logging
 import os
 import re
 import warnings
+from datetime import datetime, timedelta
 
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii
-from astropy.table import Row, Table, join
+from astropy.table import Row, Table, join, Column
 from astropy.time import Time
 from astropy.utils import deprecated
 from memoization import cached
@@ -54,17 +55,20 @@ AUTHOR_LINKS = {
     "TESScut": "https://mast.stsci.edu/tesscut/",
     "GSFC-ELEANOR-LITE": "https://archive.stsci.edu/hlsp/gsfc-eleanor-lite",
     "TGLC": "https://archive.stsci.edu/hlsp/tglc",
-    "KBONUS-BKG":"https://archive.stsci.edu/hlsp/kbonus-bkg",
+    "KBONUS-BKG": "https://archive.stsci.edu/hlsp/kbonus-bkg",
 }
 
 REPR_COLUMNS_BASE = [
     "#",
     "mission",
-    "year",
+    "sequence",
     "author",
+    "product_type",
     "exptime",
     "target_name",
     "distance",
+    "start_time",
+    "end_time",
 ]
 
 
@@ -134,11 +138,18 @@ class SearchResult(object):
         This ordering is not a judgement on the quality of one product vs another,
         because we love all pipelines!
         """
-        sort_priority = {"Kepler": 1, "K2": 1, "SPOC": 1, "KBONUS-BKG":2, "TESS-SPOC": 2, "QLP": 3}
+        sort_priority = {
+            "Kepler": 1,
+            "K2": 1,
+            "SPOC": 1,
+            "KBONUS-BKG": 2,
+            "TESS-SPOC": 2,
+            "QLP": 3,
+        }
         self.table["sort_order"] = [
             sort_priority.get(author, 9) for author in self.table["author"]
         ]
-        self.table.sort(["distance", "project", "sort_order", "year", "exptime"])
+        self.table.sort(["distance", "project", "sort_order", "start_time", "exptime"])
 
     def _add_columns(self):
         """Adds a user-friendly index (``#``) column and adds column unit
@@ -150,14 +161,40 @@ class SearchResult(object):
         self.table["exptime"].format = ".0f"
         self.table["distance"].unit = "arcsec"
 
-        # Add the year column from `t_min` or `productFilename`
-        year = np.floor(Time(self.table["t_min"], format="mjd").decimalyear)
-        self.table["year"] = year.astype(int)
-        # `t_min` is incorrect for Kepler products, so we extract year from the filename for those =(
-        for idx in np.where(self.table["author"] == "Kepler")[0]:
-            self.table["year"][idx] = re.findall(
-                r"\d+.(\d{4})\d+", self.table["productFilename"][idx]
-            )[0]
+        # # Add the year column from `t_min` or `productFilename`
+        # year = np.floor(Time(self.table["t_min"], format="mjd").decimalyear)
+        # self.table["year"] = year.astype(int)
+        # # `t_min` is incorrect for Kepler products, so we extract year from the filename for those =(
+        # for idx in np.where(self.table["author"] == "Kepler")[0]:
+        #     self.table["year"][idx] = re.findall(
+        #         r"\d+.(\d{4})\d+", self.table["productFilename"][idx]
+        #     )[0]
+
+        # Kepler files have the wrong start and stop times
+        kepler_mask = self.table["provenance_name"] == "Kepler"
+        filenames = filenames = np.asarray(
+            self.table["productFilename"][kepler_mask].data
+        )
+        start_time = [
+            Time(datetime.strptime(filename.split("-")[-1].split("_")[0], "%Y%j%H%M%S"))
+            for filename in filenames
+        ]
+        end_time = [
+            start_time[idx] + timedelta(days=30)
+            if filename.endswith("slc.fits")
+            else start_time[idx] + timedelta(days=90)
+            for idx, filename in enumerate(filenames)
+        ]
+        self.table["start_time"][kepler_mask] = start_time
+        self.table["end_time"][kepler_mask] = end_time
+
+        # Some products are HLSPs and some are mission products, this column helps people distinguish them
+        self.table["product_type"] = "Mission Product"
+        self.table["product_type"][
+            ~(self.table["author"] == "SPOC")
+            & ~(self.table["author"] == "K2")
+            & ~(self.table["author"] == "Kepler")
+        ] = "HLSP"
 
     def __repr__(self, html=False):
         def to_tess_gi_url(proposal_id):
@@ -273,6 +310,31 @@ class SearchResult(object):
     def distance(self):
         """Distance from the search position for each data product found."""
         return self.table["distance"].quantity
+
+    @property
+    def product_type(self):
+        """Whether the data product is a mission product or High Level Science Product."""
+        return self.table["product_type"].data
+
+    @property
+    def sequence(self):
+        """What quarter, campaign, or sector the data is from."""
+        return self.table["sequence"].data
+
+    @property
+    def start_time(self):
+        """Start time of the observation."""
+        return Time(self.table["start_time"].data)
+
+    @property
+    def end_time(self):
+        """End time of the observation."""
+        return Time(self.table["end_time"].data)
+
+    @property
+    def year(self):
+        """Year of the observation"""
+        return list(Time(self.start_time).strftime("%Y"))
 
     def _download_one(
         self, table, quality_bitmask, download_dir, cutout_size, **kwargs
@@ -970,6 +1032,11 @@ def _search_products(
         provenance_name = None
     else:
         provenance_name = np.atleast_1d(provenance_name).tolist()
+    if provenance_name is not None:
+        # If author "TESS" is used, we assume it is SPOC
+        provenance_name = np.unique(
+            [p if p.lower() != "tess" else "SPOC" for p in provenance_name]
+        ).tolist()
 
     # Speed up by restricting the MAST query if we don't want FFI image data
     extra_query_criteria = {}
@@ -990,6 +1057,7 @@ def _search_products(
         sequence_number=campaign or sector,
         **extra_query_criteria,
     )
+
     log.debug(
         "MAST found {} observations. "
         "Now querying MAST for the corresponding data products."
@@ -1015,8 +1083,17 @@ def _search_products(
 
         # Add the user-friendly 'author' column (synonym for 'provenance_name')
         result["author"] = result["provenance_name"]
+        result["start_time"] = Column(
+            Time(result["t_min"] + 2400000.5, format="jd"),
+            format=lambda x: f"{x.isot.split('T')[0]}",
+        )
+        result["end_time"] = Column(
+            Time(result["t_max"] + 2400000.5, format="jd"),
+            format=lambda x: f"{x.isot.split('T')[0]}",
+        )
         # Add the user-friendly 'mission' column
-        result["mission"] = None
+        result["mission"] = result["project"]
+        result["sequence"] = None
         obs_prefix = {"Kepler": "Quarter", "K2": "Campaign", "TESS": "Sector"}
         for idx in range(len(result)):
             obs_project = result["project"][idx]
@@ -1036,9 +1113,10 @@ def _search_products(
                 for half, letter in zip([1, 2], ["a", "b"]):
                     if f"c{tmp_seqno}{half}" in result["productFilename"][idx]:
                         obs_seqno = f"{int(tmp_seqno):02d}{letter}"
-            result["mission"][idx] = "{} {} {}".format(
-                obs_project, obs_prefix.get(obs_project, ""), obs_seqno
-            )
+            if len(obs_seqno) != 0:
+                result["sequence"][idx] = "{} {}".format(
+                    obs_prefix.get(obs_project, ""), obs_seqno
+                )
 
         masked_result = _filter_products(
             result,
@@ -1170,8 +1248,25 @@ def _query_mast(
     tess_match = re.match(r"^(tess|tic) ?(\d+)$", target_lower)
     if tess_match:
         exact_target_name = f"{tess_match.group(2).zfill(9)}"
-
-    if exact_target_name and radius is None:
+    if provenance_name is not None:
+        if len(np.atleast_1d(provenance_name)) == 1:
+            mission_match = (
+                (
+                    bool(kplr_match)
+                    & (np.atleast_1d(provenance_name)[0].lower() == "kepler")
+                )
+                | (
+                    bool(ktwo_match)
+                    & (np.atleast_1d(provenance_name)[0].lower() == "k2")
+                )
+                | (
+                    bool(tess_match)
+                    & (np.atleast_1d(provenance_name)[0].lower() == "spoc")
+                )
+            )
+    else:
+        mission_match = False
+    if exact_target_name and (radius is None) and mission_match:
         log.debug(
             "Started querying MAST for observations with the exact "
             f"target_name='{exact_target_name}'."
@@ -1209,6 +1304,15 @@ def _query_mast(
             warnings.filterwarnings("ignore", category=NoResultsWarning)
             warnings.filterwarnings("ignore", message="t_exptime is continuous")
             obs = Observations.query_criteria(objectname=target, **query_criteria)
+            if exact_target_name:
+                mask = ~np.asarray(
+                    [
+                        target_name.startswith(exact_target_name[:4])
+                        & ~(target_name == exact_target_name)
+                        for target_name in obs["target_name"]
+                    ]
+                ).astype(bool)
+                obs = obs[mask]
         obs.sort("distance")
         # We use `exptime` as an alias for `t_exptime`
         obs["exptime"] = obs["t_exptime"]

@@ -14,6 +14,7 @@ from . import (
     tasoc,
     tess,
     tglc,
+    kbonus,
 )
 from .detect import *
 from .read import *
@@ -37,5 +38,6 @@ try:
         "kepseismic", LightCurve, kepseismic.read_kepseismic_lightcurve
     )
     registry.register_reader("tglc", LightCurve, tglc.read_tglc_lightcurve)
+    registry.register_reader("kbonus", LightCurve, kbonus.read_kbonus_lightcurve)
 except registry.IORegistryError:
     pass  # necessary to enable autoreload during debugging

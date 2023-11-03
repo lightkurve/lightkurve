@@ -28,6 +28,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'KEPSEISMIC'`
         * `'CDIPS'`
         * `'TGLC'`
+        * `'KBONUS-BKG'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -71,6 +72,11 @@ def detect_filetype(hdulist: HDUList) -> str:
         ]
     ):
         return "PATHOS"
+
+    # Is it a KBONUS-BKG light curve?
+    # cf. https://archive.stsci.edu/hlsp/kbonus-bkg
+    if hdulist[0].header.get("HLSPID") == "KBONUS-BKG":
+        return "KBONUS-BKG"
 
     # Is it a TASOC TESS light curve?
     # cf. https://tasoc.dk and https://archive.stsci.edu/hlsp/tasoc
