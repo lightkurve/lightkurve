@@ -4,7 +4,7 @@ import warnings
 from copy import deepcopy
 
 from astropy.io import fits
-from astropy.table import Table
+from astropy.table import MaskedColumn, Table
 from astropy.time import Time
 from astropy.units import UnitsWarning
 import numpy as np
@@ -49,6 +49,17 @@ def read_generic_lightcurve(
         # out to be addressed at the archive level. (See issue #1216.)
         warnings.simplefilter("ignore", category=UnitsWarning)
         tab = Table.read(hdulist[ext], format="fits")
+
+    # Turn any MaskedColumn into regular Column. Later they will be turned
+    # to regular Quantity.
+    # This is done to avoid the use of MaskedQuantity.
+    #
+    # The logic mimics Astropy's built-in Kepler / TESS reader:
+    # https://github.com/astropy/astropy/blob/6fda4d5dc40e94e8944c2d23ba5a7004be330479/astropy/timeseries/io/kepler.py#L79
+    for colname in tab.colnames:
+        unit = tab[colname].unit
+        if unit and isinstance(tab[colname], MaskedColumn):
+            tab[colname] = tab[colname].filled(np.nan)
 
     # Make sure the meta data also includes header fields from extension #0
     tab.meta.update(hdulist[0].header)
