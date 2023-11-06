@@ -42,6 +42,8 @@ AUTHOR_LINKS = {
     "KBONUS-BKG": "https://archive.stsci.edu/hlsp/kbonus-bkg",
     "KEPSEISMIC": "https://archive.stsci.edu/prepds/kepseismic/",
     "IRIS": "https://archive.stsci.edu/hlsp/iris",
+    "K2VARCAT": "https://archive.stsci.edu/prepds/k2varcat/",
+    "K2SC": "https://archive.stsci.edu/prepds/k2sc/",
 }
 
 # Note if a HLSP does not appear in this list it no longer appears in the MAST query.

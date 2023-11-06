@@ -24,7 +24,6 @@ from lightkurve.search import (
     search_targetpixelfile,
     search_tesscut,
     SearchResult,
-    SearchError,
     log,
 )
 from lightkurve import (
@@ -366,7 +365,14 @@ def test_source_confusion():
     # a target 4 arcsec away was returned instead.
     # See https://github.com/lightkurve/lightkurve/issues/148
     desired_target = "KIC 6507433"
-    tpf = search_targetpixelfile(desired_target, quarter=8).download()
+    # If a radius is specified, will do a cone search
+    sr = lk.search_targetpixelfile(desired_target, quarter=8, radius=0.0001)
+    assert len(sr) == 2
+
+    # If radius is None, will find only exact matches for Kepler
+    sr = lk.search_targetpixelfile(desired_target, quarter=8)
+    assert len(sr) == 1
+    tpf = sr.download()
     assert tpf.targetid == 6507433
 
 
@@ -604,16 +610,16 @@ def test_split_k2_campaigns():
     """Do split K2 campaign sections appear separately in search results?"""
     # Campaign 9
     search_c09 = search_targetpixelfile("EPIC 228162462", cadence="long", campaign=9)
-    assert search_c09.table["mission"][0] == "K2 Campaign 09a"
-    assert search_c09.table["mission"][1] == "K2 Campaign 09b"
+    assert search_c09.table["sequence"][0] == "Campaign 09a"
+    assert search_c09.table["sequence"][1] == "Campaign 09b"
     # Campaign 10
     search_c10 = search_targetpixelfile("EPIC 228725972", cadence="long", campaign=10)
-    assert search_c10.table["mission"][0] == "K2 Campaign 10a"
-    assert search_c10.table["mission"][1] == "K2 Campaign 10b"
+    assert search_c10.table["sequence"][0] == "Campaign 10a"
+    assert search_c10.table["sequence"][1] == "Campaign 10b"
     # Campaign 11
     search_c11 = search_targetpixelfile("EPIC 203830112", cadence="long", campaign=11)
-    assert search_c11.table["mission"][0] == "K2 Campaign 11a"
-    assert search_c11.table["mission"][1] == "K2 Campaign 11b"
+    assert search_c11.table["sequence"][0] == "Campaign 11a"
+    assert search_c11.table["sequence"][1] == "Campaign 11b"
 
 
 @pytest.mark.remote_data
