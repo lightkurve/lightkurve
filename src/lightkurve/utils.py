@@ -24,7 +24,7 @@ from astropy.visualization import (
 from astropy.time import Time
 from astropy.coordinates import SkyCoord, Angle, Distance
 from astroquery.vizier import Vizier
-from astropy.table import Table
+from astropy.table import Table, vstack
 from typing import Union
 
 log = logging.getLogger(__name__)
@@ -898,8 +898,8 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
 
     # We need to remove any nan values from our proper  motion list
     # Doing this will allow objects which do not have proper motion to still be displayed
-    table["pmRA"] = np.ma.filled(table["pmRA"].astype(float), 0.0)
-    table["pmDEC"] = np.ma.filled(table["pmDEC"].astype(float), 0.0)
+    table["pmRA"] = np.ma.filled(table["pmRA"].astype(float), 0.0) 
+    table["pmDEC"] = np.ma.filled(table["pmDEC"].astype(float), 0.0)    
 
     # Get the input data from the table
     c = SkyCoord(
@@ -911,7 +911,7 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
         obstime=equinox,
     )
 
-    # Suppress warning caused by zero values for pm
+    #Suppress warning caused by Astropy as noted in issue 111747 (https://github.com/astropy/astropy/issues/11747)
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", message="ERFA function")
 
@@ -919,8 +919,14 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
         c1 = c.apply_space_motion(new_obstime=epoch)
 
     # Add new data corrected RA and Dec
-    table["RA"] = c1.ra.to(u.deg).value * u.deg
-    table["DEC"] = c1.dec.to(u.deg).value * u.deg
+    table["RA"] = c1.ra.to(u.deg)
+    table["DEC"] = c1.dec.to(u.deg)
+
+    #Get the index of the targets with zero proper motions
+    pmzero_index = np.where((table["pmRA"]==0.0) & (table["pmDEC"]==0.0))
+    
+    table["RA"][pmzero_index] = table["RAJ2000"][pmzero_index]
+    table["DEC"][pmzero_index] = table["DEJ2000"][pmzero_index]
 
     return table
 
@@ -1054,10 +1060,10 @@ def query_skycatalog(
         / -2.5
     )
 
-    # Now sort the table based on separation
-    result.sort(["Separation"])
-
     # apply_propermotion
     result = _apply_propermotion(result, equinox=equinox, epoch=epoch)
+
+    # Now sort the table based on separation
+    result.sort(["Separation"])
 
     return result
