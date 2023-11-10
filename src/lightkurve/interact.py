@@ -298,7 +298,19 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
         border_fill_color="whitesmoke",
     )
     fig.title.offset = -10
-    fig.yaxis.axis_label = "Flux (e/s)"
+
+    # ylabel: mimic the logic in lc._create_plot()
+    ylabel = "Flux"
+    if lc.meta.get("NORMALIZED"):
+        ylabel = "Normalized " + ylabel
+    elif (lc["flux"].unit) and (lc["flux"].unit.to_string() != ""):
+        if lc["flux"].unit == (u.electron / u.second):
+            yunit_str = "e/s"  # the common case, use abbreviation
+        else:
+            yunit_str = lc["flux"].unit.to_string()
+        ylabel += f" ({yunit_str})"
+    fig.yaxis.axis_label = ylabel
+
     fig.xaxis.axis_label = "Time (days)"
     try:
         if (lc.mission == "K2") or (lc.mission == "Kepler"):
@@ -536,7 +548,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     """Make the Gaia Figure Elements"""
 
     result = _get_nearby_gaia_objects(tpf, magnitude_limit)
-    
+
     source_colnames_extras = []
     tooltips_extras = []
     try:
