@@ -304,7 +304,7 @@ class RegressionCorrector(Corrector):
         )
         self.corrected_lc = self.lc.copy()
         self.corrected_lc.flux = self.lc.flux - self.model_lc.flux
-        self.corrected_lc.flux_err = (self.lc.flux_err ** 2 + model_err ** 2) ** 0.5
+        self.corrected_lc.flux_err = (self.lc.flux_err ** 2 + self.model_lc.flux_err ** 2) ** 0.5
         self.diagnostic_lightcurves = self._create_diagnostic_lightcurves()
         return self.corrected_lc
 
