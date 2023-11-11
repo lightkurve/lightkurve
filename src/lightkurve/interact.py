@@ -1000,6 +1000,7 @@ def show_interact_widget(
     vmax=None,
     scale="log",
     cmap="Viridis256",
+    return_selected_mask=False,
 ):
     """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
@@ -1064,6 +1065,9 @@ def show_interact_widget(
         Maximum color scale for tpf figure
     cmap: str
         Colormap to use for tpf plot. Default is 'Viridis256'
+    return_selected_mask: bool
+        Optional, if set to `True`, also return the pixel selection as an aperture mask.
+    TODO: 1) document return result, 2) update for the docstring in tpf.interact(), 3) remind users to copy the result once satisfied.
     """
     try:
         import bokeh
@@ -1111,6 +1115,9 @@ def show_interact_widget(
         aperture_mask[0, 0] = True
 
     lc.meta["APERTURE_MASK"] = aperture_mask
+
+    # a copy of current pixel current selection for the use of caller
+    selected_mask_to_return = aperture_mask.copy()
 
     if transform_func is not None:
         lc = transform_func(lc)
@@ -1220,10 +1227,12 @@ def show_interact_widget(
                     ylims = _to_unitless(ylim_func(lc_new))
                 fig_lc.y_range.start = ylims[0]
                 fig_lc.y_range.end = ylims[1]
+                np.copyto(selected_mask_to_return,  lc_new.meta["APERTURE_MASK"])  # Update selected_mask_to_return
             else:
                 lc_source.data["flux"] = lc.flux.value * 0.0
                 fig_lc.y_range.start = -1
                 fig_lc.y_range.end = 1
+                selected_mask_to_return.fill(False)  # Update selected_mask_to_return
 
             message_on_save.text = " "
             export_button.button_type = "success"
@@ -1310,7 +1319,11 @@ def show_interact_widget(
         doc.add_root(widgets_and_figures)
 
     output_notebook(verbose=False, hide_banner=True)
-    return show(create_interact_ui, notebook_url=notebook_url)
+    show_result = show(create_interact_ui, notebook_url=notebook_url)
+    if return_selected_mask:
+        return show_result, selected_mask_to_return
+    else:
+        return show_result
 
 
 
