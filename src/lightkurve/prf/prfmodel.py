@@ -70,6 +70,7 @@ def from_tpf(tpf):
 		prf_object = KeplerPRF(tpf.column, tpf.row, tpf.channel, tpf.shape[1:3])
 	else:
 		raise TypeError("TPF must be from Kepler/K2 or TESS")
+
 	return prf_object
 
 
@@ -562,7 +563,48 @@ class KeplerPRF(PRF):
 		scale: float = 1.0,
 		rotation_angle: float = 0.0,
 		) -> npt.ArrayLike:
-		return self._prf_model(center_col, center_row, scale=scale, rotation_angle=rotation_angle)
+		PRF_mod = self._prf_model(center_col, center_row, scale=scale, rotation_angle=rotation_angle)
+		
+		# Mask out flux if it falls on the collateral pixels
+		# See https://nexsci.caltech.edu/workshop/2012/keplergo/PipelineCAL.shtml
+		
+		
+		# TODO: Can have divide by zero warning
+		# TODO: Check logic of subtracting or adding. Sometimes indexes are negative which is wrong. 
+		target_flux_init = np.sum(PRF_mod[0,:,:])
+		if self.column < 12:
+			mask_cols = 12 - self.column
+			PRF_mod[:,:,:mask_cols] = 0
+			warnings.warn(
+	  	  	  	  f"TPF contains collateral pixels: Column(s) < 12",
+	  	  	  	  LightkurveWarning,
+	  	  	  	  )
+		if self.column + self.shape[1] >= 1112:
+			mask_cols = 1112 - self.column
+			PRF_mod[:,:,mask_cols:] = 0
+			warnings.warn(
+	  	  	  	  f"TPF contains collateral pixels: Column(s) >= 1112 ",
+	  	  	  	  LightkurveWarning,
+	  	  	  )
+		if self.row < 20:
+			mask_rows = 20 - self.row
+			PRF_mod[:,:mask_rows,:] = 0
+			warnings.warn(
+	  	  	  	  f"TPF contains collateral pixels: Row(s) < 20",
+	  	  	  	  LightkurveWarning,
+	  	  	  )
+		if self.row + self.shape[1] >= 1044:
+			mask_rows = 1044 - self.row
+			PRF_mod[:,mask_rows:,:] = 0
+			warnings.warn(
+	  	  	  	  f"TPF contains collateral pixels: Row(s) >= 1044)",
+	  	  	  	  LightkurveWarning,
+	  	  	  )	  
+	  	tar_flux_after = np.sum(PRF_mod[0,:,:])  
+	  	
+	  	if tar_flux_init != tar_flux_after:
+	  		print(f"{100 * (1 - (tar_flux_after / tar_flux_init))}\% of target flux fell on non-science pixels.")	  	
+		return PRF_mod
 
 	def _read_prf_calibration_file(self, path, ext):
 		"""Reads the Kepler calibration files"""
@@ -715,31 +757,35 @@ class TessPRF(PRF):
 		PRF_mod = self._prf_model(center_col, center_row, scale=scale, rotation_angle=rotation_angle)
 		
 		# Mask out flux if it falls on the collateral pixels
-
+		# See https://heasarc.gsfc.nasa.gov/docs/tess/data-products.html
+		tar_flux_init = np.sum(PRF_mod[0,:,:])
+		
 		if self.column < 45:
-			tar_flux_before = np.sum(PRF_mod[0,:,:])
 			mask_cols = 45 - self.column
 			PRF_mod[:,:,:mask_cols] = 0
-			tar_flux_after = np.sum(PRF_mod[0,:,:])
-			
 			warnings.warn(
-                f"TPF contains collateral pixels. {(1-(tar_flux_after/tar_flux_before))*100}% of flux is missing",
-                LightkurveWarning,
-            )
-	
-			
+	  	  	  	  f"TPF contains collateral pixels: Column(s) < 45",
+	  	  	  	  LightkurveWarning,
+	  	  	  )
 		if self.column + self.shape[1] >= 2093:
-			tar_flux_before = np.sum(PRF_mod[0,:,:])
 			mask_cols = 2093 - self.column
 			PRF_mod[:,:,mask_cols:] = 0
-			tar_flux_after = np.sum(PRF_mod[0,:,:])
-			
 			warnings.warn(
-                f"TPF contains collateral pixels. {(1-(tar_flux_after/tar_flux_before))*100}% of flux is missing",
-                LightkurveWarning,
-            )
-		
-		return PRF_mod #self._prf_model(center_col, center_row, scale=scale, rotation_angle=rotation_angle)
+	  	  	  	  f"TPF contains collateral pixels: Column(s) >= 2093 ",
+	  	  	  	  LightkurveWarning,
+	  	  	  )
+	  	  	  
+		if self.row + self.shape[1] > 2048:
+			mask_rows = 2048 - self.row
+			PRF_mod[:,mask_rows:,:] = 0
+			warnings.warn(
+	  	  	  	  f"TPF contains collateral pixels: Row(s) > 2048",
+	  	  	  	  LightkurveWarning,
+	  	  	  )
+	  	  	  
+		if tar_flux_init != tar_flux_after:
+	  		print(f"{100 * (1 - (tar_flux_after / tar_flux_init))}\% of target flux fell on non-science pixels.")	
+		return PRF_mod 
 
 	def _read_prf_calibration_file(self, hdu):
 		data = hdu.data
