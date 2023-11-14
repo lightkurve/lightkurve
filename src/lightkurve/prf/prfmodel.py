@@ -582,7 +582,6 @@ class KeplerPRF(PRF):
 		# See https://nexsci.caltech.edu/workshop/2012/keplergo/PipelineCAL.shtml
 		
 		
-		# TODO: Check logic of subtracting or adding. Sometimes indexes are negative which is wrong. 
 		tar_flux_init = np.sum(PRF_mod[0,:,:])
 		if self.column < 12:
 			mask_cols = 12 - self.column
