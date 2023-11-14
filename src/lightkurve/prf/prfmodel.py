@@ -782,7 +782,8 @@ class TessPRF(PRF):
 	  	  	  	  f"TPF contains collateral pixels: Row(s) > 2048",
 	  	  	  	  LightkurveWarning,
 	  	  	  )
-	  	  	  
+	  	tar_flux_after = np.sum(PRF_mod[0,:,:])
+	  	  
 		if tar_flux_init != tar_flux_after:
 	  		print(f"{100 * (1 - (tar_flux_after / tar_flux_init))}\% of target flux fell on non-science pixels.")	
 		return PRF_mod 
