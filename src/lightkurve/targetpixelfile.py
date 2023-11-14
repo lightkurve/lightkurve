@@ -2057,6 +2057,134 @@ class TargetPixelFile(object):
 
         return ax
 
+    def get_simple_aperture(
+        self,
+        center_col: Union[float, SkyCoord, None] = None,
+        center_row: Union[float, SkyCoord, None] = None,
+        scale: float = 1.0,
+        rotation_angle: float = 0.0,
+        min_completeness: float = 0.9,
+        plot: bool = False,
+    ) -> npt.ArrayLike:
+        """
+        Gets a simple aperture for the target star. This does not account for blending.
+
+        Parameters:
+        -----------
+        center_col : float
+                        column location of the target in pixels or SkyCoord (ra).
+        center_row : float
+                        row location of the target in pixels or SkyCoord (dec).
+        scale : float
+                        Pixel scale stretch parameter, can be used to account for focus changes.
+                        Values > 1 stretch the image, Values < 1 make the PRF more compact.
+                        E.g. a scale value of 0.5 will double the PRF footprint.
+        rotation_angle : float
+                        Rotation angle in radians
+        min_completeness : float
+                        Minimum fraction of flux contained within the aperture
+        plot : bool
+                        plots the simple aperture over the model PRF
+
+        Returns:
+        --------
+        aperture : npt.ArrayLike
+                        2D boolean array of the same (nrows x ncolumns)
+
+        """
+        
+        if (min_completeness < 0) | (min_completeness > 1):
+        	raise ValueError("Completeness must be between 0 and 1")
+
+        # By default, get the target position from the header.
+        if (center_col is None) | (center_row is None):
+            center_col, center_row = self.wcs.world_to_pixel(
+                SkyCoord(self.ra, self.dec, unit="deg")
+            )
+            center_col = float(center_col) + self.column
+            center_row = float(center_row) + self.row
+        if isinstance(center_col, SkyCoord) | isinstance(center_row, SkyCoord):
+            center_col, center_row = self.wcs.world_to_pixel(
+                SkyCoord(center_col.deg, center_row.deg, unit="deg")
+            )
+            center_col = float(center_col) + self.column
+            center_row = float(center_row) + self.row
+
+        PRF_base = self.prf
+        prf_model = PRF_base.prf_model(
+            center_col=center_col,
+            center_row=center_row,
+            scale=scale,
+            rotation_angle=rotation_angle,
+        )
+        aperture = PRF_base.get_simple_aperture(
+            prf_model, min_completeness=min_completeness, plot=plot
+        )
+
+        return aperture
+        
+        
+    def estimate_completeness(
+        self,
+        aperture: npt.ArrayLike,
+        center_col: Union[float, SkyCoord, None] = None,
+        center_row: Union[float, SkyCoord, None] = None,
+        scale: float = 1.0,
+        rotation_angle: float = 0.0,
+    ) -> float:
+        """
+        Estimates the fraction of flux from the target falls within a given aperture from the PRF model.
+        This does not account for blending.
+
+        Parameters:
+        -----------
+        aperture: npt.ArrayLike
+                        2D boolean array with col/width matching the dimensions of the PRF.
+                        True where source is inside aperture.
+        center_col : float
+                        column location of the target in pixels or SkyCoord (ra). If not provided, assumes the center
+        center_row : float
+                        row location of the target in pixels or SkyCoord (dec). If not provided, assumes the center.
+        scale : float
+                        Pixel scale stretch parameter, i.e. the numbers by which the PRF
+                        model needs to be multiplied in the column and row directions to
+                        account for focus changes. Default 1 (no scaling)
+        rotation_angle : float
+                        Rotation angle in radians
+
+
+        Returns:
+        --------
+        aperture : npt.ArrayLike
+                        2D boolean array of the same (nrows x ncolumns)
+
+        """
+
+
+
+        # By default, get the target position from the header. For a tesscut, this is just the input coordinates.
+        if (center_col is None) | (center_row is None):
+            center_col, center_row = self.wcs.world_to_pixel(
+                SkyCoord(self.ra, self.dec, unit="deg")
+            )
+            center_col = float(center_col) + self.column
+            center_row = float(center_row) + self.row
+        if isinstance(center_col, SkyCoord) | isinstance(center_row, SkyCoord):
+            center_col, center_row = self.wcs.world_to_pixel(
+                SkyCoord(center_col.deg, center_row.deg, unit="deg")
+            )
+            center_col = float(center_col) + self.column
+            center_row = float(center_row) + self.row
+
+        PRF_base = self.prf
+        prf_model = PRF_base.prf_model(
+            center_col=center_col,
+            center_row=center_row,
+            scale=scale,
+            rotation_angle=rotation_angle,
+        )
+
+        return PRF_base.estimate_completeness(prf_model, aperture)
 
 class KeplerTargetPixelFile(TargetPixelFile):
     """Class to read and interact with the pixel data products
@@ -2148,12 +2276,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
             channel=self.channel, shape=self.shape[1:], column=self.column, row=self.row
         )
 
-    def get_simple_aperture(self, ra=None, dec=None, completeness=0.9):
-        # self.ra, self.dec, pmra, pmdec in header -> row and column at time
-        # warning if ra and dec is None if somehow tesscut maybe?
-        # prf_model = self.prf.prf_model(row=row, column=column)
-        # aperture = self.prf.get_simple_aperture(prf_model, completeness=completeness)
-        NotImplementedError
 
     @property
     def obsmode(self):
@@ -2421,133 +2543,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     # Move this to the generic tpf class?
 
-    def get_simple_aperture(
-        self,
-        center_col: Union[float, SkyCoord, None] = None,
-        center_row: Union[float, SkyCoord, None] = None,
-        scale: float = 1.0,
-        rotation_angle: float = 0.0,
-        min_completeness: float = 0.9,
-        plot: bool = False,
-    ) -> npt.ArrayLike:
-        """
-        Gets a simple aperture for the target star. This does not account for blending.
-
-        Parameters:
-        -----------
-        center_col : float
-                        column location of the target in pixels or SkyCoord (ra).
-        center_row : float
-                        row location of the target in pixels or SkyCoord (dec).
-        scale : float
-                        Pixel scale stretch parameter, can be used to account for focus changes.
-                        Values > 1 stretch the image, Values < 1 make the PRF more compact.
-                        E.g. a scale value of 0.5 will double the PRF footprint.
-        rotation_angle : float
-                        Rotation angle in radians
-        min_completeness : float
-                        Minimum fraction of flux contained within the aperture
-        plot : bool
-                        plots the simple aperture over the model PRF
-
-        Returns:
-        --------
-        aperture : npt.ArrayLike
-                        2D boolean array of the same (nrows x ncolumns)
-
-        """
-        
-        if (min_completeness < 0) | (min_completeness > 1):
-        	raise ValueError("Completeness must be between 0 and 1")
-
-        # By default, get the target position from the header.
-        if (center_col is None) | (center_row is None):
-            center_col, center_row = self.wcs.world_to_pixel(
-                SkyCoord(self.ra, self.dec, unit="deg")
-            )
-            center_col = float(center_col) + self.column
-            center_row = float(center_row) + self.row
-        if isinstance(center_col, SkyCoord) | isinstance(center_row, SkyCoord):
-            center_col, center_row = self.wcs.world_to_pixel(
-                SkyCoord(center_col.deg, center_row.deg, unit="deg")
-            )
-            center_col = float(center_col) + self.column
-            center_row = float(center_row) + self.row
-
-        KepPRF = self.prf
-        prf_model = KepPRF.prf_model(
-            center_col=center_col,
-            center_row=center_row,
-            scale=scale,
-            rotation_angle=rotation_angle,
-        )
-        aperture = KepPRF.get_simple_aperture(
-            prf_model, min_completeness=min_completeness, plot=plot
-        )
-
-        return aperture
-
-    def estimate_completeness(
-        self,
-        aperture: npt.ArrayLike,
-        center_col: Union[float, SkyCoord, None] = None,
-        center_row: Union[float, SkyCoord, None] = None,
-        scale: float = 1.0,
-        rotation_angle: float = 0.0,
-    ) -> float:
-        """
-        Estimates the fraction of flux from the target falls within a given aperture based on the PRF model.
-        This does not account for blending.
-
-        Parameters:
-        -----------
-        aperture: npt.ArrayLike
-                        2D boolean array with col/width matching the dimensions of the PRF.
-                        True where source is inside aperture.
-        center_col : float
-                        column location of the target in pixels or SkyCoord (ra). If not provided, assumes the center
-        center_row : float
-                        row location of the target in pixels or SkyCoord (dec). If not provided, assumes the center.
-        scale : float
-                        Pixel scale stretch parameter, i.e. the numbers by which the PRF
-                        model needs to be multiplied in the column and row directions to
-                        account for focus changes. Default 1 (no scaling)
-        rotation_angle : float
-                        Rotation angle in radians
-
-
-        Returns:
-        --------
-        aperture : npt.ArrayLike
-                        2D boolean array of the same (nrows x ncolumns)
-
-        """
 
 
 
-        # By default, get the target position from the header. For a tesscut, this is just the input coordinates.
-        if (center_col is None) | (center_row is None):
-            center_col, center_row = self.wcs.world_to_pixel(
-                SkyCoord(self.ra, self.dec, unit="deg")
-            )
-            center_col = float(center_col) + self.column
-            center_row = float(center_row) + self.row
-        if isinstance(center_col, SkyCoord) | isinstance(center_row, SkyCoord):
-            center_col, center_row = self.wcs.world_to_pixel(
-                SkyCoord(center_col.deg, center_row.deg, unit="deg")
-            )
-            center_col = float(center_col) + self.column
-            center_row = float(center_row) + self.row
-
-        KepPRF = self.prf
-        prf_model = KepPRF.prf_model(
-            center_col=center_col,
-            center_row=center_row,
-            scale=scale,
-            rotation_angle=rotation_angle,
-        )
-
-        return KepPRF.estimate_completeness(prf_model, aperture)
 
     # Can this function have the same name as prf.PRF.estimate_contamination?
     """Same as the above function, this could probably be in the generic class. 
@@ -3168,136 +3166,8 @@ class TessTargetPixelFile(TargetPixelFile):
 		return self.prf.prf_model(center_col = catalog['columns'], center_row = catalog['row'], scale=scale, rotation_angle=rotation_angle)
 		'''
 
-    # Move this to base class.
-    def get_simple_aperture(
-        self,
-        center_col: Union[float, SkyCoord, None] = None,
-        center_row: Union[float, SkyCoord, None] = None,
-        scale: float = 1.0,
-        rotation_angle: float = 0.0,
-        min_completeness: float = 0.9,
-        plot: bool = False,
-    ) -> npt.ArrayLike:
-        """
-        Gets a simple aperture for the target star. This does not account for blending.
-
-        Parameters:
-        -----------
-        center_col : float
-                        column location of the target in pixels or SkyCoord (ra).
-        center_row : float
-                        row location of the target in pixels or SkyCoord (dec).
-        scale : float
-                        Pixel scale stretch parameter, can be used to account for focus changes.
-                        Values > 1 stretch the image, Values < 1 make the PRF more compact.
-                        E.g. a scale value of 0.5 will double the PRF footprint.
-        rotation_angle : float
-                        Rotation angle in radians
-        min_completeness : float
-                        Minimum fraction of flux contained within the aperture
-        plot : bool
-                        plots the simple aperture over the model PRF
-
-        Returns:
-        --------
-        aperture : npt.ArrayLike
-                        2D boolean array of the same (nrows x ncolumns)
-
-        """
-        
-        if (min_completeness < 0) | (min_completeness > 1):
-        	raise ValueError("Completeness must be between 0 and 1")
-
-        # By default, get the target position from the header. For a tesscut, this is just the input coordinates.
-        if (center_col is None) | (center_row is None):
-            center_col, center_row = self.wcs.world_to_pixel(
-                SkyCoord(self.ra, self.dec, unit="deg")
-            )
-            center_col = float(center_col) + self.column
-            center_row = float(center_row) + self.row
-        if isinstance(center_col, SkyCoord) | isinstance(center_row, SkyCoord):
-            center_col, center_row = self.wcs.world_to_pixel(
-                SkyCoord(center_col.deg, center_row.deg, unit="deg")
-            )
-            center_col = float(center_col) + self.column
-            center_row = float(center_row) + self.row
-
-		# TODO: fix this.
-        TessPRF = self.prf
-        prf_model = TessPRF.prf_model(
-            center_col=center_col,
-            center_row=center_row,
-            scale=scale,
-            rotation_angle=rotation_angle,
-        )
-
-        aperture = TessPRF.get_simple_aperture(
-            prf_model, min_completeness=min_completeness, plot=plot
-        )
-
-        return aperture
-
-    def estimate_completeness(
-        self,
-        aperture: npt.ArrayLike,
-        center_col: Union[float, SkyCoord, None] = None,
-        center_row: Union[float, SkyCoord, None] = None,
-        scale: float = 1.0,
-        rotation_angle: float = 0.0,
-    ) -> float:
-        """
-        Estimates the fraction of flux from the target falls within a given aperture from the PRF model.
-        This does not account for blending.
-
-        Parameters:
-        -----------
-        aperture: npt.ArrayLike
-                        2D boolean array with col/width matching the dimensions of the PRF.
-                        True where source is inside aperture.
-        center_col : float
-                        column location of the target in pixels or SkyCoord (ra). If not provided, assumes the center
-        center_row : float
-                        row location of the target in pixels or SkyCoord (dec). If not provided, assumes the center.
-        scale : float
-                        Pixel scale stretch parameter, i.e. the numbers by which the PRF
-                        model needs to be multiplied in the column and row directions to
-                        account for focus changes. Default 1 (no scaling)
-        rotation_angle : float
-                        Rotation angle in radians
 
 
-        Returns:
-        --------
-        aperture : npt.ArrayLike
-                        2D boolean array of the same (nrows x ncolumns)
-
-        """
-
-
-
-        # By default, get the target position from the header. For a tesscut, this is just the input coordinates.
-        if (center_col is None) | (center_row is None):
-            center_col, center_row = self.wcs.world_to_pixel(
-                SkyCoord(self.ra, self.dec, unit="deg")
-            )
-            center_col = float(center_col) + self.column
-            center_row = float(center_row) + self.row
-        if isinstance(center_col, SkyCoord) | isinstance(center_row, SkyCoord):
-            center_col, center_row = self.wcs.world_to_pixel(
-                SkyCoord(center_col.deg, center_row.deg, unit="deg")
-            )
-            center_col = float(center_col) + self.column
-            center_row = float(center_row) + self.row
-
-        TessPRF = self.prf
-        prf_model = TessPRF.prf_model(
-            center_col=center_col,
-            center_row=center_row,
-            scale=scale,
-            rotation_angle=rotation_angle,
-        )
-
-        return TessPRF.estimate_completeness(prf_model, aperture)
 
     # Can this function have the same name as prf.PRF.estimate_contamination?
     """Same as the above function, this could probably be in the generic class. 
