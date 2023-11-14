@@ -275,7 +275,13 @@ class PRF(ABC):
 						Two dimensional array representing the PRF values parametrized
 						by flux, centroids, widths, and rotation as applicble.
 		"""
-
+		if scale <= 0:
+			scale = 1
+			warnings.warn(
+				f"Scale can not be <= 0. Resetting scale to 1.",
+				LightkurveWarning,
+			)
+			
 		scale = 1.0 / scale
 
 		if center_col is None:
@@ -347,8 +353,15 @@ class PRF(ABC):
 						of the PRF model with respect to center_col, center_row, flux, scale_col,
 					scale_row, and rotation_angle, respectively.
 		"""
+		
+		if scale <= 0:
+			scale = 1
+			warnings.warn(
+				f"Scale can not be <= 0. Resetting scale to 1.",
+				LightkurveWarning,
+			)
 		# Implemented to match intuition that larger scale value results in a broader PRF
-		scale = 1 / scale
+		scale = 1.0 / scale
 
 		if center_col is None:
 			center_col = self.column + self.shape[1] / 2
@@ -569,9 +582,8 @@ class KeplerPRF(PRF):
 		# See https://nexsci.caltech.edu/workshop/2012/keplergo/PipelineCAL.shtml
 		
 		
-		# TODO: Can have divide by zero warning
 		# TODO: Check logic of subtracting or adding. Sometimes indexes are negative which is wrong. 
-		target_flux_init = np.sum(PRF_mod[0,:,:])
+		tar_flux_init = np.sum(PRF_mod[0,:,:])
 		if self.column < 12:
 			mask_cols = 12 - self.column
 			PRF_mod[:,:,:mask_cols] = 0
@@ -603,7 +615,7 @@ class KeplerPRF(PRF):
 		tar_flux_after = np.sum(PRF_mod[0,:,:])  
 	  	
 		if tar_flux_init != tar_flux_after:
-			print(f"{100 * (1 - (tar_flux_after / tar_flux_init))}\% of target flux fell on non-science pixels.")	  	
+			print(f"{100 * (1 - (tar_flux_after / tar_flux_init))}% of target flux fell on non-science pixels.")	  	
 		return PRF_mod
 
 	def _read_prf_calibration_file(self, path, ext):
@@ -785,7 +797,7 @@ class TessPRF(PRF):
 		tar_flux_after = np.sum(PRF_mod[0,:,:])
 	  	  
 		if tar_flux_init != tar_flux_after:
-			print(f"{100 * (1 - (tar_flux_after / tar_flux_init))}\% of target flux fell on non-science pixels.")	
+			print(f"{100 * (1 - (tar_flux_after / tar_flux_init))}% of target flux fell on non-science pixels.")	
 		return PRF_mod 
 
 	def _read_prf_calibration_file(self, hdu):
