@@ -71,7 +71,20 @@ def test_filenotfound():
     # ensure the filepath is in the exception
     assert filename in str(excinfo.value)
 
+# Ensure all internal file handles are closed in read operations
+#  (the ResourceWarning in case of unclosed file handles,
+#   is wrapped by PytestUnraisableExceptionWarning)
+@pytest.mark.filterwarnings("error::ResourceWarning")
+@pytest.mark.filterwarnings("error::pytest.PytestUnraisableExceptionWarning")
+def test_lc_file_read_no_unclosed_file_handles():
+    filename_lc = os.path.join(TESTDATA, "test-lc-tess-pimen-100-cadences.fits")
+    lc = read(filename_lc)
+    assert isinstance(lc, LightCurve)
 
+
+
+@pytest.mark.filterwarnings("error::ResourceWarning")
+@pytest.mark.filterwarnings("error::pytest.PytestUnraisableExceptionWarning")
 @pytest.mark.filterwarnings("ignore:.*been truncated.*")  # ignore AstropyUserWarning: File may have been truncated
 def test_file_corrupted():
     """Regression test for #1184; ensure lk.read() yields an error that includes the filename."""
