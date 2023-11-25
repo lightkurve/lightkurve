@@ -4,6 +4,8 @@ import tempfile
 
 import pytest
 
+from astropy.io import fits
+
 from lightkurve.utils import LightkurveDeprecationWarning, LightkurveError
 from lightkurve import (
     PACKAGEDIR,
@@ -12,11 +14,39 @@ from lightkurve import (
     LightCurve,
 )
 from lightkurve.io import read
+from lightkurve.io.generic import read_generic_lightcurve
 
 from .. import TESTDATA
 
+#
+# For tests with pytest error::ResourceWarning
+# and error::pytest.PytestUnraisableExceptionWarning
+# they are to ensure all internal file handles are closed in read operations
+# (ResourceWarning in case of unclosed file handles,
+#  is wrapped by as PytestUnraisableExceptionWarning by pytest)
+#
 
-def test_read():
+@pytest.mark.filterwarnings("error::ResourceWarning")
+@pytest.mark.filterwarnings("error::pytest.PytestUnraisableExceptionWarning")
+def test_read_lc():
+    filename_lc = os.path.join(TESTDATA, "test-lc-tess-pimen-100-cadences.fits")
+    lc = read(filename_lc)
+    assert isinstance(lc, LightCurve)
+
+
+@pytest.mark.filterwarnings("error::ResourceWarning")
+@pytest.mark.filterwarnings("error::pytest.PytestUnraisableExceptionWarning")
+def test_read_lc_in_hdu():
+    filename_lc = os.path.join(TESTDATA, "test-lc-tess-pimen-100-cadences.fits")
+    hdul = fits.open(filename_lc)
+    # lk.read() does not support hdul as input
+    lc = read_generic_lightcurve(hdul, flux_column="pdcsap_flux", time_format="btjd")
+    hdul.close()
+    assert len(lc.flux) > 0, "LC should be functional even the hdul is closed."
+
+
+# tpf.hdu has open file handle, so they are not tested for unclosed file handles
+def test_read_tpf():
     # define paths to k2 and tess data
     k2_path = os.path.join(TESTDATA, "test-tpf-star.fits")
     tess_path = os.path.join(TESTDATA, "tess25155310-s01-first-cadences.fits.gz")
@@ -70,17 +100,6 @@ def test_filenotfound():
         read(filename)
     # ensure the filepath is in the exception
     assert filename in str(excinfo.value)
-
-# Ensure all internal file handles are closed in read operations
-#  (the ResourceWarning in case of unclosed file handles,
-#   is wrapped by PytestUnraisableExceptionWarning)
-@pytest.mark.filterwarnings("error::ResourceWarning")
-@pytest.mark.filterwarnings("error::pytest.PytestUnraisableExceptionWarning")
-def test_lc_file_read_no_unclosed_file_handles():
-    filename_lc = os.path.join(TESTDATA, "test-lc-tess-pimen-100-cadences.fits")
-    lc = read(filename_lc)
-    assert isinstance(lc, LightCurve)
-
 
 
 @pytest.mark.filterwarnings("error::ResourceWarning")
