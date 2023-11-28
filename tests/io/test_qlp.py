@@ -10,9 +10,17 @@ from lightkurve.io.detect import detect_filetype
 
 
 @pytest.mark.remote_data
-def test_qlp():
+@pytest.mark.parametrize(
+    "url, flux_err_colname_expected", [
+        ("https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HLSP/qlp/s0011/0000/0002/7755/4109/hlsp_qlp_tess_ffi_s0011-0000000277554109_tess_v01_llc.fits",
+         "KSPSAP_FLUX_ERR",  # for sectors 1 -55
+         ),
+        ("https://mast.stsci.edu/api/v0.1/Download/file/?uri=mast:HLSP/qlp/s0056/0000/0000/1054/9159/hlsp_qlp_tess_ffi_s0056-0000000010549159_tess_v01_llc.fits",
+         "DET_FLUX_ERR",  # for sectors 56+
+         ),
+        ])
+def test_qlp(url, flux_err_colname_expected):
     """Can we read in QLP light curves?"""
-    url = "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HLSP/qlp/s0011/0000/0002/7755/4109/hlsp_qlp_tess_ffi_s0011-0000000277554109_tess_v01_llc.fits"    
     with fits.open(url, mode="readonly") as hdulist:
         # Can we auto-detect a QLP file?
         assert detect_filetype(hdulist) == "QLP"
@@ -20,6 +28,7 @@ def test_qlp():
         lc = read_qlp_lightcurve(url, quality_bitmask=0)
         assert lc.meta["FLUX_ORIGIN"] == "sap_flux"
         assert_array_equal(lc.flux.value, hdulist[1].data["SAP_FLUX"])
+        assert_array_equal(lc.flux_err.value, hdulist[1].data[flux_err_colname_expected])
 
 
 @pytest.mark.remote_data

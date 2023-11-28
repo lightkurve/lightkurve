@@ -9,7 +9,7 @@ from ..utils import TessQualityFlags
 from .generic import read_generic_lightcurve
 
 
-def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column="kspsap_flux_err", quality_bitmask="default"):
+def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column=None, quality_bitmask="default"):
     """Returns a `~lightkurve.lightcurve.LightCurve` object given a light curve file from the MIT Quicklook Pipeline (QLP).
 
     By default, QLP's `sap_flux` column is used to populate the `flux` values,
@@ -42,6 +42,11 @@ def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column="kspsa
         See the `~lightkurve.utils.TessQualityFlags` class for details on the bitmasks.
     """
     lc = read_generic_lightcurve(filename, flux_column=flux_column, flux_err_column=flux_err_column, time_format="btjd")
+    if flux_err_column is None:
+        if lc.meta.get("SECTOR", 0) >= 56:
+            lc["flux_err"] = lc["det_flux_err"]
+        else:
+            lc["flux_err"] = lc["kspsap_flux_err"]
 
     # Filter out poor-quality data
     # NOTE: Unfortunately Astropy Table masking does not yet work for columns
