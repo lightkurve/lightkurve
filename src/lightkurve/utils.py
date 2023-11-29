@@ -898,8 +898,8 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
 
     # We need to remove any nan values from our proper  motion list
     # Doing this will allow objects which do not have proper motion to still be displayed
-    table["pmRA"] = np.ma.filled(table["pmRA"].astype(float), 0.0) 
-    table["pmDEC"] = np.ma.filled(table["pmDEC"].astype(float), 0.0)    
+    table["pmRA"] = np.ma.filled(table["pmRA"].astype(float), 0.0)
+    table["pmDEC"] = np.ma.filled(table["pmDEC"].astype(float), 0.0)
 
     # Get the input data from the table
     c = SkyCoord(
@@ -911,7 +911,7 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
         obstime=equinox,
     )
 
-    #Suppress warning caused by Astropy as noted in issue 111747 (https://github.com/astropy/astropy/issues/11747)
+    # Suppress warning caused by Astropy as noted in issue 111747 (https://github.com/astropy/astropy/issues/11747)
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", message="ERFA function")
 
@@ -922,9 +922,10 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
     table["RA"] = c1.ra.to(u.deg)
     table["DEC"] = c1.dec.to(u.deg)
 
-    #Get the index of the targets with zero proper motions
-    pmzero_index = np.where((table["pmRA"]==0.0) & (table["pmDEC"]==0.0))
-    
+    # Get the index of the targets with zero proper motions
+    pmzero_index = np.where((table["pmRA"] == 0.0) & (table["pmDEC"] == 0.0))
+
+    # In those instances replace with J2000 values
     table["RA"][pmzero_index] = table["RAJ2000"][pmzero_index]
     table["DEC"][pmzero_index] = table["DEJ2000"][pmzero_index]
 
@@ -935,6 +936,7 @@ def query_skycatalog(
     coord: SkyCoord,
     epoch: Time,
     catalog: str,
+    target_coord: SkyCoord = None,
     radius: Union[float, u.Quantity] = u.Quantity(100, "arcsecond"),
     magnitude_limit: float = 18.0,
     equinox: Time = Time(2000, format="jyear", scale="tt"),
@@ -1042,14 +1044,33 @@ def query_skycatalog(
     )
 
     # Based on the input coordinates pick the object with the mininmum separation as the reference star.
-    c1 = SkyCoord(result["RAJ2000"], result["DEJ2000"], unit="deg")
-    sep = coord.separation(c1)
 
-    # Find the object with the minimum separation
+    c1 = SkyCoord(result["RAJ2000"], result["DEJ2000"], unit="deg")
+
+    if target_coord is None:
+        sep = coord.separation(c1)
+    else:
+        sep = target_coord.separation(c1)
+
+    # Find the object with the minimum separation - this is our target
     ref_index = np.argmin(sep)
 
-    # Provide the separation
-    result["Separation"] = sep
+    # apply_propermotion
+    result = _apply_propermotion(result, equinox=equinox, epoch=epoch)
+
+    # Now we want to repete but using the values corrected for proper motion
+    # First get the correct values for target
+    coord_pm_correct = SkyCoord(
+        result["RA"][ref_index], result["DEC"][ref_index], unit="deg"
+    )
+
+    c1_pm_correct = SkyCoord(result["RA"], result["DEC"], unit="deg")
+
+    # Then calculate the separation based on pm corrected values
+    sep_pm_correct = coord_pm_correct.separation(c1_pm_correct)
+
+    # Provide the separation in the output table
+    result["Separation"] = sep_pm_correct
 
     # Calculate the relative flux
     result["Relative_Flux"] = np.exp(
@@ -1059,9 +1080,6 @@ def query_skycatalog(
         )
         / -2.5
     )
-
-    # apply_propermotion
-    result = _apply_propermotion(result, equinox=equinox, epoch=epoch)
 
     # Now sort the table based on separation
     result.sort(["Separation"])

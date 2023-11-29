@@ -2054,13 +2054,13 @@ class TargetPixelFile(object):
     @property
     def skycatalog(self):
         """Function that returns an astropy table of sources with the proper motion correction applied
-
+        
         Returns:
         ------
         catalog : astropy.table.Table
         Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
         """
-
+        
         if self.mission.lower() == "kepler":
             catalog_name = "kic"
             radius = 4 * (np.max([self.shape[1], self.shape[2]]) + 10) / 2 * u.arcsec
@@ -2072,25 +2072,39 @@ class TargetPixelFile(object):
             radius = 21 * (np.max([self.shape[1], self.shape[2]]) + 10) / 2 * u.arcsec
         else:
             raise ValueError("Must pass a valid Target Pixel File object.")
-
+        
+        # When you have a TPF you want the query to be around the center of the TPF
+        # Not the R.A and Dec listed as this may be very off center
+        
+        # Get the R.A and Dec of the center of the TPF
+        tpf_coord = self.wcs.pixel_to_world(
+            (self.shape[2] - 1) / 2, (self.shape[1] - 1) / 2
+        )
+        
+        # Get the R.A and Dec of the target
+        target_coord = SkyCoord(self.ra, self.dec, unit="deg")
+        
+        # Pass this information to the query_skycatalog function
         catalog = query_skycatalog(
-            coord=SkyCoord(self.ra, self.dec, unit="deg"),
+            coord=tpf_coord,
             epoch=self.time[0],
+            target_coord=target_coord,
             radius=radius,
             catalog=catalog_name,
         )
-
+        
+        # Get the pixel values for each object in the returned catalog
         column, row = self.wcs.world_to_pixel(
             SkyCoord(catalog["RA"], catalog["DEC"], unit="deg")
         )
-
+        
         catalog["Column"] = (self.column + column) * u.pix
         catalog["Row"] = (self.row + row) * u.pix
-
+        
         # Cut down to targets within 1 pixel of edge of TPF
         col_min = self.column - 1
         row_min = self.row - 1
-
+        
         col_max = self.column + self.shape[2]
         row_max = self.row + self.shape[1]
 
@@ -2101,9 +2115,8 @@ class TargetPixelFile(object):
             & (catalog["Row"] >= row_min)
             & (catalog["Row"] <= row_max)
         ]
-
+        
         return catalog
-
     
 class KeplerTargetPixelFile(TargetPixelFile):
     """Class to read and interact with the pixel data products
