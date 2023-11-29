@@ -55,6 +55,16 @@ def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column=None, 
     quality_mask = TessQualityFlags.create_quality_mask(
         quality_array=lc["quality"], bitmask=quality_bitmask
     )
+    # QLP-specific quality_bitmask handling
+    if quality_bitmask in ["hardest", "hard"]:
+        if lc.meta.get("SECTOR", 0) >= 56:
+            qlp_low_precision_bitmask = 2 ** 30
+        else:
+            # https://archive.stsci.edu/hlsps/qlp/hlsp_qlp_tess_ffi_all_tess_v1_data-prod-desc.pdf
+            qlp_low_precision_bitmask = 2 ** 12
+        q_mask2 = TessQualityFlags.create_quality_mask(
+            quality_array=lc["quality"], bitmask=qlp_low_precision_bitmask)
+        quality_mask = quality_mask & q_mask2
     lc = lc[quality_mask]
 
     lc.meta["AUTHOR"] = "QLP"
