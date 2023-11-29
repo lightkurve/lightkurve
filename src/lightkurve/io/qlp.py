@@ -13,8 +13,11 @@ def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column=None, 
     """Returns a `~lightkurve.lightcurve.LightCurve` object given a light curve file from the MIT Quicklook Pipeline (QLP).
 
     By default, QLP's `sap_flux` column is used to populate the `flux` values,
-    and 'kspsap_flux_err' is used to populate `flux_err`. For a discussion
+    and `kspsap_flux_err` / `det_flux_err` is used to populate `flux_err`. For a discussion
     related to this choice, see https://github.com/lightkurve/lightkurve/issues/1083
+
+    For detrended flux, the columns are named with `kspsap_` prefix in sectors 1-55,
+    and `det_` prefix in sectors 56+. Column `sys_rm_flux` is available in sectors 56+.
 
     More information: https://archive.stsci.edu/hlsp/qlp
 
@@ -22,10 +25,10 @@ def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column=None, 
     ----------
     filename : str
         Local path or remote url of a QLP light curve FITS file.
-    flux_column : 'sap_flux', 'kspsap_flux', 'kspsap_flux_sml', 'kspsap_flux_lag', or 'sap_bkg'
+    flux_column : 'sap_flux', 'kspsap_flux', 'kspsap_flux_sml', 'kspsap_flux_lag', 'det_flux', 'det_flux_sml', 'det_flux_lag', 'sys_rm_flux', or 'sap_bkg'
         Which column in the FITS file contains the preferred flux data?
         By default the "Simple Aperture Photometry" flux (sap_flux) is used.
-    flux_err_column: 'kspsap_flux_err', or 'sap_bkg_err'
+    flux_err_column: 'kspsap_flux_err','det_flux_err', or 'sap_bkg_err'
       Which column in the FITS file contains the preferred flux_err data?
     quality_bitmask : str or int
         Bitmask (integer) which identifies the quality flag bitmask that should
@@ -38,6 +41,9 @@ def read_qlp_lightcurve(filename, flux_column="sap_flux", flux_err_column=None, 
               This is known to remove good data.
             * "hardest": removes all data that has been flagged.
               This mask is not recommended.
+
+        QLP-specific "Low precision points" (bit 13 in sectors 1-55, bit 31 in sectors 56+)
+        is included in "hard" and "hardest" bitmasks.
 
         See the `~lightkurve.utils.TessQualityFlags` class for details on the bitmasks.
     """
