@@ -103,8 +103,7 @@ class TargetPixelFile(object):
         if isinstance(path, fits.HDUList):
             self.hdu = path
         else:
-            with fits.open(self.path, **kwargs) as hdulist:
-                self.hdu = deepcopy(hdulist)
+            self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
 
@@ -660,10 +659,10 @@ class TargetPixelFile(object):
                     # Kepler and TESS pipeline style integer flags
                     aperture_mask = (aperture_mask & 2) == 2
                 else:
-                    aperture_mask = aperture_mask.astype(bool)                
+                    aperture_mask = aperture_mask.astype(bool)
             elif np.issubdtype(aperture_mask.dtype, float):
-                aperture_mask = aperture_mask.astype(bool)                
-        self._last_aperture_mask = aperture_mask 
+                aperture_mask = aperture_mask.astype(bool)
+        self._last_aperture_mask = aperture_mask
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3, reference_pixel="center"):

@@ -1,6 +1,8 @@
 2.5.0 (unreleased)
 =====================
 
+- Fixed memory leak in reading Lightcurve / TargetPixel FITS files in v2.4.2 [#1390]
+
 
 2.4.2 (2023-11-03)
 =====================

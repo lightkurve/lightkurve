@@ -222,6 +222,19 @@ def test_bitmasking(quality_bitmask, answer):
     assert len(lc) == answer
 
 
+def test_hdu_property():
+    """Test to ensure lc.hdu property is in functional HDU, independent from the LightCurve object."""
+    lc = read(filename_tess)
+    with lc.hdu as hdul:
+        # 1. ensure that the hdu is fully functional, e.g., the data table can be accessed.
+        num_cadences = len(hdul[1].data)
+        assert num_cadences > 0
+
+    # 2. ensure that lc object is not tied to the life cycle of the hdulist from lc.hdu:
+    #    after hdul is closed, the lc object is still fully functional
+    assert len(lc.flux) > 0
+
+
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
     lc = KeplerLightCurve(
