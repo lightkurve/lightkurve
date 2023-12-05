@@ -16,12 +16,16 @@ from astropy.nddata import Cutout2D
 from astropy.table import Table
 from astropy.wcs import WCS
 from astropy.utils.exceptions import AstropyWarning
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import SkyCoord, Angle
 from astropy.stats.funcs import median_absolute_deviation as MAD
 from astropy.utils.decorators import deprecated
 from astropy.time import Time
 from astropy.units import Quantity
 import astropy.units as u
+from astropy.table import Table
+from astroquery.vizier import Vizier
+
+import typing as T
 
 import matplotlib
 from matplotlib import animation
@@ -46,6 +50,9 @@ from .utils import (
     centroid_quadratic,
     _query_solar_system_objects,
     finalize_notebook_url,
+    query_skycatalog,
+    _apply_propermotion
+
 )
 from .io import detect_filetype
 
@@ -92,7 +99,7 @@ class HduToMetaMapping(collections.abc.Mapping):
     def __str__(self):
         return self._dict.__str__()
 
-
+#HERE
 class TargetPixelFile(object):
     """Abstract class representing FITS files which contain time series imaging data.
 
@@ -495,7 +502,7 @@ class TargetPixelFile(object):
         """
         attrs = {}
         for attr in dir(self):
-            if not attr.startswith("_") and attr != "header" and attr != "astropy_time":
+            if not attr.startswith("_") and attr != "header" and attr != "astropy_time" and attr !="skycatalog":
                 res = getattr(self, attr)
                 if callable(res):
                     continue
@@ -1421,6 +1428,7 @@ class TargetPixelFile(object):
             magnitude_limit=magnitude_limit,
         )
 
+
     def to_corrector(self, method="pld", **kwargs):
         """Returns a `~correctors.corrector.Corrector` instance to remove systematics.
 
@@ -2057,6 +2065,7 @@ class TargetPixelFile(object):
 
         return ax
 
+
     def get_simple_aperture(
         self,
         center_col: Union[float, SkyCoord, None] = None,
@@ -2186,6 +2195,74 @@ class TargetPixelFile(object):
 
         return PRF_base.estimate_completeness(prf_model, aperture)
 
+    @property
+    def skycatalog(self):
+        """Function that returns an astropy table of sources with the proper motion correction applied
+        
+        Returns:
+        ------
+        catalog : astropy.table.Table
+        Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
+        """
+        
+        if self.mission.lower() == "kepler":
+            catalog_name = "kic"
+            radius = 4 * (np.max([self.shape[1], self.shape[2]]) + 10) / 2 * u.arcsec
+        elif self.mission.lower() == "k2":
+            catalog_name = "epic"
+            radius = 4 * (np.max([self.shape[1], self.shape[2]]) + 10) / 2 * u.arcsec
+        elif self.mission.lower() == "tess":
+            catalog_name = "tic"
+            radius = 21 * (np.max([self.shape[1], self.shape[2]]) + 10) / 2 * u.arcsec
+        else:
+            raise ValueError("Must pass a valid Target Pixel File object.")
+        
+        # When you have a TPF you want the query to be around the center of the TPF
+        # Not the R.A and Dec listed as this may be very off center
+        
+        # Get the R.A and Dec of the center of the TPF
+        tpf_coord = self.wcs.pixel_to_world(
+            (self.shape[2] - 1) / 2, (self.shape[1] - 1) / 2
+        )
+        
+        # Get the R.A and Dec of the target
+        target_coord = SkyCoord(self.ra, self.dec, unit="deg")
+        
+        # Pass this information to the query_skycatalog function
+        catalog = query_skycatalog(
+            coord=tpf_coord,
+            epoch=self.time[0],
+            target_coord=target_coord,
+            radius=radius,
+            catalog=catalog_name,
+        )
+        
+        # Get the pixel values for each object in the returned catalog
+        column, row = self.wcs.world_to_pixel(
+            SkyCoord(catalog["RA"], catalog["DEC"], unit="deg")
+        )
+        
+        catalog["Column"] = (self.column + column) * u.pix
+        catalog["Row"] = (self.row + row) * u.pix
+        
+        # Cut down to targets within 1 pixel of edge of TPF
+        col_min = self.column - 1
+        row_min = self.row - 1
+        
+        col_max = self.column + self.shape[2]
+        row_max = self.row + self.shape[1]
+
+
+        # Filter
+        catalog = catalog[
+            (catalog["Column"] >= col_min)
+            & (catalog["Column"] <= col_max)
+            & (catalog["Row"] >= row_min)
+            & (catalog["Row"] <= row_max)
+        ]
+        
+        return catalog
+    
 class KeplerTargetPixelFile(TargetPixelFile):
     """Class to read and interact with the pixel data products
     ("Target Pixel Files") created by NASA's Kepler pipeline.
@@ -2369,6 +2446,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return KeplerLightCurve(
             time=self.time, flux=flux, flux_err=flux_err, **keys, meta=meta
         )
+    
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -3116,7 +3194,7 @@ class TessTargetPixelFile(TargetPixelFile):
         return TessLightCurve(
             time=self.time, flux=flux, flux_err=flux_err, **keys, meta=meta
         )
-
+    
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         # Ignore warnings related to zero or negative errors
