@@ -2,6 +2,8 @@
 =====================
 
 - Fixed memory leak in reading Lightcurve / TargetPixel FITS files in v2.4.2 [#1390]
+- Added support for changes in QLP High Level Science Product
+  in TESS sectors 56 and later. [#1392]
 
 
 2.4.2 (2023-11-03)
