@@ -1,7 +1,7 @@
 """ 
 This is an update to the PRF module. Changes include:
 
-- Adding functionality for TESS
+- Added functionality for TESS
 - TESS PRF files are modified to '0-out' pixels that do not contribute to the PRF, matching Kepler's format
 - Kepler and TESS files are stored in the lightkurve file structure (ie not downloaded from the internet)
 - PRF contributions < 1e-16 are ignored.
@@ -16,7 +16,7 @@ This is an update to the PRF module. Changes include:
 Use cases :
 
 "I want to make an aperture for a TESSCut TPF"
-	- tpf.simple_aperture(...)
+	- tpf.get_target_aperture(...)
 	
 "I want to build a PRF model to simulate a real TPF"
 	- If given a list of the location of each object within the cutout region, 
@@ -78,7 +78,7 @@ class PRF(ABC):
 	@abstractmethod
 	def __init__(self, column: int, row: int, shape: tuple = (11, 11)):
 		"""
-		A generic base class object for PRFs. You're not supposed to use this directly.
+		A generic base class object for PRFs. No to be used directly.
 		See KeplerPRF and TessPRF for the instantiable classes.
 
 		Parameters:
@@ -100,16 +100,15 @@ class PRF(ABC):
 	def __repr__(self):
 		return "PRF Base Class"
 
-	def get_simple_aperture(
+	def get_target_aperture(
 		self,
 		prf_model: npt.ArrayLike,
 		target_idx: int = 0,
 		min_completeness: float = 0.9,
-		plot: bool = False,
 	) -> npt.ArrayLike:
 		"""
 		Based on completeness requirement, create an aperture.
-		This simple aperture does NOT account for contamination by other sources.
+		This basic aperture does NOT account for contamination by other sources.
 
 		Parameters:
 		-----------
@@ -120,14 +119,13 @@ class PRF(ABC):
 			The index of the source to be considered as the target (default 0)
 		min_completeness : float
 			Minimum fraction of flux contained within the aperture. Value between 0 and 1
-		plot : bool
-			plots the simple aperture over the model PRF
+
 
 		Returns:
 		--------
 		aperture : npt.ArrayLike
-						2D boolean array of the same (nrows x ncolumns) as `prf_model`.
-						True where source is inside aperture
+			2D boolean array of the same (nrows x ncolumns) as `prf_model`.
+			True where source is inside aperture
 		"""
 		
 		if (min_completeness < 0) | (min_completeness > 1):
@@ -160,7 +158,7 @@ class PRF(ABC):
 
 		return aperture
 
-	def estimate_contamination(
+	def get_contamination(
 		self,
 		prf_model: npt.ArrayLike,
 		aperture: npt.ArrayLike,
@@ -193,7 +191,7 @@ class PRF(ABC):
 			)
 			return 1.0
 
-		prfs = get_flux_weighted_prf(prf_model, fluxes[ii])
+		prfs = self.get_flux_weighted_prf(prf_model, fluxes)
 
 		target_flux = np.sum(prfs[target_idx, aperture])
 		all_flux = np.sum(prfs[:, aperture])
@@ -224,7 +222,8 @@ class PRF(ABC):
 			)
 		return np.array([prf_model[ii, :, :] * fluxes[ii] for ii in range(len(fluxes))])
 
-	def estimate_completeness(
+
+	def get_completeness(
 		self, prf_model: npt.ArrayLike, aperture: npt.ArrayLike, target_idx: int = 0
 	) -> float:
 		"""
@@ -265,7 +264,7 @@ class PRF(ABC):
 		scale : float
 						Pixel scale stretch parameter, can be used to account for focus changes.
 						Values > 1 stretch the image, Values < 1 make the PRF more compact.
-						E.g. a scale value of 0.5 will double the PRF footprint.
+						E.g. a scale value of 2 will double the PRF footprint.
 		rotation_angle : float
 						Rotation angle in radians
 
@@ -384,7 +383,7 @@ class PRF(ABC):
 			rot_col = delta_row * sina + delta_col * cosa
 
 			# for a proof of the maths that follow, see the pdf attached
-			# on pull request #198 in lightkurve GitHub repo.
+			# to pull request #198 in lightkurve GitHub repo.
 			deriv_flux = self.interpolate(
 				rot_row.flatten() * scale, rot_col.flatten() * scale, grid=False
 			).reshape(self.shape)
@@ -430,8 +429,8 @@ class PRF(ABC):
 
 	def _prf_model(
 		self,
-		center_col: Union[float, list[float], npt.ArrayLike, None] = None,
-		center_row: Union[float, list[float], npt.ArrayLike, None] = None,
+		center_col: Union[float, list[float], npt.ArrayLike],
+		center_row: Union[float, list[float], npt.ArrayLike],
 		scale: float = 1.0,
 		rotation_angle: float = 0.0,
 	) -> npt.ArrayLike:
@@ -443,9 +442,9 @@ class PRF(ABC):
 		Optional Parameters
 		-------------------
 		center_col : float or list of floats
-						column location of the target on the CCD. If not provided, finds the center of the field of view
+						column location of the target on the CCD. 
 		center_row : float or list of floats
-						row location of the target on the CCD. If not provided, finds the center of the field of view
+						row location of the target on the CCD. 
 		scale : float
 						Pixel scale stretch parameter, i.e. the numbers by which the PRF
 						model needs to be multiplied in the column and row directions to
@@ -468,7 +467,7 @@ class PRF(ABC):
 				raise ValueError("Column/row locations must have the same shape.")
 			prf_model = np.zeros((len(center_col), self.shape[0], self.shape[1]))
 			for ii in range(len(center_col)):
-				# Flux for each target is not taken into account here.
+				# Flux for each target is NOT taken into account by default.
 				# To account for flux, see get_flux_weighted_prf().
 				prf_model[ii, :, :] = self.evaluate(
 					center_col=center_col[ii],
@@ -483,39 +482,6 @@ class PRF(ABC):
 			)
 			return np.expand_dims(prf_model, axis=0)
 
-	def _plot_aperture(
-		self,
-		prf_model: npt.ArrayLike,
-		aperture: npt.ArrayLike,
-		target_idx: int = 0,
-		hatch_color: str = "red",
-	):
-		fig, ax = plt.subplots(1)
-		ax.set_title("Model PRF Aperture")
-		ax.imshow(
-			prf_model[target_idx, :, :],
-			origin="lower",
-			extent=(
-				self.column,
-				self.column + self.shape[1],
-				self.row,
-				self.row + self.shape[0],
-			),
-		)
-		for i in range(self.shape[0]):
-			for j in range(self.shape[1]):
-				if aperture[i, j]:
-					xy = (j + self.column, i + self.row)
-					rect = patches.Rectangle(
-						xy=xy,
-						width=1,
-						height=1,
-						color=hatch_color,
-						fill=False,
-						hatch="//",
-					)
-					ax.add_patch(rect)
-		plt.show()
 
 	@abstractmethod
 	def _prepare_prf(self):
@@ -565,7 +531,7 @@ class KeplerPRF(PRF):
 		center_row: Union[float, list[float], npt.ArrayLike, None] = None,
 		scale: float = 1.0,
 		rotation_angle: float = 0.0,
-	) -> npt.ArrayLike:  # Add more here
+	) -> npt.ArrayLike:  
 		return self.prf_model(
 			center_col, center_row, scale=scale, rotation_angle=rotation_angle
 		)
@@ -580,8 +546,6 @@ class KeplerPRF(PRF):
 		
 		# Mask out flux if it falls on the collateral pixels
 		# See https://nexsci.caltech.edu/workshop/2012/keplergo/PipelineCAL.shtml
-		
-		
 		tar_flux_init = np.sum(PRF_mod[0,:,:])
 		if self.column < 12:
 			mask_cols = 12 - self.column
@@ -734,7 +698,6 @@ class TessPRF(PRF):
 	def __init__(
 		self, column: int, row: int, camera: int, ccd: int, shape: tuple = (11, 11)
 	):
-		# Sector needed as different engineering files are needed for sectors < 4
 		super().__init__(column=column, row=row, shape=shape)
 		self.camera = camera
 		self.ccd = ccd
@@ -870,7 +833,6 @@ class TessPRF(PRF):
 		supersamp_prf /= np.nansum(supersamp_prf) * cdelt1p[0] * cdelt2p[0]
 
 		# location of the data image centered on the PRF image (in PRF pixel units)
-		# NOTE IN STEVE'S CODE, HE ADDS 1 TO SELF.COLUMN/SELF.ROW AND COLDIM/ROWDIM
 		col_coord = np.arange(self.column + 0.5, self.column + coldim + 0.5)
 		row_coord = np.arange(self.row + 0.5, self.row + rowdim + 0.5)
 		# x-axis correspond to row-axis in scipy.RectBivariate
