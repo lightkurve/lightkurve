@@ -151,8 +151,7 @@ class PRF(ABC):
             aperture[ap_index] = True
             # reshape to shape of prf
             aperture = aperture.reshape(np.shape(prf))
-        if plot:
-            self._plot_aperture(prf_model, aperture, target_idx)
+
 
         return aperture
 
@@ -457,9 +456,13 @@ class PRF(ABC):
         # PRF.evaluate returns a PRF for one onject.
         # Here, evaluate is called for each target provided (e.g., for each source within a tpf)
         if (center_col is None) or (center_row is None):
-            raise ValueError(
-                "center_col and center_row for at least one target must be provided."
+            warnings.warn(
+                f"center_col and center_row not providing. Defaulting to center pixel. ",
+                LightkurveWarning,
             )
+            print(self.column, self.shape[1])
+            center_col = self.column + self.shape[-1]/2
+            center_row = self.row + self.shape[-2]/2
         if isinstance(center_col, (list, np.ndarray)):
             if len(center_col) != len(center_row):
                 raise ValueError("Column/row locations must have the same shape.")

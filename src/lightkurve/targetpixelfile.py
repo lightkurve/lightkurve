@@ -2094,7 +2094,6 @@ class TargetPixelFile(object):
         scale: float = 1.0,
         rotation_angle: float = 0.0,
         min_completeness: float = 0.9,
-        plot: bool = False,
     ) -> npt.ArrayLike:
         """
         Gets a basic aperture for the target star. This does not account for blending.
@@ -2113,8 +2112,7 @@ class TargetPixelFile(object):
                                         Rotation angle in radians
         min_completeness : float
                                         Minimum fraction of flux contained within the aperture
-        plot : bool
-                                        plots the simple aperture over the model PRF
+
 
         Returns:
         --------
@@ -2151,7 +2149,7 @@ class TargetPixelFile(object):
             rotation_angle=rotation_angle,
         )
         aperture = PRF_base.get_target_aperture(
-            prf_model, min_completeness=min_completeness, plot=plot
+            prf_model, min_completeness=min_completeness
         )
 
         return aperture
@@ -2217,7 +2215,7 @@ class TargetPixelFile(object):
             rotation_angle=rotation_angle,
         )
 
-        return PRF_base.estimate_completeness(prf_model, aperture)
+        return PRF_base.get_completeness(prf_model, aperture)
 
     def estimate_contamination(
         self,
