@@ -222,6 +222,19 @@ def test_bitmasking(quality_bitmask, answer):
     assert len(lc) == answer
 
 
+def test_hdu_property():
+    """Test to ensure lc.hdu property is in functional HDU, independent from the LightCurve object."""
+    lc = read(filename_tess)
+    with lc.hdu as hdul:
+        # 1. ensure that the hdu is fully functional, e.g., the data table can be accessed.
+        num_cadences = len(hdul[1].data)
+        assert num_cadences > 0
+
+    # 2. ensure that lc object is not tied to the life cycle of the hdulist from lc.hdu:
+    #    after hdul is closed, the lc object is still fully functional
+    assert len(lc.flux) > 0
+
+
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
     lc = KeplerLightCurve(
@@ -1009,7 +1022,6 @@ def test_remove_nans():
     lc_clean = lc.remove_nans("flux_err")
     assert_array_equal(lc_clean.flux, [])
 
-
 def test_remove_outliers():
     # Does `remove_outliers()` remove outliers?
     lc = LightCurve(time=[1, 2, 3, 4], flux=[1, 1, 1000, 1])
@@ -1025,6 +1037,10 @@ def test_remove_outliers():
     lc_clean = lc.remove_outliers(sigma_lower=float("inf"), sigma_upper=1)
     assert_array_equal(lc_clean.time.value, [1, 3, 4, 5])
     assert_array_equal(lc_clean.flux, [1, 1, -1000, 1])
+    # Ensure that we can sigma clip masked arrays
+    lc = LightCurve(time=[1, 2, 3, 4, 5], flux=Masked([1, 1, 1000, 1, np.nan]))
+    lc_clean = lc.remove_outliers(sigma=1)
+    assert_array_equal(lc_clean.time.value, [1, 2, 4])
 
 
 @pytest.mark.remote_data

@@ -106,23 +106,23 @@ def test_search_lightcurve(caplog):
     # The name Kepler-10 somehow no longer works on MAST. So we use 2MASS instead:
     #   https://simbad.cds.unistra.fr/simbad/sim-id?Ident=%405506010&Name=Kepler-10
     assert (
-        len(search_lightcurve("2MASS J19024305+5014286", mission="Kepler", cadence="long").table)
+        len(search_lightcurve("2MASS J19024305+5014286", mission="Kepler", author="Kepler", cadence="long").table)
         == 15
     )
     # An invalid KIC/EPIC ID or target name should be dealt with gracefully
     search_lightcurve(-999)
-    assert "Could not resolve" in caplog.text
+    assert "disambiguate" in caplog.text
     search_lightcurve("DOES_NOT_EXIST (UNIT TEST)")
-    assert "Could not resolve" in caplog.text
+    assert "disambiguate" in caplog.text
     # If we ask for all cadence types, there should be four Kepler files given
-    assert len(search_lightcurve("KIC 4914423", quarter=6, cadence="any").table) == 4
+    assert len(search_lightcurve("KIC 4914423", quarter=6, cadence="any", author="Kepler").table) == 4
     # ...and only one should have long cadence
-    assert len(search_lightcurve("KIC 4914423", quarter=6, cadence="long").table) == 1
+    assert len(search_lightcurve("KIC 4914423", quarter=6, cadence="long", author="Kepler").table) == 1
     # Should be able to resolve an ra/dec
-    assert len(search_lightcurve("297.5835, 40.98339", quarter=6).table) == 1
+    assert len(search_lightcurve("297.5835, 40.98339", quarter=6, author="Kepler").table) == 1
     # Should be able to resolve a SkyCoord
     c = SkyCoord("297.5835 40.98339", unit=(u.deg, u.deg))
-    search = search_lightcurve(c, quarter=6)
+    search = search_lightcurve(c, quarter=6, author="Kepler")
     assert len(search.table) == 1
     assert len(search) == 1
     # We should be able to download a light curve
@@ -385,11 +385,10 @@ def test_mast_http_error_handling(monkeypatch):
     from astroquery.mast import Observations
 
     result = search_lightcurve("TIC 273985862", mission="TESS")
-    remote_url = result.table[0]["dataURL"]
+    remote_url = result.table[0]["dataURI"]
 
     def mock_http_error_response(*args, **kwargs):
         """Mock the `download_product()` response to simulate MAST returns HTTP error"""
-        print("DBG mock_http_error_response called")
         return Table(data={
             "Local Path": ["./mastDownload/acme_lc.fits"],
             "Status": ["ERROR"],

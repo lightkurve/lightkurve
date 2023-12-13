@@ -1,13 +1,28 @@
-2.4.1dev (unreleased)
+2.5.0 (unreleased)
 =====================
 
+- Fixed memory leak in reading Lightcurve / TargetPixel FITS files in v2.4.2 [#1390]
+- Added support for changes in QLP High Level Science Product
+  in TESS sectors 56 and later. [#1392]
+
+
+2.4.2 (2023-11-03)
+=====================
+
+- Fixed download issue due to MAST API change [#1380]
+
+2.4.1 (2023-09-06)
+=====================
+
+- Updated interact features to work with JupyterHub (e.g. TiKE) [#1349]
+- Exposed niters parameter in the PCA function of design matrix
+- Fixed the aperture parsing functions inside TPFs to be compliant with `numpy` v1.25 [#1360]
 - Made `LombScarglePeriodogram` compatible with Astropy v5.3 [#1342]
 - Updated the TPF plotting function to work correctly with WCS plotting [#1298]
 - Added the ability to open light curves from the TGLC High Level Science Product
 
 2.4.0 (2023-02-14)
 ==================
-
 
 - Added the ability to configure the default cache directory used by
   ``SearchResult.download()`` / ``SearchResult.download_all()``. [#1214]

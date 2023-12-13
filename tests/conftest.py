@@ -59,3 +59,7 @@ else:
 _cache_dir = os.path.join(os.environ['XDG_CACHE_HOME'], 'lightkurve')
 if not os.path.isdir(_cache_dir):
     os.mkdir(_cache_dir)
+
+_astropy_cache_dir = os.path.join(os.environ['XDG_CACHE_HOME'], 'astropy')
+if not os.path.isdir(_astropy_cache_dir):
+    os.mkdir(_astropy_cache_dir)
