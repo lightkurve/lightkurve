@@ -900,21 +900,32 @@ def _apply_propermotion(table: Table, equinox: Time, epoch: Time):
     # Doing this will allow objects which do not have proper motion to still be displayed
     table["pmRA"] = np.ma.filled(table["pmRA"].astype(float), 0.0)
     table["pmDEC"] = np.ma.filled(table["pmDEC"].astype(float), 0.0)
+    # If an object does not have a parallax then we treat it as if the object is an "infinite distance"
+    # and set the parallax to 1e-7 arcseconds or 10Mpc.
+    table["Plx"] = np.ma.filled(table["Plx"].astype(float), 1e-4)
 
-    # Get the input data from the table
-    c = SkyCoord(
-        ra=table["RAJ2000"],
-        dec=table["DEJ2000"],
-        pm_ra_cosdec=table["pmRA"],
-        pm_dec=table["pmDEC"],
-        frame="icrs",
-        obstime=equinox,
-    )
+    # Suppress warning caused by Astropy as noted in issue 111747 (https://github.com/astropy/astropy/issues/11747)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="negative parallaxes")
+        
+        
+    
+        # Get the input data from the table
+        c = SkyCoord(
+            ra=table["RAJ2000"],
+            dec=table["DEJ2000"],
+            distance=Distance(parallax=table["Plx"].quantity, allow_negative=True),
+            pm_ra_cosdec=table["pmRA"],
+            pm_dec=table["pmDEC"],
+            frame="icrs",
+            obstime=equinox,
+        )
 
     # Suppress warning caused by Astropy as noted in issue 111747 (https://github.com/astropy/astropy/issues/11747)
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", message="ERFA function")
-
+        warnings.filterwarnings("ignore", message="invalid value")
+        
         # Calculate the new values
         c1 = c.apply_space_motion(new_obstime=epoch)
 
@@ -970,28 +981,28 @@ def query_skycatalog(
     _Catalog_Dictionary = {
         "kic": {
             "catalog": "V/133/kic",
-            "columns": ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"],
+            "columns": ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx", "kepmag"],
             "column_filters": "kepmag",
             "rename_in": ("KIC", "pmDE", "kepmag"),
             "rename_out": ("ID", "pmDEC", "Kepler_Mag"),
         },
         "epic": {
             "catalog": "IV/34/epic",
-            "columns": ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Kpmag"],
+            "columns": ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Plx", "Kpmag"],
             "column_filters": "Kpmag",
             "rename_in": ["Kpmag"],
             "rename_out": ["K2_Mag"],
         },
         "tic": {
             "catalog": "IV/39/tic82",
-            "columns": ["TIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Tmag"],
+            "columns": ["TIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx", "Tmag"],
             "column_filters": "Tmag",
             "rename_in": ("TIC", "pmDE", "Tmag"),
             "rename_out": ("ID", "pmDEC", "TESS_Mag"),
         },
         "gaiadr3": {
             "catalog": "I/355/gaiadr3",
-            "columns": ["DR3Name", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Gmag"],
+            "columns": ["DR3Name", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx", "Gmag"],
             "column_filters": "Gmag",
             "rename_in": ("DR3Name", "pmDE", "Gmag"),
             "rename_out": ("ID", "pmDEC", "Gaia_G_Mag"),
