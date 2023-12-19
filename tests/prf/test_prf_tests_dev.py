@@ -35,10 +35,10 @@ def test_kepler():
     # Check that tpf.simple_aperture returns an aperture of the same shape
     # Check the aperture contains at least one pixel
     # Check that there are more pixels in apertures containing more flux
-    aperture = tpf.get_simple_aperture(min_completeness=0.9)
+    aperture = tpf.estimate_target_aperture(min_completeness=0.9)
     assert aperture.shape == tpf.shape[1:3]
     assert np.sum(aperture) >= 1
-    assert np.sum(aperture) > np.sum(tpf.get_simple_aperture(min_completeness=0.1))
+    assert np.sum(aperture) > np.sum(tpf.estimate_target_aperture(min_completeness=0.1))
 
     # Running this with only 1 target star should be default always show no contamination
     # assert tpf.estimate_contamination(aperture) == 1.
@@ -71,10 +71,10 @@ def test_tess():
     # Check that tpf.simple_aperture returns an aperture of the same shape
     # Check the aperture contains at least one pixel
     # Check that there are more pixels in apertures containing more flux
-    aperture = tpf.get_simple_aperture(min_completeness=0.9)
+    aperture = tpf.estimate_target_aperture(min_completeness=0.9)
     assert aperture.shape == tpf.shape[1:3]
     assert np.sum(aperture) >= 1
-    assert np.sum(aperture) > np.sum(tpf.get_simple_aperture(min_completeness=0.1))
+    assert np.sum(aperture) > np.sum(tpf.estimate_target_aperture(min_completeness=0.1))
     
     test_prf = lk.prf.TessPRF(column=100, row=200, camera=4, ccd=2, shape=(15,15))
     assert test_prf.prf_model(center_col=np.arange(100,115, 2), center_row=np.arange(100,115, 2)).shape == (len(np.arange(100,115, 2)), 15,15)
