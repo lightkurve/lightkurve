@@ -2994,7 +2994,12 @@ class FoldedLightCurve(LightCurve):
         """The cycle of the correspond `time_original`.
         The first cycle is cycle 0, irrespective of whether it is a complete one or not.
         """
-        cycle_epoch_start = self.epoch_time - self.period / 2
+        epoch_time = self.meta.get("EPOCH_TIME")
+        if epoch_time is None:
+            # explicit check needed (cannot be the default value in get() function call above)
+            # because Lightcurve.fold() will put an explicit None in meta, if epoch_time is not specified.
+            epoch_time = self.time.min()
+        cycle_epoch_start = epoch_time - self.period / 2
         result = np.asarray(np.floor(((self.time_original - cycle_epoch_start) / self.period).value), dtype=int)
         result = result - result.min()
         return result
