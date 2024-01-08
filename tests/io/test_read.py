@@ -120,6 +120,14 @@ def test_filenotfound():
     # TPF, truncated somewhere in the header (PRIMARY),
     "test-tpf-kplr-tabby-corrupted-at-header2.fits",
 
+    # TPF, TESS variants, some code paths are TESS / Kepler specific
+    # so TESS TPFs are included to complete the coverage
+    # source: mast:TESS/product/tess2023209231226-s0068-0000000261136679-0262-s_tp.fits
+    #  (pi Men, sector 68, SPOC 2min cadence)
+    "test-lc-tess-pimen-corrupted.fits",
+    "test-lc-tess-pimen-corrupted-at-header.fits",
+    "test-lc-tess-pimen-corrupted-at-header2.fits",
+
     # LC, truncated in data section ; source: mast:TESS/product/tess2018206045859-s0001-0000000261136679-0120-s_lc.fits
     "test-lc-tess-pimen-corrupted.fits",
     # LC, truncated in header (BINTABLE)
