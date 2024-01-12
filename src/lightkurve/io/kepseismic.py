@@ -1,7 +1,8 @@
 """Reader function for KEPSEISMIC community light curve products."""
 from ..lightcurve import KeplerLightCurve
-
+from ..units import ppm
 from .generic import read_generic_lightcurve
+
 
 def read_kepseismic_lightcurve(filename, **kwargs):
     """Read a KEPSEISMIC light curve file.
@@ -19,14 +20,11 @@ def read_kepseismic_lightcurve(filename, **kwargs):
         A populated light curve object.
     """
 
-    lc = read_generic_lightcurve(
-        filename,
-        time_format='bkjd')
-
+    lc = read_generic_lightcurve(filename, time_format="bkjd")
+    lc["flux"] += 1e6 * ppm
     lc.meta["AUTHOR"] = "KEPSEISMIC"
     lc.meta["TARGETID"] = lc.meta.get("KEPLERID")
-
+    lc = lc.normalize()
     # KEPSEISMIC light curves are normalized by default
     lc.meta["NORMALIZED"] = True
-
     return KeplerLightCurve(data=lc, **kwargs)

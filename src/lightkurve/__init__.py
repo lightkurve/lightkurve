@@ -71,6 +71,7 @@ class Conf(_config.ConfigNamespace):
     warn_legacy_cache_dir
         If set to True, issue warning if the legacy default cache directory exists. Default is True.
     """
+
     # Note: when using list or string_list datatype,
     # the behavior of astropy's parsing of the config file value:
     # - it does not accept python list literal
@@ -81,22 +82,23 @@ class Conf(_config.ConfigNamespace):
         [],
         "List of extra columns to be included when displaying a SearchResult object.",
         cfgtype="string_list",
-        module="lightkurve.search"
+        module="lightkurve.search",
     )
 
     cache_dir = _config.ConfigItem(
         None,
         "Default cache directory for data files downloaded, etc.",
         cfgtype="string",
-        module="lightkurve.config"
+        module="lightkurve.config",
     )
 
     warn_legacy_cache_dir = _config.ConfigItem(
         True,
         "If set to True, issue warning if the legacy default cache directory exists.",
         cfgtype="boolean",
-        module="lightkurve.config"
+        module="lightkurve.config",
     )
+
 
 conf = Conf()
 
@@ -106,13 +108,14 @@ from . import units  # enable ppt and ppm as units
 from .time import *
 from .lightcurve import *
 from .lightcurvefile import *
-from .correctors import *
 from .targetpixelfile import *
-from .utils import *
-from .convenience import *
-from .collections import *
 from .io import *
 from .search import *
+from .collections import *
+from .utils import *
+from .convenience import *
+from .correctors import *
 
 from . import config
+
 config.warn_if_default_cache_dir_migration_needed()

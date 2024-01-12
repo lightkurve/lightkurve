@@ -87,7 +87,6 @@ def read(path_or_url, **kwargs):
         # Raise an explicit FileNotFoundError if file not found
         if "No such file" in str(e):
             raise e
-
     try:
         if filetype == "KeplerLightCurve":
             return KeplerLightCurve.read(path_or_url, format="kepler", **kwargs)
@@ -109,8 +108,13 @@ def read(path_or_url, **kwargs):
             return KeplerLightCurve.read(path_or_url, format="everest", **kwargs)
         elif filetype == "KEPSEISMIC":
             return KeplerLightCurve.read(path_or_url, format="kepseismic", **kwargs)
+        elif filetype == "IRIS":
+            return KeplerLightCurve.read(path_or_url, format="iris", **kwargs)
         elif filetype == "TGLC":
             return TessLightCurve.read(path_or_url, format="tglc", **kwargs)
+        elif filetype == "KBONUS-BKG":
+            return KeplerLightCurve.read(path_or_url, format="kbonus", **kwargs)
+
     except BaseException as exc:
         # ensure path_or_url is in the error
         raise LightkurveError(
