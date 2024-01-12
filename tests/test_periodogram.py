@@ -44,18 +44,16 @@ def test_periodogram_normalization():
         flux_unit="electron/second",
     )
     # Test amplitude normalization and correct units
-    pg = lc.to_periodogram(normalization="amplitude")
+    pg = lc.to_periodogram().normalize("amplitude")
     assert pg.power.unit == u.electron / u.second
-    pg = lc.normalize(unit="ppm").to_periodogram(normalization="amplitude")
+    pg = lc.normalize(unit="ppm").to_periodogram().normalize("amplitude")
     assert pg.power.unit == u.cds.ppm
 
     # Test PSD normalization and correct units
-    pg = lc.to_periodogram(freq_unit=u.microhertz, normalization="psd")
-    assert pg.power.unit == (u.electron / u.second) ** 2 / u.microhertz
     pg = lc.normalize(unit="ppm").to_periodogram(
-        freq_unit=u.microhertz, normalization="psd"
+        xunit=u.microhertz, normalization="psd"
     )
-    assert pg.power.unit == u.cds.ppm ** 2 / u.microhertz
+    assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
 
 def test_periodogram_warnings():
@@ -69,8 +67,8 @@ def test_periodogram_warnings():
     # Test amplitude normalization and correct units
     pg = lc.to_periodogram(normalization="amplitude")
     assert pg.power.unit == u.cds.ppm
-    pg = lc.to_periodogram(freq_unit=u.microhertz, normalization="psd")
-    assert pg.power.unit == u.cds.ppm ** 2 / u.microhertz
+    pg = lc.to_periodogram(xunit=u.microhertz, normalization="psd")
+    assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
 
 def test_periodogram_units():
@@ -178,7 +176,7 @@ def test_smooth():
         flux_err=np.zeros(1000) + 0.1,
     )
     lc = lc.normalize()
-    p = lc.to_periodogram(normalization="psd", freq_unit=u.microhertz)
+    p = lc.to_periodogram(normalization="psd", xunit=u.microhertz)
     # Test boxkernel and logmedian methods
     assert all(p.smooth(method="boxkernel").frequency == p.frequency)
     assert all(p.smooth(method="logmedian").frequency == p.frequency)
@@ -223,7 +221,7 @@ def test_flatten():
         flux_err=np.zeros(npts) + 0.1,
     )
     lc = lc.normalize()
-    p = lc.to_periodogram(normalization="psd", freq_unit=1 / u.day)
+    p = lc.to_periodogram(normalization="psd", xunit=1 / u.day)
 
     # Check method returns equal frequency
     assert all(p.flatten(method="logmedian").frequency == p.frequency)
@@ -444,7 +442,7 @@ def test_masked_flux_nans():
     https://github.com/lightkurve/lightkurve/pull/1162#issuecomment-983847177
     """
     time = [1, 2, 3, 4]
-    flux = u.Quantity([1., np.nan, 1., 1.], unit="electron/s")
+    flux = u.Quantity([1.0, np.nan, 1.0, 1.0], unit="electron/s")
     masked_flux = Masked(flux, mask=[False, True, False, False])
     lc = LightCurve(time=time, flux=masked_flux)
     pg = lc.to_periodogram()
