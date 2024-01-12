@@ -18,7 +18,7 @@ from astropy.io import fits
 from astropy.time import TimeBase, Time, TimeDelta
 from astropy import units as u
 from astropy.units import Quantity
-from astropy.timeseries import TimeSeries, aggregate_downsample
+from astropy.timeseries import TimeSeries
 from astropy.table import vstack
 from astropy.stats import calculate_bin_edges
 from astropy.utils.decorators import deprecated, deprecated_renamed_argument
@@ -26,6 +26,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 from astropy.utils.masked import Masked
 
 from . import PACKAGEDIR, MPLSTYLE
+from .downsample import aggregate_downsample
 from .utils import (
     running_mean,
     bkjd_to_astropy_time,
@@ -41,7 +42,8 @@ __all__ = ["LightCurve", "KeplerLightCurve", "TessLightCurve", "FoldedLightCurve
 
 log = logging.getLogger(__name__)
 
-_HAS_VAR_BINS = 'time_bin_end' in aggregate_downsample.__kwdefaults__
+_HAS_VAR_BINS = "time_bin_end" in aggregate_downsample.__kwdefaults__
+
 
 def _to_unitless_day(data):
     if isinstance(data, Quantity):
@@ -167,7 +169,6 @@ class LightCurve(TimeSeries):
     __array_priority__ = 100_000
 
     def __init__(self, data=None, *args, time=None, flux=None, flux_err=None, **kwargs):
-
         # the ` {has,get,set}_time_in_data()`: helpers to handle `data` of different types
         # in some cases, they also need to access kwargs["names"] as well
 
@@ -265,7 +266,9 @@ class LightCurve(TimeSeries):
             elif _is_np_structured_array(data):
                 # astropy Time cannot be assigned to a column in np structured array
                 # we have special codepath handling it outside this function
-                raise AssertionError("Setting Time instances to np structured array is not supported")
+                raise AssertionError(
+                    "Setting Time instances to np structured array is not supported"
+                )
             else:
                 # should never reach here. It'd have been caught by `has_time_in()``
                 raise AssertionError("Unsupported type for time in data")
@@ -441,7 +444,7 @@ class LightCurve(TimeSeries):
                 name not in self.__dict__
                 and not name.startswith("_")
                 and not self._new_attributes_relax
-                and name != 'meta'
+                and name != "meta"
             ):
                 warnings.warn(
                     (
@@ -561,8 +564,10 @@ class LightCurve(TimeSeries):
             else:
                 lc["flux_err"][:] = np.nan
 
-        lc.meta['FLUX_ORIGIN'] = flux_column
-        normalized_new_flux = lc["flux"].unit is None or lc["flux"].unit is u.dimensionless_unscaled
+        lc.meta["FLUX_ORIGIN"] = flux_column
+        normalized_new_flux = (
+            lc["flux"].unit is None or lc["flux"].unit is u.dimensionless_unscaled
+        )
         # Note: here we assume unitless flux means it's normalized
         # it's not exactly true in many constructed lightcurves in unit test
         # but the assumption should hold for any real world use cases, e.g. TESS QLP
@@ -727,7 +732,7 @@ class LightCurve(TimeSeries):
             )
         else:
             newlc.flux = other / self.flux
-            newlc.flux_err = abs((other * self.flux_err) / (self.flux ** 2))
+            newlc.flux_err = abs((other * self.flux_err) / (self.flux**2))
         return newlc
 
     def __div__(self, other):
@@ -883,7 +888,7 @@ class LightCurve(TimeSeries):
             np.nanstd(self.flux) * sigma
         )
         # In astropy>=5.0, extra_mask is a masked array
-        if hasattr(extra_mask, 'mask'):
+        if hasattr(extra_mask, "mask"):
             mask &= extra_mask.filled(False)
         else:  # support astropy<5.0
             mask &= extra_mask
@@ -936,7 +941,7 @@ class LightCurve(TimeSeries):
             )
             trend_signal = Quantity(f(self.time.value), self.flux.unit)
             # In astropy>=5.0, mask1 is a masked array
-            if hasattr(mask1, 'mask'):
+            if hasattr(mask1, "mask"):
                 mask[mask] &= mask1.filled(False)
             else:  # support astropy<5.0
                 mask[mask] &= mask1
@@ -1253,10 +1258,14 @@ class LightCurve(TimeSeries):
 
         # Temporary workaround for issue #1172.  TODO: remove the `if`` statement
         # below once we adopt AstroPy >=5.0.3 as a minimum dependency.
-        if hasattr(lc.flux_err, 'mask'):
-            fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err.unmasked)
+        if hasattr(lc.flux_err, "mask"):
+            fe[~in_original] = np.interp(
+                ntime[~in_original], lc.time.value, lc.flux_err.unmasked
+            )
         else:
-            fe[~in_original] = np.interp(ntime[~in_original], lc.time.value, lc.flux_err)
+            fe[~in_original] = np.interp(
+                ntime[~in_original], lc.time.value, lc.flux_err
+            )
 
         if method == "gaussian_noise":
             try:
@@ -1421,6 +1430,7 @@ class LightCurve(TimeSeries):
         time_bin_end=None,
         n_bins=None,
         aggregate_func=None,
+        aggregate_dict=None,
         bins=None,
         binsize=None,
     ):
@@ -1461,9 +1471,11 @@ class LightCurve(TimeSeries):
             The number of bins to use. Defaults to the number needed to fit all
             the original points. Note that this will create this number of bins
             of length ``time_bin_size`` independent of the lightkurve length.
-        aggregate_func : callable, optional
-            The function to use for combining points in the same bin. Defaults
-            to np.nanmean.
+        aggregate_dict : callable, optional
+            A dictionary object that contains a number of entries equal to the number
+            of columns in the lightcurve object, where each key is a lightkurve column
+            name and the correspoing value is the function that will be used to bin
+            that column.
         bins : int, iterable or str, optional
             If an int, this gives the number of bins to divide the lightkurve into.
             In contrast to ``n_bins`` this adjusts the length of ``time_bin_size``
@@ -1501,11 +1513,15 @@ class LightCurve(TimeSeries):
                 "``n_bins`` or ``time_bin_size``."
             )
         elif bins is not None:
-            if (bins not in ('blocks', 'knuth', 'scott', 'freedman') and
-                    np.array(bins).dtype != np.int_):
+            if (
+                bins not in ("blocks", "knuth", "scott", "freedman")
+                and np.array(bins).dtype != np.int_
+            ):
                 raise TypeError("``bins`` must have integer type.")
             elif (isinstance(bins, str) or np.size(bins) != 1) and not _HAS_VAR_BINS:
-                raise ValueError("Sequence or method for ``bins`` requires Astropy 5.0.")
+                raise ValueError(
+                    "Sequence or method for ``bins`` requires Astropy 5.0."
+                )
 
         if time_bin_start is None:
             time_bin_start = self.time[0]
@@ -1527,28 +1543,34 @@ class LightCurve(TimeSeries):
                     # should it instead set equal-number bins with binsize=int(len(self) / bins)?
                     # Get start times in mjd and convert back to original format
                     bin_starts = calculate_bin_edges(self.time.mjd, bins=bins)[:-1]
-                    time_bin_start = Time(Time(bin_starts, format='mjd'), format=self.time.format)
+                    time_bin_start = Time(
+                        Time(bin_starts, format="mjd"), format=self.time.format
+                    )
                 elif np.size(bins) == 1:
                     warnings.warn(
                         '"classic" `bins` require Astropy 5.0; will use constant lengths in time.',
-                        LightkurveWarning)
+                        LightkurveWarning,
+                    )
                     # Odd memory error in np.searchsorted with pytest-memtest?
                     if self.time[0] >= time_bin_start:
                         i = len(self.time)
                     else:
                         i = len(self.time) - np.searchsorted(self.time, time_bin_start)
-                    time_bin_size = ((self.time[-1] - time_bin_start) * i /
-                                     ((i - 1) * bins)).to(u.day)
+                    time_bin_size = (
+                        (self.time[-1] - time_bin_start) * i / ((i - 1) * bins)
+                    ).to(u.day)
                 else:
                     time_bin_start = self.time[bins[:-1]]
-                    kwargs['time_bin_end'] = self.time[bins[1:]]
+                    kwargs["time_bin_end"] = self.time[bins[1:]]
             elif binsize is not None:
                 if _HAS_VAR_BINS:
                     time_bin_start = self.time[::binsize]
                 else:
                     warnings.warn(
-                        '`binsize` requires Astropy 5.0 to guarantee equal number of points; '
-                        'will use estimated time lengths for bins.', LightkurveWarning)
+                        "`binsize` requires Astropy 5.0 to guarantee equal number of points; "
+                        "will use estimated time lengths for bins.",
+                        LightkurveWarning,
+                    )
                     if self.time[0] >= time_bin_start:
                         i = 0
                     else:
@@ -1559,46 +1581,40 @@ class LightCurve(TimeSeries):
         elif not isinstance(time_bin_size, Quantity):
             time_bin_size *= u.day
 
-        # Call AstroPy's aggregate_downsample
+        if aggregate_dict is None:
+            aggregate_dict = {
+                "flux": np.nanmean,
+                "flux_err": (
+                    lambda x: np.sqrt(np.nansum(x**2)) / np.sum(~np.isnan(x))
+                ),
+                "flux_bin_std": np.nanstd,
+                "quality": np.bitwise_or.reduce,
+                "cadenceno": np.median,
+            }
+
+        # Call aggregate_downsample modified from AstroPy's
         with warnings.catch_warnings():
             # ignore uninteresting empty slice warnings
             warnings.simplefilter("ignore", (RuntimeWarning, AstropyUserWarning))
+
+            # To - Do: We'll need some defaults/ways to implement the dictionary
+
+            self.add_column(self.flux, name="flux_bin_std")
+
             ts = aggregate_downsample(
                 self,
                 time_bin_size=time_bin_size,
                 n_bins=n_bins,
                 time_bin_start=time_bin_start,
                 aggregate_func=aggregate_func,
-                **kwargs
+                aggregate_dict=aggregate_dict,
+                **kwargs,
             )
 
-            # If `flux_err` is populated, assume the errors combine as the root-mean-square
-            if np.any(np.isfinite(self.flux_err)):
-                rmse_func = (
-                    lambda x: np.sqrt(np.nansum(x ** 2)) / len(np.atleast_1d(x))
-                    if np.any(np.isfinite(x))
-                    else np.nan
-                )
-                ts_err = aggregate_downsample(
-                    self,
-                    time_bin_size=time_bin_size,
-                    n_bins=n_bins,
-                    time_bin_start=time_bin_start,
-                    aggregate_func=rmse_func,
-                )
-                ts["flux_err"] = ts_err["flux_err"]
-            # If `flux_err` is unavailable, populate `flux_err` as nanstd(flux)
-            else:
-                ts_err = aggregate_downsample(
-                    self,
-                    time_bin_size=time_bin_size,
-                    n_bins=n_bins,
-                    time_bin_start=time_bin_start,
-                    aggregate_func=np.nanstd,
-                )
-                ts["flux_err"] = ts_err["flux"]
+            self.remove_column(name="flux_bin_std")
 
         # Prepare a LightCurve object by ensuring there is a time column
+        # To Do - check to see if this changes anything in the typical case
         ts._required_columns = []
         ts.add_column(ts.time_bin_start + ts.time_bin_size / 2.0, name="time")
 
@@ -1782,7 +1798,7 @@ class LightCurve(TimeSeries):
             raise ValueError("the `cadence_mask` argument is missing or invalid")
         # Avoid searching times with NaN flux; this is necessary because e.g.
         # `remove_outliers` includes NaNs in its mask.
-        if hasattr(self.flux, 'mask'):
+        if hasattr(self.flux, "mask"):
             # Temporary workaround for issue #1172. TODO: remove this `if`` statement
             # once we adopt AstroPy >=5.0.3 as a minimum dependency
             cadence_mask &= ~np.isnan(self.flux.unmasked)
@@ -1911,7 +1927,7 @@ class LightCurve(TimeSeries):
 
         # Workaround for AstroPy v5.0.0 issue #12481: the 'c' argument
         # in matplotlib's scatter does not work with masked quantities.
-        if "c" in kwargs and hasattr(kwargs["c"], 'mask'):
+        if "c" in kwargs and hasattr(kwargs["c"], "mask"):
             kwargs["c"] = kwargs["c"].unmasked
 
         flux = self[column]
@@ -1922,9 +1938,9 @@ class LightCurve(TimeSeries):
 
         # Second workaround for AstroPy v5.0.0 issue #12481:
         # matplotlib does not work well with `MaskedNDArray` arrays.
-        if hasattr(flux, 'mask'):
+        if hasattr(flux, "mask"):
             flux = flux.filled(np.nan)
-        if hasattr(flux_err, 'mask'):
+        if hasattr(flux_err, "mask"):
             flux_err = flux_err.filled(np.nan)
 
         # Normalize the data if requested
@@ -2490,7 +2506,7 @@ class LightCurve(TimeSeries):
                         name=flux_column_name, format="E", unit="e-/s", array=self.flux
                     )
                 )
-            if hasattr(self,'flux_err'):
+            if hasattr(self, "flux_err"):
                 if ~(flux_column_name.upper() + "_ERR" in extra_data.keys()):
                     cols.append(
                         fits.Column(
@@ -2500,7 +2516,7 @@ class LightCurve(TimeSeries):
                             array=self.flux_err,
                         )
                     )
-            if hasattr(self,'cadenceno'):
+            if hasattr(self, "cadenceno"):
                 if ~np.asarray(
                     ["CADENCENO" in k.upper() for k in extra_data.keys()]
                 ).any():
@@ -2654,12 +2670,12 @@ class LightCurve(TimeSeries):
         elif (bin_points == 1) and (method in ["sigma"]):
             bin_func = lambda y, e: ((y[0] - 1) / e[0], np.nan)
         elif method == "mean":
-            bin_func = lambda y, e: (np.nanmean(y), np.nansum(e ** 2) ** 0.5 / len(e))
+            bin_func = lambda y, e: (np.nanmean(y), np.nansum(e**2) ** 0.5 / len(e))
         elif method == "median":
-            bin_func = lambda y, e: (np.nanmedian(y), np.nansum(e ** 2) ** 0.5 / len(e))
+            bin_func = lambda y, e: (np.nanmedian(y), np.nansum(e**2) ** 0.5 / len(e))
         elif method == "sigma":
             bin_func = lambda y, e: (
-                (np.nanmean(y) - 1) / (np.nansum(e ** 2) ** 0.5 / len(e)),
+                (np.nanmean(y) - 1) / (np.nansum(e**2) ** 0.5 / len(e)),
                 np.nan,
             )
 
@@ -2723,7 +2739,7 @@ class LightCurve(TimeSeries):
         # If the method is average we need to denormalize the plot
         if method in ["mean", "median"]:
             median = np.nanmedian(self.flux.value)
-            if hasattr(median, 'mask'):
+            if hasattr(median, "mask"):
                 median = median.filled(np.nan)
             ar *= median
 
@@ -2819,7 +2835,9 @@ class LightCurve(TimeSeries):
 
         # If ``transit_time`` is a ``Quantity```, attempt converting it to a ``Time`` object
         if isinstance(transit_time, Quantity):
-            transit_time = Time(transit_time, format=self.time.format, scale=self.time.scale)
+            transit_time = Time(
+                transit_time, format=self.time.format, scale=self.time.scale
+            )
 
         # Ensure all parameters are 1D-arrays
         period = np.atleast_1d(period)
@@ -2963,6 +2981,7 @@ class LightCurve(TimeSeries):
         truncated_lc : LightCurve
             The truncated light curve.
         """
+
         def _to_unitless(data):
             return np.asarray(getattr(data, "value", data))
 
@@ -2995,7 +3014,10 @@ class FoldedLightCurve(LightCurve):
         The first cycle is cycle 0, irrespective of whether it is a complete one or not.
         """
         cycle_epoch_start = self.epoch_time - self.period / 2
-        result = np.asarray(np.floor(((self.time_original - cycle_epoch_start) / self.period).value), dtype=int)
+        result = np.asarray(
+            np.floor(((self.time_original - cycle_epoch_start) / self.period).value),
+            dtype=int,
+        )
         result = result - result.min()
         return result
 
