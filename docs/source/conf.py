@@ -77,6 +77,12 @@ language = None
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ["**/.ipynb_checkpoints"]
 
+if os.environ.get('LK_DOC_BUILD_EXCLUDE_IPYNB', None) is not None:
+    # Skip building ipynb (in tutorials) to speed up doc build
+    # for testing changes in other sections: API reference, etc.
+    exclude_patterns.append("**.ipynb")
+    print("Note: .ipynb build is excluded")
+
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
