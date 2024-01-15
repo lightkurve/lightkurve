@@ -104,11 +104,16 @@ class TargetPixelFile(object):
             self.hdu = path
         else:
             self.hdu = fits.open(self.path, **kwargs)
-        self.quality_bitmask = quality_bitmask
-        self.targetid = targetid
+        try:
+            self.quality_bitmask = quality_bitmask
+            self.targetid = targetid
 
-        # For consistency with `LightCurve`, provide a `meta` dictionary
-        self.meta = HduToMetaMapping(self.hdu[0])
+            # For consistency with `LightCurve`, provide a `meta` dictionary
+            self.meta = HduToMetaMapping(self.hdu[0])
+        except Exception as e:
+            # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
+            self.hdu.close()
+            raise e
 
     def __getitem__(self, key):
         """Implements indexing and slicing.
@@ -2095,28 +2100,33 @@ class KeplerTargetPixelFile(TargetPixelFile):
         super(KeplerTargetPixelFile, self).__init__(
             path, quality_bitmask=quality_bitmask, **kwargs
         )
-        self.quality_mask = KeplerQualityFlags.create_quality_mask(
-            quality_array=self.hdu[1].data["QUALITY"], bitmask=quality_bitmask
-        )
-
-        # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.hdu)
-        if filetype == "TessTargetPixelFile":
-            warnings.warn(
-                "A TESS data product is being opened using the "
-                "`KeplerTargetPixelFile` class. "
-                "Please use `TessTargetPixelFile` instead.",
-                LightkurveWarning,
-            )
-        elif filetype is None:
-            warnings.warn(
-                "File header not recognized as Kepler or TESS " "observation.",
-                LightkurveWarning,
+        try:
+            self.quality_mask = KeplerQualityFlags.create_quality_mask(
+                quality_array=self.hdu[1].data["QUALITY"], bitmask=quality_bitmask
             )
 
-        # Use the KEPLERID keyword as the default targetid
-        if self.targetid is None:
-            self.targetid = self.get_header().get("KEPLERID")
+            # check to make sure the correct filetype has been provided
+            filetype = detect_filetype(self.hdu)
+            if filetype == "TessTargetPixelFile":
+                warnings.warn(
+                    "A TESS data product is being opened using the "
+                    "`KeplerTargetPixelFile` class. "
+                    "Please use `TessTargetPixelFile` instead.",
+                    LightkurveWarning,
+                )
+            elif filetype is None:
+                warnings.warn(
+                    "File header not recognized as Kepler or TESS " "observation.",
+                    LightkurveWarning,
+                )
+
+            # Use the KEPLERID keyword as the default targetid
+            if self.targetid is None:
+                self.targetid = self.get_header().get("KEPLERID")
+        except Exception as e:
+            # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
+            self.hdu.close()
+            raise e
 
     def __repr__(self):
         return "KeplerTargetPixelFile Object (ID: {})".format(self.targetid)
@@ -2765,33 +2775,38 @@ class TessTargetPixelFile(TargetPixelFile):
         super(TessTargetPixelFile, self).__init__(
             path, quality_bitmask=quality_bitmask, **kwargs
         )
-        self.quality_mask = TessQualityFlags.create_quality_mask(
-            quality_array=self.hdu[1].data["QUALITY"], bitmask=quality_bitmask
-        )
-        # Early TESS releases had cadences with time=NaN (i.e. missing data)
-        # which were not flagged by a QUALITY flag yet; the line below prevents
-        # these cadences from being used. They would break most methods!
-        if (quality_bitmask != 0) and (quality_bitmask != "none"):
-            self.quality_mask &= np.isfinite(self.hdu[1].data["TIME"])
-
-        # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.hdu)
-        if filetype == "KeplerTargetPixelFile":
-            warnings.warn(
-                "A Kepler data product is being opened using the "
-                "`TessTargetPixelFile` class. "
-                "Please use `KeplerTargetPixelFile` instead.",
-                LightkurveWarning,
+        try:
+            self.quality_mask = TessQualityFlags.create_quality_mask(
+                quality_array=self.hdu[1].data["QUALITY"], bitmask=quality_bitmask
             )
-        elif filetype is None:
-            warnings.warn(
-                "File header not recognized as Kepler or TESS " "observation.",
-                LightkurveWarning,
-            )
+            # Early TESS releases had cadences with time=NaN (i.e. missing data)
+            # which were not flagged by a QUALITY flag yet; the line below prevents
+            # these cadences from being used. They would break most methods!
+            if (quality_bitmask != 0) and (quality_bitmask != "none"):
+                self.quality_mask &= np.isfinite(self.hdu[1].data["TIME"])
 
-        # Use the TICID keyword as the default targetid
-        if self.targetid is None:
-            self.targetid = self.get_header().get("TICID")
+            # check to make sure the correct filetype has been provided
+            filetype = detect_filetype(self.hdu)
+            if filetype == "KeplerTargetPixelFile":
+                warnings.warn(
+                    "A Kepler data product is being opened using the "
+                    "`TessTargetPixelFile` class. "
+                    "Please use `KeplerTargetPixelFile` instead.",
+                    LightkurveWarning,
+                )
+            elif filetype is None:
+                warnings.warn(
+                    "File header not recognized as Kepler or TESS " "observation.",
+                    LightkurveWarning,
+                )
+
+            # Use the TICID keyword as the default targetid
+            if self.targetid is None:
+                self.targetid = self.get_header().get("TICID")
+        except Exception as e:
+            # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
+            self.hdu.close()
+            raise e
 
     def __repr__(self):
         return "TessTargetPixelFile(TICID: {})".format(self.targetid)

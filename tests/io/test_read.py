@@ -108,15 +108,40 @@ def test_filenotfound():
 
 @pytest.mark.filterwarnings("error::ResourceWarning")
 @pytest.mark.filterwarnings("error::pytest.PytestUnraisableExceptionWarning")
-@pytest.mark.filterwarnings("ignore:.*been truncated.*")  # ignore AstropyUserWarning: File may have been truncated
-def test_file_corrupted():
+# ignore AstropyUserWarning: File may have been truncated  (for corrupted at data section FITS)
+@pytest.mark.filterwarnings("ignore:.*been truncated.*")
+# ignore  VerifyWarning: Error validating header for HDU #1 ... (for test-lc-tess-pimen-corrupted-at-header.fits )
+@pytest.mark.filterwarnings("ignore:.*Error validating header.*")
+@pytest.mark.parametrize("fits_name", [
+    # TPF, truncated somewhere in the data section, the error is in 'TypeError: buffer is too small for requested array'
+    "test-tpf-kplr-tabby-corrupted.fits",
+    # TPF, truncated somewhere in the header (BINTABLE), the error is 'IndexError: list index out of range'
+    "test-tpf-kplr-tabby-corrupted-at-header.fits",
+    # TPF, truncated somewhere in the header (PRIMARY),
+    "test-tpf-kplr-tabby-corrupted-at-header2.fits",
+
+    # TPF, TESS variants, some code paths are TESS / Kepler specific
+    # so TESS TPFs are included to complete the coverage
+    # source: mast:TESS/product/tess2023209231226-s0068-0000000261136679-0262-s_tp.fits
+    #  (pi Men, sector 68, SPOC 2min cadence)
+    "test-lc-tess-pimen-corrupted.fits",
+    "test-lc-tess-pimen-corrupted-at-header.fits",
+    "test-lc-tess-pimen-corrupted-at-header2.fits",
+
+    # LC, truncated in data section ; source: mast:TESS/product/tess2018206045859-s0001-0000000261136679-0120-s_lc.fits
+    "test-lc-tess-pimen-corrupted.fits",
+    # LC, truncated in header (BINTABLE)
+    "test-lc-tess-pimen-corrupted-at-header.fits",
+    # LC, truncated in header (PRIMARY)
+    "test-lc-tess-pimen-corrupted-at-header2.fits",
+])
+def test_file_corrupted(fits_name):
     """Regression test for #1184; ensure lk.read() yields an error that includes the filename."""
-    # fits source: mast:TESS/product/tess2018206045859-s0001-0000000261136679-0120-s_lc.fits
-    filename_lc_pimen_corrupted = os.path.join(TESTDATA, "test-lc-tess-pimen-100-cadences-corrupted.fits")
+    filename_fits_corrupted = os.path.join(TESTDATA, fits_name)
     with pytest.raises(BaseException) as excinfo:
-        read(filename_lc_pimen_corrupted)
+        read(filename_fits_corrupted)
     # ensure the filepath is in the exception
-    assert filename_lc_pimen_corrupted in str(excinfo.value)
+    assert filename_fits_corrupted in str(excinfo.value)
 
 
 def test_basic_ascii_io():
