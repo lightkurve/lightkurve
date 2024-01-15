@@ -143,4 +143,4 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
                        'matplotlib': ('https://matplotlib.org', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-                       'astropy': ('https://docs.astropy.org/en/latest/', None)}
+                       'astropy': ('https://docs.astropy.org/en/stable/', None)}
