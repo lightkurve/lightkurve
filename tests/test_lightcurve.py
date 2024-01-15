@@ -248,6 +248,8 @@ def test_lightcurve_fold():
     assert_almost_equal(fold.phase[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
+    assert np.min(fold.cycle) == 0  # for #1397, case lc.fold() without epoch_time
+    assert np.max(fold.cycle) == 10
     assert fold.targetid == lc.targetid
     assert fold.label == lc.label
     assert set(lc.meta).issubset(set(fold.meta))
@@ -258,6 +260,8 @@ def test_lightcurve_fold():
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
+    assert np.min(fold.cycle) == 0
+    assert np.max(fold.cycle) == 10
     with warnings.catch_warnings():
         # `transit_midpoint` is deprecated and its use will emit a warning
         warnings.simplefilter("ignore", LightkurveWarning)
