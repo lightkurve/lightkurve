@@ -25,6 +25,7 @@
 - Made `LombScarglePeriodogram` compatible with Astropy v5.3 [#1342]
 - Updated the TPF plotting function to work correctly with WCS plotting [#1298]
 - Added the ability to open light curves from the TGLC High Level Science Product
+- Added a function called query_skycatalog to obtain R,A and Dec. values that have been corrected for proper motion.
 
 2.4.0 (2023-02-14)
 ==================

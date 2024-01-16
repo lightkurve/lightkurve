@@ -5,6 +5,8 @@ import datetime
 import os
 import warnings
 import logging
+from typing import Union
+import numpy.typing as npt
 
 import collections
 
@@ -14,12 +16,16 @@ from astropy.nddata import Cutout2D
 from astropy.table import Table
 from astropy.wcs import WCS
 from astropy.utils.exceptions import AstropyWarning
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import SkyCoord, Angle
 from astropy.stats.funcs import median_absolute_deviation as MAD
 from astropy.utils.decorators import deprecated
 from astropy.time import Time
 from astropy.units import Quantity
 import astropy.units as u
+from astropy.table import Table
+from astroquery.vizier import Vizier
+
+import typing as T
 
 import matplotlib
 from matplotlib import animation
@@ -33,7 +39,7 @@ from copy import deepcopy
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
-from .prf import KeplerPRF
+from .prf import KeplerPRF, TessPRF
 from .utils import (
     KeplerQualityFlags,
     TessQualityFlags,
@@ -43,7 +49,9 @@ from .utils import (
     validate_method,
     centroid_quadratic,
     _query_solar_system_objects,
-    finalize_notebook_url
+    finalize_notebook_url,
+    query_skycatalog,
+    _apply_propermotion,
 )
 from .io import detect_filetype
 
@@ -71,7 +79,7 @@ class HduToMetaMapping(collections.abc.Mapping):
         # use OrderedDict rather than simple dict for 2 reasons:
         # 1. more friendly __repr__ and __str__
         # 2. make the behavior between a TPF and a LC is more consistent.
-        #    (LightCurve.meta is an OrderedDict)
+        # 	(LightCurve.meta is an OrderedDict)
         self._dict = collections.OrderedDict()
         self._dict.update(hdu.header)
 
@@ -91,6 +99,7 @@ class HduToMetaMapping(collections.abc.Mapping):
         return self._dict.__str__()
 
 
+# HERE
 class TargetPixelFile(object):
     """Abstract class representing FITS files which contain time series imaging data.
 
@@ -119,7 +128,7 @@ class TargetPixelFile(object):
         """Implements indexing and slicing.
 
         Note: the implementation below cannot be be simplified using
-            `copy[1].data = copy[1].data[self.quality_mask][key]`
+                        `copy[1].data = copy[1].data[self.quality_mask][key]`
         due to the complicated behavior of AstroPy's `FITS_rec`.
         """
         # Step 1: determine the indexes of the data to return.
@@ -260,12 +269,12 @@ class TargetPixelFile(object):
         Parameters
         ----------
         ext : int or str
-            FITS extension name or number.
+                        FITS extension name or number.
 
         Returns
         -------
         header : `~astropy.io.fits.header.Header`
-            Header object containing metadata keywords.
+                        Header object containing metadata keywords.
         """
         return self.hdu[ext].header
 
@@ -400,7 +409,7 @@ class TargetPixelFile(object):
         Returns
         -------
         w : `astropy.wcs.WCS` object
-            WCS solution
+                        WCS solution
         """
         if "MAST" in self.hdu[0].header["ORIGIN"]:  # Is it a TessCut TPF?
             # TPF's generated using the TESSCut service in early 2019 only appear
@@ -445,14 +454,14 @@ class TargetPixelFile(object):
         Parameters
         ----------
         cadence : 'all' or int
-            Which cadences to return the RA Dec coordinates for.
+                        Which cadences to return the RA Dec coordinates for.
 
         Returns
         -------
         ra : numpy array, same shape as tpf.flux[cadence]
-            Array containing RA values for every pixel, for every cadence.
+                        Array containing RA values for every pixel, for every cadence.
         dec : numpy array, same shape as tpf.flux[cadence]
-            Array containing Dec values for every pixel, for every cadence.
+                        Array containing Dec values for every pixel, for every cadence.
         """
         w = self.wcs
         X, Y = np.meshgrid(np.arange(self.shape[2]), np.arange(self.shape[1]))
@@ -497,7 +506,12 @@ class TargetPixelFile(object):
         """
         attrs = {}
         for attr in dir(self):
-            if not attr.startswith("_") and attr != "header" and attr != "astropy_time":
+            if (
+                not attr.startswith("_")
+                and attr != "header"
+                and attr != "astropy_time"
+                and attr != "skycatalog"
+            ):
                 res = getattr(self, attr)
                 if callable(res):
                     continue
@@ -562,17 +576,19 @@ class TargetPixelFile(object):
         Parameters
         ----------
         method : 'aperture', 'prf', 'sap', 'sff', 'cbv', 'pld'.
-            Photometry method to use. 'aperture' is an alias of 'sap'.
+                        Photometry method to use. 'aperture' is an alias of 'sap'.
         **kwargs : dict
-            Extra arguments to be passed to the `extract_aperture_photometry()`, the
-            `extract_prf_photometry()`, or the `to_corrector()` method of this class.
+                        Extra arguments to be passed to the `extract_aperture_photometry()`, the
+                        `extract_prf_photometry()`, or the `to_corrector()` method of this class.
 
         Returns
         -------
         lc : LightCurve object
-            Object containing the resulting lightcurve.
+                        Object containing the resulting lightcurve.
         """
-        method = validate_method(method, supported_methods=["aperture", "prf", "sap", "sff", "cbv", "pld"])
+        method = validate_method(
+            method, supported_methods=["aperture", "prf", "sap", "sff", "cbv", "pld"]
+        )
         if method in ["aperture", "sap"]:
             return self.extract_aperture_photometry(**kwargs)
         elif method == "prf":
@@ -585,7 +601,7 @@ class TargetPixelFile(object):
 
     def _resolve_default_aperture_mask(self, aperture_mask):
         if isinstance(aperture_mask, str):
-            if (aperture_mask == "default"):
+            if aperture_mask == "default":
                 # returns 'pipeline', unless it is missing. Falls back to 'threshold'
                 return "pipeline" if np.any(self.pipeline_mask) else "threshold"
             else:
@@ -603,23 +619,23 @@ class TargetPixelFile(object):
         ----------
         aperture_mask : array-like, 'pipeline', 'all', 'threshold', 'default',
         'background', or None
-            A boolean array describing the aperture such that `True` means
-            that the pixel will be used.
-            If None or 'all' are passed, all pixels will be used.
-            If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
-            If 'threshold' is passed, all pixels brighter than 3-sigma above
-            the median flux will be used.
-            If 'default' is passed, 'pipeline' mask will be used when available,
-            with 'threshold' as the fallback.
-            If 'background' is passed, all pixels fainter than the median flux
-            will be used.
-            If 'empty' is passed, no pixels will be used.
+                        A boolean array describing the aperture such that `True` means
+                        that the pixel will be used.
+                        If None or 'all' are passed, all pixels will be used.
+                        If 'pipeline' is passed, the mask suggested by the official pipeline
+                        will be returned.
+                        If 'threshold' is passed, all pixels brighter than 3-sigma above
+                        the median flux will be used.
+                        If 'default' is passed, 'pipeline' mask will be used when available,
+                        with 'threshold' as the fallback.
+                        If 'background' is passed, all pixels fainter than the median flux
+                        will be used.
+                        If 'empty' is passed, no pixels will be used.
 
         Returns
         -------
         aperture_mask : ndarray
-            2D boolean numpy array containing `True` for selected pixels.
+                        2D boolean numpy array containing `True` for selected pixels.
         """
         aperture_mask = self._resolve_default_aperture_mask(aperture_mask)
 
@@ -633,7 +649,7 @@ class TargetPixelFile(object):
 
         # Input validation
         if hasattr(aperture_mask, "shape"):
-            if (aperture_mask.shape != self.shape[1:]):
+            if aperture_mask.shape != self.shape[1:]:
                 raise ValueError(
                     "`aperture_mask` has shape {}, "
                     "but the flux data has shape {}"
@@ -657,7 +673,7 @@ class TargetPixelFile(object):
                 aperture_mask = np.zeros((self.shape[1], self.shape[2]), dtype=bool)
         elif isinstance(aperture_mask, np.ndarray):
             # Kepler and TESS pipeline style integer flags
-            if np.issubdtype(aperture_mask.dtype, np.dtype('>i4')):
+            if np.issubdtype(aperture_mask.dtype, np.dtype(">i4")):
                 aperture_mask = (aperture_mask & 2) == 2
             elif np.issubdtype(aperture_mask.dtype, int):
                 if ((aperture_mask & 2) == 2).any():
@@ -689,20 +705,20 @@ class TargetPixelFile(object):
         Parameters
         ----------
         threshold : float
-            A value for the number of sigma by which a pixel needs to be
-            brighter than the median flux to be included in the aperture mask.
+                        A value for the number of sigma by which a pixel needs to be
+                        brighter than the median flux to be included in the aperture mask.
         reference_pixel: (int, int) tuple, 'center', or None
-            (col, row) pixel coordinate closest to the desired region.
-            For example, use `reference_pixel=(0,0)` to select the region
-            closest to the bottom left corner of the target pixel file.
-            If 'center' (default) then the region closest to the center pixel
-            will be selected. If `None` then all regions will be selected.
+                        (col, row) pixel coordinate closest to the desired region.
+                        For example, use `reference_pixel=(0,0)` to select the region
+                        closest to the bottom left corner of the target pixel file.
+                        If 'center' (default) then the region closest to the center pixel
+                        will be selected. If `None` then all regions will be selected.
 
         Returns
         -------
         aperture_mask : ndarray
-            2D boolean numpy array containing `True` for pixels above the
-            threshold.
+                        2D boolean numpy array containing `True` for pixels above the
+                        threshold.
         """
         if reference_pixel == "center":
             reference_pixel = (self.shape[2] / 2, self.shape[1] / 2)
@@ -756,17 +772,17 @@ class TargetPixelFile(object):
         Parameters
         ----------
         aperture_mask : 'background', 'all', or array-like
-            Which pixels should be used to estimate the background?
-            If None or 'all' are passed, all pixels in the pixel file will be
-            used.  If 'background' is passed, all pixels fainter than the
-            median flux will be used. Alternatively, users can pass a boolean
-            array describing the aperture mask such that `True` means that the
-            pixel will be used.
+                        Which pixels should be used to estimate the background?
+                        If None or 'all' are passed, all pixels in the pixel file will be
+                        used.  If 'background' is passed, all pixels fainter than the
+                        median flux will be used. Alternatively, users can pass a boolean
+                        array describing the aperture mask such that `True` means that the
+                        pixel will be used.
 
         Returns
         -------
         lc : `LightCurve` object
-            Median background flux in units electron/second/pixel.
+                        Median background flux in units electron/second/pixel.
         """
         mask = self._parse_aperture_mask(aperture_mask)
         # For each cadence, compute the median pixel flux across the background
@@ -795,28 +811,28 @@ class TargetPixelFile(object):
         Parameters
         ----------
         aperture_mask : 'pipeline', 'threshold', 'all', 'default', or array-like
-            Which pixels contain the object to be measured, i.e. which pixels
-            should be used in the estimation?  If None or 'all' are passed,
-            all pixels in the pixel file will be used.
-            If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
-            If 'threshold' is passed, all pixels brighter than 3-sigma above
-            the median flux will be used.
-            If 'default' is passed, 'pipeline' mask will be used when available,
-            with 'threshold' as the fallback.
-            Alternatively, users can pass a boolean array describing the
-            aperture mask such that `True` means that the pixel will be used.
+                        Which pixels contain the object to be measured, i.e. which pixels
+                        should be used in the estimation?  If None or 'all' are passed,
+                        all pixels in the pixel file will be used.
+                        If 'pipeline' is passed, the mask suggested by the official pipeline
+                        will be returned.
+                        If 'threshold' is passed, all pixels brighter than 3-sigma above
+                        the median flux will be used.
+                        If 'default' is passed, 'pipeline' mask will be used when available,
+                        with 'threshold' as the fallback.
+                        Alternatively, users can pass a boolean array describing the
+                        aperture mask such that `True` means that the pixel will be used.
         method : 'moments' or 'quadratic'
-            Defines which method to use to estimate the centroids. 'moments'
-            computes the centroid based on the sample moments of the data.
-            'quadratic' fits a 2D polynomial to the data and returns the
-            coordinate of the peak of that polynomial.
+                        Defines which method to use to estimate the centroids. 'moments'
+                        computes the centroid based on the sample moments of the data.
+                        'quadratic' fits a 2D polynomial to the data and returns the
+                        coordinate of the peak of that polynomial.
 
         Returns
         -------
         columns, rows : `~astropy.units.Quantity`, `~astropy.units.Quantity`
-            Arrays containing the column and row positions for the centroid
-            for each cadence, or NaN for cadences where the estimation failed.
+                        Arrays containing the column and row positions for the centroid
+                        for each cadence, or NaN for cadences where the estimation failed.
         """
         method = validate_method(method, ["moments", "quadratic"])
         if method == "moments":
@@ -931,7 +947,7 @@ class TargetPixelFile(object):
         sigma=3,
         cache=True,
         return_mask=False,
-        show_progress=True
+        show_progress=True,
     ):
         """Returns a list of asteroids or comets which affected the target pixel files.
 
@@ -965,39 +981,39 @@ class TargetPixelFile(object):
         Parameters
         ----------
         cadence_mask : str, or boolean array with length of self.time
-            mask in time to select which frames or points should be searched for SSOs.
-            Default "outliers" will search for SSOs at points that are `sigma` from the mean.
-            "all" will search all cadences. Alternatively, pass a boolean array with values of "True"
-            for times to search for SSOs.
+                        mask in time to select which frames or points should be searched for SSOs.
+                        Default "outliers" will search for SSOs at points that are `sigma` from the mean.
+                        "all" will search all cadences. Alternatively, pass a boolean array with values of "True"
+                        for times to search for SSOs.
         radius : optional, float
-            Radius to search for bodies. If None, will search for SSOs within 5 pixels of
-            all pixels in the TPF.
+                        Radius to search for bodies. If None, will search for SSOs within 5 pixels of
+                        all pixels in the TPF.
         sigma : optional, float
-            If `cadence_mask` is set to `"outlier"`, `sigma` will be used to identify
-            outliers.
+                        If `cadence_mask` is set to `"outlier"`, `sigma` will be used to identify
+                        outliers.
         cache : optional, bool
-            If True will cache the search result in the astropy cache. Set to False
-            to request the search again.
+                        If True will cache the search result in the astropy cache. Set to False
+                        to request the search again.
         return_mask: optional, bool
-            If True will return a boolean mask in time alongside the result
+                        If True will return a boolean mask in time alongside the result
         show_progress: optional, bool
-            If True will display a progress bar during the download
+                        If True will display a progress bar during the download
 
         Returns
         -------
         result : pandas.DataFrame
-            DataFrame containing the list objects in frames that were identified to contain
-            SSOs.
+                        DataFrame containing the list objects in frames that were identified to contain
+                        SSOs.
 
         Examples
         --------
         Find if there are SSOs affecting the target pixel file for the given time frame:
 
-            >>> df_sso = tpf.query_solar_system_objects(cadence_mask=(tpf.time.value >= 2014.1) & (tpf.time.value <= 2014.9))  # doctest: +SKIP
+                        >>> df_sso = tpf.query_solar_system_objects(cadence_mask=(tpf.time.value >= 2014.1) & (tpf.time.value <= 2014.9))  # doctest: +SKIP
 
         Find if there are SSOs affecting the target pixel file for all times, but it will be much slower:
 
-            >>> df_sso = tpf.query_solar_system_objects(cadence_mask='all')  # doctest: +SKIP
+                        >>> df_sso = tpf.query_solar_system_objects(cadence_mask='all')  # doctest: +SKIP
 
         """
 
@@ -1036,7 +1052,7 @@ class TargetPixelFile(object):
 
         if radius == None:
             radius = (
-                2 ** 0.5 * (pixel_scale * (np.max(self.shape[1:]) + 5))
+                2**0.5 * (pixel_scale * (np.max(self.shape[1:]) + 5))
             ) * u.arcsecond.to(u.deg)
 
         res = _query_solar_system_objects(
@@ -1074,35 +1090,35 @@ class TargetPixelFile(object):
         Parameters
         ----------
         ax : `~matplotlib.axes.Axes`
-            A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be generated.
+                        A matplotlib axes object to plot into. If no axes is provided,
+                        a new one will be generated.
         frame : int
-            Frame number. The default is 0, i.e. the first frame.
+                        Frame number. The default is 0, i.e. the first frame.
         cadenceno : int, optional
-            Alternatively, a cadence number can be provided.
-            This argument has priority over frame number.
+                        Alternatively, a cadence number can be provided.
+                        This argument has priority over frame number.
         bkg : bool
-            If True and `column="FLUX"`, background will be added to the pixel values.
+                        If True and `column="FLUX"`, background will be added to the pixel values.
         column : str
-            Choose the FITS data column to be plotted. May be one of ('FLUX',
-            'FLUX_ERR','FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS').
+                        Choose the FITS data column to be plotted. May be one of ('FLUX',
+                        'FLUX_ERR','FLUX_BKG','FLUX_BKG_ERR','COSMIC_RAYS','RAW_CNTS').
         aperture_mask : ndarray or str
-            Highlight pixels selected by aperture_mask.
+                        Highlight pixels selected by aperture_mask.
         show_colorbar : bool
-            Whether or not to show the colorbar
+                        Whether or not to show the colorbar
         mask_color : str
-            Color to show the aperture mask
+                        Color to show the aperture mask
         style : str
-            Path or URL to a matplotlib style file, or name of one of
-            matplotlib's built-in stylesheets (e.g. 'ggplot').
-            Lightkurve's custom stylesheet is used by default.
+                        Path or URL to a matplotlib style file, or name of one of
+                        matplotlib's built-in stylesheets (e.g. 'ggplot').
+                        Lightkurve's custom stylesheet is used by default.
         kwargs : dict
-            Keywords arguments passed to `lightkurve.utils.plot_image`.
+                        Keywords arguments passed to `lightkurve.utils.plot_image`.
 
         Returns
         -------
         ax : `~matplotlib.axes.Axes`
-            The matplotlib axes object.
+                        The matplotlib axes object.
         """
         if style == "lightkurve" or style is None:
             style = MPLSTYLE
@@ -1168,8 +1184,6 @@ class TargetPixelFile(object):
                 if hasattr(ax, "wcs"):
                     img_extent = None
 
-
-
             ax = plot_image(
                 data_to_plot,
                 ax=ax,
@@ -1180,7 +1194,6 @@ class TargetPixelFile(object):
                 **kwargs,
             )
             ax.grid(False)
-
 
         # Overlay the aperture mask if given
         if aperture_mask is not None:
@@ -1214,13 +1227,13 @@ class TargetPixelFile(object):
         Parameters
         ----------
         step : int
-            Spacing between frames.  By default, the spacing will be determined such that
-            50 frames are shown, i.e. `step = len(tpf) // 50`.  Showing more than 50 frames
-            will be slow on many systems.
+                        Spacing between frames.  By default, the spacing will be determined such that
+                        50 frames are shown, i.e. `step = len(tpf) // 50`.  Showing more than 50 frames
+                        will be slow on many systems.
         interval : int
-            Delay between frames in milliseconds.
+                        Delay between frames in milliseconds.
         **plot_args : dict
-            Optional parameters passed to tpf.plot().
+                        Optional parameters passed to tpf.plot().
         """
         if step is None:
             step = len(self) // 50
@@ -1261,21 +1274,28 @@ class TargetPixelFile(object):
         Parameters
         ----------
         step : int
-            Spacing between frames.  By default, the spacing will be determined such that
-            50 frames are shown, i.e. `step = len(tpf) // 50`.  Showing more than 50 frames
-            will be slow on many systems.
+                        Spacing between frames.  By default, the spacing will be determined such that
+                        50 frames are shown, i.e. `step = len(tpf) // 50`.  Showing more than 50 frames
+                        will be slow on many systems.
         interval : int
-            Delay between frames in milliseconds.
+                        Delay between frames in milliseconds.
         **plot_args : dict
-            Optional parameters passed to tpf.plot().
+                        Optional parameters passed to tpf.plot().
         """
         try:
             # To make installing Lightkurve easier, ipython is an optional dependency,
             # because we can assume it is installed when notebook-specific features are called
             from IPython.display import HTML
-            return HTML(self._to_matplotlib_animation(step=step, interval=interval, **plot_args).to_jshtml())
+
+            return HTML(
+                self._to_matplotlib_animation(
+                    step=step, interval=interval, **plot_args
+                ).to_jshtml()
+            )
         except ModuleNotFoundError:
-            log.error("ipython needs to be installed for animate() to work (e.g., `pip install ipython`)")
+            log.error(
+                "ipython needs to be installed for animate() to work (e.g., `pip install ipython`)"
+            )
 
     def to_fits(self, output_fn=None, overwrite=False):
         """Writes the TPF to a FITS file on disk."""
@@ -1308,62 +1328,62 @@ class TargetPixelFile(object):
         Parameters
         ----------
         notebook_url : str
-            Location of the Jupyter notebook page (default: "localhost:8888")
-            When showing Bokeh applications, the Bokeh server must be
-            explicitly configured to allow connections originating from
-            different URLs. This parameter defaults to the standard notebook
-            host and port. If you are running on a different location, you
-            will need to supply this value for the application to display
-            properly. If no protocol is supplied in the URL, e.g. if it is
-            of the form "localhost:8888", then "http" will be used.
-            For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
-            to the public hostname of your JupyterHub and notebook_url will
-            be defined appropriately automatically.
+                        Location of the Jupyter notebook page (default: "localhost:8888")
+                        When showing Bokeh applications, the Bokeh server must be
+                        explicitly configured to allow connections originating from
+                        different URLs. This parameter defaults to the standard notebook
+                        host and port. If you are running on a different location, you
+                        will need to supply this value for the application to display
+                        properly. If no protocol is supplied in the URL, e.g. if it is
+                        of the form "localhost:8888", then "http" will be used.
+                        For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+                        to the public hostname of your JupyterHub and notebook_url will
+                        be defined appropriately automatically.
         max_cadences : int
-            Print an error message if the number of cadences shown is larger than
-            this value. This limit helps keep browsers from becoming unresponsive.
+                        Print an error message if the number of cadences shown is larger than
+                        this value. This limit helps keep browsers from becoming unresponsive.
         aperture_mask : array-like, 'pipeline', 'threshold', 'default', or 'all'
-            A boolean array describing the aperture such that `True` means
-            that the pixel will be used.
-            If None or 'all' are passed, all pixels will be used.
-            If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
-            If 'threshold' is passed, all pixels brighter than 3-sigma above
-            the median flux will be used.
-            If 'default' is passed, 'pipeline' mask will be used when available,
-            with 'threshold' as the fallback.
+                        A boolean array describing the aperture such that `True` means
+                        that the pixel will be used.
+                        If None or 'all' are passed, all pixels will be used.
+                        If 'pipeline' is passed, the mask suggested by the official pipeline
+                        will be returned.
+                        If 'threshold' is passed, all pixels brighter than 3-sigma above
+                        the median flux will be used.
+                        If 'default' is passed, 'pipeline' mask will be used when available,
+                        with 'threshold' as the fallback.
         exported_filename: str
-            An optional filename to assign to exported fits files containing
-            the custom aperture mask generated by clicking on pixels in interact.
-            The default adds a suffix '-custom-aperture-mask.fits' to the
-            TargetPixelFile basename.
+                        An optional filename to assign to exported fits files containing
+                        the custom aperture mask generated by clicking on pixels in interact.
+                        The default adds a suffix '-custom-aperture-mask.fits' to the
+                        TargetPixelFile basename.
         transform_func: function
-            A function that transforms the lightcurve.  The function takes in a
-            LightCurve object as input and returns a LightCurve object as output.
-            The function can be complex, such as detrending the lightcurve.  In this
-            way, the interactive selection of aperture mask can be evaluated after
-            inspection of the transformed lightcurve.  The transform_func is applied
-            before saving a fits file.  Default: None (no transform is applied).
+                        A function that transforms the lightcurve.  The function takes in a
+                        LightCurve object as input and returns a LightCurve object as output.
+                        The function can be complex, such as detrending the lightcurve.  In this
+                        way, the interactive selection of aperture mask can be evaluated after
+                        inspection of the transformed lightcurve.  The transform_func is applied
+                        before saving a fits file.  Default: None (no transform is applied).
         ylim_func: function
-            A function that returns ylimits (low, high) given a LightCurve object.
-            The default is to return an expanded window around the 10-90th
-            percentile of lightcurve flux values.
+                        A function that returns ylimits (low, high) given a LightCurve object.
+                        The default is to return an expanded window around the 10-90th
+                        percentile of lightcurve flux values.
 
         Examples
         --------
         To select an aperture mask for V827 Tau::
 
-            >>> import lightkurve as lk
-            >>> tpf = lk.search_targetpixelfile("V827 Tau", mission="K2").download()  # doctest: +SKIP
-            >>> tpf.interact()  # doctest: +SKIP
+                        >>> import lightkurve as lk
+                        >>> tpf = lk.search_targetpixelfile("V827 Tau", mission="K2").download()  # doctest: +SKIP
+                        >>> tpf.interact()  # doctest: +SKIP
 
 
         To see the full y-axis dynamic range of your lightcurve and normalize
         the lightcurve after each pixel selection::
 
-            >>> ylim_func = lambda lc: (0.0, lc.flux.max())  # doctest: +SKIP
-            >>> transform_func = lambda lc: lc.normalize()  # doctest: +SKIP
-            >>> tpf.interact(ylim_func=ylim_func, transform_func=transform_func)  # doctest: +SKIP
+                        >>> ylim_func = lambda lc: (0.0, lc.flux.max())  # doctest: +SKIP
+                        >>> transform_func = lambda lc: lc.normalize()  # doctest: +SKIP
+                        >>> tpf.interact(ylim_func=ylim_func, transform_func=transform_func)  # doctest: +SKIP
 
         """
         from .interact import show_interact_widget
@@ -1381,36 +1401,40 @@ class TargetPixelFile(object):
             **kwargs,
         )
 
-
-    def interact_sky(self, notebook_url=None, aperture_mask="empty", magnitude_limit=18):
+    def interact_sky(
+        self, notebook_url=None, aperture_mask="empty", magnitude_limit=18
+    ):
         """Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.
 
         Parameters
         ----------
         notebook_url : str
-            Location of the Jupyter notebook page (default: "localhost:8888")
-            When showing Bokeh applications, the Bokeh server must be
-            explicitly configured to allow connections originating from
-            different URLs. This parameter defaults to the standard notebook
-            host and port. If you are running on a different location, you
-            will need to supply this value for the application to display
-            properly. If no protocol is supplied in the URL, e.g. if it is
-            of the form "localhost:8888", then "http" will be used.
-            For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
-            to the public hostname of your JupyterHub and notebook_url will
-            be defined appropriately automatically.
+                        Location of the Jupyter notebook page (default: "localhost:8888")
+                        When showing Bokeh applications, the Bokeh server must be
+                        explicitly configured to allow connections originating from
+                        different URLs. This parameter defaults to the standard notebook
+                        host and port. If you are running on a different location, you
+                        will need to supply this value for the application to display
+                        properly. If no protocol is supplied in the URL, e.g. if it is
+                        of the form "localhost:8888", then "http" will be used.
+                        For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+                        to the public hostname of your JupyterHub and notebook_url will
+                        be defined appropriately automatically.
         aperture_mask : array-like, 'pipeline', 'threshold', 'default', 'background', or 'empty'
-            Highlight pixels selected by aperture_mask.
-            Default is 'empty': no pixel is highlighted.
+                        Highlight pixels selected by aperture_mask.
+                        Default is 'empty': no pixel is highlighted.
         magnitude_limit : float
-            A value to limit the results in based on Gaia Gmag. Default, 18.
+                        A value to limit the results in based on Gaia Gmag. Default, 18.
         """
         from .interact import show_skyview_widget
 
         notebook_url = finalize_notebook_url(notebook_url)
 
         return show_skyview_widget(
-            self, notebook_url=notebook_url, aperture_mask=aperture_mask, magnitude_limit=magnitude_limit
+            self,
+            notebook_url=notebook_url,
+            aperture_mask=aperture_mask,
+            magnitude_limit=magnitude_limit,
         )
 
     def to_corrector(self, method="pld", **kwargs):
@@ -1419,16 +1443,16 @@ class TargetPixelFile(object):
         Parameters
         ----------
         methods : string
-            Currently, only "pld" is supported.  This will return a
-            `~correctors.PLDCorrector` class instance.
+                        Currently, only "pld" is supported.  This will return a
+                        `~correctors.PLDCorrector` class instance.
         **kwargs : dict
-            Extra keyword arguments to be passed on to the corrector class.
+                        Extra keyword arguments to be passed on to the corrector class.
 
         Returns
         -------
         correcter : `~correctors.corrector.Corrector`
-            Instance of a Corrector class, which typically provides `~correctors.PLDCorrector.correct()`
-            and `~correctors.PLDCorrector.diagnose()` methods.
+                        Instance of a Corrector class, which typically provides `~correctors.PLDCorrector.correct()`
+                        and `~correctors.PLDCorrector.diagnose()` methods.
         """
         allowed_methods = ["pld"]
         if method == "sff":
@@ -1457,21 +1481,21 @@ class TargetPixelFile(object):
         Parameters
         ----------
         center : (int, int) tuple or `astropy.SkyCoord`
-            Center of the cutout.  If an (int, int) tuple is passed, it will be
-            interpreted as the (column, row) coordinates relative to
-            the bottom-left corner of the TPF.  If an `astropy.SkyCoord` is
-            passed then the sky coordinate will be used instead.
-            If `None` (default) then the center of the TPF will be used.
+                        Center of the cutout.  If an (int, int) tuple is passed, it will be
+                        interpreted as the (column, row) coordinates relative to
+                        the bottom-left corner of the TPF.  If an `astropy.SkyCoord` is
+                        passed then the sky coordinate will be used instead.
+                        If `None` (default) then the center of the TPF will be used.
         size : int or (int, int) tuple
-            Number of pixels to cut out. If a single integer is passed then
-            a square of that size will be cut. If a tuple is passed then a
-            rectangle with dimensions (column_size, row_size) will be cut.
+                        Number of pixels to cut out. If a single integer is passed then
+                        a square of that size will be cut. If a tuple is passed then a
+                        rectangle with dimensions (column_size, row_size) will be cut.
 
         Returns
         -------
         tpf : `lightkurve.TargetPixelFile` object
-            New and smaller Target Pixel File object containing only the data
-            cut out.
+                        New and smaller Target Pixel File object containing only the data
+                        cut out.
         """
         imshape = self.flux.shape[1:]
 
@@ -1622,42 +1646,42 @@ class TargetPixelFile(object):
         Parameters
         ----------
         images_flux : list of str, or list of fits.ImageHDU objects
-            Sorted list of FITS filename paths or ImageHDU objects to get
-            the flux data from.
+                        Sorted list of FITS filename paths or ImageHDU objects to get
+                        the flux data from.
         position : astropy.SkyCoord
-            Position around which to cut out pixels.
+                        Position around which to cut out pixels.
         images_raw_cnts : list of str, or list of fits.ImageHDU objects
-            Sorted list of FITS filename paths or ImageHDU objects to get
-            the raw counts data from.
+                        Sorted list of FITS filename paths or ImageHDU objects to get
+                        the raw counts data from.
         images_flux_err : list of str, or list of fits.ImageHDU objects
-            Sorted list of FITS filename paths or ImageHDU objects to get
-            the flux error data from.
+                        Sorted list of FITS filename paths or ImageHDU objects to get
+                        the flux error data from.
         images_flux_bkg : list of str, or list of fits.ImageHDU objects
-            Sorted list of FITS filename paths or ImageHDU objects to get
-            the background data from.
+                        Sorted list of FITS filename paths or ImageHDU objects to get
+                        the background data from.
         images_flux_bkg_err : list of str, or list of fits.ImageHDU objects
-            Sorted list of FITS filename paths or ImageHDU objects to get
-            the background error data from.
+                        Sorted list of FITS filename paths or ImageHDU objects to get
+                        the background error data from.
         images_cosmic_rays : list of str, or list of fits.ImageHDU objects
-            Sorted list of FITS filename paths or ImageHDU objects to get
-            the cosmic rays data from.
+                        Sorted list of FITS filename paths or ImageHDU objects to get
+                        the cosmic rays data from.
         size : (int, int)
-            Dimensions (cols, rows) to cut out around `position`.
+                        Dimensions (cols, rows) to cut out around `position`.
         extension : int or str
-            If `images` is a list of filenames, provide the extension number
-            or name to use. This should be the same for all flux inputs
-            provided. Default: 1.
+                        If `images` is a list of filenames, provide the extension number
+                        or name to use. This should be the same for all flux inputs
+                        provided. Default: 1.
         target_id : int or str
-            Unique identifier of the target to be recorded in the TPF.
+                        Unique identifier of the target to be recorded in the TPF.
         hdu0_keywords : dict
-            Additional keywords to add to the first header file.
+                        Additional keywords to add to the first header file.
         **kwargs : dict
-            Extra arguments to be passed to the `TargetPixelFile` constructor.
+                        Extra arguments to be passed to the `TargetPixelFile` constructor.
 
         Returns
         -------
         tpf : TargetPixelFile
-            A new Target Pixel File assembled from the images.
+                        A new Target Pixel File assembled from the images.
         """
         len_images = len(images_flux)
 
@@ -1831,7 +1855,7 @@ class TargetPixelFile(object):
                 ext_info["TDIM{}".format(m)] = "({},{})".format(size[0], size[1])
             # Compute the distance from the star to the TPF lower left corner
             # That is approximately half the TPF size, with an adjustment factor if the star's pixel
-            #    position gets rounded up or not.
+            # 	position gets rounded up or not.
             # The first int is there so that even sizes always round to one less than half of their value
 
             half_tpfsize_col = int((size[0] - 1) / 2.0) + (
@@ -1870,49 +1894,49 @@ class TargetPixelFile(object):
         Parameters
         ----------
         ax : `~matplotlib.axes.Axes`
-            A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be generated.
+                        A matplotlib axes object to plot into. If no axes is provided,
+                        a new one will be generated.
         periodogram : bool
-            Default: False; if True, periodograms will be plotted, using normalized light curves.
-            Note that this keyword overrides normalized.
+                        Default: False; if True, periodograms will be plotted, using normalized light curves.
+                        Note that this keyword overrides normalized.
         aperture_mask : ndarray or str
-            Highlight pixels selected by aperture_mask.
-            Only `pipeline`, `threshold`, or custom masks will be plotted.
-            `all` and None masks will be ignored.
+                        Highlight pixels selected by aperture_mask.
+                        Only `pipeline`, `threshold`, or custom masks will be plotted.
+                        `all` and None masks will be ignored.
         show_flux : bool
-            Default: False; if True, shade pixels with frame 0 flux colour
-            Inspired by https://github.com/noraeisner/LATTE
+                        Default: False; if True, shade pixels with frame 0 flux colour
+                        Inspired by https://github.com/noraeisner/LATTE
         corrector_func : function
-            Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.
-            This function is applied to each light curve in the collection
-            prior to stitching. The default is to normalize each light curve.
+                        Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.
+                        This function is applied to each light curve in the collection
+                        prior to stitching. The default is to normalize each light curve.
         style : str
-            Path or URL to a matplotlib style file, or name of one of
-            matplotlib's built-in stylesheets (e.g. 'ggplot').
-            Lightkurve's custom stylesheet is used by default.
+                        Path or URL to a matplotlib style file, or name of one of
+                        matplotlib's built-in stylesheets (e.g. 'ggplot').
+                        Lightkurve's custom stylesheet is used by default.
         markersize : float
-            Size of the markers in the lightcurve plot. For periodogram plot, it is used as the line width.
-            Default: 0.5
+                        Size of the markers in the lightcurve plot. For periodogram plot, it is used as the line width.
+                        Default: 0.5
         kwargs : dict
-            e.g. extra parameters to be passed to `lc.to_periodogram`.
+                        e.g. extra parameters to be passed to `lc.to_periodogram`.
 
         Examples
         --------
         Inspect the lightcurve around a possible transit at per-pixel level::
 
-            >>> import lightkurve as lk
-            >>> # A possible transit around time BTJD 2277.0. Inspect the lightcurve around that time
-            >>> tpf = tpf[(tpf.time.value >= 2276.5) & (tpf.time.value <= 2277.5)]    # doctest: +SKIP
-            >>> tpf.plot_pixels(aperture_mask='pipeline')  # doctest: +SKIP
-            >>>
-            >>> # Variation: shade the pixel based on the flux at frame 0
-            >>> # increase markersize so that it is more legible for pixels with yellow background (the brightest pixels)
-            >>> tpf.plot_pixels(aperture_mask='pipeline', show_flux=True, markersize=1.5)  # doctest: +SKIP
-            >>>
-            >>> # Variation: Customize the plot's size so that each pixel is about 1 inch by 1 inch
-            >>> import matplotlib.pyplot as plt
-            >>> fig = plt.figure(figsize=(tpf.flux[0].shape[0] * 1.0, tpf.flux[0].shape[1] * 1.0))    # doctest: +SKIP
-            >>> tpf.plot_pixels(ax=fig.gca(), aperture_mask='pipeline')    # doctest: +SKIP
+                        >>> import lightkurve as lk
+                        >>> # A possible transit around time BTJD 2277.0. Inspect the lightcurve around that time
+                        >>> tpf = tpf[(tpf.time.value >= 2276.5) & (tpf.time.value <= 2277.5)]	# doctest: +SKIP
+                        >>> tpf.plot_pixels(aperture_mask='pipeline')  # doctest: +SKIP
+                        >>>
+                        >>> # Variation: shade the pixel based on the flux at frame 0
+                        >>> # increase markersize so that it is more legible for pixels with yellow background (the brightest pixels)
+                        >>> tpf.plot_pixels(aperture_mask='pipeline', show_flux=True, markersize=1.5)  # doctest: +SKIP
+                        >>>
+                        >>> # Variation: Customize the plot's size so that each pixel is about 1 inch by 1 inch
+                        >>> import matplotlib.pyplot as plt
+                        >>> fig = plt.figure(figsize=(tpf.flux[0].shape[0] * 1.0, tpf.flux[0].shape[1] * 1.0))	# doctest: +SKIP
+                        >>> tpf.plot_pixels(ax=fig.gca(), aperture_mask='pipeline')	# doctest: +SKIP
 
 
         """
@@ -2049,6 +2073,275 @@ class TargetPixelFile(object):
 
         return ax
 
+    '''
+	Would this be useful to have as a property? 
+	tpf.prf returns the intialized PRF model
+	tpf.prf_model returns the 3D cube
+	@property
+	def prf_model(self,
+		scale: float = 1.0,
+		rotation_angle: float = 0.0) -> npt.ArrayLike:
+		"""
+		Returns a 3D stack of PRF models for each star in the TPF
+		The PRF is initialized with the same row/column dimensions and camera/ccd as the TPF
+		"""
+		catalog = self.skycatalog
+		
+		return self.prf.prf_model(center_col = catalog['Column'].value, center_row = catalog['Row'].value
+			, scale=scale, rotation_angle=rotation_angle)
+		'''
+
+    def estimate_target_aperture(
+        self,
+        center_col: Union[float, SkyCoord, None] = None,
+        center_row: Union[float, SkyCoord, None] = None,
+        scale: float = 1.0,
+        rotation_angle: float = 0.0,
+        min_completeness: float = 0.9,
+    ) -> npt.ArrayLike:
+        """
+        Gets a basic aperture for the target star. This does not account for blending.
+
+        Parameters:
+        -----------
+        center_col : float
+                                        column location of the target in pixels or SkyCoord (ra).
+        center_row : float
+                                        row location of the target in pixels or SkyCoord (dec).
+        scale : float
+                                        Pixel scale stretch parameter, can be used to account for focus changes.
+                                        Values > 1 stretch the image, Values < 1 make the PRF more compact.
+                                        E.g. a scale value of 2 will double the PRF footprint.
+        rotation_angle : float
+                                        Rotation angle in radians
+        min_completeness : float
+                                        Minimum fraction of flux contained within the aperture
+
+
+        Returns:
+        --------
+        aperture : npt.ArrayLike
+                                        2D boolean array of the same shape as the tpf (nrows x ncolumns)
+
+        """
+
+        if (min_completeness < 0) | (min_completeness > 1):
+            raise ValueError("Completeness must be between 0 and 1")
+
+        # By default, get the updated target position using skycatalog functionality.
+        if (center_col is None) | (center_row is None):
+            center_col, center_row = self.wcs.world_to_pixel(
+                SkyCoord(
+                    self.skycatalog["RA"][0], self.skycatalog["DEC"][0], unit="deg"
+                )
+            )
+
+        if isinstance(center_col, SkyCoord) | isinstance(center_row, SkyCoord):
+            center_col, center_row = self.wcs.world_to_pixel(
+                SkyCoord(center_col.deg, center_row.deg, unit="deg")
+            )
+        # if the user did not input the column/pixel values directly
+        if not isinstance(center_col, float) | isinstance(center_row, float):
+            center_col = float(center_col) + self.column
+            center_row = float(center_row) + self.row
+
+        PRF_base = self.prf
+        prf_model = PRF_base.prf_model(
+            center_col=center_col,
+            center_row=center_row,
+            scale=scale,
+            rotation_angle=rotation_angle,
+        )
+        aperture = PRF_base.get_target_aperture(
+            prf_model, min_completeness=min_completeness
+        )
+
+        return aperture
+
+    def estimate_completeness(
+        self,
+        aperture: npt.ArrayLike,
+        center_col: Union[float, SkyCoord, None] = None,
+        center_row: Union[float, SkyCoord, None] = None,
+        scale: float = 1.0,
+        rotation_angle: float = 0.0,
+    ) -> float:
+        """
+        Estimates the fraction of flux from the target that falls within a given aperture from the PRF model.
+        This does not account for blending.
+
+        Parameters:
+        -----------
+        aperture: npt.ArrayLike
+                                        2D boolean array with col/width matching the dimensions of the PRF.
+                                        True where source is inside aperture.
+        center_col : float
+                                        column location of the target in pixels or SkyCoord (ra).
+        center_row : float
+                                        row location of the target in pixels or SkyCoord (dec).
+        scale : float
+                                        Pixel scale stretch parameter, i.e. the numbers by which the PRF
+                                        model needs to be multiplied in the column and row directions to
+                                        account for focus changes. Default 1 (no scaling)
+        rotation_angle : float
+                                        Rotation angle in radians
+
+
+        Returns:
+        --------
+        aperture : npt.ArrayLike
+                                        2D boolean array of the same (nrows x ncolumns)
+
+        """
+
+        # By default, get the updated target position using skycatalog functionality.
+        if (center_col is None) | (center_row is None):
+            center_col, center_row = self.wcs.world_to_pixel(
+                SkyCoord(
+                    self.skycatalog["RA"][0], self.skycatalog["DEC"][0], unit="deg"
+                )
+            )
+
+        if isinstance(center_col, SkyCoord) | isinstance(center_row, SkyCoord):
+            center_col, center_row = self.wcs.world_to_pixel(
+                SkyCoord(center_col.deg, center_row.deg, unit="deg")
+            )
+        # if the user did not input the column/pixel values directly, get CCD pixel values
+        if not isinstance(center_col, float) | isinstance(center_row, float):
+            center_col = float(center_col) + self.column
+            center_row = float(center_row) + self.row
+
+        PRF_base = self.prf
+        prf_model = PRF_base.prf_model(
+            center_col=center_col,
+            center_row=center_row,
+            scale=scale,
+            rotation_angle=rotation_angle,
+        )
+
+        return PRF_base.get_completeness(prf_model, aperture)
+
+    def estimate_contamination(
+        self,
+        aperture: [npt.ArrayLike, None] = None,
+        center_col: Union[float, SkyCoord, None] = None,
+        center_row: Union[float, SkyCoord, None] = None,
+        scale: float = 1.0,
+        rotation_angle: float = 0.0,
+    ) -> float:
+        """Estimates the fraction of total flux within the aperture that comes from the target source.
+
+
+        Parameters:
+        -----------
+        aperture: npt.ArrayLike
+                        2D boolean array with col/width matching the dimensions of the PRF.
+                        True where source is inside aperture.
+        center_col : float
+                        column location of the target in pixels or SkyCoord (ra).
+        center_row : float
+                        row location of the target in pixels or SkyCoord (dec).
+        scale : float
+                        Pixel scale stretch parameter, i.e. the numbers by which the PRF
+                        model needs to be multiplied in the column and row directions to
+                        account for focus changes. Default 1 (no scaling)
+        rotation_angle : float
+                        Rotation angle in radians
+
+
+
+        Returns:
+        --------
+        contamination : float
+                        Fraction of total flux in the aperture that comes from the target source.
+                        Will be a value between 0 and 1 (1 being all flux comes from the target source)
+        """
+
+        if aperture is None:
+            aperture = self.pipeline_mask
+            # TESScut has an array of all 'False' values for the mask
+            print("Using the pipeline aperture")
+            if np.sum(aperture) == 0:
+                raise ValueError("Need to specify a valid aperture")
+
+        PRF_base = self.prf
+        prf_model = PRF_base.prf_model(
+            center_row=self.skycatalog["Row"].value,
+            center_col=self.skycatalog["Column"].value,
+            scale=scale,
+            rotation_angle=rotation_angle,
+        )
+        return PRF_base.get_contamination(
+            prf_model, aperture, self.skycatalog["Relative_Flux"].value
+        )
+
+    @property
+    def skycatalog(self):
+        """Function that returns an astropy table of sources with the proper motion correction applied
+
+        Returns:
+        ------
+        catalog : astropy.table.Table
+        Returns an astropy table with ID, RA and Dec coordinates corrected for propermotion, and Mag
+        """
+
+        if self.mission.lower() == "kepler":
+            catalog_name = "kic"
+            radius = 4 * (np.max([self.shape[1], self.shape[2]]) + 10) / 2 * u.arcsec
+        elif self.mission.lower() == "k2":
+            catalog_name = "epic"
+            radius = 4 * (np.max([self.shape[1], self.shape[2]]) + 10) / 2 * u.arcsec
+        elif self.mission.lower() == "tess":
+            catalog_name = "tic"
+            radius = 21 * (np.max([self.shape[1], self.shape[2]]) + 10) / 2 * u.arcsec
+        else:
+            raise ValueError("Must pass a valid Target Pixel File object.")
+
+        # When you have a TPF you want the query to be around the center of the TPF
+        # Not the R.A and Dec listed as this may be very off center
+
+        # Get the R.A and Dec of the center of the TPF
+        tpf_coord = self.wcs.pixel_to_world(
+            (self.shape[2] - 1) / 2, (self.shape[1] - 1) / 2
+        )
+
+        # Get the R.A and Dec of the target
+        target_coord = SkyCoord(self.ra, self.dec, unit="deg")
+
+        # Pass this information to the query_skycatalog function
+        catalog = query_skycatalog(
+            coord=tpf_coord,
+            epoch=self.time[0],
+            target_coord=target_coord,
+            radius=radius,
+            catalog=catalog_name,
+        )
+
+        # Get the pixel values for each object in the returned catalog
+        column, row = self.wcs.world_to_pixel(
+            SkyCoord(catalog["RA"], catalog["DEC"], unit="deg")
+        )
+
+        catalog["Column"] = (self.column + column) * u.pix
+        catalog["Row"] = (self.row + row) * u.pix
+
+        # Cut down to targets within 1 pixel of edge of TPF
+        col_min = self.column - 1
+        row_min = self.row - 1
+
+        col_max = self.column + self.shape[2]
+        row_max = self.row + self.shape[1]
+
+        # Filter
+        catalog = catalog[
+            (catalog["Column"] >= col_min)
+            & (catalog["Column"] <= col_max)
+            & (catalog["Row"] >= row_min)
+            & (catalog["Row"] <= row_max)
+        ]
+
+        return catalog
+
 
 class KeplerTargetPixelFile(TargetPixelFile):
     """Class to read and interact with the pixel data products
@@ -2065,35 +2358,35 @@ class KeplerTargetPixelFile(TargetPixelFile):
     Parameters
     ----------
     path : str or `~astropy.io.fits.HDUList`
-        Path to a Kepler Target Pixel file. Alternatively, you can pass a
-        `.HDUList` object, which is the AstroPy object returned by
-        the `astropy.io.fits.open` function.
+                    Path to a Kepler Target Pixel file. Alternatively, you can pass a
+                    `.HDUList` object, which is the AstroPy object returned by
+                    the `astropy.io.fits.open` function.
     quality_bitmask : "none", "default", "hard", "hardest", or int
-        Bitmask that should be used to ignore bad-quality cadences.
-        If a string is passed, it has the following meaning:
+                    Bitmask that should be used to ignore bad-quality cadences.
+                    If a string is passed, it has the following meaning:
 
-            * "none": no cadences will be ignored (equivalent to
-              ``quality_bitmask=0``).
-            * "default": cadences with severe quality issues will be ignored
-              (equivalent to ``quality_bitmask=1130799``).
-            * "hard": more conservative choice of flags to ignore
-              (equivalent to ``quality_bitmask=1664431``).
-              This is known to remove good data.
-            * "hardest": remove all cadences that have one or more flags raised
-              (equivalent to ``quality_bitmask=2096639``). This mask is not
-              recommended because some quality flags can safely be ignored.
+                                    * "none": no cadences will be ignored (equivalent to
+                                      ``quality_bitmask=0``).
+                                    * "default": cadences with severe quality issues will be ignored
+                                      (equivalent to ``quality_bitmask=1130799``).
+                                    * "hard": more conservative choice of flags to ignore
+                                      (equivalent to ``quality_bitmask=1664431``).
+                                      This is known to remove good data.
+                                    * "hardest": remove all cadences that have one or more flags raised
+                                      (equivalent to ``quality_bitmask=2096639``). This mask is not
+                                      recommended because some quality flags can safely be ignored.
 
-        If an integer is passed, it will be used as a bitmask, i.e. it will
-        have the effect of removing cadences where
-        ``(tpf.hdu[1].data['QUALITY'] & quality_bitmask) > 0``.
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
+                    If an integer is passed, it will be used as a bitmask, i.e. it will
+                    have the effect of removing cadences where
+                    ``(tpf.hdu[1].data['QUALITY'] & quality_bitmask) > 0``.
+                    See the :class:`KeplerQualityFlags` class for details on the bitmasks.
     **kwargs : dict
-        Optional keyword arguments passed on to `astropy.io.fits.open`.
+                    Optional keyword arguments passed on to `astropy.io.fits.open`.
 
     References
     ----------
     .. [1] Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
-        http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
+                    http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
     """
 
     def __init__(self, path, quality_bitmask="default", **kwargs):
@@ -2131,7 +2424,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def __repr__(self):
         return "KeplerTargetPixelFile Object (ID: {})".format(self.targetid)
 
-    def get_prf_model(self):
+    @property
+    def prf(self):
         """Returns an object of KeplerPRF initialized using the
         necessary metadata in the tpf object.
 
@@ -2187,27 +2481,27 @@ class KeplerTargetPixelFile(TargetPixelFile):
         Parameters
         ----------
         aperture_mask : array-like, 'pipeline', 'threshold', 'default', or 'all'
-            A boolean array describing the aperture such that `True` means
-            that the pixel will be used.
-            If None or 'all' are passed, all pixels will be used.
-            If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
-            If 'threshold' is passed, all pixels brighter than 3-sigma above
-            the median flux will be used.
-            If 'default' is passed, 'pipeline' mask will be used when available,
-            with 'threshold' as the fallback.
+                        A boolean array describing the aperture such that `True` means
+                        that the pixel will be used.
+                        If None or 'all' are passed, all pixels will be used.
+                        If 'pipeline' is passed, the mask suggested by the official pipeline
+                        will be returned.
+                        If 'threshold' is passed, all pixels brighter than 3-sigma above
+                        the median flux will be used.
+                        If 'default' is passed, 'pipeline' mask will be used when available,
+                        with 'threshold' as the fallback.
         flux_method: 'sum', 'median', or 'mean'
-            Determines how the pixel values within the aperture mask are combined
-            at each cadence. Defaults to 'sum'.
+                        Determines how the pixel values within the aperture mask are combined
+                        at each cadence. Defaults to 'sum'.
         centroid_method : str, 'moments' or 'quadratic'
-            For the details on this arguments, please refer to the documentation
-            for `estimate_centroids()`.
+                        For the details on this arguments, please refer to the documentation
+                        for `estimate_centroids()`.
 
         Returns
         -------
         lc : KeplerLightCurve object
-            Array containing the summed flux within the aperture for each
-            cadence.
+                        Array containing the summed flux within the aperture for each
+                        cadence.
         """
         # explicitly resolve default, so that the aperture_mask set in meta
         # later will be the resolved one
@@ -2274,13 +2568,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         Parameters
         ----------
         **kwargs : dict
-            Arguments to be passed to the `TPFModel` constructor, e.g.
-            `star_priors`.
+                        Arguments to be passed to the `TPFModel` constructor, e.g.
+                        `star_priors`.
 
         Returns
         -------
         model : TPFModel object
-            Model with appropriate defaults for this Target Pixel File.
+                        Model with appropriate defaults for this Target Pixel File.
         """
         from .prf import TPFModel, StarPrior, BackgroundPrior
         from .prf import UniformPrior, GaussianPrior
@@ -2334,19 +2628,19 @@ class KeplerTargetPixelFile(TargetPixelFile):
         Parameters
         ----------
         cadences : list of int
-            Cadences to fit.  If `None` (default) then all cadences will be fit.
+                        Cadences to fit.  If `None` (default) then all cadences will be fit.
         parallel : bool
-            If `True`, fitting cadences will be distributed across multiple
-            cores using Python's `multiprocessing` module.
+                        If `True`, fitting cadences will be distributed across multiple
+                        cores using Python's `multiprocessing` module.
         **kwargs : dict
-            Keywords to be passed to `get_model()` to create the
-            `~prf.TPFModel` object that will be fit.
+                        Keywords to be passed to `get_model()` to create the
+                        `~prf.TPFModel` object that will be fit.
 
         Returns
         -------
         results : PRFPhotometry object
-            Object that provides access to PRF-fitting photometry results and
-            various diagnostics.
+                        Object that provides access to PRF-fitting photometry results and
+                        various diagnostics.
         """
         from .prf import PRFPhotometry
 
@@ -2378,6 +2672,19 @@ class KeplerTargetPixelFile(TargetPixelFile):
             "targetid": self.targetid,
         }
         return KeplerLightCurve(time=self.time, flux=lc.flux, **keys)
+
+    # QUESTION: The above 4 functions were experimental in the existing lk version
+    # 		   Do we want to remove them or keep them? They do a more sophisticated fit,
+    # 		   which perhaps does not follow the 'building blocks' philosophy
+
+    @property
+    def prf(self):
+        """
+        Returns an initialized KeplerPRF object.
+        The PRF is initialized with the same row/column dimensions and channel as the TPF
+        """
+
+        return KeplerPRF(self.column, self.row, self.channel, self.shape[1:3])
 
 
 class FactoryError(Exception):
@@ -2750,25 +3057,25 @@ class TessTargetPixelFile(TargetPixelFile):
     Parameters
     ----------
     path : str
-        Path to a TESS Target Pixel (FITS) File.
+                    Path to a TESS Target Pixel (FITS) File.
     quality_bitmask : "none", "default", "hard", "hardest", or int
-        Bitmask that should be used to ignore bad-quality cadences.
-        If a string is passed, it has the following meaning:
+                    Bitmask that should be used to ignore bad-quality cadences.
+                    If a string is passed, it has the following meaning:
 
-            * "none": no cadences will be ignored (`quality_bitmask=0`).
-            * "default": cadences with severe quality issues will be ignored
-              (`quality_bitmask=175`).
-            * "hard": more conservative choice of flags to ignore
-              (`quality_bitmask=7407`). This is known to remove good data.
-            * "hardest": removes all data that has been flagged
-              (`quality_bitmask=8191`). This mask is not recommended.
+                                    * "none": no cadences will be ignored (`quality_bitmask=0`).
+                                    * "default": cadences with severe quality issues will be ignored
+                                      (`quality_bitmask=175`).
+                                    * "hard": more conservative choice of flags to ignore
+                                      (`quality_bitmask=7407`). This is known to remove good data.
+                                    * "hardest": removes all data that has been flagged
+                                      (`quality_bitmask=8191`). This mask is not recommended.
 
-        If an integer is passed, it will be used as a bitmask, i.e. it will
-        have the effect of removing cadences where
-        ``(tpf.hdu[1].data['QUALITY'] & quality_bitmask) > 0``.
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
+                    If an integer is passed, it will be used as a bitmask, i.e. it will
+                    have the effect of removing cadences where
+                    ``(tpf.hdu[1].data['QUALITY'] & quality_bitmask) > 0``.
+                    See the :class:`KeplerQualityFlags` class for details on the bitmasks.
     kwargs : dict
-        Keyword arguments passed to `astropy.io.fits.open()`.
+                    Keyword arguments passed to `astropy.io.fits.open()`.
     """
 
     def __init__(self, path, quality_bitmask="default", **kwargs):
@@ -2851,26 +3158,26 @@ class TessTargetPixelFile(TargetPixelFile):
         Parameters
         ----------
         aperture_mask : array-like, 'pipeline', 'threshold', 'default', or 'all'
-            A boolean array describing the aperture such that `True` means
-            that the pixel will be used.
-            If None or 'all' are passed, all pixels will be used.
-            If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
-            If 'threshold' is passed, all pixels brighter than 3-sigma above
-            the median flux will be used.
-            If 'default' is passed, 'pipeline' mask will be used when available,
-            with 'threshold' as the fallback.
+                        A boolean array describing the aperture such that `True` means
+                        that the pixel will be used.
+                        If None or 'all' are passed, all pixels will be used.
+                        If 'pipeline' is passed, the mask suggested by the official pipeline
+                        will be returned.
+                        If 'threshold' is passed, all pixels brighter than 3-sigma above
+                        the median flux will be used.
+                        If 'default' is passed, 'pipeline' mask will be used when available,
+                        with 'threshold' as the fallback.
         flux_method: 'sum', 'median', or 'mean'
-            Determines how the pixel values within the aperture mask are combined
-            at each cadence. Defaults to 'sum'.
+                        Determines how the pixel values within the aperture mask are combined
+                        at each cadence. Defaults to 'sum'.
         centroid_method : str, 'moments' or 'quadratic'
-            For the details on this arguments, please refer to the documentation
-            for `estimate_centroids()`.
+                        For the details on this arguments, please refer to the documentation
+                        for `estimate_centroids()`.
 
         Returns
         -------
         lc : TessLightCurve object
-            Contains the summed flux within the aperture for each cadence.
+                        Contains the summed flux within the aperture for each cadence.
         """
         # explicitly resolve default, so that the aperture_mask set in meta
         # later will be the resolved one
@@ -2925,3 +3232,12 @@ class TessTargetPixelFile(TargetPixelFile):
             flux_err=flux_bkg_err,
             **keys,
         )
+
+    @property
+    def prf(self):
+        """
+        Returns an initialized TessPRF object.
+        The PRF is initialized with the same row/column dimensions and camera/ccd as the TPF
+        """
+
+        return TessPRF(self.column, self.row, self.camera, self.ccd, self.shape[1:3])
