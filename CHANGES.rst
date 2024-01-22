@@ -9,6 +9,7 @@
 - Fixed to ensure file handles are properly released when reading
   corrupted TargetPixelFile. [#1399]
 - Fixed ``FoldedLightCurve.cycle``, case ``epoch_time`` not specified [#1398]
+- Various improvements to the online documentation. [#1400]
 
 
 2.4.2 (2023-11-03)

@@ -1097,7 +1097,7 @@ class TargetPixelFile(object):
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
         kwargs : dict
-            Keywords arguments passed to `lightkurve.utils.plot_image`.
+            Keywords arguments passed to `~lightkurve.utils.plot_image`.
 
         Returns
         -------
@@ -1346,8 +1346,8 @@ class TargetPixelFile(object):
             before saving a fits file.  Default: None (no transform is applied).
         ylim_func: function
             A function that returns ylimits (low, high) given a LightCurve object.
-            The default is to return an expanded window around the 10-90th
-            percentile of lightcurve flux values.
+            The default is to return a window approximately around 5 sigma-clipped
+            lightcurve flux values.
 
         Examples
         --------
@@ -1884,8 +1884,8 @@ class TargetPixelFile(object):
             Inspired by https://github.com/noraeisner/LATTE
         corrector_func : function
             Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.
-            This function is applied to each light curve in the collection
-            prior to stitching. The default is to normalize each light curve.
+            This function is applied to each pixel's light curve.
+            The default is to return a 5 sigma-clipped light curve.
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
@@ -1894,7 +1894,7 @@ class TargetPixelFile(object):
             Size of the markers in the lightcurve plot. For periodogram plot, it is used as the line width.
             Default: 0.5
         kwargs : dict
-            e.g. extra parameters to be passed to `lc.to_periodogram`.
+            e.g. extra parameters to be passed to `~lightkurve.LightCurve.to_periodogram`.
 
         Examples
         --------
@@ -1911,7 +1911,7 @@ class TargetPixelFile(object):
             >>>
             >>> # Variation: Customize the plot's size so that each pixel is about 1 inch by 1 inch
             >>> import matplotlib.pyplot as plt
-            >>> fig = plt.figure(figsize=(tpf.flux[0].shape[0] * 1.0, tpf.flux[0].shape[1] * 1.0))    # doctest: +SKIP
+            >>> fig = plt.figure(figsize=(tpf.flux[0].shape[1] * 1.0, tpf.flux[0].shape[0] * 1.0))    # doctest: +SKIP
             >>> tpf.plot_pixels(ax=fig.gca(), aperture_mask='pipeline')    # doctest: +SKIP
 
 

@@ -2268,7 +2268,8 @@ class LightCurve(TimeSeries):
         path_or_buf : string or file handle
             File path or object. By default, the result is returned as a string.
         **kwargs : dict
-            Dictionary of arguments to be passed to `TimeSeries.write()`.
+            Dictionary of arguments to be passed to
+            `astropy`'s `~astropy.timeseries.TimeSeries.write`.
 
         Returns
         -------
@@ -2292,8 +2293,8 @@ class LightCurve(TimeSeries):
 
         The data frame will be indexed by `time` using values corresponding
         to the light curve's time format.  This is different from the
-        default behavior of `Table.to_pandas()` in AstroPy, which converts
-        time values into ISO timestamps.
+        default behavior of `astropy`'s `~astropy.timeseries.TimeSeries.to_pandas`,
+        which converts time values into ISO timestamps.
 
         Returns
         -------
