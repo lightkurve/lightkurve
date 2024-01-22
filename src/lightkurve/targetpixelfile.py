@@ -1097,7 +1097,7 @@ class TargetPixelFile(object):
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
         kwargs : dict
-            Keywords arguments passed to `lightkurve.utils.plot_image`.
+            Keywords arguments passed to `~lightkurve.utils.plot_image`.
 
         Returns
         -------
