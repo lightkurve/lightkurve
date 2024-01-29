@@ -797,7 +797,7 @@ def test_normalize():
 
     # already in relative units
     lc = LightCurve(time=np.arange(10), flux=np.ones(10)).normalize()
-    with pytest.warns(None) as warn_record:
+    with warnings.catch_warnings(record=True) as warn_record:
         lc.normalize()
     assert len(warn_record) == 0
     assert lc.meta["NORMALIZED"]
@@ -1562,7 +1562,7 @@ def test_attr_access_columns():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         lc.foo = "bar"
-    with pytest.warns(None) as warn_record:
+    with warnings.catch_warnings(record=True) as warn_record:
         lc.foo = "bar2"
     assert len(warn_record) == 0
 
@@ -1647,7 +1647,7 @@ def test_meta_assignment(lc):
 
     # ensure lc.meta assignment does not emit any warnings.
     meta_new = {'TSTART': 123456789.0}
-    with pytest.warns(None) as record:
+    with warnings.catch_warnings(record=True) as record:
         lc.meta = meta_new
 
     if (len(record) > 0):
