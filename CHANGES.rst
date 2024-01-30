@@ -10,6 +10,8 @@
   corrupted TargetPixelFile. [#1399]
 - Fixed ``FoldedLightCurve.cycle``, case ``epoch_time`` not specified [#1398]
 - Various improvements to the online documentation. [#1400]
+- Fixed a bug in ``tpf.interact()`` so that proper y label is displayed when
+  lightcurve is normalized with ``transform_func``. [#1387]
 
 
 2.4.2 (2023-11-03)
