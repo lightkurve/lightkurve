@@ -7,8 +7,12 @@ from lightkurve import (
     search_tesscut,
     KeplerLightCurve,
     TessLightCurve,
+    read,
 )
 from lightkurve.correctors import PLDCorrector
+
+from astropy.io import fits
+import numpy as np
 
 
 @pytest.mark.remote_data
@@ -106,3 +110,49 @@ def test_tpf_with_zero_flux_cadence():
     """Regression test for #873."""
     tpf = search_tesscut("TIC 123835353", sector=6).download(cutout_size=5)
     tpf.to_corrector("pld").correct()
+
+
+
+@pytest.mark.remote_data
+def test_tpf_with_allflux_err_NaN():
+
+    #This test shows that a TPF with all flux_err values equal to NaN fails
+    #to be put into PLDCorrector - throwing a ValueError 
+
+    #Download a TPF
+    search_tpf = search_targetpixelfile("KT Eri", sector=32)
+    tpf = search_tpf[0].download()
+    #Get the TPF file path
+    fname = tpf.path
+
+    #Open the TPF fits file and populate the flux_err with NaN values
+    with fits.open(fname, mode='update') as hdulist:
+        a = np.empty((112388,11,11))
+        a[:] = np.nan
+        hdulist[1].data['FLUX_ERR'] = a
+    hdulist.close()
+
+    #Read in the fits file as a TPF object
+    tpf = read(fname)
+
+    #Create and apply the PLDCorrector - this should fail as the mask gets rid of all values.
+    with pytest.raises(ValueError):
+        PLDCorrector(tpf).correct()
+
+@pytest.mark.remote_data
+def test_tpf_with_someflux_err_NaN():
+
+    #This test shows that a TPF with some flux_err values equal to NaN 
+    #can be put into PLDCorrector 
+
+    #Download a TPF from MAST
+    fits_file = "https://archive.stsci.edu/missions/tess/tid/s0026/0000/0001/5832/4245/tess2020160202036-s0026-0000000158324245-0188-s_tp.fits"
+    #Read fits file 
+    tpf = read(fits_file)
+    #The apply the PLDCorrector - this should pass
+    #The PLDCorrector should mask out the bad entries in flux_err and set them as NaN
+    #The code should then progress as ususal
+    pld = tpf.to_corrector('pld')
+    
+    
+    
