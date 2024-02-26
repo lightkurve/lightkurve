@@ -62,6 +62,19 @@ def test_graceful_exit_outside_notebook():
 
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
+def test_return_selected_mask():
+    """Test to `return_selected_mask=True` can run without any syntax error."""
+    import bokeh
+
+    tpf = TessTargetPixelFile(example_tpf)
+    mask_to_use = tpf.create_threshold_mask()
+    result, selection_mask = tpf.interact(aperture_mask=mask_to_use, return_selected_mask=True)
+    assert result is None
+    # the returned mask should be the same as the supplied one initially
+    assert_array_equal(selection_mask, mask_to_use)
+
+
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_custom_aperture_mask():
     """Can we provide a custom lightcurve to show?"""
     with warnings.catch_warnings():
