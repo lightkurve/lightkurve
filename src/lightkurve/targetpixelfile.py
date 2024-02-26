@@ -1291,6 +1291,7 @@ class TargetPixelFile(object):
         exported_filename=None,
         transform_func=None,
         ylim_func=None,
+        return_selection_mask=False,
         **kwargs,
     ):
         """Display an interactive Jupyter Notebook widget to inspect the pixel data.
@@ -1348,6 +1349,16 @@ class TargetPixelFile(object):
             A function that returns ylimits (low, high) given a LightCurve object.
             The default is to return a window approximately around 5 sigma-clipped
             lightcurve flux values.
+        return_selection_mask: bool
+            Optional, if set to `True`, return the pixel selection as an aperture mask.
+
+        Returns
+        -------
+        If ``return_selection_mask`` is set to ``True``, this method will return:
+        selection_mask : array-like
+            The mask representing the pixels the user has currently selected.
+            The user should copy the result after pixel selection is finalized, because the values
+            of the return array change dynamically as the user changes the pixel selection.
 
         Examples
         --------
@@ -1365,6 +1376,13 @@ class TargetPixelFile(object):
             >>> transform_func = lambda lc: lc.normalize()  # doctest: +SKIP
             >>> tpf.interact(ylim_func=ylim_func, transform_func=transform_func)  # doctest: +SKIP
 
+        the lightcurve after each pixel selection::
+
+            >>> interact_mask = tpf.interact(return_selection_mask=True)  # doctest: +SKIP
+            >>> # Once the desired pixels have been selected, save the result in
+            >>> # a separate variable to "freeze" the selection.
+            >>> my_custom_mask = interact_mask.copy()
+
         """
         from .interact import show_interact_widget
 
@@ -1378,6 +1396,7 @@ class TargetPixelFile(object):
             exported_filename=exported_filename,
             transform_func=transform_func,
             ylim_func=ylim_func,
+            return_selection_mask=return_selection_mask,
             **kwargs,
         )
 
