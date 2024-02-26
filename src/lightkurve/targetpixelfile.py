@@ -1393,7 +1393,7 @@ class TargetPixelFile(object):
             >>> interact_mask = tpf.interact(return_selection_mask=True)  # doctest: +SKIP
             >>> # Once the desired pixels have been selected, save the result in
             >>> # a separate variable to "freeze" the selection.
-            >>> my_custom_mask = interact_mask.copy()
+            >>> my_custom_mask = interact_mask.copy()  # doctest: +SKIP
 
         """
         from .interact import show_interact_widget
