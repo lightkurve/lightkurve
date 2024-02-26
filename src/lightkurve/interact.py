@@ -1009,7 +1009,7 @@ def show_interact_widget(
     vmax=None,
     scale="log",
     cmap="Viridis256",
-    return_selected_mask=False,
+    return_selection_mask=False,
 ):
     """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
@@ -1074,9 +1074,16 @@ def show_interact_widget(
         Maximum color scale for tpf figure
     cmap: str
         Colormap to use for tpf plot. Default is 'Viridis256'
-    return_selected_mask: bool
-        Optional, if set to `True`, also return the pixel selection as an aperture mask.
-    TODO: 1) document return result, 2) update for the docstring in tpf.interact(), 3) remind users to copy the result once satisfied.
+    return_selection_mask: bool
+        Optional, if set to `True`, return the pixel selection as an aperture mask.
+
+    Returns
+    -------
+    If ``return_selection_mask`` is set to ``True``, this method will return:
+    selection_mask: array-like
+    The mask representing the pixels the user has currently selected.
+    The user should copy the result after pixel selection is finalized, because the values
+    of the return array change dynamically as user changes the pixel selection.
     """
     if _BOKEH_IMPORT_ERROR is not None:
         log.error(
@@ -1321,12 +1328,9 @@ def show_interact_widget(
         doc.add_root(widgets_and_figures)
 
     output_notebook(verbose=False, hide_banner=True)
-    show_result = show(create_interact_ui, notebook_url=notebook_url)
-    if return_selected_mask:
-        return show_result, selected_mask_to_return
-    else:
-        return show_result
-
+    show(create_interact_ui, notebook_url=notebook_url)
+    if return_selection_mask:
+        return selected_mask_to_return
 
 
 def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitude_limit=18):
