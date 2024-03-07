@@ -634,6 +634,8 @@ def centroid_quadratic(data, mask=None):
     # Issue 1401 demonstrates that using 'data' to find the max will break when all flux is negative
     # replacing 0 with nan allows the correct max to be identified. 
     data_masked = data.copy()
+    if np.issubdtype(data_masked.dtype, int):
+        data_masked = data_masked.astype(float)
     data_masked[data_masked == 0] = np.nan
     arg_data_max = np.nanargmax(data_masked)
     yy, xx = np.unravel_index(arg_data_max, data.shape)
