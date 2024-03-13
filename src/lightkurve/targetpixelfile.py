@@ -2772,6 +2772,7 @@ class TessTargetPixelFile(TargetPixelFile):
     """
 
     def __init__(self, path, quality_bitmask="default", **kwargs):
+
         super(TessTargetPixelFile, self).__init__(
             path, quality_bitmask=quality_bitmask, **kwargs
         )

@@ -110,6 +110,7 @@ class QualityFlags(object):
                     "expected one of {}"
                     "".format(bitmask, valid_options)
                 )
+        log.warning("JUST A CHECK " + bitmask)   
         # The bitmask is applied using the bitwise AND operator
         quality_mask = (quality_array & bitmask) == 0
         # Log the quality masking as info or warning
@@ -251,7 +252,8 @@ class TessQualityFlags(QualityFlags):
 
     #: DEFAULT bitmask identifies all cadences which are definitely useless.
     DEFAULT_BITMASK = (
-        AttitudeTweak | SafeMode | CoarsePoint | EarthPoint | Desat | ManualExclude
+        AttitudeTweak | SafeMode | CoarsePoint | EarthPoint | Desat | ManualExclude | 
+        BadCalibrationExclude | PlanetSearchExclude 
     )
     #: HARD bitmask is conservative and may identify cadences which are useful.
     HARD_BITMASK = (
