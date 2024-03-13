@@ -109,7 +109,7 @@ class QualityFlags(object):
                     "quality_bitmask='{}' is not supported, "
                     "expected one of {}"
                     "".format(bitmask, valid_options)
-                )  
+                )
         # The bitmask is applied using the bitwise AND operator
         quality_mask = (quality_array & bitmask) == 0
         # Log the quality masking as info or warning
@@ -630,14 +630,9 @@ def centroid_quadratic(data, mask=None):
         data = data.value
     # Step 1: identify the patch of 3x3 pixels (z_)
     # that is centered on the brightest pixel (xx, yy)
-        
     if mask is not None:
         data = data * mask
-        
     arg_data_max = np.nanargmax(data)
-
-
-
     yy, xx = np.unravel_index(arg_data_max, data.shape)
     # Make sure the 3x3 patch does not leave the TPF bounds
     if yy < 1:

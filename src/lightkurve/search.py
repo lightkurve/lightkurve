@@ -429,6 +429,7 @@ class SearchResult(object):
                 "to limit your search.".format(len(self.table)),
                 LightkurveWarning,
             )
+            
         return self._download_one(
             table=self.table[:1],
             quality_bitmask=quality_bitmask,
