@@ -109,8 +109,7 @@ class QualityFlags(object):
                     "quality_bitmask='{}' is not supported, "
                     "expected one of {}"
                     "".format(bitmask, valid_options)
-                )
-        log.warning("JUST A CHECK " + bitmask)   
+                )  
         # The bitmask is applied using the bitwise AND operator
         quality_mask = (quality_array & bitmask) == 0
         # Log the quality masking as info or warning
@@ -632,18 +631,10 @@ def centroid_quadratic(data, mask=None):
     # Step 1: identify the patch of 3x3 pixels (z_)
     # that is centered on the brightest pixel (xx, yy)
         
-     # Issue 1401 demonstrates that using 'data' to find the max will break when all flux is negative
-    # replacing 0 with nan allows the correct max to be identified. 
     if mask is not None:
         data = data * mask
         
-        data_masked = data.copy()
-        if np.issubdtype(data_masked.dtype, int): # can't replace an int array with nan
-            data_masked = data_masked.astype(float)
-        data_masked[data_masked == 0] = np.nan
-        arg_data_max = np.nanargmax(data_masked)
-    else: 
-        arg_data_max = np.nanargmax(data)
+    arg_data_max = np.nanargmax(data)
 
 
 
