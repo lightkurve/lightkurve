@@ -250,6 +250,7 @@ class TessQualityFlags(QualityFlags):
     InsufficientTargets = 32768
 
     #: DEFAULT bitmask identifies all cadences which are definitely useless.
+    # BadCalibrationExclude and PlanetSearchExclude added (see #1302)
     DEFAULT_BITMASK = (
         AttitudeTweak | SafeMode | CoarsePoint | EarthPoint | Desat | ManualExclude | 
         BadCalibrationExclude | PlanetSearchExclude 
