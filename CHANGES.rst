@@ -12,6 +12,7 @@
 - Various improvements to the online documentation. [#1400]
 - Fixed a bug in ``tpf.interact()`` so that proper y label is displayed when
   lightcurve is normalized with ``transform_func``. [#1387]
+- Added PlanetSearchExclude and BadCalibrationExclude to TESS default bitmask [#1302]
 
 
 2.4.2 (2023-11-03)
