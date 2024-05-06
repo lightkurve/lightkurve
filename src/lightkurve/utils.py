@@ -630,7 +630,11 @@ def centroid_quadratic(data, mask=None):
     # Step 1: identify the patch of 3x3 pixels (z_)
     # that is centered on the brightest pixel (xx, yy)
     if mask is not None:
-        data = data * mask
+        # mask handling.
+        # Issue 1401 demonstrates that using 'data' to find the max will break when all flux is negative
+        # set masked pixels to be smaller than the existing minimum (instead of 0) to resolve it.
+        data = data.copy()
+        data[~mask] = np.nanmin(data) - 1
     arg_data_max = np.nanargmax(data)
     yy, xx = np.unravel_index(arg_data_max, data.shape)
     # Make sure the 3x3 patch does not leave the TPF bounds

@@ -165,23 +165,35 @@ def test_centroid_quadratic():
     assert np.isclose(row, 5) & np.isclose(col, 1.5)
 
 
-def test_centroid_quadratic_robustness():
-    """Test quadratic centroids in edge cases; regression test for #610."""
+# create a mask that'd mask out first 2 rows
+a_mask = np.full((5, 5), True, dtype=bool)
+a_mask[0:2, :] = False
+
+@pytest.mark.parametrize("mask", [None, a_mask])
+def test_centroid_quadratic_robustness(mask):
+    """Test quadratic centroids in edge cases; regression test for #610, etc."""
     # Brightest pixel in upper left
     data = np.zeros((5, 5))
     data[0, 0] = 1
-    centroid_quadratic(data)
+    centroid_quadratic(data, mask=mask)
 
     # Brightest pixel in bottom right
     data = np.zeros((5, 5))
     data[-1, -1] = 1
-    centroid_quadratic(data)
+    centroid_quadratic(data, mask=mask)
 
     # Data contains a NaN
     data = np.zeros((5, 5))
     data[0, 0] = np.nan
     data[-1, -1] = 10
-    col, row = centroid_quadratic(data)
+    col, row = centroid_quadratic(data, mask=mask)
+    assert np.isfinite(col) & np.isfinite(row)
+
+    # Data contains are all negative (#1401 case `mask` is specified)
+    # in a difference image
+    data = np.full((5, 5), -9.0)
+    data[3, 2] = -5.0
+    col, row = centroid_quadratic(data, mask=mask)
     assert np.isfinite(col) & np.isfinite(row)
 
 
