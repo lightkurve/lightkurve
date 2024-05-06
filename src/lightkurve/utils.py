@@ -648,6 +648,13 @@ def centroid_quadratic(data, mask=None):
         xx = data.shape[1] - 2
 
     z_ = data[yy - 1 : yy + 2, xx - 1 : xx + 2]
+    if np.any(np.isnan(z_)):
+        # handle edge case the 3X3 patch has NaN
+        # Need some finite value for NaN pixels for the
+        # quadratic fit below: use the mean the mean of the 3x3 patch
+        # to reduce the skew
+        z_ = z_.copy()
+        z_[np.isnan(z_)] = np.nanmean(z_)
 
     # Next, we will fit the coefficients of the bivariate quadratic with the
     # help of a design matrix (A) as defined by Eqn 20 in Vakili & Hogg

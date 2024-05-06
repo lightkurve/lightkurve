@@ -189,6 +189,13 @@ def test_centroid_quadratic_robustness(mask):
     col, row = centroid_quadratic(data, mask=mask)
     assert np.isfinite(col) & np.isfinite(row)
 
+    # has NaN in the identified 3x3 patch
+    data = np.zeros((5, 5))
+    data[3, 2] = 10
+    data[3, 3] = np.nan
+    col, row = centroid_quadratic(data, mask=mask)
+    assert np.isfinite(col) & np.isfinite(row)
+
     # Data contains are all negative (#1401 case `mask` is specified)
     # in a difference image
     data = np.full((5, 5), -9.0)
