@@ -9,9 +9,11 @@
 - Fixed to ensure file handles are properly released when reading
   corrupted TargetPixelFile. [#1399]
 - Fixed ``FoldedLightCurve.cycle``, case ``epoch_time`` not specified [#1398]
-- Various improvements to the online documentation. [#1400]
+- Various improvements to the online documentation. [#1400, #1425]
 - Fixed a bug in ``tpf.interact()`` so that proper y label is displayed when
   lightcurve is normalized with ``transform_func``. [#1387]
+- Fixed ``lightkurve.utils.centroid_quadratic()`` in edge cases, e.g., fluxes are
+  all negative with mask specified, NaN in the identified brightest 3X3 patch. [#1426]
 
 
 2.4.2 (2023-11-03)
