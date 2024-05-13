@@ -336,7 +336,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
         nonselection_line_color="gray",
         nonselection_line_alpha=1.0,
     )
-    circ = fig.circle(
+    circ = fig.scatter(
         "time",
         "flux",
         source=lc_source,
@@ -605,7 +605,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         ]
     tooltips = tooltips_extras + tooltips
 
-    r = fig.circle(
+    r = fig.scatter(
         "x",
         "y",
         source=source,
@@ -637,7 +637,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     if target_ra is not None and target_dec is not None:
         pix_x, pix_y = tpf.wcs.all_world2pix([(target_ra, target_dec)], 0)[0]
         target_x, target_y = tpf.column + pix_x, tpf.row + pix_y
-        fig.cross(x=target_x, y=target_y, size=20, color="black", line_width=1)
+        fig.scatter(marker="cross", x=target_x, y=target_y, size=20, color="black", line_width=1)
         if not pm_corrected:
             warnings.warn(("Proper motion correction cannot be applied to the target, as none is available. "
                            "Thus the target (the cross) might be noticeably away from its actual position, "

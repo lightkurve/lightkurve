@@ -312,7 +312,7 @@ def make_lightcurve_figure_elements(
     fig.y_range = Range1d(start=float(ylims[0]), end=float(ylims[1]))
 
     # Add light curve
-    fig.circle(
+    fig.scatter(
         "time",
         "flux",
         line_width=1,
@@ -346,7 +346,7 @@ def make_lightcurve_figure_elements(
         text_alpha=0.6,
     )
     fig.add_glyph(help_source, question_mark)
-    help = fig.circle(
+    help = fig.scatter(
         "time",
         "flux",
         alpha=0.0,
@@ -407,7 +407,7 @@ def make_folded_figure_elements(
     fig.xaxis.axis_label = f"Phase [{f.time.format.upper()}]"
 
     # Scatter point for data
-    fig.circle(
+    fig.scatter(
         "phase",
         "flux",
         line_width=1,
@@ -442,7 +442,7 @@ def make_folded_figure_elements(
         text_alpha=0.6,
     )
     fig.add_glyph(help_source, question_mark)
-    help = fig.circle(
+    help = fig.scatter(
         "phase",
         "flux",
         alpha=0.0,
@@ -507,7 +507,7 @@ def make_bls_figure_elements(result, bls_source, help_source):
     )
 
     # Add circles for the selection of new period. These are always hidden
-    fig.circle(
+    fig.scatter(
         "period",
         "power",
         source=bls_source,
@@ -559,7 +559,7 @@ def make_bls_figure_elements(result, bls_source, help_source):
         text_alpha=0.6,
     )
     fig.add_glyph(help_source, question_mark)
-    help = fig.circle(
+    help = fig.scatter(
         "period",
         "power",
         alpha=0.0,
