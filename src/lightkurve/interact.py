@@ -34,9 +34,10 @@ from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError, final
 log = logging.getLogger(__name__)
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
+_BOKEH_IMPORT_ERROR = None
 try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
-    from bokeh.io import show, output_notebook, push_notebook
+    from bokeh.io import show, output_notebook
     from bokeh.plotting import figure, ColumnDataSource
     from bokeh.models import (
         LogColorMapper,
@@ -55,9 +56,10 @@ try:
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button, Div
     from bokeh.models.formatters import PrintfTickFormatter
-except ImportError:
+except Exception as e:
     # We will print a nice error message in the `show_interact_widget` function
-    pass
+    # the error would be raised there in case users need to diagnose problems
+    _BOKEH_IMPORT_ERROR = e
 
 
 def _search_nearby_of_tess_target(tic_id):
@@ -1065,19 +1067,12 @@ def show_interact_widget(
     cmap: str
         Colormap to use for tpf plot. Default is 'Viridis256'
     """
-    try:
-        import bokeh
-
-        if bokeh.__version__[0] == "0":
-            warnings.warn(
-                "interact() requires Bokeh version 1.0 or later", LightkurveWarning
-            )
-    except ImportError:
+    if _BOKEH_IMPORT_ERROR is not None:
         log.error(
             "The interact() tool requires the `bokeh` Python package; "
             "you can install bokeh using e.g. `conda install bokeh`."
         )
-        return None
+        raise _BOKEH_IMPORT_ERROR
 
     notebook_url = finalize_notebook_url(notebook_url)
 
@@ -1339,19 +1334,12 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitud
     magnitude_limit : float
         A value to limit the results in based on Gaia Gmag. Default, 18.
     """
-    try:
-        import bokeh
-
-        if bokeh.__version__[0] == "0":
-            warnings.warn(
-                "interact_sky() requires Bokeh version 1.0 or later", LightkurveWarning
-            )
-    except ImportError:
+    if _BOKEH_IMPORT_ERROR is not None:
         log.error(
             "The interact_sky() tool requires the `bokeh` Python package; "
             "you can install bokeh using e.g. `conda install bokeh`."
         )
-        return None
+        raise _BOKEH_IMPORT_ERROR
 
     notebook_url = finalize_notebook_url(notebook_url)
 

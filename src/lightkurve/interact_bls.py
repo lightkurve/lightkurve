@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
+_BOKEH_IMPORT_ERROR = None
 try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
     from bokeh.io import show, output_notebook
@@ -24,8 +25,10 @@ try:
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button, Paragraph
     from bokeh.events import PanEnd, Reset
-except ImportError:
-    pass  # we will print an error message in `show_interact_widget` instead
+except Exception as e:
+    # We will print a nice error message in the `show_interact_widget` function
+    # the error would be raised there in case users need to diagnose problems
+    _BOKEH_IMPORT_ERROR = e
 
 from .interact import prepare_lightcurve_datasource
 from .lightcurve import LightCurve
@@ -630,19 +633,12 @@ def show_interact_widget(
         but less accurate compute time. You can also vary this value using the
         Resolution Slider.
     """
-    try:
-        import bokeh
-
-        if bokeh.__version__[0] == "0":
-            warnings.warn(
-                "interact_bls() requires Bokeh version 1.0 or later", LightkurveWarning
-            )
-    except ImportError:
+    if _BOKEH_IMPORT_ERROR is not None:
         log.error(
             "The interact_bls() tool requires the `bokeh` package; "
             "you can install bokeh using e.g. `conda install bokeh`."
         )
-        return None
+        raise _BOKEH_IMPORT_ERROR
 
     def _round_strip_unit(val, decimals):
         return np.round(getattr(val, "value", val), decimals)
