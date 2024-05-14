@@ -22,6 +22,7 @@ import numpy as np
 from astropy.coordinates import SkyCoord, Angle
 from astropy.io import ascii
 from astropy.stats import sigma_clip
+from astropy.table import Table, Column
 from astropy.time import Time
 import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
@@ -768,6 +769,104 @@ SIMBAD by coordinate</a></td></tr>
     return fig, r, message_selected_target
 
 
+def _add_separation(result: Table, target_coord: SkyCoord):
+    """Calculate angular separation of the catalog result from the target."""
+    result_coord = SkyCoord(result["RA"], result["DEC"], unit="deg")
+    separation = target_coord.separation(result_coord)
+    result["Separation"] = separation.arcsec
+    result["Separation"].unit = u.arcsec
+
+
+def add_ztf_figure_elements(tpf, fig, magnitude_limit=18, query_kwargs=None):
+    from . import interact_sky_provider_ztf as ztf
+
+    try:
+        ra, dec, pm_corrected = _get_corrected_coordinate(tpf)
+        c1 = SkyCoord(ra, dec, frame="icrs", unit="deg")
+        # OPEN: for now do not issue warning for no PM correction,
+        # as users would likely get multiple warnings (from code path of plotting the target as a cross)
+    except Exception as err:
+        msg = ("Cannot get nearby stars because TargetPixelFile has no valid coordinate. "
+               f"ra: {getattr(tpf, 'ra', None)}, dec: {getattr(tpf, 'dec', None)}")
+        raise LightkurveError(msg) from err
+
+    # Use pixel scale for query size
+    pix_scale = 4.0  # arcseconds / pixel for Kepler, default
+    if tpf.mission == "TESS":
+        pix_scale = 21.0
+    # We are querying with a diameter as the radius, overfilling by 2x.
+    radius = Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec")
+    # OPEN: consider to use a smaller radius, or let users override it
+    # ZTF archive use case is usually for identifying contaminating variable source,
+    # so usually a smaller radius would be sufficient
+
+    if query_kwargs is None:
+        query_kwargs = {}
+    result = ztf.query_catalog(c1, radius, magnitude_limit=magnitude_limit, **query_kwargs)
+
+    # Note: no proper motion correction can be done (each source is not associated with a parallax)
+    _add_separation(result, c1)
+
+    # Prepare the data source for plotting
+    # Convert to pixel coordinates
+    result_px_coords = tpf.wcs.all_world2pix(result["RA"], result["DEC"], 0)
+
+    # Gently size the points by their magnitude
+    sizes = 64.0 / 2 ** (result["magForSize"] / 5.0)
+    source = dict(
+        ra=result["RA"],
+        dec=result["DEC"],
+        x=result_px_coords[0] + tpf.column,
+        y=result_px_coords[1] + tpf.row,
+        separation=result["Separation"],
+        size=sizes,
+    )
+    ztf.add_to_data_source(result, source)
+    # Convert astropy column to plain ndarray, otherwise some columns (MaskedColumn of type int)
+    # could raise error during bokeh's serialization:
+    # ValueError: cannot convert float NaN to integer
+    # ...
+    # numpy.ma TypeError: Cannot convert fill_value nan to dtype int64
+    # the conversion could lead to some issues if certain values are genuinely missing
+    for c in source.keys():
+        val = source[c]
+        if isinstance(val, Column):
+            source[c] = np.asarray(val)
+
+    source = ColumnDataSource(source)
+
+    # TODO: plot them, along with a hover pop-in
+    r = fig.scatter(
+        "x",
+        "y",
+        source=source,
+        fill_alpha=0.3,
+        size="size",
+        line_color=None,
+        marker="diamond",  # OPEN: control it?
+        selection_color="green",  # OPEN: control the color
+        nonselection_fill_alpha=0.3,
+        nonselection_line_color=None,
+        nonselection_line_alpha=1.0,
+        fill_color="green",
+        hover_fill_color="green",
+        hover_alpha=0.9,
+        hover_line_color="white",
+    )
+
+    fig.add_tools(
+        HoverTool(
+            tooltips=ztf.get_tooltips(),
+            renderers=[r],
+            mode="mouse",
+            point_policy="snap_to_data",
+        )
+    )
+    # TODO: render the detail table on click
+
+    return result, source  # temporary
+
+
 def to_selected_pixels_source(tpf_source):
     xx = tpf_source.data["xx"].flatten()
     yy = tpf_source.data["yy"].flatten()
@@ -1309,7 +1408,7 @@ def show_interact_widget(
 
 
 
-def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitude_limit=18):
+def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", providers=["gaia_plus"], magnitude_limit=18):
     """skyview
 
     Parameters
@@ -1368,6 +1467,15 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitud
             height=600,
             tools="tap,box_zoom,wheel_zoom,reset"
         )
+        if "ztf" in providers:
+            add_ztf_figure_elements(
+                tpf, fig_tpf, magnitude_limit=magnitude_limit
+            )
+        # plot GAIA+ at the end so that if there are multiple tooltips showing up on hover,
+        # the one from GAIA+ will be at the front
+        # TODO: make gaia optional.
+        # Some generic work needs to be moved out, e.g., the `message_selected_target` Div
+        # plotting of the target (as cross), etc.
         fig_tpf, r, message_selected_target = add_gaia_figure_elements(
             tpf, fig_tpf, magnitude_limit=magnitude_limit
         )
