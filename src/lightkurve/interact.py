@@ -777,7 +777,7 @@ def _add_separation(result: Table, target_coord: SkyCoord):
     result["Separation"].unit = u.arcsec
 
 
-def add_ztf_figure_elements(tpf, fig, magnitude_limit=18, query_kwargs=None):
+def add_ztf_figure_elements(tpf, fig, message_selected_target, magnitude_limit=18, query_kwargs=None):
     from . import interact_sky_provider_ztf as ztf
 
     try:
@@ -835,7 +835,11 @@ def add_ztf_figure_elements(tpf, fig, magnitude_limit=18, query_kwargs=None):
 
     source = ColumnDataSource(source)
 
-    # TODO: plot them, along with a hover pop-in
+    #
+    # Do the actual UI work
+    #
+
+    # 1. plot the data, along with a hover pop-in
     r = fig.scatter(
         "x",
         "y",
@@ -843,13 +847,13 @@ def add_ztf_figure_elements(tpf, fig, magnitude_limit=18, query_kwargs=None):
         fill_alpha=0.3,
         size="size",
         line_color=None,
-        marker="diamond",  # OPEN: control it?
-        selection_color="green",  # OPEN: control the color
+        marker="square",  # OPEN: control it?
+        selection_color="pink",  # OPEN: control the color
         nonselection_fill_alpha=0.3,
         nonselection_line_color=None,
         nonselection_line_alpha=1.0,
-        fill_color="green",
-        hover_fill_color="green",
+        fill_color="pink",
+        hover_fill_color="pink",
         hover_alpha=0.9,
         hover_line_color="white",
     )
@@ -862,9 +866,43 @@ def add_ztf_figure_elements(tpf, fig, magnitude_limit=18, query_kwargs=None):
             point_policy="snap_to_data",
         )
     )
-    # TODO: render the detail table on click
 
-    return result, source  # temporary
+    # 2. render the detail table on click
+    def row_to_dict(idx):
+        # convert a target at index idx in the column data source to a dict
+        return {k: source.data[k][idx] for k in source.data}
+
+    def show_target_info(attr, old, new):
+        # the following is essentially redoing the bokeh tooltip template above in plain HTML
+        # with some slight tweak, mainly to add some helpful links.
+        if len(new) > 0:
+            # print("DBG", new[0], ": ", row_to_dict(new[0]))
+            msg = """
+<style type="text/css">
+    .target_details .error {
+        font-size: 80%;
+        font-color: gray;
+        margin-left: 1ch;
+    }
+    .target_details .error:before {
+        content: "± ";
+    }
+</style>
+Selected:<br>
+<table class="target_details">
+"""
+            for idx in new:
+                details = ztf.get_detail_view(row_to_dict(idx))
+                for header, val_html in details.items():
+                    msg += f"<tr><td>{header}</td><td>{val_html}</td>"
+                msg += '<tr><td colspan="2">&nbsp;</td></tr>'  # space between multiple targets
+            msg += "\n<table>"
+            message_selected_target.text = msg
+        # else do nothing (not clearing the widget) for now.
+
+    source.selected.on_change("indices", show_target_info)
+
+    # 3. TODO: show arrow of the selected target, requires the arrow construct to be supplied to the function
 
 
 def to_selected_pixels_source(tpf_source):
@@ -1467,18 +1505,20 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", providers
             height=600,
             tools="tap,box_zoom,wheel_zoom,reset"
         )
-        if "ztf" in providers:
-            add_ztf_figure_elements(
-                tpf, fig_tpf, magnitude_limit=magnitude_limit
-            )
-        # plot GAIA+ at the end so that if there are multiple tooltips showing up on hover,
-        # the one from GAIA+ will be at the front
         # TODO: make gaia optional.
         # Some generic work needs to be moved out, e.g., the `message_selected_target` Div
         # plotting of the target (as cross), etc.
         fig_tpf, r, message_selected_target = add_gaia_figure_elements(
             tpf, fig_tpf, magnitude_limit=magnitude_limit
         )
+        # TODO: plot GAIA+ at the end so that if there are multiple tooltips showing up on hover,
+        # the one from GAIA+ will be at the front.
+        # It requires message_selected_target be constructed here instead of add_gaia_figure_elements
+
+        if "ztf" in providers:
+            add_ztf_figure_elements(
+                tpf, fig_tpf, message_selected_target, magnitude_limit=magnitude_limit
+            )
 
         # Optionally override the default title
         if tpf.mission == "K2":
