@@ -7,6 +7,16 @@ from astropy.table import Table
 
 from astroquery.ipac.irsa import Irsa
 
+import numpy as np
+
+
+def _to_lc_url(oid, data_release, format):
+    # see: https://irsa.ipac.caltech.edu/docs/program_interface/ztf_lightcurve_api.html
+    if isinstance(oid, (int, np.int64, str)):
+        return f"https://irsa.ipac.caltech.edu/cgi-bin/ZTF/nph_light_curves?ID={oid}&COLLECTION=ztf_dr{data_release}&FORMAT={format}"
+    else:
+        return [_to_lc_url(a_oid, data_release, format) for a_oid in oid]
+
 
 def query_catalog(
     coord: SkyCoord,
@@ -32,9 +42,8 @@ def query_catalog(
     if filtercode is not None:
         rs = rs[rs["filtercode"] == filtercode]
 
-    # TODO: add URL to the data, e.g.,
-    # f"https://irsa.ipac.caltech.edu/cgi-bin/ZTF/nph_light_curves?ID={ztf_oid}&BAD_CATFLAGS_MASK=32768&COLLECTION=ztf_dr20&FORMAT=ascii"
-    # see: https://irsa.ipac.caltech.edu/docs/program_interface/ztf_lightcurve_api.html
+    # add URL of the lightcurve data (use csv format)
+    rs["url"] = _to_lc_url(rs["oid"], data_release, "csv")
 
     # use standardized names for the required columns (across different catalogs)
     #
@@ -55,7 +64,8 @@ def add_to_data_source(result: Table, source: dict):
         "ngoodobsrel",   # num. of good observations in the release
         "refmag", "refmagerr", "medianmag", "medmagerr", "maxmag", "minmag",
         "astrometricrms",  # Root Mean Squared deviation in epochal positions relative to object RA,Dec
-        ]:
+        "url",
+    ]:
         more_data[col] = result[col]
     source.update(more_data)
 
@@ -72,3 +82,21 @@ def get_tooltips() -> list:
         ("column", "@x{0.0}"),
         ("row", "@y{0.0}"),
         ]
+
+
+def get_detail_view(data: dict) -> dict:
+    return {
+        "ZTF OID": f"""{data['oid']} (<a href="{data['url']}" target="_blank">LC</a>)""",
+        'Separation (")': f"{data['separation']:.2f}",
+        "filter": data['filtercode'],
+        "num. good obs.": data['ngoodobsrel'],
+        "Reference Mag": f"{data['refmag']:.3f} <span class='error'>{data['refmagerr']:.3f}<span>",
+        "Median Mag": f"{data['medianmag']:.3f} <span class='error'>{data['medmagerr']:.3f}<span>",
+        "Max Mag": f"{data['maxmag']:.3f}",
+        "Min Mag": f"{data['minmag']:.3f}",
+        "RA": f"{data['ra']:.8f}",
+        "DEC": f"{data['dec']:.8f}",
+        'astrometric RMS (")': f"{data['astrometricrms'] * 3600:.4f}",
+        "column": f"{data['x']:.1f}",
+        "row": f"{data['y']:.1f}",
+    }
