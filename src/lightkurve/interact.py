@@ -777,8 +777,12 @@ def _add_separation(result: Table, target_coord: SkyCoord):
     result["Separation"].unit = u.arcsec
 
 
-def add_ztf_figure_elements(tpf, fig, message_selected_target, magnitude_limit=18, query_kwargs=None):
-    from . import interact_sky_provider_ztf as ztf
+def init_provider(provider, tpf, magnitude_limit, extra_kwargs=None):
+    """Supplying the given provider all the parameters needed (for query, plotting, etc)."""
+    if extra_kwargs is None:
+        extra_kwargs = {}
+
+    provider_kwargs = extra_kwargs.copy()
 
     try:
         ra, dec, pm_corrected = _get_corrected_coordinate(tpf)
@@ -790,22 +794,29 @@ def add_ztf_figure_elements(tpf, fig, message_selected_target, magnitude_limit=1
                f"ra: {getattr(tpf, 'ra', None)}, dec: {getattr(tpf, 'dec', None)}")
         raise LightkurveError(msg) from err
 
-    # Use pixel scale for query size
-    pix_scale = 4.0  # arcseconds / pixel for Kepler, default
-    if tpf.mission == "TESS":
-        pix_scale = 21.0
-    # We are querying with a diameter as the radius, overfilling by 2x.
-    radius = Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec")
-    # OPEN: consider to use a smaller radius, or let users override it
-    # ZTF archive use case is usually for identifying contaminating variable source,
-    # so usually a smaller radius would be sufficient
+    provider_kwargs["coord"] = c1
 
-    if query_kwargs is None:
-        query_kwargs = {}
-    result = ztf.query_catalog(c1, radius, magnitude_limit=magnitude_limit, **query_kwargs)
+    if provider_kwargs.get("radius") is None:
+        # use the default search radius, scaled to the TargePixelFile size
+
+        # Use pixel scale for query size
+        pix_scale = 4.0  # arcseconds / pixel for Kepler, default
+        if tpf.mission == "TESS":
+            pix_scale = 21.0
+        # We are querying with a diameter as the radius, overfilling by 2x.
+        provider_kwargs["radius"] = Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec")
+
+    provider_kwargs["magnitude_limit"] = magnitude_limit
+
+    provider.init(**provider_kwargs)
+    return provider
+
+
+def add_catalog_figure_elements(provider, tpf, fig, message_selected_target):
+    result = provider.query_catalog()
 
     # Note: no proper motion correction can be done (each source is not associated with a parallax)
-    _add_separation(result, c1)
+    _add_separation(result, provider.coord)
 
     # Prepare the data source for plotting
     # Convert to pixel coordinates
@@ -821,7 +832,7 @@ def add_ztf_figure_elements(tpf, fig, message_selected_target, magnitude_limit=1
         separation=result["Separation"],
         size=sizes,
     )
-    ztf.add_to_data_source(result, source)
+    provider.add_to_data_source(result, source)
     # Convert astropy column to plain ndarray, otherwise some columns (MaskedColumn of type int)
     # could raise error during bokeh's serialization:
     # ValueError: cannot convert float NaN to integer
@@ -844,23 +855,13 @@ def add_ztf_figure_elements(tpf, fig, message_selected_target, magnitude_limit=1
         "x",
         "y",
         source=source,
-        fill_alpha=0.3,
         size="size",
-        line_color=None,
-        marker="square",  # OPEN: control it?
-        selection_color="pink",  # OPEN: control the color
-        nonselection_fill_alpha=0.3,
-        nonselection_line_color=None,
-        nonselection_line_alpha=1.0,
-        fill_color="pink",
-        hover_fill_color="pink",
-        hover_alpha=0.9,
-        hover_line_color="white",
+        **provider.scatter_kwargs
     )
 
     fig.add_tools(
         HoverTool(
-            tooltips=ztf.get_tooltips(),
+            tooltips=provider.get_tooltips(),
             renderers=[r],
             mode="mouse",
             point_policy="snap_to_data",
@@ -876,7 +877,6 @@ def add_ztf_figure_elements(tpf, fig, message_selected_target, magnitude_limit=1
         # the following is essentially redoing the bokeh tooltip template above in plain HTML
         # with some slight tweak, mainly to add some helpful links.
         if len(new) > 0:
-            # print("DBG", new[0], ": ", row_to_dict(new[0]))
             msg = """
 <style type="text/css">
     .target_details .error {
@@ -892,7 +892,7 @@ Selected:<br>
 <table class="target_details">
 """
             for idx in new:
-                details = ztf.get_detail_view(row_to_dict(idx))
+                details = provider.get_detail_view(row_to_dict(idx))
                 for header, val_html in details.items():
                     msg += f"<tr><td>{header}</td><td>{val_html}</td>"
                 msg += '<tr><td colspan="2">&nbsp;</td></tr>'  # space between multiple targets
@@ -1516,9 +1516,12 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", providers
         # It requires message_selected_target be constructed here instead of add_gaia_figure_elements
 
         if "ztf" in providers:
-            add_ztf_figure_elements(
-                tpf, fig_tpf, message_selected_target, magnitude_limit=magnitude_limit
-            )
+            from . import interact_sky_provider_ztf as ztf
+            provider = ztf.ZTFInteractSkyCatalogProvider()
+            # pass all the parameters for query, plotting, etc. to the provider
+            # TODO: let users supply extra kwargs for customization
+            provider = init_provider(provider, tpf, magnitude_limit, extra_kwargs=None)
+            add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target)
 
         # Optionally override the default title
         if tpf.mission == "K2":
