@@ -777,6 +777,21 @@ def _add_separation(result: Table, target_coord: SkyCoord):
     result["Separation"].unit = u.arcsec
 
 
+def add_target_figure_elements(tpf, fig):
+    # mark the target's position
+    target_ra, target_dec, pm_corrected = _get_corrected_coordinate(tpf)
+    target_x, target_y = None, None
+    if target_ra is not None and target_dec is not None:
+        pix_x, pix_y = tpf.wcs.all_world2pix([(target_ra, target_dec)], 0)[0]
+        target_x, target_y = tpf.column + pix_x, tpf.row + pix_y
+        fig.scatter(marker="cross", x=target_x, y=target_y, size=20, color="black", line_width=1)
+        if not pm_corrected:
+            warnings.warn(("Proper motion correction cannot be applied to the target, as none is available. "
+                           "Thus the target (the cross) might be noticeably away from its actual position, "
+                           "if it has large proper motion."),
+                           category=LightkurveWarning)
+
+
 def init_provider(provider, tpf, magnitude_limit, extra_kwargs=None):
     """Supplying the given provider all the parameters needed (for query, plotting, etc)."""
     if extra_kwargs is None:
@@ -812,10 +827,22 @@ def init_provider(provider, tpf, magnitude_limit, extra_kwargs=None):
     return provider
 
 
-def add_catalog_figure_elements(provider, tpf, fig, message_selected_target):
-    result = provider.query_catalog()
+def add_catalog_figure_elements(provider, tpf, fig, message_selected_target, arrow_4_selected):
 
-    # Note: no proper motion correction can be done (each source is not associated with a parallax)
+    result = provider.query_catalog()
+    # do proper motion correction, if needed
+    m = provider.get_proper_motion_correction_meta()
+    if m is not None:
+        ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
+            result[m.ra_colname].quantity, result[m.dec_colname].quantity,
+            result[m.pmra_colname].quantity, result[m.pmdec_colname].quantity,
+            m.equinox,
+            tpf.time[0])
+        result["RA"] = ra_corrected.to(u.deg).value
+        result["RA"].unit = u.deg
+        result["DEC"] = dec_corrected.to(u.deg).value
+        result["DEC"].unit = u.deg
+
     _add_separation(result, provider.coord)
 
     # Prepare the data source for plotting
@@ -838,11 +865,11 @@ def add_catalog_figure_elements(provider, tpf, fig, message_selected_target):
     # ValueError: cannot convert float NaN to integer
     # ...
     # numpy.ma TypeError: Cannot convert fill_value nan to dtype int64
-    # the conversion could lead to some issues if certain values are genuinely missing
+    # TODO: the conversion could lead to some issues if certain values are genuinely missing
     for c in source.keys():
         val = source[c]
         if isinstance(val, Column):
-            source[c] = np.asarray(val)
+            source[c] = np.asarray(val, val.dtype)
 
     source = ColumnDataSource(source)
 
@@ -892,9 +919,12 @@ Selected:<br>
 <table class="target_details">
 """
             for idx in new:
-                details = provider.get_detail_view(row_to_dict(idx))
+                details, extra_rows = provider.get_detail_view(row_to_dict(idx))
                 for header, val_html in details.items():
                     msg += f"<tr><td>{header}</td><td>{val_html}</td>"
+                if extra_rows is not None:
+                    for row_html in extra_rows:
+                        msg += f'<tr><td colspan="2">{row_html}</td></tr>'
                 msg += '<tr><td colspan="2">&nbsp;</td></tr>'  # space between multiple targets
             msg += "\n<table>"
             message_selected_target.text = msg
@@ -902,7 +932,49 @@ Selected:<br>
 
     source.selected.on_change("indices", show_target_info)
 
-    # 3. TODO: show arrow of the selected target, requires the arrow construct to be supplied to the function
+    # 3. show arrow of the selected target, requires the arrow construct to be supplied to the function
+    # display an arrow on the selected target
+    def show_arrow_at_target(attr, old, new):
+        if len(new) > 0:
+            x, y = source.data["x"][new[0]], source.data["y"][new[0]]
+
+            # place the arrow near (x,y), taking care of boundary cases (at the edge of the plot)
+            x_midpoint = fig.x_range.start + (fig.x_range.end - fig.x_range.start) / 2
+            if x < fig.x_range.start + 1:
+                # boundary case: the point is at the left edge of the plot
+                arrow_4_selected.x_start = x + 0.85
+                arrow_4_selected.x_end = x + 0.2
+            elif x > fig.x_range.end - 1:
+                # boundary case: the point is at the right edge of the plot
+                arrow_4_selected.x_start = x - 0.85
+                arrow_4_selected.x_end = x - 0.2
+            elif x < x_midpoint:
+                # normal case 1 : point is at the left side of the plot
+                arrow_4_selected.x_start = x - 0.85
+                arrow_4_selected.x_end = x - 0.2
+            else:
+                # normal case 2 : point is at the right side of the plot
+                # flip arrow's direction
+                arrow_4_selected.x_start = x + 0.85
+                arrow_4_selected.x_end = x + 0.2
+
+            if y > fig.y_range.end - 0.5:
+                # boundary case: the point is at near the top of the plot
+                arrow_4_selected.y_start = y - 0.4
+                arrow_4_selected.y_end = y - 0.1
+            elif y < fig.y_range.start + 0.5:
+                # boundary case: the point is at near the top of the plot
+                arrow_4_selected.y_start = y + 0.4
+                arrow_4_selected.y_end = y + 0.1
+            else:  # normal case
+                arrow_4_selected.y_start = y
+                arrow_4_selected.y_end = y
+
+            arrow_4_selected.visible = True
+        else:
+            arrow_4_selected.visible = False
+
+    source.selected.on_change("indices", show_arrow_at_target)
 
 
 def to_selected_pixels_source(tpf_source):
@@ -1445,8 +1517,19 @@ def show_interact_widget(
     return show(create_interact_ui, notebook_url=notebook_url)
 
 
+def _create_provider(name):
+    if name == "gaiadr3":
+        from . import interact_sky_provider_gaia_tic as gaia_t
+        return gaia_t.GaiaDR3InteractSkyCatalogProvider()  # TODO:
+    elif name == "gaiadr3_tic":
+        from . import interact_sky_provider_gaia_tic as gaia_t
+        return gaia_t.GaiaDR3InteractSkyCatalogProvider()
+    elif name == "ztf":
+        from . import interact_sky_provider_ztf as ztf
+        return ztf.ZTFInteractSkyCatalogProvider()
 
-def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", providers=["gaia_plus"], magnitude_limit=18):
+
+def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", providers=["gaiadr3_tic"], magnitude_limit=18):
     """skyview
 
     Parameters
@@ -1490,6 +1573,7 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", providers
         fiducial_frame = 0
 
     aperture_mask = tpf._parse_aperture_mask(aperture_mask)
+
     def create_interact_ui(doc):
         tpf_source = prepare_tpf_datasource(tpf, aperture_mask)
 
@@ -1505,23 +1589,30 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", providers
             height=600,
             tools="tap,box_zoom,wheel_zoom,reset"
         )
-        # TODO: make gaia optional.
-        # Some generic work needs to be moved out, e.g., the `message_selected_target` Div
-        # plotting of the target (as cross), etc.
-        fig_tpf, r, message_selected_target = add_gaia_figure_elements(
-            tpf, fig_tpf, magnitude_limit=magnitude_limit
-        )
-        # TODO: plot GAIA+ at the end so that if there are multiple tooltips showing up on hover,
-        # the one from GAIA+ will be at the front.
-        # It requires message_selected_target be constructed here instead of add_gaia_figure_elements
 
-        if "ztf" in providers:
-            from . import interact_sky_provider_ztf as ztf
-            provider = ztf.ZTFInteractSkyCatalogProvider()
+        # Add a marker (cross) to indicate the coordinate of the target
+        add_target_figure_elements(tpf, fig_tpf)
+
+        # a widget that displays some of the selected star's metadata
+        # so that they can be copied (e.g., GAIA ID).
+        # Generally the content is a more detailed version of the on-hover tooltip.
+        message_selected_target = Div(text="")
+
+        # an arrow that serves as the marker of the selected star.
+        arrow_4_selected = Arrow(
+            end=VeeHead(size=16, fill_color="red", line_color="black"),
+            line_color="red", line_width=4,
+            x_start=0, y_start=0, x_end=0, y_end=0, tags=["selected"],
+            visible=False,
+        )
+        fig_tpf.add_layout(arrow_4_selected)
+
+        for provider in providers:
+            provider = _create_provider(provider)
             # pass all the parameters for query, plotting, etc. to the provider
             # TODO: let users supply extra kwargs for customization
             provider = init_provider(provider, tpf, magnitude_limit, extra_kwargs=None)
-            add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target)
+            add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
 
         # Optionally override the default title
         if tpf.mission == "K2":
