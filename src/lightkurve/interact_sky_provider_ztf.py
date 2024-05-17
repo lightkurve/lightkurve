@@ -89,9 +89,6 @@ class ZTFInteractSkyCatalogProvider:
         if self.filtercode is not None:
             rs = rs[rs["filtercode"] == self.filtercode]
 
-        # add URL of the lightcurve data (use csv format)
-        rs["url"] = _to_lc_url(rs["oid"], self.data_release, self.lc_format)
-
         # use standardized names for the required columns (across different catalogs)
         #
         # RA / DEC : coordinate in degree, proper motion corrected if possible
@@ -119,7 +116,6 @@ class ZTFInteractSkyCatalogProvider:
             "maxmag",
             "minmag",
             "astrometricrms",  # Root Mean Squared deviation in epochal positions relative to object RA,Dec
-            "url",
         ]:
             more_data[col] = result[col]
         source.update(more_data)
@@ -138,8 +134,9 @@ class ZTFInteractSkyCatalogProvider:
         ]
 
     def get_detail_view(self, data: dict) -> dict:
+        ztf_url = _to_lc_url(data['oid'], self.data_release, self.lc_format)
         return {
-            "ZTF OID": f"""{data['oid']} (<a href="{data['url']}" target="_blank">LC</a>)""",
+            "ZTF OID": f"""{data['oid']} (<a href="{ztf_url}" target="_blank">LC</a>)""",
             'Separation (")': f"{data['separation']:.2f}",
             "filter": data["filtercode"],
             "num. good obs.": data["ngoodobsrel"],
