@@ -9,6 +9,8 @@ from astroquery.ipac.irsa import Irsa
 
 import numpy as np
 
+from .interact_sky_provider import ProperMotionCorrectionMeta
+
 
 def _to_lc_url(oid, data_release, format):
     # see: https://irsa.ipac.caltech.edu/docs/program_interface/ztf_lightcurve_api.html
@@ -100,6 +102,10 @@ class ZTFInteractSkyCatalogProvider:
 
         return rs
 
+    def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
+        # No PM correction can be done, as PM is not available in ZTF
+        return None
+
     def add_to_data_source(self, result: Table, source: dict):
         more_data = dict()
         for col in [  # the additional columns to be included in the data source
@@ -146,4 +152,4 @@ class ZTFInteractSkyCatalogProvider:
             'astrometric RMS (")': f"{data['astrometricrms'] * 3600:.4f}",
             "column": f"{data['x']:.1f}",
             "row": f"{data['y']:.1f}",
-        }
+        }, None
