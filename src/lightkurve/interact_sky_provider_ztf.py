@@ -83,6 +83,16 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
             )
 
     def query_catalog(self) -> Table:
+        # Optimization: ZTF coverage is about north of -30deg dec.
+        # So skip query IRSA if the target is way too south and return an empty result table
+        #
+        # https://irsa.ipac.caltech.edu/data/ZTF/docs/releases/ztf_release_notes_latest
+        if self.coord.dec < -35 * u.deg:
+            empty_data = dict(RA=[], DEC=[], magForSize=[])
+            for c in self.extra_cols_for_source:
+                empty_data[c] = []
+            return Table(data=empty_data)
+
         catalog = f"ztf_objects_dr{self.data_release}"
         # OPEN: consider memoize the result, as astroquery v0.47 does not support caching for Irsa
         rs = Irsa.query_region(coordinates=self.coord, catalog=catalog, spatial="Cone", radius=self.radius)
