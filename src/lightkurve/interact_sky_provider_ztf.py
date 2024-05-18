@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Tuple, Union
 
 import astropy.units as u
 
@@ -9,7 +9,7 @@ from astroquery.ipac.irsa import Irsa
 
 import numpy as np
 
-from .interact_sky_provider import ProperMotionCorrectionMeta
+from .interact_sky_provider import ProperMotionCorrectionMeta, InteractSkyCatalogProvider
 
 
 def _to_lc_url(oid, data_release, format):
@@ -21,12 +21,7 @@ def _to_lc_url(oid, data_release, format):
         return [_to_lc_url(a_oid, data_release, format) for a_oid in oid]
 
 
-class ZTFInteractSkyCatalogProvider:
-
-    # query: generic
-    coord: SkyCoord
-    radius: Union[float, u.Quantity]
-    magnitude_limit: float
+class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
     # query: ZTF-specific
     ngoodobsrel_min: int
     filtercode: str
@@ -34,8 +29,19 @@ class ZTFInteractSkyCatalogProvider:
     # for ZTF LC URL
     lc_format: str
     # OPEN: support BAD_CATFLAGS_MASK parameter in the ZTF LC URL
-    # for plotting
-    scatter_kwargs: dict
+
+    extra_cols_for_source = [  # extra columns to be included in bokeh data source
+        "oid",
+        "filtercode",
+        "ngoodobsrel",  # num. of good observations in the release
+        "refmag",
+        "refmagerr",
+        "medianmag",
+        "medmagerr",
+        "maxmag",
+        "minmag",
+        "astrometricrms",  # Root Mean Squared deviation in epochal positions relative to object RA,Dec
+    ]
 
     def init(
         self,
@@ -103,23 +109,6 @@ class ZTFInteractSkyCatalogProvider:
         # No PM correction can be done, as PM is not available in ZTF
         return None
 
-    def add_to_data_source(self, result: Table, source: dict):
-        more_data = dict()
-        for col in [  # the additional columns to be included in the data source
-            "oid",
-            "filtercode",
-            "ngoodobsrel",  # num. of good observations in the release
-            "refmag",
-            "refmagerr",
-            "medianmag",
-            "medmagerr",
-            "maxmag",
-            "minmag",
-            "astrometricrms",  # Root Mean Squared deviation in epochal positions relative to object RA,Dec
-        ]:
-            more_data[col] = result[col]
-        source.update(more_data)
-
     def get_tooltips(self) -> list:
         return [
             ("ZTF oid", "@oid"),
@@ -133,8 +122,8 @@ class ZTFInteractSkyCatalogProvider:
             ("row", "@y{0.0}"),
         ]
 
-    def get_detail_view(self, data: dict) -> dict:
-        ztf_url = _to_lc_url(data['oid'], self.data_release, self.lc_format)
+    def get_detail_view(self, data: dict) -> Tuple[dict, list]:
+        ztf_url = _to_lc_url(data["oid"], self.data_release, self.lc_format)
         return {
             "ZTF OID": f"""{data['oid']} (<a href="{ztf_url}" target="_blank">LC</a>)""",
             'Separation (")': f"{data['separation']:.2f}",

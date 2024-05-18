@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Tuple, Union
 import warnings
 
 import astropy.units as u
@@ -9,53 +9,14 @@ from astropy.time import Time
 
 from astroquery.vizier import Vizier
 
-import numpy as np
-
-from .interact_sky_provider import ProperMotionCorrectionMeta
+from .interact_sky_provider import ProperMotionCorrectionMeta, InteractSkyCatalogProvider
 
 
-class GaiaDR3InteractSkyCatalogProvider:
-
-    # query: generic
-    coord: SkyCoord
-    radius: Union[float, u.Quantity]
-    magnitude_limit: float
-    # for plotting
-    scatter_kwargs: dict
-
-    # Vizier-specific
-    catalog_name = "I/355/gaiadr3"
-    columns = ["*", "RAJ2000", "DEJ2000"]
-    magnitude_limit_column_name = "Gmag"
-
-    J2000 = Time(2000, format="jyear", scale="tt")
-
-    def init(
-        self,
-        coord: SkyCoord,
-        radius: Union[float, u.Quantity],
-        magnitude_limit: float,
-        scatter_kwargs: dict = None,
-    ) -> None:
-        self.coord = coord
-        self.radius = radius
-        self.magnitude_limit = magnitude_limit
-        if scatter_kwargs is not None:
-            self.scatter_kwargs = scatter_kwargs
-        else:
-            self.scatter_kwargs = dict(
-                marker="circle",
-                fill_alpha=0.3,
-                line_color=None,
-                selection_color="firebrick",
-                nonselection_fill_alpha=0.3,
-                nonselection_line_color=None,
-                nonselection_line_alpha=1.0,
-                fill_color="firebrick",
-                hover_fill_color="firebrick",
-                hover_alpha=0.9,
-                hover_line_color="white",
-            )
+class VizierInteractSkyCatalogProvider(InteractSkyCatalogProvider):
+    # Vizier-specific query
+    catalog_name = None
+    columns = ["*"]
+    magnitude_limit_column_name = None
 
     def query_catalog(self) -> Table:
         with warnings.catch_warnings():
@@ -77,36 +38,65 @@ class GaiaDR3InteractSkyCatalogProvider:
         elif len(result) == 0:
             raise too_few_found_message
         result = result[self.catalog_name]
-        result = result[result[self.magnitude_limit_column_name] < self.magnitude_limit]
+        if self.magnitude_limit_column_name is not None:
+            result = result[result[self.magnitude_limit_column_name] < self.magnitude_limit]
         if len(result) == 0:
             raise no_targets_found_message
 
         # to be used as the basis for sizing the dots in plots
-        result["magForSize"] = result[self.magnitude_limit_column_name]
+        if self.magnitude_limit_column_name is not None:
+            result["magForSize"] = result[self.magnitude_limit_column_name]
 
         return result
+
+
+class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
+
+    # Gaia DR3 Vizier specific
+    catalog_name = "I/355/gaiadr3"
+    columns = ["*", "RAJ2000", "DEJ2000"]
+    magnitude_limit_column_name = "Gmag"
+
+    J2000 = Time(2000, format="jyear", scale="tt")
+
+    extra_cols_for_source = [
+        "Source",
+        "Gmag",
+        "Plx",
+    ]
+
+    # Gaia columns that could have large integers
+    extra_cols_as_str_for_source = ["Source", "SolID"]
+
+    def init(
+        self,
+        coord: SkyCoord,
+        radius: Union[float, u.Quantity],
+        magnitude_limit: float,
+        scatter_kwargs: dict = None,
+    ) -> None:
+        if scatter_kwargs is None:
+            scatter_kwargs = dict(
+                marker="circle",
+                fill_alpha=0.3,
+                line_color=None,
+                selection_color="firebrick",
+                nonselection_fill_alpha=0.3,
+                nonselection_line_color=None,
+                nonselection_line_alpha=1.0,
+                fill_color="firebrick",
+                hover_fill_color="firebrick",
+                hover_alpha=0.9,
+                hover_line_color="white",
+            )
+        super().init(coord, radius, magnitude_limit, scatter_kwargs)
 
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
         return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", self.J2000)
 
-    def add_to_data_source(self, result: Table, source: dict):
-        more_data = dict()
-        for col in [  # the additional columns to be included in the data source
-            "Source",
-            "Gmag",
-            "Plx",
-            # TODO:
-        ]:
-            # bokeh ColumnDataSource-specific workaround
-            # convert column with large integers to string, to avoid
-            # BokehUserWarning: out of range integer may result in loss of precision
-            # TODO: make it more generic, and explain why we do not do it for all np.int64 type columns
-            col_val = result[col]
-            if col in ["Source"]:
-                col_val = col_val.astype(str)
-            more_data[col] = col_val
-        more_data["one_over_plx"] = 1.0 / (result["Plx"] / 1000.0)
-        source.update(more_data)
+    def add_to_data_source(self, result: Table, source: dict) -> None:
+        super().add_to_data_source(result, source)
+        source["one_over_plx"] = 1.0 / (result["Plx"] / 1000.0)
 
     def get_tooltips(self) -> list:
         return [
@@ -120,7 +110,7 @@ class GaiaDR3InteractSkyCatalogProvider:
             ("row", "@y{0.0}"),
         ]
 
-    def get_detail_view(self, data: dict) -> dict:
+    def get_detail_view(self, data: dict) -> Tuple[dict, list]:
         # the vizier URL returns both Gaia DR3 Main and Gaia DR3 Astrophysical parameters table for convenience
         vizier_url = (
             "https://vizier.cds.unistra.fr/viz-bin/VizieR-4?-source=+I%2F355%2Fgaiadr3+I%2F355%2Fparamp"
