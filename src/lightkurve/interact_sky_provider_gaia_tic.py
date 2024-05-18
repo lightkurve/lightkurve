@@ -57,7 +57,9 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
     columns = ["*", "RAJ2000", "DEJ2000"]
     magnitude_limit_column_name = "Gmag"
 
-    J2000 = Time(2000, format="jyear", scale="tt")
+    # Gaia DR3 reference epoch: 2016.0,  time coordinate: barycentric coordinate time (TCB).
+    # https://www.cosmos.esa.int/web/gaia/dr3
+    J2016 = Time(2016.0, format="jyear", scale="tcb")
 
     extra_cols_for_source = [
         "Source",
@@ -92,7 +94,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         super().init(coord, radius, magnitude_limit, scatter_kwargs)
 
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
-        return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", self.J2000)
+        return ProperMotionCorrectionMeta("RA_ICRS", "DE_ICRS", "pmRA", "pmDE", self.J2016)
 
     def add_to_data_source(self, result: Table, source: dict) -> None:
         super().add_to_data_source(result, source)
