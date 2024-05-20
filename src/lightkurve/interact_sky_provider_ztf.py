@@ -29,6 +29,7 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
     # for ZTF LC URL
     lc_format: str
     # OPEN: support BAD_CATFLAGS_MASK parameter in the ZTF LC URL
+    label: str = "ZTF"
 
     extra_cols_for_source = [  # extra columns to be included in bokeh data source
         "oid",

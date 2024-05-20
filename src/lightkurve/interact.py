@@ -52,10 +52,11 @@ try:
         BasicTicker,
         Arrow,
         VeeHead,
+        InlineStyleSheet,
     )
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
-    from bokeh.models.widgets import Button, Div
+    from bokeh.models.widgets import Button, Div, CheckboxGroup
     from bokeh.models.formatters import PrintfTickFormatter
 except Exception as e:
     # We will print a nice error message in the `show_interact_widget` function
@@ -979,6 +980,7 @@ Selected:<br>
             arrow_4_selected.visible = False
 
     source.selected.on_change("indices", show_arrow_at_target)
+    return r
 
 
 def to_selected_pixels_source(tpf_source):
@@ -1619,12 +1621,16 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=
         )
         fig_tpf.add_layout(arrow_4_selected)
 
+        providers = []
+        catalog_renderers = []
         for provider in catalogs:
             provider = _create_catalog_provider(provider)
             # pass all the parameters for query, plotting, etc. to the provider
             # TODO: let users supply extra kwargs for customization
             provider = init_provider(provider, tpf, magnitude_limit, extra_kwargs=None)
-            add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
+            renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
+            providers.append(provider)
+            catalog_renderers.append(renderer)
 
         # Optionally override the default title
         if tpf.mission == "K2":
@@ -1645,7 +1651,32 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=
             )
 
         # Layout all of the plots
-        widgets_and_figures = layout([fig_tpf, message_selected_target], [stretch_slider])
+        if len(catalogs) < 2:
+            widgets_and_figures = layout([fig_tpf, message_selected_target], stretch_slider)
+        else:
+            select_catalog_ui = CheckboxGroup(
+                labels=[p.label for p in providers],
+                active=list(range(0, len(catalogs))),  # make all checked
+                inline=True,
+                )
+            # add more horizontal spacing between checkboxes
+            select_catalog_ui.stylesheets = [InlineStyleSheet(css="""\
+.bk-input-group.bk-inline > label {
+    margin: 5px 10px;
+}
+""")]
+
+            def select_catalog_handler(attr, old, new):
+                # new is the list of indices of active (i.e., checked) catalogs
+                for i in range(len(catalog_renderers)):
+                    r = catalog_renderers[i]
+                    if i in new:
+                        r.visible = True
+                    else:
+                        r.visible = False
+
+            select_catalog_ui.on_change("active", select_catalog_handler)
+            widgets_and_figures = layout([fig_tpf, message_selected_target], select_catalog_ui, stretch_slider)
         doc.add_root(widgets_and_figures)
 
     output_notebook(verbose=False, hide_banner=True)

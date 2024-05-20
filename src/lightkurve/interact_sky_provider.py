@@ -22,6 +22,7 @@ class InteractSkyCatalogProvider(ABC):
     scatter_kwargs: dict
     extra_cols_for_source = []  # extra columns to be included in bokeh data source
     extra_cols_as_str_for_source = []  # columns to be converted to string in bokeh data source
+    label: str = None
 
     def init(
         self,
