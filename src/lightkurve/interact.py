@@ -829,7 +829,6 @@ def init_provider(provider, tpf, magnitude_limit, extra_kwargs=None):
     provider_kwargs["magnitude_limit"] = magnitude_limit
 
     provider.init(**provider_kwargs)
-    return provider
 
 
 def add_catalog_figure_elements(provider, tpf, fig, message_selected_target, arrow_4_selected):
@@ -1623,11 +1622,18 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=
 
         providers = []
         catalog_renderers = []
-        for provider in catalogs:
-            provider = _create_catalog_provider(provider)
+        for catalog_spec in catalogs:
+            if isinstance(catalog_spec, (tuple, list)):
+                provider, extra_kwargs = catalog_spec
+            else:
+                provider, extra_kwargs = catalog_spec, None
+
+            if isinstance(provider, str):
+                provider = _create_catalog_provider(provider)
+            # else assume it's a InteractSkyCatalogProvider object
+
             # pass all the parameters for query, plotting, etc. to the provider
-            # TODO: let users supply extra kwargs for customization
-            provider = init_provider(provider, tpf, magnitude_limit, extra_kwargs=None)
+            init_provider(provider, tpf, magnitude_limit, extra_kwargs=extra_kwargs)
             renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
             providers.append(provider)
             catalog_renderers.append(renderer)

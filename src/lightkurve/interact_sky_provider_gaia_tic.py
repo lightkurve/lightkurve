@@ -74,6 +74,8 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         "Plx",
     ]
 
+    extra_cols_in_detail_view = None
+
     # Gaia columns that could have large integers
     extra_cols_as_str_for_source = ["Source", "SolID"]
 
@@ -83,6 +85,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         radius: Union[float, u.Quantity],
         magnitude_limit: float,
         scatter_kwargs: dict = None,
+        extra_cols_in_detail_view: dict = None,
     ) -> None:
         if scatter_kwargs is None:
             scatter_kwargs = dict(
@@ -99,6 +102,12 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
                 hover_line_color="white",
             )
         super().init(coord, radius, magnitude_limit, scatter_kwargs)
+        if extra_cols_in_detail_view is not None:
+            self.extra_cols_in_detail_view = extra_cols_in_detail_view
+            cols = extra_cols_in_detail_view.keys()
+            # include them in the query, and the data source
+            self.columns += cols
+            self.extra_cols_for_source += cols
 
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
         # Use RAJ200/ DEJ2000 instead of Gaia DR3's native RA_IRCS in J2016.0 for ease of
@@ -140,7 +149,8 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         else:
             source_val_html = ""
             extra_rows = []
-        return {
+
+        key_vals = {
             "Source": source_val_html,
             'Separation (")': f"{data['separation']:.2f}",
             "Gmag": f"{data['Gmag']:.3f}",
@@ -149,7 +159,13 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             "DEC": f"{data['dec']:.8f}",
             "column": f"{data['x']:.1f}",
             "row": f"{data['y']:.1f}",
-        }, extra_rows
+        }
+
+        if self.extra_cols_in_detail_view is not None:
+            for col, label in self.extra_cols_in_detail_view.items():
+                key_vals[label] = data.get(col)
+
+        return key_vals, extra_rows
 
 
 class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):

@@ -1408,7 +1408,8 @@ class TargetPixelFile(object):
         notebook_url = finalize_notebook_url(notebook_url)
 
         return show_skyview_widget(
-            self, notebook_url=notebook_url, aperture_mask=aperture_mask, catalogs=catalogs, magnitude_limit=magnitude_limit
+            self, notebook_url=notebook_url, aperture_mask=aperture_mask,
+            catalogs=catalogs, magnitude_limit=magnitude_limit
         )
 
     def to_corrector(self, method="pld", **kwargs):
