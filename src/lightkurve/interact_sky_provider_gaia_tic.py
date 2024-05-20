@@ -59,6 +59,8 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
     columns = ["*", "RAJ2000", "DEJ2000"]
     magnitude_limit_column_name = "Gmag"
 
+    label: str = "Gaia DR3"
+
     # Gaia DR3 reference epoch: 2016.0,  time coordinate: barycentric coordinate time (TCB).
     # https://www.cosmos.esa.int/web/gaia/dr3
     # J2016 = Time(2016.0, format="jyear", scale="tcb")
@@ -154,6 +156,8 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
     # OPEN: composition (with GaiaDR3InteractSkyCatalogProvider as a member, instead of inheriting it)
     # would be cleaner conceptually
 
+    label: str = "Gaia DR3 + TIC"
+
     tic_catalog_name = "IV/39/tic82"
 
     def __init__(self) -> None:
@@ -167,7 +171,8 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
             # suppress useless warning to workaround  https://github.com/astropy/astroquery/issues/2352
             # for Gaia
             warnings.filterwarnings(
-                "ignore", category=u.UnitsWarning, message="Unit 'Sun' not supported by the VOUnit standard")
+                "ignore", category=u.UnitsWarning, message="Unit 'Sun' not supported by the VOUnit standard"
+            )
             tic_rs = _query_cone_region(
                 self.coord,
                 self.radius,
