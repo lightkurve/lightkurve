@@ -106,12 +106,16 @@ def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
     c = SkyCoord(ra, dec, pm_ra_cosdec=pm_ra, pm_dec=pm_dec,
                 frame='icrs', obstime=equinox)
 
-    # Suppress ErfaWarning temporarily as a workaround for:
-    #   https://github.com/astropy/astropy/issues/11747
     with warnings.catch_warnings():
+        # Suppress ErfaWarning temporarily as a workaround for:
+        #   https://github.com/astropy/astropy/issues/11747
         # the same warning appears both as an ErfaWarning and a astropy warning
         # so we filter by the message instead
         warnings.filterwarnings("ignore", message="ERFA function")
+
+        # ignore RuntimeWarning: invalid value encountered in pmsafe
+        # as some rows could have missing PM
+        warnings.filterwarnings("ignore", message="invalid value encountered in pmsafe")
         new_c = c.apply_space_motion(new_obstime=new_time)
     return new_c.ra, new_c.dec, True
 
@@ -1517,19 +1521,21 @@ def show_interact_widget(
     return show(create_interact_ui, notebook_url=notebook_url)
 
 
-def _create_provider(name):
+def _create_catalog_provider(name):
     if name == "gaiadr3":
         from . import interact_sky_provider_gaia_tic as gaia_t
-        return gaia_t.GaiaDR3InteractSkyCatalogProvider()  # TODO:
+        return gaia_t.GaiaDR3InteractSkyCatalogProvider()
     elif name == "gaiadr3_tic":
         from . import interact_sky_provider_gaia_tic as gaia_t
-        return gaia_t.GaiaDR3InteractSkyCatalogProvider()
+        return gaia_t.GaiaDR3TICInteractSkyCatalogProvider()
     elif name == "ztf":
         from . import interact_sky_provider_ztf as ztf
         return ztf.ZTFInteractSkyCatalogProvider()
+    else:
+        raise ValueError(f"Unsupported catalog: {name}")
 
 
-def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", providers=["gaiadr3_tic"], magnitude_limit=18):
+def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=None, magnitude_limit=18):
     """skyview
 
     Parameters
@@ -1562,6 +1568,12 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", providers
         raise _BOKEH_IMPORT_ERROR
 
     notebook_url = finalize_notebook_url(notebook_url)
+
+    if catalogs is None:
+        if tpf.mission == "TESS":
+            catalogs = ["gaiadr3_tic"]
+        else:
+            catalogs = ["gaiadr3"]
 
     # Try to identify the "fiducial frame", for which the TPF WCS is exact
     zp = (tpf.pos_corr1 == 0) & (tpf.pos_corr2 == 0)
@@ -1607,8 +1619,8 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", providers
         )
         fig_tpf.add_layout(arrow_4_selected)
 
-        for provider in providers:
-            provider = _create_provider(provider)
+        for provider in catalogs:
+            provider = _create_catalog_provider(provider)
             # pass all the parameters for query, plotting, etc. to the provider
             # TODO: let users supply extra kwargs for customization
             provider = init_provider(provider, tpf, magnitude_limit, extra_kwargs=None)
