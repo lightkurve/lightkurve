@@ -22,7 +22,7 @@ import numpy as np
 from astropy.coordinates import SkyCoord, Angle
 from astropy.io import ascii
 from astropy.stats import sigma_clip
-from astropy.table import Table, Column
+from astropy.table import Table, Column, MaskedColumn
 from astropy.time import Time
 import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
@@ -864,16 +864,25 @@ def add_catalog_figure_elements(provider, tpf, fig, message_selected_target, arr
         size=sizes,
     )
     provider.add_to_data_source(result, source)
+    # Workaround https://github.com/bokeh/bokeh/issues/13904
     # Convert astropy column to plain ndarray, otherwise some columns (MaskedColumn of type int)
     # could raise error during bokeh's serialization:
     # ValueError: cannot convert float NaN to integer
     # ...
     # numpy.ma TypeError: Cannot convert fill_value nan to dtype int64
-    # TODO: the conversion could lead to some issues if certain values are genuinely missing
     for c in source.keys():
         val = source[c]
+        if isinstance(val, (MaskedColumn, np.ma.MaskedArray)):
+            if np.issubdtype(val.dtype, np.integer):
+                # use the default fill_value.
+                # It might not be what one actually wants, but that's the best we could do
+                val = val.filled()
+            else:
+                # mimic bokeh's serialization logic (which ignores fill_value, as it's often untrustworthy)
+                val = val.filled(np.nan)
+        # to be on the safe side, convert astropy Column to nd array to avoid any behavioral difference
         if isinstance(val, Column):
-            source[c] = np.asarray(val, val.dtype)
+            source[c] = val.value
 
     source = ColumnDataSource(source)
 
