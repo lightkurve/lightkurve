@@ -6,6 +6,7 @@ import astropy.units as u
 
 from astropy.coordinates import SkyCoord
 from astropy.table import Table, MaskedColumn
+from astropy.time import Time
 
 import numpy as np
 
@@ -72,17 +73,28 @@ def _do_remote_query(query_url):
 def _parse_response(result):
     result = result.get("VSXObjects")
     if result is None:
-        return None
+        result = {}
     result = result.get("VSXObject")
     if result is None:
-        return None  # TODO: create an minimal empty table
+        result = []  # for minimal empty table
 
     tab = Table(rows=result)
+
+    # ensure it has the needed columns (the JSON result from VSX API would skip columns with no data)
+    for c in ["RA2000", "Declination2000", "Epoch", "Period"]:
+        if c not in tab.colnames:
+            tab[c] = np.nan
+    for c in ["ProperMotionRA", "ProperMotionDec"]:
+        # dummy PM needs to be zero for proper motion correction to work correctly
+        if c not in tab.colnames:
+            tab[c] = 0.0
+    for c in ["Name", "OID", "VariabilityType", "SpectralType", "MaxMag", "MinMag"]:
+        if c not in tab.colnames:
+            tab[c] = ""
 
     # use the column names in Vizier.
     # Note: pmRA and pmDE are not in Vizier, but the names are common
     # column names in Vizier
-    # TODO: handle cases sometimes columns such as SpectralType does not exist
     tab.rename_columns(
         [
             "RA2000",
@@ -103,23 +115,20 @@ def _parse_response(result):
     )
 
     for c in ["RAJ2000", "DEJ2000"]:
-        if c in tab.colnames:
-            tab[c] = tab[c].astype(float)
-            tab[c].unit = u.deg
+        tab[c] = tab[c].astype(float)
+        tab[c].unit = u.deg
 
     for c in ["pmRA", "pmDE"]:
-        if c in tab.colnames:
-            if isinstance(tab[c], MaskedColumn):
-                tab[c].fill_value = np.nan
-            tab[c] = tab[c].astype(float)
-            tab[c].unit = u.mas / u.year
+        if isinstance(tab[c], MaskedColumn):
+            tab[c].fill_value = np.nan
+        tab[c] = tab[c].astype(float)
+        tab[c].unit = u.mas / u.year
 
     for c in ["Period", "Epoch"]:
-        if c in tab.colnames:
-            val_uncertain_flag = [_parse_number_with_uncertainty_flag(v) for v in tab[c]]
-            tab[c] = [t[0] for t in val_uncertain_flag]
-            tab[c].unit = u.day
-            tab[f"u_{c}"] = [t[1] for t in val_uncertain_flag]
+        val_uncertain_flag = [_parse_number_with_uncertainty_flag(v) for v in tab[c]]
+        tab[c] = [t[0] for t in val_uncertain_flag]
+        tab[c].unit = u.day
+        tab[f"u_{c}"] = [t[1] for t in val_uncertain_flag]
 
     tab["OID"] = tab["OID"].astype(int)
 
@@ -130,6 +139,7 @@ def _parse_response(result):
         max_parsed = [_parse_limit_mag_uncertainty_band(v) for v in tab["MaxMag"]]
         tab["l_max"] = [t["l"] for t in max_parsed]
         tab["max"] = [t["mag"] for t in max_parsed]
+        tab["max"] = tab["max"].astype(float)  # needed in case if the parsed data has nan
         tab["max"].unit = u.mag
         tab["u_max"] = [t["u"] for t in max_parsed]
         tab["n_max"] = [t["band"] for t in max_parsed]
@@ -139,6 +149,8 @@ def _parse_response(result):
         min_parsed = [_parse_limit_mag_amp_uncertainty_band(v) for v in tab["MinMag"]]
         tab["l_min"] = [t["l"] for t in min_parsed]
         tab["min"] = [t["mag"] for t in min_parsed]
+        tab["min"] = tab["min"].astype(float)  # needed in case if the parsed data has nan
+        tab["min"].unit = u.mag
         tab["f_min"] = [t["a"] for t in min_parsed]  # amplitude, Y or ""
         tab["u_min"] = [t["u"] for t in min_parsed]
         tab["n_min"] = [t["band"] for t in min_parsed]
@@ -165,5 +177,92 @@ def _query_cone_region(ra2000, dec2000, radius_deg, magnitude_limit=None):
     return _parse_response(result)
 
 
+def _to_mag_text(tab):
+    def _do_to_text(r):  # for one row
+        if np.isnan(r["min"]):
+            # no range / amplitude
+            return f'{r["l_max"]}{r["max"]}{r["u_max"]} {r["n_max"]}'
+
+        # show max - min or mag (amplitude)
+        if r["n_max"] == r["n_min"]:
+            # passband the same, abbreviate them to be shown only
+            n_max, n_min = "", f' {r["n_min"]}'
+        else:
+            n_max, n_min = f' {r["n_max"]}', f' {r["n_min"]}'
+
+        if r["f_min"] != "Y":
+            # max mag - min mag format
+            return f'{r["l_max"]}{r["max"]}{r["u_max"]}{n_max} - {r["l_min"]}{r["min"]}{r["u_min"]}{n_min}'
+        else:
+            # magnitude - amplitude format
+            return f'{r["l_max"]}{r["max"]}{r["u_max"]}{n_max}  ({r["l_min"]}{r["min"]}{r["u_min"]}){n_min}'
+
+    return [_do_to_text(row) for row in tab]
+
+
 class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
-    pass
+
+    extra_cols_for_source = [
+        "Name",
+        "OID",
+        "Type",
+        "Period",
+        "magText",
+    ]
+
+    label: str = "VSX"
+
+    J2000 = Time(2000.0, format="jyear", scale="tt")
+
+    def init(
+        self,
+        coord: SkyCoord,
+        radius: Union[float, u.Quantity],
+        magnitude_limit: float,
+        scatter_kwargs: dict = None,
+    ) -> None:
+        if scatter_kwargs is None:
+            scatter_kwargs = dict(
+                marker="x",
+                line_color="firebrick",
+                line_width=2,
+            )
+        super().init(coord, radius, magnitude_limit, scatter_kwargs)
+
+    def query_catalog(self) -> Table:
+        cj2000 = self.coord.transform_to("icrs")
+        rs = _query_cone_region(
+            cj2000.ra.to(u.deg).value, cj2000.dec.to(u.deg).value, self.radius.to(u.deg).value, self.magnitude_limit
+        )
+        rs["magForSize"] = 10  # use constant marker size
+        rs["magText"] = _to_mag_text(rs)
+        return rs
+
+    def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
+        return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", self.J2000)
+
+    def get_tooltips(self) -> list:
+        return [
+            ("Name", "@Name"),
+            ('Separation (")', "@separation{0.00}"),
+            ("Type", "@Type"),
+            ("Magnitude", "@magText"),
+            ("RA", "@ra{0,0.00000000}"),
+            ("DEC", "@dec{0,0.00000000}"),
+            ("column", "@x{0.0}"),
+            ("row", "@y{0.0}"),
+        ]
+
+    def get_detail_view(self, data: dict) -> Tuple[dict, list]:
+        vsx_url = f"https://www.aavso.org/vsx/index.php?view=detail.top&oid={data['OID']}"
+        return {
+            "Name": f"""{data['Name']} (<a href="{vsx_url}" target="_blank">VSX</a>)""",
+            'Separation (")': f"{data['separation']:.2f}",
+            "Variability type": data["Type"],
+            "Magnitude": data["magText"],
+            "Period (d)": data["Period"],
+            "RA": f"{data['ra']:.8f}",
+            "DEC": f"{data['dec']:.8f}",
+            "column": f"{data['x']:.1f}",
+            "row": f"{data['y']:.1f}",
+        }, None
