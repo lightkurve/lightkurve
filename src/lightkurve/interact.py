@@ -1134,6 +1134,9 @@ def _create_catalog_provider(name):
     elif name == "ztf":
         from . import interact_sky_provider_ztf as ztf
         return ztf.ZTFInteractSkyCatalogProvider()
+    elif name == "vsx":
+        from . import interact_sky_provider_vsx as vsx
+        return vsx.VSXInteractSkyCatalogProvider()
     else:
         raise ValueError(f"Unsupported catalog: {name}")
 
