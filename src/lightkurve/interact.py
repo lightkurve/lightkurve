@@ -61,6 +61,22 @@ except Exception as e:
     _BOKEH_IMPORT_ERROR = e
 
 
+def _fill_masked_or_nan_with(ary, fill_value):
+    if not isinstance(ary, np.ndarray):
+        # assume to be scalar
+        if np.isnan(ary) or ary is np.ma.masked:
+            return fill_value
+        else:
+            return ary
+
+    # case ndarray (also astropy Column)
+    ary = ary.copy()
+    ary[np.isnan(ary)] = fill_value
+    if isinstance(ary, np.ma.MaskedArray):  # also astropy MaskedColumn
+        ary = ary.filled(fill_value)
+    return ary
+
+
 def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
     """Return proper-motion corrected RA / Dec.
        It also return whether proper motion correction is applied or not."""
@@ -71,12 +87,18 @@ def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
        equinox is None:
         return ra, dec, False
 
+    # handle cases pm_ra, pm_dec has some nan or masked value
+    # we treat them as 0 for the PM correction below
+    # (otherwise the result would be nan)
+    pm_ra = _fill_masked_or_nan_with(pm_ra, 0.0)
+    pm_dec = _fill_masked_or_nan_with(pm_dec, 0.0)
+
     # To be more accurate, we should have supplied distance to SkyCoord
     # in theory, for Gaia DR2 data, we can infer the distance from the parallax provided.
     # It is not done for 2 reasons:
     # 1. Gaia DR2 data has negative parallax values occasionally. Correctly handling them could be tricky. See:
     #    https://www.cosmos.esa.int/documents/29201/1773953/Gaia+DR2+primer+version+1.3.pdf/a4459741-6732-7a98-1406-a1bea243df79
-    # 2. For our purpose (ploting in various interact usage) here, the added distance does not making
+    # 2. For our purpose (plotting in various interact usage) here, the added distance does not making
     #    noticeable significant difference. E.g., applying it to Proxima Cen, a target with large parallax
     #    and huge proper motion, does not change the result in any noticeable way.
     #

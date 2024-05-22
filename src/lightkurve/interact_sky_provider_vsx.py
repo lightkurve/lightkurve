@@ -81,13 +81,9 @@ def _parse_response(result):
     tab = Table(rows=result)
 
     # ensure it has the needed columns (the JSON result from VSX API would skip columns with no data)
-    for c in ["RA2000", "Declination2000", "Epoch", "Period"]:
+    for c in ["RA2000", "Declination2000", "ProperMotionRA", "ProperMotionDec", "Epoch", "Period"]:
         if c not in tab.colnames:
             tab[c] = np.nan
-    for c in ["ProperMotionRA", "ProperMotionDec"]:
-        # dummy PM needs to be zero for proper motion correction to work correctly
-        if c not in tab.colnames:
-            tab[c] = 0.0
     for c in ["Name", "OID", "VariabilityType", "SpectralType", "MaxMag", "MinMag"]:
         if c not in tab.colnames:
             tab[c] = ""
