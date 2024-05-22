@@ -498,8 +498,10 @@ def add_catalog_figure_elements(provider, tpf, fig, message_selected_target, arr
                 # mimic bokeh's serialization logic (which ignores fill_value, as it's often untrustworthy)
                 val = val.filled(np.nan)
         # to be on the safe side, convert astropy Column to nd array to avoid any behavioral difference
-        if isinstance(val, Column):
+        if hasattr(val, "value"):  # Column, Quantity, etc.
             source[c] = val.value
+        else:
+            source[c] = val
 
     source = ColumnDataSource(source)
 
