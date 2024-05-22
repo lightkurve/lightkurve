@@ -50,6 +50,8 @@ try:
         Arrow,
         VeeHead,
         InlineStyleSheet,
+        Row,
+        Column,
     )
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
@@ -1163,6 +1165,33 @@ def _create_catalog_provider(name):
         raise ValueError(f"Unsupported catalog: {name}")
 
 
+def _create_select_catalog_ui(providers, catalog_renderers):
+    select_catalog_ui = CheckboxGroup(
+        labels=[p.label for p in providers],
+        active=list(range(0, len(providers))),  # make all checked
+        inline=True,
+        )
+    # add more horizontal spacing between checkboxes
+    select_catalog_ui.stylesheets = [InlineStyleSheet(css="""\
+.bk-input-group.bk-inline > label {
+margin: 5px 10px;
+}
+""")]
+
+    def select_catalog_handler(attr, old, new):
+        # new is the list of indices of active (i.e., checked) catalogs
+        for i in range(len(catalog_renderers)):
+            r = catalog_renderers[i]
+            if i in new:
+                r.visible = True
+            else:
+                r.visible = False
+
+    select_catalog_ui.on_change("active", select_catalog_handler)
+
+    return select_catalog_ui
+
+
 def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=None, magnitude_limit=18):
     """skyview
 
@@ -1285,31 +1314,20 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=
 
         # Layout all of the plots
         if len(catalogs) < 2:
-            widgets_and_figures = layout([fig_tpf, message_selected_target], stretch_slider)
-        else:
-            select_catalog_ui = CheckboxGroup(
-                labels=[p.label for p in providers],
-                active=list(range(0, len(catalogs))),  # make all checked
-                inline=True,
+            widgets_and_figures = layout(
+                Row(
+                    Column(fig_tpf, stretch_slider),
+                    message_selected_target,
                 )
-            # add more horizontal spacing between checkboxes
-            select_catalog_ui.stylesheets = [InlineStyleSheet(css="""\
-.bk-input-group.bk-inline > label {
-    margin: 5px 10px;
-}
-""")]
-
-            def select_catalog_handler(attr, old, new):
-                # new is the list of indices of active (i.e., checked) catalogs
-                for i in range(len(catalog_renderers)):
-                    r = catalog_renderers[i]
-                    if i in new:
-                        r.visible = True
-                    else:
-                        r.visible = False
-
-            select_catalog_ui.on_change("active", select_catalog_handler)
-            widgets_and_figures = layout([fig_tpf, message_selected_target], select_catalog_ui, stretch_slider)
+            )
+        else:
+            select_catalog_ui = _create_select_catalog_ui(providers, catalog_renderers)
+            widgets_and_figures = layout(
+                Row(
+                    Column(fig_tpf,  select_catalog_ui, stretch_slider),
+                    message_selected_target,
+                )
+            )
         doc.add_root(widgets_and_figures)
 
     output_notebook(verbose=False, hide_banner=True)
