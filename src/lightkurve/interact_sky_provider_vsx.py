@@ -12,11 +12,14 @@ import numpy as np
 
 import requests
 
+from . import LightkurveError
 from .interact_sky_provider import ProperMotionCorrectionMeta, InteractSkyCatalogProvider
 
 
 def _parse_limit_mag_uncertainty_band(text):
-    if text is np.ma.masked:
+    # to handle case input is number (i.e., the origin astropy column is of type float)
+    text = str(text)
+    if text == "--" or text == "nan":  # string  representation of np.ma.masked and nan respectively
         return dict(l="", mag=np.nan, u="", band="")
 
     # handle text such as 12.9 V
@@ -33,7 +36,9 @@ def _parse_limit_mag_uncertainty_band(text):
 
 
 def _parse_limit_mag_amp_uncertainty_band(text):
-    if text is np.ma.masked:
+    # to handle case input is number (i.e., the origin astropy column is of type float)
+    text = str(text)
+    if text == "--" or text == "nan":  # string  representation of np.ma.masked and nan respectively
         return dict(l="", mag=np.nan, u="", band="", a="")
 
     no_amp_res = _parse_limit_mag_uncertainty_band(text)  # limit flag has already been extracted
@@ -53,8 +58,11 @@ def _parse_limit_mag_amp_uncertainty_band(text):
 
 
 def _parse_number_with_uncertainty_flag(text):
-    if text is np.ma.masked:
+    # to handle case input is number (i.e., the origin astropy column is of type float)
+    text = str(text)
+    if text == "--" or text == "nan":  # string  representation of np.ma.masked and nan respectively
         return np.nan, ""
+
     matches = re.match(r"\s*(-?\d+([.]\d+)?)(:?)\s*", text)
     if matches is None:
         # parse unexpectedly failed, put the entire text in uncertain flag for now
@@ -170,7 +178,10 @@ def _query_cone_region(ra2000, dec2000, radius_deg, magnitude_limit=None):
         query_url += f"&tomag={magnitude_limit}"
 
     result = _do_remote_query(query_url)
-    return _parse_response(result)
+    try:
+        return _parse_response(result)
+    except Exception as e:
+        raise LightkurveError(f"Unexpected error in parsing VSX result from {query_url}", e)
 
 
 def _to_mag_text(tab):
