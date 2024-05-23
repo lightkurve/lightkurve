@@ -56,7 +56,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
 
     # Gaia DR3 Vizier specific
     catalog_name = "I/355/gaiadr3"
-    columns = ["*", "RAJ2000", "DEJ2000"]
+    columns = ["*", "RAJ2000", "DEJ2000", "VarFlag"]
     magnitude_limit_column_name = "Gmag"
 
     label: str = "Gaia DR3"
@@ -72,6 +72,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         "Source",
         "Gmag",
         "Plx",
+        "VarFlag",
     ]
 
     extra_cols_in_detail_view = None
@@ -128,6 +129,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             ("DEC", "@dec{0,0.00000000}"),
             ("column", "@x{0.0}"),
             ("row", "@y{0.0}"),
+            ("Variable", "@VarFlag"),
         ]
 
     def get_detail_view(self, data: dict) -> Tuple[dict, list]:
@@ -150,6 +152,14 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             source_val_html = ""
             extra_rows = []
 
+        var_html = data["VarFlag"]
+        if var_html == "VARIABLE":
+            gaiadr3_var_url = (
+                "https://vizier.cds.unistra.fr/viz-bin/VizieR-4?-source=+I%2F358%2Fvarisum+I%2F358%2Fvclassre"
+                f"&Source={data['Source']}"
+            )
+            var_html += f' (<a href="{gaiadr3_var_url}" target="_blank">Vizier</a>)'
+
         key_vals = {
             "Source": source_val_html,
             'Separation (")': f"{data['separation']:.2f}",
@@ -159,6 +169,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             "DEC": f"{data['dec']:.8f}",
             "column": f"{data['x']:.1f}",
             "row": f"{data['y']:.1f}",
+            "Variable": var_html,
         }
 
         if self.extra_cols_in_detail_view is not None:
