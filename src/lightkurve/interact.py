@@ -451,6 +451,10 @@ def init_provider(provider, tpf, magnitude_limit, extra_kwargs=None):
 def add_catalog_figure_elements(provider, tpf, fig, message_selected_target, arrow_4_selected):
 
     result = provider.query_catalog()
+    if result is None:
+        # case empty result, return a dummy renderer
+        return fig.scatter()
+
     # do proper motion correction, if needed
     m = provider.get_proper_motion_correction_meta()
     if m is not None:

@@ -81,10 +81,13 @@ def _do_remote_query(query_url):
 def _parse_response(result):
     result = result.get("VSXObjects")
     if result is None:
-        result = {}
+        return None
+    if not isinstance(result, dict):
+        # handle no result case (which is an empty list)
+        return None
     result = result.get("VSXObject")
     if result is None:
-        result = []  # for minimal empty table
+        return None
 
     tab = Table(rows=result)
 
@@ -241,8 +244,9 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         rs = _query_cone_region(
             cj2000.ra.to(u.deg).value, cj2000.dec.to(u.deg).value, self.radius.to(u.deg).value, self.magnitude_limit
         )
-        rs["magForSize"] = 10  # use constant marker size
-        rs["magText"] = _to_mag_text(rs)
+        if rs is not None:
+            rs["magForSize"] = 10  # use constant marker size
+            rs["magText"] = _to_mag_text(rs)
         return rs
 
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
