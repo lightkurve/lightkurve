@@ -34,9 +34,10 @@ from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError, final
 log = logging.getLogger(__name__)
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
+_BOKEH_IMPORT_ERROR = None
 try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
-    from bokeh.io import show, output_notebook, push_notebook
+    from bokeh.io import show, output_notebook
     from bokeh.plotting import figure, ColumnDataSource
     from bokeh.models import (
         LogColorMapper,
@@ -55,9 +56,10 @@ try:
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button, Div
     from bokeh.models.formatters import PrintfTickFormatter
-except ImportError:
+except Exception as e:
     # We will print a nice error message in the `show_interact_widget` function
-    pass
+    # the error would be raised there in case users need to diagnose problems
+    _BOKEH_IMPORT_ERROR = e
 
 
 def _search_nearby_of_tess_target(tic_id):
@@ -336,7 +338,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
         nonselection_line_color="gray",
         nonselection_line_alpha=1.0,
     )
-    circ = fig.circle(
+    circ = fig.scatter(
         "time",
         "flux",
         source=lc_source,
@@ -605,7 +607,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         ]
     tooltips = tooltips_extras + tooltips
 
-    r = fig.circle(
+    r = fig.scatter(
         "x",
         "y",
         source=source,
@@ -637,7 +639,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     if target_ra is not None and target_dec is not None:
         pix_x, pix_y = tpf.wcs.all_world2pix([(target_ra, target_dec)], 0)[0]
         target_x, target_y = tpf.column + pix_x, tpf.row + pix_y
-        fig.cross(x=target_x, y=target_y, size=20, color="black", line_width=1)
+        fig.scatter(marker="cross", x=target_x, y=target_y, size=20, color="black", line_width=1)
         if not pm_corrected:
             warnings.warn(("Proper motion correction cannot be applied to the target, as none is available. "
                            "Thus the target (the cross) might be noticeably away from its actual position, "
@@ -1065,19 +1067,12 @@ def show_interact_widget(
     cmap: str
         Colormap to use for tpf plot. Default is 'Viridis256'
     """
-    try:
-        import bokeh
-
-        if bokeh.__version__[0] == "0":
-            warnings.warn(
-                "interact() requires Bokeh version 1.0 or later", LightkurveWarning
-            )
-    except ImportError:
+    if _BOKEH_IMPORT_ERROR is not None:
         log.error(
             "The interact() tool requires the `bokeh` Python package; "
             "you can install bokeh using e.g. `conda install bokeh`."
         )
-        return None
+        raise _BOKEH_IMPORT_ERROR
 
     notebook_url = finalize_notebook_url(notebook_url)
 
@@ -1339,19 +1334,12 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitud
     magnitude_limit : float
         A value to limit the results in based on Gaia Gmag. Default, 18.
     """
-    try:
-        import bokeh
-
-        if bokeh.__version__[0] == "0":
-            warnings.warn(
-                "interact_sky() requires Bokeh version 1.0 or later", LightkurveWarning
-            )
-    except ImportError:
+    if _BOKEH_IMPORT_ERROR is not None:
         log.error(
             "The interact_sky() tool requires the `bokeh` Python package; "
             "you can install bokeh using e.g. `conda install bokeh`."
         )
-        return None
+        raise _BOKEH_IMPORT_ERROR
 
     notebook_url = finalize_notebook_url(notebook_url)
 

@@ -627,10 +627,20 @@ def centroid_quadratic(data, mask=None):
     """
     if isinstance(data, u.Quantity):
         data = data.value
+
+    if np.issubdtype(data.dtype, int):
+        # multiple code paths below require data be of float type
+        # proactively convert int to float once and for all.
+        data = data.astype(float)
+
     # Step 1: identify the patch of 3x3 pixels (z_)
     # that is centered on the brightest pixel (xx, yy)
     if mask is not None:
-        data = data * mask
+        # mask handling.
+        # Issue 1401 demonstrates that using 'data' to find the max will break when all flux is negative
+        # set masked pixels NaN (instead of 0) to resolve it.
+        data = data.copy()
+        data[~mask] = np.nan
     arg_data_max = np.nanargmax(data)
     yy, xx = np.unravel_index(arg_data_max, data.shape)
     # Make sure the 3x3 patch does not leave the TPF bounds
@@ -644,6 +654,13 @@ def centroid_quadratic(data, mask=None):
         xx = data.shape[1] - 2
 
     z_ = data[yy - 1 : yy + 2, xx - 1 : xx + 2]
+    if np.any(np.isnan(z_)):
+        # handle edge case the 3X3 patch has NaN
+        # Need some finite value for NaN pixels for the
+        # quadratic fit below: use the mean of the 3x3 patch
+        # to reduce the skew
+        z_ = z_.copy()
+        z_[np.isnan(z_)] = np.nanmean(z_)
 
     # Next, we will fit the coefficients of the bivariate quadratic with the
     # help of a design matrix (A) as defined by Eqn 20 in Vakili & Hogg

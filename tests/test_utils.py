@@ -165,24 +165,65 @@ def test_centroid_quadratic():
     assert np.isclose(row, 5) & np.isclose(col, 1.5)
 
 
-def test_centroid_quadratic_robustness():
-    """Test quadratic centroids in edge cases; regression test for #610."""
+# create a mask that'd mask out first 2 rows
+a_mask = np.full((5, 5), True, dtype=bool)
+a_mask[0:2, :] = False
+
+@pytest.mark.parametrize("data_dtype, mask", [
+    (float, None),
+    (float, a_mask),
+    (int, None),
+    (int, a_mask),
+    ])
+def test_centroid_quadratic_robustness(data_dtype, mask):
+    """Test quadratic centroids in edge cases; regression test for #610, etc."""
     # Brightest pixel in upper left
-    data = np.zeros((5, 5))
+    data = np.zeros((5, 5), dtype=data_dtype)
     data[0, 0] = 1
-    centroid_quadratic(data)
+    centroid_quadratic(data, mask=mask)
+    col, row = centroid_quadratic(data, mask=mask)
+    if mask is None:
+        assert np.isfinite(col) & np.isfinite(row)
+    else:
+        # the mask (of top 2 rows) would make the eligible pixels to be uniformly at 0
+        # no centroid can be calculated in such case.
+        assert np.isnan(col) & np.isnan(row)
 
     # Brightest pixel in bottom right
-    data = np.zeros((5, 5))
+    data = np.zeros((5, 5), dtype=data_dtype)
     data[-1, -1] = 1
-    centroid_quadratic(data)
+    col, row = centroid_quadratic(data, mask=mask)
+    assert np.isfinite(col) & np.isfinite(row)
 
     # Data contains a NaN
-    data = np.zeros((5, 5))
-    data[0, 0] = np.nan
-    data[-1, -1] = 10
-    col, row = centroid_quadratic(data)
+    if data_dtype is float:  # NaN only applicable to float
+        data = np.zeros((5, 5), dtype=data_dtype)
+        data[0, 0] = np.nan
+        data[-1, -1] = 10
+        col, row = centroid_quadratic(data, mask=mask)
+        assert np.isfinite(col) & np.isfinite(row)
+
+    # has NaN in the identified 3x3 patch
+    if data_dtype is float:  # NaN only applicable to float
+        data = np.zeros((5, 5), dtype=data_dtype)
+        data[3, 2] = 10
+        data[3, 3] = np.nan
+        col, row = centroid_quadratic(data, mask=mask)
+        assert np.isfinite(col) & np.isfinite(row)
+
+    # Data contains are all negative (#1401 case `mask` is specified)
+    # e.g., in a difference image
+    data = np.full((5, 5), -9, dtype=data_dtype)
+    data[3, 2] = -5
+    col, row = centroid_quadratic(data, mask=mask)
     assert np.isfinite(col) & np.isfinite(row)
+
+    # case the 3x3 patch contains masked pixels
+    if mask is not None:
+        data = np.zeros((5, 5), dtype=data_dtype)
+        data[2, 1] = 10  # the row above is masked
+        col, row = centroid_quadratic(data, mask=mask)
+        assert np.isfinite(col) & np.isfinite(row)
 
 
 def test_show_citation_instructions():
