@@ -9,7 +9,7 @@ from astropy.time import Time
 
 from astroquery.vizier import Vizier
 
-from .interact_sky_provider import ProperMotionCorrectionMeta, InteractSkyCatalogProvider
+from .core import ProperMotionCorrectionMeta, InteractSkyCatalogProvider
 
 
 def _query_cone_region(coord, radius, catalog, columns=["*"], query_kwargs=dict()) -> Table:
