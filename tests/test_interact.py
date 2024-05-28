@@ -1,6 +1,9 @@
 """Tests the features of the lightkurve.interact module."""
 import warnings
 
+from astropy.table import Table
+from astropy.time import Time
+from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -11,7 +14,7 @@ from lightkurve.search import search_targetpixelfile
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from .test_targetpixelfile import filename_tpf_tabby_lite
 from lightkurve.interact import get_lightcurve_y_limits
-
+from lightkurve.interact_sky_providers import InteractSkyCatalogProvider, ProperMotionCorrectionMeta
 
 bad_optional_imports = False
 try:
@@ -170,8 +173,81 @@ def test_interact_functions():
     make_tpf_figure_elements(tpf, tpf_source)
     show_interact_widget(tpf)
 
+#
+# Tests for interact_sky()
+#
 
-@pytest.mark.remote_data
+
+class AbstractStubInteractSkyCatalogProvider(InteractSkyCatalogProvider):
+
+    def query_catalog(self):
+        if self.stub_data is None:
+            return None
+        tab = Table.read(self.stub_data, format="ascii")
+        for c in tab.colnames:
+            if c.lower() == "mag":
+                tab[c].unit = u.mag
+            elif c.lower() in ["pmra", "pmde"]:
+                tab[c].unit = u.mas / u.year
+            elif c.startswith("RA") or c.startswith("DE"):
+                tab[c].unit = u.deg
+        tab["magForSize"] = tab["Mag"]
+        return tab
+
+    def get_tooltips(self):
+        return [
+            ("ID", "@ID"),
+            ("Mag", "@Mag"),
+        ]
+
+    def get_detail_view(self, data):
+        return {
+            "ID": data["ID"],
+            "Mag": data["Mag"],
+            }, None
+
+
+class StubNoPMInteractSkyCatalogProvider(AbstractStubInteractSkyCatalogProvider):
+    label = "stub_no_pm"
+
+    stub_data = """\
+    ID,RA,DEC,Mag
+    1,30.00,45.00,11.0
+    2,30.01,45.01,12.0
+"""
+
+    def get_proper_motion_correction_meta(self):
+        return None
+
+
+class StubWithPMInteractSkyCatalogProvider(AbstractStubInteractSkyCatalogProvider):
+    label = "stub_with_pm"
+
+    stub_data = """\
+    ID,RAJ2000,DEJ2000,pmRA,pmDE,Mag
+    1,30.00,45.00,1.1,1.2,11.0
+    2,30.01,45.01,1.1,1.2,12.0
+"""
+
+    def get_proper_motion_correction_meta(self):
+        J2000 = Time(2000.0, format="jyear", scale="tt")
+        return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", J2000)
+
+class StubEmptyResultInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProvider):
+    label = "stub_empty_result"
+
+    stub_data = """\
+    ID,RAJ2000,DEJ2000,pmRA,pmDE,Mag
+"""
+
+
+class StubNoneResultInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProvider):
+    label = "stub_empty_result"
+
+    # some providers would return None for Empty result
+    stub_data = None
+
+
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 @pytest.mark.filterwarnings("ignore:Proper motion correction cannot be applied to the target")  # for TESSCut
 @pytest.mark.parametrize("tpf_class, tpf_file, aperture_mask", [
@@ -186,33 +262,54 @@ def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
     from lightkurve.interact import (
         prepare_tpf_datasource,
         make_tpf_figure_elements,
+        add_target_figure_elements,
+        make_interact_sky_selection_elements,
+        init_provider,
+        add_catalog_figure_elements
     )
     tpf = tpf_class(tpf_file)
     mask = tpf._parse_aperture_mask(aperture_mask)
     tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
-    fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source, tpf_source_selectable=False)
-    # TODO: interact_sky() refactor
-    # add_gaia_figure_elements(tpf, fig1)
-    # add_gaia_figure_elements(tpf, fig1, magnitude_limit=22)
+    fig_tpf, slider1 = make_tpf_figure_elements(tpf, tpf_source, tpf_source_selectable=False)
+    add_target_figure_elements(tpf, fig_tpf)
+    message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
+
+    for provider in [
+        StubNoPMInteractSkyCatalogProvider(),
+        StubWithPMInteractSkyCatalogProvider(),
+        # test boundary cases
+        StubEmptyResultInteractSkyCatalogProvider(),
+        StubNoneResultInteractSkyCatalogProvider(),
+    ]:
+        init_provider(provider, tpf, magnitude_limit=18)
+        renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
+        assert renderer is not None
 
 
-@pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_sky_functions_case_no_target_coordinate():
     import bokeh
     from lightkurve.interact import (
         prepare_tpf_datasource,
         make_tpf_figure_elements,
+        add_target_figure_elements,
+        make_interact_sky_selection_elements,
+        init_provider,
+        add_catalog_figure_elements
     )
     tpf_class, tpf_file = TessTargetPixelFile, example_tpf_no_target_position
 
     tpf = tpf_class(tpf_file)
     mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
     tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
-    fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source)
-    # TODO: interact_sky() refactor
-    # with pytest.raises(LightkurveError, match=r".* no valid coordinate.*"):
-    #     add_gaia_figure_elements(tpf, fig1)
+    fig_tpf, slider1 = make_tpf_figure_elements(tpf, tpf_source)
+    add_target_figure_elements(tpf, fig_tpf)
+    message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
+
+    with pytest.raises(LightkurveError, match=r".* no valid coordinate.*"):
+        provider = StubWithPMInteractSkyCatalogProvider()
+        init_provider(provider, tpf, magnitude_limit=18)
+        add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
 
 
 # TODO: interact_sky() refactor
